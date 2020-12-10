@@ -1,0 +1,35 @@
+<div class="crm-flex-box">
+  <div>
+    <div class="form-inline">
+      <label ng-if="loading && $ctrl.rowCount === false"><i class="crm-i fa-spin fa-spinner"></i></label>
+      <label ng-if="$ctrl.rowCount === 1">
+        {{ $ctrl.selectedRows.length ? ts('%1 selected of 1 result', {1: $ctrl.selectedRows.length}) : ts('1 result') }}
+      </label>
+      <label ng-if="$ctrl.rowCount === 0 || $ctrl.rowCount > 1">
+        {{ $ctrl.selectedRows.length ? ts('%1 selected of %2 results', {1: $ctrl.selectedRows.length, 2: $ctrl.rowCount}) : ts('%1 results', {1: $ctrl.rowCount}) }}
+      </label>
+    </div>
+  </div>
+  <div class="text-center crm-flex-2">
+    <ul uib-pagination ng-if="$ctrl.rowCount && !$ctrl.stale"
+        class="pagination"
+        boundary-links="true"
+        total-items="$ctrl.rowCount"
+        ng-model="$ctrl.page"
+        ng-change="$ctrl.changePage()"
+        items-per-page="$ctrl.limit"
+        max-size="6"
+        force-ellipses="true"
+        previous-text="&lsaquo;"
+        next-text="&rsaquo;"
+        first-text="&laquo;"
+        last-text="&raquo;"
+    ></ul>
+  </div>
+  <div class="form-inline text-right">
+    <label for="crm-search-results-page-size" >
+      {{:: ts('Page size:') }}
+    </label>
+    <input class="form-control" id="crm-search-results-page-size" type="number" ng-model="$ctrl.limit" min="10" step="10" ng-change="onChangeLimit()">
+  </div>
+</div>

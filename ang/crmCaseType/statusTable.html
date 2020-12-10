@@ -6,8 +6,8 @@ Required vars: selectedStatuses
   <thead>
   <tr>
     <th></th>
-    <th>{{ts('Name')}}</th>
-    <th>{{ts('Class')}}</th>
+    <th>{{:: ts('Name') }}</th>
+    <th>{{:: ts('Class') }}</th>
   </tr>
   </thead>
 
@@ -28,7 +28,7 @@ Required vars: selectedStatuses
   <tfoot>
   <tr>
     <td></td>
-    <td><a class="crm-hover-button action-item" ng-click="newStatus()" href><i class="crm-i fa-plus"></i> {{ ts('New Status') }}</a></td>
+    <td><a class="crm-hover-button action-item" ng-click="newStatus()" href><i class="crm-i fa-plus" aria-hidden="true"></i> {{:: ts('New Status') }}</a></td>
     <td></td>
   </tr>
   </tfoot>

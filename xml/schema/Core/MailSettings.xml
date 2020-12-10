@@ -150,4 +150,26 @@
       <type>Select</type>
     </html>
   </field>
+  <field>
+    <name>is_non_case_email_skipped</name>
+    <title>Skip emails which do not have a Case ID or Case hash</title>
+    <type>boolean</type>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <comment>Enabling this option will have CiviCRM skip any emails that do not have the Case ID or Case Hash so that the system will only process emails that can be placed on case records. Any emails that are not processed will be moved to the ignored folder.</comment>
+    <add>5.31</add>
+  </field>
+  <field>
+    <name>is_contact_creation_disabled_if_no_match</name>
+    <type>boolean</type>
+    <title>Do not create new contacts when filing emails</title>
+    <default>0</default>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <description>If this option is enabled, CiviCRM will not create new contacts when filing emails.</description>
+    <add>5.31</add>
+  </field>
 </table>

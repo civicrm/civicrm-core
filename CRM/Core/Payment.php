@@ -1,32 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 use Civi\Payment\System;
 use Civi\Payment\Exception\PaymentProcessorException;
+use Civi\Payment\PropertyBag;
 
 /**
  * Class CRM_Core_Payment.
@@ -81,7 +66,7 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_END = 'END';
 
   /**
-   * @var object
+   * @var array
    */
   protected $_paymentProcessor;
 
@@ -109,7 +94,7 @@ abstract class CRM_Core_Payment {
   /**
    * Processor type label.
    *
-   * (Deprecated parameter but used in some messages).
+   * (Deprecated unused parameter).
    *
    * @var string
    * @deprecated
@@ -150,6 +135,63 @@ abstract class CRM_Core_Payment {
   protected $backOffice = FALSE;
 
   /**
+   * This is only needed during the transitional phase. In future you should
+   * pass your own PropertyBag into the method you're calling.
+   *
+   * New code should NOT use $this->propertyBag.
+   *
+   * @var Civi\Payment\PropertyBag
+   */
+  protected $propertyBag;
+
+  /**
+   * Return the payment instrument ID to use.
+   *
+   * Note:
+   * We normally SHOULD be returning the payment instrument of the payment processor.
+   * However there is an outstanding case where this needs overriding, which is
+   * when using CRM_Core_Payment_Manual which uses the pseudoprocessor (id = 0).
+   *
+   * i.e. If you're writing a Payment Processor you should NOT be using
+   * setPaymentInstrumentID() at all.
+   *
+   * @todo
+   * Ideally this exception-to-the-rule should be handled outside of this class
+   * i.e. this class's getPaymentInstrumentID method should return it from the
+   * payment processor and CRM_Core_Payment_Manual could override it to provide 0.
+   *
+   * @return int
+   */
+  public function getPaymentInstrumentID() {
+    return isset($this->paymentInstrumentID)
+      ? $this->paymentInstrumentID
+      : (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
+  }
+
+  /**
+   * Getter for the id Payment Processor ID.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
+   * @deprecated Set payment Instrument id - see note on getPaymentInstrumentID.
+   *
+   * By default we actually ignore the form value. The manual processor takes
+   * it more seriously.
+   *
+   * @param int $paymentInstrumentID
+   */
+  public function setPaymentInstrumentID($paymentInstrumentID) {
+    $this->paymentInstrumentID = (int) $paymentInstrumentID;
+    // See note on getPaymentInstrumentID().
+    return $this->getPaymentInstrumentID();
+  }
+
+  /**
    * @return bool
    */
   public function isBackOffice() {
@@ -163,26 +205,6 @@ abstract class CRM_Core_Payment {
    */
   public function setBackOffice($isBackOffice) {
     $this->backOffice = $isBackOffice;
-  }
-
-  /**
-   * Get payment instrument id.
-   *
-   * @return int
-   */
-  public function getPaymentInstrumentID() {
-    return $this->paymentInstrumentID ? $this->paymentInstrumentID : $this->_paymentProcessor['payment_instrument_id'];
-  }
-
-  /**
-   * Set payment Instrument id.
-   *
-   * By default we actually ignore the form value. The manual processor takes it more seriously.
-   *
-   * @param int $paymentInstrumentID
-   */
-  public function setPaymentInstrumentID($paymentInstrumentID) {
-    $this->paymentInstrumentID = $this->_paymentProcessor['payment_instrument_id'];
   }
 
   /**
@@ -248,8 +270,6 @@ abstract class CRM_Core_Payment {
    * @todo move to factory class \Civi\Payment\System (or similar)
    *
    * @param array $params
-   *
-   * @return mixed
    */
   public static function logPaymentNotification($params) {
     $message = 'payment_notification ';
@@ -334,7 +354,7 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsLiveMode() {
-    return TRUE;
+    return empty($this->_paymentProcessor['is_test']);
   }
 
   /**
@@ -343,7 +363,7 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsTestMode() {
-    return TRUE;
+    return !empty($this->_paymentProcessor['is_test']);
   }
 
   /**
@@ -377,6 +397,19 @@ abstract class CRM_Core_Payment {
    */
   protected function supportsCancelRecurring() {
     return method_exists(CRM_Utils_System::getClassName($this), 'cancelSubscription');
+  }
+
+  /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return $this->supportsCancelRecurring();
   }
 
   /**
@@ -419,6 +452,21 @@ abstract class CRM_Core_Payment {
    * @return bool
    */
   protected function supportsRecurContributionsForPledges() {
+    return FALSE;
+  }
+
+  /**
+   * Does the processor work without an email address?
+   *
+   * The historic assumption is that all processors require an email address. This capability
+   * allows a processor to state it does not need to be provided with an email address.
+   * NB: when this was added (Feb 2020), the Manual processor class overrides this but
+   * the only use of the capability is in the webform_civicrm module.  It is not currently
+   * used in core but may be in future.
+   *
+   * @return bool
+   */
+  protected function supportsNoEmailProvided() {
     return FALSE;
   }
 
@@ -516,6 +564,14 @@ abstract class CRM_Core_Payment {
    *   Only explicitly supported contexts are handled without error.
    *   Currently supported:
    *   - contributionPageRecurringHelp (params: is_recur_installments, is_email_receipt)
+   *   - contributionPageContinueText (params: amount, is_payment_to_existing)
+   *   - cancelRecurDetailText:
+   *     params:
+   *       mode, amount, currency, frequency_interval, frequency_unit,
+   *       installments, {membershipType|only if mode=auto_renew},
+   *       selfService (bool) - TRUE if user doesn't have "edit contributions" permission.
+   *         ie. they are accessing via a "self-service" link from an email receipt or similar.
+   *   - cancelRecurNotSupportedText
    *
    * @param array $params
    *   Parameters for the field, context specific.
@@ -544,20 +600,47 @@ abstract class CRM_Core_Payment {
         return $gotText;
 
       case 'contributionPageContinueText':
-        if ($params['amount'] <= 0) {
-          return ts('To complete this transaction, click the <strong>Continue</strong> button below.');
+        return ts('Click the <strong>Continue</strong> button to proceed with the payment.');
+
+      case 'cancelRecurDetailText':
+        if ($params['mode'] === 'auto_renew') {
+          return ts('Click the button below if you want to cancel the auto-renewal option for your %1 membership. This will not cancel your membership. However you will need to arrange payment for renewal when your membership expires.',
+            [1 => $params['membershipType']]
+          );
         }
-        if ($this->_paymentProcessor['billing_mode'] == 4) {
-          return ts('Click the <strong>Continue</strong> button to go to %1, where you will select your payment method and complete the contribution.', [$this->_paymentProcessor['payment_processor_type']]);
+        else {
+          $text = ts('Recurring Contribution Details: %1 every %2 %3', [
+            1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
+            2 => $params['frequency_interval'],
+            3 => $params['frequency_unit'],
+          ]);
+          if (!empty($params['installments'])) {
+            $text .= ' ' . ts('for %1 installments', [1 => $params['installments']]) . '.';
+          }
+          $text = "<strong>{$text}</strong><div class='content'>";
+          $text .= ts('Click the button below to cancel this commitment and stop future transactions. This does not affect contributions which have already been completed.');
+          $text .= '</div>';
+          return $text;
         }
-        if ($params['is_payment_to_existing']) {
-          return ts('To complete this transaction, click the <strong>Make Payment</strong> button below.');
+
+      case 'cancelRecurNotSupportedText':
+        if (!$this->supportsCancelRecurring()) {
+          return ts('Automatic cancellation is not supported for this payment processor. You or the contributor will need to manually cancel this recurring contribution using the payment processor website.');
         }
-        return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
+        return '';
 
     }
     CRM_Core_Error::deprecatedFunctionWarning('Calls to getText must use a supported method');
     return '';
+  }
+
+  /**
+   * Get the title of the payment processor to display to the user
+   *
+   * @return string
+   */
+  public function getTitle() {
+    return $this->getPaymentProcessor()['title'] ?? $this->getPaymentProcessor()['name'];
   }
 
   /**
@@ -570,7 +653,7 @@ abstract class CRM_Core_Payment {
    * @return null
    */
   public function getVar($name) {
-    return isset($this->$name) ? $this->$name : NULL;
+    return $this->$name ?? NULL;
   }
 
   /**
@@ -678,6 +761,8 @@ abstract class CRM_Core_Payment {
    * Get the metadata of all the fields configured for this processor.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getAllFields() {
     $paymentFields = array_intersect_key($this->getPaymentFormFieldsMetadata(), array_flip($this->getPaymentFormFields()));
@@ -737,7 +822,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 20,
           'autocomplete' => 'off',
-          'class' => 'creditcard',
+          'class' => 'creditcard required',
         ],
         'is_required' => TRUE,
         // 'description' => '16 digit card number', // If you enable a description field it will be shown below the field on the form
@@ -750,6 +835,7 @@ abstract class CRM_Core_Payment {
           'size' => 5,
           'maxlength' => 10,
           'autocomplete' => 'off',
+          'class' => ($isCVVRequired ? 'required' : ''),
         ],
         'is_required' => $isCVVRequired,
         'rules' => [
@@ -773,7 +859,7 @@ abstract class CRM_Core_Payment {
             'rule_parameters' => TRUE,
           ],
         ],
-        'extra' => ['class' => 'crm-form-select'],
+        'extra' => ['class' => 'crm-form-select required'],
       ],
       'credit_card_type' => [
         'htmlType' => 'select',
@@ -790,6 +876,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'on',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
       ],
@@ -802,6 +889,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 34,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'rules' => [
           [
@@ -821,6 +909,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 11,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
         'rules' => [
@@ -839,6 +928,7 @@ abstract class CRM_Core_Payment {
           'size' => 20,
           'maxlength' => 64,
           'autocomplete' => 'off',
+          'class' => 'required',
         ],
         'is_required' => TRUE,
 
@@ -940,6 +1030,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -966,6 +1057,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -979,6 +1071,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -992,6 +1085,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1002,6 +1096,7 @@ abstract class CRM_Core_Payment {
       'name' => "billing_state_province_id-{$billingLocationID}",
       'cc_field' => TRUE,
       'is_required' => TRUE,
+      'extra' => ['class' => 'required'],
     ];
 
     $metadata["billing_postal_code-{$billingLocationID}"] = [
@@ -1013,6 +1108,7 @@ abstract class CRM_Core_Payment {
         'size' => 30,
         'maxlength' => 60,
         'autocomplete' => 'off',
+        'class' => 'required',
       ],
       'is_required' => TRUE,
     ];
@@ -1026,6 +1122,7 @@ abstract class CRM_Core_Payment {
         '' => ts('- select -'),
       ] + CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
+      'extra' => ['class' => 'required crm-form-select2 crm-select2'],
     ];
     return $metadata;
   }
@@ -1051,28 +1148,32 @@ abstract class CRM_Core_Payment {
   }
 
   /**
-   * Get the currency for the transaction.
+   * Get the currency for the transaction from the params.
    *
-   * Handle any inconsistency about how it is passed in here.
+   * Legacy wrapper. Better for a method to work on its own PropertyBag.
+   *
+   * This code now uses PropertyBag to allow for old inputs like currencyID.
    *
    * @param $params
    *
    * @return string
    */
-  protected function getCurrency($params) {
-    return CRM_Utils_Array::value('currencyID', $params, CRM_Utils_Array::value('currency', $params));
+  protected function getCurrency($params = []) {
+    $localPropertyBag = new PropertyBag();
+    $localPropertyBag->mergeLegacyInputParams($params);
+    return $localPropertyBag->getCurrency();
   }
 
   /**
-   * Get the currency for the transaction.
+   * Legacy. Better for a method to work on its own PropertyBag,
+   * but also, this function does not do very much.
    *
-   * Handle any inconsistency about how it is passed in here.
-   *
-   * @param $params
+   * @param array $params
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  protected function getAmount($params) {
+  protected function getAmount($params = []) {
     return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
   }
 
@@ -1211,6 +1312,23 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Processors may need to inspect, validate, cast and copy data that is
+   * specific to this Payment Processor from the input array to custom fields
+   * on the PropertyBag.
+   *
+   * @param Civi\Payment\PropertyBag $propertyBag
+   * @param array $params
+   * @param string $component
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function extractCustomPropertiesForDoPayment(PropertyBag $propertyBag, array $params, $component = 'contribute') {
+    // example
+    // (validation and casting goes first)
+    // $propertyBag->setCustomProperty('myprocessor_customPropertyName', $value);
+  }
+
+  /**
    * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
    * Any processor that still implements the deprecated doTransferCheckout() or doDirectPayment() should be updated to use doPayment().
    *
@@ -1225,7 +1343,7 @@ abstract class CRM_Core_Payment {
    *  For the current status see: https://lab.civicrm.org/dev/financial/issues/53
    * If we DO have a contribution ID, then the payment processor can (and should) update parameters on the contribution record as necessary.
    *
-   * @param array $params
+   * @param array|PropertyBag $params
    *
    * @param string $component
    *
@@ -1265,9 +1383,44 @@ abstract class CRM_Core_Payment {
       }
     }
     if (is_a($result, 'CRM_Core_Error')) {
+      CRM_Core_Error::deprecatedFunctionWarning('payment processors should throw exceptions rather than return errors');
       throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
     }
     return $result;
+  }
+
+  /**
+   * Cancel a recurring subscription.
+   *
+   * Payment processor classes should override this rather than implementing cancelSubscription.
+   *
+   * A PaymentProcessorException should be thrown if the update of the contribution_recur
+   * record should not proceed (in many cases this function does nothing
+   * as the payment processor does not need to take any action & this should silently
+   * proceed. Note the form layer will only call this after calling
+   * $processor->supports('cancelRecurring');
+   *
+   * A payment processor can control whether to notify the actual payment provider or just
+   * cancel in CiviCRM by setting the `isNotifyProcessorOnCancelRecur` property on PropertyBag.
+   * If supportsCancelRecurringNotifyOptional() is TRUE this will be automatically set based on
+   * the user selection on the form. If FALSE you need to set it yourself.
+   *
+   * @param \Civi\Payment\PropertyBag $propertyBag
+   *
+   * @return array
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doCancelRecurring(PropertyBag $propertyBag) {
+    if (method_exists($this, 'cancelSubscription')
+    && ($propertyBag->has('isNotifyProcessorOnCancelRecur') && $propertyBag->getIsNotifyProcessorOnCancelRecur())) {
+      $message = NULL;
+      if ($this->cancelSubscription($message, $propertyBag)) {
+        return ['message' => $message];
+      }
+      throw new PaymentProcessorException($message);
+    }
+    return ['message' => ts('Recurring contribution cancelled')];
   }
 
   /**
@@ -1354,7 +1507,8 @@ abstract class CRM_Core_Payment {
     catch (CRM_Core_Exception $e) {
       Civi::log()->error('ipn_payment_callback_exception', [
         'context' => [
-          'backtrace' => CRM_Core_Error::formatBacktrace(debug_backtrace()),
+          'backtrace' => $e->getTraceAsString(),
+          'message' => $e->getMessage(),
         ],
       ]);
     }
@@ -1380,7 +1534,7 @@ abstract class CRM_Core_Payment {
    */
   public static function handlePaymentMethod($method, $params = []) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value(CRM_Core_Config::singleton()->userFrameworkURLVar, $_GET, ''));
+      $q = explode('/', CRM_Utils_System::currentPath());
       $lastParam = array_pop($q);
       if (is_numeric($lastParam)) {
         $params['processor_id'] = $_GET['processor_id'] = $lastParam;
@@ -1525,7 +1679,8 @@ abstract class CRM_Core_Payment {
    * @param null $entity
    * @param string $action
    *
-   * @return string
+   * @return string|null
+   * @throws \CRM_Core_Exception
    */
   public function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
@@ -1603,7 +1758,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     }
 
     // Else default
-    return isset($this->_paymentProcessor['url_recur']) ? $this->_paymentProcessor['url_recur'] : '';
+    return $this->_paymentProcessor['url_recur'] ?? '';
   }
 
   /**
@@ -1620,32 +1775,20 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
    *
    * @return string
    */
-  protected function getPaymentDescription($params, $length = 24) {
+  protected function getPaymentDescription($params = [], $length = 24) {
+    $propertyBag = PropertyBag::cast($params);
     $parts = [
-      'contactID',
-      'contributionID',
-      'description',
-      'billing_first_name',
-      'billing_last_name',
+      $propertyBag->getter('contactID', TRUE),
+      $propertyBag->getter('contributionID', TRUE),
+      $propertyBag->getter('description', TRUE) ?: ($propertyBag->getter('isRecur', TRUE) ? ts('Recurring payment') : NULL),
+      $propertyBag->getter('billing_first_name', TRUE),
+      $propertyBag->getter('billing_last_name', TRUE),
     ];
-    $validParts = [];
-    if (isset($params['description'])) {
-      $uninformativeStrings = [
-        ts('Online Event Registration: '),
-        ts('Online Contribution: '),
-      ];
-      $params['description'] = str_replace($uninformativeStrings, '', $params['description']);
-    }
-    foreach ($parts as $part) {
-      if ((!empty($params[$part]))) {
-        $validParts[] = $params[$part];
-      }
-    }
-    return substr(implode('-', $validParts), 0, $length);
+    return substr(implode('-', array_filter($parts)), 0, $length);
   }
 
   /**
-   * Checks if backoffice recurring edit is allowed
+   * Checks if back-office recurring edit is allowed
    *
    * @return bool
    */

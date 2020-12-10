@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -74,7 +58,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     $this->_checkboxes = ['is_first_amount' => ts('First Donation?')];
 
     foreach ($this->_amounts as $name => $title) {
-      $this->{$name} = CRM_Utils_Array::value($name, $this->_formValues);
+      $this->{$name} = $this->_formValues[$name] ?? NULL;
     }
 
     foreach ($this->_checkboxes as $name => $title) {
@@ -193,7 +177,7 @@ ORDER BY   donation_amount desc
 
     if ($justIDs) {
       $tempTable = CRM_Utils_SQL_TempTable::build()->createWithQuery($sql);
-      $sql = "SELECT contact_a.id as contact_id FROM {$tempTable->getName()} as contact_a";
+      $sql = "SELECT contact_a.id as contact_id FROM {$tempTable->getName()} c INNER JOIN civicrm_contact contact_a ON c.id = contact_a.id";
     }
     return $sql;
   }
@@ -229,7 +213,7 @@ count(contrib_1.id) AS donation_count
       !empty($this->exclude_end_date) ||
       !empty($this->is_first_amount)
     ) {
-      $from .= " LEFT JOIN XG_CustomSearch_SYBNT xg ON xg.contact_id = contact_a.id ";
+      $from .= " LEFT JOIN {$this->_xgTableName} xg ON xg.contact_id = contact_a.id ";
     }
 
     return $from;
@@ -269,11 +253,11 @@ count(contrib_1.id) AS donation_count
     ) {
 
       // first create temp table to store contact ids
-      $sql = "DROP TEMPORARY TABLE IF EXISTS XG_CustomSearch_SYBNT";
+      $this->_xgTable = CRM_Utils_SQL_TempTable::build()->setMemory();
+      $this->_xgTableName = $this->_xgTable->getName();
+      $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_xgTableName}";
       CRM_Core_DAO::executeQuery($sql);
-
-      $sql = "CREATE TEMPORARY TABLE XG_CustomSearch_SYBNT ( contact_id int primary key) ENGINE=HEAP";
-      CRM_Core_DAO::executeQuery($sql);
+      $this->_xgTable->createWithColumns('contact_id int primary key');
 
       $excludeClauses = [];
       if ($this->exclude_start_date) {
@@ -306,7 +290,7 @@ count(contrib_1.id) AS donation_count
       if ($excludeClause || $havingClause) {
         // Run subquery
         $query = "
-REPLACE   INTO XG_CustomSearch_SYBNT
+REPLACE   INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
 WHERE    c.is_test = 0
@@ -321,7 +305,7 @@ GROUP BY c.contact_id
       // now ensure we dont consider donors that are not first time
       if ($this->is_first_amount) {
         $query = "
-REPLACE  INTO XG_CustomSearch_SYBNT
+REPLACE  INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
 WHERE    c.is_test = 0
@@ -345,12 +329,12 @@ AND      c.receive_date < {$this->start_date_1}
    */
   public function having($includeContactIDs = FALSE) {
     $clauses = [];
-    $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
+    $min = $this->_formValues['min_amount'] ?? NULL;
     if ($min) {
       $clauses[] = "sum(contrib_1.total_amount) >= $min";
     }
 
-    $max = CRM_Utils_Array::value('max_amount', $this->_formValues);
+    $max = $this->_formValues['max_amount'] ?? NULL;
     if ($max) {
       $clauses[] = "sum(contrib_1.total_amount) <= $max";
     }

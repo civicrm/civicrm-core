@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -38,7 +22,7 @@
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
   protected $_contactID;
-  protected $_locationType;
+  protected $_locationTypeID;
   protected $_params;
 
   protected $_entity;
@@ -48,12 +32,12 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     parent::setUp();
 
     $this->_contactID = $this->organizationCreate();
-    $this->_locationType = $this->locationTypeCreate();
+    $this->_locationTypeID = $this->locationTypeCreate();
     CRM_Core_PseudoConstant::flush();
 
     $this->_params = [
       'contact_id' => $this->_contactID,
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
       'street_name' => 'Ambachtstraat',
       'street_number' => '23',
       'street_address' => 'Ambachtstraat 23',
@@ -65,7 +49,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $this->locationTypeDelete($this->_locationType->id);
+    $this->locationTypeDelete($this->_locationTypeID);
     $this->contactDelete($this->_contactID);
     $this->quickCleanup(['civicrm_address', 'civicrm_relationship']);
     parent::tearDown();
@@ -73,11 +57,13 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateAddress($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument('address', 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('Address', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
@@ -92,7 +78,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $params = [
       'street_parsing' => 1,
       'street_address' => '54A Excelsior Ave. Apt 1C',
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
       'contact_id' => $this->_contactID,
     ];
     $subfile = "AddressParse";
@@ -199,7 +185,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $individualParams = [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
-      'update_current_employer' => 0,
+      'add_relationship' => 0,
     ];
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
     $this->callAPISuccess('relationship', 'getcount', [
@@ -270,7 +256,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     //check there are no address to start with
     $get = $this->callAPISuccess('address', 'get', [
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
     ]);
     $this->assertEquals(0, $get['count'], 'Contact already exists ');
 
@@ -280,7 +266,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('address', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $get = $this->callAPISuccess('address', 'get', [
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
     ]);
     $this->assertEquals(0, $get['count'], 'Contact not successfully deleted In line ' . __LINE__);
   }
@@ -448,7 +434,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testCreateDuplicateLocationTypes() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
     $address2 = $this->callAPISuccess('address', 'create', [
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
       'street_address' => '1600 Pensilvania Avenue',
       'city' => 'Washington DC',
       'is_primary' => 0,
@@ -457,7 +443,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ]);
     $check = $this->callAPISuccess('address', 'getcount', [
       'contact_id' => $this->_contactID,
-      'location_type_id' => $this->_locationType->id,
+      'location_type_id' => $this->_locationTypeID,
     ]);
     $this->assertEquals(2, $check);
     $this->callAPISuccess('address', 'delete', ['id' => $address1['id']]);
@@ -468,7 +454,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $cid = $this->individualCreate([
       'api.Address.create' => [
         'street_address' => __FUNCTION__,
-        'location_type_id' => $this->_locationType->id,
+        'location_type_id' => $this->_locationTypeID,
       ],
     ]);
     $result = $this->callAPISuccess('address', 'getsingle', [

@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
@@ -38,6 +22,9 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     'Contribution',
     'Membership',
     'Contact',
+    'Individual',
+    'Household',
+    'Organization',
   ];
 
   /**
@@ -47,9 +34,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    * all reports have been adjusted to take care of it. This report has not
    * and will run an inefficient query until fixed.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = TRUE;
 
@@ -88,8 +74,24 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             'title' => ts('Contact Subtype'),
             'no_repeat' => TRUE,
           ],
+          'do_not_phone' => [
+            'title' => ts('Do Not Phone'),
+            'no_repeat' => TRUE,
+          ],
           'do_not_email' => [
             'title' => ts('Do Not Email'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_mail' => [
+            'title' => ts('Do Not Mail'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_sms' => [
+            'title' => ts('Do Not SMS'),
+            'no_repeat' => TRUE,
+          ],
+          'do_not_trade' => [
+            'title' => ts('Do Not Trade'),
             'no_repeat' => TRUE,
           ],
           'is_opt_out' => [
@@ -221,7 +223,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => [1],
           ],
           'total_amount' => ['title' => ts('Contribution Amount')],
@@ -422,15 +424,15 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
             elseif ($fieldName == 'first_donation_date' ||
               $fieldName == 'first_donation_amount'
             ) {
-              $baseField = CRM_Utils_Array::value('base_field', $field);
+              $baseField = $field['base_field'] ?? NULL;
               $select[] = "{$this->_aliases['civicrm_contribution']}.{$baseField} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
             }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
             }
           }
         }
@@ -517,7 +519,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           FROM civicrm_contribution contribution
           INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                 ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0
-          {$this->_aclFrom}
           LEFT JOIN civicrm_membership_payment mp
                 ON contribution.id = mp.contribution_id
           LEFT JOIN civicrm_membership m
@@ -646,7 +647,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
     $entryFound = FALSE;
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     $batches = CRM_Batch_BAO_Batch::getBatches();
 
@@ -656,8 +657,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
             if (!empty($field['csv_display']) && !empty($field['no_display'])) {
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
-              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
+              $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
             }
           }
         }
@@ -673,8 +674,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           if ($contactId = $row['civicrm_contact_id']) {
             if ($rowNum == 0) {
               $pcid = $contactId;
-              $fAmt = $row['first_donation_first_donation_amount'];
-              $fDate = $row['first_donation_first_donation_date'];
+              $fAmt = $row['first_donation_first_donation_amount'] ?? '';
+              $fDate = $row['first_donation_first_donation_date'] ?? '';
             }
             else {
               if ($pcid == $contactId) {
@@ -683,8 +684,8 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
                 $pcid = $contactId;
               }
               else {
-                $fAmt = $row['first_donation_first_donation_amount'];
-                $fDate = $row['first_donation_first_donation_date'];
+                $fAmt = $row['first_donation_first_donation_amount'] ?? '';
+                $fDate = $row['first_donation_first_donation_date'] ?? '';
                 $pcid = $contactId;
               }
             }
@@ -732,7 +733,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
       }
 
       if (!empty($row['civicrm_batch_batch_id'])) {
-        $rows[$rowNum]['civicrm_batch_batch_id'] = CRM_Utils_Array::value($row['civicrm_batch_batch_id'], $batches);
+        $rows[$rowNum]['civicrm_batch_batch_id'] = $batches[$row['civicrm_batch_batch_id']] ?? NULL;
         $entryFound = TRUE;
       }
 

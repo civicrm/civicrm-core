@@ -36,16 +36,6 @@
     <add>1.2</add>
   </field>
   <field>
-    <name>mapping_type</name>
-    <type>enum</type>
-    <values>Export, Import, Export Contributions, Import Contributions, Import Activity, Search Builder, Import
-      Memberships, Import Participants
-    </values>
-    <comment>Type of Mapping.</comment>
-    <add>1.2</add>
-    <drop>2.1</drop>
-  </field>
-  <field>
     <name>mapping_type_id</name>
     <type>int unsigned</type>
     <title>Mapping Type</title>

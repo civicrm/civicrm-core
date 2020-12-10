@@ -1,7 +1,7 @@
 // https://civicrm.org/licensing
 /**
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
- * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
+ * @see https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
+ * @see https://docs.civicrm.org/dev/en/latest/framework/ajax/
  */
 (function($, CRM, _, undefined) {
   /**
@@ -56,6 +56,7 @@
     return result;
   }
 
+  // https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
   CRM.api4 = function(entity, action, params, index) {
     return new Promise(function(resolve, reject) {
       if (typeof entity === 'string') {
@@ -88,7 +89,7 @@
 
   /**
    * AJAX api
-   * @link http://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface#AJAXInterface-CRM.api3
+   * @link https://docs.civicrm.org/dev/en/latest/api/interfaces/#ajax
    */
   CRM.api3 = function(entity, action, params, status) {
     if (typeof(entity) === 'string') {
@@ -497,7 +498,7 @@
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
           added = [];
-        $(buttonContainers, $el).find('input.crm-form-submit, a.button, button').each(function() {
+        $(buttonContainers, $el).find('.crm-form-submit, .crm-form-xbutton, a.button, button').each(function() {
           var $el = $(this),
             label = $el.is('input') ? $el.attr('value') : $el.text(),
             identifier = $el.attr('name') || $el.attr('href');
@@ -516,12 +517,12 @@
             added.push(identifier);
           }
           // display:none causes the form to not submit when pressing "enter"
-          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'}).find('.crm-button-icon').hide();
+          $el.parents(buttonContainers).css({height: 0, padding: 0, margin: 0, overflow: 'hidden'});
         });
         $el.dialog('option', 'buttons', buttons);
       }
       // Allow a button to prevent ajax submit
-      $('input[data-no-ajax-submit=true]').click(function() {
+      $('input[data-no-ajax-submit=true], button[data-no-ajax-submit=true]').click(function() {
         $(this).closest('form').ajaxFormUnbind();
       });
       // For convenience, focus the first field

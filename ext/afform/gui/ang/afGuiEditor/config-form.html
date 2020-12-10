@@ -1,0 +1,51 @@
+<ng-form name="config_form">
+
+<div class="form-group">
+  <label for="af_config_form_title">
+    {{ ts('Title:') }} <span class="crm-marker">*</span>
+  </label>
+  <input ng-model="afform.title" class="form-control" id="af_config_form_title" required />
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_description">
+    {{ ts('Description:') }}
+  </label>
+  <textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
+  <p class="help-block">{{ts('Semi-private description about the form\'s purpose.')}}</p>
+  <!-- "Semi-private": not generally public, but not audited for secrecy -->
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_server_route">
+    {{ ts('Path:') }}
+  </label>
+  <input ng-model="afform.server_route" class="form-control" id="af_config_form_server_route" />
+  <p class="help-block">{{ts('Expose the form as a standalone page on the web site. (Example: "civicrm/my-form")')}}</p>
+</div>
+
+<div class="form-group" ng-if="!!afform.server_route">
+  <label for="af_config_form_is_public">
+    <input type="checkbox" id="af_config_form_is_public" ng-model="afform.is_public">
+    {{ ts('Enable frontend styling') }}
+  </label>
+  <p class="help-block">{{ts('The general look/feel should match the frontend')}}</p>
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_is_dashlet">
+    <input type="checkbox" id="af_config_form_is_dashlet" ng-model="afform.is_dashlet">
+    {{ ts('Enable dashlet') }}
+  </label>
+  <p class="help-block">{{ts('Allow backend users to embed the form on the dashboard.')}}</p>
+</div>
+
+<div class="form-group">
+  <label for="af_config_form_permission">
+    {{ ts('Permission:') }}
+  </label>
+  <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions, placeholder: ts('Open access')}" />
+  <p class="help-block">{{ts('What permission is required to use this form?')}}</p>
+</div>
+
+</ng-form>

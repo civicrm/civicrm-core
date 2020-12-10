@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Mail_Incoming {
   const
@@ -338,10 +322,12 @@ class CRM_Utils_Mail_Incoming {
 
   /**
    * @param $mail
+   * @param $createContact
+   * @param $requireContact
    *
    * @return array
    */
-  public static function parseMailingObject(&$mail) {
+  public static function parseMailingObject(&$mail, $createContact = TRUE, $requireContact = TRUE) {
 
     $config = CRM_Core_Config::singleton();
 
@@ -358,18 +344,18 @@ class CRM_Utils_Mail_Incoming {
     }
 
     $params['from'] = [];
-    self::parseAddress($mail->from, $field, $params['from'], $mail);
+    self::parseAddress($mail->from, $field, $params['from'], $mail, $createContact);
 
     // we definitely need a contact id for the from address
     // if we dont have one, skip this email
-    if (empty($params['from']['id'])) {
+    if ($requireContact && empty($params['from']['id'])) {
       return NULL;
     }
 
     $emailFields = ['to', 'cc', 'bcc'];
     foreach ($emailFields as $field) {
       $value = $mail->$field;
-      self::parseAddresses($value, $field, $params, $mail);
+      self::parseAddresses($value, $field, $params, $mail, $createContact);
     }
 
     // define other parameters
@@ -412,8 +398,9 @@ class CRM_Utils_Mail_Incoming {
    * @param array $params
    * @param $subParam
    * @param $mail
+   * @param $createContact
    */
-  public static function parseAddress(&$address, &$params, &$subParam, &$mail) {
+  public static function parseAddress(&$address, &$params, &$subParam, &$mail, $createContact = TRUE) {
     // CRM-9484
     if (empty($address->email)) {
       return;
@@ -424,7 +411,7 @@ class CRM_Utils_Mail_Incoming {
 
     $contactID = self::getContactID($subParam['email'],
       $subParam['name'],
-      TRUE,
+      $createContact,
       $mail
     );
     $subParam['id'] = $contactID ? $contactID : NULL;
@@ -435,13 +422,14 @@ class CRM_Utils_Mail_Incoming {
    * @param $token
    * @param array $params
    * @param $mail
+   * @param $createContact
    */
-  public static function parseAddresses(&$addresses, $token, &$params, &$mail) {
+  public static function parseAddresses(&$addresses, $token, &$params, &$mail, $createContact = TRUE) {
     $params[$token] = [];
 
     foreach ($addresses as $address) {
       $subParam = [];
-      self::parseAddress($address, $params, $subParam, $mail);
+      self::parseAddress($address, $params, $subParam, $mail, $createContact);
       $params[$token][] = $subParam;
     }
   }

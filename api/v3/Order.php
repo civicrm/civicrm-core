@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -80,25 +64,53 @@ function _civicrm_api3_order_get_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_order_create($params) {
-
+  civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
   $entity = NULL;
   $entityIds = [];
+  $params['contribution_status_id'] = $params['contribution_status_id'] ?? 'Pending';
+  if ($params['contribution_status_id'] !== 'Pending' && 'Pending' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id'])) {
+    CRM_Core_Error::deprecatedFunctionWarning("Creating a Order with a status other than pending is deprecated. Please do not set contribution_status_id, it will default to Pending. You can chain payment creation e.g civicrm_api3('Order', 'create', ['blah' => 'blah', 'contribution_status_id' => 'Pending', 'api.Payment.create => ['total_amount' => 5]]");
+  }
+
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
     $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
-      $entityParams = CRM_Utils_Array::value('params', $lineItems, []);
+      $entityParams = $lineItems['params'] ?? [];
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
         $item = reset($lineItems['line_item']);
         $entity = str_replace('civicrm_', '', $item['entity_table']);
       }
+
       if ($entityParams) {
-        if (in_array($entity, ['participant', 'membership'])) {
+        $supportedEntity = TRUE;
+        switch ($entity) {
+          case 'participant':
+            if (isset($entityParams['participant_status_id'])
+              && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
+              throw new CiviCRM_API3_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
+            }
+            $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
+            $entityParams['status_id'] = $entityParams['participant_status_id'];
+            break;
+
+          case 'membership':
+            $entityParams['status_id'] = 'Pending';
+            break;
+
+          default:
+            // Don't create any related entities. We might want to support eg. Pledge one day?
+            $supportedEntity = FALSE;
+            break;
+        }
+        if ($supportedEntity) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
@@ -107,13 +119,11 @@ function civicrm_api3_order_create($params) {
             $items['entity_id'] = $entityResult['id'];
           }
         }
-        else {
-          // pledge payment
-        }
       }
+
       if (empty($priceSetID)) {
         $item = reset($lineItems['line_item']);
-        $priceSetID = civicrm_api3('PriceField', 'getvalue', [
+        $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
           'return' => 'price_set_id',
           'id' => $item['price_field_id'],
         ]);
@@ -122,7 +132,20 @@ function civicrm_api3_order_create($params) {
       $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
   }
-  $contribution = civicrm_api3('Contribution', 'create', $params);
+  $contributionParams = $params;
+  // If this is nested we need to set sequential to 0 as sequential handling is done
+  // in create_success & id will be miscalculated...
+  $contributionParams['sequential'] = 0;
+  foreach ($contributionParams as $key => $value) {
+    // Unset chained keys so the code does not attempt to do this chaining twice.
+    // e.g if calling 'api.Payment.create' We want to finish creating the order first.
+    // it would probably be better to have a full whitelist of contributionParams
+    if (substr($key, 0, 3) === 'api') {
+      unset($contributionParams[$key]);
+    }
+  }
+
+  $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
   // add payments
   if ($entity && !empty($contribution['id'])) {
     foreach ($entityIds as $entityId) {
@@ -134,10 +157,13 @@ function civicrm_api3_order_create($params) {
       if ($entity == 'pledge') {
         $paymentParams += $entityParams;
       }
-      $payments = civicrm_api3($entity . '_payment', 'create', $paymentParams);
+      elseif ($entity == 'membership') {
+        $paymentParams['isSkipLineItem'] = TRUE;
+      }
+      civicrm_api3($entity . '_payment', 'create', $paymentParams);
     }
   }
-  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $contribution), $params, 'Order', 'create');
+  return civicrm_api3_create_success($contribution['values'] ?? [], $params, 'Order', 'create');
 }
 
 /**
@@ -175,7 +201,6 @@ function civicrm_api3_order_cancel($params) {
   $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
   $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
   $result = civicrm_api3('Contribution', 'create', $params);
-  CRM_Contribute_BAO_Contribution::transitionComponents($params);
   return civicrm_api3_create_success($result['values'], $params, 'Order', 'cancel');
 }
 
@@ -213,7 +238,6 @@ function _civicrm_api3_order_create_spec(&$params) {
   $params['total_amount'] = [
     'name' => 'total_amount',
     'title' => 'Total Amount',
-    'api.required' => TRUE,
   ];
   $params['financial_type_id'] = [
     'name' => 'financial_type_id',

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -148,6 +132,12 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
     $remoteExtensionRows = $this->formatRemoteExtensionRows($localExtensionRows);
     $this->assign('remoteExtensionRows', $remoteExtensionRows);
+
+    Civi::resources()
+      ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
+      ->addSetting([
+        'tabSettings' => ['active' => $_GET['selectedChild'] ?? NULL],
+      ]);
   }
 
   /**
@@ -164,7 +154,11 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
+    $hiddenExtensions = $mapper->getKeysByTag('mgmt:hidden');
     foreach ($keys as $key) {
+      if (in_array($key, $hiddenExtensions)) {
+        continue;
+      }
       try {
         $obj = $mapper->keyToInfo($key);
       }
@@ -173,18 +167,25 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         continue;
       }
 
+      $mapper = CRM_Extension_System::singleton()->getMapper();
+
       $row = self::createExtendedInfo($obj);
       $row['id'] = $obj->key;
+      $row['action'] = '';
 
       // assign actions
       $action = 0;
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_UNINSTALLED:
-          $action += CRM_Core_Action::ADD;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ADD;
+          }
           break;
 
         case CRM_Extension_Manager::STATUS_DISABLED:
-          $action += CRM_Core_Action::ENABLE;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ENABLE;
+          }
           $action += CRM_Core_Action::DELETE;
           break;
 
@@ -201,18 +202,17 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
       // then $action += CRM_Core_Action::UPDATE
-      $row['action'] = CRM_Core_Action::formLink(self::links(),
-        $action,
-        [
-          'id' => $row['id'],
-          'key' => $obj->key,
-        ],
-        ts('more'),
-        FALSE,
-        'extension.local.action',
-        'Extension',
-        $row['id']
-      );
+      if ($action) {
+        $row['action'] = CRM_Core_Action::formLink(self::links(),
+          $action,
+          ['id' => $row['id'], 'key' => $obj->key],
+          ts('more'),
+          FALSE,
+          'extension.local.action',
+          'Extension',
+          $row['id']
+        );
+      }
       // Key would be better to send, but it's not an integer.  Moreover, sending the
       // values to hook_civicrm_links means that you can still get at the key
 
@@ -240,6 +240,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     // build list of available downloads
     $remoteExtensionRows = [];
     $compat = CRM_Extension_System::getCompatibilityInfo();
+    $mapper = CRM_Extension_System::singleton()->getMapper();
 
     foreach ($remoteExtensions as $info) {
       if (!empty($compat[$info->key]['obsolete'])) {
@@ -263,7 +264,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       if (isset($localExtensionRows[$info->key])) {
         if (array_key_exists('version', $localExtensionRows[$info->key])) {
           if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
-            $row['is_upgradeable'] = TRUE;
+            $row['upgradelink'] = $mapper->getUpgradeLink($remoteExtensions[$info->key], $localExtensionRows[$info->key]);
           }
         }
       }

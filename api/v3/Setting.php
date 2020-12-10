@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -148,10 +132,10 @@ function _civicrm_api3_setting_getdefaults_spec(&$params) {
  * @throws \API_Exception
  */
 function civicrm_api3_setting_getoptions($params) {
-  $domainId = CRM_Utils_Array::value('domain_id', $params);
+  $domainId = $params['domain_id'] ?? NULL;
   $specs = \Civi\Core\SettingsMetadata::getMetadata(['name' => $params['field']], $domainId, TRUE);
 
-  if (empty($specs[$params['field']]) || !is_array(CRM_Utils_Array::value('options', $specs[$params['field']]))) {
+  if (!isset($specs[$params['field']]['options']) || !is_array($specs[$params['field']]['options'])) {
     throw new API_Exception("The field '" . $params['field'] . "' has no associated option list.");
   }
 
@@ -211,7 +195,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * Revert settings to defaults.
  *
  * @param array $params
- *
+ * @deprecated
  * @return array
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
@@ -257,6 +241,15 @@ function _civicrm_api3_setting_fill_spec(&$params) {
 }
 
 /**
+ * Declare deprecated api functions.
+ *
+ * @return array
+ */
+function _civicrm_api3_setting_deprecation() {
+  return ['fill' => 'Setting "fill" is no longer necessary.'];
+}
+
+/**
  * Create or update a setting.
  *
  * @param array $params
@@ -264,6 +257,9 @@ function _civicrm_api3_setting_fill_spec(&$params) {
  *
  * @return array
  *   api result array
+ *
+ * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_setting_create($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
@@ -395,24 +391,24 @@ function _civicrm_api3_setting_getvalue_spec(&$params) {
  * @param array $params
  *
  * @return array
- * @throws \Exception
+ * @throws API_Exception
  */
 function _civicrm_api3_setting_getDomainArray(&$params) {
   if (empty($params['domain_id']) && isset($params['id'])) {
     $params['domain_id'] = $params['id'];
   }
 
-  if ($params['domain_id'] == 'current_domain') {
+  if ($params['domain_id'] === 'current_domain') {
     $params['domain_id'] = CRM_Core_Config::domainID();
   }
 
-  if ($params['domain_id'] == 'all') {
+  if ($params['domain_id'] === 'all') {
     $domainAPIResult = civicrm_api('domain', 'get', ['version' => 3, 'return' => 'id']);
     if (isset($domainAPIResult['values'])) {
       $params['domain_id'] = array_keys($domainAPIResult['values']);
     }
     else {
-      throw new Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
+      throw new API_Exception('All domains not retrieved - problem with Domain Get api call ' . $domainAPIResult['error_message']);
     }
   }
   if (is_array($params['domain_id'])) {

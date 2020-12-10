@@ -5,6 +5,7 @@
   <class>PriceFieldValue</class>
   <name>civicrm_price_field_value</name>
   <add>3.3</add>
+  <component>CiviContribute</component>
   <field>
     <name>id</name>
     <title>Price Field Value ID</title>
@@ -41,6 +42,7 @@
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>label</name>
@@ -53,6 +55,7 @@
       <type>Text</type>
     </html>
     <add>3.3</add>
+    <default>NULL</default>
   </field>
   <field>
     <name>description</name>

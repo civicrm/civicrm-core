@@ -1,46 +1,26 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * Class CRM_Grant_BAO_Query
  */
 class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
+   * Get grant fields.
+   *
    * @return array
    */
   public static function &getFields() {
-    $fields = [];
-    $fields = CRM_Grant_BAO_Grant::exportableFields();
-    return $fields;
+    return CRM_Grant_BAO_Grant::exportableFields();
   }
 
   /**
@@ -298,6 +278,8 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
 
   /**
    * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
@@ -346,10 +328,10 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
 
     $form->add('text', 'grant_amount_low', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
+    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('9.99')]), 'money');
 
     $form->add('text', 'grant_amount_high', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
-    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
+    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency('99.99')]), 'money');
 
     self::addCustomFormFields($form, ['Grant']);
 

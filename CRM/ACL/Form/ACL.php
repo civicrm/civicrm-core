@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_ACL_Form_ACL extends CRM_Admin_Form {
 
@@ -110,15 +94,14 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
       return;
     }
 
-    $attributes = CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL');
-
     $this->add('text', 'name', ts('Description'), CRM_Core_DAO::getAttribute('CRM_ACL_DAO_ACL', 'name'), TRUE);
 
-    $operations = ['' => ts('- select -')] + CRM_ACL_BAO_ACL::operation();
     $this->add('select',
       'operation',
       ts('Operation'),
-      $operations, TRUE
+      CRM_ACL_BAO_ACL::operation(),
+      TRUE,
+      ['placeholder' => TRUE]
     );
 
     $objTypes = [
@@ -147,22 +130,22 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     $this->add('select', 'entity_id', $label, $role, TRUE);
 
     $group = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select group -'),
       '0' => ts('All Groups'),
     ] + CRM_Core_PseudoConstant::group();
 
     $customGroup = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select set of custom fields -'),
       '0' => ts('All Custom Groups'),
     ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
 
     $ufGroup = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select profile -'),
       '0' => ts('All Profiles'),
     ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     $event = [
-      '-1' => ts('- select -'),
+      '-1' => ts('- select event -'),
       '0' => ts('All Events'),
     ] + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 

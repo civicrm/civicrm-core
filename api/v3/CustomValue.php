@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -38,7 +22,7 @@
  *   Expected keys are in format custom_fieldID:recordID or custom_groupName:fieldName:recordID.
  *
  * @example:
- * @code
+ * ```
  *   // entity ID. You do not need to specify entity type, we figure it out based on the fields you're using
  *   'entity_id' => 123,
  *   // (omitting :id) inserts or updates a field in a single-valued group
@@ -55,7 +39,7 @@
  *   'custom_some_group:my_field' => 'myinfo',
  *   // updates record ID 8 in my_other_field in multi-valued some_big_group
  *   'custom_some_big_group:my_other_field:8' => 'myinfo',
- * @endcode
+ * ```
  *
  * @throws Exception
  * @return array
@@ -363,14 +347,14 @@ function civicrm_api3_custom_value_gettree($params) {
     $result[$group['name']] = [];
     $groupToReturn = $toReturn['custom_group'] ? $toReturn['custom_group'] : array_keys($group);
     foreach ($groupToReturn as $item) {
-      $result[$group['name']][$item] = CRM_Utils_Array::value($item, $group);
+      $result[$group['name']][$item] = $group[$item] ?? NULL;
     }
     $result[$group['name']]['fields'] = [];
     foreach ($group['fields'] as $fieldInfo) {
       $field = ['value' => NULL];
       $fieldToReturn = $toReturn['custom_field'] ? $toReturn['custom_field'] : array_keys($fieldInfo);
       foreach ($fieldToReturn as $item) {
-        $field[$item] = CRM_Utils_Array::value($item, $fieldInfo);
+        $field[$item] = $fieldInfo[$item] ?? NULL;
       }
       unset($field['customValue']);
       if (!empty($fieldInfo['customValue'])) {

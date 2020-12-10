@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,12 +19,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
   protected $_individualId;
   protected $_pledge;
-  protected $_apiversion;
   protected $_params;
   protected $_entity;
   protected $scheduled_date;
-  public $DBResetRequired = TRUE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
@@ -119,7 +104,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($this->_pledge['id'], $pledge['pledge_id']);
     $this->assertEquals(date('Y-m-d') . ' 00:00:00', $pledge['pledge_create_date']);
     $this->assertEquals(100.00, $pledge['pledge_amount']);
-    $this->assertEquals('Pending', $pledge['pledge_status']);
+    $this->assertEquals('Pending Label**', $pledge['pledge_status']);
     $this->assertEquals(5, $pledge['pledge_frequency_interval']);
     $this->assertEquals('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(date('Y-m-d', strtotime($this->scheduled_date)) . ' 00:00:00', $pledge['pledge_next_pay_date']);
@@ -426,7 +411,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_contact_id, $this->_individualId);
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
-    $this->assertEquals($old_status_id, 'Pending');
+    $this->assertEquals($old_status_id, 'Pending Label**');
     $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,
@@ -473,7 +458,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_contact_id, $this->_individualId);
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
-    $this->assertEquals($old_status_id, 'Pending');
+    $this->assertEquals($old_status_id, 'Pending Label**');
     $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,

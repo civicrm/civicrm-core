@@ -1,37 +1,39 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\StatusPreference;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 abstract class CRM_Utils_Check_Component {
+
+  /**
+   * Get the configured status checks.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function getChecksConfig() {
+    if (!isset(Civi::$statics[__FUNCTION__])) {
+      Civi::$statics[__FUNCTION__] = (array) StatusPreference::get(FALSE)
+        ->addWhere('domain_id', '=', 'current_domain')
+        ->execute()->indexBy('name');
+    }
+    return Civi::$statics[__FUNCTION__];
+  }
 
   /**
    * Should these checks be run?
@@ -43,19 +45,75 @@ abstract class CRM_Utils_Check_Component {
   }
 
   /**
+   * Get the names of all check functions in this class
+   *
+   * @return string[]
+   */
+  public function getAllChecks() {
+    return array_filter(get_class_methods($this), function($method) {
+      return $method !== 'checkAll' && strpos($method, 'check') === 0;
+    });
+  }
+
+  /**
    * Run all checks in this class.
    *
-   * @return array
-   *   [CRM_Utils_Check_Message]
+   * @param array $requestedChecks
+   *   Optionally specify the names of specific checks requested, or leave empty to run all
+   * @param bool $includeDisabled
+   *   Run checks that have been explicitly disabled (default false)
+   *
+   * @return CRM_Utils_Check_Message[]
+   *
+   * @throws API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function checkAll() {
+  public function checkAll($requestedChecks = [], $includeDisabled = FALSE) {
     $messages = [];
-    foreach (get_class_methods($this) as $method) {
-      if ($method !== 'checkAll' && strpos($method, 'check') === 0) {
-        $messages = array_merge($messages, $this->$method());
+    foreach ($this->getAllChecks() as $method) {
+      // Note that we should check if the test is disabled BEFORE running it in case it's disabled for performance.
+      if ($this->isRequested($method, $requestedChecks) && ($includeDisabled || !$this->isDisabled($method))) {
+        $messages = array_merge($messages, $this->$method($includeDisabled));
       }
     }
     return $messages;
+  }
+
+  /**
+   * Is this check one of those requested
+   *
+   * @param string $method
+   * @param array $requestedChecks
+   * @return bool
+   */
+  private function isRequested($method, $requestedChecks) {
+    if (!$requestedChecks) {
+      return TRUE;
+    }
+    foreach ($requestedChecks as $name) {
+      if (strpos($name, $method) === 0) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Is the specified check disabled.
+   *
+   * @param string $method
+   *
+   * @return bool
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function isDisabled($method) {
+    $checks = $this->getChecksConfig();
+    if (isset($checks[$method]['is_active'])) {
+      return !$checks[$method]['is_active'];
+    }
+    return FALSE;
   }
 
   /**
@@ -65,6 +123,7 @@ abstract class CRM_Utils_Check_Component {
    * @param float|bool $timeoutOverride
    *
    * @return bool
+   * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function fileExists($url, $timeoutOverride = FALSE) {
     // Timeout past in maybe 0 in which case we should still permit it (0 is infinite).

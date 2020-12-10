@@ -1,35 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -135,7 +118,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       'details' => $params['suggested_message'],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'is_test' => $params['is_test'],
-      'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
+      'campaign_id' => $params['campaign_id'] ?? NULL,
     ];
 
     // activity creation
@@ -173,9 +156,9 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $transaction->commit();
 
     // Process sending of mails
-    $mailParams['title'] = CRM_Utils_Array::value('title', $params);
-    $mailParams['general_link'] = CRM_Utils_Array::value('general_link', $friendParams);
-    $mailParams['message'] = CRM_Utils_Array::value('suggested_message', $params);
+    $mailParams['title'] = $params['title'] ?? NULL;
+    $mailParams['general_link'] = $friendParams['general_link'] ?? NULL;
+    $mailParams['message'] = $params['suggested_message'] ?? NULL;
 
     // Default "from email address" is default domain address.
     list($_, $mailParams['email_from']) = CRM_Core_BAO_Domain::getNameAndEmail();

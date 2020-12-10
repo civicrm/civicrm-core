@@ -17,7 +17,6 @@
     <desc>Configure spool period, throttling and other mailer settings.</desc>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
-    <icon>admin/small/07.png</icon>
     <weight>400</weight>
   </item>
   <item>
@@ -27,7 +26,6 @@
     <desc>Configure the header and footer used for mailings. Customize the content of automated Subscribe, Unsubscribe, Resubscribe and Opt-out messages.</desc>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
-    <icon>admin/small/Profile.png</icon>
     <weight>410</weight>
   </item>
   <item>
@@ -36,7 +34,6 @@
     <desc>List of Email Addresses which can be used when sending emails to contacts.</desc>
     <page_callback>CRM_Admin_Page_Options</page_callback>
     <adminGroup>CiviMail</adminGroup>
-    <icon>admin/small/title.png</icon>
     <weight>415</weight>
   </item>
   <item>
@@ -46,7 +43,6 @@
     <desc>Configure email account setting.</desc>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
     <adminGroup>CiviMail</adminGroup>
-    <icon>admin/small/07.png</icon>
     <weight>420</weight>
   </item>
   <item>
@@ -205,5 +201,22 @@
     <path>civicrm/ajax/contactmailing</path>
     <page_callback>CRM_Mailing_Page_AJAX::getContactMailings</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/setupMailAccount</path>
+    <page_callback>CRM_Mailing_Page_AJAX::setup</page_callback>
+    <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mailing/url</path>
+    <page_callback>CRM_Mailing_Page_Url</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
+  </item>
+  <item>
+    <path>civicrm/mailing/open</path>
+    <page_callback>CRM_Mailing_Page_Open</page_callback>
+    <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
   </item>
 </menu>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail/mime.php';
@@ -243,17 +227,15 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $component->id = $mailing->reply_id;
     $component->find(TRUE);
 
-    $message = new Mail_Mime("\n");
-
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $headers = [
-      'Subject' => $component->subject,
-      'To' => $to,
-      'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
-      'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-      'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+    $params = [
+      'subject' => $component->subject,
+      'toEmail' => $to,
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];
 
     // TODO: do we need reply tokens?
@@ -273,24 +255,19 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     if ($eq->format == 'HTML' || $eq->format == 'Both') {
       $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $mailing, NULL, $tokens['html']);
-      $message->setHTMLBody($html);
     }
     if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
       $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $mailing, NULL, $tokens['text']);
-      $message->setTxtBody($text);
     }
+    $params['html'] = $html;
+    $params['text'] = $text;
 
-    $b = CRM_Utils_Mail::setMimeParams($message);
-    $h = $message->headers($headers);
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'a', $eq->job_id, queue_id, $eq->hash);
-
-    $mailer = \Civi::service('pear_mail');
-    if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($to, $h, $b);
-      unset($errorScope);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($params, 'a', $eq->job_id, queue_id, $eq->hash);
+    if (CRM_Core_BAO_MailSettings::includeMessageId()) {
+      $params['messageId'] = $params['Message-ID'];
     }
+    CRM_Utils_Mail::send($params);
   }
 
   /**

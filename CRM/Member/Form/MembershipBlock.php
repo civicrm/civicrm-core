@@ -1,34 +1,12 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
- */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -43,14 +21,18 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   protected $_memPriceSetId = NULL;
 
   /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    parent::preProcess();
+    $this->setSelectedChild('membership');
+  }
+
+  /**
    * Set default values for the form. Note that in edit/view mode
    * the default values are retrieved from the database
-   *
-   *
-   * @return void
    */
   public function setDefaultValues() {
-    //parent::setDefaultValues();
     $defaults = [];
     if (isset($this->_id)) {
       $defaults = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
@@ -110,7 +92,8 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
   /**
    * Build the form object.
    *
-   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     $membershipTypes = CRM_Member_BAO_MembershipType::getMembershipTypes();
@@ -223,12 +206,13 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
-   *
    * @param $files
    * @param int $contributionPageId
    *
    * @return bool|array
    *   mixed true or array of errors
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function formRule($params, $files, $contributionPageId = NULL) {
     $errors = [];
@@ -331,8 +315,6 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
   /**
    * Process the form.
-   *
-   * @return void
    */
   public function postProcess() {
     // get the submitted form values.
@@ -353,7 +335,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       if (is_array($params['membership_type'])) {
         foreach ($params['membership_type'] as $k => $v) {
           if ($v) {
-            $membershipTypes[$k] = CRM_Utils_Array::value("auto_renew_$k", $params);
+            $membershipTypes[$k] = $params["auto_renew_$k"] ?? NULL;
           }
         }
       }
@@ -363,7 +345,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       }
 
       // check for price set.
-      $priceSetID = CRM_Utils_Array::value('member_price_set_id', $params);
+      $priceSetID = $params['member_price_set_id'] ?? NULL;
       if (!empty($params['member_is_active']) && is_array($membershipTypes) && !$priceSetID) {
         $usedPriceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_contribution_page', $this->_id, 2);
         if (empty($params['mem_price_field_id']) && !$usedPriceSetId) {
@@ -381,21 +363,21 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           }
           $setParams['is_quick_config'] = 1;
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+          $setParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
           $fieldParams['price_set_id'] = $priceSet->id;
         }
         elseif ($usedPriceSetId) {
           $setParams['extends'] = CRM_Core_Component::getComponentID('CiviMember');
-          $setParams['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $this->_values);
+          $setParams['financial_type_id'] = $this->_values['financial_type_id'] ?? NULL;
           $setParams['id'] = $usedPriceSetId;
           $priceSet = CRM_Price_BAO_PriceSet::create($setParams);
           $priceSetID = $priceSet->id;
           $fieldParams['price_set_id'] = $priceSet->id;
         }
         else {
-          $fieldParams['id'] = CRM_Utils_Array::value('mem_price_field_id', $params);
+          $fieldParams['id'] = $params['mem_price_field_id'] ?? NULL;
           $priceSetID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', CRM_Utils_Array::value('mem_price_field_id', $params), 'price_set_id');
         }
         $editedFieldParams = [
@@ -412,7 +394,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
           $fieldParams['weight'] = 1;
         }
         else {
-          $fieldParams['id'] = CRM_Utils_Array::value('id', $editedResults);
+          $fieldParams['id'] = $editedResults['id'] ?? NULL;
         }
 
         $fieldParams['label'] = !empty($params['membership_type_label']) ? $params['membership_type_label'] : ts('Membership');
@@ -432,12 +414,12 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
             unset($options[$priceFieldID]);
           }
           $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($memType);
-          $fieldParams['option_label'][$rowCount] = CRM_Utils_Array::value('name', $membetype);
+          $fieldParams['option_label'][$rowCount] = $membetype['name'] ?? NULL;
           $fieldParams['option_amount'][$rowCount] = CRM_Utils_Array::value('minimum_fee', $membetype, 0);
-          $fieldParams['option_weight'][$rowCount] = CRM_Utils_Array::value('weight', $membetype);
-          $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
-          $fieldParams['default_option'] = CRM_Utils_Array::value('membership_type_default', $params);
-          $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);
+          $fieldParams['option_weight'][$rowCount] = $membetype['weight'] ?? NULL;
+          $fieldParams['option_description'][$rowCount] = $membetype['description'] ?? NULL;
+          $fieldParams['default_option'] = $params['membership_type_default'] ?? NULL;
+          $fieldParams['option_financial_type_id'][$rowCount] = $membetype['financial_type_id'] ?? NULL;
 
           $fieldParams['membership_type_id'][$rowCount] = $memType;
           // [$rowCount] = $membetype[''];

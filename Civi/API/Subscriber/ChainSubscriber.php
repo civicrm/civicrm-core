@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -34,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * The ChainSubscriber looks for API parameters which specify a nested or
  * chained API call. For example:
  *
- * @code
+ * ```
  * $result = civicrm_api('Contact', 'create', array(
  *   'version' => 3,
  *   'first_name' => 'Amy',
@@ -43,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *     'location_type_id' => 123,
  *   ),
  * ));
- * @endcode
+ * ```
  *
  * The ChainSubscriber looks for any parameters of the form "api.Email.create";
  * if found, it issues the nested API call (and passes some extra context --
@@ -56,7 +40,7 @@ class ChainSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      Events::RESPOND => ['onApiRespond', Events::W_EARLY],
+      'civi.api.respond' => ['onApiRespond', Events::W_EARLY],
     ];
   }
 
@@ -70,7 +54,7 @@ class ChainSubscriber implements EventSubscriberInterface {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] < 4) {
       $result = $event->getResponse();
-      if (\CRM_Utils_Array::value('is_error', $result, 0) == 0) {
+      if (is_array($result) && empty($result['is_error'])) {
         $this->callNestedApi($event->getApiKernel(), $apiRequest['params'], $result, $apiRequest['action'], $apiRequest['entity'], $apiRequest['version']);
         $event->setResponse($result);
       }
@@ -122,7 +106,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
         $subaction = empty($subAPI[2]) ? $action : $subAPI[2];
         $subParams = [
-          'debug' => \CRM_Utils_Array::value('debug', $params),
+          'debug' => $params['debug'] ?? NULL,
         ];
         $subEntity = _civicrm_api_get_entity_name_from_camel($subAPI[1]);
 
@@ -199,7 +183,7 @@ class ChainSubscriber implements EventSubscriberInterface {
             foreach ($newparams as $entityparams) {
               $subParams = array_merge($genericParams, $entityparams);
               _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
-              $result['values'][$idIndex][$field][] = $apiKernel->run($subEntity, $subaction, $subParams);
+              $result['values'][$idIndex][$field][] = $apiKernel->runSafe($subEntity, $subaction, $subParams);
               if ($result['is_error'] === 1) {
                 throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
               }
@@ -209,7 +193,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
             $subParams = array_merge($subParams, $newparams);
             _civicrm_api_replace_variables($subParams, $result['values'][$idIndex], $separator);
-            $result['values'][$idIndex][$field] = $apiKernel->run($subEntity, $subaction, $subParams);
+            $result['values'][$idIndex][$field] = $apiKernel->runSafe($subEntity, $subaction, $subParams);
             if (!empty($result['is_error'])) {
               throw new \Exception($subEntity . ' ' . $subaction . 'call failed with' . $result['error_message']);
             }

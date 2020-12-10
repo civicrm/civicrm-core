@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,27 +20,34 @@
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
-  public static $_links = NULL;
-  public $_permission = NULL;
-  public $_contactId = NULL;
-  public $_id = NULL;
-  public $_action = NULL;
+  use CRM_Core_Page_EntityPageTrait;
+
+  /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'ContributionRecur';
+  }
+
+  protected function getDefaultAction() {
+    return 'view';
+  }
 
   /**
    * View details of a recurring contribution.
    */
   public function view() {
-    if (empty($this->_id)) {
+    if (empty($this->getEntityId())) {
       CRM_Core_Error::statusBounce('Recurring contribution not found');
     }
 
     try {
       $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
-        'id' => $this->_id,
+        'id' => $this->getEntityId(),
       ]);
     }
     catch (Exception $e) {
-      CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
+      CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->getEntityId());
     }
 
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
@@ -97,21 +88,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   }
 
   public function preProcess() {
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'view');
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    $this->assign('contactId', $this->_contactId);
-
-    // check logged in url permission
-    CRM_Contact_Page_View::checkUserPermission($this);
-
-    $this->assign('action', $this->_action);
-
-    if ($this->_permission == CRM_Core_Permission::EDIT && !CRM_Core_Permission::check('edit contributions')) {
-      // demote to view since user does not have edit contrib rights
-      $this->_permission = CRM_Core_Permission::VIEW;
-      $this->assign('permission', 'view');
-    }
+    $this->preProcessQuickEntityPage();
   }
 
   /**
@@ -123,7 +100,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
   public function run() {
     $this->preProcess();
 
-    if ($this->_action & CRM_Core_Action::VIEW) {
+    if ($this->isViewContext()) {
       $this->view();
     }
 

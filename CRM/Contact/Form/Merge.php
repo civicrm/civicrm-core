@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -103,11 +87,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       if (!$this->_rgid) {
         // Unset browse URL as we have come from the search screen.
         $browseUrl = '';
-        $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', [
-          'contact_type' => $this->_contactType,
-          'used' => 'Supervised',
-          'return' => 'id',
-        ]);
+        try {
+          $this->_rgid = civicrm_api3('RuleGroup', 'getvalue', [
+            'contact_type' => $this->_contactType,
+            'used' => 'Supervised',
+            'return' => 'id',
+          ]);
+        }
+        catch (Exception $e) {
+          throw new CRM_Core_Exception(ts('There is no Supervised dedupe rule configured for contact type %1.', [1 => $this->_contactType]));
+        }
       }
       $this->assign('browseUrl', $browseUrl);
       if ($browseUrl) {
@@ -128,6 +117,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $mainUfId = CRM_Core_BAO_UFMatch::getUFId($this->_cid);
       $mainUser = NULL;
       if ($mainUfId) {
+        // @todo also calculate & assign url here & get it out of getRowsElementsAndInfo as it is form layer functionality.
         $mainUser = $config->userSystem->getUser($this->_cid);
         $this->assign('mainUfId', $mainUfId);
         $this->assign('mainUfName', $mainUser ? $mainUser['name'] : NULL);
@@ -165,12 +155,13 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       $otherUser = NULL;
 
       if ($otherUfId) {
+        // @todo also calculate & assign url here & get it out of getRowsElementsAndInfo as it is form layer functionality.
         $otherUser = $config->userSystem->getUser($this->_oid);
         $this->assign('otherUfId', $otherUfId);
         $this->assign('otherUfName', $otherUser ? $otherUser['name'] : NULL);
       }
 
-      $cmsUser = ($mainUfId && $otherUfId) ? TRUE : FALSE;
+      $cmsUser = $mainUfId && $otherUfId;
       $this->assign('user', $cmsUser);
 
       $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($this->_cid, $this->_oid);
@@ -225,19 +216,22 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
           // @todo consider enabling if it is an add & defaulting to true.
           $element[4] = array_merge((array) CRM_Utils_Array::value(4, $element, []), ['disabled' => TRUE]);
         }
-        $this->addElement($element[0],
+        $newCheckBox = $this->addElement($element[0],
           $element[1],
           array_key_exists('2', $element) ? $element[2] : NULL,
           array_key_exists('3', $element) ? $element[3] : NULL,
           array_key_exists('4', $element) ? $element[4] : NULL,
           array_key_exists('5', $element) ? $element[5] : NULL
         );
+        if (!empty($element['is_checked'])) {
+          $newCheckBox->setChecked(TRUE);
+        }
       }
 
       // add related table elements
-      foreach ($rowsElementsAndInfo['rel_table_elements'] as $relTableElement) {
-        $element = $this->addElement($relTableElement[0], $relTableElement[1]);
-        $element->setChecked(TRUE);
+      foreach (array_keys($rowsElementsAndInfo['rel_tables']) as $relTableElement) {
+        $this->addElement('checkbox', $relTableElement);
+        $this->_defaults[$relTableElement] = 1;
       }
 
       $this->assign('rel_tables', $rowsElementsAndInfo['rel_tables']);
@@ -382,7 +376,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
       CRM_Utils_System::permissionDenied();
     }
     // ensure that oid is not the current user, if so refuse to do the merge
-    if (CRM_Core_Session::singleton()->getLoggedInContactID() == $oid) {
+    if (CRM_Core_Session::getLoggedInContactID() == $oid) {
       $message = ts('The contact record which is linked to the currently logged in user account - \'%1\' - cannot be deleted.',
         [1 => CRM_Core_Session::singleton()->getLoggedInContactDisplayName()]
       );
@@ -418,6 +412,16 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         'other_contact_value' => CRM_Utils_Date::customFormat($contacts[$this->_oid]['modified_date']) . ($mostRecent == $this->_oid ? ' (' . ts('Most Recent') . ')' : ''),
       ],
     ]);
+  }
+
+  /**
+   * Set the defaults for the form.
+   *
+   * @return array
+   *   Array of default values
+   */
+  public function setDefaultValues() {
+    return $this->_defaults;
   }
 
 }

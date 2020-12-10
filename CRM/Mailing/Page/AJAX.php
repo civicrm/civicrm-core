@@ -1,40 +1,50 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class contains all the function that are called using AJAX
  */
 class CRM_Mailing_Page_AJAX {
+
+  /**
+   * Kick off the "Add Mail Account" process for some given type of account.
+   *
+   * Ex: 'civicrm/ajax/setupMailAccount?type=standard'
+   * Ex: 'civicrm/ajax/setupMailAccount?type=oauth_1'
+   *
+   * @see CRM_Core_BAO_MailSettings::getSetupActions()
+   * @throws \CRM_Core_Exception
+   */
+  public static function setup() {
+    $type = CRM_Utils_Request::retrieve('type', 'String');
+    $setupActions = CRM_Core_BAO_MailSettings::getSetupActions();
+    $setupAction = $setupActions[$type] ?? NULL;
+    if ($setupAction === NULL) {
+      throw new \CRM_Core_Exception("Cannot setup mail account. Invalid type requested.");
+    }
+
+    $result = call_user_func($setupAction['callback'], $setupAction);
+    if (isset($result['url'])) {
+      CRM_Utils_System::redirect($result['url']);
+    }
+    else {
+      throw new \CRM_Core_Exception("Cannot setup mail account. Setup does not have a URL.");
+    }
+  }
 
   /**
    * Fetch the template text/html messages

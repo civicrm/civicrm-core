@@ -30,7 +30,6 @@
  *
  * @package CRM
  * @copyright U.S. PIRG Education Fund 2007
- * $Id$
  *
  */
 class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMultiSelect {

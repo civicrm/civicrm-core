@@ -1,0 +1,10 @@
+<div id="bootstrap-theme">
+  <div ng-controller="crmSearchActionDelete">
+    <p><strong>{{:: ts('Are you sure you want to delete %1 %2?', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
+    <hr />
+    <div class="buttons pull-right">
+      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
+      <button ng-click="$ctrl.delete()" class="btn btn-primary">{{:: ts('Delete %1', {1: $ctrl.entityTitle}) }}</button>
+    </div>
+  </div>
+</div>

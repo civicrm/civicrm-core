@@ -1,4 +1,5 @@
-Dear {contact.display_name},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {if $is_pay_later}
   This is being sent to you as an acknowledgement that you have registered one or more members for the following workshop, event or purchase. Please note, however, that the status of your payment is pending, and the registration for this event will not be completed until your payment is received.
 {else}
@@ -9,7 +10,7 @@ Dear {contact.display_name},
   {$pay_later_receipt}
 {/if}
 
-  Your order number is #{$transaction_id}. Please print this confirmation for your records.{if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
+  Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
  Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:
 
 {if $billing_name}

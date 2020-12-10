@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -98,6 +82,51 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertTrue($this->runPermissionCheck('contact', 'create', $params), 'permission check should be skippable');
   }
 
+  public function getCamelCaseFuncs() {
+    // There have been two slightly different functions for normalizing names;
+    // _civicrm_api_get_camel_name() and \Civi\API\Request::normalizeEntityName().
+    return [
+      // These are the typical cases - where the two have always agreed.
+      ['Foo', 'Foo'],
+      ['foo', 'Foo'],
+      ['FooBar', 'FooBar'],
+      ['foo_bar', 'FooBar'],
+      ['fooBar', 'FooBar'],
+      ['Im', 'Im'],
+      ['ACL', 'Acl'],
+      ['HTTP', 'HTTP'],
+
+      // These are some atypical cases - where the two have always agreed.
+      ['foo__bar', 'FooBar'],
+      ['Foo_Bar', 'FooBar'],
+      ['one_two_three', 'OneTwoThree'],
+      ['oneTwo_three', 'OneTwoThree'],
+      ['Got2B', 'Got2B'],
+      ['got2_BGood', 'Got2BGood'],
+
+      // These are some atypical cases - where they have traditionally disagreed.
+      // _civicrm_api_get_camel_name() has now changed to match normalizeEntityName()
+      // because the latter is more defensive.
+      ['Foo-Bar', 'FooBar'],
+      ['Foo+Bar', 'FooBar'],
+      ['Foo.Bar', 'FooBar'],
+      ['Foo/../Bar/', 'FooBar'],
+      ['./Foo', 'Foo'],
+    ];
+  }
+
+  /**
+   * @param string $inputValue
+   *   The user-supplied/untrusted entity name.
+   * @param string $expectValue
+   *   The normalized/UpperCamelCase entity name.
+   * @dataProvider getCamelCaseFuncs
+   */
+  public function testCamelName($inputValue, $expectValue) {
+    $actualValue = _civicrm_api_get_camel_name($inputValue);
+    $this->assertEquals($expectValue, $actualValue);
+  }
+
   /**
    * @param string $entity
    * @param string $action
@@ -111,10 +140,11 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *   TRUE or FALSE depending on the outcome of the authorization check
    */
   public function runPermissionCheck($entity, $action, $params, $throws = FALSE) {
+    $params['version'] = 3;
     $dispatcher = new \Symfony\Component\EventDispatcher\EventDispatcher();
     $dispatcher->addSubscriber(new \Civi\API\Subscriber\PermissionCheck());
     $kernel = new \Civi\API\Kernel($dispatcher);
-    $apiRequest = \Civi\API\Request::create($entity, $action, $params, NULL);
+    $apiRequest = \Civi\API\Request::create($entity, $action, $params);
     try {
       $kernel->authorize(NULL, $apiRequest);
       return TRUE;
@@ -241,12 +271,18 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test the validate function transforms dates.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
   public function test_civicrm_api3_validate_fields() {
-    $params = ['start_date' => '2010-12-20', 'end_date' => ''];
+    $params = ['relationship_start_date' => '2010-12-20', 'relationship_end_date' => ''];
     $fields = civicrm_api3('relationship', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('relationship', 'get', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['start_date']);
-    $this->assertEquals('', $params['end_date']);
+    $this->assertEquals('20101220000000', $params['relationship_start_date']);
+    $this->assertEquals('', $params['relationship_end_date']);
   }
 
   public function test_civicrm_api3_validate_fields_membership() {
@@ -376,18 +412,18 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     });
     $kernel->registerApiProvider($provider);
 
-    $r1 = $kernel->run('Widget', 'get', $params);
+    $r1 = $kernel->runSafe('Widget', 'get', $params);
     $this->assertEquals(count($resultIds), $r1['count']);
     $this->assertEquals($resultIds, array_keys($r1['values']));
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r1['values'])));
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r1['values'])));
 
-    $r2 = $kernel->run('Widget', 'get', $params + ['sequential' => 1]);
+    $r2 = $kernel->runSafe('Widget', 'get', $params + ['sequential' => 1]);
     $this->assertEquals(count($resultIds), $r2['count']);
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r2['values'])));
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r2['values'])));
 
-    $r3 = $kernel->run('Widget', 'get', $params + ['options' => ['offset' => 1, 'limit' => 2]]);
+    $r3 = $kernel->runSafe('Widget', 'get', $params + ['options' => ['offset' => 1, 'limit' => 2]]);
     $slice = array_slice($resultIds, 1, 2);
     $this->assertEquals(count($slice), $r3['count']);
     $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('snack_id', $r3['values'])));
@@ -408,7 +444,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     });
     $kernel->registerApiProvider($provider);
 
-    $r1 = $kernel->run('Widget', 'get', [
+    $r1 = $kernel->runSafe('Widget', 'get', [
       'version' => 3,
       'snack_id' => 'b',
       'return' => 'fruit',
@@ -416,7 +452,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertAPISuccess($r1);
     $this->assertEquals(['b' => ['id' => 'b', 'fruit' => 'grape']], $r1['values']);
 
-    $r2 = $kernel->run('Widget', 'get', [
+    $r2 = $kernel->runSafe('Widget', 'get', [
       'version' => 3,
       'snack_id' => 'b',
       'return' => ['fruit', 'cheese'],
@@ -424,7 +460,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertAPISuccess($r2);
     $this->assertEquals(['b' => ['id' => 'b', 'fruit' => 'grape', 'cheese' => 'cheddar']], $r2['values']);
 
-    $r3 = $kernel->run('Widget', 'get', [
+    $r3 = $kernel->runSafe('Widget', 'get', [
       'version' => 3,
       'cheese' => 'cheddar',
       'return' => ['fruit'],
@@ -438,6 +474,8 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
   /**
    * CRM-20892 Add Tests of new timestamp checking function
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testTimeStampChecking() {
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing (id, modified_date) VALUES (25, '2016-06-30 12:52:52')");
@@ -445,6 +483,26 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->callAPISuccess('Mailing', 'create', ['id' => 25, 'subject' => 'Test Subject']);
     $this->assertFalse(_civicrm_api3_compare_timestamps('2017-02-15 16:00:00', 25, 'Mailing'));
     $this->callAPISuccess('Mailing', 'delete', ['id' => 25]);
+  }
+
+  /**
+   * Test that the foreign key constraint test correctly interprets pseudoconstants.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public function testKeyConstraintCheck() {
+    $fieldInfo = $this->callAPISuccess('Contribution', 'getfields', [])['values']['financial_type_id'];
+    _civicrm_api3_validate_constraint(1, 'financial_type_id', $fieldInfo, 'Contribution');
+    _civicrm_api3_validate_constraint('Donation', 'financial_type_id', $fieldInfo, 'Contribution');
+    try {
+      _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');
+    }
+    catch (API_Exception $e) {
+      $this->assertEquals("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
+      return;
+    }
+    $this->fail('Last function call should have thrown an exception');
   }
 
 }

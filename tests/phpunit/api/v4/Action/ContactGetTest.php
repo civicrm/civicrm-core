@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -72,6 +54,82 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     // Putting is_deleted anywhere in the where clause will disable the default
     $contacts = Contact::get()->addClause('OR', ['last_name', '=', $last_name], ['is_deleted', '=', 0])->addSelect('id')->execute();
     $this->assertContains($del['id'], $contacts->column('id'));
+  }
+
+  public function testGetWithLimit() {
+    $last_name = uniqid('getWithLimitTest');
+
+    $bob = Contact::create()
+      ->setValues(['first_name' => 'Bob', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jan = Contact::create()
+      ->setValues(['first_name' => 'Jan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $dan = Contact::create()
+      ->setValues(['first_name' => 'Dan', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $num = Contact::get(FALSE)->selectRowCount()->execute()->count();
+
+    // The object's count() method will account for all results, ignoring limit & offset, while the array results are limited
+    $offset1 = Contact::get(FALSE)->setOffset(1)->execute();
+    $this->assertCount($num, $offset1);
+    $this->assertCount($num - 1, (array) $offset1);
+    $offset2 = Contact::get(FALSE)->setOffset(2)->execute();
+    $this->assertCount($num - 2, (array) $offset2);
+    $this->assertCount($num, $offset2);
+    // With limit, it doesn't fetch total count by default
+    $limit2 = Contact::get(FALSE)->setLimit(2)->execute();
+    $this->assertCount(2, (array) $limit2);
+    $this->assertCount(2, $limit2);
+    // With limit, you have to trigger the full row count manually
+    $limit2 = Contact::get(FALSE)->setLimit(2)->addSelect('sort_name', 'row_count')->execute();
+    $this->assertCount(2, (array) $limit2);
+    $this->assertCount($num, $limit2);
+    $msg = '';
+    try {
+      $limit2->single();
+    }
+    catch (\API_Exception $e) {
+      $msg = $e->getMessage();
+    }
+    $this->assertRegExp(';Expected to find one Contact record;', $msg);
+    $limit1 = Contact::get(FALSE)->setLimit(1)->execute();
+    $this->assertCount(1, (array) $limit1);
+    $this->assertCount(1, $limit1);
+    $this->assertTrue(!empty($limit1->single()['sort_name']));
+  }
+
+  /**
+   * Test a lack of fatal errors when the where contains an emoji.
+   *
+   * By default our DBs are not 🦉 compliant. This test will age
+   * out when we are.
+   *
+   * @throws \API_Exception
+   */
+  public function testEmoji(): void {
+    $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
+    if ($schemaNeedsAlter) {
+      \CRM_Core_DAO::executeQuery("
+        ALTER TABLE civicrm_contact MODIFY COLUMN
+        `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
+        CHARSET utf8
+      ");
+    }
+    Contact::get()
+      ->setDebug(TRUE)
+      ->addWhere('first_name', '=', '🦉Claire')
+      ->execute();
+    if ($schemaNeedsAlter) {
+      \CRM_Core_DAO::executeQuery("
+        ALTER TABLE civicrm_contact MODIFY COLUMN
+        `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
+        CHARSET utf8mb4
+      ");
+    }
   }
 
 }

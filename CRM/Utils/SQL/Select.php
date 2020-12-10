@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * Dear God Why Do I Have To Write This (Dumb SQL Builder)
  *
  * Usage:
- * @code
+ * ```
  * $select = CRM_Utils_SQL_Select::from('civicrm_activity act')
  *     ->join('absence', 'inner join civicrm_activity absence on absence.id = act.source_record_id')
  *     ->where('activity_type_id = #type', array('type' => 234))
@@ -41,7 +25,7 @@
  *        'value' => $form['foo']
  *      ))
  * echo $select->toSQL();
- * @endcode
+ * ```
  *
  * Design principles:
  *  - Portable
@@ -65,7 +49,7 @@
  * xor output. The notations for input and output interpolation are a bit different,
  * and they may not be mixed.
  *
- * @code
+ * ```
  * // Interpolate on input. Set params when using them.
  * $select->where('activity_type_id = #type', array(
  *   'type' => 234,
@@ -75,16 +59,17 @@
  * $select
  *     ->where('activity_type_id = #type')
  *     ->param('type', 234),
- * @endcode
+ * ```
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
 
   private $insertInto = NULL;
   private $insertVerb = 'INSERT INTO ';
   private $insertIntoFields = [];
+  private $onDuplicates = [];
   private $selects = [];
   private $from;
   private $joins = [];
@@ -127,7 +112,7 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
    */
   public function __construct($from, $options = []) {
     $this->from = $from;
-    $this->mode = isset($options['mode']) ? $options['mode'] : self::INTERPOLATE_AUTO;
+    $this->mode = $options['mode'] ?? self::INTERPOLATE_AUTO;
   }
 
   /**
@@ -390,6 +375,45 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
   }
 
   /**
+   * Take the results of the SELECT query and copy them into another
+   * table.
+   *
+   * If the same record already exists in the other table (based on
+   * primary-key or unique-key), then update the corresponding record.
+   *
+   * @param string $table
+   *   The table to write data into.
+   * @param array|string $keys
+   *   List of PK/unique fields
+   *   NOTE: This must match the unique-key that was declared in the schema.
+   * @param array $mapping
+   *   List of values to select and where to send them.
+   *
+   *   For example, consider:
+   *     ['relationship_id' => 'rel.id']
+   *
+   *   This would select the value of 'rel.id' and write to 'relationship_id'.
+   *
+   * @param null|array $args
+   *   Use NULL to skip interpolation; use an array of variables to enable.
+   * @return $this
+   */
+  public function syncInto($table, $keys, $mapping, $args = NULL) {
+    $keys = (array) $keys;
+
+    $this->select(array_values($mapping), $args);
+    $this->insertInto($table, array_keys($mapping));
+
+    foreach ($mapping as $intoColumn => $fromValue) {
+      if (!in_array($intoColumn, $keys)) {
+        $this->onDuplicate("$intoColumn = $fromValue", $args);
+      }
+    }
+
+    return $this;
+  }
+
+  /**
    * @param array $fields
    *   The fields to fill in the other table (in order).
    * @return CRM_Utils_SQL_Select
@@ -398,6 +422,22 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     $fields = (array) $fields;
     foreach ($fields as $field) {
       $this->insertIntoFields[] = $field;
+    }
+    return $this;
+  }
+
+  /**
+   * For INSERT INTO...SELECT...' queries, you may give an "ON DUPLICATE UPDATE" clause.
+   *
+   * @param string|array $exprs list of SQL expressions
+   * @param null|array $args use NULL to disable interpolation; use an array of variables to enable
+   * @return CRM_Utils_SQL_Select
+   */
+  public function onDuplicate($exprs, $args = NULL) {
+    $exprs = (array) $exprs;
+    foreach ($exprs as $expr) {
+      $evaluatedExpr = $this->interpolate($expr, $args);
+      $this->onDuplicates[$evaluatedExpr] = $evaluatedExpr;
     }
     return $this;
   }
@@ -479,6 +519,15 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
         $sql .= 'OFFSET ' . $this->offset . "\n";
       }
     }
+    if ($this->onDuplicates) {
+      if ($this->insertVerb === 'INSERT INTO ') {
+        $sql .= ' ON DUPLICATE KEY UPDATE ' . implode(", ", $this->onDuplicates) . "\n";
+      }
+      else {
+        throw new \Exception("The ON DUPLICATE clause and only be used with INSERT INTO queries.");
+      }
+    }
+
     if ($this->mode === self::INTERPOLATE_OUTPUT) {
       $sql = $this->interpolate($sql, $this->params, self::INTERPOLATE_OUTPUT);
     }

@@ -1,34 +1,20 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Email;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -95,6 +81,13 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   protected $_recordId = NULL;
 
   /**
+   * Should the primary email be converted into a link, if emailabe.
+   *
+   * @var bool
+   */
+  protected $isShowEmailTaskLink = FALSE;
+
+  /**
    *
    * fetch multirecord as well as non-multirecord fields
    * @var int
@@ -113,15 +106,18 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
    * @param bool $skipPermission
    * @param null $profileIds
    *
-   * @return \CRM_Profile_Page_Dynamic
+   * @param bool $isShowEmailTaskLink
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL) {
+  public function __construct($id, $gid, $restrict, $skipPermission = FALSE, $profileIds = NULL, $isShowEmailTaskLink = FALSE) {
     parent::__construct();
 
     $this->_id = $id;
     $this->_gid = $gid;
     $this->_restrict = $restrict;
     $this->_skipPermission = $skipPermission;
+    $this->isShowEmailTaskLink = $isShowEmailTaskLink;
 
     if (!array_key_exists('multiRecord', $_GET)) {
       $this->set('multiRecord', NULL);
@@ -253,7 +249,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       if ($this->_isContactActivityProfile && $this->_gid) {
         $errors = CRM_Profile_Form::validateContactActivityProfile($this->_activityId, $this->_id, $this->_gid);
         if (!empty($errors)) {
-          CRM_Core_Error::fatal(array_pop($errors));
+          CRM_Core_Error::statusBounce(array_pop($errors));
         }
       }
 
@@ -331,6 +327,11 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $labels[$index] = preg_replace('/\s+|\W+/', '_', $name);
       }
 
+      if ($this->isShowEmailTaskLink) {
+        foreach ($this->getEmailFields($fields) as $fieldName) {
+          $values[$fields[$fieldName]['title']] = $this->getLinkedEmail($values[$fields[$fieldName]['title']]);
+        }
+      }
       foreach ($values as $title => $value) {
         $profileFields[$labels[$title]] = [
           'label' => $title,
@@ -430,6 +431,49 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   public function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();
+  }
+
+  /**
+   * Get the email field as a task link, if not on hold or set to do_not_email.
+   *
+   * @param string $email
+   *
+   * @return string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getLinkedEmail($email): string {
+    if (!$email) {
+      return '';
+    }
+    $emailID = Email::get()->setOrderBy(['is_primary' => 'DESC'])->setWhere([['contact_id', '=', $this->_id], ['email', '=', $email], ['on_hold', '=', FALSE], ['contact.is_deceased', '=', FALSE], ['contact.is_deleted', '=', FALSE], ['contact.do_not_email', '=', FALSE]])->execute()->first()['id'];
+    if (!$emailID) {
+      return $email;
+    }
+    $emailPopupUrl = CRM_Utils_System::url('civicrm/activity/email/add', [
+      'action' => 'add',
+      'reset' => '1',
+      'email_id' => $emailID,
+    ], TRUE);
+
+    return '<a class="crm-popup" href="' . $emailPopupUrl . '">' . $email . '</a>';
+  }
+
+  /**
+   * Get the email fields from within the fields array.
+   *
+   * @param array $fields
+   */
+  protected function getEmailFields(array $fields): array {
+    $emailFields = [];
+    foreach (array_keys($fields) as $fieldName) {
+      if (substr($fieldName, 0, 6) === 'email-'
+          && (is_numeric(substr($fieldName, 6)) || substr($fieldName, 6) ===
+        'Primary')) {
+        $emailFields[] = $fieldName;
+      }
+    }
+    return $emailFields;
   }
 
 }

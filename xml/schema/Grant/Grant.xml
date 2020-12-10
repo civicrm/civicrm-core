@@ -6,6 +6,14 @@
   <comment>This table stores information about grants given to a contact.</comment>
   <add>1.8</add>
   <log>true</log>
+  <icon>fa-money</icon>
+  <component>CiviGrant</component>
+  <paths>
+    <add>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</add>
+    <view>contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
+    <update>civicrm/contact/view/grant?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</update>
+    <delete>civicrm/contact/view/grant?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -177,15 +185,6 @@
     <html>
       <type>Select</type>
     </html>
-  </field>
-  <field>
-    <name>currency</name>
-    <type>varchar</type>
-    <length>8</length>
-    <default>NULL</default>
-    <comment>3 character string, value from config setting or input via user.</comment>
-    <add>3.2</add>
-    <drop>4.3</drop>
   </field>
   <field>
     <name>rationale</name>

@@ -2,93 +2,92 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
- */
-
 
 namespace Civi\Api4\Generic;
 
 /**
- * Base class for DAO-based entities.
+ * Base class for DAO entities (sql tables).
+ *
+ * This is one of 3 possible base classes for an APIv4 Entity
+ * (the others are `BasicEntity` and `AbstractEntity`).
+ *
+ * This base class is used for entities that have an associated DAO and support CRUD operations.
+ *
+ * Entities that extend this class can override actions and add others on an ad-hoc basis.
+ *
+ * DAO entities which do not support all CRUD operations should instead extend AbstractEntity
+ * in order to implement just the actions appropriate to that entity.
  */
 abstract class DAOEntity extends AbstractEntity {
 
   /**
+   * @param bool $checkPermissions
    * @return DAOGetAction
    */
-  public static function get() {
-    return new DAOGetAction(static::class, __FUNCTION__);
+  public static function get($checkPermissions = TRUE) {
+    return (new DAOGetAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
-   * @return DAOGetAction
+   * @param bool $checkPermissions
+   * @return DAOSaveAction
    */
-  public static function save() {
-    return new DAOSaveAction(static::class, __FUNCTION__);
+  public static function save($checkPermissions = TRUE) {
+    return (new DAOSaveAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOGetFieldsAction
    */
-  public static function getFields() {
-    return new DAOGetFieldsAction(static::class, __FUNCTION__);
+  public static function getFields($checkPermissions = TRUE) {
+    return (new DAOGetFieldsAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOCreateAction
    */
-  public static function create() {
-    return new DAOCreateAction(static::class, __FUNCTION__);
+  public static function create($checkPermissions = TRUE) {
+    return (new DAOCreateAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAOUpdateAction
    */
-  public static function update() {
-    return new DAOUpdateAction(static::class, __FUNCTION__);
+  public static function update($checkPermissions = TRUE) {
+    return (new DAOUpdateAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return DAODeleteAction
    */
-  public static function delete() {
-    return new DAODeleteAction(static::class, __FUNCTION__);
+  public static function delete($checkPermissions = TRUE) {
+    return (new DAODeleteAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
+   * @param bool $checkPermissions
    * @return BasicReplaceAction
    */
-  public static function replace() {
-    return new BasicReplaceAction(static::class, __FUNCTION__);
+  public static function replace($checkPermissions = TRUE) {
+    return (new BasicReplaceAction(static::class, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

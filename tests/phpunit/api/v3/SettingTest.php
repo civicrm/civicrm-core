@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -48,21 +32,15 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $params = [
-      'name' => 'Default Domain Name',
-      'domain_version' => '4.7',
+      'name' => __CLASS__ . 'Second Domain',
+      'domain_version' => CRM_Utils_System::version(),
     ];
     $result = $this->callAPISuccess('domain', 'get', $params);
     if (empty($result['id'])) {
       $result = $this->callAPISuccess('domain', 'create', $params);
     }
-
-    $params['name'] = 'Second Domain';
-    $result = $this->callAPISuccess('domain', 'get', $params);
-    if (empty($result['id'])) {
-      $result = $this->callAPISuccess('domain', 'create', $params);
-    }
     $this->_domainID2 = $result['id'];
-    $params['name'] = 'A-team domain';
+    $params['name'] = __CLASS__ . 'Third domain';
     $result = $this->callAPISuccess('domain', 'get', $params);
     if (empty($result['id'])) {
       $result = $this->callAPISuccess('domain', 'create', $params);
@@ -76,7 +54,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
     $this->callAPISuccess('system', 'flush', []);
-    $this->quickCleanup(['civicrm_domain']);
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_domain WHERE name LIKE "' . __CLASS__ . '%"');
   }
 
   /**
@@ -316,10 +294,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateAllDomains');
 
-    $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][1]['uniq_email_per_site']);
-    $this->assertArrayHasKey(3, $result['values'], 'Domain create probably failed Debug this IF domain test is passing');
-    $this->assertEquals(1, $result['values'][3]['uniq_email_per_site'], 'failed to set setting for domain 3.');
+    $this->assertEquals(1, $result['values'][$this->_domainID2]['uniq_email_per_site']);
+    $this->assertEquals(1, $result['values'][$this->_currentDomain]['uniq_email_per_site']);
+    $this->assertArrayHasKey($this->_domainID3, $result['values'], 'Domain create probably failed Debug this IF domain test is passing');
+    $this->assertEquals(1, $result['values'][$this->_domainID3]['uniq_email_per_site'], 'failed to set setting for domain 3.');
 
     $params = [
       'domain_id' => 'all',
@@ -329,27 +307,27 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $description = "Shows getting a variable for all domains.";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetAllDomains');
 
-    $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][1]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][3]['uniq_email_per_site']);
+    $this->assertEquals(1, $result['values'][$this->_domainID2]['uniq_email_per_site']);
+    $this->assertEquals(1, $result['values'][$this->_currentDomain]['uniq_email_per_site']);
+    $this->assertEquals(1, $result['values'][$this->_domainID3]['uniq_email_per_site']);
 
     $params = [
-      'domain_id' => [1, 3],
+      'domain_id' => [$this->_currentDomain, $this->_domainID3],
       'uniq_email_per_site' => 0,
     ];
     $description = "Shows setting a variable for specified domains.";
     $result = $this->callAPIAndDocument('setting', 'create', $params, __FUNCTION__, __FILE__, $description, 'CreateSpecifiedDomains');
 
-    $this->assertEquals(0, $result['values'][3]['uniq_email_per_site']);
-    $this->assertEquals(0, $result['values'][1]['uniq_email_per_site']);
+    $this->assertEquals(0, $result['values'][$this->_domainID3]['uniq_email_per_site']);
+    $this->assertEquals(0, $result['values'][$this->_currentDomain]['uniq_email_per_site']);
     $params = [
-      'domain_id' => [1, 2],
+      'domain_id' => [$this->_currentDomain, $this->_domainID2],
       'return' => ['uniq_email_per_site'],
     ];
     $description = "Shows getting a variable for specified domains.";
     $result = $this->callAPIAndDocument('setting', 'get', $params, __FUNCTION__, __FILE__, $description, 'GetSpecifiedDomains');
-    $this->assertEquals(1, $result['values'][2]['uniq_email_per_site']);
-    $this->assertEquals(0, $result['values'][1]['uniq_email_per_site']);
+    $this->assertEquals(1, $result['values'][$this->_domainID2]['uniq_email_per_site']);
+    $this->assertEquals(0, $result['values'][$this->_currentDomain]['uniq_email_per_site']);
 
   }
 
@@ -540,8 +518,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testDefaults() {
     $domparams = [
-      'name' => 'B Team Domain',
-      'domain_version' => '4.7',
+      'name' => __CLASS__ . 'B Team Domain',
+      'domain_version' => CRM_Utils_System::version(),
     ];
     $dom = $this->callAPISuccess('domain', 'create', $domparams);
     $params = [

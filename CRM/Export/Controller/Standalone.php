@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -58,13 +42,15 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       $this->set('cids', implode(',', array_keys($perm['values'])));
     }
 
-    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action);
+    $this->_stateMachine = new CRM_Export_StateMachine_Standalone($this, $action, $entity);
 
     // create and instantiate the pages
     $this->addPages($this->_stateMachine, $action);
 
     // add all the actions
     $this->addActions();
+    $dao = CRM_Core_DAO_AllCoreTables::getFullName($entity);
+    CRM_Utils_System::setTitle(ts('Export %1', [1 => $dao::getEntityTitle(TRUE)]));
   }
 
   /**
@@ -83,14 +69,33 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
       }
     }
     // Set the "task" selector value to Export
-    $className = 'CRM_' . $this->get('entity') . '_Task';
+    $className = 'CRM_' . $this->getComponent($this->get('entity')) . '_Task';
     foreach ($className::tasks() as $taskId => $task) {
       $taskForm = (array) $task['class'];
-      if ($taskForm[0] == 'CRM_Export_Form_Select') {
+      if (strpos($taskForm[0], 'CRM_Export_Form_Select') === 0) {
         $values['task'] = $taskId;
       }
     }
     return $values;
+  }
+
+  /**
+   * Get the relevant entity name.
+   *
+   * @return string
+   */
+  public function getComponent() {
+    $components = CRM_Export_BAO_Export::getComponents();
+    return $components[$this->getEntity()];
+  }
+
+  /**
+   * Get the name used to construct the class.
+   *
+   * @return mixed
+   */
+  public function getEntity() {
+    return $this->get('entity');
   }
 
 }

@@ -70,14 +70,14 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     \CRM_Utils_Time::setTime('2013-11-30 03:00:00');
     $this->callApiSuccess('Activity', 'create', [
       'id' => self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'id'),
-      'status_id' => $actStatuses['Skip Activity'],
+      'status_id' => $actStatuses['Skip_Activity'],
     ]);
     $analyzer->flush();
     $this->assertEquals($caseStatuses['Open'], self::ag($analyzer->getCase(), 'status_id'));
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
-    $this->assertEquals($actStatuses['Skip Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertEquals($actStatuses['Skip_Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
 
@@ -94,7 +94,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
-    $this->assertEquals($actStatuses['Skip Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertEquals($actStatuses['Skip_Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Scheduled'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
     $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));
@@ -110,7 +110,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
-    $this->assertEquals($actStatuses['Skip Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertEquals($actStatuses['Skip_Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
     $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));
@@ -127,7 +127,7 @@ class SequenceListenerTest extends \CiviCaseTestCase {
     $this->assertApproxTime('2013-11-30 01:00:00', self::ag($analyzer->getSingleActivity('Medical evaluation'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Medical evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 02:00:00', self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'activity_date_time'));
-    $this->assertEquals($actStatuses['Skip Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
+    $this->assertEquals($actStatuses['Skip_Activity'], self::ag($analyzer->getSingleActivity('Mental health evaluation'), 'status_id'));
     $this->assertApproxTime('2013-11-30 03:00:00', self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'activity_date_time'));
     $this->assertEquals($actStatuses['Completed'], self::ag($analyzer->getSingleActivity('Secure temporary housing'), 'status_id'));
     $this->assertApproxTime('2013-11-30 04:00:00', self::ag($analyzer->getSingleActivity('Follow up'), 'activity_date_time'));

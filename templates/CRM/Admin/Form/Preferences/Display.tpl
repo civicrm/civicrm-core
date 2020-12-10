@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for editing Site Preferences  *}
@@ -177,10 +161,7 @@
       <td>
         {$form.editor_id.html}
         &nbsp;
-        <span class="crm-button crm-icon-button" style="display:inline-block;vertical-align:middle;float:none!important;">
-          <i class="crm-i fa-wrench" style="margin: 0 -18px 0 2px;"></i>
-          {$form.ckeditor_config.html}
-        </span>
+        {$form.ckeditor_config.html}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
@@ -222,22 +203,14 @@
         {$form.menubar_color.html}
       </td>
     </tr>
-
-    {if $config->userSystem->is_drupal EQ '1'}
-      <tr class="crm-preferences-display-form-block-theme">
-        <td class="label">{ts}Theme{/ts} {help id="theme"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-    {else}
-      <tr class="crm-preferences-display-form-block-theme_backend">
-        <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
-        <td>{$form.theme_backend.html}</td>
-      </tr>
-      <tr class="crm-preferences-display-form-block-theme_frontend">
-        <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
-        <td>{$form.theme_frontend.html}</td>
-      </tr>
-      {/if}
+    <tr class="crm-preferences-display-form-block-theme_backend">
+      <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
+      <td>{$form.theme_backend.html}</td>
+    </tr>
+    <tr class="crm-preferences-display-form-block-theme_frontend">
+      <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
+      <td>{$form.theme_frontend.html}</td>
+    </tr>
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

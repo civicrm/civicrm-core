@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Mail {
 
@@ -41,10 +25,13 @@ class CRM_Utils_Mail {
    * to the mailer through the container.
    *
    * @return Mail
+   *
+   * @throws CRM_Core_Exception
    */
   public static function createMailer() {
     $mailingInfo = Civi::settings()->get('mailing_backend');
 
+    /*@var Mail $mailer*/
     if ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB ||
       (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
     ) {
@@ -53,7 +40,7 @@ class CRM_Utils_Mail {
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if ($mailingInfo['smtpServer'] == '' || !$mailingInfo['smtpServer']) {
         CRM_Core_Error::debug_log_message(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
-        CRM_Core_Error::fatal(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        throw new CRM_Core_Exception(ts('There is no valid smtp server setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the SMTP Server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
 
       $params['host'] = $mailingInfo['smtpServer'] ? $mailingInfo['smtpServer'] : 'localhost';
@@ -97,7 +84,7 @@ class CRM_Utils_Mail {
         !$mailingInfo['sendmail_path']
       ) {
         CRM_Core_Error::debug_log_message(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
-        CRM_Core_Error::fatal(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
+        throw new CRM_Core_Exception(ts('There is no valid sendmail path setting. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the sendmail server.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
       }
       $params['sendmail_path'] = $mailingInfo['sendmail_path'];
       $params['sendmail_args'] = $mailingInfo['sendmail_args'];
@@ -108,7 +95,7 @@ class CRM_Utils_Mail {
       $mailer = self::_createMailer('mail', []);
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_MOCK) {
-      $mailer = self::_createMailer('mock', []);
+      $mailer = self::_createMailer('mock', $mailingInfo);
     }
     elseif ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED) {
       CRM_Core_Error::debug_log_message(ts('Outbound mail has been disabled. Click <a href=\'%1\'>Administer >> System Setting >> Outbound Email</a> to set the OutBound Email.', [1 => CRM_Utils_System::url('civicrm/admin/setting/smtp', 'reset=1')]));
@@ -138,6 +125,17 @@ class CRM_Utils_Mail {
     else {
       $mailer = Mail::factory($driver, $params);
     }
+
+    // Previously, CiviCRM bundled patches to change the behavior of 3 specific drivers. Use wrapper/filters to avoid patching.
+    $mailer = new CRM_Utils_Mail_FilteredPearMailer($driver, $params, $mailer);
+    if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
+      $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
+      $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {
+        if (!is_array($headers)) {
+          return PEAR::raiseError('$headers must be an array');
+        }
+      });
+    }
     CRM_Utils_Hook::alterMailer($mailer, $driver, $params);
     return $mailer;
   }
@@ -155,6 +153,8 @@ class CRM_Utils_Mail {
    * text    : text of the message
    * html    : html version of the message
    * replyTo : reply-to header in the email
+   * returnpath : email address for bounces to be sent to
+   * messageId : Message ID for this email mesage
    * attachments: an associative array of
    *   fullPath : complete pathname to the file
    *   mime_type: mime type of the attachment
@@ -170,7 +170,7 @@ class CRM_Utils_Mail {
     $defaultReturnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
-    $from = CRM_Utils_Array::value('from', $params);
+    $from = $params['from'] ?? NULL;
     if (!$defaultReturnPath) {
       $defaultReturnPath = self::pluckEmailFromHeader($from);
     }
@@ -183,9 +183,9 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    $textMessage = CRM_Utils_Array::value('text', $params);
-    $htmlMessage = CRM_Utils_Array::value('html', $params);
-    $attachments = CRM_Utils_Array::value('attachments', $params);
+    $textMessage = $params['text'] ?? NULL;
+    $htmlMessage = $params['html'] ?? NULL;
+    $attachments = $params['attachments'] ?? NULL;
 
     // CRM-6224
     if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
@@ -206,13 +206,13 @@ class CRM_Utils_Mail {
 
     // On some servers mail() fails when 'Cc' or 'Bcc' headers are defined but empty.
     foreach (['Cc', 'Bcc'] as $optionalHeader) {
-      $headers[$optionalHeader] = CRM_Utils_Array::value(strtolower($optionalHeader), $params);
+      $headers[$optionalHeader] = $params[strtolower($optionalHeader)] ?? NULL;
       if (empty($headers[$optionalHeader])) {
         unset($headers[$optionalHeader]);
       }
     }
 
-    $headers['Subject'] = CRM_Utils_Array::value('subject', $params);
+    $headers['Subject'] = $params['subject'] ?? NULL;
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
@@ -226,7 +226,7 @@ class CRM_Utils_Mail {
     }
     $headers['Date'] = date('r');
     if ($includeMessageId) {
-      $headers['Message-ID'] = '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
+      $headers['Message-ID'] = $params['messageId'] ?? '<' . uniqid('civicrm_', TRUE) . "@$emailDomain>";
     }
     if (!empty($params['autoSubmitted'])) {
       $headers['Auto-Submitted'] = "Auto-Generated";
@@ -264,7 +264,11 @@ class CRM_Utils_Mail {
         $msg->addAttachment(
           $attach['fullPath'],
           $attach['mime_type'],
-          $attach['cleanName']
+          $attach['cleanName'],
+          TRUE,
+          'base64',
+          'attachment',
+          (isset($attach['charset']) ? $attach['charset'] : '')
         );
       }
     }
@@ -282,21 +286,29 @@ class CRM_Utils_Mail {
     // * All other mailers require that all be recipients be listed in the $to array AND that
     //   the Bcc must not be present in $header as otherwise it will be shown to all recipients
     // ref: https://pear.php.net/bugs/bug.php?id=8047, full thread and answer [2011-04-19 20:48 UTC]
-    if (get_class($mailer) != "Mail_mail") {
+    // TODO: Refactor this quirk-handler as another filter in FilteredPearMailer. But that would merit review of impact on universe.
+    $driver = ($mailer instanceof CRM_Utils_Mail_FilteredPearMailer) ? $mailer->getDriver() : NULL;
+    $isPhpMail = (get_class($mailer) === "Mail_mail" || $driver === 'mail');
+    if (!$isPhpMail) {
       // get emails from headers, since these are
       // combination of name and email addresses.
       if (!empty($headers['Cc'])) {
-        $to[] = CRM_Utils_Array::value('Cc', $headers);
+        $to[] = $headers['Cc'] ?? NULL;
       }
       if (!empty($headers['Bcc'])) {
-        $to[] = CRM_Utils_Array::value('Bcc', $headers);
+        $to[] = $headers['Bcc'] ?? NULL;
         unset($headers['Bcc']);
       }
     }
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $result = $mailer->send($to, $headers, $message);
+      try {
+        $result = $mailer->send($to, $headers, $message);
+      }
+      catch (Exception $e) {
+        CRM_Core_Session::setStatus($e->getMessage(), ts('Mailing Error'), 'error');
+        return FALSE;
+      }
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
@@ -340,34 +352,10 @@ class CRM_Utils_Mail {
    * @param $to
    * @param $headers
    * @param $message
+   * @deprecated
    */
   public static function logger(&$to, &$headers, &$message) {
-    if (is_array($to)) {
-      $toString = implode(', ', $to);
-      $fileName = $to[0];
-    }
-    else {
-      $toString = $fileName = $to;
-    }
-    $content = "To: " . $toString . "\n";
-    foreach ($headers as $key => $val) {
-      $content .= "$key: $val\n";
-    }
-    $content .= "\n" . $message . "\n";
-
-    if (is_numeric(CIVICRM_MAIL_LOG)) {
-      $config = CRM_Core_Config::singleton();
-      // create the directory if not there
-      $dirName = $config->configAndLogDir . 'mail' . DIRECTORY_SEPARATOR;
-      CRM_Utils_File::createDir($dirName);
-      $fileName = md5(uniqid(CRM_Utils_String::munge($fileName))) . '.txt';
-      file_put_contents($dirName . $fileName,
-        $content
-      );
-    }
-    else {
-      file_put_contents(CIVICRM_MAIL_LOG, $content, FILE_APPEND);
-    }
+    CRM_Utils_Mail_Logger::log($to, $headers, $message);
   }
 
   /**

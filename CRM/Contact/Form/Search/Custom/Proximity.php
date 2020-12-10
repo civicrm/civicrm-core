@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,13 +15,10 @@
  * was added to advanced search.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
-  protected $_latitude = NULL;
-  protected $_longitude = NULL;
-  protected $_distance = NULL;
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
 
@@ -55,24 +36,9 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     unset($this->_formValues['uf_group_id']);
     unset($this->_formValues['component_mode']);
     unset($this->_formValues['operator']);
+    $this->_group = $this->_formValues['group'] ?? NULL;
 
-    if (!empty($this->_formValues)) {
-      // add the country and state
-      self::addGeocodingData($this->_formValues);
-      $this->_latitude = $this->_formValues['geo_code_1'];
-      $this->_longitude = $this->_formValues['geo_code_2'];
-
-      if ($this->_formValues['prox_distance_unit'] == "miles") {
-        $conversionFactor = 1609.344;
-      }
-      else {
-        $conversionFactor = 1000;
-      }
-      $this->_distance = $this->_formValues['distance'] * $conversionFactor;
-    }
-    $this->_group = CRM_Utils_Array::value('group', $this->_formValues);
-
-    $this->_tag = CRM_Utils_Array::value('tag', $this->_formValues);
+    $this->_tag = $this->_formValues['tag'] ?? NULL;
 
     $this->_columns = [
       ts('Name') => 'sort_name',
@@ -206,6 +172,10 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     $isCountOnly = FALSE;
     if ($selectClause === 'count(distinct contact_a.id) as total') {
       $isCountOnly = TRUE;
+    }
+
+    if (empty($this->_formValues['geo_code_1']) ||  empty($this->_formValues['geo_code_2'])) {
+      self::addGeocodingData($this->_formValues);
     }
 
     $searchParams = [

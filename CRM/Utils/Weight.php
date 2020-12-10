@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -30,12 +14,13 @@
  */
 class CRM_Utils_Weight {
   /**
-   * @var array, list of GET fields which must be validated
+   * List of GET fields which must be validated
    *
    * To reduce the size of this patch, we only sign the exploitable fields
    * which make up "$baseURL" in addOrder() (eg 'filter' or 'dao').
    * Less-exploitable fields (eg 'dir') are left unsigned.
    * 'id','src','dst','dir'
+   * @var array
    */
   public static $SIGNABLE_FIELDS = ['reset', 'dao', 'idName', 'url', 'filter'];
 
@@ -434,13 +419,17 @@ class CRM_Utils_Weight {
     }
   }
 
+  /**
+   *
+   * @throws CRM_Core_Exception
+   */
   public static function fixOrder() {
     $signature = CRM_Utils_Request::retrieve('_sgn', 'String');
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), self::$SIGNABLE_FIELDS);
 
     // Validate $_GET values b/c subsequent code reads $_GET (via CRM_Utils_Request::retrieve)
     if (!$signer->validate($signature, $_GET)) {
-      CRM_Core_Error::fatal('Request signature is invalid');
+      throw new CRM_Core_Exception('Request signature is invalid');
     }
 
     // Note: Ensure this list matches self::$SIGNABLE_FIELDS

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -33,11 +17,11 @@
  * @group headless
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
+  use CRMTraits_PCP_PCPTestTrait;
 
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Contribution';
   protected $_params;
   protected $_ids = [];
@@ -88,13 +72,16 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
     $this->_userId = $this->createLoggedInUser();
 
-    $this->_individualId = $this->individualCreate();
+    $this->_individualId = $this->ids['contact'][0] = $this->individualCreate();
     $this->_params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -133,10 +120,21 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+  }
+
+  /**
+   * CHeck that all tests that have created payments have created them with the right financial entities.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function assertPostConditions() {
+    $this->validateAllPayments();
   }
 
   /**
@@ -416,7 +414,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals('50.00', $contribution['total_amount']);
     $this->assertEquals(.08, $contribution['fee_amount']);
     $this->assertEquals(49.92, $contribution['net_amount']);
     $this->assertEquals('tx', $contribution['trxn_id']);
@@ -467,7 +465,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50', $contribution['total_amount']);
+    $this->assertEquals('50.00', $contribution['total_amount']);
     $this->assertEquals(0, $contribution['non_deductible_amount']);
   }
 
@@ -482,6 +480,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *  - 1 Contribution with status = Pending
    *  - 1 Line item
    *  - 1 civicrm_financial_item. This is linked to the line item and has a status of 3
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardInvalid() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -520,6 +521,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function creates a billing address if provided.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitCreditCardWithBillingAddress() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -592,6 +596,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -606,7 +613,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -631,7 +638,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Below you will find a receipt for this contribution.',
       '<testloggedin@example.com>',
     ]);
     $mut->stop();
@@ -801,6 +808,35 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'clumsy smurf',
     ]);
     $mut->stop();
+  }
+
+  /**
+   * Test submitting the back office contribution form with pcp data.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function testSubmitWithPCP(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $mut->clearMessages();
+    $params = $this->pcpParams();
+    $pcpID = $this->createPCPBlock($params);
+    $form = new CRM_Contribute_Form_Contribution();
+    $form->testSubmit([
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'contribution_status_id' => 1,
+      'total_amount' => 5,
+      'pcp_made_through_id' => $pcpID,
+      'pcp_display_in_roll' => '1',
+      'pcp_roll_nickname' => 'Dobby',
+      'pcp_personal_note' => 'I wuz here',
+    ], CRM_Core_Action::ADD);
+    $softCredit = $this->callAPISuccessGetSingle('ContributionSoft', []);
+    $this->assertEquals('Dobby', $softCredit['pcp_roll_nickname']);
+    $mut->checkMailLog(['Personal Campaign Page Owner Notification']);
   }
 
   /**
@@ -979,6 +1015,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function that completes the partially paid payment using Credit Card
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testPartialPaymentWithCreditCard() {
     // create a partially paid contribution by using back-office form
@@ -991,23 +1030,23 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
         'check_number' => substr(sha1(rand()), 0, 7),
         'billing_city-5' => 'Vancouver',
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
+        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       ], CRM_Core_Action::ADD
     );
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertNotEmpty($contribution);
+    $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertEquals('Partially paid', $contribution['contribution_status']);
     // pay additional amount by using Credit Card
     $form = new CRM_Contribute_Form_AdditionalPayment();
     $form->testSubmit([
       'contribution_id' => $contribution['id'],
       'contact_id' => $this->_individualId,
-      'total_amount' => 50,
+      'total_amount' => 40,
       'currency' => 'USD',
       'financial_type_id' => 1,
-      'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Credit card', $this->paymentInstruments),
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
       'credit_card_number' => '411111111111111',
@@ -1034,7 +1073,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testSubmitSaleTax($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit([
@@ -1077,10 +1116,14 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Test the submit function for FT without tax.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmitWithOutSaleTax() {
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit([
@@ -1101,15 +1144,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $this->assertEquals(NULL, $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 1);
     $this->callAPISuccessGetCount('FinancialItem', [], 1);
-    $lineItem = $this->callAPISuccessGetSingle(
-      'LineItem',
-      [
-        'contribution_id' => $contribution['id'],
-        'return' => ['line_total', 'tax_amount'],
-      ]
-    );
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'return' => ['line_total', 'tax_amount'],
+    ]);
     $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertTrue(empty($lineItem['tax_amount']));
+    $this->assertEquals(0.00, $lineItem['tax_amount']);
   }
 
   /**
@@ -1124,8 +1164,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTax($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    list($form, $contribution) = $this->doInitialSubmit();
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    [$form, $contribution] = $this->doInitialSubmit();
     $this->assertEquals(11000, $contribution['total_amount']);
     $this->assertEquals(1000, $contribution['tax_amount']);
     $this->assertEquals(11000, $contribution['net_amount']);
@@ -1164,13 +1204,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 3);
-    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1]);
-    $this->assertEquals(2, $items['count']);
-    $this->assertEquals('Contribution Amount', $items['values'][0]['description']);
-    $this->assertEquals('Sales Tax', $items['values'][1]['description']);
+    $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1])['values'];
+    $this->assertEquals(2, count($items));
+    $this->assertEquals('Contribution Amount', $items[0]['description']);
+    $this->assertEquals('Sales Tax', $items[1]['description']);
 
-    $this->assertEquals(10000, $items['values'][0]['amount']);
-    $this->assertEquals(1000, $items['values'][1]['amount']);
+    $this->assertEquals(10000, $items[0]['amount']);
+    $this->assertEquals(1000, $items[1]['amount']);
   }
 
   /**
@@ -1185,8 +1225,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   public function testReSubmitSaleTaxAlteredAmount($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
-    $this->relationForFinancialTypeWithFinancialAccount($this->_financialTypeId);
-    list($form, $contribution) = $this->doInitialSubmit();
+    $this->addTaxAccountToFinancialType($this->_financialTypeId);
+    [$form, $contribution] = $this->doInitialSubmit();
 
     $mut = new CiviMailUtils($this, TRUE);
     // Testing here if when we edit something trivial like adding a check_number tax, net, total amount stay the same:
@@ -1312,6 +1352,9 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
   /**
    * Check payment processor is correctly assigned for a contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
   public function testContributionBasePreProcess() {
     //Create contribution page with only pay later enabled.
@@ -1321,6 +1364,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'currency' => 'NZD',
       'goal_amount' => 100,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_active' => TRUE,
       'is_email_receipt' => TRUE,
@@ -1680,6 +1724,59 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ]);
     $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
     $this->membershipDelete($membership['id']);
+  }
+
+  /**
+   * Test no warnings or errors during preProcess when editing.
+   */
+  public function testPreProcessContributionEdit() {
+    // Simulate a contribution in pending status
+    $contribution = $this->callAPISuccess(
+      'Contribution',
+      'create',
+      array_merge($this->_params, ['contribution_status_id' => 'Pending'])
+    );
+
+    // set up the form to edit the contribution and call preProcess
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution');
+    $_REQUEST['cid'] = $this->_individualId;
+    $_REQUEST['id'] = $contribution['id'];
+    $form->_action = CRM_Core_Action::UPDATE;
+    $form->preProcess();
+
+    // Check something while we're here
+    $this->assertEquals($contribution['id'], $form->_values['contribution_id']);
+
+    unset($_REQUEST['cid']);
+    unset($_REQUEST['id']);
+  }
+
+  /**
+   * Mostly just check there's no errors opening the Widget tab on contribution
+   * pages.
+   */
+  public function testOpeningWidgetAdminPage() {
+    $page_id = $this->callAPISuccess('ContributionPage', 'create', [
+      'title' => 'my page',
+      'financial_type_id' => $this->_financialTypeId,
+      'payment_processor' => $this->paymentProcessorID,
+    ])['id'];
+
+    $form = new CRM_Contribute_Form_ContributionPage_Widget();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Contribute_Form_ContributionPage_Widget', 'Widget');
+
+    $form->set('reset', '1');
+    $form->set('action', 'update');
+    $form->set('id', $page_id);
+
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    $contents = ob_get_contents();
+    ob_end_clean();
+
+    // The page contents load later by ajax, so there's just the surrounding
+    // html available now, but we can check at least one thing while we're here.
+    $this->assertContains("mainTabContainer", $contents);
   }
 
 }

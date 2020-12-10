@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService) {
+  angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService, mailingFields) {
     $scope.abtest = abtest;
     var ts = $scope.ts = CRM.ts(null);
     var block = $scope.block = crmBlocker();
@@ -9,6 +9,7 @@
     $scope.crmMailingABCriteria = crmMailingABCriteria;
     $scope.crmMailingConst = CRM.crmMailing;
     $scope.checkPerm = CRM.checkPerm;
+    $scope.mailingFields = mailingFields;
 
     $scope.isSubmitted = function isSubmitted() {
       return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;

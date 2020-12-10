@@ -37,7 +37,7 @@ class RequestTest extends \CiviUnitTestCase {
    */
   public function testCreateRequest_EntityActionMunging($input, $expected) {
     list ($inEntity, $inAction, $inVersion) = $input;
-    $apiRequest = Request::create($inEntity, $inAction, ['version' => $inVersion], NULL);
+    $apiRequest = Request::create($inEntity, $inAction, ['version' => $inVersion]);
     $this->assertEquals($expected, [$apiRequest['entity'], $apiRequest['action'], $apiRequest['version']]);
   }
 

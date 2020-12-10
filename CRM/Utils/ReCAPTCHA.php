@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_ReCAPTCHA {
 
@@ -94,7 +78,7 @@ class CRM_Utils_ReCAPTCHA {
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
     if (!function_exists('recaptcha_get_html')) {
-      require_once 'packages/recaptcha/recaptchalib.php';
+      require_once 'recaptcha/recaptchalib.php';
     }
 
     // Load the Recaptcha api.js over HTTPS
@@ -112,6 +96,7 @@ class CRM_Utils_ReCAPTCHA {
       TRUE
     );
     $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
+    $form->addRule('g-recaptcha-response', ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
     if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
       $form->setElementError(
         'g-recaptcha-response',
@@ -131,6 +116,20 @@ class CRM_Utils_ReCAPTCHA {
       $captcha->add($form);
       $form->assign('isCaptcha', TRUE);
     }
+  }
+
+  /**
+   * @param $value
+   * @param CRM_Core_Form $form
+   *
+   * @return mixed
+   */
+  public static function validate($value, $form) {
+    $resp = recaptcha_check_answer(CRM_Core_Config::singleton()->recaptchaPrivateKey,
+      $_SERVER['REMOTE_ADDR'],
+      $_POST['g-recaptcha-response']
+    );
+    return $resp->is_valid;
   }
 
 }

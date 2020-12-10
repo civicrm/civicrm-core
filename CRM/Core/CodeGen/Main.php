@@ -5,6 +5,10 @@
  */
 class CRM_Core_CodeGen_Main {
   public $buildVersion;
+
+  /**
+   * @var string
+   */
   public $db_version;
   /**
    * drupal, joomla, wordpress
@@ -76,11 +80,11 @@ class CRM_Core_CodeGen_Main {
 
     $versionFile = $this->phpCodePath . "/xml/version.xml";
     $versionXML = CRM_Core_CodeGen_Util_Xml::parse($versionFile);
-    $this->db_version = $versionXML->version_no;
+    $this->db_version = (string) $versionXML->version_no;
     $this->buildVersion = preg_replace('/^(\d{1,2}\.\d{1,2})\.(\d{1,2}|\w{4,7})$/i', '$1', $this->db_version);
     if (isset($argVersion)) {
       // change the version to that explicitly passed, if any
-      $this->db_version = $argVersion;
+      $this->db_version = (string) $argVersion;
     }
 
     $this->schemaPath = $schemaPath;
@@ -133,31 +137,16 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   }
 
   /**
-   * Compute a digest based on the GenCode logic (PHP/tpl).
-   *
-   * @return string
+   * @return static
    */
-  public function getSourceDigest() {
-    if ($this->sourceDigest === NULL) {
-      $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
-      $files = CRM_Core_CodeGen_Util_File::findManyFiles([
-        ["$srcDir/CRM/Core/CodeGen", '*.php'],
-        ["$srcDir/xml", "*.php"],
-        ["$srcDir/xml", "*.tpl"],
-      ]);
-
-      $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
-    }
-    return $this->sourceDigest;
-  }
-
-  protected function init() {
+  public function init() {
     if (!$this->database || !$this->tables) {
       $specification = new CRM_Core_CodeGen_Specification();
       $specification->parse($this->schemaPath, $this->buildVersion);
       $this->database = $specification->database;
       $this->tables = $specification->tables;
     }
+    return $this;
   }
 
 }

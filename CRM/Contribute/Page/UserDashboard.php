@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
@@ -70,7 +54,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
           'label' => ts('Pay Now'),
           'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
             'reset' => 1,
-            'id' => CRM_Invoicing_Utils::getDefaultPaymentPage(),
+            'id' => Civi::settings()->get('default_invoice_page'),
             'ccid' => $row['contribution_id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],
@@ -96,7 +80,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $recur->is_test = 0;
     $recur->find();
 
-    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
 
     $recurRow = [];
     $recurIDs = [];
@@ -114,7 +98,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       $values['recur_status'] = $recurStatus[$values['contribution_status_id']];
       $recurRow[$values['id']] = $values;
 
-      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard')));
+      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks((int) $recur->id, 'dashboard')));
 
       $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur->id, 'recur');
       $hideUpdate = $details->membership_id & $details->auto_renew;
@@ -123,7 +107,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         $action -= CRM_Core_Action::UPDATE;
       }
 
-      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
+      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks((int) $recur->id, 'dashboard'),
         $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],

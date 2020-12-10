@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {capture assign="linkTitle"}{ts}Edit settings{/ts}{/capture}
@@ -64,7 +48,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/mapping" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Mapping and Geocoding{/ts}</a></td>
-        <td>{ts}Configure a mapping provider (e.g. Google or Yahoo) to display maps for contact addresses and event locations.{/ts}</td>
+        <td>{ts}Configure a mapping provider (e.g. OpenStreetMap or Google) to display maps for contact addresses and event locations.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Search Settings{/ts}</a></td>
@@ -83,12 +67,12 @@
         <td colspan="2">{ts}Sending Emails (includes contribution receipts and event confirmations){/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Outbound Email{/ts}</a></td>
-        <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
-    </tr>
-    <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}From Email Addresses{/ts}</a></td>
         <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
+    </tr>
+    <tr class="even">
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Outbound Email{/ts}</a></td>
+        <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -157,35 +141,35 @@
         <td colspan="2">{ts}Components{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/contributions/what-is-civicontribute" text="CiviContribute"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/contributions/what-is-civicontribute" text=$componentTitles.CiviContribute}</td>
         <td>{ts}Online fundraising and donor management, as well as offline contribution processing and tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/pledges/what-is-civipledge" text="CiviPledge"}</td>
+        <td class="tasklist nowrap" style="width: 10%;">{docURL page="user/pledges/what-is-civipledge" text=$componentTitles.CiviPledge}</td>
         <td>{ts}Accept and track pledges (for recurring gifts).{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/events/what-is-civievent" text="CiviEvent"}</td>
+        <td class="tasklist nowrap">{docURL page="user/events/what-is-civievent" text=$componentTitles.CiviEvent}</td>
         <td>{ts}Online event registration and participant tracking.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text="CiviMember"}</td>
+        <td class="tasklist nowrap">{docURL page="user/membership/what-is-civimember" text=$componentTitles.CiviMember}</td>
         <td>{ts}Online signup and membership management.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/email/what-is-civimail" text="CiviMail"}</td>
+        <td class="tasklist nowrap">{docURL page="user/email/what-is-civimail" text=$componentTitles.CiviMail}</td>
         <td>{ts}Personalized email blasts and newsletters.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/campaign/what-is-civicampaign" text="CiviCampaign"}</td>
+        <td class="tasklist nowrap">{docURL page="user/campaign/what-is-civicampaign" text=$componentTitles.CiviCampaign}</td>
         <td>{ts}Link together events, mailings, activities, and contributions. Create surveys and online petitions.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/case-management/what-is-civicase" text="CiviCase"}</td>
+        <td class="tasklist nowrap">{docURL page="user/case-management/what-is-civicase" text=$componentTitles.CiviCase}</td>
         <td>{ts}Integrated case management for human service providers{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap">{docURL page="user/grants/what-is-civigrant" text="CiviGrant"}</td>
+        <td class="tasklist nowrap">{docURL page="user/grants/what-is-civigrant" text=$componentTitles.CiviGrant}</td>
         <td>{ts}Distribute funds to others, for example foundations, grant givers, etc.{/ts}</td>
     </tr>
 </table>

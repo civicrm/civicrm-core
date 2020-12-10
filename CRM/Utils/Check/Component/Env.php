@@ -1,39 +1,23 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkPhpVersion() {
     $messages = [];
@@ -45,7 +29,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('This system uses PHP version %1 which meets or exceeds the recommendation of %2.',
           [
             1 => $phpVersion,
-            2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
+            2 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
           ts('PHP Up-to-Date'),
           \Psr\Log\LogLevel::INFO,
@@ -72,7 +56,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
           [
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-            3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
+            3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
           ts('PHP Out-of-Date'),
           \Psr\Log\LogLevel::WARNING,
@@ -82,11 +66,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('This system uses PHP version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least PHP version %2 is recommended; the preferrred version is %3.',
+        ts('This system uses PHP version %1. To ensure the continued operation of CiviCRM, upgrade your server now. At least PHP version %2 is recommended; the preferred version is %3.',
           [
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
-            3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
+            3 => preg_replace(';^(\d+\.\d+(?:\.[1-9]\d*)?).*$;', '\1', CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER),
           ]),
           ts('PHP Out-of-Date'),
           \Psr\Log\LogLevel::ERROR,
@@ -98,7 +82,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkPhpMysqli() {
     $messages = [];
@@ -123,7 +107,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check that the MySQL time settings match the PHP time settings.
    *
-   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMysqlTime() {
     $messages = [];
@@ -133,11 +117,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (!CRM_Utils_Time::isEqual($phpNow, $sqlNow, 2.5 * 60)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Timestamps reported by MySQL (eg "%2") and PHP (eg "%3" ) are mismatched.<br /><a href="%1">Read more about this warning</a>', [
-          1 => CRM_Utils_System::getWikiBaseURL() . 'checkMysqlTime',
-          2 => $sqlNow,
-          3 => $phpNow,
-        ]),
+        ts('Timestamps reported by MySQL (eg "%1") and PHP (eg "%2" ) are mismatched.', [
+          1 => $sqlNow,
+          2 => $phpNow,
+        ]) . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-time'),
         ts('Timestamp Mismatch'),
         \Psr\Log\LogLevel::ERROR,
         'fa-server'
@@ -148,7 +131,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDebug() {
     $config = CRM_Core_Config::singleton();
@@ -158,7 +141,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         ts('Warning: Debug is enabled in <a href="%1">system settings</a>. This should not be enabled on production servers.',
           [1 => CRM_Utils_System::url('civicrm/admin/setting/debug', 'reset=1')]),
         ts('Debug Mode Enabled'),
-        \Psr\Log\LogLevel::WARNING,
+        CRM_Core_Config::environment() == 'Production' ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::INFO,
         'fa-bug'
       );
       $message->addAction(
@@ -174,10 +157,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @return array
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
    */
-  public function checkOutboundMail() {
+  public function checkOutboundMail($force = FALSE) {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     $mailingInfo = Civi::settings()->get('mailing_backend');
     if (($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB
@@ -200,10 +189,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check that domain email and org name are set
-   * @return array
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
    */
-  public function checkDomainNameEmail() {
+  public function checkDomainNameEmail($force = FALSE) {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     $domain        = CRM_Core_BAO_Domain::getDomain();
@@ -234,7 +229,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $msg,
-        ts('Complete Setup'),
+        ts('Organization Setup'),
         \Psr\Log\LogLevel::WARNING,
         'fa-check-square-o'
       );
@@ -245,10 +240,17 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if a default bounce handling mailbox is set up
-   * @return array
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
    */
-  public function checkDefaultMailbox() {
+  public function checkDefaultMailbox($force = FALSE) {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
+
     $config = CRM_Core_Config::singleton();
 
     if (in_array('CiviMail', $config->enableComponents) &&
@@ -262,10 +264,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         \Psr\Log\LogLevel::WARNING,
         'fa-envelope'
       );
-      $docUrl = 'target="_blank" href="' . CRM_Utils_System::docURL(['page' => 'user/advanced-configuration/email-system-configuration/', 'URLonly' => TRUE]) . '""';
       $message->addHelp(
         ts('A default mailbox must be configured for email bounce processing.') . '<br />' .
-        ts("Learn more in the <a %1>online documentation</a>.", [1 => $docUrl])
+          CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration/')
       );
       $messages[] = $message;
     }
@@ -274,55 +275,78 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * Checks if cron has run in a reasonable amount of time
-   * @return array
+   * Checks if cron has run in the past hour (3600 seconds)
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
+   * @throws CRM_Core_Exception
    */
-  public function checkLastCron() {
+  public function checkLastCron($force = FALSE) {
+    // TODO: Remove this check when MINIMUM_UPGRADABLE_VERSION goes to 4.7.
+    if (CRM_Utils_System::version() !== CRM_Core_BAO_Domain::version()) {
+      return [];
+    }
+
     $messages = [];
+
+    // Cron doesn't work in non-production environments; skip.
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     $statusPreference = new CRM_Core_DAO_StatusPreference();
     $statusPreference->domain_id = CRM_Core_Config::domainID();
-    $statusPreference->name = 'checkLastCron';
+    $statusPreference->name = __FUNCTION__;
 
+    $level = \Psr\Log\LogLevel::INFO;
+    $now = gmdate('U');
+
+    // Get timestamp of last cron run
     if ($statusPreference->find(TRUE) && !empty($statusPreference->check_info)) {
-      $lastCron = $statusPreference->check_info;
-      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $lastCron))]);
+      $msg = ts('Last cron run at %1.', [1 => CRM_Utils_Date::customFormat(date('c', $statusPreference->check_info))]);
+    }
+    // If cron record doesn't exist, this is a new install. Make a placeholder record (prefs='new').
+    else {
+      $statusPreference = CRM_Core_BAO_StatusPreference::create([
+        'name' => __FUNCTION__,
+        'check_info' => $now,
+        'prefs' => 'new',
+      ]);
+    }
+    $lastCron = $statusPreference->check_info;
+
+    if ($statusPreference->prefs !== 'new' && $lastCron > $now - 3600) {
+      $title = ts('Cron Running OK');
     }
     else {
-      $lastCron = 0;
-      $msg = ts('No cron runs have been recorded.');
+      // If placeholder record found, give one day "grace period" for admin to set-up cron
+      if ($statusPreference->prefs === 'new') {
+        $title = ts('Set-up Cron');
+        $msg = ts('No cron runs have been recorded.');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::NOTICE : \Psr\Log\LogLevel::WARNING;
+      }
+      else {
+        $title = ts('Cron Not Running');
+        // After 1 day (86400 seconds) increase the error level
+        $level = ($lastCron > $now - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR;
+      }
+      $msg .= '<p>' . ts('A cron job is required to execute scheduled jobs automatically.') .
+       '<br />' . CRM_Utils_System::docURL2('sysadmin/setup/jobs/') . '</p>';
     }
 
-    if ($lastCron > gmdate('U') - 3600) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Running OK'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-clock-o'
-      );
-    }
-    else {
-      $cronLink = 'target="_blank" href="' . htmlentities(CRM_Utils_System::docURL2('sysadmin/setup/jobs/', TRUE)) . '""';
-      $msg .= '<p>' . ts('To enable scheduling support, please <a %1>set up the cron job</a>.', [
-        1 => $cronLink,
-      ]) . '</p>';
-      $message = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        $msg,
-        ts('Cron Not Running'),
-        ($lastCron > gmdate('U') - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR,
-        'fa-clock-o'
-      );
-      $messages[] = $message;
-    }
-
+    $messages[] = new CRM_Utils_Check_Message(
+      __FUNCTION__,
+      $msg,
+      $title,
+      $level,
+      'fa-clock-o'
+    );
     return $messages;
   }
 
   /**
    * Recommend that sites use path-variables for their directories and URLs.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkUrlVariables() {
     $messages = [];
@@ -359,7 +383,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Recommend that sites use path-variables for their directories and URLs.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDirVariables() {
     $messages = [];
@@ -399,8 +423,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check that important directories are writable.
    *
-   * @return array
-   *   Any CRM_Utils_Check_Message instances that need to be generated.
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDirsWritable() {
     $notWritable = [];
@@ -448,13 +471,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if new versions are available
-   * @return array
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
+   * @throws CRM_Core_Exception
    */
-  public function checkVersion() {
+  public function checkVersion($force = FALSE) {
     $messages = [];
     try {
       $vc = new CRM_Utils_VersionCheck();
-      $vc->initialize();
+      $vc->initialize($force);
     }
     catch (Exception $e) {
       $messages[] = new CRM_Utils_Check_Message(
@@ -469,7 +494,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     // Show a notice if the version_check job is disabled
-    if (empty($vc->cronJob['is_active'])) {
+    if (!$force && empty($vc->cronJob['is_active'])) {
       $args = empty($vc->cronJob['id']) ? ['reset' => 1] : ['reset' => 1, 'action' => 'update', 'id' => $vc->cronJob['id']];
       $messages[] = new CRM_Utils_Check_Message(
         'checkVersionDisabled',
@@ -481,15 +506,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     if ($vc->isInfoAvailable) {
-      $severities = [
-        'info' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::INFO),
-        'notice' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::NOTICE) ,
-        'warning' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::WARNING) ,
-        'critical' => CRM_Utils_Check::severityMap(\Psr\Log\LogLevel::CRITICAL),
-      ];
-      foreach ($vc->getVersionMessages() as $msg) {
+      foreach ($vc->getVersionMessages() ?? [] as $msg) {
         $messages[] = new CRM_Utils_Check_Message(__FUNCTION__ . '_' . $msg['name'],
-          $msg['message'], $msg['title'], $severities[$msg['severity']], 'fa-cloud-upload');
+          $msg['message'], $msg['title'], $msg['severity'], 'fa-cloud-upload');
       }
     }
 
@@ -498,7 +517,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if extensions are set up properly
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensions() {
     $messages = [];
@@ -581,21 +600,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    if (!$remotes) {
-      // CRM-13141 There may not be any compatible extensions available for the requested CiviCRM version + CMS. If so, $extdir is empty so just return a notice.
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('There are currently no extensions on the CiviCRM public extension directory which are compatible with version %1. If you want to install an extension which is not marked as compatible, you may be able to <a %2>download and install extensions manually</a> (depending on access to your web server).', [
-          1 => CRM_Utils_System::majorVersion(),
-          2 => 'href="http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions"',
-        ]),
-        ts('No Extensions Available for this Version'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-plug'
-      );
-      return $messages;
-    }
-
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     $updates = $errors = $okextensions = [];
@@ -611,28 +615,21 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $row = CRM_Admin_Page_Extensions::createExtendedInfo($obj);
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-          $errors[] = ts('%1 extension (%2) is installed but missing files.', [1 => CRM_Utils_Array::value('label', $row), 2 => $key]);
+          $errors[] = ts('%1 extension (%2) is installed but missing files.', [1 => $row['label'] ?? NULL, 2 => $key]);
           break;
 
         case CRM_Extension_Manager::STATUS_INSTALLED:
           if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
-            $updates[] = ts('%1 (%2) version %3 is installed. <a %4>Upgrade to version %5</a>.', [
-              1 => CRM_Utils_Array::value('label', $row),
-              2 => $key,
-              3 => $row['version'],
-              4 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id=$key&key=$key") . '"',
-              5 => $remotes[$key]->version,
-            ]);
+            $updates[] = $row['label'] . ': ' . $mapper->getUpgradeLink($remotes[$key], $row);
           }
           else {
             if (empty($row['label'])) {
               $okextensions[] = $key;
             }
             else {
-              $okextensions[] = ts('%1 (%2) version %3', [
+              $okextensions[] = ts('%1: Version %2', [
                 1 => $row['label'],
-                2 => $key,
-                3 => $row['version'],
+                2 => $row['version'],
               ]);
             }
           }
@@ -642,7 +639,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if (!$okextensions && !$updates && !$errors) {
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionsOk',
+        __FUNCTION__ . 'Ok',
         ts('No extensions installed. <a %1>Browse available extensions</a>.', [
           1 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1') . '"',
         ]),
@@ -664,7 +661,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     if ($updates) {
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionUpdates',
+        __FUNCTION__ . 'Updates',
         '<ul><li>' . implode('</li><li>', $updates) . '</li></ul>',
         ts('Extension Update Available', ['plural' => '%count Extension Updates Available', 'count' => count($updates)]),
         \Psr\Log\LogLevel::WARNING,
@@ -680,7 +677,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         $message = ts('All extensions are up-to-date:');
       }
       $messages[] = new CRM_Utils_Check_Message(
-        'extensionsOk',
+        __FUNCTION__ . 'Ok',
         $message . '<ul><li>' . implode('</li><li>', $okextensions) . '</li></ul>',
         ts('Extensions'),
         \Psr\Log\LogLevel::INFO,
@@ -694,7 +691,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Checks if there are pending extension upgrades.
    *
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkExtensionUpgrades() {
     if (CRM_Extension_Upgrades::hasPending()) {
@@ -718,7 +715,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Checks if CiviCRM database version is up-to-date
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDbVersion() {
     $messages = [];
@@ -755,10 +752,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     else {
-      $codeVersion = CRM_Utils_System::version();
-
       // if db.ver < code.ver, time to upgrade
-      if (version_compare($dbVersion, $codeVersion) < 0) {
+      if (CRM_Core_BAO_Domain::isDBUpdateRequired()) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
           ts('New codebase version detected. You must visit <a href=\'%1\'>upgrade screen</a> to upgrade the database.', [1 => $upgradeUrl]),
@@ -769,6 +764,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       }
 
       // if db.ver > code.ver, sth really wrong
+      $codeVersion = CRM_Utils_System::version();
       if (version_compare($dbVersion, $codeVersion) > 0) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
@@ -788,8 +784,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * ensure that all CiviCRM tables are InnoDB
-   * @return array
+   * Ensure that all CiviCRM tables are InnoDB
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkDbEngine() {
     $messages = [];
@@ -807,11 +803,17 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
-   * ensure reply id is set to any default value
-   * @return array
+   * Ensure reply id is set to any default value
+   * @param bool $force
+   * @return CRM_Utils_Check_Message[]
    */
-  public function checkReplyIdForMailing() {
+  public function checkReplyIdForMailing($force = FALSE) {
     $messages = [];
+
+    // CiviMail doesn't work in non-production environments; skip.
+    if (!$force && CRM_Core_Config::environment() != 'Production') {
+      return $messages;
+    }
 
     if (!CRM_Mailing_PseudoConstant::defaultComponent('Reply', '')) {
       $messages[] = new CRM_Utils_Check_Message(
@@ -827,7 +829,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check for required mbstring extension
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMbstring() {
     $messages = [];
@@ -846,7 +848,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
   /**
    * Check if environment is Production.
-   * @return array
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkEnvironment() {
     $messages = [];
@@ -857,38 +859,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         __FUNCTION__,
         ts('The environment of this CiviCRM instance is set to \'%1\'. Certain functionality like scheduled jobs has been disabled.', [1 => $environment]),
         ts('Non-Production Environment'),
-        \Psr\Log\LogLevel::ALERT,
+        \Psr\Log\LogLevel::NOTICE,
         'fa-bug'
-      );
-    }
-    return $messages;
-  }
-
-  /**
-   * Check that the resource URL points to the correct location.
-   * @return array
-   */
-  public function checkResourceUrl() {
-    $messages = [];
-    // Skip when run during unit tests, you can't check without a CMS.
-    if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
-      return $messages;
-    }
-    // CRM-21629 Set User Agent to avoid being blocked by filters
-    stream_context_set_default([
-      'http' => ['user_agent' => 'CiviCRM'],
-    ]);
-
-    // Does arrow.png exist where we expect it?
-    $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
-    if ($this->fileExists($arrowUrl) === FALSE) {
-      $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',
-          [1 => CRM_Utils_System::url('civicrm/admin/setting/url', 'reset=1')]),
-        ts('Incorrect Resource URL'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-server'
       );
     }
     return $messages;
@@ -897,7 +869,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   /**
    * Check for utf8mb4 support by MySQL.
    *
-   * @return array<CRM_Utils_Check_Message> an empty array, or a list of warnings
+   * @return CRM_Utils_Check_Message[]
    */
   public function checkMysqlUtf8mb4() {
     $messages = [];
@@ -907,14 +879,15 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     }
 
     // Use mysqli_query() to avoid logging an error message.
-    if (mysqli_query(CRM_Core_DAO::getConnection()->connection, 'CREATE TEMPORARY TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB')) {
-      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE civicrm_utf8mb4_test');
+    $mb4testTableName = CRM_Utils_SQL_TempTable::build()->setCategory('utf8mb4test')->getName();
+    if (mysqli_query(CRM_Core_DAO::getConnection()->connection, 'CREATE TEMPORARY TABLE ' . $mb4testTableName . ' (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB')) {
+      CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE ' . $mb4testTableName);
     }
     else {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('Future versions of CiviCRM may require MySQL utf8mb4 support. It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true'),
-        ts('MySQL utf8mb4 Support'),
+        ts("Future versions of CiviCRM may require MySQL to support utf8mb4 encoding. It is recommended, though not yet required. Please discuss with your server administrator about configuring your MySQL server for utf8mb4. CiviCRM's recommended configurations are in the System Administrator Guide") . '<br />' . CRM_Utils_System::docURL2('sysadmin/requirements/#mysql-configuration'),
+        ts('MySQL Emoji Support (utf8mb4)'),
         \Psr\Log\LogLevel::WARNING,
         'fa-database'
       );
@@ -947,6 +920,43 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       }
     }
 
+    return $messages;
+  }
+
+  public function checkMysqlVersion() {
+    $messages = [];
+    $version = CRM_Utils_SQL::getDatabaseVersion();
+    $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
+    $mariaDbRecommendedVersion = '10.1';
+    $upcomingCiviChangeVersion = '5.34';
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('To prepare for CiviCRM v%4, please upgrade MySQL. The recommended version will be MySQL v%2 or MariaDB v%3.', [
+          1 => $version,
+          2 => $minRecommendedVersion . '+',
+          3 => $mariaDbRecommendedVersion . '+',
+          4 => $upcomingCiviChangeVersion . '+',
+        ]),
+        ts('MySQL Out-of-Date'),
+        \Psr\Log\LogLevel::NOTICE,
+        'fa-server'
+      );
+    }
+    return $messages;
+  }
+
+  public function checkPHPIntlExists() {
+    $messages = [];
+    if (!extension_loaded('intl')) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts('This system currently does not have the PHP-Intl extension enabled.  Please contact your system administrator about getting the extension enabled.'),
+        ts('Missing PHP Extension: INTL'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+    }
     return $messages;
   }
 

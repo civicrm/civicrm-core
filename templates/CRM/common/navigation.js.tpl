@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}// http://civicrm.org/licensing
 {capture assign=menuMarkup}{strip}
@@ -33,7 +17,7 @@
             <input type="hidden" name="hidden_location" value="1" />
             <input type="hidden" name="hidden_custom" value="1" />
             <input type="hidden" name="qfKey" value="" />
-            <div style="height:1px; overflow:hidden;"><input type="submit" value="{ts}Go{/ts}" name="_qf_Advanced_refresh" class="crm-form-submit default" /></div>
+            <div style="height:1px; overflow:hidden;"><button type="submit" name="_qf_Advanced_refresh" class="crm-button crm-form-submit default">{ts}Go{/ts}</button></div>
           </div>
         </form>
         <ul>
@@ -160,10 +144,6 @@ $('#civicrm-menu').ready(function() {
     var $selection = $('.crm-quickSearchField input:checked'),
       label = $selection.parent().text(),
       value = $selection.val();
-    // These fields are not supported by advanced search
-    if (!value || value === 'first_name' || value === 'last_name') {
-      value = 'sort_name';
-    }
     $('#sort_name_navigation').attr({name: value, placeholder: label});
   }
   $('.crm-quickSearchField').click(function() {

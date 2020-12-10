@@ -43,7 +43,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::service('dispatcher'), [
+    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
       'mailingId' => $mailing->id,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -80,7 +80,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::service('dispatcher'), [
+    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -126,7 +126,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::service('dispatcher'), [
+    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplateText, $inputTemplateFormat);

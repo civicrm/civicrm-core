@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -307,9 +291,10 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $config = CRM_Core_Config::singleton();
 
-    $dbBackdrop = DB::connect($config->userFrameworkDSN);
+    $ufDSN = CRM_Utils_SQL::autoSwitchDSN($config->userFrameworkDSN);
+    $dbBackdrop = DB::connect($ufDSN);
     if (DB::isError($dbBackdrop)) {
-      CRM_Core_Error::fatal("Cannot connect to Backdrop database via $config->userFrameworkDSN, " . $dbBackdrop->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to Backdrop database via $ufDSN, " . $dbBackdrop->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
@@ -539,7 +524,9 @@ AND    u.status = 1
     }
     // load Backdrop bootstrap
     chdir($cmsPath);
-    define('BACKDROP_ROOT', $cmsPath);
+    if (!defined('BACKDROP_ROOT')) {
+      define('BACKDROP_ROOT', $cmsPath);
+    }
 
     // For Backdrop multi-site CRM-11313
     if ($realPath && strpos($realPath, 'sites/all/modules/') === FALSE) {
@@ -580,7 +567,7 @@ AND    u.status = 1
       return TRUE;
     }
 
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       // Load the user we need to check Backdrop permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
@@ -1044,6 +1031,30 @@ AND    u.status = 1
   public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
     $e->list[] = 'css/backdrop.css';
     $e->list[] = 'js/crm.backdrop.js';
+  }
+
+  /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    if (function_exists('backdrop_session_start')) {
+      // https://issues.civicrm.org/jira/browse/CRM-14356
+      if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
+        backdrop_session_start();
+      }
+      $_SESSION = [];
+    }
+    else {
+      session_start();
+    }
+  }
+
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => url('admin/config/people/permissions')];
   }
 
 }

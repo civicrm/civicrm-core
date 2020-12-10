@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 /*
  * Settings metadata file
@@ -53,8 +35,7 @@ return [
       'maxlength' => '100',
     ],
     'default' => NULL,
-    'title' => 'Custom Translate Function',
-    'description' => '',
+    'title' => ts('Custom Translate Function'),
   ],
   'monetaryThousandSeparator' => [
     'group_name' => 'Localization Preferences',
@@ -68,10 +49,9 @@ return [
     ],
     'default' => ',',
     'add' => '4.3',
-    'title' => 'Thousands Separator',
+    'title' => ts('Thousands Separator'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'monetaryDecimalPoint' => [
@@ -86,10 +66,9 @@ return [
     ],
     'default' => '.',
     'add' => '4.3',
-    'title' => 'Decimal Delimiter',
+    'title' => ts('Decimal Delimiter'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'moneyformat' => [
@@ -101,10 +80,9 @@ return [
     'html_type' => 'text',
     'default' => '%c %a',
     'add' => '4.3',
-    'title' => 'Monetary Amount Display',
+    'title' => ts('Monetary Amount Display'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'moneyvalueformat' => [
@@ -116,10 +94,9 @@ return [
     'html_type' => 'text',
     'default' => '%!i',
     'add' => '4.3',
-    'title' => 'Monetary Value Display',
+    'title' => ts('Monetary Value Display'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => NULL,
     'help_text' => NULL,
   ],
   'defaultCurrency' => [
@@ -134,10 +111,10 @@ return [
     ],
     'default' => 'USD',
     'add' => '4.3',
-    'title' => 'Default Currency',
+    'title' => ts('Default Currency'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Default currency assigned to contributions and other monetary transactions.',
+    'description' => ts('Default currency assigned to contributions and other monetary transactions.'),
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getCurrencySymbols',
@@ -157,11 +134,11 @@ return [
       //'class' => 'crm-select2',
     ],
     'add' => '4.4',
-    'title' => 'Default Country',
+    'title' => ts('Default Country'),
     'is_domain' => 1,
     'is_contact' => 0,
     'is_required' => FALSE,
-    'description' => 'This value is selected by default when adding a new contact address.',
+    'description' => ts('This value is selected by default when adding a new contact address.'),
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
@@ -183,8 +160,8 @@ return [
     //),
     //'html_attributes',
     'default' => NULL,
-    'title' => 'Default State/Province',
-    'description' => 'This value is selected by default when adding a new contact address.',
+    'title' => ts('Default State/Province'),
+    'description' => ts('This value is selected by default when adding a new contact address.'),
   ],
   'countryLimit' => [
     'group_name' => 'Localization Preferences',
@@ -200,10 +177,9 @@ return [
     ],
     'default' => [],
     'add' => '4.3',
-    'title' => 'Available Countries',
+    'title' => ts('Available Countries'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
@@ -223,10 +199,9 @@ return [
     ],
     'default' => [],
     'add' => '4.3',
-    'title' => 'Available States and Provinces (by Country)',
+    'title' => ts('Available States and Provinces (by Country)'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
@@ -240,11 +215,11 @@ return [
     'quick_form_type' => 'YesNo',
     'default' => '0',
     'add' => '4.3',
-    'title' => 'Inherit CMS Language',
+    'title' => ts('Inherit CMS Language'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
+    'description' => ts('If Yes, the initial session language will be set by the CMS, which can later be changed if using the CiviCRM language switcher.'),
   ],
   'dateformatDatetime' => [
     'group_name' => 'Localization Preferences',
@@ -255,10 +230,9 @@ return [
     'html_type' => 'text',
     'default' => '%B %E%f, %Y %l:%M %P',
     'add' => '4.3',
-    'title' => 'Date Format: Complete Date and Time',
+    'title' => ts('Date Format: Complete Date and Time'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
   ],
   'dateformatFull' => [
@@ -270,10 +244,9 @@ return [
     'html_type' => 'text',
     'default' => '%B %E%f, %Y',
     'add' => '4.3',
-    'title' => 'Date Format: Complete Date',
+    'title' => ts('Date Format: Complete Date'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
   ],
   'dateformatPartial' => [
@@ -285,10 +258,9 @@ return [
     'html_type' => 'text',
     'default' => '%B %Y',
     'add' => '4.3',
-    'title' => 'Date Format: Month and Year',
+    'title' => ts('Date Format: Month and Year'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
   ],
   'dateformatTime' => [
@@ -307,8 +279,7 @@ return [
       'maxlength' => '60',
     ],
     'default' => '%l:%M %P',
-    'title' => 'Date Format: Time Only',
-    'description' => '',
+    'title' => ts('Date Format: Time Only'),
   ],
   'dateformatYear' => [
     'add' => '4.7',
@@ -326,8 +297,7 @@ return [
       'maxlength' => '60',
     ],
     'default' => '%Y',
-    'title' => 'Date Format: Year Only',
-    'description' => '',
+    'title' => ts('Date Format: Year Only'),
   ],
   'dateformatFinancialBatch' => [
     'add' => '4.7',
@@ -345,8 +315,7 @@ return [
       'maxlength' => '60',
     ],
     'default' => '%m/%d/%Y',
-    'title' => 'Date Format: Financial Batch',
-    'description' => '',
+    'title' => ts('Date Format: Financial Batch'),
   ],
   'dateformatshortdate' => [
     'add' => '4.7',
@@ -364,8 +333,7 @@ return [
       'maxlength' => '60',
     ],
     'default' => '%m/%d/%Y',
-    'title' => 'Date Format: Short date Month Day Year',
-    'description' => '',
+    'title' => ts('Date Format: Short date Month Day Year'),
   ],
   'dateInputFormat' => [
     'add' => '4.7',
@@ -382,8 +350,7 @@ return [
       'callback' => 'CRM_Core_SelectValues::getDatePluginInputFormats',
     ],
     'default' => 'mm/dd/yy',
-    'title' => 'Date Input Format',
-    'description' => '',
+    'title' => ts('Date Input Format'),
   ],
   'fieldSeparator' => [
     'add' => '4.7',
@@ -401,8 +368,8 @@ return [
       'maxlength' => '8',
     ],
     'default' => ',',
-    'title' => 'Import / Export Field Separator',
-    'description' => 'Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: \',\' \';\' \':\' \'|\' ).',
+    'title' => ts('Import / Export Field Separator'),
+    'description' => ts('Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: \',\' \';\' \':\' \'|\' ).'),
   ],
   'fiscalYearStart' => [
     'add' => '4.7',
@@ -416,8 +383,7 @@ return [
     'quick_form_type' => 'MonthDay',
     'html_type' => 'MonthDay',
     'default' => ['M' => 1, 'd' => 1],
-    'title' => 'Fiscal Year Start',
-    'description' => '',
+    'title' => ts('Fiscal Year Start'),
   ],
   'languageLimit' => [
     'group_name' => 'Localization Preferences',
@@ -432,10 +398,9 @@ return [
     ],
     'default' => NULL,
     'add' => '4.3',
-    'title' => 'Available Languages (Multi-lingual)',
+    'title' => ts('Available Languages (Multi-lingual)'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Core_I18n::languages',
@@ -454,10 +419,9 @@ return [
     ],
     'default' => NULL,
     'add' => '5.9',
-    'title' => 'Available Languages',
+    'title' => ts('Available Languages'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => ts('User Interface languages available to users'),
     'pseudoconstant' => [
       'callback' => 'CRM_Core_I18n::languages',
@@ -475,10 +439,9 @@ return [
     ],
     'default' => 'en_US',
     'add' => '4.3',
-    'title' => 'Default Language',
+    'title' => ts('Default Language'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => '',
     'help_text' => NULL,
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions',
@@ -503,8 +466,8 @@ return [
       'maxlength' => '30',
     ],
     'default' => 'Windows-1252',
-    'title' => 'Legacy Encoding',
-    'description' => 'If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of Windows-1252 will work for Excel-created .CSV files on many computers.',
+    'title' => ts('Legacy Encoding'),
+    'description' => ts('If import files are NOT encoded as UTF-8, specify an alternate character encoding for these files. The default of Windows-1252 will work for Excel-created .CSV files on many computers.'),
   ],
   'timeInputFormat' => [
     'add' => '4.7',
@@ -521,8 +484,7 @@ return [
       'callback' => 'CRM_Core_SelectValues::getTimeFormats',
     ],
     'default' => '1',
-    'title' => 'Time Input Format',
-    'description' => '',
+    'title' => ts('Time Input Format'),
     'on_change' => [
       'CRM_Core_BAO_PreferencesDate::onChangeSetting',
     ],
@@ -539,10 +501,9 @@ return [
     ],
     'default' => '0',
     'add' => '4.7',
-    'title' => 'Week begins on',
+    'title' => ts('Week begins on'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => "",
     'help_text' => NULL,
   ],
   'contact_default_language' => [
@@ -560,11 +521,34 @@ return [
     ],
     'default' => '*default*',
     'add' => '4.7',
-    'title' => 'Default Language for contacts',
+    'title' => ts('Default Language for contacts'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => 'Default language (if any) for contact records',
+    'description' => ts('Default language (if any) for contact records.'),
     'help_text' => 'If a contact is created with no language this setting will determine the language data (if any) to save.'
     . 'You may or may not wish to make an assumption here about whether it matches the site language',
+  ],
+  'pinnedContactCountries' => [
+    'group_name' => 'Localization Preferences',
+    'group' => 'localization',
+    'name' => 'pinnedContactCountries',
+    'type' => 'Array',
+    'quick_form_type' => 'Element',
+    'html_type' => 'advmultiselect',
+    'html_attributes' => [
+      'size' => 5,
+      'style' => 'width:150px',
+      'class' => 'advmultiselect',
+    ],
+    'default' => [],
+    'add' => '5.33',
+    'title' => ts('Pinned Countries'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Appear in Top section of select list'),
+    'help_text' => ts('Selected countries will appear in top section of country list'),
+    'pseudoconstant' => [
+      'callback' => 'CRM_Admin_Form_Setting_Localization::getAvailableCountries',
+    ],
   ],
 ];

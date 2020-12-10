@@ -2,42 +2,23 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
 namespace Civi\Api4\Utils;
 
-use Civi\Api4\CustomGroup;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 require_once 'api/v3/utils.php';
@@ -55,34 +36,48 @@ class CoreUtil {
    */
   public static function getBAOFromApiName($entityName) {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
-      return 'CRM_Contact_BAO_Contact';
+      return 'CRM_Core_BAO_CustomValue';
     }
     return \_civicrm_api3_get_BAO($entityName);
   }
 
   /**
-   * Get table name of given Custom group
+   * Get table name of given entity
    *
-   * @param string $customGroupName
+   * @param string $entityName
    *
    * @return string
    */
-  public static function getCustomTableByName($customGroupName) {
-    return CustomGroup::get()
-      ->addSelect('table_name')
-      ->addWhere('name', '=', $customGroupName)
-      ->execute()
-      ->first()['table_name'];
+  public static function getTableName($entityName) {
+    if (strpos($entityName, 'Custom_') === 0) {
+      $customGroup = substr($entityName, 7);
+      return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
+    }
+    return AllCoreTables::getTableForEntityName($entityName);
   }
 
   /**
    * Given a sql table name, return the name of the api entity.
    *
    * @param $tableName
-   * @return string
+   * @return string|NULL
    */
   public static function getApiNameFromTableName($tableName) {
-    return AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
+    $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
+    if (!$entityName) {
+      $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
+      $entityName = $customGroup ? "Custom_$customGroup" : NULL;
+    }
+    return $entityName;
+  }
+
+  /**
+   * @return string[]
+   */
+  public static function getOperators() {
+    $operators = \CRM_Core_DAO::acceptedSQLOperators();
+    $operators[] = 'CONTAINS';
+    return $operators;
   }
 
 }

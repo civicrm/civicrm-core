@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -57,16 +39,15 @@ class ParticipantTest extends UnitTestCase {
   }
 
   public function testGetActions() {
-    $result = Participant::getActions()
-      ->setCheckPermissions(FALSE)
+    $result = Participant::getActions(FALSE)
       ->execute()
       ->indexBy('name');
 
     $getParams = $result['get']['params'];
-    $whereDescription = 'Criteria for selecting items.';
+    $whereDescription = 'Criteria for selecting Participants';
 
     $this->assertEquals(TRUE, $getParams['checkPermissions']['default']);
-    $this->assertEquals($whereDescription, $getParams['where']['description']);
+    $this->assertContains($whereDescription, $getParams['where']['description']);
   }
 
   public function testGet() {
@@ -76,7 +57,7 @@ class ParticipantTest extends UnitTestCase {
     }
 
     // With no records:
-    $result = Participant::get()->setCheckPermissions(FALSE)->execute();
+    $result = Participant::get(FALSE)->execute();
     $this->assertEquals(0, $result->count(), "count of empty get is not 0");
 
     // Check that the $result knows what the inputs were
@@ -131,8 +112,7 @@ class ParticipantTest extends UnitTestCase {
     $secondEventId = $dummy['events'][1]['id'];
     $firstContactId = $dummy['contacts'][0]['id'];
 
-    $firstOnlyResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstOnlyResult = Participant::get(FALSE)
       ->addClause('AND', ['event_id', '=', $firstEventId])
       ->execute();
 
@@ -140,12 +120,11 @@ class ParticipantTest extends UnitTestCase {
       "count of first event is not $expectedFirstEventCount");
 
     // get first two events using different methods
-    $firstTwo = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstTwo = Participant::get(FALSE)
       ->addWhere('event_id', 'IN', [$firstEventId, $secondEventId])
       ->execute();
 
-    $firstResult = $result->first();
+    $firstResult = $firstTwo->first();
 
     // verify counts
     // count should either twice the first event count or one less
@@ -161,8 +140,7 @@ class ParticipantTest extends UnitTestCase {
       "count is too low"
     );
 
-    $firstParticipantResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $firstParticipantResult = Participant::get(FALSE)
       ->addWhere('event_id', '=', $firstEventId)
       ->addWhere('contact_id', '=', $firstContactId)
       ->execute();
@@ -172,8 +150,7 @@ class ParticipantTest extends UnitTestCase {
     $firstParticipantId = $firstParticipantResult->first()['id'];
 
     // get a result which excludes $first_participant
-    $otherParticipantResult = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $otherParticipantResult = Participant::get(FALSE)
       ->setSelect(['id'])
       ->addClause('NOT', [
         ['event_id', '=', $firstEventId],
@@ -183,8 +160,7 @@ class ParticipantTest extends UnitTestCase {
       ->indexBy('id');
 
     // check alternate syntax for NOT
-    $otherParticipantResult2 = Participant::get()
-      ->setCheckPermissions(FALSE)
+    $otherParticipantResult2 = Participant::get(FALSE)
       ->setSelect(['id'])
       ->addClause('NOT', 'AND', [
         ['event_id', '=', $firstEventId],

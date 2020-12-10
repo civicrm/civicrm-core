@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -108,6 +90,9 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *   Create or delete.
    * @param array $owner
    *   Primary membership info (membership_id, contact_id, membership_type ...).
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function relAction($action, $owner) {
     switch ($action) {
@@ -130,21 +115,19 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'end_date' => CRM_Utils_Date::processDate($owner['end_date'], NULL, TRUE, 'Ymd'),
           'source' => ts('Manual Assignment of Related Membership'),
           'is_test' => $owner['is_test'],
-          'campaign_id' => CRM_Utils_Array::value('campaign_id', $owner),
+          'campaign_id' => $owner['campaign_id'] ?? NULL,
           'status_id' => $owner['status_id'],
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
         ];
-        // @todo stop passing $ids here (we are only doing so because of passbyreference)
-        $ids = [];
-        CRM_Member_BAO_Membership::create($params, $ids);
+        CRM_Member_BAO_Membership::create($params);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', [1 => $relatedDisplayName]),
           ts('Membership Added'), 'success');
         break;
 
       default:
-        CRM_Core_Error::fatal(ts("Invalid action specified in URL"));
+        throw new CRM_Core_Exception(ts('Invalid action specified in URL'));
     }
 
     // Redirect back to membership view page for the owner, without the relAction parameters
@@ -395,7 +378,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->membershipID, 'contribution_recur_id');
 
-      $autoRenew = $isRecur ? TRUE : FALSE;
+      $autoRenew = (bool) $isRecur;
     }
 
     if (!empty($values['is_test'])) {

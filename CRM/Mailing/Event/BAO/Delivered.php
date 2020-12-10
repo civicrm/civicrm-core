@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
 
@@ -280,18 +264,15 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    *   Consider mailings that were completed not more than $maxDays ago.
    */
   public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
-    $dao = new CRM_Core_DAO();
+
+    $temporaryTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('mailingemail')
+      ->setMemory()
+      ->createWithColumns('id int primary key, reset_date datetime');
+    $temporaryTableName = $temporaryTable->getName();
 
     $query = "
-CREATE TEMPORARY TABLE civicrm_email_temp_values (
-  id           int primary key,
-  reset_date   datetime
-) ENGINE = HEAP;
-";
-    CRM_Core_DAO::executeQuery($query);
-
-    $query = "
-            INSERT INTO civicrm_email_temp_values (id, reset_date)
+            INSERT INTO {$temporaryTableName} (id, reset_date)
             SELECT      civicrm_email.id as email_id,
                         max(civicrm_mailing_event_delivered.time_stamp) as reset_date
             FROM        civicrm_mailing_event_queue
@@ -309,12 +290,13 @@ CREATE TEMPORARY TABLE civicrm_email_temp_values (
 
     $query = "
 UPDATE     civicrm_email e
-INNER JOIN civicrm_email_temp_values et ON e.id = et.id
+INNER JOIN {$temporaryTableName} et ON e.id = et.id
 SET        e.on_hold = 0,
            e.hold_date = NULL,
            e.reset_date = et.reset_date
 ";
     CRM_Core_DAO::executeQuery($query);
+    $temporaryTable->drop();
   }
 
 }

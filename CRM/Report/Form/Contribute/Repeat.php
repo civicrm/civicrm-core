@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $_amountClauseWithAND = NULL;
@@ -85,9 +69,8 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   /**
    * This report has been optimised for group filtering.
    *
-   * CRM-19170
-   *
    * @var bool
+   * @see https://issues.civicrm.org/jira/browse/CRM-19170
    */
   protected $groupFilterNotOptimised = FALSE;
 
@@ -237,12 +220,12 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
             'title' => ts('Financial Type'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search'),
           ),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => array('1'),
           ),
         ),
@@ -260,7 +243,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
    * Override parent select for reasons someone will someday make sense of & document.
    */
   public function select() {
-    $select = array();
+    $select = [];
     $append = NULL;
     // since contact fields not related to financial type
     if (array_key_exists('financial_type', $this->_params['group_bys']) ||
@@ -279,17 +262,17 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
               $select[] = $field['clause'];
 
               // FIXME: dirty hack for setting columnHeaders
-              $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$field['alias']}_{$field['name']}_sum"]['title'] = $field['title'];
-              $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['type'] = CRM_Utils_Array::value('type', $field);
+              $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['type'] = $field['type'] ?? NULL;
               $this->_columnHeaders["{$field['alias']}_{$field['name']}_count"]['title'] = $field['title'];
               continue;
             }
 
             // only include statistics columns if set
             $select[] = "{$field['dbAlias']} as {$field['alias']}_{$field['name']}";
-            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = CRM_Utils_Array::value('title', $field);
+            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = $field['type'] ?? NULL;
+            $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = $field['title'] ?? NULL;
             if (!empty($field['no_display'])) {
               $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['no_display'] = TRUE;
             }
@@ -402,14 +385,14 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     foreach ($this->_columns['civicrm_contribution']['filters'] as $fieldName => $field) {
       $clause = NULL;
       if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-        $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-        $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-        $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+        $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+        $from = $this->_params["{$fieldName}_from"] ?? NULL;
+        $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
         $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to, $field['type']);
       }
       else {
-        $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+        $op = $this->_params["{$fieldName}_op"] ?? NULL;
         if ($op) {
           $clause = $this->whereClause($field,
             $op,
@@ -425,7 +408,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     }
 
     if (!$this->_amountClauseWithAND) {
-      $amountClauseWithAND = array();
+      $amountClauseWithAND = [];
       if (!empty($clauses['total_amount1'])) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}1.total_amount_sum", $clauses['total_amount1']);
@@ -466,7 +449,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       ) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
-          $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+          $op = $this->_params["{$fieldName}_op"] ?? NULL;
           if ($op) {
             $clause = $this->whereClause($field,
               $op,
@@ -494,7 +477,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    */
   public static function formRule($fields, $files, $self) {
 
-    $errors = $checkDate = $errorCount = array();
+    $errors = $checkDate = $errorCount = [];
 
     $rules = array(
       'id' => array(
@@ -574,7 +557,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
       foreach ($fields['fields'] as $fld_id => $value) {
         if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2') && !(substr($fld_id, 0, 7) === "custom_")) {
           $found = FALSE;
-          $invlidGroups = array();
+          $invlidGroups = [];
           foreach ($fields['group_bys'] as $grp_id => $val) {
             $validFields = $rules[$grp_id];
             if (in_array($fld_id, $validFields)) {
@@ -687,7 +670,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     $sql = "{$this->_select} {$this->_from} {$this->_where}";
     $dao = $this->executeReportQuery($sql);
     //store contributions in array 'contact_sums' for comparison
-    $contact_sums = array();
+    $contact_sums = [];
     while ($dao->fetch()) {
       $contact_sums[$dao->contact_civireport_id] = array(
         'contribution1_total_amount_sum' => $dao->contribution1_total_amount_sum,
@@ -769,7 +752,7 @@ GROUP BY    currency
 ";
     $dao = $this->executeReportQuery($sql);
 
-    $amount = $average = $amount2 = $average2 = array();
+    $amount = $average = $amount2 = $average2 = [];
     $count = $count2 = 0;
     while ($dao->fetch()) {
       if ($dao->amount) {
@@ -840,7 +823,7 @@ GROUP BY    currency
     $count = 0;
     $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_orderBy} {$this->_limit}";
     $dao = $this->executeReportQuery($sql);
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       foreach ($this->_columnHeaders as $key => $value) {
         $rows[$count][$key] = $dao->$key;

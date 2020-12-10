@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * file content.
  * For core fields use "entity_table", for custom fields use "field_name"
  *
- * @code
+ * ```
  * // Create an attachment for a core field
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'entity_table' => 'civicrm_activity',
@@ -42,9 +26,9 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
- * @code
+ * ```
  * // Create an attachment for a custom file field
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'field_name' => 'custom_6',
@@ -55,9 +39,9 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
- * @code
+ * ```
  * // Move an existing file and save as an attachment
  * $result = civicrm_api3('Attachment', 'create', array(
  *   'entity_table' => 'civicrm_activity',
@@ -70,7 +54,7 @@
  * ));
  * $attachment = $result['values'][$result['id']];
  * echo sprintf("<a href='%s'>View %s</a>", $attachment['url'], $attachment['name']);
- * @endcode
+ * ```
  *
  * Notes:
  *  - File content is not returned by default. One must specify 'return => content'.
@@ -161,8 +145,10 @@ function civicrm_api3_attachment_create($params) {
   }
   elseif (is_string($moveFile)) {
     // CRM-17432 Do not use rename() since it will break file permissions.
-    // Also avoid move_uplaoded_file() because the API can use options.move-file.
-    copy($moveFile, $path);
+    // Also avoid move_uploaded_file() because the API can use options.move-file.
+    if (!copy($moveFile, $path)) {
+      throw new API_Exception("Cannot copy uploaded file $moveFile to $path");
+    }
     unlink($moveFile);
   }
 
@@ -352,7 +338,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
  * @throws API_Exception validation errors
  */
 function _civicrm_api3_attachment_parse_params($params) {
-  $id = CRM_Utils_Array::value('id', $params, NULL);
+  $id = $params['id'] ?? NULL;
   if ($id && !is_numeric($id)) {
     throw new API_Exception("Malformed id");
   }
@@ -399,7 +385,7 @@ function _civicrm_api3_attachment_parse_params($params) {
 
   $isTrusted = empty($params['check_permissions']);
 
-  $returns = isset($params['return']) ? $params['return'] : [];
+  $returns = $params['return'] ?? [];
   $returns = is_array($returns) ? $returns : [$returns];
   $returnContent = in_array('content', $returns);
 

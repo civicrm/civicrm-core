@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -97,6 +81,10 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_mailingID = CRM_Utils_Request::retrieve('id', 'String', CRM_Core_DAO::$_nullObject, TRUE);
     }
 
+    // Retrieve contact ID and checksum from the URL
+    $cs = CRM_Utils_Request::retrieve('cs', 'String');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Int');
+
     // # CRM-7651
     // override contactID from the function level if passed in
     if (isset($contactID) &&
@@ -104,6 +92,12 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
     ) {
       $this->_contactID = $contactID;
     }
+
+    // Support checksummed view of the mailing to replace tokens
+    elseif (!empty($cs) && !empty($cid) && CRM_Contact_BAO_Contact_Utils::validChecksum($cid, $cs)) {
+      $this->_contactID = $cid;
+    }
+
     else {
       $this->_contactID = CRM_Core_Session::getLoggedInContactID();
     }
@@ -147,13 +141,13 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       return NULL;
     }
 
-    $contactId = isset($this->_contactID) ? $this->_contactID : 0;
+    $contactId = $this->_contactID ?? 0;
 
     $result = civicrm_api3('Mailing', 'preview', [
       'id' => $this->_mailingID,
       'contact_id' => $contactId,
     ]);
-    $mailing = \CRM_Utils_Array::value('values', $result);
+    $mailing = $result['values'] ?? NULL;
 
     $title = NULL;
     if (isset($mailing['body_html']) && empty($_GET['text'])) {

@@ -1,42 +1,28 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Financial Type
  */
-class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
+class CRM_Financial_Form_FinancialType extends CRM_Core_Form {
 
   use CRM_Core_Form_EntityFormTrait;
+
+  protected $_BAOName = 'CRM_Financial_BAO_FinancialType';
 
   /**
    * Fields for the entity to be assigned to the template.
@@ -54,13 +40,15 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     // Check permission for Financial Type when ACL-FT is enabled
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
       && !CRM_Core_Permission::check('administer CiviCRM Financial Types')
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     parent::preProcess();
@@ -112,9 +100,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    self::buildQuickEntityForm();
+    $this->buildQuickEntityForm();
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -128,11 +118,13 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $errors = CRM_Financial_BAO_FinancialType::del($this->_id);
-      if (!empty($errors)) {
+      if (is_array($errors) && !empty($errors)) {
         CRM_Core_Error::statusBounce($errors['error_message'], CRM_Utils_System::url('civicrm/admin/financial/financialType', "reset=1&action=browse"), ts('Cannot Delete'));
       }
       CRM_Core_Session::setStatus(ts('Selected financial type has been deleted.'), ts('Record Deleted'), 'success');
@@ -162,11 +154,11 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
           1 => $params['name'],
         ];
         $financialAccounts = civicrm_api3('EntityFinancialAccount', 'get', [
-          'return' => ["financial_account_id.name"],
-          'entity_table' => "civicrm_financial_type",
+          'return' => ['financial_account_id.name'],
+          'entity_table' => 'civicrm_financial_type',
           'entity_id' => $financialType['id'],
           'options' => ['sort' => "id"],
-          'account_relationship' => ['!=' => "Income Account is"],
+          'account_relationship' => ['!=' => 'Income Account is'],
         ]);
         if (!empty($financialAccounts['values'])) {
           foreach ($financialAccounts['values'] as $financialAccount) {
@@ -183,6 +175,21 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
     }
+  }
+
+  /**
+   * Set default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @return array
+   */
+  public function setDefaultValues() {
+    $defaults = $this->getEntityDefaults();
+
+    if ($this->_action & CRM_Core_Action::ADD) {
+      $defaults['is_active'] = 1;
+    }
+    return $defaults;
   }
 
 }

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Campaign_BAO_Query {
   //since normal activity clause clause get collides.
@@ -456,8 +440,8 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     if (!is_array($params) || empty($params)) {
       return $voterClause;
     }
-    $surveyId = CRM_Utils_Array::value('campaign_survey_id', $params);
-    $searchVoterFor = CRM_Utils_Array::value('campaign_search_voter_for', $params);
+    $surveyId = $params['campaign_survey_id'] ?? NULL;
+    $searchVoterFor = $params['campaign_search_voter_for'] ?? NULL;
 
     //get the survey activities.
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
@@ -487,14 +471,14 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         $recontactInterval = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey',
           $surveyId, 'recontact_interval'
         );
-        $recontactInterval = unserialize($recontactInterval);
+        $recontactInterval = CRM_Utils_String::unserialize($recontactInterval);
         if ($surveyId &&
           is_array($recontactInterval) &&
           !empty($recontactInterval)
         ) {
           $voterIds = [];
           foreach ($voterActValues as $values) {
-            $numOfDays = CRM_Utils_Array::value($values['result'], $recontactInterval);
+            $numOfDays = $recontactInterval[$values['result']] ?? NULL;
             if ($numOfDays &&
               $values['status_id'] == $completedStatusId
             ) {
@@ -518,17 +502,10 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
         $voterIdCount = count($voterIds);
 
         //create temporary table to store voter ids.
-        $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
+        $tempTable = CRM_Utils_SQL_TempTable::build();
+        $tempTableName = $tempTable->getName();
         CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
-
-        $query = "
-     CREATE TEMPORARY TABLE {$tempTableName} (
-            id int unsigned NOT NULL AUTO_INCREMENT,
-            survey_contact_id int unsigned NOT NULL,
-  PRIMARY KEY ( id )
-);
-";
-        CRM_Core_DAO::executeQuery($query);
+        $tempTable->createWithColumns('id int unsigned NOT NULL AUTO_INCREMENT, survey_contact_id int unsigned NOT NULL, PRIMARY KEY ( id )');
 
         $batch = 100;
         $insertedCount = 0;

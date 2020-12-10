@@ -6,6 +6,7 @@
   <comment>Case type definition</comment>
   <add>4.5</add>
   <log>true</log>
+  <component>CiviCase</component>
   <field>
     <name>id</name>
     <title>Case Type ID</title>

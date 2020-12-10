@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -99,9 +83,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
       $form->_values['amount'] = $form->_params['amount'];
     }
 
+    if (isset($paymentParams['contribution_source'])) {
+      $paymentParams['source'] = $paymentParams['contribution_source'];
+    }
     if ($isPaymentTransaction) {
       $contributionParams = [
-        'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
+        'id' => $paymentParams['contribution_id'] ?? NULL,
         'contact_id' => $contactID,
         'is_test' => $isTest,
         'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
@@ -158,11 +145,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $paymentParams['contributionID'] = $contribution->id;
       $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
-      if (isset($paymentParams['contribution_source'])) {
-        $paymentParams['source'] = $paymentParams['contribution_source'];
-      }
 
-      if (CRM_Utils_Array::value('is_recur', $form->_params) && $contribution->contribution_recur_id) {
+      if (!empty($form->_params['is_recur']) && $contribution->contribution_recur_id) {
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
       }
       if (isset($paymentParams['contribution_source'])) {
@@ -196,8 +180,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
             $contribution->payment_status_id = $result['payment_status_id'];
           }
           $result['contribution'] = $contribution;
-          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution',
-            'status_id', 'Pending') && $payment->isSendReceiptForPending()) {
+          if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')
+            && $payment->isSendReceiptForPending()) {
             CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
               $form->_values,
               $contribution->is_test
@@ -253,7 +237,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    * @return bool
    */
   protected static function isPaymentTransaction($form) {
-    return ($form->_amount >= 0.0) ? TRUE : FALSE;
+    return $form->_amount >= 0.0;
   }
 
   /**
@@ -362,78 +346,6 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
-   * @param array $params
-   * @param string $type
-   *
-   * @return bool
-   */
-  public static function _fillCommonParams(&$params, $type = 'paypal') {
-    if (array_key_exists('transaction', $params)) {
-      $transaction = &$params['transaction'];
-    }
-    else {
-      $transaction = &$params;
-    }
-
-    $params['contact_type'] = 'Individual';
-
-    $billingLocTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', 'Billing', 'id', 'name');
-    if (!$billingLocTypeId) {
-      $billingLocTypeId = 1;
-    }
-    if (!CRM_Utils_System::isNull($params['address'])) {
-      $params['address'][1]['is_primary'] = 1;
-      $params['address'][1]['location_type_id'] = $billingLocTypeId;
-    }
-    if (!CRM_Utils_System::isNull($params['email'])) {
-      $params['email'] = [
-        1 => [
-          'email' => $params['email'],
-          'location_type_id' => $billingLocTypeId,
-        ],
-      ];
-    }
-
-    if (isset($transaction['trxn_id'])) {
-      // set error message if transaction has already been processed.
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->trxn_id = $transaction['trxn_id'];
-      if ($contribution->find(TRUE)) {
-        $params['error'][] = ts('transaction already processed.');
-      }
-    }
-    else {
-      // generate a new transaction id, if not already exist
-      $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
-    }
-
-    if (!isset($transaction['financial_type_id'])) {
-      $contributionTypes = array_keys(CRM_Contribute_PseudoConstant::financialType());
-      $transaction['financial_type_id'] = $contributionTypes[0];
-    }
-
-    if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
-      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
-    }
-
-    if (!isset($transaction['invoice_id'])) {
-      $transaction['invoice_id'] = $transaction['trxn_id'];
-    }
-
-    $source = ts('ContributionProcessor: %1 API',
-      [1 => ucfirst($type)]
-    );
-    if (isset($transaction['source'])) {
-      $transaction['source'] = $source . ':: ' . $transaction['source'];
-    }
-    else {
-      $transaction['source'] = $source;
-    }
-
-    return TRUE;
-  }
-
-  /**
    * @param int $contactID
    *
    * @return mixed
@@ -489,31 +401,19 @@ LIMIT 1
    *   Amount of field.
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
-   * @param bool $ugWeDoNotKnowIfItNeedsCleaning_Help
-   *   This should ALWAYS BE FALSE and then be removed. A 'clean' money string uses a standardised format
-   *   such as '1000.99' for one thousand $/Euro/CUR and ninety nine cents/units.
-   *   However, we are in the habit of not necessarily doing that so need to grandfather in
-   *   the new expectation.
    *
    * @return array
    *   array of tax amount
    *
    */
-  public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
-    $taxAmount = [];
-    if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
-      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', ['civi.tag' => 'deprecated']);
-      $amount = CRM_Utils_Rule::cleanMoney($amount);
-    }
-    // There can not be any rounding at this stage - as this is prior to quantity multiplication
-    $taxAmount['tax_amount'] = ($taxRate / 100) * $amount;
-
-    return $taxAmount;
+  public static function calculateTaxAmount($amount, $taxRate) {
+    // There can not be any rounding at this stage - as it should be done at point of display.
+    return ['tax_amount' => ($taxRate / 100) * $amount];
   }
 
   /**
    * Format monetary amount: round and return to desired decimal place
-   * CRM-20145
+   * @see https://issues.civicrm.org/jira/browse/CRM-20145
    *
    * @param float $amount
    *   Monetary amount
@@ -524,6 +424,7 @@ LIMIT 1
    *   Amount rounded and returned with the desired decimal places
    */
   public static function formatAmount($amount, $decimals = 2) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Utils_Rule::cleanMoney instead');
     return number_format((float) round($amount, (int) $decimals), (int) $decimals, '.', '');
   }
 
@@ -538,47 +439,59 @@ LIMIT 1
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
-    if ($usedFor == 'pledge') {
+    if ($usedFor === 'pledge') {
       $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
     }
     else {
       $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
-    $statusNamesToUnset = [];
+    $statusNamesToUnset = [
+      // For records which represent a data template for a recurring
+      // contribution that may not yet have a payment. This status should not
+      // be available from forms. 'Template' contributions should only be created
+      // in conjunction with a ContributionRecur record, and should have their
+      // is_template field set to 1. This status excludes them from reports
+      // that are still ignorant of the is_template field.
+      'Template',
+    ];
     // on create fetch statuses on basis of component
     if (!$id) {
-      $statusNamesToUnset = [
+      $statusNamesToUnset = array_merge($statusNamesToUnset, [
         'Refunded',
         'Chargeback',
         'Pending refund',
-      ];
+      ]);
 
-      // Event registration and New Membership backoffice form support partially paid payment,
-      //  so exclude this status only for 'New Contribution' form
-      if ($usedFor == 'contribution') {
+      if ($usedFor === 'contribution') {
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
           'Partially paid',
         ]);
       }
-      elseif ($usedFor == 'participant') {
+      elseif ($usedFor === 'participant') {
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Cancelled',
           'Failed',
-        ]);
-      }
-      elseif ($usedFor == 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
+          'Partially paid',
+        ]);
+      }
+      elseif ($usedFor === 'membership') {
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'In Progress',
+          'Cancelled',
+          'Failed',
+          'Overdue',
+          'Partially paid',
         ]);
       }
     }
     else {
       $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'contribution_status_id');
-      $name = CRM_Utils_Array::value($contributionStatus, $statusNames);
+      $name = $statusNames[$contributionStatus] ?? NULL;
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
@@ -650,6 +563,19 @@ LIMIT 1
   public static function overrideDefaultCurrency($params) {
     $config = CRM_Core_Config::singleton();
     $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+  }
+
+  /**
+   * Get either the public title if set or the title of a contribution page for use in workflow message template.
+   * @param int $contribution_page_id
+   * @return string
+   */
+  public static function getContributionPageTitle($contribution_page_id) {
+    $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'frontend_title');
+    if (empty($title)) {
+      $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $contribution_page_id, 'title');
+    }
+    return $title;
   }
 
 }

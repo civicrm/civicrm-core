@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_VersionCheck {
   const
@@ -90,9 +74,10 @@ class CRM_Utils_VersionCheck {
   /**
    * Self-populates version info
    *
-   * @throws \Exception
+   * @param bool $force
+   * @throws Exception
    */
-  public function initialize() {
+  public function initialize($force = FALSE) {
     $this->getJob();
 
     // Populate remote $versionInfo from cache file
@@ -100,9 +85,9 @@ class CRM_Utils_VersionCheck {
 
     // Fallback if scheduled job is enabled but has failed to run.
     $expiryTime = time() - self::CACHEFILE_EXPIRE;
-    if (!empty($this->cronJob['is_active']) &&
+    if ($force || (!empty($this->cronJob['is_active']) &&
       (!$this->isInfoAvailable || filemtime($this->cacheFile) < $expiryTime)
-    ) {
+    )) {
       // First try updating the files modification time, for 2 reasons:
       //  - if the file is not writeable, this saves the trouble of pinging back
       //  - if the remote server is down, this will prevent an immediate retry
@@ -253,7 +238,7 @@ class CRM_Utils_VersionCheck {
       $this->stats['extensions'][] = [
         'name' => $dao->full_name,
         'enabled' => $dao->is_active,
-        'version' => isset($info->version) ? $info->version : NULL,
+        'version' => $info->version ?? NULL,
       ];
     }
   }

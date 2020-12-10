@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -149,12 +133,12 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
           }
           if (!empty($financialAccount->financial_account_type_id)) {
             $optionGroupName = 'financial_account_type';
-            $financialType[$dao->id]['financial_account_type'] = CRM_Utils_Array::value($financialAccount->financial_account_type_id, $financialAccountType);
+            $financialType[$dao->id]['financial_account_type'] = $financialAccountType[$financialAccount->financial_account_type_id] ?? NULL;
 
           }
           if (!empty($dao->account_relationship)) {
             $optionGroupName = 'account_relationship';
-            $financialType[$dao->id]['account_relationship'] = CRM_Utils_Array::value($dao->account_relationship, $accountRelationship);
+            $financialType[$dao->id]['account_relationship'] = $accountRelationship[$dao->account_relationship] ?? NULL;
           }
         }
         // form all action links
@@ -182,8 +166,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $this->assign('financialTypeTitle', $this->_title);
     }
     else {
-      CRM_Core_Error::fatal();
-      return NULL;
+      CRM_Core_Error::statusBounce('No Financial Accounts found for the Financial Type');
     }
   }
 

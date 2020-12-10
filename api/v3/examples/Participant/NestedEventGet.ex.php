@@ -89,7 +89,6 @@ function participant_get_expectedresult() {
               'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
               'event_description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
               'event_type_id' => '1',
-              'participant_listing_id' => 0,
               'is_public' => '1',
               'start_date' => '2013-07-29 00:00:00',
               'event_start_date' => '2013-07-29 00:00:00',

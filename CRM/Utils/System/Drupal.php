@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -86,6 +70,19 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
       return FALSE;
     }
     return $form_state['user']->uid;
+  }
+
+  /**
+   * Appends a Drupal 7 Javascript file when the CRM Menubar Javascript file has
+   * been included. The file is added before the menu bar so we can properly listen
+   * for the menu bar ready event.
+   */
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $event) {
+    $menuBarFileIndex = array_search('js/crm.menubar.js', $event->list);
+
+    if ($menuBarFileIndex !== FALSE) {
+      array_splice($event->list, $menuBarFileIndex, 0, ['js/crm.drupal7.js']);
+    }
   }
 
   /**
@@ -320,9 +317,10 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
     $config = CRM_Core_Config::singleton();
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
+    $ufDSN = CRM_Utils_SQL::autoSwitchDSN($config->userFrameworkDSN);
+    $dbDrupal = DB::connect($ufDSN);
     if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $ufDSN, " . $dbDrupal->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;
@@ -527,7 +525,7 @@ AND    u.status = 1
       return TRUE;
     }
 
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       //load user, we need to check drupal permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));

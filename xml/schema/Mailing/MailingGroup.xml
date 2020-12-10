@@ -6,6 +6,7 @@
   <name>civicrm_mailing_group</name>
   <comment>Stores information about the groups that participate in this mailing..</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Group ID</title>

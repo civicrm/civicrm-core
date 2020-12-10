@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
@@ -170,31 +154,11 @@ WHERE     pledge_id = %1
    *   pledge payment id
    */
   public static function add($params) {
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'PledgePayment', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'PledgePayment', NULL, $params);
-    }
-
-    $payment = new CRM_Pledge_DAO_PledgePayment();
-    $payment->copyValues($params);
-
     // set currency for CRM-1496
-    if (!isset($payment->currency)) {
-      $payment->currency = CRM_Core_Config::singleton()->defaultCurrency;
+    if (empty($params['id']) && !isset($params['currency'])) {
+      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
     }
-
-    $result = $payment->save();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'PledgePayment', $payment->id, $payment);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'PledgePayment', $payment->id, $payment);
-    }
-
-    return $result;
+    return self::writeRecord($params);
   }
 
   /**

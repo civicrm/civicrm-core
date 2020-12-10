@@ -1,33 +1,17 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -101,21 +85,6 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   }
 
   /**
-   * Set the active tab
-   *
-   * @param string $default
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function setSelectedChild($default = NULL) {
-    $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, $default);
-    if (!empty($selectedChild)) {
-      $this->set('selectedChild', $selectedChild);
-      $this->assign('selectedChild', $selectedChild);
-    }
-  }
-
-  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
@@ -143,10 +112,10 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       // its an update mode, do a permission check
       if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::EDIT)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $participantListingID = CRM_Utils_Array::value('participant_listing_id', $eventInfo);
+      $participantListingID = $eventInfo['participant_listing_id'] ?? NULL;
       //CRM_Core_DAO::getFieldValue( 'CRM_Event_DAO_Event', $this->_id, 'participant_listing_id' );
       if ($participantListingID) {
         $participantListingURL = CRM_Utils_System::url('civicrm/event/participant',
@@ -163,7 +132,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     // figure out whether we’re handling an event or an event template
     if ($this->_id) {
-      $this->_isTemplate = CRM_Utils_Array::value('is_template', $eventInfo);
+      $this->_isTemplate = $eventInfo['is_template'] ?? NULL;
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
       $this->_isTemplate = CRM_Utils_Request::retrieve('is_template', 'Boolean', $this);
@@ -211,7 +180,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     $ufEdit = CRM_ACL_API::group(CRM_Core_Permission::EDIT, NULL, 'civicrm_uf_group', $ufGroups);
     $checkPermission = [
       [
-        'administer CiviCRM',
+        'administer CiviCRM data',
         'manage event profiles',
       ],
     ];
@@ -266,7 +235,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $params = ['id' => $this->_id];
       CRM_Event_BAO_Event::retrieve($params, $defaults);
 
-      $this->_campaignID = CRM_Utils_Array::value('campaign_id', $defaults);
+      $this->_campaignID = $defaults['campaign_id'] ?? NULL;
     }
     elseif ($this->_templateId) {
       $params = ['id' => $this->_templateId];
@@ -291,7 +260,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
 
-    $this->_cancelURL = CRM_Utils_Array::value('cancelURL', $_POST);
+    $this->_cancelURL = $_POST['cancelURL'] ?? NULL;
 
     if (!$this->_cancelURL) {
       if ($this->_isTemplate) {
@@ -388,8 +357,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCampaign', $config->enableComponents)) {
         $values = $this->controller->exportValues($this->_name);
-        $newCampaignID = CRM_Utils_Array::value('campaign_id', $values);
-        $eventID = CRM_Utils_Array::value('id', $values);
+        $newCampaignID = $values['campaign_id'] ?? NULL;
+        $eventID = $values['id'] ?? NULL;
         if ($eventID && $this->_campaignID != $newCampaignID) {
           CRM_Event_BAO_Event::updateParticipantCampaignID($eventID, $newCampaignID);
         }

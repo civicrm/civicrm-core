@@ -74,15 +74,6 @@
     <onDelete>CASCADE</onDelete>
   </foreignKey>
   <field>
-    <name>email</name>
-    <type>varchar</type>
-    <length>64</length>
-    <rule>email</rule>
-    <comment>Email address</comment>
-    <add>1.1</add>
-    <drop>2.0</drop>
-  </field>
-  <field>
     <name>language</name>
     <title>Preferred Language</title>
     <type>varchar</type>
@@ -90,14 +81,6 @@
     <comment>UI language preferred by the given user/contact</comment>
     <add>2.1</add>
   </field>
-  <index>
-    <name>UI_uf_id_domain_id</name>
-    <fieldName>uf_id</fieldName>
-    <fieldName>domain_id</fieldName>
-    <unique>true</unique>
-    <add>1.5</add>
-    <drop>1.7</drop>
-  </index>
   <index>
     <name>UI_uf_name_domain_id</name>
     <fieldName>uf_name</fieldName>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -71,12 +55,12 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
 
     if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
-      CRM_Core_Error::fatal('Required information missing.');
+      throw new CRM_Core_Exception('Required information missing.');
     }
 
     if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
-      CRM_Core_Error::fatal(ts("%1 processor doesn't support updating subscription billing details.",
-        array(1 => $this->_paymentProcessor['object']->_processorName)
+      throw new CRM_Core_Exception(ts("%1 processor doesn't support updating subscription billing details.",
+        [1 => $this->_paymentProcessor['title']]
       ));
     }
     $this->assign('paymentProcessor', $this->_paymentProcessor);
@@ -100,10 +84,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    *   Default values
    */
   public function setDefaultValues() {
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     if ($this->_subscriptionDetails->contact_id) {
-      $fields = array();
+      $fields = [];
       $names = array(
         'first_name',
         'middle_name',
@@ -186,7 +170,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     CRM_Core_Form::validateMandatoryFields($self->_fields, $fields, $errors);
 
     // validate the payment instrument values (e.g. credit card number)
@@ -208,7 +192,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
     $fields["email-{$this->_bltID}"] = 1;
 
-    $processorParams = array();
+    $processorParams = [];
     foreach ($params as $key => $val) {
       $key = str_replace('billing_', '', $key);
       list($key) = explode('-', $key);
@@ -216,10 +200,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
     $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
     $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
-    $processorParams['month'] = $processorParams['credit_card_exp_date']['M'];
-    $processorParams['year'] = $processorParams['credit_card_exp_date']['Y'];
-    $processorParams['subscriptionId'] = $this->_subscriptionDetails->subscription_id;
+    $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
+    $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
+    $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
     $processorParams['amount'] = $this->_subscriptionDetails->amount;
+    $message = '';
     $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
@@ -268,7 +253,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       // format new address for display
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
-        $addressParts[$part] = CRM_Utils_Array::value($part, $processorParams);
+        $addressParts[$part] = $processorParams[$part] ?? NULL;
       }
       $tplParams['address'] = CRM_Utils_Address::format($addressParts);
 
@@ -278,7 +263,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $addressParts = array("street_address", "city", "postal_code", "state_province", "country");
       foreach ($addressParts as $part) {
         $key = "{$part}-{$this->_bltID}";
-        $addressParts[$part] = CRM_Utils_Array::value($key, $this->_defaults);
+        $addressParts[$part] = $this->_defaults[$key] ?? NULL;
       }
       $this->_defaults['address'] = CRM_Utils_Address::format($addressParts);
 
@@ -349,10 +334,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
       $tplParams['contact'] = array('display_name' => $donorDisplayName);
 
-      $date = CRM_Utils_Date::format($processorParams['credit_card_exp_date']);
-      $tplParams['credit_card_exp_date'] = CRM_Utils_Date::mysqlToIso($date);
-      $tplParams['credit_card_number'] = CRM_Utils_System::mungeCreditCard($processorParams['credit_card_number']);
-      $tplParams['credit_card_type'] = $processorParams['credit_card_type'];
+      $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
 
       $sendTemplateParams = array(
         'groupName' => $this->_subscriptionDetails->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',

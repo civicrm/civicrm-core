@@ -1,0 +1,14 @@
+<hr>
+<div class="form-inline">
+  <div class="btn-group" role="group">
+    <button class="btn btn-primary{{ $ctrl.autoSearch ? '-outline' : '' }}" ng-click="onClickSearch()" ng-disabled="loading || (!$ctrl.autoSearch && !$ctrl.stale)">
+      <i class="crm-i {{ loading ? 'fa-spin fa-spinner' : 'fa-search' }}"></i>
+      {{:: ts('Search') }}
+    </button>
+    <button class="btn crm-search-auto-toggle btn-primary{{ $ctrl.autoSearch ? '' : '-outline' }}" ng-click="onClickAuto()">
+      <i class="crm-i fa-toggle-{{ $ctrl.autoSearch ? 'on' : 'off' }}"></i>
+      {{:: ts('Auto') }}
+    </button>
+  </div>
+  <crm-search-actions entity="$ctrl.savedSearch.api_entity" ids="$ctrl.selectedRows" refresh="$ctrl.refreshPage()"></crm-search-actions>
+</div>

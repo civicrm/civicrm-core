@@ -1,0 +1,4 @@
+<li ng-repeat="row in $ctrl.results">
+  <div ng-repeat="col in $ctrl.columns" ng-bind-html="formatResult(row, col)" title="{{:: col.title }}" class="{{:: col.break ? '' : 'crm-inline-block' }}">
+  </div>
+</li>

@@ -7,11 +7,11 @@
     <div crm-mailing-radio-date="schedule" ng-model="abtest.mailings.c.scheduled_date">
       <div>
         <input ng-model="schedule.mode" type="radio" name="send" value="now" id="schedule-send-now"/>
-        <label for="schedule-send-now">{{ts('Send final mailing immediately')}}</label>
+        <label for="schedule-send-now">{{:: ts('Send final mailing immediately') }}</label>
       </div>
       <div>
         <input ng-model="schedule.mode" type="radio" name="send" value="at" id="schedule-send-at"/>
-        <label for="schedule-send-at">{{ts('Send final mailing at:')}}</label>
+        <label for="schedule-send-at">{{:: ts('Send final mailing at:') }}</label>
         <input crm-ui-datepicker ng-model="schedule.datetime"/>
       </div>
     </div>

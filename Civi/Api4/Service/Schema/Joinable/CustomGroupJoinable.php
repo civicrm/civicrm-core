@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -57,32 +39,36 @@ class CustomGroupJoinable extends Joinable {
    * @param $targetTable
    * @param $alias
    * @param bool $isMultiRecord
-   * @param string $entity
    * @param string $columns
    */
-  public function __construct($targetTable, $alias, $isMultiRecord, $entity, $columns) {
-    $this->entity = $entity;
+  public function __construct($targetTable, $alias, $isMultiRecord, $columns) {
     $this->columns = $columns;
     parent::__construct($targetTable, 'entity_id', $alias);
     $this->joinType = $isMultiRecord ?
       self::JOIN_TYPE_ONE_TO_MANY : self::JOIN_TYPE_ONE_TO_ONE;
+    // Only multi-record groups are considered an api "entity"
+    if (!$isMultiRecord) {
+      $this->entity = NULL;
+    }
   }
 
   /**
    * @inheritDoc
    */
   public function getEntityFields() {
-    if (!$this->entityFields) {
-      $fields = CustomField::get()
-        ->setCheckPermissions(FALSE)
-        ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_required', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'date_format', 'time_format', 'start_date_years', 'end_date_years'])
+    $cacheKey = 'APIv4_CustomGroupJoinable-' . $this->getTargetTable();
+    $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
+    if (!$entityFields) {
+      $fields = CustomField::get(FALSE)
+        ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
-        $this->entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
+        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, self::getEntityFromExtends($field['custom_group.extends']));
       }
+      \Civi::cache('metadata')->set($cacheKey, $entityFields);
     }
-    return $this->entityFields;
+    return $entityFields;
   }
 
   /**
@@ -102,7 +88,31 @@ class CustomGroupJoinable extends Joinable {
    * @return string
    */
   public function getSqlColumn($fieldName) {
+    if (strpos($fieldName, '.') !== FALSE) {
+      $fieldName = substr($fieldName, 1 + strrpos($fieldName, '.'));
+    }
     return $this->columns[$fieldName];
+  }
+
+  /**
+   * Translate custom_group.extends to entity name.
+   *
+   * Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs.
+   * @see \CRM_Core_SelectValues::customGroupExtends
+   *
+   * @param $extends
+   * @return string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getEntityFromExtends($extends) {
+    if (strpos($extends, 'Participant') === 0) {
+      return 'Participant';
+    }
+    if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
+      return 'Contact';
+    }
+    return $extends;
   }
 
 }

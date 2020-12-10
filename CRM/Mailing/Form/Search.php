@@ -1,41 +1,37 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Mailing_Form_Search extends CRM_Core_Form {
+class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
+
+  /**
+   * Get the default entity being queried.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Mailing';
+  }
 
   public function preProcess() {
     parent::preProcess();
   }
 
+  /**
+   * @throws \CiviCRM_API3_Exception
+   */
   public function buildQuickForm() {
     $parent = $this->controller->getParent();
     $nameTextLabel = ($parent->_sms) ? ts('SMS Name') : ts('Mailing Name');
@@ -51,6 +47,8 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
 
+    CRM_Mailing_BAO_Query::buildSearchForm($this);
+
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
     // CRM-15434 - Fix mailing search by status in non-English languages
@@ -59,7 +57,6 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       $this->addElement('checkbox', "mailing_status[$statusId]", NULL, $statusName);
     }
     $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
-    $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     // Search by language, if multi-lingual
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
@@ -84,9 +81,11 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
   /**
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = $statusVals = [];
+    $entityDefaults = parent::setDefaultValues();
     $parent = $this->controller->getParent();
 
     if ($parent->get('unscheduled')) {
@@ -106,11 +105,15 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     if ($parent->_sms) {
       $defaults['sms'] = 1;
     }
-    return $defaults;
+    return array_merge($defaults, $entityDefaults);
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function postProcess() {
-    $params = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
+    $params = $this->_formValues;
 
     if (!empty($params['mailing_relative'])) {
       list($params['mailing_low'], $params['mailing_high']) = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
@@ -146,6 +149,28 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
         }
       }
     }
+  }
+
+  /**
+   * Handle force=1 in the url.
+   *
+   * Search field metadata is normally added in buildForm but we are bypassing that in this flow
+   * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function handleForcedSearch() {
+    $this->setSearchMetadata();
+    $this->addContactSearchFields();
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Mailing' => CRM_Mailing_BAO_Query::getSearchFieldMetadata()]);
   }
 
 }

@@ -6,6 +6,7 @@
   <name>civicrm_mailing_abtest</name>
   <comment>Stores information about abtesting</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -62,6 +63,7 @@
     <title>Domain ID</title>
     <comment>Which site is this mailing for</comment>
     <add>4.6</add>
+    <required>true</required>
   </field>
   <field>
     <name>testing_criteria</name>
@@ -128,6 +130,7 @@
     <add>4.6</add>
     <html>
       <type>Select Date</type>
+      <formatType>mailing</formatType>
     </html>
   </field>
 </table>

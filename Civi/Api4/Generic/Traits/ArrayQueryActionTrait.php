@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -48,16 +30,18 @@ trait ArrayQueryActionTrait {
 
   /**
    * @param array $values
-   *   List of all rows
-   * @return array
-   *   Filtered list of rows
+   *   List of all rows to be filtered
+   * @param \Civi\Api4\Generic\Result $result
+   *   Object to store result
    */
-  protected function queryArray($values) {
+  protected function queryArray($values, $result) {
     $values = $this->filterArray($values);
     $values = $this->sortArray($values);
+    // Set total count before applying limit
+    $result->rowCount = count($values);
     $values = $this->limitArray($values);
     $values = $this->selectArray($values);
-    return $values;
+    $result->exchangeArray($values);
   }
 
   /**
@@ -76,7 +60,7 @@ trait ArrayQueryActionTrait {
    * @return bool
    */
   private function evaluateFilters($row) {
-    $where = $this->getWhere();
+    $where = array_values($this->getWhere());
     $allConditions = in_array($where[0], ['AND', 'OR', 'NOT']) ? $where : ['AND', $where];
     return $this->walkFilters($row, $allConditions);
   }
@@ -124,9 +108,9 @@ trait ArrayQueryActionTrait {
     if (!is_array($condition)) {
       throw new NotImplementedException('Unexpected where syntax; expecting array.');
     }
-    $value = isset($row[$condition[0]]) ? $row[$condition[0]] : NULL;
+    $value = $row[$condition[0]] ?? NULL;
     $operator = $condition[1];
-    $expected = isset($condition[2]) ? $condition[2] : NULL;
+    $expected = $condition[2] ?? NULL;
     switch ($operator) {
       case '=':
       case '!=':
@@ -174,6 +158,15 @@ trait ArrayQueryActionTrait {
       case 'NOT IN':
         return !in_array($value, $expected);
 
+      case 'CONTAINS':
+        if (is_array($value)) {
+          return in_array($expected, $value);
+        }
+        elseif (is_string($value) || is_numeric($value)) {
+          return strpos((string) $value, (string) $expected) !== FALSE;
+        }
+        return $value == $expected;
+
       default:
         throw new NotImplementedException("Unsupported operator: '$operator' cannot be used with array data");
     }
@@ -215,8 +208,17 @@ trait ArrayQueryActionTrait {
       $values = [['row_count' => count($values)]];
     }
     elseif ($this->getSelect()) {
+      // Return only fields specified by SELECT
       foreach ($values as &$value) {
         $value = array_intersect_key($value, array_flip($this->getSelect()));
+      }
+    }
+    else {
+      // With no SELECT specified, return all values that are keyed by plain field name; omit those with :pseudoconstant suffixes
+      foreach ($values as &$value) {
+        $value = array_filter($value, function($key) {
+          return strpos($key, ':') === FALSE;
+        }, ARRAY_FILTER_USE_KEY);
       }
     }
     return $values;

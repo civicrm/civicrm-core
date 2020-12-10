@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -47,11 +31,12 @@
  *   Associative array of property name/value.
  *   pairs to get profile field values
  *
- * @throws API_Exception
  * @return array
+ * @throws \CRM_Core_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_profile_get($params) {
-  $nonStandardLegacyBehaviour = is_numeric($params['profile_id']) ? TRUE : FALSE;
+  $nonStandardLegacyBehaviour = is_numeric($params['profile_id']);
   if (!empty($params['check_permissions']) && !empty($params['contact_id']) && !1 === civicrm_api3('contact', 'getcount', ['contact_id' => $params['contact_id'], 'check_permissions' => 1])) {
     throw new API_Exception('permission denied');
   }
@@ -78,7 +63,7 @@ function civicrm_api3_profile_get($params) {
       NULL,
       FALSE,
       NULL,
-      empty($params['check_permissions']) ? FALSE : TRUE,
+      empty($params['check_permissions']),
       NULL,
       CRM_Core_Permission::EDIT
     );
@@ -311,7 +296,7 @@ function _civicrm_api3_profile_submit_spec(&$params, $apirequest) {
     //@todo get_options should take an array - @ the moment it is only takes 'all' - which is supported
     // by other getfields fn
     // we don't resolve state, country & county for performance reasons
-    $resolveOptions = CRM_Utils_Array::value('get_options', $apirequest['params']) == 'all' ? TRUE : FALSE;
+    $resolveOptions = ($apirequest['params']['get_options'] ?? NULL) == 'all';
     $profileID = _civicrm_api3_profile_getProfileID($apirequest['params']['profile_id']);
     $params = _civicrm_api3_buildprofile_submitfields($profileID, $resolveOptions, CRM_Utils_Array::value('cache_clear', $params));
   }
@@ -457,17 +442,17 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
 
   if (!empty($result['api.address.get.1']['count'])) {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.1']['values'][0][$fieldname]) ? $result['api.address.get.1']['values'][0][$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result['api.address.get.1']['values'][0][$fieldname] ?? '';
     }
   }
   elseif (!empty($result['api.address.get.2']['count'])) {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result['api.address.get.2']['values'][0][$fieldname]) ? $result['api.address.get.2']['values'][0][$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result['api.address.get.2']['values'][0][$fieldname] ?? '';
     }
   }
   else {
     foreach ($addressFields as $fieldname) {
-      $values['billing_' . $fieldname . '-' . $locationTypeID] = isset($result[$fieldname]) ? $result[$fieldname] : '';
+      $values['billing_' . $fieldname . '-' . $locationTypeID] = $result[$fieldname] ?? '';
     }
   }
 
@@ -530,10 +515,10 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $profileFields[$profileID][$fieldName] = array_merge([
       'api.required' => $field['is_required'],
       'title' => $field['label'],
-      'help_pre' => CRM_Utils_Array::value('help_pre', $field),
-      'help_post' => CRM_Utils_Array::value('help_post', $field),
+      'help_pre' => $field['help_pre'] ?? NULL,
+      'help_post' => $field['help_post'] ?? NULL,
       'entity' => $entity,
-      'weight' => CRM_Utils_Array::value('weight', $field),
+      'weight' => $field['weight'] ?? NULL,
     ], $aliasArray);
 
     $ufFieldTaleFieldName = $field['field_name'];
@@ -623,13 +608,13 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
 }
 
 /**
- * @param $a
- * @param $b
+ * @param array $a
+ * @param array $b
  *
  * @return bool
  */
 function _civicrm_api3_order_by_weight($a, $b) {
-  return CRM_Utils_Array::value('weight', $b) < CRM_Utils_Array::value('weight', $a) ? TRUE : FALSE;
+  return ($b['weight'] ?? 0) < ($a['weight'] ?? 0);
 }
 
 /**
@@ -746,7 +731,7 @@ function _civicrm_api3_profile_appendaliases($values, $entity) {
   }
   //special case on membership & contribution - can't see how to handle in a generic way
   if (in_array($entity, ['membership', 'contribution'])) {
-    $values['send_receipt'] = ['title' => 'Send Receipt', 'type' => (int) 16];
+    $values['send_receipt'] = ['title' => 'Send Receipt', 'type' => 16];
   }
   return $values;
 }

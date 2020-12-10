@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -56,7 +40,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   /**
    * The contact type
    *
-   * @var string ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
+   * @var string
+   * ("Individual"/"Household"/"Organization"). Never been tested for something else than Individual
    */
   protected $_ctype = 'Individual';
 
@@ -176,7 +161,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
     //some sanity checks
     if (!$this->_surveyId) {
-      CRM_Core_Error::fatal('Petition id is not valid. (it needs a "sid" in the url).');
+      CRM_Core_Error::statusBounce('Petition id is not valid. (it needs a "sid" in the url).');
       return;
     }
     //check petition is valid and active
@@ -184,10 +169,10 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
     if (empty($this->petition)) {
-      CRM_Core_Error::fatal('Petition doesn\'t exist.');
+      CRM_Core_Error::statusBounce('Petition doesn\'t exist.');
     }
     if ($this->petition['is_active'] == 0) {
-      CRM_Core_Error::fatal('Petition is no longer active.');
+      CRM_Core_Error::statusBounce('Petition is no longer active.');
     }
 
     //get userID from session
@@ -213,7 +198,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
       $this->_contactProfileFields = CRM_Core_BAO_UFGroup::getFields($this->_contactProfileId, FALSE, CRM_Core_Action::ADD);
     }
     if (!isset($this->_contactProfileFields['email-Primary'])) {
-      CRM_Core_Error::fatal('The contact profile needs to contain the primary email address field');
+      CRM_Core_Error::statusBounce('The contact profile needs to contain the primary email address field');
     }
 
     $ufJoinParams['weight'] = 1;
@@ -476,7 +461,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     // array_values($this->_contactProfileFields)[0] but it's PHP 5.4+ only.
     $slice = array_slice($this->_contactProfileFields, 0, 1);
     $firstField = array_shift($slice);
-    $addToGroupID = isset($firstField['add_to_group_id']) ? $firstField['add_to_group_id'] : NULL;
+    $addToGroupID = $firstField['add_to_group_id'] ?? NULL;
     $this->_contactId = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_contactProfileFields,
       $this->_contactId, $addToGroupID,
       $this->_contactProfileId, $this->_ctype,
@@ -502,7 +487,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
     // create the signature activity record
     $params['contactId'] = $this->_contactId;
-    $params['activity_campaign_id'] = CRM_Utils_Array::value('campaign_id', $this->petition);
+    $params['activity_campaign_id'] = $this->petition['campaign_id'] ?? NULL;
     $result = $this->bao->createSignature($params);
 
     // send thank you or email verification emails

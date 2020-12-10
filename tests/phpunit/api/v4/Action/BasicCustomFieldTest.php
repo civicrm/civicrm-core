@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -48,83 +30,92 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
   public function testWithSingleField() {
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
-      ->addValue('name', 'MyContactFields')
-      ->addValue('extends', 'Contact')
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('name', 'MyIndividualFields')
+      ->addValue('extends', 'Individual')
       ->execute()
       ->first();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    $contactId = Contact::create()
-      ->setCheckPermissions(FALSE)
+    // Individual fields should show up when contact_type = null|Individual but not other contact types
+    $getFields = Contact::getFields(FALSE);
+    $this->assertContains('MyIndividualFields.FavColor', $getFields->execute()->column('name'));
+    $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
+    $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Household'])->execute()->column('name'));
+
+    $contactId = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
-      ->addValue('MyContactFields.FavColor', 'Red')
+      ->addValue('MyIndividualFields.FavColor', 'Red')
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('first_name')
-      ->addSelect('MyContactFields.FavColor')
+      ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
-      ->addWhere('MyContactFields.FavColor', '=', 'Red')
+      ->addWhere('MyIndividualFields.FavColor', '=', 'Red')
       ->execute()
       ->first();
 
-    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Red', $contact['MyIndividualFields.FavColor']);
 
     Contact::update()
       ->addWhere('id', '=', $contactId)
-      ->addValue('MyContactFields.FavColor', 'Blue')
+      ->addValue('MyIndividualFields.FavColor', 'Blue')
       ->execute();
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
-      ->addSelect('MyContactFields.FavColor')
+    $contact = Contact::get(FALSE)
+      ->addSelect('MyIndividualFields.FavColor')
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
 
-    $this->assertEquals('Blue', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
   }
 
   public function testWithTwoFields() {
 
-    $customGroup = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    // First custom set
+    CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
-      ->execute()
-      ->first();
-
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
-      ->addValue('label', 'FavColor')
-      ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Text')
-      ->addValue('data_type', 'String')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'FavColor')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'FavFood')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
-      ->addValue('label', 'FavFood')
-      ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'Text')
-      ->addValue('data_type', 'String')
+    // Second custom set
+    CustomGroup::create(FALSE)
+      ->addValue('name', 'MyContactFields2')
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'FavColor')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
+      ->addChain('field2', CustomField::create()
+        ->addValue('label', 'FavFood')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
       ->execute();
 
-    $contactId1 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId1 = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
       ->addValue('last_name', 'Tester')
       ->addValue('MyContactFields.FavColor', 'Red')
@@ -132,8 +123,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $contactId2 = Contact::create()
-      ->setCheckPermissions(FALSE)
+    $contactId2 = Contact::create(FALSE)
       ->addValue('first_name', 'MaryLou')
       ->addValue('last_name', 'Tester')
       ->addValue('MyContactFields.FavColor', 'Purple')
@@ -141,8 +131,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $contact = Contact::get(FALSE)
       ->addSelect('first_name')
       ->addSelect('MyContactFields.FavColor')
       ->addSelect('MyContactFields.FavFood')
@@ -151,26 +140,50 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
       ->execute()
       ->first();
-
     $this->assertArrayHasKey('MyContactFields.FavColor', $contact);
     $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
 
+    // By default custom fields are not returned
+    $contact = Contact::get(FALSE)
+      ->addWhere('id', '=', $contactId1)
+      ->addWhere('MyContactFields.FavColor', '=', 'Red')
+      ->addWhere('MyContactFields.FavFood', '=', 'Cherry')
+      ->execute()
+      ->first();
+    $this->assertArrayNotHasKey('MyContactFields.FavColor', $contact);
+
+    // Update 2nd set and ensure 1st hasn't changed
+    Contact::update()
+      ->addWhere('id', '=', $contactId1)
+      ->addValue('MyContactFields2.FavColor', 'Orange')
+      ->addValue('MyContactFields2.FavFood', 'Tangerine')
+      ->execute();
+    $contact = Contact::get(FALSE)
+      ->addSelect('MyContactFields.FavColor', 'MyContactFields2.FavColor', 'MyContactFields.FavFood', 'MyContactFields2.FavFood')
+      ->addWhere('id', '=', $contactId1)
+      ->execute()
+      ->first();
+    $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
+    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
+
+    // Update 1st set and ensure 2st hasn't changed
     Contact::update()
       ->addWhere('id', '=', $contactId1)
       ->addValue('MyContactFields.FavColor', 'Blue')
       ->execute();
-
-    $contact = Contact::get()
-      ->setCheckPermissions(FALSE)
-      ->addSelect('MyContactFields.FavColor')
+    $contact = Contact::get(FALSE)
+      ->addSelect('custom.*')
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-
     $this->assertEquals('Blue', $contact['MyContactFields.FavColor']);
+    $this->assertEquals('Orange', $contact['MyContactFields2.FavColor']);
+    $this->assertEquals('Cherry', $contact['MyContactFields.FavFood']);
+    $this->assertEquals('Tangerine', $contact['MyContactFields2.FavFood']);
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('OR', ['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -179,8 +192,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertEquals([$contactId1, $contactId2], array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -189,8 +201,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->addClause('NOT', ['MyContactFields.FavColor', '=', 'Purple'], ['MyContactFields.FavFood', '=', 'Grapes'])
       ->addSelect('id')
       ->addOrderBy('id')
@@ -200,8 +211,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertContains($contactId1, array_keys((array) $search));
     $this->assertNotContains($contactId2, array_keys((array) $search));
 
-    $search = Contact::get()
-      ->setCheckPermissions(FALSE)
+    $search = Contact::get(FALSE)
       ->setWhere([['NOT', ['OR', [['MyContactFields.FavColor', '=', 'Blue'], ['MyContactFields.FavFood', '=', 'Grapes']]]]])
       ->addSelect('id')
       ->addOrderBy('id')

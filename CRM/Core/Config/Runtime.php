@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -157,6 +141,14 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
         defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1,
         // e.g. one codebase, multi database
         parse_url(CIVICRM_DSN, PHP_URL_PATH),
+
+        // e.g. when you load a new version of the codebase, use different caches
+        // Note: in principle, the version number is just a proxy for a dozen other signals (new versions of file A, B, C).
+        // Proper caches should reset whenever the underlying signal (file A, B, or C) changes. However, bugs in this
+        // behavior often go un-detected during dev/test. Including the software-version basically mitigates the problem
+        // for sysadmin-workflows - so that such bugs should only impact developer-workflows.
+        \CRM_Utils_System::version(),
+
         // e.g. CMS vs extern vs installer
         \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
         // e.g. name-based vhosts

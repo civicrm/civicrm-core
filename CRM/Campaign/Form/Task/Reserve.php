@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -120,7 +104,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
   public function validateSurvey() {
     $errorMsg = NULL;
-    $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
+    $maxVoters = $this->_surveyDetails['max_number_of_contacts'] ?? NULL;
     if ($maxVoters) {
       if ($maxVoters <= $this->_numVoters) {
         $errorMsg = ts('The maximum number of contacts is already reserved for this interviewer.');
@@ -135,7 +119,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       }
     }
 
-    $defaultNum = CRM_Utils_Array::value('default_number_of_contacts', $this->_surveyDetails);
+    $defaultNum = $this->_surveyDetails['default_number_of_contacts'] ?? NULL;
     if (!$errorMsg && $defaultNum && (count($this->_contactIds) > $defaultNum)) {
       $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
         [
@@ -235,7 +219,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   public function postProcess() {
     //add reservation.
     $countVoters = 0;
-    $maxVoters = CRM_Utils_Array::value('max_number_of_contacts', $this->_surveyDetails);
+    $maxVoters = $this->_surveyDetails['max_number_of_contacts'] ?? NULL;
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusHeld = array_search('Scheduled', $activityStatus);
 
@@ -253,7 +237,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         'activity_date_time' => date('YmdHis'),
         'status_id' => $statusHeld,
         'skipRecentView' => 1,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_surveyDetails),
+        'campaign_id' => $this->_surveyDetails['campaign_id'] ?? NULL,
       ];
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
       if ($activity->id) {
@@ -313,8 +297,8 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
     $params = $this->controller->exportValues($this->_name);
     $groups = CRM_Utils_Array::value('groups', $params, []);
-    $newGroupName = CRM_Utils_Array::value('newGroupName', $params);
-    $newGroupDesc = CRM_Utils_Array::value('newGroupDesc', $params);
+    $newGroupName = $params['newGroupName'] ?? NULL;
+    $newGroupDesc = $params['newGroupDesc'] ?? NULL;
 
     $newGroupId = NULL;
     //create new group.
@@ -333,7 +317,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       $existingGroups = CRM_Core_PseudoConstant::group();
       foreach ($groups as $groupId) {
         $addCount = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIds, $groupId);
-        $totalCount = CRM_Utils_Array::value(1, $addCount);
+        $totalCount = $addCount[1] ?? NULL;
         if ($groupId == $newGroupId) {
           $name = $newGroupName;
           $new = TRUE;

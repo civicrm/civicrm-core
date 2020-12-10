@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -55,11 +39,11 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   }
 
   public function initialize() {
-    $this->_segmentSize = CRM_Utils_Array::value('segmentSize', $this->_formValues);
+    $this->_segmentSize = $this->_formValues['segmentSize'] ?? NULL;
 
-    $this->_includeGroups = CRM_Utils_Array::value('includeGroups', $this->_formValues);
+    $this->_includeGroups = $this->_formValues['includeGroups'] ?? NULL;
 
-    $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
+    $this->_excludeGroups = $this->_formValues['excludeGroups'] ?? NULL;
 
     $this->_allSearch = FALSE;
     $this->_groups = FALSE;
@@ -158,8 +142,10 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
    */
   public function from() {
     //define table name
-    $randomNum = md5(uniqid());
-    $this->_tableName = "civicrm_temp_custom_{$randomNum}";
+    $this->_Xg_table = CRM_Utils_SQL_TempTable::build()->setMemory()->setCategory('xgSegment');
+    $this->_Xg_tableName = $this->_Xg_table->getName();
+    $this->_Ig_table = CRM_Utils_SQL_TempTable::build()->setMemory()->setCategory('IgSegment');
+    $this->_Ig_tableName = $this->_Ig_table->getName();
 
     //block for Group search
     $smartGroup = [];
@@ -188,14 +174,13 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       $xGroups = 0;
     }
 
-    $sql = "DROP TEMPORARY TABLE IF EXISTS Xg_{$this->_tableName}";
+    $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_Xg_tableName}";
     CRM_Core_DAO::executeQuery($sql);
-    $sql = "CREATE TEMPORARY TABLE Xg_{$this->_tableName} ( contact_id int primary key) ENGINE=HEAP";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->_Xg_table->createWithColumns('contact_id int PRIMARY KEY');
 
     //used only when exclude group is selected
     if ($xGroups != 0) {
-      $excludeGroup = "INSERT INTO  Xg_{$this->_tableName} ( contact_id )
+      $excludeGroup = "INSERT INTO  {$this->_Xg_tableName} ( contact_id )
               SELECT  DISTINCT civicrm_group_contact.contact_id
               FROM civicrm_group_contact
               WHERE
@@ -215,29 +200,18 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
                           SELECT contact_id FROM civicrm_group_contact
                           WHERE civicrm_group_contact.group_id = {$values} AND civicrm_group_contact.status = 'Removed')";
 
-          $smartGroupQuery = " INSERT IGNORE INTO Xg_{$this->_tableName}(contact_id) $smartSql";
+          $smartGroupQuery = " INSERT IGNORE INTO {$this->_Xg_tableName}(contact_id) $smartSql";
 
           CRM_Core_DAO::executeQuery($smartGroupQuery);
         }
       }
     }
 
-    $sql = "DROP TEMPORARY TABLE IF EXISTS Ig_{$this->_tableName}";
+    $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_Ig_tableName}";
     CRM_Core_DAO::executeQuery($sql);
-    $sql = "CREATE TEMPORARY TABLE Ig_{$this->_tableName}
-            ( id int PRIMARY KEY AUTO_INCREMENT,
-              contact_id int,
-              group_names varchar(64)) ENGINE=HEAP";
+    $this->_Ig_table->createWithColumns("id int PRIMARY KEY AUTO_INCREMENT, contact_id int, group_names varchar(64)");
 
-    if ($this->_debug > 0) {
-      print "-- Include groups query: <pre>";
-      print "$sql;";
-      print "</pre>";
-    }
-
-    CRM_Core_DAO::executeQuery($sql);
-
-    $includeGroup = "INSERT INTO Ig_{$this->_tableName} (contact_id, group_names)
+    $includeGroup = "INSERT INTO {$this->_Ig_tableName} (contact_id, group_names)
              SELECT      civicrm_group_contact.contact_id, civicrm_group.name as group_name
              FROM        civicrm_group_contact
              LEFT JOIN   civicrm_group
@@ -245,8 +219,8 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     //used only when exclude group is selected
     if ($xGroups != 0) {
-      $includeGroup .= " LEFT JOIN        Xg_{$this->_tableName}
-                                      ON        civicrm_group_contact.contact_id = Xg_{$this->_tableName}.contact_id";
+      $includeGroup .= " LEFT JOIN        {$this->_Xg_tableName}
+                                      ON        civicrm_group_contact.contact_id = {$this->_Xg_tableName}.contact_id";
     }
     $includeGroup .= " WHERE
                                  civicrm_group_contact.status = 'Added'  AND
@@ -254,7 +228,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     //used only when exclude group is selected
     if ($xGroups != 0) {
-      $includeGroup .= " AND  Xg_{$this->_tableName}.contact_id IS null";
+      $includeGroup .= " AND {$this->_Xg_tableName}.contact_id IS null";
     }
 
     if ($this->_debug > 0) {
@@ -279,18 +253,18 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
         //used only when exclude group is selected
         if ($xGroups != 0) {
-          $smartSql .= " AND contact_a.id NOT IN (SELECT contact_id FROM  Xg_{$this->_tableName})";
+          $smartSql .= " AND contact_a.id NOT IN (SELECT contact_id FROM  {$this->_Xg_tableName})";
         }
 
-        $smartGroupQuery = " INSERT IGNORE INTO Ig_{$this->_tableName}(contact_id)
+        $smartGroupQuery = " INSERT IGNORE INTO {$this->_Ig_tableName} (contact_id)
                     $smartSql";
 
         CRM_Core_DAO::executeQuery($smartGroupQuery);
-        $insertGroupNameQuery = "UPDATE IGNORE Ig_{$this->_tableName}
+        $insertGroupNameQuery = "UPDATE IGNORE {$this->_Ig_tableName}
                     SET group_names = (SELECT title FROM civicrm_group
                         WHERE civicrm_group.id = $values)
-                    WHERE Ig_{$this->_tableName}.contact_id IS NOT NULL
-                        AND Ig_{$this->_tableName}.group_names IS NULL";
+                    WHERE {$this->_Ig_tableName}.contact_id IS NOT NULL
+                        AND {$this->_Ig_tableName}.group_names IS NULL";
         CRM_Core_DAO::executeQuery($insertGroupNameQuery);
       }
     }
@@ -300,13 +274,14 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $fromTail = "LEFT JOIN civicrm_email ON ( contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1 )";
 
-    $fromTail .= " INNER JOIN Ig_{$this->_tableName} temptable1 ON (contact_a.id = temptable1.contact_id)";
+    $fromTail .= " INNER JOIN {$this->_Ig_tableName} temptable1 ON (contact_a.id = temptable1.contact_id)";
 
     // now create a temp table to store the randomized contacts
-    $sql = "DROP TEMPORARY TABLE IF EXISTS random_{$this->_tableName}";
+    $this->_rand_table = CRM_Utils_SQL_TempTable::build()->setMemory()->setCategory('randSegment');
+    $this->_rand_tableName = $this->_rand_table->getName();
+    $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_rand_tableName}";
     CRM_Core_DAO::executeQuery($sql);
-    $sql = "CREATE TEMPORARY TABLE random_{$this->_tableName} ( id int primary key ) ENGINE=HEAP";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->_rand_table->createWithColumns("id int PRIMARY KEY");
 
     if (substr($this->_segmentSize, -1) == '%') {
       $countSql = "SELECT DISTINCT contact_a.id $from $fromTail
@@ -318,14 +293,14 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       $this->_segmentSize = round($totalSize * $multiplier);
     }
 
-    $sql = "INSERT INTO random_{$this->_tableName} ( id )
+    $sql = "INSERT INTO {$this->_rand_tableName} ( id )
                 SELECT DISTINCT contact_a.id $from $fromTail
                 WHERE " . $this->where() . "
                 ORDER BY RAND()
                 LIMIT {$this->_segmentSize}";
     CRM_Core_DAO::executeQuery($sql);
 
-    $from = "FROM random_{$this->_tableName} random";
+    $from = "FROM {$this->_rand_tableName} random";
 
     $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id {$this->_aclFrom}";
 

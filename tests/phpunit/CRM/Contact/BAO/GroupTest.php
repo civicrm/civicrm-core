@@ -1,28 +1,12 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -123,6 +107,59 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group1->save();
     $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
     $this->assertFalse(array_key_exists($group3->id, $groupsHierarchy));
+  }
+
+  /**
+   * Test nestedGroup pseudoconstant
+   */
+  public function testNestedGroup() {
+    $params = [
+      'name' => 'groupa',
+      'title' => 'Parent Group A',
+      'description' => 'Parent Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      // mailing group
+      'group_type' => ['2' => 1],
+    ];
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'groupb',
+      'title' => 'Parent Group B',
+      'description' => 'Parent Group Two',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group2 = CRM_Contact_BAO_Group::create($params);
+
+    $params = [
+      'name' => 'groupc',
+      'title' => 'Child Group C',
+      'description' => 'Child Group C',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'parents' => [
+        $group2->id => 1,
+      ],
+      'group_type' => ['2' => 1],
+    ];
+    $group3 = CRM_Contact_BAO_Group::create($params);
+
+    // Check with no group type restriction
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
+    $this->assertEquals([
+      $group1->id => 'Parent Group A',
+      $group2->id => 'Parent Group B',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
+
+    // Check restrict to mailing groups
+    $nestedGroup = CRM_Core_PseudoConstant::nestedGroup(TRUE, 'Mailing');
+    $this->assertSame([
+      $group1->id => 'Parent Group A',
+      $group3->id => '&nbsp;&nbsp;Child Group C',
+    ], $nestedGroup);
   }
 
   /**
@@ -273,6 +310,44 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
     $this->assertEquals(1, $recipients['count'], 'Check recipient count');
+  }
+
+  /**
+   * Test updating a group with just description and check the recent items
+   * list has the right title.
+   */
+  public function testGroupUpdateDescription() {
+    // Create a group. Copied from $this->testAddSimple().
+    // Note we need $checkParams because the function call changes $params.
+    $checkParams = $params = [
+      'title' => 'Group Uno',
+      'description' => 'Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    ];
+    $group = CRM_Contact_BAO_Group::create($params);
+
+    // Update the group with just id and description.
+    $newParams = [
+      'id' => $group->id,
+      'description' => 'The first group',
+    ];
+    CRM_Contact_BAO_Group::create($newParams);
+
+    // Check it against original array, except description.
+    $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);
+    foreach ($checkParams as $key => $value) {
+      if ($key === 'description') {
+        $this->assertEquals($newParams[$key], $result[$key], "$key doesn't match");
+      }
+      else {
+        $this->assertEquals($checkParams[$key], $result[$key], "$key doesn't match");
+      }
+    }
+
+    // Check recent items list.
+    $recentItems = CRM_Utils_Recent::get();
+    $this->assertEquals($checkParams['title'], $recentItems[0]['title']);
   }
 
 }

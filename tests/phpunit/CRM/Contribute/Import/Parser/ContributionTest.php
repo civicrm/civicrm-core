@@ -132,7 +132,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals('Pending', $contribution['contribution_status']);
+    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'contribution_status',
@@ -148,6 +148,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values['contribution_status_id'] = 'just say no';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+
+    // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
+    $values['contribution_status_id'] = 3;
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
+
   }
 
   /**
@@ -171,6 +177,60 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // on one hand the custom fields have a date format & on the other there is an input format &
     // it seems to ignore the latter in favour of the former - which seems wrong.
     $this->assertEquals('20191020000000', $formatted[$this->getCustomFieldName('date')]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['date']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
+  }
+
+  public function testParsedCustomOption() {
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
+    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contact_id' => $contactID]);
+    $this->createCustomGroupWithFieldOfType([], 'radio');
+    $values['contribution_id'] = $contribution['id'];
+    $values[$this->getCustomFieldName('radio')] = 'Red Testing';
+    unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
+    $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['radio']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
+  }
+
+  /**
+   * Test phone is included if it is part of dedupe rule.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPhoneMatchOnContact() {
+    // Update existing unsupervised rule, change to general.
+    $unsupervisedRuleGroup = $this->callApiSuccess('RuleGroup', 'getsingle', [
+      'used' => 'Unsupervised',
+      'contact_type' => 'Individual',
+    ]);
+    $this->callApiSuccess('RuleGroup', 'create', [
+      'id' => $unsupervisedRuleGroup['id'],
+      'used' => 'General',
+    ]);
+
+    // Create new unsupervised rule with Phone field.
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'Unsupervised',
+      'name' => 'MatchingPhone',
+      'title' => 'Matching Phone',
+      'is_reserved' => 0,
+    ]);
+    $this->callAPISuccess('Rule', 'create', [
+      'dedupe_rule_group_id' => $ruleGroup['id'],
+      'rule_table' => 'civicrm_phone',
+      'rule_weight' => 10,
+      'rule_field' => 'phone_numeric',
+    ]);
+    $fields = CRM_Contribute_BAO_Contribution::importableFields();
+    $this->assertTrue(array_key_exists('phone', $fields));
   }
 
   /**

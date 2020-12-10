@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -150,8 +134,8 @@ function _civicrm_api3_mailing_create_spec(&$params) {
 
   $params['forward_replies']['api.default'] = FALSE;
   $params['auto_responder']['api.default'] = FALSE;
-  $params['open_tracking']['api.default'] = TRUE;
-  $params['url_tracking']['api.default'] = TRUE;
+  $params['open_tracking']['api.default'] = Civi::settings()->get('open_tracking_default');
+  $params['url_tracking']['api.default'] = Civi::settings()->get('url_tracking_default');
 
   $params['header_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
   $params['footer_id']['api.default'] = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
@@ -208,7 +192,7 @@ function civicrm_api3_mailing_clone($params) {
   $get = civicrm_api3('Mailing', 'getsingle', ['id' => $params['id']]);
 
   $newParams = [];
-  $newParams['debug'] = CRM_Utils_Array::value('debug', $params);
+  $newParams['debug'] = $params['debug'] ?? NULL;
   $newParams['groups']['include'] = [];
   $newParams['groups']['exclude'] = [];
   $newParams['mailings']['include'] = [];
@@ -409,9 +393,9 @@ function civicrm_api3_mailing_event_reply($params) {
   $queue     = $params['event_queue_id'];
   $hash      = $params['hash'];
   $replyto   = $params['replyTo'];
-  $bodyTxt   = CRM_Utils_Array::value('bodyTxt', $params);
-  $bodyHTML  = CRM_Utils_Array::value('bodyHTML', $params);
-  $fullEmail = CRM_Utils_Array::value('fullEmail', $params);
+  $bodyTxt   = $params['bodyTxt'] ?? NULL;
+  $bodyHTML  = $params['bodyHTML'] ?? NULL;
+  $fullEmail = $params['fullEmail'] ?? NULL;
 
   $mailing = CRM_Mailing_Event_BAO_Reply::reply($job, $queue, $hash, $replyto);
 
@@ -456,8 +440,8 @@ function civicrm_api3_mailing_event_forward($params) {
   $queue     = $params['event_queue_id'];
   $hash      = $params['hash'];
   $email     = $params['email'];
-  $fromEmail = CRM_Utils_Array::value('fromEmail', $params);
-  $params    = CRM_Utils_Array::value('params', $params);
+  $fromEmail = $params['fromEmail'] ?? NULL;
+  $params    = $params['params'] ?? NULL;
 
   $forward = CRM_Mailing_Event_BAO_Forward::forward($job, $queue, $hash, $email, $fromEmail, $params);
 
@@ -554,7 +538,7 @@ function civicrm_api3_mailing_preview($params) {
   }
 
   $mailing = new CRM_Mailing_BAO_Mailing();
-  $mailingID = CRM_Utils_Array::value('id', $params);
+  $mailingID = $params['id'] ?? NULL;
   if ($mailingID) {
     $mailing->id = $mailingID;
     $mailing->find(TRUE);
@@ -571,7 +555,7 @@ function civicrm_api3_mailing_preview($params) {
   $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing', $mailing->id);
 
   $returnProperties = $mailing->getReturnProperties();
-  $contactID = CRM_Utils_Array::value('contact_id', $params);
+  $contactID = $params['contact_id'] ?? NULL;
   if (!$contactID) {
     // If we still don't have a userID in a session because we are annon then set contactID to be 0
     $contactID = empty($session->get('userID')) ? 0 : $session->get('userID');
@@ -580,11 +564,11 @@ function civicrm_api3_mailing_preview($params) {
 
   if (!$contactID) {
     $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = CRM_Utils_Array::value(0, $details[0]);
+    $details = $details[0][0] ?? NULL;
   }
   else {
-    $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
-    $details = $details[0][$contactID];
+    [$details] = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = $details[$contactID];
   }
 
   $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
@@ -673,7 +657,7 @@ function civicrm_api3_mailing_send_test($params) {
         $emailId = $emailDetail[$email]['email_id'];
         $contactId = $emailDetail[$email]['contact_id'];
       }
-      if (!$contactId) {
+      if (!$contactId && CRM_Core_Permission::check('add contacts')) {
         //create new contact.
         $contact   = civicrm_api3('Contact', 'create',
           [
@@ -685,13 +669,15 @@ function civicrm_api3_mailing_send_test($params) {
         $contactId = $contact['id'];
         $emailId   = $contact['values'][$contactId]['api.Email.get']['id'];
       }
-      civicrm_api3('MailingEventQueue', 'create',
-        [
-          'job_id' => $job['id'],
-          'email_id' => $emailId,
-          'contact_id' => $contactId,
-        ]
-      );
+      if ($emailId && $contactId) {
+        civicrm_api3('MailingEventQueue', 'create',
+          [
+            'job_id' => $job['id'],
+            'email_id' => $emailId,
+            'contact_id' => $contactId,
+          ]
+        );
+      }
     }
   }
 

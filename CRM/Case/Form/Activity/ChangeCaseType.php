@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -43,7 +27,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    */
   public static function preProcess(&$form) {
     if (!isset($form->_caseId)) {
-      CRM_Core_Error::fatal(ts('Case Id not found.'));
+      CRM_Core_Error::statusBounce(ts('Case Id not found.'));
     }
   }
 
@@ -84,7 +68,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
-    $form->addField('case_type_id', ['context' => 'create', 'entity' => 'Case']);
+    $form->addField('case_type_id', ['context' => 'create', 'entity' => 'Case'], TRUE);
 
     // timeline
     $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE);
@@ -150,7 +134,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       !$params['case_type_id'] ||
       !$caseType
     ) {
-      CRM_Core_Error::fatal('Required parameter missing for ChangeCaseType - end post processing');
+      CRM_Core_Error::statusBounce('Required parameter missing for ChangeCaseType - end post processing');
     }
 
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed');
@@ -161,8 +145,8 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     if ($activity->subject == 'null') {
       $activity->subject = ts('Case type changed from %1 to %2',
         [
-          1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
-          2 => CRM_Utils_Array::value($params['case_type_id'], $allCaseTypes),
+          1 => $allCaseTypes[$form->_defaults['case_type_id']] ?? NULL,
+          2 => $allCaseTypes[$params['case_type_id']] ?? NULL,
         ]
       );
       $activity->save();
@@ -176,9 +160,9 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
       'activityTypeName' => 'Change Case Type',
-      'activity_date_time' => CRM_Utils_Array::value('reset_date_time', $params),
+      'activity_date_time' => $params['reset_date_time'] ?? NULL,
       'caseID' => $caseId,
-      'resetTimeline' => CRM_Utils_Array::value('is_reset_timeline', $params),
+      'resetTimeline' => $params['is_reset_timeline'] ?? NULL,
     ];
 
     $xmlProcessor->run($caseType, $xmlProcessorParams);

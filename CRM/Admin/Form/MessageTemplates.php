@@ -1,41 +1,27 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\MessageTemplate;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Message templates
  * used by membership, contributions, event registrations, etc.
  */
-class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
+class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   /**
    * which (and whether) mailing workflow this template belongs to
    * @var int
@@ -44,20 +30,26 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Is document file is already loaded as default value?
+   *
    * @var bool
    */
   protected $_is_document = FALSE;
 
+  /**
+   * PreProcess form - load existing values.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String',
-      $this, FALSE, 'add'
-    );
+    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
     $this->assign('action', $this->_action);
-
-    $this->_BAOName = 'CRM_Core_BAO_MessageTemplate';
-    $this->set('BAOName', $this->_BAOName);
-    parent::preProcess();
+    $this->_values = [];
+    if ($this->_id) {
+      $this->_values = (array) MessageTemplate::get()->addWhere('id', '=', $this->_id)->setSelect(['*'])->execute()->first();
+    }
   }
 
   /**
@@ -110,7 +102,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       ]);
     }
     else {
-      $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);
+      $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       $this->checkUserPermission($this->_workflow_id);
       $this->assign('workflow_id', $this->_workflow_id);
 
@@ -175,6 +167,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
     //get the tokens.
     $tokens = CRM_Core_SelectValues::contactTokens();
+    $tokens = array_merge($tokens, CRM_Core_SelectValues::domainTokens());
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
@@ -186,7 +179,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       )
     ) {
       $this->add('textarea', 'msg_html', ts('HTML Message'),
-        "cols=50 rows=6"
+        ['cols' => 50, 'rows' => 6]
       );
     }
     else {
@@ -201,7 +194,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
 
     $this->add('textarea', 'msg_text', ts('Text Message'),
-      "cols=50 rows=6"
+      ['cols' => 50, 'rows' => 6]
     );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
@@ -269,10 +262,16 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_MessageTemplate::del($this->_id);
+
+      $this->postProcessHook();
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {
       // currently, the above action is used solely for previewing default workflow templates
@@ -305,18 +304,23 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
         }
       }
 
-      $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);
+      $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       if ($this->_workflow_id) {
         $params['workflow_id'] = $this->_workflow_id;
         $params['is_active'] = TRUE;
       }
 
-      $messageTemplate = CRM_Core_BAO_MessageTemplate::add($params);
-      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate->msg_title]), ts('Saved'), 'success');
+      $messageTemplate = MessageTemplate::save()->setDefaults($params)->setRecords([['id' => $this->_id]])->execute()->first();
+
+      // set the id on save, so it can be used in a extension using the posProcess hook
+      $this->_id = $messageTemplate['id'];
+      $this->postProcessHook();
+
+      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
         // Save button was pressed
-        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate->id}&reset=1"));
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/messageTemplates/add', "action=update&id={$messageTemplate['id']}&reset=1"));
       }
       // Save and done button was pressed
       if ($this->_workflow_id) {

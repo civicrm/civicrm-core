@@ -14,6 +14,11 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test message template send.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testCaseActivityCopyTemplate() {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
@@ -36,9 +41,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'idHash' => substr(sha1(CIVICRM_SITE_KEY . '1234'), 0, 7),
     ];
 
-    list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    list($sent, $subject, $message) = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
-        'groupName' => 'msg_tpl_workflow_case',
         'valueName' => 'case_activity',
         'contactId' => $contact_id,
         'tplParams' => $tplParams,

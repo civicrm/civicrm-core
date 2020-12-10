@@ -1,0 +1,7 @@
+<fieldset>
+  <div class="form-inline">
+    <label for="crm-search-admin-display-label">{{:: ts('Name:') }} <span class="crm-marker">*</span></label>
+    <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{ ts('Untitled') }}"/>
+    <label class="pull-right">{{:: $ctrl.displayTypes[$ctrl.display.type].label }}</label>
+  </div>
+</fieldset>

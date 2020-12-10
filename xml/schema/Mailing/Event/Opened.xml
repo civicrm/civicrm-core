@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_opened</name>
   <comment>Tracks when a delivered email is opened by the recipient</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Opened ID</title>

@@ -2,27 +2,11 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 /**
@@ -99,6 +83,28 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   public function smsHookTest(&$message) {
     $testSourceContact = $this->individualCreate(['phone' => [1 => ['phone' => '+61487654321']]]);
     $message->toContactID = $testSourceContact;
+  }
+
+  /**
+   * Some providers, like the mock one for these tests at the time of writing,
+   * or the dummy SMS provider extension, might not provide a default url,
+   * but the form shouldn't fail because of that.
+   */
+  public function testMissingUrl() {
+    $form = $this->getFormObject('CRM_SMS_Form_Provider');
+    $_REQUEST['key'] = 'CiviTestSMSProvider';
+
+    // This shouldn't give a notice
+    $defaults = $form->setDefaultValues();
+
+    $this->assertEquals([
+      'name' => 'CiviTestSMSProvider',
+      'api_url' => '',
+      'is_default' => 1,
+      'is_active' => 1,
+    ], $defaults);
+
+    unset($_REQUEST['key']);
   }
 
 }

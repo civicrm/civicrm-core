@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {if $products}
@@ -78,7 +62,9 @@
               <div class="premium-full-title">{$row.name}</div>
               <div class="premium-full-disabled">
                 {ts 1=$row.min_contribution|crmMoney}You must contribute at least %1 to get this item{/ts}<br/>
-                <input type="button" value="{ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}" amount="{$row.min_contribution}" />
+                <button type="button" amount="{$row.min_contribution}">
+                  {ts 1=$row.min_contribution|crmMoney}Contribute %1 Instead{/ts}
+                </button>
               </div>
               <div class="premium-full-description">
                 {$row.description}
@@ -251,7 +237,7 @@
         amounts.sort(function(a,b){return a - b});
 
         // make contribution instead buttons work
-        $('.premium-full-disabled input').click(function(){
+        $('.premium-full-disabled button').click(function(){
           var amount = Number($(this).attr('amount'));
           if (price_sets[amount]) {
             if (!$(price_sets[amount]).length) {
@@ -348,8 +334,6 @@
           $('#selectProduct').rules('add', 'premiums');
         });
 
-        // need to use jquery validate's ignore option, so that it will not ignore hidden fields
-        CRM.validate.params['ignore'] = '.ignore';
       });
     </script>
     {/literal}
@@ -365,4 +349,3 @@
     {/literal}
   {/if}
 {/if}
-

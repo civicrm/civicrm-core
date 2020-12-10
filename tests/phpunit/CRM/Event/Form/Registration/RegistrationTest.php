@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -71,6 +55,46 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
       '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format($minAmt)]),
     ];
     $this->checkArrayEquals($expectedResult, $errors);
+  }
+
+  /**
+   * event#30
+   */
+  public function testDoubleWaitlistRegistration() {
+    // By default, waitlist participant statuses are disabled (which IMO is poor UX).
+    $sql = "UPDATE civicrm_participant_status_type SET is_active = 1";
+    CRM_Core_DAO::executeQuery($sql);
+
+    // Create an event, fill its participant slots.
+    $event = $this->eventCreate([
+      'has_waitlist' => 1,
+      'max_participants' => 1,
+      'start_date' => 20351021,
+      'end_date' => 20351023,
+      'registration_end_date' => 20351015,
+    ]);
+    $this->participantCreate(['event_id' => $event['id']]);
+
+    // Add someone to the waitlist.
+    $waitlistContact = $this->individualCreate();
+
+    $firstWaitlist = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContact, 'status_id' => 'On waitlist']);
+
+    // We should now have two participants.
+    $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 2);
+
+    $form = new CRM_Event_Form_Registration_Register();
+    $form->controller = new CRM_Core_Controller();
+    $form->set('id', $event['id']);
+    $form->set('cid', $waitlistContact);
+    // We SHOULD get an error when double registering a waitlisted user.
+    try {
+      $form->preProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      return;
+    }
+    $this->fail('Waitlisted users shouldn\'t be allowed to re-register.');
   }
 
 }

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * machine. Each form can also operate in various modes
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'HTML/QuickForm/Page.php';
@@ -346,7 +330,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'postalCode',
       'money',
       'positiveInteger',
-      'xssString',
       'fileExists',
       'settingPath',
       'autocomplete',
@@ -366,7 +349,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $type
    * @param string $name
    * @param string $label
-   * @param string|array $attributes (options for select elements)
+   * @param array $attributes (options for select elements)
    * @param bool $required
    * @param array $extra
    *   (attributes for select elements).
@@ -375,11 +358,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return HTML_QuickForm_Element
    *   Could be an error object
+   *
+   * @throws \CRM_Core_Exception
    */
   public function &add(
     $type, $name, $label = '',
-    $attributes = '', $required = FALSE, $extra = NULL
+    $attributes = NULL, $required = FALSE, $extra = NULL
   ) {
+    if ($type === 'radio') {
+      CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Form::addRadio');
+    }
+
+    if ($type !== 'static' && $attributes && !is_array($attributes)) {
+      // The $attributes param used to allow for strings and would default to an
+      // empty string.  However, now that the variable is heavily manipulated,
+      // we should expect it to always be an array.
+      Civi::log()->warning('Attributes passed to CRM_Core_Form::add() are not an array.', ['civi.tag' => 'deprecated']);
+    }
     // Fudge some extra types that quickform doesn't support
     $inputType = $type;
     if ($type == 'wysiwyg' || in_array($type, self::$html5Types)) {
@@ -401,16 +396,34 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       unset($attributes['multiple']);
       $extra = NULL;
     }
-    // @see http://wiki.civicrm.org/confluence/display/CRMDOC/crmDatepicker
-    if ($type == 'datepicker') {
-      $attributes = ($attributes ? $attributes : []);
+
+    // @see https://docs.civicrm.org/dev/en/latest/framework/ui/#date-picker
+    if ($type === 'datepicker') {
+      $attributes = $attributes ?: [];
+      if (!empty($attributes['formatType'])) {
+        $dateAttributes = CRM_Core_SelectValues::date($attributes['formatType'], NULL, NULL, NULL, 'Input');
+        if (empty($extra['minDate']) && !empty($dateAttributes['minYear'])) {
+          $extra['minDate'] = $dateAttributes['minYear'] . '-01-01';
+        }
+        if (empty($extra['maxDate']) && !empty($dateAttributes['minYear'])) {
+          $extra['maxDate'] = $dateAttributes['maxYear'] . '-12-31';
+        }
+      }
+      // Support minDate/maxDate properties
+      if (isset($extra['minDate'])) {
+        $extra['minDate'] = date('Y-m-d', strtotime($extra['minDate']));
+      }
+      if (isset($extra['maxDate'])) {
+        $extra['maxDate'] = date('Y-m-d', strtotime($extra['maxDate']));
+      }
+
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
-        $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
+        $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
       }
       $type = "text";
     }
-    if ($type == 'select' && is_array($extra)) {
+    if ($type === 'select' && is_array($extra)) {
       // Normalize this property
       if (!empty($extra['multiple'])) {
         $extra['multiple'] = 'multiple';
@@ -422,16 +435,22 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // Add placeholder option for select
       if (isset($extra['placeholder'])) {
         if ($extra['placeholder'] === TRUE) {
-          $extra['placeholder'] = $required ? ts('- select -') : ts('- none -');
+          $extra['placeholder'] = ts('- select %1 -', [1 => $label]);
         }
         if (($extra['placeholder'] || $extra['placeholder'] === '') && empty($extra['multiple']) && is_array($attributes) && !isset($attributes[''])) {
           $attributes = ['' => $extra['placeholder']] + $attributes;
         }
       }
     }
-    $element = $this->addElement($type, $name, $label, $attributes, $extra);
+    $optionContext = NULL;
+    if (!empty($extra['option_context'])) {
+      $optionContext = $extra['option_context'];
+      unset($extra['option_context']);
+    }
+
+    $element = $this->addElement($type, $name, CRM_Utils_String::purifyHTML($label), $attributes, $extra);
     if (HTML_QuickForm::isError($element)) {
-      CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+      CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
     }
 
     if ($inputType == 'color') {
@@ -446,14 +465,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $error = $this->addRule($name, ts('%1 is a required field.', [1 => $label]), 'required');
       }
       if (HTML_QuickForm::isError($error)) {
-        CRM_Core_Error::fatal(HTML_QuickForm::errorMessage($element));
+        CRM_Core_Error::statusBounce(HTML_QuickForm::errorMessage($element));
       }
     }
 
     // Add context for the editing of option groups
-    if (isset($extra['option_context'])) {
-      $context = json_encode($extra['option_context']);
-      $element->setAttribute('data-option-edit-context', $context);
+    if ($optionContext) {
+      $element->setAttribute('data-option-edit-context', json_encode($optionContext));
     }
 
     return $element;
@@ -503,7 +521,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
-        $this->ajaxResponse['id'] = isset($this->id) ? $this->id : $this->_id;
+        $this->ajaxResponse['id'] = $this->id ?? $this->_id;
       }
       CRM_Core_Page_AJAX::returnJsonResponse($this->ajaxResponse);
     }
@@ -656,6 +674,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
 
+      // A lot of forms use the hacky method of looking at
+      // `$params['button name']` (dating back to them being inputs with a
+      // "value" of the button label) rather than looking at
+      // `$this->controller->getButtonName()`. It makes sense to give buttons a
+      // value by default as a precaution.
+      $attrs['value'] = 1;
+
       if (!empty($button['class'])) {
         $attrs['class'] .= ' ' . $button['class'];
       }
@@ -674,7 +699,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       if ($button['type'] === 'reset') {
-        $prevnext[] = $this->createElement($button['type'], 'reset', $button['name'], $attrs);
+        $attrs['type'] = 'reset';
+        $prevnext[] = $this->createElement('xbutton', 'reset', $button['name'], $attrs);
       }
       else {
         if (!empty($button['subName'])) {
@@ -692,12 +718,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (in_array($button['type'], ['next', 'upload', 'done']) && $button['name'] === ts('Save')) {
           $attrs['accesskey'] = 'S';
         }
-        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
-        if ($icon) {
-          $attrs['crm-icon'] = $icon;
-        }
+        $buttonContents = CRM_Core_Page::crmIcon($button['icon'] ?? $defaultIcon) . ' ' . $button['name'];
         $buttonName = $this->getButtonName($button['type'], CRM_Utils_Array::value('subName', $button));
-        $prevnext[] = $this->createElement('submit', $buttonName, $button['name'], $attrs);
+        $attrs['class'] .= " crm-button crm-button-type-{$button['type']} crm-button{$buttonName}";
+        $attrs['type'] = 'submit';
+        $prevnext[] = $this->createElement('xbutton', $buttonName, $buttonContents, $attrs);
       }
       if (!empty($button['isDefault'])) {
         $this->setDefaultAction($button['type']);
@@ -792,10 +817,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    */
   protected function assignPaymentProcessor($isPayLaterEnabled) {
-    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
-      [ucfirst($this->_mode) . 'Mode'],
-      $this->_paymentProcessorIDs
-    );
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
     if ($isPayLaterEnabled) {
       $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
     }
@@ -816,7 +838,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     else {
       throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
     }
+  }
 
+  /**
+   * Assign an array of variables to the form/tpl
+   *
+   * @param array $values Array of [key => value] to assign to the form
+   * @param array $keys Array of keys to assign from the values array
+   */
+  public function assignVariables($values, $keys) {
+    foreach ($keys as $key) {
+      $this->assign($key, $values[$key] ?? NULL);
+    }
   }
 
   /**
@@ -862,8 +895,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $params = array_merge($params, $addressParams);
     }
 
-    // @fixme it would be really nice to have a comment here so I had a clue why we are setting $fields[$name] = 1
-    // Also how does relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()
+    // How does this relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()?
     $nameFields = ['first_name', 'middle_name', 'last_name'];
     foreach ($nameFields as $name) {
       if (array_key_exists("billing_$name", $params)) {
@@ -871,6 +903,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $params['preserveDBName'] = TRUE;
       }
     }
+
+    // For legacy reasons we set these creditcard expiry fields if present
+    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
+
+    // Assign IP address parameter
+    $params['ip_address'] = CRM_Utils_System::ipAddress();
+
     return $params;
   }
 
@@ -888,8 +927,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $this->_paymentProcessorID = NULL;
     if ($this->_paymentProcessors) {
       if (!empty($this->_submitValues)) {
-        $this->_paymentProcessorID = CRM_Utils_Array::value('payment_processor_id', $this->_submitValues);
-        $this->_paymentProcessor = CRM_Utils_Array::value($this->_paymentProcessorID, $this->_paymentProcessors);
+        $this->_paymentProcessorID = $this->_submitValues['payment_processor_id'] ?? NULL;
+        $this->_paymentProcessor = $this->_paymentProcessors[$this->_paymentProcessorID] ?? NULL;
         $this->set('type', $this->_paymentProcessorID);
         $this->set('mode', $this->_mode);
         $this->set('paymentProcessor', $this->_paymentProcessor);
@@ -921,7 +960,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // minimums with the payment processor minimums. This would lead to fields like 'postal_code'
     // only being on the form if either the admin has configured it as wanted or the processor
     // requires it.
-    $this->assign('billing_profile_id', (CRM_Utils_Array::value('is_billing_required', $this->_values) ? 'billing' : ''));
+    $this->assign('billing_profile_id', (!empty($this->_values['is_billing_required']) ? 'billing' : ''));
   }
 
   /**
@@ -939,7 +978,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected function handlePreApproval(&$params) {
     try {
       $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
-      $params['component'] = 'contribute';
+      $params['component'] = $params['component'] ?? 'contribute';
       $result = $payment->doPreApproval($params);
       if (empty($result)) {
         // This could happen, for example, when paypal looks at the button value & decides it is not paypal express.
@@ -1157,17 +1196,30 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $attributes
    * @param null $separator
    * @param bool $required
+   * @param array $optionAttributes - Option specific attributes
    *
    * @return HTML_QuickForm_group
    */
-  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE) {
+  public function &addRadio($name, $title, $values, $attributes = [], $separator = NULL, $required = FALSE, $optionAttributes = []) {
     $options = [];
     $attributes = $attributes ? $attributes : [];
     $allowClear = !empty($attributes['allowClear']);
     unset($attributes['allowClear']);
     $attributes['id_suffix'] = $name;
     foreach ($values as $key => $var) {
-      $options[] = $this->createElement('radio', NULL, NULL, $var, $key, $attributes);
+      $optAttributes = $attributes;
+      if (!empty($optionAttributes[$key])) {
+        foreach ($optionAttributes[$key] as $optAttr => $optVal) {
+          $optAttributes[$optAttr] = ltrim(($optAttributes[$optAttr] ?? '') . ' ' . $optVal);
+        }
+      }
+      // We use a class here to avoid html5 issues with collapsed cutsomfield sets.
+      $optAttributes['class'] = $optAttributes['class'] ?? '';
+      if ($required) {
+        $optAttributes['class'] .= ' required';
+      }
+      $element = $this->createElement('radio', NULL, NULL, $var, $key, $optAttributes);
+      $options[] = $element;
     }
     $group = $this->addGroup($options, $name, $title, $separator);
 
@@ -1313,6 +1365,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $displayTime
    */
   public function addDateRange($name, $from = '_from', $to = '_to', $label = 'From:', $dateFormat = 'searchDate', $required = FALSE, $displayTime = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use CRM_Core_Form::addDatePickerRange insted');
     if ($displayTime) {
       $this->addDateTime($name . $from, $label, $required, ['formatType' => $dateFormat]);
       $this->addDateTime($name . $to, ts('To:'), $required, ['formatType' => $dateFormat]);
@@ -1333,13 +1386,23 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param bool $required
    * @param string $fromLabel
    * @param string $toLabel
+   * @param array $additionalOptions
+   * @param string $to string to append to the to field.
+   * @param string $from string to append to the from field.
    */
-  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
+  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To', $additionalOptions = [],
+    $to = '_high', $from = '_low') {
 
     $options = [
       '' => ts('- any -'),
       0 => ts('Choose Date Range'),
     ] + CRM_Core_OptionGroup::values('relative_date_filters');
+
+    if ($additionalOptions) {
+      foreach ($additionalOptions as $key => $optionLabel) {
+        $options[$key] = $optionLabel;
+      }
+    }
 
     $this->add('select',
       "{$fieldName}_relative",
@@ -1348,10 +1411,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $required,
       ['class' => 'crm-select2']
     );
-    $attributes = ['format' => 'searchDate'];
+    $attributes = ['formatType' => 'searchDate'];
     $extra = ['time' => $isDateTime];
-    $this->add('datepicker', $fieldName . '_low', ts($fromLabel), $attributes, $required, $extra);
-    $this->add('datepicker', $fieldName . '_high', ts($toLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $from, ts($fromLabel), $attributes, $required, $extra);
+    $this->add('datepicker', $fieldName . $to, ts($toLabel), $attributes, $required, $extra);
   }
 
   /**
@@ -1434,13 +1497,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $info = civicrm_api3($props['entity'], 'getoptions', $props);
       $options = $info['values'];
     }
-    if (!array_key_exists('placeholder', $props)) {
-      $props['placeholder'] = $required ? ts('- select -') : CRM_Utils_Array::value('context', $props) == 'search' ? ts('- any -') : ts('- none -');
+    if (!array_key_exists('placeholder', $props) && $placeholder = self::selectOrAnyPlaceholder($props, $required)) {
+      $props['placeholder'] = $placeholder;
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
       list(, $id) = explode('_', $name);
-      $label = isset($props['label']) ? $props['label'] : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
+      $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : 'civicrm/admin/options/' . CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $gid);
@@ -1458,7 +1521,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
           break;
         }
       }
-      $label = isset($props['label']) ? $props['label'] : $fieldSpec['title'];
+      $label = $props['label'] ?? $fieldSpec['title'];
       if (CRM_Utils_Array::value('context', $props) != 'search') {
         $props['data-option-edit-path'] = array_key_exists('option_url', $props) ? $props['option_url'] : CRM_Core_PseudoConstant::getOptionEditUrl($fieldSpec);
       }
@@ -1468,6 +1531,38 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $props['data-api-field'] = $props['field'];
     CRM_Utils_Array::remove($props, 'label', 'entity', 'field', 'option_url', 'options', 'context');
     return $this->add('select', $name, $label, $options, $required, $props);
+  }
+
+  /**
+   * Handles a repeated bit supplying a placeholder for entity selection
+   *
+   * @param string $props
+   *   The field properties, including the entity and context.
+   * @param bool $required
+   *   If the field is required.
+   * @param string $title
+   *   A field title, if applicable.
+   * @return string
+   *   The placeholder text.
+   */
+  private static function selectOrAnyPlaceholder($props, $required, $title = NULL) {
+    if (empty($props['entity'])) {
+      return NULL;
+    }
+    if (!$title) {
+      $daoToClass = CRM_Core_DAO_AllCoreTables::daoToClass();
+      if (array_key_exists($props['entity'], $daoToClass)) {
+        $daoClass = $daoToClass[$props['entity']];
+        $title = $daoClass::getEntityTitle();
+      }
+      else {
+        $title = ts('option');
+      }
+    }
+    if (($props['context'] ?? '') == 'search' && !$required) {
+      return ts('- any %1 -', [1 => $title]);
+    }
+    return ts('- select %1 -', [1 => $title]);
   }
 
   /**
@@ -1523,10 +1618,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // Core field - get metadata.
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
-    $fieldSpecLabel = isset($fieldSpec['html']['label']) ? $fieldSpec['html']['label'] : CRM_Utils_Array::value('title', $fieldSpec);
+    $fieldSpecLabel = $fieldSpec['html']['label'] ?? CRM_Utils_Array::value('title', $fieldSpec);
     $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
 
-    $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
+    $widget = $props['type'] ?? $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {
       $widget = 'Text';
     }
@@ -1545,7 +1640,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = $props['options'];
       }
       else {
-        $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
+        $options = $fieldSpec['options'] ?? NULL;
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
@@ -1568,6 +1663,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
     }
     $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    if (in_array($widget, ['Select', 'Select2'])
+      && !array_key_exists('placeholder', $props)
+      && $placeholder = self::selectOrAnyPlaceholder($props, $required, $label)) {
+      $props['placeholder'] = $placeholder;
+    }
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url', 'options');
 
     // TODO: refactor switch statement, to separate methods.
@@ -1577,7 +1677,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Number':
       case 'Email':
         //TODO: Autodetect ranges
-        $props['size'] = isset($props['size']) ? $props['size'] : 60;
+        $props['size'] = $props['size'] ?? 60;
         return $this->add(strtolower($widget), $name, $label, $props, $required);
 
       case 'hidden':
@@ -1585,8 +1685,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'TextArea':
         //Set default columns and rows for textarea.
-        $props['rows'] = isset($props['rows']) ? $props['rows'] : 4;
-        $props['cols'] = isset($props['cols']) ? $props['cols'] : 60;
+        $props['rows'] = $props['rows'] ?? 4;
+        $props['cols'] = $props['cols'] ?? 60;
         if (empty($props['maxlength']) && isset($fieldSpec['length'])) {
           $props['maxlength'] = $fieldSpec['length'];
         }
@@ -1608,7 +1708,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         }
 
       case 'Radio':
-        $separator = isset($props['separator']) ? $props['separator'] : NULL;
+        $separator = $props['separator'] ?? NULL;
         unset($props['separator']);
         if (!isset($props['allowClear'])) {
           $props['allowClear'] = !$required;
@@ -1626,9 +1726,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       case 'Select':
       case 'Select2':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
-        if (!array_key_exists('placeholder', $props)) {
-          $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
-        }
         // TODO: Add and/or option for fields that store multiple values
         return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 
@@ -1639,13 +1736,17 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addRadio($name, $label, $options, $props, NULL, $required);
 
       case 'CheckBox':
-        $text = isset($props['text']) ? $props['text'] : NULL;
+        if ($context === 'search') {
+          $this->addYesNo($name, $label, TRUE, FALSE, $props);
+          return;
+        }
+        $text = $props['text'] ?? NULL;
         unset($props['text']);
         return $this->addElement('checkbox', $name, $label, $text, $props);
 
       //add support for 'Advcheckbox' field
       case 'advcheckbox':
-        $text = isset($props['text']) ? $props['text'] : NULL;
+        $text = $props['text'] ?? NULL;
         unset($props['text']);
         return $this->addElement('advcheckbox', $name, $label, $text, $props);
 
@@ -1665,7 +1766,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addEntityRef($name, $label, $props, $required);
 
       case 'Password':
-        $props['size'] = isset($props['size']) ? $props['size'] : 60;
+        $props['size'] = $props['size'] ?? 60;
         return $this->add('password', $name, $label, $props, $required);
 
       // Check datatypes of fields
@@ -1765,7 +1866,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return null
    */
   public function getVar($name) {
-    return isset($this->$name) ? $this->$name : NULL;
+    return $this->$name ?? NULL;
   }
 
   /**
@@ -1993,14 +2094,14 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, []);
-    $props['entity'] = CRM_Utils_String::convertStringToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
-    $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
+    $props['entity'] = CRM_Core_DAO_AllCoreTables::convertEntityNameToCamel($props['entity'] ?? 'Contact');
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
     }
 
-    $props['placeholder'] = CRM_Utils_Array::value('placeholder', $props, $required ? ts('- select %1 -', [1 => ts(str_replace('_', ' ', $props['entity']))]) : ts('- none -'));
+    $props['placeholder'] = $props['placeholder'] ?? self::selectOrAnyPlaceholder($props, $required);
 
     $defaults = [];
     if (!empty($props['multiple'])) {
@@ -2169,11 +2270,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    * Get the contact id of the logged in user.
+   *
+   * @return int|false
    */
   public function getLoggedInUserContactID() {
     // check if the user is logged in and has a contact ID
     $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
+    return $session->get('userID') ? (int) $session->get('userID') : FALSE;
   }
 
   /**
@@ -2197,6 +2300,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - id_field
    *   - url (for ajax lookup)
    *
+   * @throws \CRM_Core_Exception
    * @todo add data attributes so we can deal with multiple instances on a form
    */
   public function addAutoSelector($profiles = [], $autoCompleteField = []) {
@@ -2239,10 +2343,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * that small pieces of duplication are not being refactored into separate functions because their only shared parent
    * is this form. Inserting a class FrontEndForm.php between the contribution & event & this class would allow functions like this
    * and a dozen other small ones to be refactored into a shared parent with the reduction of much code duplication
-   *
-   * @param $onlinePaymentProcessorEnabled
    */
-  public function addCIDZeroOptions($onlinePaymentProcessorEnabled) {
+  public function addCIDZeroOptions() {
     $this->assign('nocid', TRUE);
     $profiles = [];
     if ($this->_values['custom_pre_id']) {
@@ -2251,9 +2353,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($this->_values['custom_post_id']) {
       $profiles = array_merge($profiles, (array) $this->_values['custom_post_id']);
     }
-    if ($onlinePaymentProcessorEnabled) {
-      $profiles[] = 'billing';
-    }
+    $profiles[] = 'billing';
     if (!empty($this->_values)) {
       $this->addAutoSelector($profiles);
     }
@@ -2333,6 +2433,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addChainSelect($elementName, $settings = []) {
+    $required = $settings['required'] ?? FALSE;
+    $label = strpos($elementName, 'rovince') ? CRM_Core_DAO_StateProvince::getEntityTitle() : CRM_Core_DAO_County::getEntityTitle();
     $props = $settings += [
       'control_field' => str_replace(['state_province', 'StateProvince', 'county', 'County'], [
         'country',
@@ -2341,15 +2443,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'StateProvince',
       ], $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
-      'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
+      'label' => $label,
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
       'data-none-prompt' => ts('- N/A -'),
       'multiple' => FALSE,
-      'required' => FALSE,
-      'placeholder' => empty($settings['required']) ? ts('- none -') : ts('- select -'),
+      'required' => $required,
+      'placeholder' => ts('- select %1 -', [1 => $label]),
     ];
     CRM_Utils_Array::remove($props, 'label', 'required', 'control_field', 'context');
-    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2';
+    $props['class'] = (empty($props['class']) ? '' : "{$props['class']} ") . 'crm-select2' . ($required ? ' required crm-field-required' : '');
     $props['data-select-prompt'] = $props['placeholder'];
     $props['data-name'] = $elementName;
 
@@ -2359,7 +2461,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // CRM-15225 - normally QF will reject any selected values that are not part of the field's options, but due to a
     // quirk in our patched version of HTML_QuickForm_select, this doesn't happen if the options are NULL
     // which seems a bit dirty but it allows our dynamically-popuplated select element to function as expected.
-    return $this->add('select', $elementName, $settings['label'], NULL, $settings['required'], $props);
+    return $this->add('select', $elementName, $settings['label'], NULL, $required, $props);
   }
 
   /**
@@ -2390,7 +2492,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $this->_actionButtonName = $this->getButtonName('next', 'action');
       }
       $this->assign('actionButtonName', $this->_actionButtonName);
-      $this->add('submit', $this->_actionButtonName, ts('Go'), ['class' => 'hiddenElement crm-search-go-button']);
+      $this->add('xbutton', $this->_actionButtonName, ts('Go'), [
+        'type' => 'submit',
+        'class' => 'hiddenElement crm-search-go-button',
+      ]);
 
       // Radio to choose "All items" or "Selected items only"
       $selectedRowsRadio = $this->addElement('radio', 'radio_ts', NULL, '', 'ts_sel', ['checked' => 'checked']);
@@ -2520,7 +2625,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getCurrency($submittedValues = []) {
-    $currency = CRM_Utils_Array::value('currency', $this->_values);
+    $currency = $this->_values['currency'] ?? NULL;
     // For event forms, currency is in a different spot
     if (empty($currency)) {
       $currency = CRM_Utils_Array::value('currency', CRM_Utils_Array::value('event', $this->_values));
@@ -2542,15 +2647,76 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return bool
    */
   protected function isFormInViewOrEditMode() {
+    return $this->isFormInViewMode() || $this->isFormInEditMode();
+  }
+
+  /**
+   * Is the form in edit mode.
+   *
+   * Helper function, notably for extensions implementing the buildForm hook,
+   * so that they can return early.
+   *
+   * @return bool
+   */
+  public function isFormInEditMode() {
     return in_array($this->_action, [
       CRM_Core_Action::UPDATE,
       CRM_Core_Action::ADD,
-      CRM_Core_Action::VIEW,
       CRM_Core_Action::BROWSE,
       CRM_Core_Action::BASIC,
       CRM_Core_Action::ADVANCED,
       CRM_Core_Action::PREVIEW,
     ]);
+  }
+
+  /**
+   * Is the form in view mode.
+   *
+   * Helper function, notably for extensions implementing the buildForm hook,
+   * so that they can return early.
+   *
+   * @return bool
+   */
+  public function isFormInViewMode() {
+    return $this->_action == CRM_Core_Action::VIEW;
+  }
+
+  /**
+   * Set the active tab
+   *
+   * @param string $default
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setSelectedChild($default = NULL) {
+    $selectedChild = CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, $default);
+    if (!empty($selectedChild)) {
+      $this->set('selectedChild', $selectedChild);
+      $this->assign('selectedChild', $selectedChild);
+      Civi::resources()->addSetting(['tabSettings' => ['active' => $selectedChild]]);
+    }
+  }
+
+  /**
+   * Get the contact if from the url, using the checksum or the cid if it is the logged in user.
+   *
+   * This function returns the user being validated. It is not intended to get another user
+   * they have permission to (setContactID does do that) and can be used to check if the user is
+   * accessing their own record.
+   *
+   * @return int|false
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactIDIfAccessingOwnRecord() {
+    $contactID = (int) CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    if (!$contactID) {
+      return FALSE;
+    }
+    if ($contactID === $this->getLoggedInUserContactID()) {
+      return $contactID;
+    }
+    $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this);
+    return CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $userChecksum) ? $contactID : FALSE;
   }
 
 }

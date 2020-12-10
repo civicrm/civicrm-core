@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <script type="text/javascript">
@@ -40,7 +24,7 @@
 <div class="block-crm crm-container">
     <form method="post" id="id_fulltext_search">
     <div style="margin-bottom: 8px;">
-    <input type="text" name="text" id='text' value="" class="crm-form-text" style="width: 10em;" />&nbsp;<input type="submit" name="submit" id="fulltext_submit" value="{ts}Go{/ts}" class="crm-form-submit"/ onclick='submitForm();'>
+    <input type="text" name="text" id='text' value="" class="crm-form-text" />
     <input type="hidden" name="qfKey" value="{crmKey name='CRM_Contact_Controller_Search' addSequence=1}" />
   </div>
   <select class="form-select" id="fulltext_table" name="fulltext_table">
@@ -62,5 +46,6 @@
         <option value="Membership">{ts}Memberships{/ts}</option>
 {/if}
     </select> {help id="id-fullText" file="CRM/Contact/Form/Search/Custom/FullText.hlp"}
+    <div class="crm-submit-buttons"><button type="submit" name="submit" id="fulltext_submit" class="crm-button crm-form-submit" onclick='submitForm();'>{ts}Search{/ts}</button></div>
     </form>
 </div>

@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -49,6 +31,11 @@ class FieldSpec {
    * @var string
    */
   protected $name;
+
+  /**
+   * @var string
+   */
+  protected $label;
 
   /**
    * @var string
@@ -76,7 +63,7 @@ class FieldSpec {
   protected $requiredIf;
 
   /**
-   * @var array|boolean
+   * @var array|bool
    */
   protected $options;
 
@@ -106,6 +93,26 @@ class FieldSpec {
   protected $serialize;
 
   /**
+   * @var string
+   */
+  protected $helpPre;
+
+  /**
+   * @var string
+   */
+  protected $helpPost;
+
+  /**
+   * @var array
+   */
+  protected $permission;
+
+  /**
+   * @var string
+   */
+  protected $columnName;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -123,7 +130,7 @@ class FieldSpec {
    */
   public function __construct($name, $entity, $dataType = 'String') {
     $this->entity = $entity;
-    $this->setName($name);
+    $this->name = $this->columnName = $name;
     $this->setDataType($dataType);
   }
 
@@ -159,6 +166,24 @@ class FieldSpec {
    */
   public function setName($name) {
     $this->name = $name;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getLabel() {
+    return $this->label;
+  }
+
+  /**
+   * @param string $label
+   *
+   * @return $this
+   */
+  public function setLabel($label) {
+    $this->label = $label;
 
     return $this;
   }
@@ -287,6 +312,22 @@ class FieldSpec {
   }
 
   /**
+   * @param array $permission
+   * @return $this
+   */
+  public function setPermission($permission) {
+    $this->permission = $permission;
+    return $this;
+  }
+
+  /**
+   * @return array
+   */
+  public function getPermission() {
+    return $this->permission;
+  }
+
+  /**
    * @return string
    */
   public function getInputType() {
@@ -321,6 +362,34 @@ class FieldSpec {
   }
 
   /**
+   * @return string|NULL
+   */
+  public function getHelpPre() {
+    return $this->helpPre;
+  }
+
+  /**
+   * @param string|NULL $helpPre
+   */
+  public function setHelpPre($helpPre) {
+    $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getHelpPost() {
+    return $this->helpPost;
+  }
+
+  /**
+   * @param string|NULL $helpPost
+   */
+  public function setHelpPost($helpPost) {
+    $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;
+  }
+
+  /**
    * Add valid types that are not not part of \CRM_Utils_Type::dataTypes
    *
    * @return array
@@ -333,9 +402,11 @@ class FieldSpec {
   }
 
   /**
+   * @param array $values
+   * @param array|bool $return
    * @return array
    */
-  public function getOptions() {
+  public function getOptions($values = [], $return = TRUE) {
     if (!isset($this->options) || $this->options === TRUE) {
       $fieldName = $this->getName();
 
@@ -344,16 +415,93 @@ class FieldSpec {
         $fieldName = sprintf('custom_%d', $this->getCustomFieldId());
       }
 
+      // BAO::buildOptions returns a single-dimensional list, we call that first because of the hook contract,
+      // @see CRM_Utils_Hook::fieldOptions
+      // We then supplement the data with additional properties if requested.
       $bao = CoreUtil::getBAOFromApiName($this->getEntity());
-      $options = $bao::buildOptions($fieldName);
+      $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
 
-      if (!is_array($options) || !$options) {
-        $options = FALSE;
+      if (!is_array($optionLabels) || !$optionLabels) {
+        $this->options = FALSE;
       }
-
-      $this->setOptions($options);
+      else {
+        $this->options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
+        if (is_array($return)) {
+          self::addOptionProps($bao, $fieldName, $values, $return);
+        }
+      }
     }
     return $this->options;
+  }
+
+  /**
+   * Supplement the data from
+   *
+   * @param \CRM_Core_DAO $baoName
+   * @param string $fieldName
+   * @param array $values
+   * @param array $return
+   */
+  private function addOptionProps($baoName, $fieldName, $values, $return) {
+    // FIXME: For now, call the buildOptions function again and then combine the arrays. Not an ideal approach.
+    // TODO: Teach CRM_Core_Pseudoconstant to always load multidimensional option lists so we can get more properties like 'color' and 'icon',
+    // however that might require a change to the hook_civicrm_fieldOptions signature so that's a bit tricky.
+    if (in_array('name', $return)) {
+      $props['name'] = $baoName::buildOptions($fieldName, 'validate', $values);
+    }
+    $return = array_diff($return, ['id', 'name', 'label']);
+    // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
+    if ($return) {
+      $optionIds = implode(',', array_column($this->options, 'id'));
+      $optionIndex = array_flip(array_column($this->options, 'id'));
+      if ($this instanceof CustomFieldSpec) {
+        $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $this->getCustomFieldId(), 'option_group_id');
+      }
+      else {
+        $dao = new $baoName();
+        $fieldSpec = $dao->getFieldSpec($fieldName);
+        $pseudoconstant = $fieldSpec['pseudoconstant'] ?? NULL;
+        $optionGroupName = $pseudoconstant['optionGroupName'] ?? NULL;
+        $optionGroupId = $optionGroupName ? \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name') : NULL;
+      }
+      if (!empty($optionGroupId)) {
+        $extraStuff = \CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupId);
+        $keyColumn = $pseudoconstant['keyColumn'] ?? 'value';
+        foreach ($extraStuff as $item) {
+          if (isset($optionIndex[$item[$keyColumn]])) {
+            foreach ($return as $ret) {
+              $this->options[$optionIndex[$item[$keyColumn]]][$ret] = $item[$ret] ?? NULL;
+            }
+          }
+        }
+      }
+      else {
+        // Fetch the abbr if requested using context: abbreviate
+        if (in_array('abbr', $return)) {
+          $props['abbr'] = $baoName::buildOptions($fieldName, 'abbreviate', $values);
+          $return = array_diff($return, ['abbr']);
+        }
+        // Fetch anything else (color, icon, description)
+        if ($return && !empty($pseudoconstant['table']) && \CRM_Utils_Rule::commaSeparatedIntegers($optionIds)) {
+          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE id IN (%1)";
+          $query = \CRM_Core_DAO::executeQuery($sql, [1 => [$optionIds, 'CommaSeparatedIntegers']]);
+          while ($query->fetch()) {
+            foreach ($return as $ret) {
+              if (property_exists($query, $ret)) {
+                $this->options[$optionIndex[$query->id]][$ret] = $query->$ret;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (isset($props)) {
+      foreach ($this->options as &$option) {
+        foreach ($props as $name => $prop) {
+          $option[$name] = $prop[$option['id']] ?? NULL;
+        }
+      }
+    }
   }
 
   /**
@@ -381,6 +529,23 @@ class FieldSpec {
   public function setFkEntity($fkEntity) {
     $this->fkEntity = $fkEntity;
 
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getColumnName() {
+    return $this->columnName;
+  }
+
+  /**
+   * @param string $columnName
+   *
+   * @return $this
+   */
+  public function setColumnName($columnName) {
+    $this->columnName = $columnName;
     return $this;
   }
 

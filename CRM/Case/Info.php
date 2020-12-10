@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Case_Info extends CRM_Core_Component_Info {
 
@@ -52,7 +36,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       'translatedName' => ts('CiviCase'),
       'title' => ts('CiviCase Engine'),
       'search' => 1,
-      'showActivitiesInCore' => 0,
+      'showActivitiesInCore' => Civi::settings()->get('civicaseShowCaseActivities') ?? 0,
     ];
   }
 
@@ -244,6 +228,8 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   List of component names.
    * @param array $metadata
    *   Specification of the setting (per *.settings.php).
+   *
+   * @throws \CRM_Core_Exception.
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
@@ -254,8 +240,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
       self::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
-        $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
-        CRM_Core_Error::fatal($msg);
+        throw new CRM_Core_Exception(ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission"));
       }
     }
   }
@@ -270,12 +255,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     $dao = new CRM_Core_DAO();
     $db = $dao->getDatabaseConnection();
 
-    $domain = new CRM_Core_DAO_Domain();
-    $domain->find(TRUE);
-    $multiLingual = (bool) $domain->locales;
+    $locales = CRM_Core_I18n::getMultilingual();
     $smarty = CRM_Core_Smarty::singleton();
-    $smarty->assign('multilingual', $multiLingual);
-    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+    $smarty->assign('multilingual', (bool) $locales);
+    $smarty->assign('locales', $locales);
 
     if (!$lineMode) {
 

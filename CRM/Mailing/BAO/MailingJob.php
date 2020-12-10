@@ -1,34 +1,19 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use Civi\Api4\ActivityContact;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Mail.php';
@@ -70,7 +55,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     CRM_Utils_Hook::pre($op, 'MailingJob', CRM_Utils_Array::value('id', $params), $params);
 
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
-    $jobDAO->copyValues($params, TRUE);
+    $jobDAO->copyValues($params);
     $jobDAO->save();
     if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
@@ -448,6 +433,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $now = time();
       $params = [];
       $count = 0;
+      // dev/core#1768 Get the mail sync interval.
+      $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
       while ($recipients->fetch()) {
         // CRM-18543: there are situations when both the email and phone are null.
         // Skip the recipient in this case.
@@ -469,7 +456,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           $recipients->phone_id,
         ];
         $count++;
-        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
+        // dev/core#1768 Mail sync interval is now configurable.
+        if ($count % $mail_sync_interval == 0) {
           CRM_Mailing_Event_BAO_Queue::bulkCreate($params, $now);
           $count = 0;
           $params = [];
@@ -512,7 +500,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
     }
 
-    $job_date = CRM_Utils_Date::isoToMysql($this->scheduled_date);
+    $job_date = $this->scheduled_date;
     $fields = [];
 
     if (!empty($testParams)) {
@@ -585,13 +573,15 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     static $smtpConnectionErrors = 0;
 
     if (!is_object($mailer) || empty($fields)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('Either mailer is not an object or we don\'t have recipients to send to in this group');
     }
 
     // get the return properties
     $returnProperties = $mailing->getReturnProperties();
     $params = $targetParams = $deliveredParams = [];
     $count = 0;
+    // dev/core#1768 Get the mail sync interval.
+    $mail_sync_interval = Civi::settings()->get('civimail_sync_interval');
     $retryGroup = FALSE;
 
     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
@@ -607,7 +597,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $params[] = $field['contact_id'];
     }
 
-    $details = CRM_Utils_Token::getTokenDetails(
+    [$details] = CRM_Utils_Token::getTokenDetails(
       $params,
       $returnProperties,
       $skipOnHold, TRUE, NULL,
@@ -616,11 +606,10 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $this->id
     );
 
-    $config = CRM_Core_Config::singleton();
     foreach ($fields as $key => $field) {
       $contactID = $field['contact_id'];
-      if (!array_key_exists($contactID, $details[0])) {
-        $details[0][$contactID] = [];
+      if (!array_key_exists($contactID, $details)) {
+        $details[$contactID] = [];
       }
 
       // Compose the mailing.
@@ -633,7 +622,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $message = $mailing->compose(
         $this->id, $field['id'], $field['hash'],
         $field['contact_id'], $field['email'],
-        $recipient, FALSE, $details[0][$contactID], $attachments,
+        $recipient, FALSE, $details[$contactID], $attachments,
         FALSE, NULL, $replyToEmail
       );
       if (empty($message)) {
@@ -650,8 +639,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       if ($mailing->sms_provider_id) {
         $provider = CRM_SMS_Provider::singleton(['mailing_id' => $mailing->id]);
-        $body = $provider->getMessage($message, $field['contact_id'], $details[0][$contactID]);
-        $headers = $provider->getRecipientDetails($field, $details[0][$contactID]);
+        $body = $provider->getMessage($message, $field['contact_id'], $details[$contactID]);
+        $headers = $provider->getRecipientDetails($field, $details[$contactID]);
       }
 
       // make $recipient actually be the *encoded* header, so as not to baffle Mail_RFC822, CRM-5743
@@ -724,7 +713,8 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         $targetParams[] = $field['contact_id'];
 
         $count++;
-        if ($count % CRM_Mailing_Config::BULK_MAIL_INSERT_COUNT == 0) {
+        // dev/core#1768 Mail sync interval is now configurable.
+        if ($count % $mail_sync_interval == 0) {
           $this->writeToDB(
             $deliveredParams,
             $targetParams,
@@ -797,7 +787,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     }
 
     // Register 5xx SMTP response code (permanent failure) as bounce.
-    if (isset($code{0}) && $code{0} === '5') {
+    if (isset($code[0]) && $code[0] === '5') {
       return FALSE;
     }
 
@@ -989,20 +979,17 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
           $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
         }
         if (!$activityTypeID) {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Execption(ts('No relevant activity type found when recording Mailing Event delivered Activity'));
         }
       }
 
       $activity = [
         'source_contact_id' => $mailing->scheduled_id,
-        // CRM-9519
-        'target_contact_id' => array_unique($targetParams),
         'activity_type_id' => $activityTypeID,
         'source_record_id' => $this->mailing_id,
         'activity_date_time' => $job_date,
         'subject' => $mailing->subject,
         'status_id' => 'Completed',
-        'deleteActivityTarget' => FALSE,
         'campaign_id' => $mailing->campaign_id,
       ];
 
@@ -1020,36 +1007,37 @@ AND    civicrm_activity.source_record_id = %2
         2 => [$this->mailing_id, 'Integer'],
       ];
       $activityID = CRM_Core_DAO::singleValueQuery($query, $queryParams);
+      $targetRecordID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');
 
+      $activityTargets = [];
+      foreach ($targetParams as $id) {
+        $activityTargets[$id] = ['contact_id' => (int) $id];
+      }
       if ($activityID) {
         $activity['id'] = $activityID;
 
         // CRM-9519
         if (CRM_Core_BAO_Email::isMultipleBulkMail()) {
-          static $targetRecordID = NULL;
-          if (!$targetRecordID) {
-            $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
-            $targetRecordID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
-          }
-
           // make sure we don't attempt to duplicate the target activity
-          foreach ($activity['target_contact_id'] as $key => $targetID) {
+          // @todo - we don't have to do one contact at a time....
+          foreach ($activityTargets as $key => $target) {
             $sql = "
 SELECT id
 FROM   civicrm_activity_contact
 WHERE  activity_id = $activityID
-AND    contact_id = $targetID
+AND    contact_id = {$target['contact_id']}
 AND    record_type_id = $targetRecordID
 ";
             if (CRM_Core_DAO::singleValueQuery($sql)) {
-              unset($activity['target_contact_id'][$key]);
+              unset($activityTargets[$key]);
             }
           }
         }
       }
 
       try {
-        civicrm_api3('Activity', 'create', $activity);
+        $activity = civicrm_api3('Activity', 'create', $activity);
+        ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $activity['id'], 'record_type_id' => $targetRecordID])->execute();
       }
       catch (Exception $e) {
         $result = FALSE;
@@ -1134,7 +1122,7 @@ AND    record_type_id = $targetRecordID
    * @return mixed
    */
   public static function del($id) {
-    CRM_Utils_Hook::pre('delete', 'MailingJob', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'MailingJob', $id);
 
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->id = $id;

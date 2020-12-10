@@ -83,6 +83,7 @@ function contribution_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => '',
         'revenue_recognition_date' => '',
+        'is_template' => '',
         'contribution_type_id' => '1',
       ],
     ],

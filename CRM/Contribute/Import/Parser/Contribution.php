@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -282,9 +266,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       // onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE
       if (!empty($paramValues['invoice_id']) || !empty($paramValues['trxn_id']) || !empty($paramValues['contribution_id'])) {
         $dupeIds = [
-          'id' => CRM_Utils_Array::value('contribution_id', $paramValues),
-          'trxn_id' => CRM_Utils_Array::value('trxn_id', $paramValues),
-          'invoice_id' => CRM_Utils_Array::value('invoice_id', $paramValues),
+          'id' => $paramValues['contribution_id'] ?? NULL,
+          'trxn_id' => $paramValues['trxn_id'] ?? NULL,
+          'invoice_id' => $paramValues['invoice_id'] ?? NULL,
         ];
 
         $ids['contribution'] = CRM_Contribute_BAO_Contribution::checkDuplicateIds($dupeIds);
@@ -337,7 +321,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             }
           }
 
-          $newContribution = CRM_Contribute_BAO_Contribution::create($formatted, $ids);
+          $formatted['id'] = $ids['contribution'];
+          $newContribution = CRM_Contribute_BAO_Contribution::create($formatted);
           $this->_newContributions[] = $newContribution->id;
 
           //return soft valid since we need to show how soft credits were added
@@ -667,25 +652,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
         $values[$key] = $value;
         $type = $customFields[$customFieldID]['html_type'];
-        if ($type == 'CheckBox' || $type == 'Multi-Select') {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
+        if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
+          $values[$key] = self::unserializeCustomValue($customFieldID, $value, $type);
         }
         elseif ($type == 'Select' || $type == 'Radio' ||
           ($type == 'Autocomplete-Select' &&
@@ -694,8 +662,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         ) {
           $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
           foreach ($customOption as $customFldID => $customValue) {
-            $val = CRM_Utils_Array::value('value', $customValue);
-            $label = CRM_Utils_Array::value('label', $customValue);
+            $val = $customValue['value'] ?? NULL;
+            $label = $customValue['label'] ?? NULL;
             $label = strtolower($label);
             $value = strtolower(trim($value));
             if (($value == $label) || ($value == strtolower($val))) {
@@ -703,6 +671,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             }
           }
         }
+        continue;
       }
 
       switch ($key) {
@@ -730,9 +699,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           // import contribution record according to select contact type
           require_once 'CRM/Contact/DAO/Contact.php';
           $contactType = new CRM_Contact_DAO_Contact();
-          $contactId = CRM_Utils_Array::value('contribution_contact_id', $params);
-          $externalId = CRM_Utils_Array::value('external_identifier', $params);
-          $email = CRM_Utils_Array::value('email', $params);
+          $contactId = $params['contribution_contact_id'] ?? NULL;
+          $externalId = $params['external_identifier'] ?? NULL;
+          $email = $params['email'] ?? NULL;
           //when insert mode check contact id or external identifier
           if ($contactId || $externalId) {
             $contactType->id = $contactId;
@@ -840,9 +809,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           $value[$key] = $mismatchContactType = $softCreditContactIds = '';
           if (isset($params[$key]) && is_array($params[$key])) {
             foreach ($params[$key] as $softKey => $softParam) {
-              $contactId = CRM_Utils_Array::value('contact_id', $softParam);
-              $externalId = CRM_Utils_Array::value('external_identifier', $softParam);
-              $email = CRM_Utils_Array::value('email', $softParam);
+              $contactId = $softParam['contact_id'] ?? NULL;
+              $externalId = $softParam['external_identifier'] ?? NULL;
+              $email = $softParam['email'] ?? NULL;
               if ($contactId || $externalId) {
                 require_once 'CRM/Contact/DAO/Contact.php';
                 $contact = new CRM_Contact_DAO_Contact();
@@ -900,9 +869,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
 
           // get total amount of from import fields
-          $totalAmount = CRM_Utils_Array::value('total_amount', $params);
+          $totalAmount = $params['total_amount'] ?? NULL;
 
-          $onDuplicate = CRM_Utils_Array::value('onDuplicate', $params);
+          $onDuplicate = $params['onDuplicate'] ?? NULL;
 
           // we need to get contact id $contributionContactID to
           // retrieve pledge details as well as to validate pledge ID

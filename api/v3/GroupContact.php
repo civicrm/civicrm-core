@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -68,7 +52,7 @@ function civicrm_api3_group_contact_get($params) {
   }
   $status = CRM_Utils_Array::value('status', $params, 'Added');
 
-  $groupId = CRM_Utils_Array::value('group_id', $params);
+  $groupId = $params['group_id'] ?? NULL;
   $values = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE, FALSE, TRUE, $groupId);
   return civicrm_api3_create_success($values, $params, 'GroupContact');
 }
@@ -88,7 +72,7 @@ function _civicrm_api3_group_contact_create_spec(&$params) {
  *
  * This api has a legacy/nonstandard signature.
  * On success, the return array will be structured as follows:
- * @code
+ * ```
  * array(
  *   "is_error" => 0,
  *   "version"  => 3,
@@ -99,16 +83,16 @@ function _civicrm_api3_group_contact_create_spec(&$params) {
  *     "total_count" => integer
  *   )
  * )
- * @endcode
+ * ```
  *
  * On failure, the return array will be structured as follows:
- * @code
+ * ```
  * array(
  *   'is_error' => 1,
  *   'error_message' = string,
  *   'error_data' = mixed or undefined
  * )
- * @endcode
+ * ```
  *
  * @param array $params
  *   Input parameters:
@@ -235,7 +219,7 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
 
   $method = CRM_Utils_Array::value('method', $params, 'API');
   $status = CRM_Utils_Array::value('status', $params, $op);
-  $tracking = CRM_Utils_Array::value('tracking', $params);
+  $tracking = $params['tracking'] ?? NULL;
 
   if ($op == 'Added' || $op == 'Pending') {
     $extraReturnValues = [

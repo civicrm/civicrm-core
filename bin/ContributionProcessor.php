@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CiviContributeProcessor {
   public static $_paypalParamsMapper = array(
@@ -220,7 +204,7 @@ class CiviContributeProcessor {
 
     $handle = fopen($csvFile, "r");
     if (!$handle) {
-      CRM_Core_Error::fatal("Can't locate csv file.");
+      throw new CRM_Core_Exception("Can't locate csv file.");
     }
 
     require_once "CRM/Contribute/BAO/Contribution/Utils.php";
@@ -247,7 +231,7 @@ class CiviContributeProcessor {
         CRM_Core_Error::debug_log_message("Considering first row ( line $row ) as HEADER ..<p>", TRUE);
 
         if (empty($header)) {
-          CRM_Core_Error::fatal("Header is empty.");
+          throw new CRM_Core_Exception("Header is empty.");
         }
       }
       $row++;
@@ -270,7 +254,7 @@ class CiviContributeProcessor {
           CRM_Core_DAO::$_nullObject, FALSE, 0, 'REQUEST'
         );
         if ($start < $end) {
-          CRM_Core_Error::fatal("Start offset can't be less than End offset.");
+          throw new CRM_Core_Exception("Start offset can't be less than End offset.");
         }
 
         $start = date('Y-m-d', time() - $start * 24 * 60 * 60) . 'T00:00:00.00Z';
@@ -369,7 +353,7 @@ class CiviContributeProcessor {
         $params += $transaction;
       }
 
-      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+      self::_fillCommonParams($params, $type);
 
       return $params;
     }
@@ -399,7 +383,7 @@ class CiviContributeProcessor {
         $params += $transaction;
       }
 
-      CRM_Contribute_BAO_Contribution_Utils::_fillCommonParams($params, $type);
+      self::_fillCommonParams($params, $type);
 
       return $params;
     }
@@ -473,13 +457,85 @@ class CiviContributeProcessor {
     return TRUE;
   }
 
+  /**
+   * @param array $params
+   * @param string $type
+   *
+   * @return bool
+   */
+  public static function _fillCommonParams(&$params, $type = 'paypal') {
+    if (array_key_exists('transaction', $params)) {
+      $transaction = &$params['transaction'];
+    }
+    else {
+      $transaction = &$params;
+    }
+
+    $params['contact_type'] = 'Individual';
+
+    $billingLocTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', 'Billing', 'id', 'name');
+    if (!$billingLocTypeId) {
+      $billingLocTypeId = 1;
+    }
+    if (!CRM_Utils_System::isNull($params['address'])) {
+      $params['address'][1]['is_primary'] = 1;
+      $params['address'][1]['location_type_id'] = $billingLocTypeId;
+    }
+    if (!CRM_Utils_System::isNull($params['email'])) {
+      $params['email'] = [
+        1 => [
+          'email' => $params['email'],
+          'location_type_id' => $billingLocTypeId,
+        ],
+      ];
+    }
+
+    if (isset($transaction['trxn_id'])) {
+      // set error message if transaction has already been processed.
+      $contribution = new CRM_Contribute_DAO_Contribution();
+      $contribution->trxn_id = $transaction['trxn_id'];
+      if ($contribution->find(TRUE)) {
+        $params['error'][] = ts('transaction already processed.');
+      }
+    }
+    else {
+      // generate a new transaction id, if not already exist
+      $transaction['trxn_id'] = md5(uniqid(rand(), TRUE));
+    }
+
+    if (!isset($transaction['financial_type_id'])) {
+      $contributionTypes = array_keys(CRM_Contribute_PseudoConstant::financialType());
+      $transaction['financial_type_id'] = $contributionTypes[0];
+    }
+
+    if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
+      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
+    }
+
+    if (!isset($transaction['invoice_id'])) {
+      $transaction['invoice_id'] = $transaction['trxn_id'];
+    }
+
+    $source = ts('ContributionProcessor: %1 API',
+      [1 => ucfirst($type)]
+    );
+    if (isset($transaction['source'])) {
+      $transaction['source'] = $source . ':: ' . $transaction['source'];
+    }
+    else {
+      $transaction['source'] = $source;
+    }
+
+    return TRUE;
+  }
+
 }
 
 // bootstrap the environment and run the processor
 session_start();
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
-$config = CRM_Core_Config::singleton();
+CRM_Core_Config::singleton();
 
 CRM_Utils_System::authenticateScript(TRUE);
 

@@ -1,29 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\MembershipType;
 
 /**
  * Class CRM_Member_BAO_MembershipTypeTest
@@ -297,7 +283,6 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
    *
    */
   public function testGetRenewalDatesForMembershipType() {
-    $ids = [];
     $params = [
       'name' => 'General',
       'domain_id' => 1,
@@ -312,11 +297,11 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'Public',
       'is_active' => 1,
     ];
-    $membershipType = CRM_Member_BAO_MembershipType::add($params, $ids);
+    $membershipTypeID = MembershipType::create()->setValues($params)->execute()->first()['id'];
 
     $params = [
       'contact_id' => $this->_indiviContactID,
-      'membership_type_id' => $membershipType->id,
+      'membership_type_id' => $membershipTypeID,
       'join_date' => '20060121000000',
       'start_date' => '20060121000000',
       'end_date' => '20070120000000',
@@ -324,16 +309,16 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
     ];
-    $ids = [];
-    $membership = CRM_Member_BAO_Membership::create($params, $ids);
 
-    $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id);
+    $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $this->assertEquals($membershipRenewDates['start_date'], '20060121', 'Verify membership renewal start date.');
-    $this->assertEquals($membershipRenewDates['end_date'], '20080120', 'Verify membership renewal end date.');
+    $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership['id']);
 
-    $this->membershipDelete($membership->id);
-    $this->membershipTypeDelete(['id' => $membershipType->id]);
+    $this->assertEquals('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
+    $this->assertEquals('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
+
+    $this->membershipDelete($membership['id']);
+    $this->membershipTypeDelete(['id' => $membershipTypeID]);
   }
 
   /**
@@ -364,7 +349,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ]);
-    $result = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
+    $result = $membershipTypesResult['values'] ?? NULL;
     $this->assertEquals(empty($result), FALSE, 'Verify membership types for organization.');
 
     $membershipTypesResult = civicrm_api3('MembershipType', 'get', [
@@ -373,7 +358,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ]);
-    $result = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
+    $result = $membershipTypesResult['values'] ?? NULL;
     $this->assertEquals(empty($result), TRUE, 'Verify membership types for organization.');
 
     $this->membershipTypeDelete(['id' => $membershipType->id]);

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Type {
   const
@@ -212,11 +196,18 @@ class CRM_Utils_Type {
   /**
    * Helper function to call validate on arrays
    *
+   * @param mixed $data
+   * @param string $type
+   *
+   * @return mixed
+   *
+   * @throws \CRM_Core_Exception
+   *
    * @see validate
    */
-  public static function validateAll($data, $type, $abort = TRUE) {
+  public static function validateAll($data, $type) {
     foreach ($data as $key => $value) {
-      $data[$key] = CRM_Utils_Type::validate($value, $type, $abort);
+      $data[$key] = CRM_Utils_Type::validate($value, $type);
     }
     return $data;
   }
@@ -229,23 +220,26 @@ class CRM_Utils_Type {
    * @param string $type
    *   The type to verify against.
    * @param bool $abort
-   *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
+   *   If TRUE, the operation will throw an CRM_Core_Exception on invalid data.
    *
    * @return mixed
    *   The data, escaped if necessary.
+   * @throws CRM_Core_Exception
    */
   public static function escape($data, $type, $abort = TRUE) {
     switch ($type) {
       case 'Integer':
       case 'Int':
-        if (CRM_Utils_Rule::integer($data)) {
-          return (int) $data;
-        }
-        break;
-
       case 'Positive':
-        if (CRM_Utils_Rule::positiveInteger($data)) {
-          return (int) $data;
+      case 'Float':
+      case 'Money':
+      case 'Date':
+      case 'Timestamp':
+      case 'ContactReference':
+      case 'MysqlOrderByDirection':
+        $validatedData = self::validate($data, $type, $abort);
+        if (isset($validatedData)) {
+          return $validatedData;
         }
         break;
 
@@ -287,43 +281,10 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'Float':
-      case 'Money':
-        if (CRM_Utils_Rule::numeric($data)) {
-          return $data;
-        }
-        break;
-
       case 'String':
       case 'Memo':
       case 'Text':
-        return CRM_Core_DAO::escapeString($data);
-
-      case 'Date':
-      case 'Timestamp':
-        // a null date or timestamp is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if ((preg_match('/^\d{8}$/', $data) ||
-            preg_match('/^\d{14}$/', $data)
-          ) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
-      case 'ContactReference':
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (CRM_Utils_Rule::validContact($data)) {
-          return (int) $data;
-        }
-        break;
+        return CRM_Core_DAO::escapeString(self::validate($data, $type, $abort));
 
       case 'MysqlColumnNameOrAlias':
         if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
@@ -332,12 +293,6 @@ class CRM_Utils_Type {
           $data = '`' . implode('`.`', $parts) . '`';
 
           return $data;
-        }
-        break;
-
-      case 'MysqlOrderByDirection':
-        if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
-          return strtolower($data);
         }
         break;
 
@@ -378,16 +333,16 @@ class CRM_Utils_Type {
         break;
 
       default:
-        CRM_Core_Error::fatal(
+        throw new CRM_Core_Exception(
           $type . " is not a recognised (camel cased) data type."
         );
-        break;
     }
 
     // @todo Use exceptions instead of CRM_Core_Error::fatal().
     if ($abort) {
       $data = htmlentities($data);
-      CRM_Core_Error::fatal("$data is not of the type $type");
+
+      throw new CRM_Core_Exception("$data is not of the type $type");
     }
     return NULL;
   }
@@ -403,15 +358,13 @@ class CRM_Utils_Type {
    *   If TRUE, the operation will CRM_Core_Error::fatal() on invalid data.
    * @param string $name
    *   The name of the attribute
-   * @param bool $isThrowException
-   *   Should an exception be thrown rather than a using a deprecated fatal error.
    *
    * @return mixed
    *   The data, escaped if necessary
    *
    * @throws \CRM_Core_Exception
    */
-  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = FALSE) {
+  public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ') {
 
     $possibleTypes = [
       'Integer',
@@ -437,10 +390,7 @@ class CRM_Utils_Type {
       'Color',
     ];
     if (!in_array($type, $possibleTypes)) {
-      if ($isThrowException) {
-        throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
-      }
-      CRM_Core_Error::fatal(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
+      throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
     }
     switch ($type) {
       case 'Integer':
@@ -470,18 +420,6 @@ class CRM_Utils_Type {
         return $data;
 
       case 'Date':
-        // a null date is valid
-        if (strlen(trim($data)) == 0) {
-          return trim($data);
-        }
-
-        if (preg_match('/^\d{8}$/', $data) &&
-          CRM_Utils_Rule::mysqlDate($data)
-        ) {
-          return $data;
-        }
-        break;
-
       case 'Timestamp':
         // a null timestamp is valid
         if (strlen(trim($data)) == 0) {
@@ -504,7 +442,7 @@ class CRM_Utils_Type {
         }
 
         if (CRM_Utils_Rule::validContact($data)) {
-          return $data;
+          return (int) $data;
         }
         break;
 
@@ -529,10 +467,7 @@ class CRM_Utils_Type {
 
     if ($abort) {
       $data = htmlentities($data);
-      if ($isThrowException) {
-        throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
-      }
-      CRM_Core_Error::fatal("$name (value: $data) is not of the type $type");
+      throw new CRM_Core_Exception("$name (value: $data) is not of the type $type");
     }
 
     return NULL;

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Bridge_OG_Utils {
   const aclEnabled = 1, syncFromCiviCRM = 1;
@@ -72,12 +56,11 @@ class CRM_Bridge_OG_Utils {
 
   /**
    * @param int $groupID
-   * @param bool $abort
    *
    * @return int|null|string
    * @throws Exception
    */
-  public static function ogID($groupID, $abort = TRUE) {
+  public static function ogID($groupID) {
     $source = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group',
       $groupID,
       'source'
@@ -88,9 +71,6 @@ class CRM_Bridge_OG_Utils {
       if (is_numeric($matches[1])) {
         return $matches[1];
       }
-    }
-    if ($abort) {
-      CRM_Core_Error::fatal();
     }
     return NULL;
   }
@@ -113,7 +93,7 @@ class CRM_Bridge_OG_Utils {
     CRM_Core_BAO_UFMatch::synchronizeUFMatch($account, $ufID, $account->mail, 'Drupal');
     $contactID = CRM_Core_BAO_UFMatch::getContactId($ufID);
     if (!$contactID) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('no contact found');
     }
     return $contactID;
   }
@@ -124,7 +104,7 @@ class CRM_Bridge_OG_Utils {
    * @param bool $abort
    *
    * @return null|string
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public static function groupID($source, $title = NULL, $abort = FALSE) {
     $query = "
@@ -142,7 +122,7 @@ SELECT id
     if ($abort &&
       !$groupID
     ) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception('no group found');
     }
 
     return $groupID;

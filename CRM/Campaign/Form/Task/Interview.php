@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -103,7 +87,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $buttonName = $this->controller->getButtonName();
     $walkListActivityId = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'WalkList');
     if ($buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
-      $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
+      $orderByParams = $_POST['order_bys'] ?? NULL;
     }
     elseif ($walkListActivityId == $this->_surveyDetails['activity_type_id']) {
       $orderByParams
@@ -176,9 +160,9 @@ WHERE {$clause}
 
     $activityIds = [];
     foreach ($this->_contactIds as $key => $voterId) {
-      $actVals = CRM_Utils_Array::value($voterId, $this->_surveyActivityIds);
-      $statusId = CRM_Utils_Array::value('status_id', $actVals);
-      $activityId = CRM_Utils_Array::value('activity_id', $actVals);
+      $actVals = $this->_surveyActivityIds[$voterId] ?? NULL;
+      $statusId = $actVals['status_id'] ?? NULL;
+      $activityId = $actVals['activity_id'] ?? NULL;
       if ($activityId &&
         $statusId &&
         $scheduledStatusId == $statusId
@@ -249,7 +233,7 @@ WHERE {$clause}
     }
 
     //set the title.
-    $this->_surveyTypeId = CRM_Utils_Array::value('activity_type_id', $this->_surveyValues);
+    $this->_surveyTypeId = $this->_surveyValues['activity_type_id'] ?? NULL;
     $surveyTypeLabel = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $this->_surveyTypeId);
     CRM_Utils_System::setTitle(ts('Record %1 Responses', [1 => $surveyTypeLabel]));
   }
@@ -462,8 +446,8 @@ WHERE {$clause}
    * @return mixed
    */
   public static function registerInterview($params) {
-    $activityId = CRM_Utils_Array::value('activity_id', $params);
-    $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);
+    $activityId = $params['activity_id'] ?? NULL;
+    $surveyTypeId = $params['activity_type_id'] ?? NULL;
     if (!is_array($params) || !$surveyTypeId || !$activityId) {
       return FALSE;
     }
@@ -512,7 +496,7 @@ WHERE {$clause}
       }
     }
 
-    $contactId = CRM_Utils_Array::value('voter_id', $params);
+    $contactId = $params['voter_id'] ?? NULL;
     if ($contactId && !empty($contactParams)) {
       CRM_Contact_BAO_Contact::createProfileContact($contactParams, $fields, $contactId);
     }
@@ -532,7 +516,7 @@ WHERE {$clause}
     }
 
     $subject = '';
-    $surveyTitle = CRM_Utils_Array::value('surveyTitle', $params);
+    $surveyTitle = $params['surveyTitle'] ?? NULL;
     if ($surveyTitle) {
       $subject = $surveyTitle . ' - ';
     }
@@ -607,16 +591,9 @@ WHERE {$clause}
         $voterIdCount = count($this->_contactIds);
 
         //create temporary table to store voter ids.
-        $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_survey_respondent');
-        CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS {$tempTableName}");
-        $query = "
-     CREATE TEMPORARY TABLE {$tempTableName} (
-            id int unsigned NOT NULL AUTO_INCREMENT,
-            survey_contact_id int unsigned NOT NULL,
-  PRIMARY KEY ( id )
-);
-";
-        CRM_Core_DAO::executeQuery($query);
+        $tempTableName = CRM_Utils_SQL_TempTable::build()
+          ->createWithColumns('id int unsigned NOT NULL AUTO_INCREMENT, survey_contact_id int unsigned NOT NULL, PRIMARY KEY ( id )')
+          ->getName();
         $batch = 100;
         $insertedCount = 0;
         do {

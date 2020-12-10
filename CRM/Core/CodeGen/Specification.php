@@ -72,6 +72,7 @@ class CRM_Core_CodeGen_Specification {
     $attributes = '';
     $this->checkAndAppend($attributes, $dbXML, 'character_set', 'DEFAULT CHARACTER SET ', '');
     $this->checkAndAppend($attributes, $dbXML, 'collate', 'COLLATE ', '');
+    $attributes .= ' ROW_FORMAT=DYNAMIC';
     $database['attributes'] = $attributes;
 
     $tableAttributes_modern = $tableAttributes_simple = '';
@@ -192,6 +193,7 @@ class CRM_Core_CodeGen_Specification {
     $sourceFile = "xml/schema/{$base}/{$klass}.xml";
     $daoPath = "{$base}/DAO/";
     $baoPath = __DIR__ . '/../../../' . str_replace(' ', '', "{$base}/BAO/");
+    $useBao = $this->value('useBao', $tableXML, file_exists($baoPath . $klass . '.php'));
     $pre = str_replace('/', '_', $daoPath);
     $this->classNames[$name] = $pre . $klass;
 
@@ -203,15 +205,22 @@ class CRM_Core_CodeGen_Specification {
       }
     }
 
+    $titleFromClass = preg_replace('/([a-z])([A-Z])/', '$1 $2', $klass);
     $table = [
       'name' => $name,
       'base' => $daoPath,
       'sourceFile' => $sourceFile,
       'fileName' => $klass . '.php',
       'objectName' => $klass,
+      'title' => $tableXML->title ?? $titleFromClass,
+      'titlePlural' => $tableXML->titlePlural ?? CRM_Utils_String::pluralize($tableXML->title ?? $titleFromClass),
+      'icon' => $tableXML->icon ?? NULL,
+      'add' => $tableXML->add ?? NULL,
+      'component' => $tableXML->component ?? NULL,
+      'paths' => (array) ($tableXML->paths ?? []),
       'labelName' => substr($name, 8),
       'className' => $this->classNames[$name],
-      'bao' => (file_exists($baoPath . $klass . '.php') ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
+      'bao' => ($useBao ? str_replace('DAO', 'BAO', $this->classNames[$name]) : $this->classNames[$name]),
       'entity' => $klass,
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
@@ -339,7 +348,7 @@ class CRM_Core_CodeGen_Specification {
       default:
         $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
-        if ($type == 'int unsigned') {
+        if ($type == 'int unsigned' || $type == 'tinyint') {
           $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
@@ -371,6 +380,7 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
+    $field['contactType'] = $this->value('contactType', $fieldXML);
     if (isset($fieldXML->permission)) {
       $field['permission'] = trim($this->value('permission', $fieldXML));
       $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
@@ -383,6 +393,7 @@ class CRM_Core_CodeGen_Specification {
         'type',
         'formatType',
         'label',
+        'controlField',
         /* Fixme: prior to CRM-13497 these were in a flat structure
         // CRM-13497 moved them to be nested within 'html' but there's no point
         // making that change in the DAOs right now since we are in the process of
@@ -416,6 +427,7 @@ class CRM_Core_CodeGen_Specification {
     if (isset($fieldXML->localize_context)) {
       $field['localize_context'] = $fieldXML->localize_context;
     }
+    $field['add'] = $this->value('add', $fieldXML);
     $field['pseudoconstant'] = $this->value('pseudoconstant', $fieldXML);
     if (!empty($field['pseudoconstant'])) {
       //ok this is a bit long-winded but it gets there & is consistent with above approach

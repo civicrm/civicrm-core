@@ -1,0 +1,56 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
+  <div class="form-inline">
+    <a class="btn btn-primary pull-right" href="#/create/Contact/">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Search') }}
+    </a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>{{:: ts('ID') }}</th>
+        <th>{{:: ts('Label') }}</th>
+        <th>{{:: ts('For') }}</th>
+        <th>{{:: ts('Displays') }}</th>
+        <th>{{:: ts('Smart Group') }}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="search in $ctrl.savedSearches">
+        <td>{{ search.id }}</td>
+        <td>{{ search.label }}</td>
+        <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
+        <td>
+          <div class="btn-group">
+            <button type="button" disabled ng-if="!search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline">
+              {{:: ts('0 Displays') }}
+            </button>
+            <button type="button" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{:: search.display_name.length === 1 ? ts('1 Display') : ts('%1 Displays', {1: search.display_name.length}) }} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" ng-if=":: search.display_name.length">
+              <li ng-repeat="display_name in search.display_name">
+                <a href="{{:: $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}"><i class="fa {{:: search.display_icon[$index] }}"></i> {{:: search.display_label[$index] }}</a>
+              </li>
+            </ul>
+          </div>
+        </td>
+        <td>{{ search.groups.join(', ') }}</td>
+        <td class="text-right">
+          <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}">{{:: ts('Edit') }}</a>
+          <a class="btn btn-xs btn-default" href="#/create/{{:: search.api_entity + '?params=' + $ctrl.encode(search.api_params) }}">{{:: ts('Clone') }}</a>
+          <a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
+        </td>
+      </tr>
+      <tr ng-if="$ctrl.savedSearches.length === 0">
+        <td colspan="9">
+          <p class="messages status no-popup text-center">
+            {{:: ts('No saved searches.')}}
+          </p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

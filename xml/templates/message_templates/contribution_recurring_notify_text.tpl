@@ -1,4 +1,4 @@
-{ts 1=$displayName}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
 {if $recur_txnType eq 'START'}
 {if $auto_renew_membership}
@@ -49,7 +49,7 @@
 {ts}Your recurring contribution term has ended.{/ts}
 
 
-{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you for your support.{/ts}
+{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you.{/ts}
 
 
 ==================================================

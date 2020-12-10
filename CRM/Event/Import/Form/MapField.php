@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -54,7 +36,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_onDuplicate = $this->get('onDuplicate');
-    $highlightedFields = array();
+    $highlightedFields = [];
     if ($skipColumnHeader) {
       $this->assign('skipColumnHeader', $skipColumnHeader);
       $this->assign('rowDisplayCount', 3);
@@ -116,14 +98,14 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $mappingName = $mappingName[1];
       $mappingContactType = $mappingContactType[1];
-      $mappingLocation = CRM_Utils_Array::value('1', $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value('1', $mappingPhoneType);
-      $mappingRelation = CRM_Utils_Array::value('1', $mappingRelation);
+      $mappingLocation = $mappingLocation['1'] ?? NULL;
+      $mappingPhoneType = $mappingPhoneType['1'] ?? NULL;
+      $mappingRelation = $mappingRelation['1'] ?? NULL;
 
       //mapping is to be loaded from database
 
       $params = array('id' => $savedMapping);
-      $temp = array();
+      $temp = [];
       $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
 
       $this->assign('loadedMapping', $mappingDetails->name);
@@ -151,7 +133,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $this->addFormRule(array('CRM_Event_Import_Form_MapField', 'formRule'), $this);
 
-    $defaults = array();
+    $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
@@ -197,7 +179,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
             $jsSet = TRUE;
           }
           else {
-            $defaults["mapper[$i]"] = array();
+            $defaults["mapper[$i]"] = [];
           }
           if (!$jsSet) {
             for ($k = 1; $k < 4; $k++) {
@@ -292,12 +274,12 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     // define so we avoid notices below
     $errors['_qf_default'] = '';
     $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = array();
+      $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
@@ -355,7 +337,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     if (!empty($fields['saveMapping'])) {
-      $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
+      $nameField = $fields['saveMappingName'] ?? NULL;
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
@@ -368,7 +350,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     //display Error if loaded mapping is not selected
     if (array_key_exists('loadMapping', $fields)) {
-      $getMapName = CRM_Utils_Array::value('savedMapping', $fields);
+      $getMapName = $fields['savedMapping'] ?? NULL;
       if (empty($getMapName)) {
         $errors['savedMapping'] = ts('Select saved mapping');
       }
@@ -405,13 +387,13 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $fileName = $this->controller->exportValue('DataSource', 'uploadFile');
-    $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
+    $separator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
-    $mapperKeys = array();
-    $mapper = array();
+    $mapperKeys = [];
+    $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = array();
+    $mapperKeysMain = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
@@ -430,7 +412,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
 
-      $mappingFieldsId = array();
+      $mappingFieldsId = [];
       while ($mappingFields->fetch()) {
         if ($mappingFields->id) {
           $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
@@ -444,9 +426,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $updateMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = CRM_Utils_Array::value(0, $explodedValues);
-        $first = CRM_Utils_Array::value(1, $explodedValues);
-        $second = CRM_Utils_Array::value(2, $explodedValues);
+        $id = $explodedValues[0] ?? NULL;
+        $first = $explodedValues[1] ?? NULL;
+        $second = $explodedValues[2] ?? NULL;
 
         $updateMappingFields->name = $mapper[$i];
         $updateMappingFields->save();
@@ -468,9 +450,9 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         $saveMappingFields->column_number = $i;
 
         $explodedValues = explode('_', $mapperKeys[$i][0]);
-        $id = CRM_Utils_Array::value(0, $explodedValues);
-        $first = CRM_Utils_Array::value(1, $explodedValues);
-        $second = CRM_Utils_Array::value(2, $explodedValues);
+        $id = $explodedValues[0] ?? NULL;
+        $first = $explodedValues[1] ?? NULL;
+        $second = $explodedValues[2] ?? NULL;
 
         $saveMappingFields->name = $mapper[$i];
         $saveMappingFields->save();
@@ -479,7 +461,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $parser = new CRM_Event_Import_Parser_Participant($mapperKeysMain);
-    $parser->run($fileName, $seperator, $mapper, $skipColumnHeader,
+    $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
       CRM_Import_Parser::MODE_PREVIEW, $this->get('contactType')
     );
     // add all the necessary variables to the form

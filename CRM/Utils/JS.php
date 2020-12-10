@@ -1,35 +1,19 @@
 <?php
 /*
-+--------------------------------------------------------------------+
-| CiviCRM version 5                                                  |
-+--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2019                                |
-+--------------------------------------------------------------------+
-| This file is a part of CiviCRM.                                    |
-|                                                                    |
-| CiviCRM is free software; you can copy, modify, and distribute it  |
-| under the terms of the GNU Affero General Public License           |
-| Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-|                                                                    |
-| CiviCRM is distributed in the hope that it will be useful, but     |
-| WITHOUT ANY WARRANTY; without even the implied warranty of         |
-| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-| See the GNU Affero General Public License for more details.        |
-|                                                                    |
-| You should have received a copy of the GNU Affero General Public   |
-| License and the CiviCRM Licensing Exception along                  |
-| with this program; if not, contact CiviCRM LLC                     |
-| at info[AT]civicrm[DOT]org. If you have questions about the        |
-| GNU Affero General Public License or the licensing of CiviCRM,     |
-| see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-+--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  * Parse Javascript content and extract translatable strings.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_JS {
 
@@ -70,13 +54,15 @@ class CRM_Utils_JS {
    * Note that you can only dedupe closures if they are directly adjacent and
    * have exactly the same parameters.
    *
+   * Also dedupes the "use strict" directive as it is only meaningful at the beginning of a closure.
+   *
    * @param array $scripts
    *   Javascript source.
    * @param array $localVars
    *   Ordered list of JS vars to identify the start of a closure.
    * @param array $inputVals
    *   Ordered list of input values passed into the closure.
-   * @return string
+   * @return string[]
    *   Javascript source.
    */
   public static function dedupeClosures($scripts, $localVars, $inputVals) {
@@ -86,7 +72,7 @@ class CRM_Utils_JS {
       return preg_quote($v, '/');
     }, $localVars));
     $opening .= '\)\s*\{';
-    $opening = '/^' . $opening . '/';
+    $opening = '/^' . $opening . '\s*(?:"use strict";\s|\'use strict\';\s)?/';
 
     // Example closing: })(angular, CRM.$, CRM._);
     $closing = '\}\s*\)\s*\(\s*';
@@ -123,7 +109,7 @@ class CRM_Utils_JS {
    * @return string
    */
   public static function stripComments($script) {
-    return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
+    return preg_replace("#^\\s*//[^\n]*$(?:\r\n|\n)?#m", "", $script);
   }
 
   /**
@@ -139,25 +125,52 @@ class CRM_Utils_JS {
    * ]
    *
    * @param string $js
+   * @param bool $throwException
    * @return mixed
+   * @throws CRM_Core_Exception
    */
-  public static function decode($js) {
+  public static function decode($js, $throwException = FALSE) {
     $js = trim($js);
     $first = substr($js, 0, 1);
     $last = substr($js, -1);
-    if ($last === $first && ($first === "'" || $first === '"')) {
-      // Use a temp placeholder for escaped backslashes
-      $backslash = chr(0) . 'backslash' . chr(0);
-      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', $backslash], [$backslash, "'", '"', '&', '/', '\\'], substr($js, 1, -1));
+    if ($first === "'" && $last === "'") {
+      $js = self::convertSingleQuoteString($js, $throwException);
     }
-    if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
+    elseif (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
       $obj = self::getRawProps($js);
       foreach ($obj as $idx => $item) {
-        $obj[$idx] = self::decode($item);
+        $obj[$idx] = self::decode($item, $throwException);
       }
       return $obj;
     }
-    return json_decode($js);
+    $result = json_decode($js);
+    if ($throwException && $result === NULL && $js !== 'null') {
+      throw new CRM_Core_Exception(json_last_error_msg());
+    }
+    return $result;
+  }
+
+  /**
+   * @param string $str
+   * @param bool $throwException
+   * @return string|null
+   * @throws CRM_Core_Exception
+   */
+  public static function convertSingleQuoteString(string $str, $throwException) {
+    // json_decode can only handle double quotes around strings, so convert single-quoted strings
+    $backslash = chr(0) . 'backslash' . chr(0);
+    $str = str_replace(['\\\\', '\\"', '"', '\\&', '\\/', $backslash], [$backslash, '"', '\\"', '&', '/', '\\'], substr($str, 1, -1));
+    // Ensure the string doesn't terminate early by checking that all single quotes are escaped
+    $pos = -1;
+    while (($pos = strpos($str, "'", $pos + 1)) !== FALSE) {
+      if (($pos - strlen(rtrim(substr($str, 0, $pos)))) % 2) {
+        if ($throwException) {
+          throw new CRM_Core_Exception('Invalid string passed to CRM_Utils_JS::decode');
+        }
+        return NULL;
+      }
+    }
+    return '"' . $str . '"';
   }
 
   /**
@@ -203,7 +216,7 @@ class CRM_Utils_JS {
    *
    * @param $js
    * @return array
-   * @throws \Exception
+   * @throws Exception
    */
   public static function getRawProps($js) {
     $js = trim($js);

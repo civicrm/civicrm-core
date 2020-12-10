@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be usefusul, but   |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -103,7 +87,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Details of the subscription (recurring contribution) to be altered.
    *
-   * @var array
+   * @var \CRM_Core_DAO
    */
   protected $subscriptionDetails = [];
 
@@ -195,7 +179,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   /**
    * Get details for the recurring contribution being altered.
    *
-   * @return array
+   * @return \CRM_Core_DAO
    */
   public function getSubscriptionDetails() {
     return $this->subscriptionDetails;
@@ -208,21 +192,22 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   protected function getSubscriptionContactID() {
     $sub = $this->getSubscriptionDetails();
-    return isset($sub->contact_id) ? $sub->contact_id : FALSE;
+    return $sub->contact_id ? (int) $sub->contact_id : FALSE;
   }
 
   /**
    * Is this being used by a front end user to update their own recurring.
    *
    * @return bool
+   * @throws \CRM_Core_Exception
    */
   protected function isSelfService() {
-    if (!is_null($this->selfService)) {
+    if ($this->selfService !== NULL) {
       return $this->selfService;
     }
     $this->selfService = FALSE;
     if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+      if ($this->getSubscriptionContactID() !== $this->getContactIDIfAccessingOwnRecord()) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
       }
       $this->selfService = TRUE;

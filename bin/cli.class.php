@@ -211,7 +211,7 @@ class civicrm_cli {
         }
         // all other arguments are parameters
         $key = ltrim($arg, '--');
-        $this->_params[$key] = isset($value) ? $value : NULL;
+        $this->_params[$key] = $value ?? NULL;
       }
     }
     return TRUE;

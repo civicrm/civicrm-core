@@ -5,6 +5,7 @@
   <class>EntityFile</class>
   <name>civicrm_entity_file</name>
   <comment>Attaches (joins) uploaded files (images, documents, etc.) to entities (Contacts, Groups, Actions).</comment>
+  <add>1.5</add>
   <log>true</log>
   <field>
     <name>id</name>

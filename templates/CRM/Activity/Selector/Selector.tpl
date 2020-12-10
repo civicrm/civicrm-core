@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-activity-selector-{$context}">
@@ -54,7 +38,7 @@
     <tr>
       <th data-data="activity_type" class="crm-contact-activity-activity_type">{ts}Type{/ts}</th>
       <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-contact-activity_subject">{ts}Subject{/ts}</th>
-      <th data-data="source_contact_name" class="crm-contact-activity-source_contact">{ts}Added By{/ts}</th>
+      <th data-data="source_contact_name" class="crm-contact-activity-source_contact">{ts}Added by{/ts}</th>
       <th data-data="target_contact_name" data-orderable="false" class="crm-contact-activity-target_contact">{ts}With{/ts}</th>
       <th data-data="assignee_contact_name" data-orderable="false" class="crm-contact-activity-assignee_contact">{ts}Assigned{/ts}</th>
       <th data-data="activity_date_time" class="crm-contact-activity-activity_date_time">{ts}Date{/ts}</th>
@@ -66,7 +50,7 @@
 
   {literal}
     <script type="text/javascript">
-      (function($) {
+      (function($, _) {
         var context = {/literal}"{$context}"{literal};
         CRM.$('table.contact-activity-selector-' + context).data({
           "ajax": {
@@ -83,11 +67,16 @@
           }
         });
         $(function($) {
+          $('table.contact-activity-selector-' + context).on('xhr.dt', function(e, settings, json, xhr) {
+            for (var i=0, ien=json.data.length; i<ien; i++) {
+              json.data[i].subject = _.escape(json.data[i].subject);
+            }
+          });
           $('.activity-search-options :input').change(function(){
-            CRM.$('table.contact-activity-selector-' + context).DataTable().draw();
+            $('table.contact-activity-selector-' + context).DataTable().draw();
           });
         });
-      })(CRM.$);
+      })(CRM.$, CRM._);
     </script>
   {/literal}
   <style type="text/css">

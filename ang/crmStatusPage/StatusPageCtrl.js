@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('statuspage').controller('statuspageStatusPage',
+  angular.module('crmStatusPage').controller('crmStatusPageCtrl',
     function($scope, crmApi, crmStatus, statusData) {
       $scope.ts = CRM.ts();
       $scope.help = CRM.help;
@@ -40,7 +40,7 @@
           }]
         ], 'Set preference');
       };
-      
+
       $scope.countVisible = function(visibility) {
         return _.filter($scope.statuses, function(s) {
           return s.is_visible == visibility && s.severity_id >= 2;

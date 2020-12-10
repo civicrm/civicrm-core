@@ -71,7 +71,7 @@ class CompareCommand {
     foreach ($tests as $test) {
       $values = [];
       foreach ($suites as $suite) {
-        $values[] = isset($suite['results'][$test]) ? $suite['results'][$test] : 'MISSING';
+        $values[] = $suite['results'][$test] ?? 'MISSING';
       }
 
       if (count(array_unique($values)) > 1) {

@@ -1,0 +1,14 @@
+{*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+*}
+{htxt id="civimail-sync-interval-id"}
+  <p>
+    {ts}CiviMail records email sent at the frequency you specify. If you set it to 1, it will update the database every time it sends an email. This ensures that emails are not resent if the batch job fails, but this may cause a performance hit, particularly for large jobs.{/ts}
+  </p>
+{/htxt}

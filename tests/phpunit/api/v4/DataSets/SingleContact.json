@@ -11,13 +11,13 @@
   "Activity": [
     {
       "subject": "Won A Nobel Prize",
-      "activity_type": "Meeting",
+      "activity_type_id:name": "Meeting",
       "source_contact_id": "@ref test_contact_1.id",
       "@ref": "test_activity_1"
     },
     {
       "subject": "Cleaned The House",
-      "activity_type": "Meeting",
+      "activity_type_id:name": "Meeting",
       "source_contact_id": "@ref test_contact_1.id",
       "assignee_contact_id": [
         "@ref test_contact_1.id"

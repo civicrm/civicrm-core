@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -45,22 +27,26 @@ class CustomFieldPreSaveSubscriber extends Generic\PreSaveSubscriber {
 
   public function modify(&$field, AbstractAction $request) {
     if (!empty($field['option_values'])) {
-      $weight = 0;
+      $weight = $key = 0;
+      $field['option_label'] = $field['option_value'] = $field['option_status'] = $field['option_weight'] = [];
+      $field['option_name'] = $field['option_color'] = $field['option_description'] = $field['option_icon'] = [];
       foreach ($field['option_values'] as $key => $value) {
         // Translate simple key/value pairs into full-blown option values
         if (!is_array($value)) {
           $value = [
             'label' => $value,
-            'value' => $key,
-            'is_active' => 1,
-            'weight' => $weight,
+            'id' => $key,
           ];
-          $key = $weight++;
         }
-        $field['option_label'][$key] = $value['label'];
-        $field['option_value'][$key] = $value['value'];
-        $field['option_status'][$key] = $value['is_active'];
-        $field['option_weight'][$key] = $value['weight'];
+        $weight++;
+        $field['option_label'][] = $value['label'] ?? $value['name'];
+        $field['option_name'][] = $value['name'] ?? NULL;
+        $field['option_value'][] = $value['id'];
+        $field['option_status'][] = $value['is_active'] ?? 1;
+        $field['option_weight'][] = $value['weight'] ?? $weight;
+        $field['option_color'][] = $value['color'] ?? NULL;
+        $field['option_description'][] = $value['description'] ?? NULL;
+        $field['option_icon'][] = $value['icon'] ?? NULL;
       }
     }
     $field['option_type'] = !empty($field['option_values']);

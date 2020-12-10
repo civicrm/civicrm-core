@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing group (name and description only)  *}
@@ -42,25 +26,23 @@
       </td>
     </tr>
 
-    {if $group.created_by}
-      <tr class="crm-group-form-block-created">
-        <td class="label">{ts}Created By{/ts}</td>
-        <td>{$group.created_by}</td>
-      </tr>
-    {/if}
-
-    {if $group.modified_by}
-      <tr class="crm-group-form-block-modified">
-        <td class="label">{ts}Modified By{/ts}</td>
-        <td>{$group.modified_by}</td>
-      </tr>
-    {/if}
-
     <tr class="crm-group-form-block-description">
       <td class="label">{$form.description.label}</td>
-      <td>{$form.description.html}<br />
-        <span class="description">{ts}Group description is displayed when groups are listed in Profiles and Mailing List Subscribe forms.{/ts}</span>
+      <td>{$form.description.html}</td>
+    </tr>
+
+    <tr><td colspan="2">If either of the following fields are filled out they will be used instead of the title or description field in profiles and Mailing List Subscription/unsubscribe forms</td></tr>
+
+    <tr class="crm-group-form-block-frontend-title">
+      <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_title' id=$group.id}{/if}</td>
+      <td>{$form.frontend_title.html|crmAddClass:huge}
+        {if $group.saved_search_id}&nbsp;({ts}Smart Group{/ts}){/if}
       </td>
+    </tr>
+
+    <tr class="crm-group-form-block-frontend-description">
+      <td class="label">{$form.frontend_description.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_description' id=$group.id}{/if}</td>
+      <td>{$form.frontend_description.html}</td>
     </tr>
 
     {if $form.group_type}
@@ -87,6 +69,21 @@
       <td>{$form.is_active.html}</td>
     </tr>
 
+   {if $group.created_by}
+      <tr class="crm-group-form-block-created">
+        <td class="label">{ts}Created By{/ts}</td>
+        <td>{$group.created_by}</td>
+      </tr>
+    {/if}
+
+    {if $group.modified_by}
+      <tr class="crm-group-form-block-modified">
+        <td class="label">{ts}Modified By{/ts}</td>
+        <td>{$group.modified_by}</td>
+      </tr>
+    {/if}
+
+
     <tr>
       <td colspan=2>{include file="CRM/Custom/Form/CustomData.tpl"}</td>
     </tr>
@@ -98,29 +95,22 @@
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
   {if $action neq 1}
     <div class="action-link">
-      <a {$crmURL}>&raquo; {ts}Contacts in this Group{/ts}</a>
-      {if $group.saved_search_id}
+      <a {$crmURL}><i class="crm-i fa-users" aria-hidden="true"></i> {ts}Contacts in this Group{/ts}</a>
+      {if $editSmartGroupURL}
         <br />
-        {if $group.mapping_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {elseif $group.search_custom_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {else}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
-        {/if}
-
+        <a class="no-popup" href="{$editSmartGroupURL}"><i class="crm-i fa-pencil" aria-hidden="true"></i> {ts}Edit Smart Group Criteria{/ts}</a>
       {/if}
     </div>
   {/if}
 
   {literal}
   <script type="text/javascript">
-    {/literal}{if $freezeMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailignList}{literal}]"]').prop('disabled',true);
+    {/literal}{if $freezeMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailingList}{literal}]"]').prop('disabled',true);
     {/literal}{/if}{literal}
-    {/literal}{if $hideMailignList}{literal}
-    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
-    cj('label[for="group_type[{/literal}{$hideMailignList}{literal}]"]').hide();
+    {/literal}{if $hideMailingList}{literal}
+    cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
+    cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}
   </script>
   {/literal}

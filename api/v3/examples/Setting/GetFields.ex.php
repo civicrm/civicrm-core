@@ -234,7 +234,6 @@ function setting_getfields_expectedresult() {
         'type' => 'Array',
         'default' => [
           'invoice_prefix' => 'INV_',
-          'credit_notes_prefix' => 'CN_',
           'due_date' => '10',
           'due_date_period' => 'days',
           'notes' => '',
@@ -2776,7 +2775,7 @@ function setting_getfields_expectedresult() {
         'html_type' => 'text',
         'default' => 'simple',
         'add' => '4.5',
-        'title' => 'How to handle full-tet queries',
+        'title' => 'How to handle full-text queries',
         'is_domain' => 1,
         'is_contact' => 0,
         'description' => '',

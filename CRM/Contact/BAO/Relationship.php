@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,6 +26,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * Note: the slightly non-obvious ordering is due to history...
    */
   const NONE = 0, EDIT = 1, VIEW = 2;
+
+  /**
+   * The list of column headers
+   * @var array
+   */
+  private static $columnHeaders;
 
   /**
    * Create function - use the API instead.
@@ -298,7 +288,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
     CRM_Utils_Hook::pre($hook, 'Relationship', $params['id'], $params);
 
-    $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
+    $relationshipTypes = $params['relationship_type_id'] ?? NULL;
     // explode the string with _ to get the relationship type id
     // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
@@ -485,14 +475,14 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       throw new CRM_Core_Exception('Cannot create relationship, insufficient contact IDs provided');
     }
     if (isset($params['relationship_type_id']) && !is_numeric($params['relationship_type_id'])) {
-      $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
+      $relationshipTypes = $params['relationship_type_id'] ?? NULL;
       list($relationshipTypeID, $first) = explode('_', $relationshipTypes);
       $returnFields['relationship_type_id'] = $relationshipTypeID;
 
       foreach (['a', 'b'] as $contactLetter) {
         if (empty($params['contact_' . $contactLetter])) {
           if ($first == $contactLetter) {
-            $returnFields['contact_id_' . $contactLetter] = CRM_Utils_Array::value('contact', $ids);
+            $returnFields['contact_id_' . $contactLetter] = $ids['contact'] ?? NULL;
           }
           else {
             $returnFields['contact_id_' . $contactLetter] = $contactID;
@@ -526,16 +516,11 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * Check if there is data to create the object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
    *
    * @return bool
    */
-  public static function dataExists(&$params) {
-    // return if no data present
-    if (!is_array(CRM_Utils_Array::value('contact_check', $params))) {
-      return FALSE;
-    }
-    return TRUE;
+  public static function dataExists($params) {
+    return (isset($params['contact_check']) && is_array($params['contact_check']));
   }
 
   /**
@@ -725,14 +710,17 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id
    *   Relationship id.
    *
-   * @return null
+   * @return CRM_Contact_DAO_Relationship
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function del($id) {
     // delete from relationship table
-    CRM_Utils_Hook::pre('delete', 'Relationship', $id, CRM_Core_DAO::$_nullArray);
+    CRM_Utils_Hook::pre('delete', 'Relationship', $id);
 
     $relationship = self::clearCurrentEmployer($id, CRM_Core_Action::DELETE);
+    $relationship->delete();
     if (CRM_Core_Permission::access('CiviMember')) {
       // create $params array which isrequired to delete memberships
       // of the related contacts.
@@ -752,7 +740,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       );
     }
 
-    $relationship->delete();
     CRM_Core_Session::setStatus(ts('Selected relationship has been deleted successfully.'), ts('Record Deleted'), 'success');
 
     CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
@@ -779,6 +766,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param bool $active
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function disableEnableRelationship($id, $action, $params = [], $ids = [], $active = FALSE) {
     $relationship = self::clearCurrentEmployer($id, $action);
@@ -796,6 +784,8 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       // calling relatedMemberships to delete/add the memberships of
       // related contacts.
       if ($action & CRM_Core_Action::DISABLE) {
+        // @todo this could call a subset of the function that just relates to
+        // cleaning up no-longer-inherited relationships
         CRM_Contact_BAO_Relationship::relatedMemberships($contact_id_a,
           $params,
           $ids,
@@ -839,7 +829,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * @param int $id
    *   Relationship id.
    *
-   * $returns  returns the contact ids in the realtionship
+   * $returns  returns the contact ids in the relationship
    *
    * @return \CRM_Contact_DAO_Relationship
    */
@@ -936,7 +926,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *   true if record exists else false
    */
   public static function checkDuplicateRelationship(&$params, $id, $contactId = 0, $relationshipId = 0) {
-    $relationshipTypeId = CRM_Utils_Array::value('relationship_type_id', $params);
+    $relationshipTypeId = $params['relationship_type_id'] ?? NULL;
     list($type) = explode('_', $relationshipTypeId);
 
     $queryString = "
@@ -993,8 +983,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       $queryString .= " AND id !=" . CRM_Utils_Type::escape($relationshipId, 'Integer');
     }
 
-    $relationship = new CRM_Contact_BAO_Relationship();
-    $relationship->query($queryString);
+    $relationship = CRM_Core_DAO::executeQuery($queryString);
     while ($relationship->fetch()) {
       // Check whether the custom field values are identical.
       $result = self::checkDuplicateCustomFields($params, $relationship->id);
@@ -1129,14 +1118,16 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
    *
    * @return array
    *   [select, from, where]
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function makeURLClause($contactId, $status, $numRelationship, $count, $relationshipId, $direction, $params = []) {
     $select = $from = $where = '';
 
     $select = '( ';
     if ($count) {
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $select .= ' SELECT count(DISTINCT civicrm_relationship.id) as cnt1, 0 as cnt2 ';
       }
       else {
@@ -1171,7 +1162,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
                               civicrm_relationship.is_permission_b_a as is_permission_b_a,
                               civicrm_relationship.case_id as case_id';
 
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $select .= ', civicrm_relationship_type.label_a_b as label_a_b,
                               civicrm_relationship_type.label_b_a as relation ';
       }
@@ -1181,11 +1172,11 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       }
     }
 
-    $from = "
+    $from = '
       FROM  civicrm_relationship
 INNER JOIN  civicrm_relationship_type ON ( civicrm_relationship.relationship_type_id = civicrm_relationship_type.id )
-INNER JOIN  civicrm_contact ";
-    if ($direction == 'a_b') {
+INNER JOIN  civicrm_contact ';
+    if ($direction === 'a_b') {
       $from .= 'ON ( civicrm_contact.id = civicrm_relationship.contact_id_a ) ';
     }
     else {
@@ -1193,18 +1184,18 @@ INNER JOIN  civicrm_contact ";
     }
 
     if (!$count) {
-      $from .= "
+      $from .= '
 LEFT JOIN  civicrm_address ON (civicrm_address.contact_id = civicrm_contact.id AND civicrm_address.is_primary = 1)
 LEFT JOIN  civicrm_phone   ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary = 1)
 LEFT JOIN  civicrm_email   ON (civicrm_email.contact_id = civicrm_contact.id AND civicrm_email.is_primary = 1)
 LEFT JOIN  civicrm_state_province ON (civicrm_address.state_province_id = civicrm_state_province.id)
 LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
-";
+';
     }
 
     $where = 'WHERE ( 1 )';
     if ($contactId) {
-      if ($direction == 'a_b') {
+      if ($direction === 'a_b') {
         $where .= ' AND civicrm_relationship.contact_id_b = ' . CRM_Utils_Type::escape($contactId, 'Positive');
       }
       else {
@@ -1250,7 +1241,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $where .= ' AND relationship_type_id = ' . CRM_Utils_Type::escape($params['relationship_type_id'], 'Positive');
       }
     }
-    if ($direction == 'a_b') {
+    if ($direction === 'a_b') {
       $where .= ' ) UNION ';
     }
     else {
@@ -1284,7 +1275,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    *
    * @return array|int
    *   relationship records
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getRelationship(
     $contactId = NULL,
@@ -1473,7 +1466,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               if ($values[$rid]['rtype'] == 'b_a') {
                 $replace['clientid'] = $values[$rid]['cid'];
               }
-              $values[$rid]['case'] = '<a href="' . CRM_Utils_System::url('civicrm/case/ajax/details', sprintf('caseId=%d&cid=%d&snippet=4', $values[$rid]['case_id'], $values[$rid]['cid'])) . '" class="action-item crm-hover-button crm-summary-link"><i class="crm-i fa-folder-open-o"></i></a>';
+              $values[$rid]['case'] = '<a href="' . CRM_Utils_System::url('civicrm/case/ajax/details', sprintf('caseId=%d&cid=%d&snippet=4', $values[$rid]['case_id'], $values[$rid]['cid'])) . '" class="action-item crm-hover-button crm-summary-link"><i class="crm-i fa-folder-open-o" aria-hidden="true"></i></a>';
             }
           }
 
@@ -1495,13 +1488,14 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
   }
 
   /**
-   * Get get list of relationship type based on the target contact type.
+   * Get list of relationship type based on the target contact type.
+   * Both directions of relationships are included if their labels are not the same.
    *
    * @param string $targetContactType
-   *   It's valid contact tpye(may be Individual , Organization , Household).
+   *   A valid contact type (may be Individual, Organization, Household).
    *
    * @return array
-   *   array reference of all relationship types with context to current contact type .
+   *   array reference of all relationship types with context to current contact type.
    */
   public static function getRelationType($targetContactType) {
     $relationshipType = [];
@@ -1510,6 +1504,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     foreach ($allRelationshipType as $key => $type) {
       if ($type['contact_type_b'] == $targetContactType || empty($type['contact_type_b'])) {
         $relationshipType[$key . '_a_b'] = $type['label_a_b'];
+      }
+      if (($type['contact_type_a'] == $targetContactType || empty($type['contact_type_a']))
+        && $type['label_a_b'] != $type['label_b_a']
+      ) {
+        $relationshipType[$key . '_b_a'] = $type['label_b_a'];
       }
     }
 
@@ -1584,7 +1583,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $contact = $contactId;
     }
     elseif ($action & CRM_Core_Action::UPDATE) {
-      $contact = $ids['contact'];
+      $contact = (int) $ids['contact'];
       $targetContact = [$ids['contactTarget'] => 1];
     }
 
@@ -1623,77 +1622,17 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       }
     }
 
-    // CRM-15829 UPDATES
-    // If we're looking for active memberships we must consider pending (id: 5) ones too.
-    // Hence we can't just call CRM_Member_BAO_Membership::getValues below with the active flag, is it would completely miss pending relatioships.
-    // As suggested by @davecivicrm, the pending status id is fetched using the CRM_Member_PseudoConstant::membershipStatus() class and method, since these ids differ from system to system.
-    $pendingStatusId = array_search('Pending', CRM_Member_PseudoConstant::membershipStatus());
-
-    $query = 'SELECT * FROM `civicrm_membership_status`';
-    if ($active) {
-      $query .= ' WHERE `is_current_member` = 1 OR `id` = %1 ';
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$pendingStatusId, 'Integer']]);
-
-    while ($dao->fetch()) {
-      $membershipStatusRecordIds[$dao->id] = $dao->id;
-    }
-
-    // Now get the active memberships for all the contacts.
-    // If contact have any valid membership(s), then add it to
-    // 'values' array.
-    foreach ($values as $cid => $subValues) {
-      $memParams = ['contact_id' => $cid];
-      $memberships = [];
-
-      // CRM-15829 UPDATES
-      // Since we want PENDING memberships as well, the $active flag needs to be set to false so that this will return all memberships and we can then filter the memberships based on the status IDs recieved above.
-      CRM_Member_BAO_Membership::getValues($memParams, $memberships, FALSE, TRUE);
-
-      // CRM-15829 UPDATES
-      // filter out the memberships returned by CRM_Member_BAO_Membership::getValues based on the status IDs fetched on line ~1462
-      foreach ($memberships as $key => $membership) {
-
-        if (!isset($memberships[$key]['status_id'])) {
-          continue;
-        }
-
-        $membershipStatusId = $memberships[$key]['status_id'];
-        if (!isset($membershipStatusRecordIds[$membershipStatusId])) {
-          unset($memberships[$key]);
-        }
-      }
-
-      if (empty($memberships)) {
-        continue;
-      }
-
-      //get ownerMembershipIds for related Membership
-      //this is to handle memberships being deleted and recreated
-      if (!empty($memberships['owner_membership_ids'])) {
-        $ownerMemIds[$cid] = $memberships['owner_membership_ids'];
-        unset($memberships['owner_membership_ids']);
-      }
-
-      $values[$cid]['memberships'] = $memberships;
-    }
     $deceasedStatusId = array_search('Deceased', CRM_Member_PseudoConstant::membershipStatus());
 
-    // done with 'values' array.
-    // Finally add / edit / delete memberships for the related contacts
-
+    $relationshipProcessor = new CRM_Member_Utils_RelationshipProcessor(array_keys($values), $active);
     foreach ($values as $cid => $details) {
-      if (!array_key_exists('memberships', $details)) {
-        continue;
-      }
-
       $relatedContacts = array_keys(CRM_Utils_Array::value('relatedContacts', $details, []));
       $mainRelatedContactId = reset($relatedContacts);
 
-      foreach ($details['memberships'] as $membershipId => $membershipValues) {
+      foreach ($relationshipProcessor->getRelationshipMembershipsForContact((int) $cid) as $membershipId => $membershipValues) {
         $membershipInherittedFromContactID = NULL;
         if (!empty($membershipValues['owner_membership_id'])) {
+          // @todo - $membership already has this now.
           // Use get not getsingle so that we get e-notice noise but not a fatal is the membership has already been deleted.
           $inheritedFromMembership = civicrm_api3('Membership', 'get', ['id' => $membershipValues['owner_membership_id'], 'sequential' => 1])['values'][0];
           $membershipInherittedFromContactID = (int) $inheritedFromMembership['contact_id'];
@@ -1701,9 +1640,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
-          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid, $mainRelatedContactId);
+          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid);
           if ($isDeletable) {
-            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
+            CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['contact_id']);
           }
           continue;
         }
@@ -1714,7 +1653,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
           // If relationship is PAST and action is UPDATE
           // then delete the RELATED membership
           CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'],
-            $membershipValues['membership_contact_id']
+            $membershipValues['contact_id']
           );
           continue;
         }
@@ -1722,15 +1661,16 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         // add / edit the memberships for related
         // contacts.
 
+        // @todo - all these lines get 'relTypeDirs' - but it's already a key in the $membership array.
         // Get the Membership Type Details.
-        $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipValues['membership_type_id']);
+        $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
         // Check if contact's relationship type exists in membership type
         $relTypeDirs = [];
         if (!empty($membershipType['relationship_type_id'])) {
-          $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
+          $relTypeIds = (array) $membershipType['relationship_type_id'];
         }
         if (!empty($membershipType['relationship_direction'])) {
-          $relDirections = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
+          $relDirections = (array) $membershipType['relationship_direction'];
         }
         foreach ($relTypeIds as $key => $value) {
           $relTypeDirs[] = $value . '_' . $relDirections[$key];
@@ -1743,7 +1683,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
 
           $membershipValues['owner_membership_id'] = $membershipId;
           unset($membershipValues['id']);
-          unset($membershipValues['membership_contact_id']);
           unset($membershipValues['contact_id']);
           unset($membershipValues['membership_id']);
           foreach ($details['relatedContacts'] as $relatedContactId => $donCare) {
@@ -1754,17 +1693,12 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               $membershipValues['status_id'] = $deceasedStatusId;
               $membershipValues['skipStatusCal'] = TRUE;
             }
-            foreach (['join_date', 'start_date', 'end_date'] as $dateField) {
-              if (!empty($membershipValues[$dateField])) {
-                $membershipValues[$dateField] = CRM_Utils_Date::processDate($membershipValues[$dateField]);
-              }
-            }
 
-            if ($action & CRM_Core_Action::UPDATE) {
+            if (in_array($action, [CRM_Core_Action::UPDATE, CRM_Core_Action::ADD, CRM_Core_Action::ENABLE])) {
               //if updated relationship is already related to contact don't delete existing inherited membership
-              if (in_array($relTypeId, $relTypeIds
-                ) && !empty($values[$relatedContactId]['memberships']) && !empty($ownerMemIds
-                ) && in_array($membershipValues['owner_membership_id'], $ownerMemIds[$relatedContactId])) {
+              if (in_array((int) $relatedContactId, $membershipValues['inheriting_contact_ids'], TRUE)
+                || $relatedContactId === $membershipValues['owner_contact_id']
+              ) {
                 continue;
               }
 
@@ -1773,7 +1707,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipId, $relatedContactId);
             }
             //skip status calculation for pay later memberships.
-            if (!empty($membershipValues['status_id']) && $membershipValues['status_id'] == $pendingStatusId) {
+            if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipValues['status_id'])) {
               $membershipValues['skipStatusCal'] = TRUE;
             }
             // As long as the membership itself was not created by inheritance from the same contact
@@ -1794,7 +1728,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
             $relIds = [$params['id']];
           }
           else {
-            $relIds = CRM_Utils_Array::value('relationship_ids', $params);
+            $relIds = $params['relationship_ids'] ?? NULL;
           }
           if (self::isRelatedMembershipExpired($relTypeIds, $contactId, $mainRelatedContactId, $relTypeId,
               $relIds) && !empty($membershipValues['owner_membership_id']
@@ -1962,14 +1896,15 @@ AND cc.sort_name LIKE '%$name%'";
   public static function mergeRelationships($mainId, $otherId, &$sqls) {
     // Delete circular relationships
     $sqls[] = "DELETE FROM civicrm_relationship
-      WHERE (contact_id_a = $mainId AND contact_id_b = $otherId)
-         OR (contact_id_b = $mainId AND contact_id_a = $otherId)";
+      WHERE (contact_id_a = $mainId AND contact_id_b = $otherId AND case_id IS NULL)
+         OR (contact_id_b = $mainId AND contact_id_a = $otherId AND case_id IS NULL)";
 
     // Delete relationship from other contact if main contact already has that relationship
     $sqls[] = "DELETE r2
       FROM civicrm_relationship r1, civicrm_relationship r2
       WHERE r1.relationship_type_id = r2.relationship_type_id
       AND r1.id <> r2.id
+      AND r1.case_id IS NULL AND r2.case_id IS NULL
       AND (
         r1.contact_id_a = $mainId AND r2.contact_id_a = $otherId AND r1.contact_id_b = r2.contact_id_b
         OR r1.contact_id_b = $mainId AND r2.contact_id_b = $otherId AND r1.contact_id_a = r2.contact_id_a
@@ -2075,7 +2010,7 @@ AND cc.sort_name LIKE '%$name%'";
   public static function getContactRelationshipSelector(&$params) {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
-    $params['sort'] = CRM_Utils_Array::value('sortBy', $params);
+    $params['sort'] = $params['sortBy'] ?? NULL;
 
     if ($params['context'] == 'past') {
       $relationshipStatus = CRM_Contact_BAO_Relationship::INACTIVE;
@@ -2200,12 +2135,69 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
 
+    $columnHeaders = self::getColumnHeaders();
+    $selector = NULL;
+    CRM_Utils_Hook::searchColumns('relationship.rows', $columnHeaders, $contactRelationships, $selector);
+
     $relationshipsDT = [];
     $relationshipsDT['data'] = $contactRelationships;
     $relationshipsDT['recordsTotal'] = $params['total'];
     $relationshipsDT['recordsFiltered'] = $params['total'];
 
     return $relationshipsDT;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getColumnHeaders() {
+    return [
+      'relation' => [
+        'name' => ts('Relationship'),
+        'sort' => 'relation',
+        'direction' => CRM_Utils_Sort::ASCENDING,
+      ],
+      'sort_name' => [
+        'name' => '',
+        'sort' => 'sort_name',
+        'direction' => CRM_Utils_Sort::ASCENDING,
+      ],
+      'start_date' => [
+        'name' => ts('Start'),
+        'sort' => 'start_date',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'end_date' => [
+        'name' => ts('End'),
+        'sort' => 'end_date',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'city' => [
+        'name' => ts('City'),
+        'sort' => 'city',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'state' => [
+        'name' => ts('State/Prov'),
+        'sort' => 'state',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'email' => [
+        'name' => ts('Email'),
+        'sort' => 'email',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'phone' => [
+        'name' => ts('Phone'),
+        'sort' => 'phone',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'links' => [
+        'name' => '',
+        'sort' => 'links',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+    ];
   }
 
   /**
@@ -2235,11 +2227,11 @@ AND cc.sort_name LIKE '%$name%'";
    * @return array
    */
   public static function buildRelationshipTypeOptions($params = []) {
-    $contactId = CRM_Utils_Array::value('contact_id', $params);
+    $contactId = $params['contact_id'] ?? NULL;
     $direction = CRM_Utils_Array::value('relationship_direction', $params, 'a_b');
-    $relationshipId = CRM_Utils_Array::value('relationship_id', $params);
-    $contactType = CRM_Utils_Array::value('contact_type', $params);
-    $isForm = CRM_Utils_Array::value('is_form', $params);
+    $relationshipId = $params['relationship_id'] ?? NULL;
+    $contactType = $params['contact_type'] ?? NULL;
+    $isForm = $params['is_form'] ?? NULL;
     $showAll = FALSE;
 
     // getContactRelationshipType will return an empty set if these are not set
@@ -2341,21 +2333,85 @@ AND cc.sort_name LIKE '%$name%'";
    * @param $membershipValues
    * @param array $values
    * @param int $cid
-   * @param int $mainRelatedContactId
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid, $mainRelatedContactId): array {
+  private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid): array {
+    // @todo most of this can go - it's just the weird historical returning of $relTypeId that it does.
+    // now we have caching the parent fn can just call CRM_Member_BAO_MembershipType::getMembershipType
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
     $relTypeIds = $membershipType['relationship_type_id'];
-    $membshipInheritedFrom = $membershipValues['owner_membership_id'] ?? NULL;
-    if (!$membshipInheritedFrom || !in_array($values[$cid]['relationshipTypeId'], $relTypeIds)) {
+    $membershipInheritedFrom = $membershipValues['owner_membership_id'] ?? NULL;
+    if (!$membershipInheritedFrom || !in_array($values[$cid]['relationshipTypeId'], $relTypeIds)) {
       return [implode(',', $relTypeIds), FALSE];
     }
     //CRM-16300 check if owner membership exist for related membership
-    $isDeletable = !empty($values[$mainRelatedContactId]['memberships'][$membshipInheritedFrom]);
-    return [implode(',', $relTypeIds), $isDeletable];
+    return [implode(',', $relTypeIds), !self::isContactHasValidRelationshipToInheritMembershipType((int) $cid, (int) $membershipValues['membership_type_id'], (int) $membershipValues['owner_membership_id'])];
+  }
+
+  /**
+   * Is there a valid relationship confering this membership type on this contact.
+   *
+   * @param int $contactID
+   * @param int $membershipTypeID
+   * @param int $parentMembershipID
+   *   Id of the membership being inherited.
+   *
+   * @return bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function isContactHasValidRelationshipToInheritMembershipType(int $contactID, int $membershipTypeID, int $parentMembershipID): bool {
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
+    $existingRelationships = civicrm_api3('Relationship', 'get', [
+      'contact_id_a' => $contactID,
+      'contact_id_b' => $contactID,
+      'relationship_type_id' => ['IN' => $membershipType['relationship_type_id']],
+      'options' => ['or' => [['contact_id_a', 'contact_id_b']], 'limit' => 0],
+      'is_active' => 1,
+    ])['values'];
+
+    if (empty($existingRelationships)) {
+      return FALSE;
+    }
+
+    $membershipInheritedFromContactID = (int) civicrm_api3('Membership', 'getvalue', ['return' => 'contact_id', 'id' => $parentMembershipID]);
+    // I don't think the api can correctly filter by start & end because of handling for NULL
+    // so we filter them out here.
+    foreach ($existingRelationships as $index => $existingRelationship) {
+      $otherContactID = (int) (($contactID === (int) $existingRelationship['contact_id_a']) ? $existingRelationship['contact_id_b'] : $existingRelationship['contact_id_a']);
+      if (!empty($existingRelationship['start_date'])
+        && strtotime($existingRelationship['start_date']) > time()
+      ) {
+        unset($existingRelationships[$index]);
+        continue;
+      }
+      if (!empty($existingRelationship['end_date'])
+        && strtotime($existingRelationship['end_date']) < time()
+      ) {
+        unset($existingRelationships[$index]);
+        continue;
+      }
+      if ($membershipInheritedFromContactID !== $otherContactID
+      ) {
+        // This is a weird scenario - they have been inheriting the  membership
+        // just not from this relationship - and some max_related calcs etc would be required
+        // - ie because they are no longer inheriting from this relationship's 'allowance'
+        // and now are inheriting from the other relationships  'allowance', if it has not
+        // already hit 'max_related'
+        // For now ignore here & hope it's handled elsewhere - at least that's consistent with
+        // before this function was added.
+        unset($existingRelationships[$index]);
+        continue;
+      }
+      if (!civicrm_api3('Contact', 'getcount', ['id' => $otherContactID, 'is_deleted' => 0])) {
+        // Can't inherit from a deleted contact.
+        unset($existingRelationships[$index]);
+        continue;
+      }
+    }
+    return !empty($existingRelationships);
   }
 
   /**
@@ -2376,7 +2432,7 @@ SELECT count(*)
     AND is_current_member = 1";
     $result = CRM_Core_DAO::singleValueQuery($query);
     if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
-      CRM_Member_BAO_Membership::create($membershipValues);
+      civicrm_api3('Membership', 'create', $membershipValues);
     }
     return $membershipValues;
   }

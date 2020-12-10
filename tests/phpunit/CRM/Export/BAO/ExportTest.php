@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Core_DAOTest
  *
@@ -46,6 +48,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected $locationTypes = [];
 
   /**
+   * Should location types be checked to ensure primary addresses are correctly assigned after each test.
+   *
+   * @var bool
+   */
+  protected $isLocationTypesOnPostAssert = TRUE;
+
+  /**
    * Processor generated in test.
    *
    * @var \CRM_Export_BAO_ExportProcessor
@@ -80,6 +89,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_activity',
       'civicrm_campaign',
     ]);
+    OptionValue::update()->addWhere('name', '=', 'Much Much longer than just phone')->setValues(['label' => 'Mobile'])->execute();
 
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
@@ -277,9 +287,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Country' => 'Netherlands',
       'Phone' => '',
       'Phone Extension' => '',
+      'Phone Type ID' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
-      'On Hold' => '',
+      'On Hold' => 'No',
       'Use for Bulk Mail' => '',
       'Signature Text' => '',
       'Signature Html' => '',
@@ -303,7 +314,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Campaign ID' => '',
       'Status Override' => '',
       'Total Amount' => '200.00',
-      'Contribution Status' => 'Pending',
+      'Contribution Status' => 'Pending Label**',
       'Date Received' => '2019-07-25 07:34:23',
       'Payment Method' => 'Check',
       'Transaction ID' => '',
@@ -646,7 +657,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'mergeSameHousehold' => TRUE,
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals(1, count($this->csv));
+    $this->assertCount(1, $this->csv);
     $this->assertEquals('Portland', $row['City']);
     $this->assertEquals('ME', $row['State']);
     $this->assertEquals($householdID, $row['Household ID']);
@@ -675,23 +686,33 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Test custom data exporting.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
   public function testExportCustomData() {
     $this->setUpContactExportData();
     $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
+    $longString = 'Blah';
+    for ($i = 0; $i < 70; $i++) {
+      $longString .= 'Blah';
+    }
+    $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
+
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
-      $this->getCustomFieldName('text') => 'BlahdeBlah',
+      $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',
+      $this->getCustomFieldName('select_string') => 'blah',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
       ['name' => $this->getCustomFieldName('text')],
       ['name' => $this->getCustomFieldName('country')],
+      ['name' => $this->getCustomFieldName('select_string')],
     ];
 
     $this->doExportTest([
@@ -699,9 +720,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'ids' => [$this->contactIDs[1]],
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals('BlahdeBlah', $row['Enter text here']);
+    $this->assertEquals($longString, $row['Enter text here']);
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
+    $this->assertEquals($longString, $row['Pick Color']);
   }
 
   /**
@@ -712,7 +734,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportIMData() {
     // Use default providers.
-    $providers = ['AIM', 'GTalk', 'Jabber', 'MSN', 'Skype', 'Yahoo'];
+    $providers = ['Aim', 'Gtalk', 'Jabber', 'Msn', 'Skype', 'Yahoo'];
     // Main sure labels are not all anglo chars.
     $this->diversifyLocationTypes();
 
@@ -752,47 +774,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
     }
 
-    $fields = [['Individual', 'contact_id']];
+    $fields = [['name' => 'contact_id']];
     // ' ' denotes primary location type.
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
-      $fields[] = [
-        'Individual',
-        'im_provider',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-      ];
+      $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType);
+      $fields[] = ['name' => 'im_provider', 'location_type_id' => $locationTypeID];
       foreach ($relationships as $contactID => $relationship) {
-        $fields[] = [
-          'Individual',
-          $relationship['relationship_type_id'] . '_a_b',
-          'im_provider',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-        ];
+        $fields[] = ['name' => 'im_provider', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
       }
       foreach ($providers as $provider) {
-        $fields[] = [
-          'Individual',
-          'im',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider),
-        ];
+        $providerID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider);
+        $fields[] = ['name' => 'im', 'location_type_id' => $locationTypeID, 'im_provider_id' => $providerID];
         foreach ($relationships as $contactID => $relationship) {
-          $fields[] = [
-            'Individual',
-            $relationship['relationship_type_id'] . '_a_b',
-            'im',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'provider_id', $provider),
-          ];
+          $fields[] = ['name' => 'im', 'location_type_id' => $locationTypeID, 'im_provider_id' => $providerID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b'];
         }
       }
     }
 
-    // @todo switch to just declaring the new format....
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
 
     foreach ($this->csv->getRecords() as $row) {
       $id = $row['Contact ID'];
@@ -813,12 +812,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * Less over the top complete than the im test.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \League\Csv\Exception
    */
   public function testExportPhoneData() {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->individualCreate();
+
+    OptionValue::update()->addWhere('name', '=', 'Mobile')->setValues(['label' => 'Much Much longer than just phone'])->execute();
     $locationTypes = ['Billing' => 'Billing', 'Home' => 'Home'];
     $phoneTypes = ['Mobile', 'Phone'];
     foreach ($this->contactIDs as $contactID) {
@@ -852,57 +855,34 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
     }
 
-    $fields = [['Individual', 'contact_id']];
+    $fields = [];
     // ' ' denotes primary location type.
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
-      $fields[] = [
-        'Individual',
-        'phone',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-      ];
-      $fields[] = [
-        'Individual',
-        'phone_type_id',
-        CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-      ];
+      $locationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType);
+      $fields[] = ['name' => 'phone', 'location_type_id' => $locationTypeID];
+      $fields[] = ['name' => 'phone_type', 'location_type_id' => $locationTypeID];
+      $fields[] = ['name' => 'phone_type_id', 'location_type_id' => $locationTypeID];
       foreach ($relationships as $contactID => $relationship) {
-        $fields[] = [
-          'Individual',
-          $relationship['relationship_type_id'] . '_a_b',
-          'phone_type_id',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-        ];
+        $fields[] = ['name' => 'phone_type_id', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
+        $fields[] = ['name' => 'phone_type', 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
       }
       foreach ($phoneTypes as $phoneType) {
-        $fields[] = [
-          'Individual',
-          'phone',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
-        ];
+        $phoneTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType);
+        $fields[] = ['name' => 'phone', 'phone_type_id' => $phoneTypeID, 'location_type_id' => $locationTypeID];
         foreach ($relationships as $contactID => $relationship) {
-          $fields[] = [
-            'Individual',
-            $relationship['relationship_type_id'] . '_a_b',
-            'phone_type_id',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'location_type_id', $locationType),
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', $phoneType),
-          ];
+          $fields[] = ['name' => 'phone_type_id', 'phone_type_id' => $phoneTypeID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
+          $fields[] = ['name' => 'phone_type', 'phone_type_id' => $phoneTypeID, 'relationship_type_id' => $relationship['relationship_type_id'], 'relationship_direction' => 'a_b', 'location_type_id' => $locationTypeID];
         }
       }
     }
-    // @todo switch to just declaring the new format....
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
+
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
-      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
+      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Much Much longer than just phone']);
       $this->assertEquals('', $row['Billing-Phone-Phone']);
-      $this->assertEquals('Phone', $row['Spouse of-Phone Type']);
-      $this->assertEquals('Mobile', $row['Phone Type']);
-      $this->assertEquals('Mobile', $row['Billing-Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Spouse of-Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Phone Type']);
+      $this->assertEquals('Much Much longer than just phone', $row['Billing-Phone Type']);
     }
   }
 
@@ -981,40 +961,40 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
 
     $this->assertEquals([
-      'contact_id' => 'contact_id varchar(16)',
-      'billing_city' => 'billing_city varchar(64)',
-      'billing_street_address' => 'billing_street_address varchar(96)',
-      'billing_postal_code' => 'billing_postal_code varchar(64)',
-      'home_city' => 'home_city varchar(64)',
-      'home_street_address' => 'home_street_address varchar(96)',
-      'home_postal_code' => 'home_postal_code varchar(64)',
-      'main_city' => 'main_city varchar(64)',
-      'main_street_address' => 'main_street_address varchar(96)',
-      'main_postal_code' => 'main_postal_code varchar(64)',
-      'other_city' => 'other_city varchar(64)',
-      'other_street_address' => 'other_street_address varchar(96)',
-      'other_postal_code' => 'other_postal_code varchar(64)',
-      'whare_kai_city' => 'whare_kai_city varchar(64)',
-      'whare_kai_street_address' => 'whare_kai_street_address varchar(96)',
-      'whare_kai_postal_code' => 'whare_kai_postal_code varchar(64)',
-      '2_a_b_billing_city' => '2_a_b_billing_city varchar(64)',
-      '2_a_b_home_city' => '2_a_b_home_city varchar(64)',
-      '2_a_b_main_city' => '2_a_b_main_city varchar(64)',
-      '2_a_b_other_city' => '2_a_b_other_city varchar(64)',
-      '2_a_b_whare_kai_city' => '2_a_b_whare_kai_city varchar(64)',
-      '2_a_b_city' => '2_a_b_city varchar(64)',
-      '8_a_b_billing_city' => '8_a_b_billing_city varchar(64)',
-      '8_a_b_home_city' => '8_a_b_home_city varchar(64)',
-      '8_a_b_main_city' => '8_a_b_main_city varchar(64)',
-      '8_a_b_other_city' => '8_a_b_other_city varchar(64)',
-      '8_a_b_whare_kai_city' => '8_a_b_whare_kai_city varchar(64)',
-      '8_a_b_city' => '8_a_b_city varchar(64)',
-      '5_a_b_billing_city' => '5_a_b_billing_city varchar(64)',
-      '5_a_b_home_city' => '5_a_b_home_city varchar(64)',
-      '5_a_b_main_city' => '5_a_b_main_city varchar(64)',
-      '5_a_b_other_city' => '5_a_b_other_city varchar(64)',
-      '5_a_b_whare_kai_city' => '5_a_b_whare_kai_city varchar(64)',
-      '5_a_b_city' => '5_a_b_city varchar(64)',
+      'contact_id' => '`contact_id` varchar(16)',
+      'billing_city' => '`billing_city` varchar(64)',
+      'billing_street_address' => '`billing_street_address` varchar(96)',
+      'billing_postal_code' => '`billing_postal_code` varchar(64)',
+      'home_city' => '`home_city` varchar(64)',
+      'home_street_address' => '`home_street_address` varchar(96)',
+      'home_postal_code' => '`home_postal_code` varchar(64)',
+      'main_city' => '`main_city` varchar(64)',
+      'main_street_address' => '`main_street_address` varchar(96)',
+      'main_postal_code' => '`main_postal_code` varchar(64)',
+      'other_city' => '`other_city` varchar(64)',
+      'other_street_address' => '`other_street_address` varchar(96)',
+      'other_postal_code' => '`other_postal_code` varchar(64)',
+      'whare_kai_city' => '`whare_kai_city` varchar(64)',
+      'whare_kai_street_address' => '`whare_kai_street_address` varchar(96)',
+      'whare_kai_postal_code' => '`whare_kai_postal_code` varchar(64)',
+      '2_a_b_billing_city' => '`2_a_b_billing_city` varchar(64)',
+      '2_a_b_home_city' => '`2_a_b_home_city` varchar(64)',
+      '2_a_b_main_city' => '`2_a_b_main_city` varchar(64)',
+      '2_a_b_other_city' => '`2_a_b_other_city` varchar(64)',
+      '2_a_b_whare_kai_city' => '`2_a_b_whare_kai_city` varchar(64)',
+      '2_a_b_city' => '`2_a_b_city` varchar(64)',
+      '8_a_b_billing_city' => '`8_a_b_billing_city` varchar(64)',
+      '8_a_b_home_city' => '`8_a_b_home_city` varchar(64)',
+      '8_a_b_main_city' => '`8_a_b_main_city` varchar(64)',
+      '8_a_b_other_city' => '`8_a_b_other_city` varchar(64)',
+      '8_a_b_whare_kai_city' => '`8_a_b_whare_kai_city` varchar(64)',
+      '8_a_b_city' => '`8_a_b_city` varchar(64)',
+      '5_a_b_billing_city' => '`5_a_b_billing_city` varchar(64)',
+      '5_a_b_home_city' => '`5_a_b_home_city` varchar(64)',
+      '5_a_b_main_city' => '`5_a_b_main_city` varchar(64)',
+      '5_a_b_other_city' => '`5_a_b_other_city` varchar(64)',
+      '5_a_b_whare_kai_city' => '`5_a_b_whare_kai_city` varchar(64)',
+      '5_a_b_city' => '`5_a_b_city` varchar(64)',
     ], $this->processor->getSQLColumns());
   }
 
@@ -1037,6 +1017,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $row = $this->csv->fetchOne();
     $this->assertEquals(CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID), $row['Home-Master Address Belongs To']);
+  }
+
+  /**
+   * Test merging same address when specifying fields.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressSpecifyFields() {
+    $this->setUpContactSameAddressExportData();
+    $this->doExportTest(['mergeSameAddress' => TRUE, 'fields' => [['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1]]]);
   }
 
   /**
@@ -1120,9 +1111,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Country' => 'Netherlands',
       'Phone' => '',
       'Phone Extension' => '',
+      'Phone Type ID' => '',
       'Phone Type' => '',
       'Email' => 'home@example.com',
-      'On Hold' => '',
+      'On Hold' => 'No',
       'Use for Bulk Mail' => '',
       'Signature Text' => '',
       'Signature Html' => '',
@@ -1135,7 +1127,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Tag(s)' => '',
       'Note(s)' => '',
     ];
-    $this->assertExpectedOutput($expected, $this->csv->fetchOne());
+    // Include both possible options as we rely on implicit order here and MySQL 8 in testing is returning a different value for some fields.
+    $this->assertExpectedOutput($expected, $this->csv->fetchOne(), [
+      'Email' => ['home@example.com', 'work@example.com'],
+      'Location Type' => ['Home', 'Work'],
+    ]);
   }
 
   /**
@@ -1174,6 +1170,71 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exporting when no rows are retrieved.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testExportNoRows() {
+    $contactA = $this->callAPISuccess('contact', 'create', [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ]);
+    $this->doExportTest([
+      'selectAll' => TRUE,
+      'ids' => [$contactA['id']],
+      'exportParams' => [
+        'postal_mailing_export' => [
+          'postal_mailing_export' => TRUE,
+        ],
+        'mergeSameAddress' => TRUE,
+      ],
+    ]);
+    $this->assertEquals('Contact ID', $this->csv->getHeader()[0]);
+  }
+
+  /**
+   * Test to ensure that 'Merge All Contacts with the Same Address' works on export.
+   *
+   * 3 contacts are created A, B and C where A and B are individual contacts that share same address via master_id.
+   * C is a household contact whose member is contact A.
+   *
+   * These 3 contacts are selected for export with 'Merge All Contacts with the Same Address' = TRUE
+   * And at the end export table contain only 1 contact i.e. is C as A and B got merged into 1 as they share same address but then A is Household member of C.
+   * So C take preference over A and thus C is exported as result.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressOnExport() {
+    $this->individualCreate();
+    $householdID = $this->setUpHousehold()[0];
+    $contactIDs = array_merge($this->contactIDs, [$householdID]);
+    // Empty existing addresses & start fresh.
+    $this->callAPISuccess('Address', 'get', ['api.Address.delete' => 1]);
+    foreach ($contactIDs as $id) {
+      $this->callAPISuccess('Address', 'create', [
+        'city' => 'Portland',
+        'street_address' => 'Ambachtstraat 23',
+        'state_province_id' => 'Maine',
+        'location_type_id' => 'Home',
+        'contact_id' => $id,
+      ]);
+    }
+
+    $this->doExportTest([
+      'selectAll' => FALSE,
+      'ids' => $contactIDs,
+      'mergeSameAddress' => TRUE,
+    ]);
+
+    $this->assertCount(1, $this->csv);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('Household', $this->csv->fetchOne()['Contact Type']);
+  }
+
+  /**
    * Test that deceased and do not mail contacts are removed from contacts before
    *
    * @dataProvider getReasonsNotToMail
@@ -1193,6 +1254,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $contactB = $this->callAPISuccess('contact', 'create', array_merge([
       'first_name' => 'Jane',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ], $reason));
+
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janet',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+      'api.address.create' => ['supplemental_address_1' => 'An address'],
+    ], $reason));
+
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janice',
       'last_name' => 'Doe',
       'contact_type' => 'Individual',
     ], $reason));
@@ -1469,6 +1545,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'postal_greeting' => 1,
       'current_employer' => 1,
       'location_type' => 1,
+      'address_id' => 1,
       'street_address' => 1,
       'street_number' => 1,
       'street_number_suffix' => 1,
@@ -1504,6 +1581,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'tags' => 1,
       'notes' => 1,
       'phone_type_id' => 1,
+      'phone_type' => 1,
     ];
     if (!$isContactMode) {
       unset($returnProperties['groups']);
@@ -1673,9 +1751,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'case_type' => 1,
       'case_role' => 1,
       'case_deleted' => 1,
-      'case_recent_activity_date' => 1,
-      'case_recent_activity_type' => 1,
-      'case_scheduled_activity_date' => 1,
+      'case_activity_date_time' => 1,
+      'case_activity_type' => 1,
     ];
   }
 
@@ -1743,7 +1820,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // We need some data so that we can get to the end of the export
     // function. Hopefully one day that won't be required to get metadata info out.
     // eventually aspire to call $provider->getSQLColumns straight after it
-    // is intiated.
+    // is initiated.
     $this->setupBaseExportData($exportMode);
     $this->doExportTest(['selectAll' => TRUE, 'exportMode' => $exportMode, 'ids' => [1]]);
     $this->assertEquals($expected, $this->processor->getSQLColumns());
@@ -1831,36 +1908,36 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getAllSpecifiableParticipantReturnColumns() {
     return [
-      'participant_campaign_id' => 'participant_campaign_id varchar(16)',
-      'participant_contact_id' => 'participant_contact_id varchar(16)',
-      'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status varchar(255)',
-      'currency' => 'currency varchar(3)',
-      'componentpaymentfield_received_date' => 'componentpaymentfield_received_date varchar(32)',
-      'default_role_id' => 'default_role_id varchar(16)',
-      'participant_discount_name' => 'participant_discount_name varchar(16)',
-      'event_id' => 'event_id varchar(16)',
-      'event_end_date' => 'event_end_date varchar(32)',
-      'event_start_date' => 'event_start_date varchar(32)',
-      'template_title' => 'template_title varchar(255)',
-      'event_title' => 'event_title varchar(255)',
-      'participant_fee_amount' => 'participant_fee_amount varchar(32)',
-      'participant_fee_currency' => 'participant_fee_currency varchar(3)',
-      'fee_label' => 'fee_label varchar(255)',
-      'participant_fee_level' => 'participant_fee_level longtext',
-      'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
-      'participant_id' => 'participant_id varchar(16)',
-      'participant_note' => 'participant_note text',
-      'participant_role_id' => 'participant_role_id varchar(128)',
-      'participant_role' => 'participant_role varchar(255)',
-      'participant_source' => 'participant_source varchar(128)',
-      'participant_status_id' => 'participant_status_id varchar(16)',
-      'participant_status' => 'participant_status varchar(255)',
-      'participant_register_date' => 'participant_register_date varchar(32)',
-      'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
-      'participant_is_test' => 'participant_is_test varchar(16)',
-      'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount varchar(32)',
-      'componentpaymentfield_transaction_id' => 'componentpaymentfield_transaction_id varchar(255)',
-      'transferred_to_contact_id' => 'transferred_to_contact_id varchar(16)',
+      'participant_campaign_id' => '`participant_campaign_id` varchar(16)',
+      'participant_contact_id' => '`participant_contact_id` varchar(16)',
+      'componentpaymentfield_contribution_status' => '`componentpaymentfield_contribution_status` varchar(255)',
+      'currency' => '`currency` varchar(3)',
+      'componentpaymentfield_received_date' => '`componentpaymentfield_received_date` varchar(32)',
+      'default_role_id' => '`default_role_id` varchar(16)',
+      'participant_discount_name' => '`participant_discount_name` varchar(16)',
+      'event_id' => '`event_id` varchar(16)',
+      'event_end_date' => '`event_end_date` varchar(32)',
+      'event_start_date' => '`event_start_date` varchar(32)',
+      'template_title' => '`template_title` varchar(255)',
+      'event_title' => '`event_title` varchar(255)',
+      'participant_fee_amount' => '`participant_fee_amount` varchar(32)',
+      'participant_fee_currency' => '`participant_fee_currency` varchar(3)',
+      'fee_label' => '`fee_label` varchar(255)',
+      'participant_fee_level' => '`participant_fee_level` longtext',
+      'participant_is_pay_later' => '`participant_is_pay_later` varchar(16)',
+      'participant_id' => '`participant_id` varchar(16)',
+      'participant_note' => '`participant_note` longtext',
+      'participant_role_id' => '`participant_role_id` varchar(128)',
+      'participant_role' => '`participant_role` varchar(255)',
+      'participant_source' => '`participant_source` varchar(128)',
+      'participant_status_id' => '`participant_status_id` varchar(16)',
+      'participant_status' => '`participant_status` varchar(255)',
+      'participant_register_date' => '`participant_register_date` varchar(32)',
+      'participant_registered_by_id' => '`participant_registered_by_id` varchar(16)',
+      'participant_is_test' => '`participant_is_test` varchar(16)',
+      'componentpaymentfield_total_amount' => '`componentpaymentfield_total_amount` varchar(32)',
+      'componentpaymentfield_transaction_id' => '`componentpaymentfield_transaction_id` varchar(255)',
+      'transferred_to_contact_id' => '`transferred_to_contact_id` varchar(16)',
     ];
   }
 
@@ -2155,46 +2232,48 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       46 => 'Postal Greeting',
       47 => 'Current Employer',
       48 => 'Location Type',
-      49 => 'Street Address',
-      50 => 'Street Number',
-      51 => 'Street Number Suffix',
-      52 => 'Street Name',
-      53 => 'Street Unit',
-      54 => 'Supplemental Address 1',
-      55 => 'Supplemental Address 2',
-      56 => 'Supplemental Address 3',
-      57 => 'City',
-      58 => 'Postal Code Suffix',
-      59 => 'Postal Code',
-      60 => 'Latitude',
-      61 => 'Longitude',
-      62 => 'Is Manually Geocoded',
-      63 => 'Address Name',
-      64 => 'Master Address Belongs To',
-      65 => 'County',
-      66 => 'State',
-      67 => 'Country',
-      68 => 'Phone',
-      69 => 'Phone Extension',
-      70 => 'Phone Type',
-      71 => 'Email',
-      72 => 'On Hold',
-      73 => 'Use for Bulk Mail',
-      74 => 'Signature Text',
-      75 => 'Signature Html',
-      76 => 'IM Provider',
-      77 => 'IM Screen Name',
-      78 => 'OpenID',
-      79 => 'World Region',
-      80 => 'Website',
-      81 => 'Group(s)',
-      82 => 'Tag(s)',
-      83 => 'Note(s)',
+      49 => 'Address ID',
+      50 => 'Street Address',
+      51 => 'Street Number',
+      52 => 'Street Number Suffix',
+      53 => 'Street Name',
+      54 => 'Street Unit',
+      55 => 'Supplemental Address 1',
+      56 => 'Supplemental Address 2',
+      57 => 'Supplemental Address 3',
+      58 => 'City',
+      59 => 'Postal Code Suffix',
+      60 => 'Postal Code',
+      61 => 'Latitude',
+      62 => 'Longitude',
+      63 => 'Is Manually Geocoded',
+      64 => 'Address Name',
+      65 => 'Master Address Belongs To',
+      66 => 'County',
+      67 => 'State',
+      68 => 'Country',
+      69 => 'Phone',
+      70 => 'Phone Extension',
+      71 => 'Phone Type ID',
+      72 => 'Phone Type',
+      73 => 'Email',
+      74 => 'On Hold',
+      75 => 'Use for Bulk Mail',
+      76 => 'Signature Text',
+      77 => 'Signature Html',
+      78 => 'IM Provider',
+      79 => 'IM Screen Name',
+      80 => 'OpenID',
+      81 => 'World Region',
+      82 => 'Website',
+      83 => 'Group(s)',
+      84 => 'Tag(s)',
+      85 => 'Note(s)',
     ];
     if (!$isContactExport) {
-      unset($headers[81]);
-      unset($headers[82]);
       unset($headers[83]);
+      unset($headers[84]);
+      unset($headers[85]);
     }
     return $headers;
   }
@@ -2206,23 +2285,23 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getActivityHeaderDefinition() {
     return [
-      81 => 'Activity ID',
-      82 => 'Activity Type',
-      83 => 'Activity Type ID',
-      84 => 'Subject',
-      85 => 'Activity Date',
-      86 => 'Duration',
-      87 => 'Location',
-      88 => 'Details',
-      89 => 'Activity Status',
-      90 => 'Activity Priority',
-      91 => 'Source Contact',
-      92 => 'source_record_id',
-      93 => 'Test',
-      94 => 'Campaign ID',
-      95 => 'result',
-      96 => 'Engagement Index',
-      97 => 'parent_id',
+      82 => 'Activity ID',
+      83 => 'Activity Type',
+      84 => 'Activity Type ID',
+      85 => 'Subject',
+      86 => 'Activity Date',
+      87 => 'Duration',
+      88 => 'Location',
+      89 => 'Details',
+      90 => 'Activity Status',
+      91 => 'Activity Priority',
+      92 => 'Source Contact',
+      93 => 'source_record_id',
+      94 => 'Test',
+      95 => 'Campaign ID',
+      96 => 'result',
+      97 => 'Engagement Index',
+      98 => 'parent_id',
     ];
   }
 
@@ -2233,25 +2312,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getCaseHeaderDefinition() {
     return [
-      81 => 'Contact ID',
-      82 => 'Case ID',
-      83 => 'case_activity_subject',
-      84 => 'Case Subject',
-      85 => 'Case Status',
-      86 => 'Case Type',
-      87 => 'Role in Case',
-      88 => 'Case is in the Trash',
-      89 => 'case_recent_activity_date',
-      90 => 'case_recent_activity_type',
-      91 => 'case_scheduled_activity_date',
-      92 => 'Case Start Date',
-      93 => 'Case End Date',
-      94 => 'case_source_contact_id',
-      95 => 'case_activity_status',
-      96 => 'case_activity_duration',
-      97 => 'case_activity_medium_id',
-      98 => 'case_activity_details',
-      99 => 'case_activity_is_auto',
+      82 => 'Contact ID',
+      83 => 'Case ID',
+      84 => 'Subject',
+      85 => 'Case Subject',
+      86 => 'Case Status',
+      87 => 'Case Type',
+      88 => 'Role in Case',
+      89 => 'Case is in the Trash',
+      90 => 'Activity Date',
+      91 => 'Activity Type',
+      93 => 'Case Start Date',
+      94 => 'Case End Date',
+      95 => 'Activity Reporter',
+      96 => 'Activity Status',
+      97 => 'Duration',
+      98 => 'Activity Medium',
+      99 => 'Details',
+      100 => 'Activity Auto-generated?',
     ];
   }
 
@@ -2262,39 +2340,39 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getContributeHeaderDefinition() {
     return [
-      81 => 'Financial Type',
-      82 => 'Contribution Source',
-      83 => 'Date Received',
-      84 => 'Thank-you Date',
-      85 => 'Cancelled / Refunded Date',
-      86 => 'Total Amount',
-      87 => 'Accounting Code',
-      88 => 'Payment Methods',
-      89 => 'Payment Method ID',
-      90 => 'Check Number',
-      91 => 'Non-deductible Amount',
-      92 => 'Fee Amount',
-      93 => 'Net Amount',
-      94 => 'Transaction ID',
-      95 => 'Invoice Reference',
-      96 => 'Invoice Number',
-      97 => 'Currency',
-      98 => 'Cancellation / Refund Reason',
-      99 => 'Receipt Date',
-      100 => 'Test',
-      101 => 'Is Pay Later',
-      102 => 'Contribution Status',
-      103 => 'Recurring Contribution ID',
-      104 => 'Amount Label',
-      105 => 'Contribution Note',
-      106 => 'Batch Name',
-      107 => 'Campaign Title',
-      108 => 'Campaign ID',
-      109 => 'Soft Credit For',
-      110 => 'Soft Credit Amount',
-      111 => 'Soft Credit Type',
-      112 => 'Soft Credit For Contact ID',
-      113 => 'Soft Credit For Contribution ID',
+      82 => 'Financial Type',
+      83 => 'Contribution Source',
+      84 => 'Date Received',
+      85 => 'Thank-you Date',
+      86 => 'Cancelled / Refunded Date',
+      87 => 'Total Amount',
+      88 => 'Accounting Code',
+      89 => 'Payment Methods',
+      90 => 'Payment Method ID',
+      91 => 'Check Number',
+      92 => 'Non-deductible Amount',
+      93 => 'Fee Amount',
+      94 => 'Net Amount',
+      95 => 'Transaction ID',
+      96 => 'Invoice Reference',
+      97 => 'Invoice Number',
+      98 => 'Currency',
+      99 => 'Cancellation / Refund Reason',
+      100 => 'Receipt Date',
+      101 => 'Test',
+      102 => 'Is Pay Later',
+      103 => 'Contribution Status',
+      104 => 'Recurring Contribution ID',
+      105 => 'Amount Label',
+      106 => 'Contribution Note',
+      107 => 'Batch Name',
+      108 => 'Campaign Title',
+      109 => 'Campaign ID',
+      110 => 'Soft Credit For',
+      111 => 'Soft Credit Amount',
+      112 => 'Soft Credit Type',
+      113 => 'Soft Credit For Contact ID',
+      114 => 'Soft Credit For Contribution ID',
     ];
   }
 
@@ -2305,27 +2383,27 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getParticipantHeaderDefinition() {
     return [
-      81 => 'Event',
-      82 => 'Event Title',
-      83 => 'Event Start Date',
-      84 => 'Event End Date',
-      85 => 'Event Type',
-      86 => 'Participant ID',
-      87 => 'Participant Status',
-      88 => 'Participant Status Id',
-      89 => 'Participant Role',
-      90 => 'Participant Role Id',
-      91 => 'Participant Note',
-      92 => 'Register date',
-      93 => 'Participant Source',
-      94 => 'Fee level',
-      95 => 'Test',
-      96 => 'Is Pay Later',
-      97 => 'Fee Amount',
-      98 => 'Discount Name',
-      99 => 'Fee Currency',
-      100 => 'Registered By ID',
-      101 => 'Campaign ID',
+      82 => 'Event',
+      83 => 'Event Title',
+      84 => 'Event Start Date',
+      85 => 'Event End Date',
+      86 => 'Event Type',
+      87 => 'Participant ID',
+      88 => 'Participant Status',
+      89 => 'Participant Status Id',
+      90 => 'Participant Role',
+      91 => 'Participant Role Id',
+      92 => 'Participant Note',
+      93 => 'Register date',
+      94 => 'Participant Source',
+      95 => 'Fee level',
+      96 => 'Test',
+      97 => 'Is Pay Later',
+      98 => 'Fee Amount',
+      99 => 'Discount Name',
+      100 => 'Fee Currency',
+      101 => 'Registered By ID',
+      102 => 'Campaign ID',
     ];
   }
 
@@ -2336,20 +2414,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getMemberHeaderDefinition() {
     return [
-      81 => 'Membership Type',
-      82 => 'Test',
-      83 => 'Is Pay Later',
-      84 => 'Member Since',
-      85 => 'Membership Start Date',
-      86 => 'Membership Expiration Date',
-      87 => 'Source',
-      88 => 'Membership Status',
-      89 => 'Membership ID',
-      90 => 'Primary Member ID',
-      91 => 'Max Related',
-      92 => 'Membership Recurring Contribution',
-      93 => 'Campaign ID',
-      94 => 'Status Override',
+      82 => 'Membership Type',
+      83 => 'Test',
+      84 => 'Is Pay Later',
+      85 => 'Member Since',
+      86 => 'Membership Start Date',
+      87 => 'Membership Expiration Date',
+      88 => 'Source',
+      89 => 'Membership Status',
+      90 => 'Membership ID',
+      91 => 'Primary Member ID',
+      92 => 'Max Related',
+      93 => 'Membership Recurring Contribution',
+      94 => 'Campaign ID',
+      95 => 'Status Override',
     ];
   }
 
@@ -2360,30 +2438,30 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getPledgeHeaderDefinition() {
     return [
-      81 => 'Pledge ID',
-      82 => 'Total Pledged',
-      83 => 'Total Paid',
-      84 => 'Pledge Made',
-      85 => 'Pledge Start Date',
-      86 => 'Next Payment Date',
-      87 => 'Next Payment Amount',
-      88 => 'Pledge Status',
-      89 => 'Test',
-      90 => 'Pledge Contribution Page Id',
-      91 => 'pledge_financial_type',
-      92 => 'Pledge Frequency Interval',
-      93 => 'Pledge Frequency Unit',
-      94 => 'pledge_currency',
-      95 => 'Campaign ID',
-      96 => 'Balance Amount',
-      97 => 'Payment ID',
-      98 => 'Scheduled Amount',
-      99 => 'Scheduled Date',
-      100 => 'Paid Amount',
-      101 => 'Paid Date',
-      102 => 'Last Reminder',
-      103 => 'Reminders Sent',
-      104 => 'Pledge Payment Status',
+      82 => 'Pledge ID',
+      83 => 'Total Pledged',
+      84 => 'Total Paid',
+      85 => 'Pledge Made',
+      86 => 'Pledge Start Date',
+      87 => 'Next Payment Date',
+      88 => 'Next Payment Amount',
+      89 => 'Pledge Status',
+      90 => 'Test',
+      91 => 'Pledge Contribution Page Id',
+      92 => 'pledge_financial_type',
+      93 => 'Pledge Frequency Interval',
+      94 => 'Pledge Frequency Unit',
+      95 => 'pledge_currency',
+      96 => 'Campaign ID',
+      97 => 'Balance Amount',
+      98 => 'Payment ID',
+      99 => 'Scheduled Amount',
+      100 => 'Scheduled Date',
+      101 => 'Paid Amount',
+      102 => 'Paid Date',
+      103 => 'Last Reminder',
+      104 => 'Reminders Sent',
+      105 => 'Pledge Payment Status',
     ];
   }
 
@@ -2396,90 +2474,92 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getBasicSqlColumnDefinition($isContactExport) {
     $columns = [
-      'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
-      'contact_type' => 'contact_type varchar(64)',
-      'contact_sub_type' => 'contact_sub_type varchar(255)',
-      'do_not_email' => 'do_not_email varchar(16)',
-      'do_not_phone' => 'do_not_phone varchar(16)',
-      'do_not_mail' => 'do_not_mail varchar(16)',
-      'do_not_sms' => 'do_not_sms varchar(16)',
-      'do_not_trade' => 'do_not_trade varchar(16)',
-      'is_opt_out' => 'is_opt_out varchar(16)',
-      'legal_identifier' => 'legal_identifier varchar(32)',
-      'external_identifier' => 'external_identifier varchar(64)',
-      'sort_name' => 'sort_name varchar(128)',
-      'display_name' => 'display_name varchar(128)',
-      'nick_name' => 'nick_name varchar(128)',
-      'legal_name' => 'legal_name varchar(128)',
-      'image_url' => 'image_url longtext',
-      'preferred_communication_method' => 'preferred_communication_method varchar(255)',
-      'preferred_language' => 'preferred_language varchar(5)',
-      'preferred_mail_format' => 'preferred_mail_format varchar(8)',
-      'hash' => 'hash varchar(32)',
-      'contact_source' => 'contact_source varchar(255)',
-      'first_name' => 'first_name varchar(64)',
-      'middle_name' => 'middle_name varchar(64)',
-      'last_name' => 'last_name varchar(64)',
-      'prefix_id' => 'prefix_id varchar(255)',
-      'suffix_id' => 'suffix_id varchar(255)',
-      'formal_title' => 'formal_title varchar(64)',
-      'communication_style_id' => 'communication_style_id varchar(255)',
-      'email_greeting_id' => 'email_greeting_id varchar(16)',
-      'postal_greeting_id' => 'postal_greeting_id varchar(16)',
-      'addressee_id' => 'addressee_id varchar(16)',
-      'job_title' => 'job_title varchar(255)',
-      'gender_id' => 'gender_id varchar(255)',
-      'birth_date' => 'birth_date varchar(32)',
-      'is_deceased' => 'is_deceased varchar(16)',
-      'deceased_date' => 'deceased_date varchar(32)',
-      'household_name' => 'household_name varchar(128)',
-      'organization_name' => 'organization_name varchar(128)',
-      'sic_code' => 'sic_code varchar(8)',
-      'user_unique_id' => 'user_unique_id varchar(255)',
-      'current_employer_id' => 'current_employer_id varchar(16)',
-      'contact_is_deleted' => 'contact_is_deleted varchar(16)',
-      'created_date' => 'created_date varchar(32)',
-      'modified_date' => 'modified_date varchar(32)',
-      'addressee' => 'addressee varchar(255)',
-      'email_greeting' => 'email_greeting varchar(255)',
-      'postal_greeting' => 'postal_greeting varchar(255)',
-      'current_employer' => 'current_employer varchar(128)',
-      'location_type' => 'location_type text',
-      'street_address' => 'street_address varchar(96)',
-      'street_number' => 'street_number varchar(16)',
-      'street_number_suffix' => 'street_number_suffix varchar(8)',
-      'street_name' => 'street_name varchar(64)',
-      'street_unit' => 'street_unit varchar(16)',
-      'supplemental_address_1' => 'supplemental_address_1 varchar(96)',
-      'supplemental_address_2' => 'supplemental_address_2 varchar(96)',
-      'supplemental_address_3' => 'supplemental_address_3 varchar(96)',
-      'city' => 'city varchar(64)',
-      'postal_code_suffix' => 'postal_code_suffix varchar(12)',
-      'postal_code' => 'postal_code varchar(64)',
-      'geo_code_1' => 'geo_code_1 varchar(32)',
-      'geo_code_2' => 'geo_code_2 varchar(32)',
-      'manual_geo_code' => 'manual_geo_code varchar(16)',
-      'address_name' => 'address_name varchar(255)',
-      'master_id' => 'master_id varchar(128)',
-      'county' => 'county varchar(64)',
-      'state_province' => 'state_province varchar(64)',
-      'country' => 'country varchar(64)',
-      'phone' => 'phone varchar(32)',
-      'phone_ext' => 'phone_ext varchar(16)',
-      'phone_type_id' => 'phone_type_id varchar(16)',
-      'email' => 'email varchar(254)',
-      'on_hold' => 'on_hold varchar(16)',
-      'is_bulkmail' => 'is_bulkmail varchar(16)',
-      'signature_text' => 'signature_text longtext',
-      'signature_html' => 'signature_html longtext',
-      'im_provider' => 'im_provider text',
-      'im_screen_name' => 'im_screen_name varchar(64)',
-      'openid' => 'openid varchar(255)',
-      'world_region' => 'world_region varchar(128)',
-      'url' => 'url varchar(128)',
-      'groups' => 'groups text',
-      'tags' => 'tags text',
-      'notes' => 'notes text',
+      'civicrm_primary_id' => '`civicrm_primary_id` varchar(16)',
+      'contact_type' => '`contact_type` varchar(64)',
+      'contact_sub_type' => '`contact_sub_type` varchar(255)',
+      'do_not_email' => '`do_not_email` varchar(16)',
+      'do_not_phone' => '`do_not_phone` varchar(16)',
+      'do_not_mail' => '`do_not_mail` varchar(16)',
+      'do_not_sms' => '`do_not_sms` varchar(16)',
+      'do_not_trade' => '`do_not_trade` varchar(16)',
+      'is_opt_out' => '`is_opt_out` varchar(16)',
+      'legal_identifier' => '`legal_identifier` varchar(32)',
+      'external_identifier' => '`external_identifier` varchar(64)',
+      'sort_name' => '`sort_name` varchar(128)',
+      'display_name' => '`display_name` varchar(128)',
+      'nick_name' => '`nick_name` varchar(128)',
+      'legal_name' => '`legal_name` varchar(128)',
+      'image_url' => '`image_url` longtext',
+      'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
+      'preferred_language' => '`preferred_language` varchar(5)',
+      'preferred_mail_format' => '`preferred_mail_format` varchar(8)',
+      'hash' => '`hash` varchar(32)',
+      'contact_source' => '`contact_source` varchar(255)',
+      'first_name' => '`first_name` varchar(64)',
+      'middle_name' => '`middle_name` varchar(64)',
+      'last_name' => '`last_name` varchar(64)',
+      'prefix_id' => '`prefix_id` varchar(255)',
+      'suffix_id' => '`suffix_id` varchar(255)',
+      'formal_title' => '`formal_title` varchar(64)',
+      'communication_style_id' => '`communication_style_id` varchar(255)',
+      'email_greeting_id' => '`email_greeting_id` varchar(16)',
+      'postal_greeting_id' => '`postal_greeting_id` varchar(16)',
+      'addressee_id' => '`addressee_id` varchar(16)',
+      'job_title' => '`job_title` varchar(255)',
+      'gender_id' => '`gender_id` varchar(255)',
+      'birth_date' => '`birth_date` varchar(32)',
+      'is_deceased' => '`is_deceased` varchar(16)',
+      'deceased_date' => '`deceased_date` varchar(32)',
+      'household_name' => '`household_name` varchar(128)',
+      'organization_name' => '`organization_name` varchar(128)',
+      'sic_code' => '`sic_code` varchar(8)',
+      'user_unique_id' => '`user_unique_id` varchar(255)',
+      'current_employer_id' => '`current_employer_id` varchar(16)',
+      'contact_is_deleted' => '`contact_is_deleted` varchar(16)',
+      'created_date' => '`created_date` varchar(32)',
+      'modified_date' => '`modified_date` varchar(32)',
+      'addressee' => '`addressee` varchar(255)',
+      'email_greeting' => '`email_greeting` varchar(255)',
+      'postal_greeting' => '`postal_greeting` varchar(255)',
+      'current_employer' => '`current_employer` varchar(255)',
+      'location_type' => '`location_type` varchar(255)',
+      'address_id' => '`address_id` varchar(16)',
+      'street_address' => '`street_address` varchar(96)',
+      'street_number' => '`street_number` varchar(16)',
+      'street_number_suffix' => '`street_number_suffix` varchar(8)',
+      'street_name' => '`street_name` varchar(64)',
+      'street_unit' => '`street_unit` varchar(16)',
+      'supplemental_address_1' => '`supplemental_address_1` varchar(96)',
+      'supplemental_address_2' => '`supplemental_address_2` varchar(96)',
+      'supplemental_address_3' => '`supplemental_address_3` varchar(96)',
+      'city' => '`city` varchar(64)',
+      'postal_code_suffix' => '`postal_code_suffix` varchar(12)',
+      'postal_code' => '`postal_code` varchar(64)',
+      'geo_code_1' => '`geo_code_1` varchar(32)',
+      'geo_code_2' => '`geo_code_2` varchar(32)',
+      'manual_geo_code' => '`manual_geo_code` varchar(16)',
+      'address_name' => '`address_name` varchar(255)',
+      'master_id' => '`master_id` varchar(128)',
+      'county' => '`county` varchar(64)',
+      'state_province' => '`state_province` varchar(64)',
+      'country' => '`country` varchar(64)',
+      'phone' => '`phone` varchar(32)',
+      'phone_ext' => '`phone_ext` varchar(16)',
+      'phone_type_id' => '`phone_type_id` varchar(16)',
+      'email' => '`email` varchar(254)',
+      'on_hold' => '`on_hold` varchar(16)',
+      'is_bulkmail' => '`is_bulkmail` varchar(16)',
+      'signature_text' => '`signature_text` longtext',
+      'signature_html' => '`signature_html` longtext',
+      'im_provider' => '`im_provider` varchar(255)',
+      'im' => '`im` varchar(64)',
+      'openid' => '`openid` varchar(255)',
+      'world_region' => '`world_region` varchar(128)',
+      'url' => '`url` varchar(128)',
+      'groups' => '`groups` longtext',
+      'tags' => '`tags` longtext',
+      'notes' => '`notes` longtext',
+      'phone_type' => '`phone_type` varchar(255)',
     ];
     if (!$isContactExport) {
       unset($columns['groups']);
@@ -2496,25 +2576,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getCaseSqlColumns() {
     return [
-      'case_start_date' => 'case_start_date varchar(32)',
-      'case_end_date' => 'case_end_date varchar(32)',
-      'case_subject' => 'case_subject varchar(128)',
-      'case_source_contact_id' => 'case_source_contact_id varchar(255)',
-      'case_activity_status' => 'case_activity_status text',
-      'case_activity_duration' => 'case_activity_duration text',
-      'case_activity_medium_id' => 'case_activity_medium_id varchar(255)',
-      'case_activity_details' => 'case_activity_details text',
-      'case_activity_is_auto' => 'case_activity_is_auto text',
-      'contact_id' => 'contact_id varchar(16)',
-      'case_id' => 'case_id varchar(16)',
-      'case_activity_subject' => 'case_activity_subject text',
-      'case_status' => 'case_status text',
-      'case_type' => 'case_type text',
-      'case_role' => 'case_role text',
-      'case_deleted' => 'case_deleted varchar(16)',
-      'case_recent_activity_date' => 'case_recent_activity_date text',
-      'case_recent_activity_type' => 'case_recent_activity_type text',
-      'case_scheduled_activity_date' => 'case_scheduled_activity_date text',
+      'case_start_date' => '`case_start_date` varchar(32)',
+      'case_end_date' => '`case_end_date` varchar(32)',
+      'case_subject' => '`case_subject` varchar(128)',
+      'case_source_contact_id' => '`case_source_contact_id` varchar(255)',
+      'case_activity_status' => '`case_activity_status` varchar(255)',
+      'case_activity_duration' => '`case_activity_duration` varchar(16)',
+      'case_activity_medium_id' => '`case_activity_medium_id` varchar(16)',
+      'case_activity_details' => '`case_activity_details` longtext',
+      'case_activity_is_auto' => '`case_activity_is_auto` varchar(16)',
+      'contact_id' => '`contact_id` varchar(16)',
+      'case_id' => '`case_id` varchar(16)',
+      'case_activity_subject' => '`case_activity_subject` varchar(255)',
+      'case_status' => '`case_status` text',
+      'case_type' => '`case_type` text',
+      'case_role' => '`case_role` text',
+      'case_deleted' => '`case_deleted` varchar(16)',
+      'case_activity_date_time' => '`case_activity_date_time` varchar(32)',
+      'case_activity_type' => '`case_activity_type` varchar(255)',
     ];
   }
 
@@ -2525,23 +2604,23 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getActivitySqlColumns() {
     return [
-      'activity_id' => 'activity_id varchar(16)',
-      'activity_type' => 'activity_type varchar(255)',
-      'activity_type_id' => 'activity_type_id varchar(16)',
-      'activity_subject' => 'activity_subject varchar(255)',
-      'activity_date_time' => 'activity_date_time varchar(32)',
-      'activity_duration' => 'activity_duration varchar(16)',
-      'activity_location' => 'activity_location varchar(255)',
-      'activity_details' => 'activity_details longtext',
-      'activity_status' => 'activity_status varchar(255)',
-      'activity_priority' => 'activity_priority varchar(255)',
-      'source_contact' => 'source_contact varchar(255)',
-      'source_record_id' => 'source_record_id varchar(255)',
-      'activity_is_test' => 'activity_is_test varchar(16)',
-      'activity_campaign_id' => 'activity_campaign_id varchar(16)',
-      'result' => 'result text',
-      'activity_engagement_level' => 'activity_engagement_level varchar(16)',
-      'parent_id' => 'parent_id varchar(255)',
+      'activity_id' => '`activity_id` varchar(16)',
+      'activity_type' => '`activity_type` varchar(255)',
+      'activity_type_id' => '`activity_type_id` varchar(16)',
+      'activity_subject' => '`activity_subject` varchar(255)',
+      'activity_date_time' => '`activity_date_time` varchar(32)',
+      'activity_duration' => '`activity_duration` varchar(16)',
+      'activity_location' => '`activity_location` varchar(255)',
+      'activity_details' => '`activity_details` longtext',
+      'activity_status' => '`activity_status` varchar(255)',
+      'activity_priority' => '`activity_priority` varchar(255)',
+      'source_contact' => '`source_contact` varchar(255)',
+      'source_record_id' => '`source_record_id` varchar(255)',
+      'activity_is_test' => '`activity_is_test` varchar(16)',
+      'activity_campaign_id' => '`activity_campaign_id` varchar(16)',
+      'result' => '`result` text',
+      'activity_engagement_level' => '`activity_engagement_level` varchar(16)',
+      'parent_id' => '`parent_id` varchar(255)',
     ];
   }
 
@@ -2552,27 +2631,27 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getParticipantSqlColumns() {
     return [
-      'event_id' => 'event_id varchar(16)',
-      'event_title' => 'event_title varchar(255)',
-      'event_start_date' => 'event_start_date varchar(32)',
-      'event_end_date' => 'event_end_date varchar(32)',
-      'event_type' => 'event_type varchar(255)',
-      'participant_id' => 'participant_id varchar(16)',
-      'participant_status' => 'participant_status varchar(255)',
-      'participant_status_id' => 'participant_status_id varchar(16)',
-      'participant_role' => 'participant_role varchar(255)',
-      'participant_role_id' => 'participant_role_id varchar(128)',
-      'participant_note' => 'participant_note text',
-      'participant_register_date' => 'participant_register_date varchar(32)',
-      'participant_source' => 'participant_source varchar(128)',
-      'participant_fee_level' => 'participant_fee_level longtext',
-      'participant_is_test' => 'participant_is_test varchar(16)',
-      'participant_is_pay_later' => 'participant_is_pay_later varchar(16)',
-      'participant_fee_amount' => 'participant_fee_amount varchar(32)',
-      'participant_discount_name' => 'participant_discount_name varchar(16)',
-      'participant_fee_currency' => 'participant_fee_currency varchar(3)',
-      'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
-      'participant_campaign_id' => 'participant_campaign_id varchar(16)',
+      'event_id' => '`event_id` varchar(16)',
+      'event_title' => '`event_title` varchar(255)',
+      'event_start_date' => '`event_start_date` varchar(32)',
+      'event_end_date' => '`event_end_date` varchar(32)',
+      'event_type' => '`event_type` varchar(255)',
+      'participant_id' => '`participant_id` varchar(16)',
+      'participant_status' => '`participant_status` varchar(255)',
+      'participant_status_id' => '`participant_status_id` varchar(16)',
+      'participant_role' => '`participant_role` varchar(255)',
+      'participant_role_id' => '`participant_role_id` varchar(128)',
+      'participant_note' => '`participant_note` longtext',
+      'participant_register_date' => '`participant_register_date` varchar(32)',
+      'participant_source' => '`participant_source` varchar(128)',
+      'participant_fee_level' => '`participant_fee_level` longtext',
+      'participant_is_test' => '`participant_is_test` varchar(16)',
+      'participant_is_pay_later' => '`participant_is_pay_later` varchar(16)',
+      'participant_fee_amount' => '`participant_fee_amount` varchar(32)',
+      'participant_discount_name' => '`participant_discount_name` varchar(16)',
+      'participant_fee_currency' => '`participant_fee_currency` varchar(3)',
+      'participant_registered_by_id' => '`participant_registered_by_id` varchar(16)',
+      'participant_campaign_id' => '`participant_campaign_id` varchar(16)',
     ];
   }
 
@@ -2583,119 +2662,119 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getContributionSqlColumns() {
     return [
-      'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
-      'contact_type' => 'contact_type varchar(64)',
-      'contact_sub_type' => 'contact_sub_type varchar(255)',
-      'do_not_email' => 'do_not_email varchar(16)',
-      'do_not_phone' => 'do_not_phone varchar(16)',
-      'do_not_mail' => 'do_not_mail varchar(16)',
-      'do_not_sms' => 'do_not_sms varchar(16)',
-      'do_not_trade' => 'do_not_trade varchar(16)',
-      'is_opt_out' => 'is_opt_out varchar(16)',
-      'legal_identifier' => 'legal_identifier varchar(32)',
-      'external_identifier' => 'external_identifier varchar(64)',
-      'sort_name' => 'sort_name varchar(128)',
-      'display_name' => 'display_name varchar(128)',
-      'nick_name' => 'nick_name varchar(128)',
-      'legal_name' => 'legal_name varchar(128)',
-      'image_url' => 'image_url longtext',
-      'preferred_communication_method' => 'preferred_communication_method varchar(255)',
-      'preferred_language' => 'preferred_language varchar(5)',
-      'preferred_mail_format' => 'preferred_mail_format varchar(8)',
-      'hash' => 'hash varchar(32)',
-      'contact_source' => 'contact_source varchar(255)',
-      'first_name' => 'first_name varchar(64)',
-      'middle_name' => 'middle_name varchar(64)',
-      'last_name' => 'last_name varchar(64)',
-      'prefix_id' => 'prefix_id varchar(255)',
-      'suffix_id' => 'suffix_id varchar(255)',
-      'formal_title' => 'formal_title varchar(64)',
-      'communication_style_id' => 'communication_style_id varchar(255)',
-      'email_greeting_id' => 'email_greeting_id varchar(16)',
-      'postal_greeting_id' => 'postal_greeting_id varchar(16)',
-      'addressee_id' => 'addressee_id varchar(16)',
-      'job_title' => 'job_title varchar(255)',
-      'gender_id' => 'gender_id varchar(255)',
-      'birth_date' => 'birth_date varchar(32)',
-      'is_deceased' => 'is_deceased varchar(16)',
-      'deceased_date' => 'deceased_date varchar(32)',
-      'household_name' => 'household_name varchar(128)',
-      'organization_name' => 'organization_name varchar(128)',
-      'sic_code' => 'sic_code varchar(8)',
-      'user_unique_id' => 'user_unique_id varchar(255)',
-      'current_employer_id' => 'current_employer_id varchar(16)',
-      'contact_is_deleted' => 'contact_is_deleted varchar(16)',
-      'created_date' => 'created_date varchar(32)',
-      'modified_date' => 'modified_date varchar(32)',
-      'addressee' => 'addressee varchar(255)',
-      'email_greeting' => 'email_greeting varchar(255)',
-      'postal_greeting' => 'postal_greeting varchar(255)',
-      'current_employer' => 'current_employer varchar(128)',
-      'location_type' => 'location_type text',
-      'street_address' => 'street_address varchar(96)',
-      'street_number' => 'street_number varchar(16)',
-      'street_number_suffix' => 'street_number_suffix varchar(8)',
-      'street_name' => 'street_name varchar(64)',
-      'street_unit' => 'street_unit varchar(16)',
-      'supplemental_address_1' => 'supplemental_address_1 varchar(96)',
-      'supplemental_address_2' => 'supplemental_address_2 varchar(96)',
-      'supplemental_address_3' => 'supplemental_address_3 varchar(96)',
-      'city' => 'city varchar(64)',
-      'postal_code_suffix' => 'postal_code_suffix varchar(12)',
-      'postal_code' => 'postal_code varchar(64)',
-      'geo_code_1' => 'geo_code_1 varchar(32)',
-      'geo_code_2' => 'geo_code_2 varchar(32)',
-      'address_name' => 'address_name varchar(255)',
-      'master_id' => 'master_id varchar(128)',
-      'county' => 'county varchar(64)',
-      'state_province' => 'state_province varchar(64)',
-      'country' => 'country varchar(64)',
-      'phone' => 'phone varchar(32)',
-      'phone_ext' => 'phone_ext varchar(16)',
-      'email' => 'email varchar(254)',
-      'on_hold' => 'on_hold varchar(16)',
-      'is_bulkmail' => 'is_bulkmail varchar(16)',
-      'signature_text' => 'signature_text longtext',
-      'signature_html' => 'signature_html longtext',
-      'im_provider' => 'im_provider text',
-      'im_screen_name' => 'im_screen_name varchar(64)',
-      'openid' => 'openid varchar(255)',
-      'world_region' => 'world_region varchar(128)',
-      'url' => 'url varchar(128)',
-      'phone_type_id' => 'phone_type_id varchar(16)',
-      'financial_type' => 'financial_type varchar(255)',
-      'contribution_source' => 'contribution_source varchar(255)',
-      'receive_date' => 'receive_date varchar(32)',
-      'thankyou_date' => 'thankyou_date varchar(32)',
-      'contribution_cancel_date' => 'contribution_cancel_date varchar(32)',
-      'total_amount' => 'total_amount varchar(32)',
-      'accounting_code' => 'accounting_code varchar(64)',
-      'payment_instrument' => 'payment_instrument varchar(255)',
-      'payment_instrument_id' => 'payment_instrument_id varchar(16)',
-      'contribution_check_number' => 'contribution_check_number varchar(255)',
-      'non_deductible_amount' => 'non_deductible_amount varchar(32)',
-      'fee_amount' => 'fee_amount varchar(32)',
-      'net_amount' => 'net_amount varchar(32)',
-      'trxn_id' => 'trxn_id varchar(255)',
-      'invoice_id' => 'invoice_id varchar(255)',
-      'invoice_number' => 'invoice_number varchar(255)',
-      'currency' => 'currency varchar(3)',
-      'cancel_reason' => 'cancel_reason longtext',
-      'receipt_date' => 'receipt_date varchar(32)',
-      'is_test' => 'is_test varchar(16)',
-      'is_pay_later' => 'is_pay_later varchar(16)',
-      'contribution_status' => 'contribution_status varchar(255)',
-      'contribution_recur_id' => 'contribution_recur_id varchar(16)',
-      'amount_level' => 'amount_level longtext',
-      'contribution_note' => 'contribution_note text',
-      'contribution_batch' => 'contribution_batch text',
-      'contribution_campaign_title' => 'contribution_campaign_title varchar(255)',
-      'contribution_campaign_id' => 'contribution_campaign_id varchar(16)',
-      'contribution_soft_credit_name' => 'contribution_soft_credit_name varchar(255)',
-      'contribution_soft_credit_amount' => 'contribution_soft_credit_amount varchar(255)',
-      'contribution_soft_credit_type' => 'contribution_soft_credit_type varchar(255)',
-      'contribution_soft_credit_contact_id' => 'contribution_soft_credit_contact_id varchar(255)',
-      'contribution_soft_credit_contribution_id' => 'contribution_soft_credit_contribution_id varchar(255)',
+      'civicrm_primary_id' => '`civicrm_primary_id` varchar(16)',
+      'contact_type' => '`contact_type` varchar(64)',
+      'contact_sub_type' => '`contact_sub_type` varchar(255)',
+      'do_not_email' => '`do_not_email` varchar(16)',
+      'do_not_phone' => '`do_not_phone` varchar(16)',
+      'do_not_mail' => '`do_not_mail` varchar(16)',
+      'do_not_sms' => '`do_not_sms` varchar(16)',
+      'do_not_trade' => '`do_not_trade` varchar(16)',
+      'is_opt_out' => '`is_opt_out` varchar(16)',
+      'legal_identifier' => '`legal_identifier` varchar(32)',
+      'external_identifier' => '`external_identifier` varchar(64)',
+      'sort_name' => '`sort_name` varchar(128)',
+      'display_name' => '`display_name` varchar(128)',
+      'nick_name' => '`nick_name` varchar(128)',
+      'legal_name' => '`legal_name` varchar(128)',
+      'image_url' => '`image_url` longtext',
+      'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
+      'preferred_language' => '`preferred_language` varchar(5)',
+      'preferred_mail_format' => '`preferred_mail_format` varchar(8)',
+      'hash' => '`hash` varchar(32)',
+      'contact_source' => '`contact_source` varchar(255)',
+      'first_name' => '`first_name` varchar(64)',
+      'middle_name' => '`middle_name` varchar(64)',
+      'last_name' => '`last_name` varchar(64)',
+      'prefix_id' => '`prefix_id` varchar(255)',
+      'suffix_id' => '`suffix_id` varchar(255)',
+      'formal_title' => '`formal_title` varchar(64)',
+      'communication_style_id' => '`communication_style_id` varchar(255)',
+      'email_greeting_id' => '`email_greeting_id` varchar(16)',
+      'postal_greeting_id' => '`postal_greeting_id` varchar(16)',
+      'addressee_id' => '`addressee_id` varchar(16)',
+      'job_title' => '`job_title` varchar(255)',
+      'gender_id' => '`gender_id` varchar(255)',
+      'birth_date' => '`birth_date` varchar(32)',
+      'is_deceased' => '`is_deceased` varchar(16)',
+      'deceased_date' => '`deceased_date` varchar(32)',
+      'household_name' => '`household_name` varchar(128)',
+      'organization_name' => '`organization_name` varchar(128)',
+      'sic_code' => '`sic_code` varchar(8)',
+      'user_unique_id' => '`user_unique_id` varchar(255)',
+      'current_employer_id' => '`current_employer_id` varchar(16)',
+      'contact_is_deleted' => '`contact_is_deleted` varchar(16)',
+      'created_date' => '`created_date` varchar(32)',
+      'modified_date' => '`modified_date` varchar(32)',
+      'addressee' => '`addressee` varchar(255)',
+      'email_greeting' => '`email_greeting` varchar(255)',
+      'postal_greeting' => '`postal_greeting` varchar(255)',
+      'current_employer' => '`current_employer` varchar(255)',
+      'location_type' => '`location_type` varchar(255)',
+      'street_address' => '`street_address` varchar(96)',
+      'street_number' => '`street_number` varchar(16)',
+      'street_number_suffix' => '`street_number_suffix` varchar(8)',
+      'street_name' => '`street_name` varchar(64)',
+      'street_unit' => '`street_unit` varchar(16)',
+      'supplemental_address_1' => '`supplemental_address_1` varchar(96)',
+      'supplemental_address_2' => '`supplemental_address_2` varchar(96)',
+      'supplemental_address_3' => '`supplemental_address_3` varchar(96)',
+      'city' => '`city` varchar(64)',
+      'postal_code_suffix' => '`postal_code_suffix` varchar(12)',
+      'postal_code' => '`postal_code` varchar(64)',
+      'geo_code_1' => '`geo_code_1` varchar(32)',
+      'geo_code_2' => '`geo_code_2` varchar(32)',
+      'address_name' => '`address_name` varchar(255)',
+      'master_id' => '`master_id` varchar(128)',
+      'county' => '`county` varchar(64)',
+      'state_province' => '`state_province` varchar(64)',
+      'country' => '`country` varchar(64)',
+      'phone' => '`phone` varchar(32)',
+      'phone_ext' => '`phone_ext` varchar(16)',
+      'email' => '`email` varchar(254)',
+      'on_hold' => '`on_hold` varchar(16)',
+      'is_bulkmail' => '`is_bulkmail` varchar(16)',
+      'signature_text' => '`signature_text` longtext',
+      'signature_html' => '`signature_html` longtext',
+      'im_provider' => '`im_provider` varchar(255)',
+      'im' => '`im` varchar(64)',
+      'openid' => '`openid` varchar(255)',
+      'world_region' => '`world_region` varchar(128)',
+      'url' => '`url` varchar(128)',
+      'phone_type_id' => '`phone_type_id` varchar(16)',
+      'financial_type' => '`financial_type` varchar(255)',
+      'contribution_source' => '`contribution_source` varchar(255)',
+      'receive_date' => '`receive_date` varchar(32)',
+      'thankyou_date' => '`thankyou_date` varchar(32)',
+      'contribution_cancel_date' => '`contribution_cancel_date` varchar(32)',
+      'total_amount' => '`total_amount` varchar(32)',
+      'accounting_code' => '`accounting_code` varchar(64)',
+      'payment_instrument' => '`payment_instrument` varchar(255)',
+      'payment_instrument_id' => '`payment_instrument_id` varchar(16)',
+      'contribution_check_number' => '`contribution_check_number` varchar(255)',
+      'non_deductible_amount' => '`non_deductible_amount` varchar(32)',
+      'fee_amount' => '`fee_amount` varchar(32)',
+      'net_amount' => '`net_amount` varchar(32)',
+      'trxn_id' => '`trxn_id` varchar(255)',
+      'invoice_id' => '`invoice_id` varchar(255)',
+      'invoice_number' => '`invoice_number` varchar(255)',
+      'currency' => '`currency` varchar(3)',
+      'cancel_reason' => '`cancel_reason` longtext',
+      'receipt_date' => '`receipt_date` varchar(32)',
+      'is_test' => '`is_test` varchar(16)',
+      'is_pay_later' => '`is_pay_later` varchar(16)',
+      'contribution_status' => '`contribution_status` varchar(255)',
+      'contribution_recur_id' => '`contribution_recur_id` varchar(16)',
+      'amount_level' => '`amount_level` longtext',
+      'contribution_note' => '`contribution_note` longtext',
+      'contribution_batch' => '`contribution_batch` text',
+      'contribution_campaign_title' => '`contribution_campaign_title` varchar(255)',
+      'contribution_campaign_id' => '`contribution_campaign_id` varchar(16)',
+      'contribution_soft_credit_name' => '`contribution_soft_credit_name` varchar(255)',
+      'contribution_soft_credit_amount' => '`contribution_soft_credit_amount` varchar(32)',
+      'contribution_soft_credit_type' => '`contribution_soft_credit_type` varchar(255)',
+      'contribution_soft_credit_contact_id' => '`contribution_soft_credit_contact_id` varchar(16)',
+      'contribution_soft_credit_contribution_id' => '`contribution_soft_credit_contribution_id` varchar(16)',
     ];
   }
 
@@ -2706,30 +2785,30 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getPledgeSqlColumns() {
     return [
-      'pledge_id' => 'pledge_id varchar(16)',
-      'pledge_amount' => 'pledge_amount varchar(32)',
-      'pledge_total_paid' => 'pledge_total_paid text',
-      'pledge_create_date' => 'pledge_create_date varchar(32)',
-      'pledge_start_date' => 'pledge_start_date varchar(32)',
-      'pledge_next_pay_date' => 'pledge_next_pay_date text',
-      'pledge_next_pay_amount' => 'pledge_next_pay_amount text',
-      'pledge_status' => 'pledge_status varchar(255)',
-      'pledge_is_test' => 'pledge_is_test varchar(16)',
-      'pledge_contribution_page_id' => 'pledge_contribution_page_id varchar(255)',
-      'pledge_financial_type' => 'pledge_financial_type text',
-      'pledge_frequency_interval' => 'pledge_frequency_interval varchar(255)',
-      'pledge_frequency_unit' => 'pledge_frequency_unit varchar(255)',
-      'pledge_currency' => 'pledge_currency text',
-      'pledge_campaign_id' => 'pledge_campaign_id varchar(16)',
-      'pledge_balance_amount' => 'pledge_balance_amount text',
-      'pledge_payment_id' => 'pledge_payment_id varchar(16)',
-      'pledge_payment_scheduled_amount' => 'pledge_payment_scheduled_amount varchar(32)',
-      'pledge_payment_scheduled_date' => 'pledge_payment_scheduled_date varchar(32)',
-      'pledge_payment_paid_amount' => 'pledge_payment_paid_amount text',
-      'pledge_payment_paid_date' => 'pledge_payment_paid_date text',
-      'pledge_payment_reminder_date' => 'pledge_payment_reminder_date varchar(32)',
-      'pledge_payment_reminder_count' => 'pledge_payment_reminder_count varchar(16)',
-      'pledge_payment_status' => 'pledge_payment_status varchar(255)',
+      'pledge_id' => '`pledge_id` varchar(16)',
+      'pledge_amount' => '`pledge_amount` varchar(32)',
+      'pledge_total_paid' => '`pledge_total_paid` text',
+      'pledge_create_date' => '`pledge_create_date` varchar(32)',
+      'pledge_start_date' => '`pledge_start_date` varchar(32)',
+      'pledge_next_pay_date' => '`pledge_next_pay_date` text',
+      'pledge_next_pay_amount' => '`pledge_next_pay_amount` text',
+      'pledge_status' => '`pledge_status` varchar(255)',
+      'pledge_is_test' => '`pledge_is_test` varchar(16)',
+      'pledge_contribution_page_id' => '`pledge_contribution_page_id` varchar(16)',
+      'pledge_financial_type' => '`pledge_financial_type` text',
+      'pledge_frequency_interval' => '`pledge_frequency_interval` varchar(16)',
+      'pledge_frequency_unit' => '`pledge_frequency_unit` varchar(255)',
+      'pledge_currency' => '`pledge_currency` text',
+      'pledge_campaign_id' => '`pledge_campaign_id` varchar(16)',
+      'pledge_balance_amount' => '`pledge_balance_amount` text',
+      'pledge_payment_id' => '`pledge_payment_id` varchar(16)',
+      'pledge_payment_scheduled_amount' => '`pledge_payment_scheduled_amount` varchar(32)',
+      'pledge_payment_scheduled_date' => '`pledge_payment_scheduled_date` varchar(32)',
+      'pledge_payment_paid_amount' => '`pledge_payment_paid_amount` text',
+      'pledge_payment_paid_date' => '`pledge_payment_paid_date` text',
+      'pledge_payment_reminder_date' => '`pledge_payment_reminder_date` varchar(32)',
+      'pledge_payment_reminder_count' => '`pledge_payment_reminder_count` varchar(16)',
+      'pledge_payment_status' => '`pledge_payment_status` varchar(255)',
     ];
   }
 
@@ -2740,20 +2819,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getMembershipSqlColumns() {
     return [
-      'membership_type' => 'membership_type varchar(128)',
-      'member_is_test' => 'member_is_test varchar(16)',
-      'member_is_pay_later' => 'member_is_pay_later varchar(16)',
-      'membership_join_date' => 'membership_join_date varchar(32)',
-      'membership_start_date' => 'membership_start_date varchar(32)',
-      'membership_end_date' => 'membership_end_date varchar(32)',
-      'membership_source' => 'membership_source varchar(128)',
-      'membership_status' => 'membership_status varchar(255)',
-      'membership_id' => 'membership_id varchar(16)',
-      'owner_membership_id' => 'owner_membership_id varchar(16)',
-      'max_related' => 'max_related varchar(16)',
-      'membership_recur_id' => 'membership_recur_id varchar(16)',
-      'member_campaign_id' => 'member_campaign_id varchar(16)',
-      'member_is_override' => 'member_is_override varchar(16)',
+      'membership_type' => '`membership_type` varchar(128)',
+      'member_is_test' => '`member_is_test` varchar(16)',
+      'member_is_pay_later' => '`member_is_pay_later` varchar(16)',
+      'membership_join_date' => '`membership_join_date` varchar(32)',
+      'membership_start_date' => '`membership_start_date` varchar(32)',
+      'membership_end_date' => '`membership_end_date` varchar(32)',
+      'membership_source' => '`membership_source` varchar(128)',
+      'membership_status' => '`membership_status` varchar(255)',
+      'membership_id' => '`membership_id` varchar(16)',
+      'owner_membership_id' => '`owner_membership_id` varchar(16)',
+      'max_related' => '`max_related` varchar(16)',
+      'membership_recur_id' => '`membership_recur_id` varchar(16)',
+      'member_campaign_id' => '`member_campaign_id` varchar(16)',
+      'member_is_override' => '`member_is_override` varchar(16)',
     ];
   }
 
@@ -2792,17 +2871,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \League\Csv\Exception
    */
   protected function doExportTest($params) {
+    $fields = $params['fields'] ?? [];
+    $fieldDefaults = ['contact_type' => 'Individual', 'phone_type_id' => NULL, 'location_type_id' => NULL];
+    foreach ($fields as $key => $field) {
+      $fields[$key] = array_merge($fieldDefaults, $field);
+    }
     $this->startCapturingOutput();
     try {
       $exportMode = CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT);
       $ids = CRM_Utils_Array::value('ids', $params, ($exportMode === CRM_Export_Form_Select::CONTACT_EXPORT ? $this->contactIDs : []));
-      $defaultClause = (empty($ids) ? NULL : "contact_a.id IN (" . implode(',', $ids) . ")");
+      $defaultClause = (empty($ids) ? NULL : 'contact_a.id IN (' . implode(',', $ids) . ')');
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         $ids,
         CRM_Utils_Array::value('params', $params, []),
         CRM_Utils_Array::value('order', $params),
-        CRM_Utils_Array::value('fields', $params, []),
+        $fields,
         CRM_Utils_Array::value('moreReturnProperties', $params),
         $exportMode,
         CRM_Utils_Array::value('componentClause', $params, $defaultClause),
@@ -2825,15 +2909,19 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @param array $expected
    * @param array $row
+   * @param array $alternatives
    */
-  protected function assertExpectedOutput(array $expected, array $row) {
+  protected function assertExpectedOutput(array $expected, array $row, array $alternatives = []) {
     $variableFields = ['Created Date', 'Modified Date', 'Contact Hash'];
     foreach ($expected as $key => $value) {
       if (in_array($key, $variableFields)) {
         $this->assertTrue(!empty($row[$key]));
       }
+      elseif (array_key_exists($key, $alternatives)) {
+        $this->assertContains($row[$key], $alternatives[$key]);
+      }
       else {
-        $this->assertEquals($value, $row[$key]);
+        $this->assertEquals($value, $row[$key], 'mismatch on ' . $key);
       }
     }
   }
@@ -2846,18 +2934,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportGetPreview() {
     $this->setUpContactExportData();
     $fields = [
-      ['Individual', 'first_name'],
-      ['Individual', 'last_name'],
-      ['Individual', 'street_address', 1],
-      ['Individual', 'city', 1],
-      ['Individual', 'country', 1],
-      ['Individual', 'email', 1],
+      ['contact_type' => 'Individual', 'name' => 'first_name'],
+      ['contact_type' => 'Individual', 'name' => 'last_name'],
+      ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'country', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => 1],
     ];
-    $mappedFields = [];
-    foreach ($fields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $mappedFields,
+    $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $fields,
     'AND');
     $processor->setComponentClause('contact_a.id IN (' . implode(',', $this->contactIDs) . ')');
     $result = $processor->getPreview(2);
@@ -2900,6 +2984,46 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ];
     $this->callAPISuccess('address', 'create', $params);
+  }
+
+  /**
+   * Test for single select Autocomplete custom field.
+   *
+   */
+  public function testSingleAndMultiSelectAutoComplete() {
+    $customGroupId = $this->customGroupCreate([
+      'extends' => 'Individual',
+    ])['id'];
+    $colors = ['Y' => 'Yellow', 'G' => 'Green', 'R' => 'Red'];
+    $fieldId1 = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'option_values' => $colors,
+      'label' => 'Autocomplete Color',
+    ])['id'];
+    $fieldId2 = $this->createAutoCompleteCustomField([
+      'custom_group_id' => $customGroupId,
+      'option_values' => $colors,
+      'label' => 'Autocomplete Colors',
+      'serialize' => 1,
+    ])['id'];
+    $contactId = $this->individualCreate([
+      "custom_$fieldId1" => 'Y',
+      "custom_$fieldId2" => ['Y', 'G'],
+    ]);
+    $selectedFields = [
+      ['name' => 'contact_id'],
+      ['name' => "custom_{$fieldId1}"],
+      ['name' => "custom_{$fieldId2}"],
+    ];
+
+    $this->doExportTest([
+      'ids' => [$contactId],
+      'fields' => $selectedFields,
+      'exportMode' => CRM_Export_Form_Select::CONTACT_EXPORT,
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('Yellow', $row['Autocomplete Color']);
+    $this->assertEquals('Yellow, Green', $row['Autocomplete Colors']);
   }
 
 }

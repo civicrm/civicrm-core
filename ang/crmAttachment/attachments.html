@@ -7,13 +7,13 @@
         <a ng-href="{{file.url}}" target="_blank">{{file.name}}</a>
       </td>
       <td>
-        <input ng-model="file.description" class="crm-form-text" placeholder="{{ts('Description')}}"/>
+        <input ng-model="file.description" class="crm-form-text" placeholder="{{:: ts('Description') }}"/>
       </td>
       <td>
         <a
           crm-icon="fa-trash"
           crm-confirm="{message: ts('Deleting an attachment will completely remove it from server.')}" on-yes="att.deleteFile(file)"
-          title="{{ts('Delete attachment')}}"
+          title="{{:: ts('Delete attachment') }}"
           class="crm-hover-button">
         </a>
       </td>
@@ -23,11 +23,11 @@
     <tr ng-repeat="item in att.uploader.queue" ng-class="{nvReady: item.isReady, nvUploading:item.isUploading, nvUploaded:item.isUploaded,nvSuccess:item.isSuccess,nvCancel:item.isCancel,nvError:item.isError}">
       <td class="filename filename-new">{{item.file.name}}</td>
       <td>
-        <input ng-model="item.crmData.description" class="crm-form-text" placeholder="{{ts('Description')}}"/>
+        <input ng-model="item.crmData.description" class="crm-form-text" placeholder="{{:: ts('Description') }}"/>
         <!-- item.isReady item.isUploading item.isUploaded item.isSuccess item.isCancel item.isError -->
       </td>
       <td>
-        <a crm-icon="fa-times" ng-click="item.remove()" class="crm-hover-button" title="{{ts('Remove unsaved attachment')}}"></a>
+        <a crm-icon="fa-times" ng-click="item.remove()" class="crm-hover-button" title="{{:: ts('Remove unsaved attachment') }}"></a>
       </td>
     </tr>
     </tbody>
@@ -38,9 +38,12 @@
   e.g. http://www.quirksmode.org/dom/inputfile.html
   -->
   <div>
-    {{ts('Add file:')}} <input type="file" nv-file-select uploader="att.uploader" multiple/><br/>
+    {{:: ts('Add file:') }} <input type="file" nv-file-select uploader="att.uploader" multiple/><br/>
   </div>
   <div>
-    {{ts('Alternatively, you may add new files using drag/drop.')}}
+    {{:: ts('Alternatively, you may add new files using drag/drop.') }}
+    <span ng-if="max_size">
+      {{ts('Each file must be less than %1M in size.', {1: max_size})}}
+    </span>
   </div>
 </div>

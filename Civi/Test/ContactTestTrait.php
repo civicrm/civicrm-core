@@ -18,7 +18,7 @@ trait ContactTestTrait {
   /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)
-   * CRM-8180
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
    *
    * @return int
    *   Contact ID of the created user.
@@ -31,6 +31,7 @@ trait ContactTestTrait {
       'domain_id' => \CRM_Core_Config::domainID(),
     ];
     $contactID = $this->individualCreate($params);
+    $this->callAPISuccess('UFMatch', 'get', ['uf_id' => 6, 'api.UFMatch.delete' => []]);
     $this->callAPISuccess('UFMatch', 'create', [
       'contact_id' => $contactID,
       'uf_name' => 'superman',
@@ -73,7 +74,7 @@ trait ContactTestTrait {
    * @return int
    *   id of Individual created
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function individualCreate($params = [], $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
@@ -155,16 +156,13 @@ trait ContactTestTrait {
    *   For civicrm_contact_add api function call.
    *
    * @return int
-   *   id of Household created
-   * @throws \CRM_Core_Exception
+   *   id of contact created
    *
+   * @throws \CiviCRM_API3_Exception
    */
   private function _contactCreate($params) {
-    $result = $this->callAPISuccess('contact', 'create', $params);
-    if (!empty($result['is_error']) || empty($result['id'])) {
-      throw new \CRM_Core_Exception('Could not create test contact, with message: ' . \CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . \CRM_Utils_Array::value('trace', $result));
-    }
-    return $result['id'];
+    $result = civicrm_api3('contact', 'create', $params);
+    return (int) $result['id'];
   }
 
   /**

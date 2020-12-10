@@ -1,0 +1,51 @@
+<li>
+  <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
+    <label>{{ ts('Type:') }}</label>
+    <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{ ts('Field type') }}">
+      <option ng-repeat="(type, label) in editor.meta.inputType" value="{{ type }}" ng-if="inputTypeCanBe(type)">{{ label }}</option>
+    </select>
+  </div>
+</li>
+<li>
+  <a href ng-click="toggleRequired(); $event.stopPropagation();" title="{{ ts('Require this field') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': !getProp('required'), 'fa-check-square-o': getProp('required')}"></i>
+    {{ ts('Required') }}
+  </a>
+</li>
+<li>
+  <a href ng-click="toggleLabel(); $event.stopPropagation();" title="{{ ts('Show field label') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': node.defn.title === false, 'fa-check-square-o': node.defn.title !== false}"></i>
+    {{ ts('Label') }}
+  </a>
+</li>
+<li>
+  <a href ng-click="toggleHelp('pre'); $event.stopPropagation();" title="{{ ts('Show help text above this field') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': !propIsset('help_pre'), 'fa-check-square-o': propIsset('help_pre')}"></i>
+    {{ ts('Pre help text') }}
+  </a>
+</li>
+<li>
+  <a href ng-click="toggleHelp('post'); $event.stopPropagation();" title="{{ ts('Show help text below this field') }}">
+    <i class="crm-i" ng-class="{'fa-square-o': !propIsset('help_post'), 'fa-check-square-o': propIsset('help_post')}"></i>
+    {{ ts('Post help text') }}
+  </a>
+</li>
+<li role="separator" class="divider" ng-if="hasOptions()"></li>
+<li ng-if="hasOptions()" ng-click="$event.stopPropagation()">
+  <a href ng-click="resetOptions()" title="{{ ts('Reset the option list for this field') }}">
+    <i class="crm-i fa-{{ node.defn.options ? '' : 'check-' }}circle-o"></i>
+    {{ ts('Default option list') }}
+  </a>
+</li>
+<li ng-if="hasOptions()">
+  <a href ng-click="editOptions()" title="{{ ts('Customize the option list for this field') }}">
+    <i class="crm-i fa-{{ !node.defn.options ? '' : 'check-' }}circle-o"></i>
+    {{ ts('Customize options') }}
+  </a>
+</li>
+<li role="separator" class="divider"></li>
+<li>
+  <a href ng-click="container.removeElement(node)" title="{{ ts('Remove field from form') }}">
+    <span class="text-danger">{{ ts('Delete this field') }}</span>
+  </a>
+</li>

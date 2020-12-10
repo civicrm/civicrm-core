@@ -1,29 +1,16 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Email;
+use Civi\Api4\PCPBlock;
 
 /**
  * Trait CRMTraits_PCP_PCPTestTrait
@@ -45,7 +32,7 @@ trait CRMTraits_PCP_PCPTestTrait {
     $supporterProfile = CRM_Core_DAO::createTestObject('CRM_Core_DAO_UFGroup');
     $supporterProfileId = $supporterProfile->id;
 
-    $params = array(
+    return [
       'entity_table' => 'civicrm_contribution_page',
       'entity_id' => $contribPageId,
       'supporter_profile_id' => $supporterProfileId,
@@ -55,9 +42,8 @@ trait CRMTraits_PCP_PCPTestTrait {
       'tellfriend_limit' => 1,
       'link_text' => 'Create your own PCP',
       'is_active' => 1,
-    );
-
-    return $params;
+      'owner_notify_id:name' => 'owner_chooses',
+    ];
   }
 
   /**
@@ -65,14 +51,17 @@ trait CRMTraits_PCP_PCPTestTrait {
    *
    * Create the necessary initial objects for a pcp page, then return the
    * params needed to create the pcp page.
+   *
+   * @throw API_Exception
    */
   public function pcpParams() {
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
     $contactId = $contact->id;
+    Email::create()->setValues(['email' => 'dobby@example.org', 'contact_id' => $contactId])->execute();
     $contribPage = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage');
     $contribPageId = $contribPage->id;
 
-    $params = array(
+    return [
       'contact_id' => $contactId,
       'status_id' => '1',
       'title' => 'My PCP',
@@ -80,13 +69,28 @@ trait CRMTraits_PCP_PCPTestTrait {
       'page_text' => 'You better give more.',
       'donate_link_text' => 'Donate Now',
       'page_id' => $contribPageId,
+      'is_notify' => TRUE,
       'is_thermometer' => 1,
       'is_honor_roll' => 1,
       'goal_amount' => 10000.00,
       'is_active' => 1,
-    );
+    ];
+  }
 
-    return $params;
+  /**
+   * Create a pcp block for testing.
+   *
+   * @param array $params
+   *
+   * @return int
+   */
+  protected function createPCPBlock(array $params):int {
+    $blockParams = $this->pcpBlockParams();
+    $params = array_merge($this->pcpParams(), $params);
+    $params['pcp_block_id']  = PCPBlock::create()->setValues($blockParams)->execute()->first()['id'];
+
+    $pcp = CRM_PCP_BAO_PCP::create($params);
+    return (int) $pcp->id;
   }
 
 }

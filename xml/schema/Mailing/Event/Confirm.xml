@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_confirm</name>
   <comment>Tracks when a subscription event is confirmed by email</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Confirmation ID</title>

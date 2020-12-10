@@ -50,7 +50,6 @@ function domain_create_expectedresult() {
         'id' => '3',
         'name' => 'A-team domain',
         'description' => 'domain of chaos',
-        'config_backend' => '',
         'contact_id' => '7',
         'locales' => '',
         'locale_custom_strings' => '',

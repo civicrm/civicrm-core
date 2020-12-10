@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -155,21 +137,11 @@ class CRM_Core_BAO_CustomOption {
         $action -= CRM_Core_Action::DELETE;
       }
 
-      if (in_array($field->html_type, ['CheckBox', 'Multi-Select'])) {
-        if (isset($defVal) && in_array($dao->value, $defVal)) {
-          $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
-        }
-        else {
-          $options[$dao->id]['is_default'] = '';
-        }
+      if ($field->html_type == 'CheckBox' || ($field->html_type == 'Select' && $field->serialize == 1)) {
+        $options[$dao->id]['is_default'] = (isset($defVal) && in_array($dao->value, $defVal));
       }
       else {
-        if ($field->default_value == $dao->value) {
-          $options[$dao->id]['is_default'] = '<img src="' . $config->resourceBase . 'i/check.gif" />';
-        }
-        else {
-          $options[$dao->id]['is_default'] = '';
-        }
+        $options[$dao->id]['is_default'] = ($field->default_value == $dao->value);
       }
       $options[$dao->id]['description'] = $dao->description;
       $options[$dao->id]['class'] = $dao->id . ',' . $class;
@@ -226,7 +198,7 @@ AND    g.id    = v.option_group_id";
         'value' => $value,
       ];
       // delete this value from the tables
-      self::updateCustomValues($params);
+      self::updateValue($optionId, $value);
 
       // also delete this option value
       $query = "
@@ -235,79 +207,6 @@ FROM   civicrm_option_value
 WHERE  id = %1";
       $params = [1 => [$optionId, 'Integer']];
       CRM_Core_DAO::executeQuery($query, $params);
-    }
-  }
-
-  /**
-   * @param array $params
-   *
-   * @throws Exception
-   */
-  public static function updateCustomValues($params) {
-    $optionDAO = new CRM_Core_DAO_OptionValue();
-    $optionDAO->id = $params['optionId'];
-    $optionDAO->find(TRUE);
-    $oldValue = $optionDAO->value;
-
-    // get the table, column, html_type and data type for this field
-    $query = "
-SELECT g.table_name  as tableName ,
-       f.column_name as columnName,
-       f.data_type   as dataType,
-       f.html_type   as htmlType
-FROM   civicrm_custom_group g,
-       civicrm_custom_field f
-WHERE  f.custom_group_id = g.id
-  AND  f.id = %1";
-    $queryParams = [1 => [$params['fieldId'], 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-    if ($dao->fetch()) {
-      if ($dao->dataType == 'Money') {
-        $params['value'] = CRM_Utils_Rule::cleanMoney($params['value']);
-      }
-      switch ($dao->htmlType) {
-        case 'Autocomplete-Select':
-        case 'Select':
-        case 'Radio':
-          $query = "
-UPDATE {$dao->tableName}
-SET    {$dao->columnName} = %1
-WHERE  id = %2";
-          if ($dao->dataType == 'Auto-complete') {
-            $dataType = "String";
-          }
-          else {
-            $dataType = $dao->dataType;
-          }
-          $queryParams = [
-            1 => [
-              $params['value'],
-              $dataType,
-            ],
-            2 => [
-              $params['optionId'],
-              'Integer',
-            ],
-          ];
-          break;
-
-        case 'Multi-Select':
-        case 'CheckBox':
-          $oldString = CRM_Core_DAO::VALUE_SEPARATOR . $oldValue . CRM_Core_DAO::VALUE_SEPARATOR;
-          $newString = CRM_Core_DAO::VALUE_SEPARATOR . $params['value'] . CRM_Core_DAO::VALUE_SEPARATOR;
-          $query = "
-UPDATE {$dao->tableName}
-SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
-          $queryParams = [
-            1 => [$oldString, 'String'],
-            2 => [$newString, 'String'],
-          ];
-          break;
-
-        default:
-          CRM_Core_Error::fatal();
-      }
-      $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     }
   }
 

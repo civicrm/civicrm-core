@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -99,7 +83,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   public function setDefaultValues() {
     $defaults = [];
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
-    $defaults['label_name'] = CRM_Utils_Array::value('name', $format);
+    $defaults['label_name'] = $format['name'] ?? NULL;
     $defaults['do_not_mail'] = 1;
 
     return $defaults;
@@ -107,10 +91,11 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
+   *
+   * @param array|NULL $params
    */
-  public function postProcess() {
-    $fv = $this->controller->exportValues($this->_name);
-    $config = CRM_Core_Config::singleton();
+  public function postProcess($params = NULL) {
+    $fv = $params ?: $this->controller->exportValues($this->_name);
     $locName = NULL;
     //get the address format sequence from the config file
     $mailingFormat = Civi::settings()->get('mailing_format');
@@ -160,15 +145,12 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $returnProperties['last_name'] = 1;
     }
 
-    $individualFormat = FALSE;
-
     /*
      * CRM-8338: replace ids of household members with the id of their household
      * so we can merge labels by household.
      */
     if (isset($fv['merge_same_household'])) {
       $this->mergeContactIdsByHousehold();
-      $individualFormat = TRUE;
     }
 
     //get the contacts information
@@ -179,13 +161,14 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
       $location = ['location' => ["{$locName}" => $address]];
       $returnProperties = array_merge($returnProperties, $location);
       $params[] = ['location_type', '=', [1 => $fv['location_type_id']], 0, 0];
+      $primaryLocationOnly = FALSE;
     }
     else {
       $returnProperties = array_merge($returnProperties, $address);
+      $primaryLocationOnly = TRUE;
     }
 
     $rows = [];
-
     foreach ($this->_contactIds as $key => $contactID) {
       $params[] = [
         CRM_Core_Form::CB_PREFIX . $contactID,
@@ -213,13 +196,12 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     //get the total number of contacts to fetch from database.
     $numberofContacts = count($this->_contactIds);
-    $query = new CRM_Contact_BAO_Query($params, $returnProperties);
-    $details = $query->apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts);
-
+    [$details] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberofContacts, TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, $primaryLocationOnly);
     $messageToken = CRM_Utils_Token::getTokens($mailingFormat);
 
+    // $details is an array of [ contactID => contactDetails ]
     // also get all token values
-    CRM_Utils_Hook::tokenValues($details[0],
+    CRM_Utils_Hook::tokenValues($details,
       $this->_contactIds,
       NULL,
       $messageToken,
@@ -237,11 +219,11 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
 
     foreach ($this->_contactIds as $value) {
       foreach ($custom as $cfID) {
-        if (isset($details[0][$value]["custom_{$cfID}"])) {
-          $details[0][$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[0][$value]["custom_{$cfID}"], $cfID);
+        if (isset($details[$value]["custom_{$cfID}"])) {
+          $details[$value]["custom_{$cfID}"] = CRM_Core_BAO_CustomField::displayValue($details[$value]["custom_{$cfID}"], $cfID);
         }
       }
-      $contact = CRM_Utils_Array::value($value, $details['0']);
+      $contact = $details[$value] ?? NULL;
 
       if (is_a($contact, 'CRM_Core_Error')) {
         return NULL;
@@ -284,7 +266,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
                   'im',
                   'openid',
                 ])) {
-                  if ($k == 'im') {
+                  if ($k === 'im') {
                     $rows[$value][$k] = $v['1']['name'];
                   }
                   else {
@@ -347,6 +329,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
         $formatted = implode("\n", $lines);
       }
       $rows[$id] = [$formatted];
+    }
+
+    if (!empty($fv['is_unit_testing'])) {
+      return $rows;
     }
 
     //call function to create labels

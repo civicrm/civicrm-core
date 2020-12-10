@@ -76,10 +76,10 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
       'membership_id' => $membershipID,
     ]);
     $recurringContributions = [];
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
 
     foreach ($result['values'] as $payment) {
-      $recurringContributionID = $payment['contribution_id.contribution_recur_id.id'];
+      $recurringContributionID = (int) $payment['contribution_id.contribution_recur_id.id'];
       $alreadyProcessed = isset($recurringContributions[$recurringContributionID]);
 
       if ($alreadyProcessed) {
@@ -96,7 +96,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
 
       $recurringContributions[$recurringContributionID]['id'] = $recurringContributionID;
       $recurringContributions[$recurringContributionID]['contactId'] = $contactID;
-      $recurringContributions[$recurringContributionID]['contribution_status'] = CRM_Utils_Array::value($contributionStatusID, $contributionStatuses);
+      $recurringContributions[$recurringContributionID]['contribution_status'] = $contributionStatuses[$contributionStatusID] ?? NULL;
 
       $this->setActionsForRecurringContribution($recurringContributionID, $recurringContributions[$recurringContributionID]);
     }
@@ -110,7 +110,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    * @param int $recurID
    * @param array $recurringContribution
    */
-  private function setActionsForRecurringContribution($recurID, &$recurringContribution) {
+  private function setActionsForRecurringContribution(int $recurID, &$recurringContribution) {
     $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution')));
 
     // no action allowed if it's not active

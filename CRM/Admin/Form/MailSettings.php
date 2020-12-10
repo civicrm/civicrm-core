@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -36,6 +20,8 @@
  *
  */
 class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
+
+  protected $_testButtonName;
 
   /**
    * Build the form object.
@@ -47,6 +33,16 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
+
+    $this->_testButtonName = $this->getButtonName('refresh', 'test');
+    $buttons = $this->getElement('buttons')->getElements();
+    $buttons[] = $this->createElement(
+      'xbutton',
+      $this->_testButtonName,
+      CRM_Core_Page::crmIcon('fa-chain') . ' ' . ts('Save & Test'),
+      ['type' => 'submit', 'class' => 'crm-button']
+    );
+    $this->getElement('buttons')->setElements($buttons);
 
     $this->applyFilter('__ALL__', 'trim');
 
@@ -86,13 +82,16 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     ];
     $this->add('select', 'is_default', ts('Used For?'), $usedfor);
     $this->addField('activity_status', ['placeholder' => FALSE]);
+
+    $this->add('checkbox', 'is_non_case_email_skipped', ts('Skip emails which do not have a Case ID or Case hash'));
+    $this->add('checkbox', 'is_contact_creation_disabled_if_no_match', ts('Do not create new contacts when filing emails'));
   }
 
   /**
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(['CRM_Admin_Form_MailSettings', 'formRule']);
+    $this->addFormRule(['CRM_Admin_Form_MailSettings', 'formRule'], $this);
   }
 
   public function getDefaultEntity() {
@@ -120,15 +119,21 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   *   Not used here.
+   * @param CRM_Core_Form $form
+   *   This form.
    *
    * @return array
    *   list of errors to be posted back to the form
    */
-  public static function formRule($fields) {
+  public static function formRule($fields, $files, $form) {
     $errors = [];
-    // Check for default from email address and organization (domain) name. Force them to change it.
-    if ($fields['domain'] == 'EXAMPLE.ORG') {
-      $errors['domain'] = ts('Please enter a valid domain for this mailbox account (the part after @).');
+    if ($form->_action != CRM_Core_Action::DELETE) {
+      // Check for default from email address and organization (domain) name. Force them to change it.
+      if ($fields['domain'] == 'EXAMPLE.ORG') {
+        $errors['domain'] = ts('Please enter a valid domain for this mailbox account (the part after @).');
+      }
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -162,6 +167,8 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       'is_ssl',
       'is_default',
       'activity_status',
+      'is_non_case_email_skipped',
+      'is_contact_creation_disabled_if_no_match',
     ];
 
     $params = [];
@@ -169,18 +176,20 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       if (in_array($f, [
         'is_default',
         'is_ssl',
+        'is_non_case_email_skipped',
+        'is_contact_creation_disabled_if_no_match',
       ])) {
         $params[$f] = CRM_Utils_Array::value($f, $formValues, FALSE);
       }
       else {
-        $params[$f] = CRM_Utils_Array::value($f, $formValues);
+        $params[$f] = $formValues[$f] ?? NULL;
       }
     }
 
     $params['domain_id'] = CRM_Core_Config::domainID();
 
     // assign id only in update mode
-    $status = ts('Your New  Email Settings have been saved.');
+    $status = ts('Your New Email Settings have been saved.');
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
       $status = ts('Your Email Settings have been updated.');
@@ -193,6 +202,14 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     }
     else {
       CRM_Core_Session::setStatus("", ts('Changes Not Saved.'), "info");
+    }
+
+    if ($this->controller->getButtonName() == $this->_testButtonName) {
+      $test = civicrm_api4('MailSettings', 'testConnection', [
+        'where' => [['id', '=', $mailSettings->id]],
+      ])->single();
+      CRM_Core_Session::setStatus($test['details'], $test['title'],
+        $test['error'] ? 'error' : 'success');
     }
   }
 

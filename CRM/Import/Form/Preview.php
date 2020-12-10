@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -52,21 +36,37 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
+
+    // FIXME: This is a hack...
+    // The tpl contains javascript that starts the import on form submit
+    // Since our back/cancel buttons are of html type "submit" we have to prevent a form submit event when they are clicked
+    // Hacking in some onclick js to make them act more like links instead of buttons
+    $path = CRM_Utils_System::currentPath();
+    $query = ['_qf_MapField_display' => 'true'];
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
+    if (CRM_Utils_Rule::qfKey($qfKey)) {
+      $query['qfKey'] = $qfKey;
+    }
+    $previousURL = CRM_Utils_System::url($path, $query, FALSE, NULL, FALSE);
+    $cancelURL = CRM_Utils_System::url($path, 'reset=1', FALSE, NULL, FALSE);
+
     $this->addButtons([
-        [
-          'type' => 'back',
-          'name' => ts('Previous'),
-        ],
-        [
-          'type' => 'next',
-          'name' => ts('Import Now'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
+      [
+        'type' => 'back',
+        'name' => ts('Previous'),
+        'js' => ['onclick' => "location.href='{$previousURL}'; return false;"],
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Import Now'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+        'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
+      ],
     ]);
   }
 

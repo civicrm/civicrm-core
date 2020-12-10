@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -71,6 +53,15 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
   public $_componentTable;
 
   /**
+   * Use the form name to create the tpl file name.
+   *
+   * @return string
+   */
+  public function getTemplateFileName() {
+    return 'CRM/Export/Form/Select.tpl';
+  }
+
+  /**
    * Build all the data structures needed to build the form.
    *
    * @param
@@ -94,94 +85,19 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
     $this->_componentIds = [];
     $this->_componentClause = NULL;
 
-    // we need to determine component export
-    $components = ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'];
-
     // FIXME: This should use a modified version of CRM_Contact_Form_Search::getModeValue but it doesn't have all the contexts
     // FIXME: Or better still, use CRM_Core_DAO_AllCoreTables::getBriefName($daoName) to get the $entityShortName
-    switch ($this->getQueryMode()) {
-      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
-        $entityShortname = 'Contribute';
-        $entityDAOName = $entityShortname;
-        break;
+    $entityShortname = $this->getEntityShortName();
 
-      case CRM_Contact_BAO_Query::MODE_MEMBER:
-        $entityShortname = 'Member';
-        $entityDAOName = 'Membership';
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_EVENT:
-        $entityShortname = 'Event';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_PLEDGE:
-        $entityShortname = 'Pledge';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_CASE:
-        $entityShortname = 'Case';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_GRANT:
-        $entityShortname = 'Grant';
-        $entityDAOName = $entityShortname;
-        break;
-
-      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
-        $entityShortname = 'Activity';
-        $entityDAOName = $entityShortname;
-        break;
-
-      default:
-        // FIXME: Code cleanup, we may not need to do this $componentName code here.
-        $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
-        $componentName = explode('_', $formName);
-        if ($formName == 'CRM_Export_StateMachine_Standalone') {
-          $componentName = ['CRM', $this->controller->get('entity')];
-        }
-        // Contact
-        $entityShortname = $componentName[1];
-        $entityDAOName = $entityShortname;
-        break;
+    if (!in_array($entityShortname, ['Contact', 'Contribute', 'Member', 'Event', 'Pledge', 'Case', 'Grant', 'Activity'], TRUE)) {
+      // This is never reached - the exception here is just to clarify that entityShortName MUST be one of the above
+      // to save future refactorers & reviewers from asking that question.
+      throw new CRM_Core_Exception('Unreachable code');
     }
+    $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
 
-    if (in_array($entityShortname, $components)) {
-      $this->_exportMode = constant('CRM_Export_Form_Select::' . strtoupper($entityShortname) . '_EXPORT');
-      $formTaskClassName = "CRM_{$entityShortname}_Form_Task";
-      $taskClassName = "CRM_{$entityShortname}_Task";
-      if (isset($formTaskClassName::$entityShortname)) {
-        $this::$entityShortname = $formTaskClassName::$entityShortname;
-        if (isset($formTaskClassName::$tableName)) {
-          $this::$tableName = $formTaskClassName::$tableName;
-        }
-      }
-      else {
-        $this::$entityShortname = $entityShortname;
-        $this::$tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($entityDAOName));
-      }
-    }
-
-    // get the submitted values based on search
-    if ($this->_action == CRM_Core_Action::ADVANCED) {
-      $values = $this->controller->exportValues('Advanced');
-    }
-    elseif ($this->_action == CRM_Core_Action::PROFILE) {
-      $values = $this->controller->exportValues('Builder');
-    }
-    elseif ($this->_action == CRM_Core_Action::COPY) {
-      $values = $this->controller->exportValues('Custom');
-    }
-    else {
-      if (in_array($entityShortname, $components) && $entityShortname !== 'Contact') {
-        $values = $this->controller->exportValues('Search');
-      }
-      else {
-        $values = $this->controller->exportValues('Basic');
-      }
-    }
+    $this::$entityShortname = strtolower($entityShortname);
+    $values = $this->getSearchFormValues();
 
     $count = 0;
     $this->_matchingContacts = FALSE;
@@ -197,17 +113,13 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
       }
     }
 
-    $formTaskClassName::preProcessCommon($this);
+    $this->callPreProcessing();
 
     // $component is used on CRM/Export/Form/Select.tpl to display extra information for contact export
     ($this->_exportMode == self::CONTACT_EXPORT) ? $component = FALSE : $component = TRUE;
     $this->assign('component', $component);
 
-    // Set the task title
-    $componentTasks = $taskClassName::taskTitles();
-    $this->_task = $values['task'];
-    $taskName = $componentTasks[$this->_task];
-    $this->assign('taskName', $taskName);
+    $this->assign('isShowMergeOptions', $this->isShowContactMergeOptions());
 
     if ($this->_componentTable) {
       $query = "
@@ -236,7 +148,14 @@ FROM   {$this->_componentTable}
     $this->set('selectAll', $this->_selectAll);
     $this->set('exportMode', $this->_exportMode);
     $this->set('componentClause', $this->_componentClause);
-    $this->set('componentTable', $this->_componentTable);
+    $this->set('componentTable', $this->getTableName());
+  }
+
+  /**
+   * Get the name of the table for the relevant entity.
+   */
+  public function getTableName() {
+    throw new CRM_Core_Exception('should be over-riden');
   }
 
   /**
@@ -356,7 +275,7 @@ FROM   {$this->_componentTable}
       ];
 
       foreach ($greetings as $key => $value) {
-        $otherOption = CRM_Utils_Array::value($key, $params);
+        $otherOption = $params[$key] ?? NULL;
 
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
@@ -388,7 +307,7 @@ FROM   {$this->_componentTable}
     // all submitted options or any other argument
     $exportParams = $params;
 
-    $mappingId = CRM_Utils_Array::value('mapping', $params);
+    $mappingId = $params['mapping'] ?? NULL;
     if ($mappingId) {
       $this->set('mappingId', $mappingId);
     }
@@ -506,12 +425,108 @@ FROM   {$this->_componentTable}
   }
 
   /**
-   * Get the query mode (eg. CRM_Core_BAO_Query::MODE_CASE)
+   * Get the query mode (eg. CRM_Contact_BAO_Query::MODE_CASE)
    *
    * @return int
    */
   public function getQueryMode() {
     return (int) ($this->queryMode ?: $this->controller->get('component_mode'));
+  }
+
+  /**
+   * Call the pre-processing function.
+   */
+  protected function callPreProcessing(): void {
+    throw new CRM_Core_Exception('This must be over-ridden');
+  }
+
+  /**
+   * Assign the title of the task to the tpl.
+   */
+  protected function isShowContactMergeOptions() {
+    throw new CRM_Core_Exception('This must be over-ridden');
+  }
+
+  /**
+   * Get the name of the component.
+   *
+   * @return array
+   */
+  protected function getComponentName(): string {
+    // CRM_Export_Controller_Standalone has this method
+    if (method_exists($this->controller, 'getComponent')) {
+      return $this->controller->getComponent();
+    }
+    // For others, just guess based on the name of the controller
+    $formName = CRM_Utils_System::getClassName($this->controller->getStateMachine());
+    $componentName = explode('_', $formName);
+    return $componentName[1];
+  }
+
+  /**
+   * Get the DAO name for the given export.
+   *
+   * @return string
+   */
+  protected function getDAOName(): string {
+    switch ($this->getQueryMode()) {
+      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
+        return 'Contribute';
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        return 'Membership';
+
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        return 'Event';
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        return 'Pledge';
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        return 'Case';
+
+      case CRM_Contact_BAO_Query::MODE_GRANT:
+        return 'Grant';
+
+      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
+        return 'Activity';
+
+      default:
+        return $this->controller->get('entity') ?? $this->getComponentName();
+    }
+  }
+
+  /**
+   * Get the entity short name for a given export.
+   *
+   * @return string
+   */
+  protected function getEntityShortName(): string {
+    switch ($this->getQueryMode()) {
+      case CRM_Contact_BAO_Query::MODE_CONTRIBUTE:
+        return 'Contribute';
+
+      case CRM_Contact_BAO_Query::MODE_MEMBER:
+        return 'Member';
+
+      case CRM_Contact_BAO_Query::MODE_EVENT:
+        return 'Event';
+
+      case CRM_Contact_BAO_Query::MODE_PLEDGE:
+        return 'Pledge';
+
+      case CRM_Contact_BAO_Query::MODE_CASE:
+        return 'Case';
+
+      case CRM_Contact_BAO_Query::MODE_GRANT:
+        return 'Grant';
+
+      case CRM_Contact_BAO_Query::MODE_ACTIVITY:
+        return 'Activity';
+
+      default:
+        return $this->getComponentName();
+    }
   }
 
 }

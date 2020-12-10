@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -53,16 +35,14 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
 
     $this->markTestIncomplete();
 
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('title', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('options', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -70,24 +50,21 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavAnimal')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavLetter')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavFood')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
@@ -96,8 +73,7 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
 
     $this->beginQueryCount();
 
-    Contact::create()
-      ->setCheckPermissions(FALSE)
+    Contact::create(FALSE)
       ->addValue('first_name', 'Red')
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
@@ -107,8 +83,7 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->addValue('MyContactFields.FavFood', 'Coconuts')
       ->execute();
 
-    Contact::get()
-      ->setCheckPermissions(FALSE)
+    Contact::get(FALSE)
       ->addSelect('display_name')
       ->addSelect('MyContactFields.FavColor.label')
       ->addSelect('MyContactFields.FavColor.weight')

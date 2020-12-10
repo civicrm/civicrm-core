@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -156,7 +140,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         continue;
       }
       $this->_selectFields[$name] = $field['title'];
-      $this->_hasLocationTypes[$name] = CRM_Utils_Array::value('hasLocationType', $field);
+      $this->_hasLocationTypes[$name] = $field['hasLocationType'] ?? NULL;
     }
 
     // lets add group, tag and current_employer to this list
@@ -203,7 +187,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       CRM_Core_BAO_UFField::retrieve($params, $defaults);
 
       // set it to null if so (avoids crappy E_NOTICE errors below
-      $defaults['location_type_id'] = CRM_Utils_Array::value('location_type_id', $defaults);
+      $defaults['location_type_id'] = $defaults['location_type_id'] ?? NULL;
 
       //CRM-20861 - Include custom fields defined for address to set its default location type to 0.
       $specialFields = array_merge(CRM_Core_BAO_UFGroup::getLocationFields(), $addressCustomFields);
@@ -261,8 +245,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         else {
           $this->_mapperFields[$key][$key1] = $value1['title'];
         }
-        $hasLocationTypes[$key][$key1] = CRM_Utils_Array::value('hasLocationType', $value1);
-        $hasWebsiteTypes[$key][$key1] = CRM_Utils_Array::value('hasWebsiteType', $value1);
+        $hasLocationTypes[$key][$key1] = $value1['hasLocationType'] ?? NULL;
+        $hasWebsiteTypes[$key][$key1] = $value1['hasWebsiteType'] ?? NULL;
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
@@ -483,8 +467,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     // if view mode pls freeze it with the done button.
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'),
-        ['onclick' => "location.href='civicrm/admin/uf/group/field?reset=1&action=browse&gid=" . $this->_gid . "'"]
+      $this->addElement('xbutton', 'done', ts('Done'),
+        [
+          'type' => 'button',
+          'onclick' => "location.href='civicrm/admin/uf/group/field?reset=1&action=browse&gid=" . $this->_gid . "'",
+        ]
       );
     }
 
@@ -546,9 +533,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         $apiFormattedParams['location_type_id'] = $params['field_name'][2];
       }
     }
-    elseif ($params['field_name'][2] == 0) {
+    elseif (isset($params['field_name'][2]) && $params['field_name'][2] == 0) {
       // 0 is Primary location type
-      $apiFormattedParams['location_type_id'] = NULL;
+      $apiFormattedParams['location_type_id'] = '';
     }
     if (!empty($params['field_name'][3])) {
       $apiFormattedParams['phone_type_id'] = $params['field_name'][3];
@@ -716,7 +703,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     if (array_key_exists($profileFieldName, $checkPrimary)) {
       $whereCheck = $checkPrimary[$profileFieldName];
     }
-    $potentialLocationType = CRM_Utils_Array::value(2, $fields['field_name']);
+    $potentialLocationType = $fields['field_name'][2] ?? NULL;
 
     if ($whereCheck && $potentialLocationType == 0) {
       $primaryOfSameTypeFound = '';
@@ -777,7 +764,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     }
 
     $isCustomField = FALSE;
-    $profileFieldName = CRM_Utils_Array::value(1, $fields['field_name']);
+    $profileFieldName = $fields['field_name'][1] ?? NULL;
     if ($profileFieldName) {
       //get custom field id
       $customFieldId = explode('_', $profileFieldName);

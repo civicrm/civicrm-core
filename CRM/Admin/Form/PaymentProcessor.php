@@ -1,46 +1,36 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
  * This class generates form components for Payment Processor.
  */
 class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
-  protected $_id = NULL;
+  use CRM_Core_Form_EntityFormTrait;
 
-  protected $_testID = NULL;
+  /**
+   * @var int
+   * Test Payment Processor ID
+   */
+  protected $_testID;
 
-  protected $_fields = NULL;
-
+  /**
+   * @var \CRM_Core_DAO_PaymentProcessor
+   * Payment Processor DAO Object
+   */
   protected $_paymentProcessorDAO;
 
   /**
@@ -48,6 +38,49 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * Payment processor Type ID
    */
   protected $_paymentProcessorType;
+
+  /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *     Auto-added by setEntityFieldsMetadata unless specified here (use description => '' to hide)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   *  - required
+   *  - is_freeze (field should be frozen).
+   *
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+    $this->entityFields = [
+      'payment_processor_type_id' => [
+        'name' => 'payment_processor_type_id',
+        'required' => TRUE,
+      ],
+      'name' => [
+        'name' => 'name',
+        'required' => TRUE,
+      ],
+      'title' => [
+        'name' => 'title',
+      ],
+      'description' => [
+        'name' => 'description',
+      ],
+    ];
+
+    $this->setEntityFieldsMetadata();
+  }
 
   /**
    * Get the name of the base entity being edited.
@@ -58,34 +91,27 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     return 'PaymentProcessor';
   }
 
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+    $this->deleteMessage = ts('Deleting this Payment Processor may result in some transaction pages being rendered inactive.') . ' ' . ts('Do you want to continue?');
+  }
+
+  /**
+   * Preprocess the form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
     parent::preProcess();
 
-    if ($this->_id) {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
-      if (!$this->_paymentProcessorType) {
-        $this->_paymentProcessorType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
-          $this->_id,
-          'payment_processor_type_id'
-        );
-      }
-      $this->set('pp', $this->_paymentProcessorType);
-    }
-    else {
-      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, TRUE, NULL);
-    }
-
+    $this->setPaymentProcessorTypeID();
+    $this->setPaymentProcessor();
     $this->assign('ppType', $this->_paymentProcessorType);
-    $ppTypeName = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-      $this->_paymentProcessorType,
-      'name'
-    );
-    $this->assign('ppTypeName', $ppTypeName);
-
-    $this->_paymentProcessorDAO = new CRM_Financial_DAO_PaymentProcessorType();
-    $this->_paymentProcessorDAO->id = $this->_paymentProcessorType;
-
-    $this->_paymentProcessorDAO->find(TRUE);
+    $this->assign('ppTypeName', $this->_paymentProcessorDAO->name);
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/paymentProcessor',
@@ -171,17 +197,13 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param bool $check
    */
   public function buildQuickForm($check = FALSE) {
-    parent::buildQuickForm();
+    $this->buildQuickEntityForm();
 
-    if ($this->_action & CRM_Core_Action::DELETE) {
+    if ($this->isDeleteContext()) {
       return;
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessor');
-
-    $this->add('text', 'name', ts('Name'),
-      $attributes['name'], TRUE
-    );
 
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
       'CRM_Financial_DAO_PaymentProcessor',
@@ -190,10 +212,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       CRM_Core_Config::domainID(),
     ]);
 
-    $this->add('text', 'description', ts('Description'),
-      $attributes['description']
-    );
-
+    // @todo - remove this & let the entityForm do it - need to make sure we are handling the js though.
     $this->add('select',
       'payment_processor_type_id',
       ts('Payment Processor Type'),
@@ -282,7 +301,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    *
    * @return bool
    */
-  public static function checkSection(&$fields, &$errors, $section = NULL) {
+  public static function checkSection(&$fields, &$errors, $section = NULL): bool {
     $names = ['user_name'];
 
     $present = FALSE;
@@ -383,6 +402,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
   /**
    * Process the form submission.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
 
@@ -428,6 +450,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @param array $values
    * @param int $domainID
    * @param bool $test
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     if ($test) {
@@ -465,6 +489,45 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     ], $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);
+  }
+
+  /**
+   * Set the payment processor type id as a form property
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setPaymentProcessorTypeID(): void {
+    if ($this->_id) {
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, FALSE, NULL);
+      if (!$this->_paymentProcessorType) {
+        $this->_paymentProcessorType = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessor',
+          $this->_id,
+          'payment_processor_type_id'
+        );
+      }
+      $this->set('pp', $this->_paymentProcessorType);
+    }
+    else {
+      $this->_paymentProcessorType = CRM_Utils_Request::retrieve('pp', 'String', $this, TRUE, NULL);
+    }
+  }
+
+  /**
+   * Get the relevant payment processor type id.
+   *
+   * @return int
+   */
+  protected function getPaymentProcessorTypeID(): int {
+    return (int) $this->_paymentProcessorType;
+  }
+
+  /**
+   * Set the payment processor as a form property.
+   */
+  protected function setPaymentProcessor(): void {
+    $this->_paymentProcessorDAO = new CRM_Financial_DAO_PaymentProcessorType();
+    $this->_paymentProcessorDAO->id = $this->getPaymentProcessorTypeID();
+    $this->_paymentProcessorDAO->find(TRUE);
   }
 
 }

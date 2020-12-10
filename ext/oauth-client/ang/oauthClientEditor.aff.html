@@ -1,0 +1,32 @@
+<div oauth-util-import="CRM.oauthUtil.providers" to="theProviders"></div>
+
+<div ng-form="update" class="form-horizontal">
+  <div class="form-group">
+    <div>
+      <label for="provider{{options.client.id}}">{{ts('Provider')}}:</label>
+      <input class="form-control" ng-model="options.client.provider" disabled id="provider{{options.client.id}}">
+    </div>
+    <div>
+      <label for="id{{options.client.id}}">{{ts('Client ID (Private)')}}:</label>
+      <input class="form-control" ng-model="options.client.id" type="text" id="id{{options.client.id}}" disabled/>
+    </div>
+    <div>
+      <label for="guid{{options.client.id}}">{{ts('Client ID (Public)')}}:</label>
+      <input class="form-control" ng-model="options.client.guid" type="text" id="guid{{options.client.id}}"/>
+    </div>
+    <div>
+      <label for="secret{{options.client.id}}">{{ts('Client Secret')}}:</label>
+      <input class="form-control" ng-model="options.client.secret" type="text" id="secret{{options.client.id}}"/>
+    </div>
+    <div ng-if="options.client.created_date">
+      <label for="created_date{{options.client.id}}">{{ts('Created Date')}}:</label>
+      <input class="form-control" ng-model="options.client.created_date" disabled
+             id="created_date{{options.client.id}}">
+    </div>
+    <div ng-if="options.client.modified_date">
+      <label for="modified_date{{options.client.id}}">{{ts('Modified Date')}}:</label>
+      <input class="form-control" ng-model="options.client.modified_date" disabled
+             id="modified_date{{options.client.id}}">
+    </div>
+  </div>
+</div>

@@ -7,7 +7,6 @@
      <path_arguments>context=event</path_arguments>
      <desc>View and manage existing personal campaign pages.</desc>
      <adminGroup>CiviEvent</adminGroup>
-     <icon>admin/small/contribution_types.png</icon>
      <weight>362</weight>
   </item>
   <item>

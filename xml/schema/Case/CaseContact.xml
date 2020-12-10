@@ -6,6 +6,7 @@
   <comment>Joining table for case-contact associations.</comment>
   <add>2.1</add>
   <log>true</log>
+  <component>CiviCase</component>
   <field>
     <name>id</name>
     <title>Case Contact ID</title>

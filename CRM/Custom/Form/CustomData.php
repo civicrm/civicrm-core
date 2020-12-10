@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -45,7 +29,7 @@ class CRM_Custom_Form_CustomData {
    *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
    *
    * @param CRM_Core_Form $form
-   * @param null|string $subType values stored in civicrm_custom_group.extends_entity_column_value
+   * @param null|string $entitySubType values stored in civicrm_custom_group.extends_entity_column_value
    *   e.g Student for contact type
    * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
    * @param null|int $groupCount number of entities that could have custom data
@@ -53,15 +37,12 @@ class CRM_Custom_Form_CustomData {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
+  public static function addToForm(&$form, $entitySubType = NULL, $subName = NULL, $groupCount = 1, $contact_id = NULL) {
     $entityName = $form->getDefaultEntity();
     $entityID = $form->getEntityId();
-    // FIXME: If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
-    // However, if it is only partially converted (ie. we've switched customdata to use CRM_Custom_Form_CustomData)
-    // it won't, so we check if we have a subtype before calling the function.
-    $entitySubType = NULL;
-    if ($subType) {
-      $entitySubType = $form->getEntitySubTypeId($subType);
+    // If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
+    if (method_exists($form, 'getEntitySubTypeId') && empty($entitySubType)) {
+      $entitySubType = $form->getEntitySubTypeId();
     }
 
     if ($form->getAction() == CRM_Core_Action::VIEW) {
@@ -159,7 +140,7 @@ class CRM_Custom_Form_CustomData {
     }
 
     $gid = (isset($form->_groupID)) ? $form->_groupID : NULL;
-    $getCachedTree = isset($form->_getCachedTree) ? $form->_getCachedTree : TRUE;
+    $getCachedTree = $form->_getCachedTree ?? TRUE;
 
     $subType = $form->_subType;
     if (!is_array($subType) && strstr($subType, CRM_Core_DAO::VALUE_SEPARATOR)) {

@@ -1,34 +1,20 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Query\SqlExpression;
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
@@ -283,23 +269,6 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * @deprecated function - the best function to call is
-   * CRM_Contact_BAO_Contact::updateContactCache at the moment, or api job.group_cache_flush
-   * to really force a flush.
-   *
-   * Remove this function altogether by mid 2018.
-   *
-   * However, if updating code outside core to use this (or any BAO function) it is recommended that
-   * you add an api call to lock in into our contract. Currently there is not really a supported
-   * method for non core functions.
-   */
-  public static function remove() {
-    Civi::log()
-      ->warning('Deprecated code. This function should not be called without groupIDs. Extensions can use the api job.group_cache_flush for a hard flush or add an api option for soft flush', ['civi.tag' => 'deprecated']);
-    CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
-  }
-
-  /**
    * Function to clear group contact cache and reset the corresponding
    *  group's cache and refresh date
    *
@@ -347,36 +316,19 @@ WHERE  id IN ( $groupIDs )
       return;
     }
     $params = [1 => [self::getCacheInvalidDateTime(), 'String']];
-    // @todo this is consistent with previous behaviour but as the first query could take several seconds the second
-    // could become inaccurate. It seems to make more sense to fetch them first & delete from an array (which would
-    // also reduce joins). If we do this we should also consider how best to iterate the groups. If we do them one at
-    // a time we could call a hook, allowing people to manage the frequency on their groups, or possibly custom searches
-    // might do that too. However, for 2000 groups that's 2000 iterations. If we do all once we potentially create a
-    // slow query. It's worth noting the speed issue generally relates to the size of the group but if one slow group
-    // is in a query with 500 fast ones all 500 get locked. One approach might be to calculate group size or the
-    // number of groups & then process all at once or many query runs depending on what is found. Of course those
-    // preliminary queries would need speed testing.
-    CRM_Core_DAO::executeQuery(
-      "
-        DELETE gc
-        FROM civicrm_group_contact_cache gc
-        INNER JOIN civicrm_group g ON g.id = gc.group_id
-        WHERE g.cache_date <= %1
-      ",
-      $params
-    );
+    $groupsDAO = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_group WHERE cache_date <= %1", $params);
+    $expiredGroups = [];
+    while ($groupsDAO->fetch()) {
+      $expiredGroups[] = $groupsDAO->id;
+    }
+    if (!empty($expiredGroups)) {
+      $expiredGroups = implode(',', $expiredGroups);
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN ({$expiredGroups})");
 
-    // Clear these out without resetting them because we are not building caches here, only clearing them,
-    // so the state is 'as if they had never been built'.
-    CRM_Core_DAO::executeQuery(
-      "
-        UPDATE civicrm_group g
-        SET    cache_date = NULL,
-        refresh_date = NULL
-        WHERE  g.cache_date <= %1
-      ",
-      $params
-    );
+      // Clear these out without resetting them because we are not building caches here, only clearing them,
+      // so the state is 'as if they had never been built'.
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL WHERE id IN ({$expiredGroups})");
+    }
     $lock->release();
   }
 
@@ -429,9 +381,7 @@ WHERE  id IN ( $groupIDs )
   public static function deterministicCacheFlush() {
     if (self::smartGroupCacheTimeout() == 0) {
       CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
-      CRM_Core_DAO::executeQuery("
-        UPDATE civicrm_group g
-        SET cache_date = null, refresh_date = null");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL");
     }
     else {
       self::flushCaches();
@@ -472,12 +422,104 @@ WHERE  id IN ( $groupIDs )
    *   The smart group that needs to be loaded.
    * @param bool $force
    *   Should we force a search through.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function load(&$group, $force = FALSE) {
     $groupID = $group->id;
     $savedSearchID = $group->saved_search_id;
     if (array_key_exists($groupID, self::$_alreadyLoaded) && !$force) {
       return;
+    }
+
+    self::$_alreadyLoaded[$groupID] = 1;
+
+    // FIXME: some other process could have actually done the work before we got here,
+    // Ensure that work needs to be done before continuing
+    if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
+      return;
+    }
+
+    $customClass = NULL;
+    if ($savedSearchID) {
+      $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
+      $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
+
+      $excludeClause = "NOT IN (
+                        SELECT contact_id FROM civicrm_group_contact
+                        WHERE civicrm_group_contact.status = 'Removed'
+                        AND civicrm_group_contact.group_id = $groupID )";
+      $addSelect = "$groupID AS group_id";
+
+      if (!empty($ssParams['api_entity'])) {
+        $sql = self::getApiSQL($ssParams, $addSelect, $excludeClause);
+      }
+      else {
+        // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+        if (!empty($ssParams)) {
+          CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+        }
+        if (isset($ssParams['customSearchID'])) {
+          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
+        }
+        else {
+          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
+        }
+      }
+    }
+
+    $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('gccache')->setMemory();
+    $tempTable = $groupContactsTempTable->getName();
+    $groupContactsTempTable->createWithColumns('contact_id int, group_id int, UNIQUE UI_contact_group (contact_id,group_id)');
+
+    if (!empty($sql)) {
+      $contactQueries[] = $sql;
+    }
+    // lets also store the records that are explicitly added to the group
+    // this allows us to skip the group contact LEFT JOIN
+    $contactQueries[] =
+      "SELECT $groupID as group_id, contact_id as contact_id
+       FROM   civicrm_group_contact
+       WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
+
+    self::clearGroupContactCache($groupID);
+
+    foreach ($contactQueries as $contactQuery) {
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery}");
+    }
+
+    if ($group->children) {
+
+      // Store a list of contacts who are removed from the parent group
+      $sqlContactsRemovedFromGroup = "
+SELECT contact_id
+FROM civicrm_group_contact
+WHERE  civicrm_group_contact.status = 'Removed'
+AND  civicrm_group_contact.group_id = $groupID ";
+      $dao = CRM_Core_DAO::executeQuery($sqlContactsRemovedFromGroup);
+      $removed_contacts = [];
+      while ($dao->fetch()) {
+        $removed_contacts[] = $dao->contact_id;
+      }
+
+      $childrenIDs = explode(',', $group->children);
+      foreach ($childrenIDs as $childID) {
+        $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
+        // Unset each contact that is removed from the parent group
+        foreach ($removed_contacts as $removed_contact) {
+          unset($contactIDs[$removed_contact]);
+        }
+        if (empty($contactIDs)) {
+          // This child group has no contact IDs so we don't need to add them to
+          continue;
+        }
+        $values = [];
+        foreach ($contactIDs as $contactID => $dontCare) {
+          $values[] = "({$groupID},{$contactID})";
+        }
+        $str = implode(',', $values);
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) VALUES $str");
+      }
     }
 
     // grab a lock so other processes don't compete and do the same query
@@ -490,146 +532,24 @@ WHERE  id IN ( $groupIDs )
       return;
     }
 
-    self::$_alreadyLoaded[$groupID] = 1;
+    // Don't call clearGroupContactCache as we don't want to clear the cache dates
+    // The will get updated by updateCacheTime() below and not clearing the dates reduces
+    // the chance that loadAll() will try and rebuild at the same time.
+    $clearCacheQuery = "
+    DELETE  g
+      FROM  civicrm_group_contact_cache g
+      WHERE  g.group_id = %1 ";
+    $params = [
+      1 => [$groupID, 'Integer'],
+    ];
+    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
 
-    // we now have the lock, but some other process could have actually done the work
-    // before we got here, so before we do any work, lets ensure that work needs to be
-    // done
-    // we allow hidden groups here since we dont know if the caller wants to evaluate an
-    // hidden group
-    if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
-      $lock->release();
-      return;
-    }
-
-    $sql = NULL;
-    $idName = 'id';
-    $customClass = NULL;
-    if ($savedSearchID) {
-      $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
-
-      // rectify params to what proximity search expects if there is a value for prox_distance
-      // CRM-7021
-      if (!empty($ssParams)) {
-        CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
-      }
-
-      $returnProperties = [];
-      if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
-        $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-        $returnProperties = CRM_Core_BAO_Mapping::returnProperties($fv);
-      }
-
-      if (isset($ssParams['customSearchID'])) {
-        // if custom search
-
-        // we split it up and store custom class
-        // so temp tables are not destroyed if they are used
-        // hence customClass is defined above at top of function
-        $customClass = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID);
-        $searchSQL = $customClass->contactIDs();
-        $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
-        if (!strstr($searchSQL, 'WHERE')) {
-          $searchSQL .= " WHERE ( 1 ) ";
-        }
-        $idName = 'contact_id';
-      }
-      else {
-        $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-        // CRM-17075 using the formValues in this way imposes extra logic and complexity.
-        // we have the where_clause and where tables stored in the saved_search table
-        // and should use these rather than re-processing the form criteria (which over-works
-        // the link between the form layer & the query layer too).
-        // It's hard to think of when you would want to use anything other than return
-        // properties = array('contact_id' => 1) here as the point would appear to be to
-        // generate the list of contact ids in the group.
-        // @todo review this to use values in saved_search table (preferably for 4.8).
-        $query
-          = new CRM_Contact_BAO_Query(
-            $ssParams, $returnProperties, NULL,
-            FALSE, FALSE, 1,
-            TRUE, TRUE,
-            FALSE,
-            CRM_Utils_Array::value('display_relationship_type', $formValues),
-            CRM_Utils_Array::value('operator', $formValues, 'AND')
-          );
-        $query->_useDistinct = FALSE;
-        $query->_useGroupBy = FALSE;
-        $sqlParts = $query->getSearchSQLParts(
-            0, 0, NULL,
-            FALSE, FALSE,
-            FALSE, TRUE
-          );
-        $searchSQL = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}";
-      }
-      $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
-      $sql = $searchSQL . " AND contact_a.id NOT IN (
-                              SELECT contact_id FROM civicrm_group_contact
-                              WHERE civicrm_group_contact.status = 'Removed'
-                              AND   civicrm_group_contact.group_id = $groupID ) ";
-    }
-
-    if ($sql) {
-      $sql = preg_replace("/^\s*SELECT/", "SELECT $groupID as group_id, ", $sql);
-    }
-
-    // lets also store the records that are explicitly added to the group
-    // this allows us to skip the group contact LEFT JOIN
-    $sqlB = "
-SELECT $groupID as group_id, contact_id as $idName
-FROM   civicrm_group_contact
-WHERE  civicrm_group_contact.status = 'Added'
-  AND  civicrm_group_contact.group_id = $groupID ";
-
-    self::clearGroupContactCache($groupID);
-
-    $processed = FALSE;
-    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0, 2000);
-    foreach ([$sql, $sqlB] as $selectSql) {
-      if (!$selectSql) {
-        continue;
-      }
-      $insertSql = "CREATE TEMPORARY TABLE $tempTable ($selectSql);";
-      $processed = TRUE;
-      CRM_Core_DAO::executeQuery($insertSql);
-      CRM_Core_DAO::executeQuery(
-        "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT $idName, group_id FROM $tempTable
+    CRM_Core_DAO::executeQuery(
+      "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
+        SELECT DISTINCT contact_id, group_id FROM $tempTable
       ");
-      CRM_Core_DAO::executeQuery(" DROP TEMPORARY TABLE $tempTable");
-    }
-
-    self::updateCacheTime([$groupID], $processed);
-
-    if ($group->children) {
-
-      //Store a list of contacts who are removed from the parent group
-      $sql = "
-SELECT contact_id
-FROM civicrm_group_contact
-WHERE  civicrm_group_contact.status = 'Removed'
-AND  civicrm_group_contact.group_id = $groupID ";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      $removed_contacts = [];
-      while ($dao->fetch()) {
-        $removed_contacts[] = $dao->contact_id;
-      }
-
-      $childrenIDs = explode(',', $group->children);
-      foreach ($childrenIDs as $childID) {
-        $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
-        //Unset each contact that is removed from the parent group
-        foreach ($removed_contacts as $removed_contact) {
-          unset($contactIDs[$removed_contact]);
-        }
-        $values = [];
-        foreach ($contactIDs as $contactID => $dontCare) {
-          $values[] = "({$groupID},{$contactID})";
-        }
-
-        self::store([$groupID], $values);
-      }
-    }
+    $groupContactsTempTable->drop();
+    self::updateCacheTime([$groupID], TRUE);
 
     $lock->release();
   }
@@ -770,6 +690,106 @@ ORDER BY   gc.contact_id, g.children
       WHERE id = %1", [
         1 => [$groupID, 'Positive'],
       ]);
+  }
+
+  /**
+   * @param array $savedSearch
+   * @param string $addSelect
+   * @param string $excludeClause
+   * @return string
+   * @throws API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws CRM_Core_Exception
+   */
+  protected static function getApiSQL(array $savedSearch, string $addSelect, string $excludeClause) {
+    $apiParams = $savedSearch['api_params'] + ['select' => ['id'], 'checkPermissions' => FALSE];
+    $idField = SqlExpression::convert($apiParams['select'][0], TRUE)->getAlias();
+    // Unless there's a HAVING clause, we don't care about other columns
+    if (empty($apiParams['having'])) {
+      $apiParams['select'] = array_slice($apiParams['select'], 0, 1);
+    }
+    $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
+    $query = new \Civi\Api4\Query\Api4SelectQuery($api);
+    $query->forceSelectId = FALSE;
+    $query->getQuery()->having("$idField $excludeClause");
+    $sql = $query->getSql();
+    // Place sql in a nested sub-query, otherwise HAVING is impossible on any field other than contact_id
+    return "SELECT $addSelect, `$idField` AS contact_id FROM ($sql) api_query";
+  }
+
+  /**
+   * Get sql from a custom search.
+   *
+   * We split it up and store custom class
+   * so temp tables are not destroyed if they are used
+   *
+   * @param int $savedSearchID
+   * @param array $ssParams
+   * @param string $addSelect
+   * @param string $excludeClause
+   *
+   * @return string
+   * @throws \Exception
+   */
+  protected static function getCustomSearchSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
+    $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
+    $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
+    if (strpos($searchSQL, 'WHERE') === FALSE) {
+      $searchSQL .= " WHERE contact_a.id $excludeClause";
+    }
+    else {
+      $searchSQL .= " AND contact_a.id $excludeClause";
+    }
+    return preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $searchSQL);
+  }
+
+  /**
+   * Get array of sql from a saved query object group.
+   *
+   * @param int $savedSearchID
+   * @param array $ssParams
+   * @param string $addSelect
+   * @param string $excludeClause
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function getQueryObjectSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
+    $returnProperties = NULL;
+    if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
+      $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+      $returnProperties = CRM_Core_BAO_Mapping::returnProperties($fv);
+    }
+    $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+    // CRM-17075 using the formValues in this way imposes extra logic and complexity.
+    // we have the where_clause and where tables stored in the saved_search table
+    // and should use these rather than re-processing the form criteria (which over-works
+    // the link between the form layer & the query layer too).
+    // It's hard to think of when you would want to use anything other than return
+    // properties = array('contact_id' => 1) here as the point would appear to be to
+    // generate the list of contact ids in the group.
+    // @todo review this to use values in saved_search table (preferably for 4.8).
+    $query
+      = new CRM_Contact_BAO_Query(
+      $ssParams, $returnProperties, NULL,
+      FALSE, FALSE, 1,
+      TRUE, TRUE,
+      FALSE,
+      $formValues['display_relationship_type'] ?? NULL,
+      $formValues['operator'] ?? 'AND'
+    );
+    $query->_useDistinct = FALSE;
+    $query->_useGroupBy = FALSE;
+    $sqlParts = $query->getSearchSQLParts(
+      0, 0, NULL,
+      FALSE, FALSE,
+      FALSE, TRUE,
+      "contact_a.id $excludeClause"
+    );
+    $select = preg_replace("/^\s*SELECT /", "SELECT $addSelect, ", $sqlParts['select']);
+
+    return "$select {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['group_by']} {$sqlParts['having']}";
   }
 
 }

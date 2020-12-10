@@ -7,6 +7,10 @@
   <comment>Provide grouping of related contacts</comment>
   <add>1.1</add>
   <log>true</log>
+  <icon>fa-users</icon>
+  <paths>
+    <add>civicrm/group/add?reset=1</add>
+  </paths>
   <field>
     <name>id</name>
     <type>int unsigned</type>
@@ -31,7 +35,7 @@
     <name>title</name>
     <type>varchar</type>
     <title>Group Title</title>
-    <length>64</length>
+    <length>255</length>
     <localizable>true</localizable>
     <comment>Name of Group.</comment>
     <add>1.1</add>
@@ -224,4 +228,31 @@
     <add>4.5</add>
     <onDelete>SET NULL</onDelete>
   </foreignKey>
+  <field>
+    <name>frontend_title</name>
+    <type>varchar</type>
+    <title>Public Group Title</title>
+    <length>255</length>
+    <localizable>true</localizable>
+    <comment>Alternative public title for this Group.</comment>
+    <default>NULL</default>
+    <add>5.31</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>frontend_description</name>
+    <type>text</type>
+    <title>Public Group Description</title>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <comment>Alternative public description of the group.</comment>
+    <localizable>true</localizable>
+    <default>NULL</default>
+    <add>5.31</add>
+  </field>
 </table>

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -37,10 +21,12 @@
 class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
-   * Pre process the form.
+   * Classes extending CRM_Core_Form should implement this method.
+   *
+   * @return string
    */
-  public function preProcess() {
-    parent::preProcess();
+  public function getDefaultEntity() {
+    return 'Product';
   }
 
   /**
@@ -75,6 +61,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -97,7 +85,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     ]);
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
-    $this->add('textarea', 'description', ts('Description'), 'rows=3, cols=60');
+    $this->add('textarea', 'description', ts('Description'), ['cols' => 60, 'rows' => 3]);
 
     $image['image'] = $this->createElement('radio', NULL, NULL, ts('Upload from my computer'), 'image', 'onclick="add_upload_file_block(\'image\');');
     $image['thumbnail'] = $this->createElement('radio', NULL, NULL, ts('Display image and thumbnail from these locations on the web:'), 'thumbnail', 'onclick="add_upload_file_block(\'thumbnail\');');
@@ -110,7 +98,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->addElement('text', 'imageUrl', ts('Image URL'));
     $this->addElement('text', 'thumbnailUrl', ts('Thumbnail URL'));
 
-    $this->add('file', 'uploadFile', ts('Image File Name'), 'onChange="select_option();"');
+    $this->add('file', 'uploadFile', ts('Image File Name'), ['onChange' => 'select_option();']);
 
     $this->add('text', 'price', ts('Market Value'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'price'), TRUE);
     $this->addRule('price', ts('Please enter the Market Value for this product.'), 'money');
@@ -121,22 +109,18 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'min_contribution', ts('Minimum Contribution Amount'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'min_contribution'), TRUE);
     $this->addRule('min_contribution', ts('Please enter a monetary value for the Minimum Contribution Amount.'), 'money');
 
-    $this->add('textarea', 'options', ts('Options'), 'rows=3, cols=60');
+    $this->add('textarea', 'options', ts('Options'), ['cols' => 60, 'rows' => 3]);
 
     $this->add('select', 'period_type', ts('Period Type'), [
-      '' => '- select -',
       'rolling' => 'Rolling',
       'fixed' => 'Fixed',
-    ]);
+    ], FALSE, ['placeholder' => TRUE]);
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
-    $this->add('Select', 'duration_unit', ts('Duration Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
-
+    $this->addField('duration_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'duration_interval', ts('Duration'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'duration_interval'));
-
-    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
-
+    $this->addField('frequency_unit', ['placeholder' => ts('- select period -')], FALSE);
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
@@ -173,7 +157,9 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'select',
       'financial_type_id',
       ts('Financial Type'),
-      ['' => ts('- select -')] + $financialType
+      $financialType,
+      FALSE,
+      ['placeholder' => TRUE]
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));

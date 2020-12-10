@@ -1,0 +1,36 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+
+    <div class="btn-group btn-group-md  pull-right">
+      <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !afform.title" ng-click="save()">
+        <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
+        <span ng-if="changesSaved && !saving">{{ ts('Saved') }}</span>
+        <span ng-if="!changesSaved && !saving">{{ ts('Save') }}</span>
+        <span ng-if="saving">{{ ts('Saving...') }}</span>
+      </button>
+    </div>
+
+    <ul class="nav nav-tabs">
+      <li role="presentation" ng-class="{active: canvasTab === 'layout'}">
+        <a ng-click="canvasTab = 'layout'">
+          <span>{{ ts('Form Layout') }}</span>
+        </a>
+      </li>
+      <li role="presentation" ng-class="{active: canvasTab === 'markup'}">
+        <a ng-click="canvasTab = 'markup'; updateLayoutHtml()">
+          <span>{{ ts('Markup') }}</span>
+        </a>
+      </li>
+    </ul>
+
+  </div>
+  <div id="afGuiEditor-canvas-body" class="panel-body" ng-if="canvasTab === 'layout'">
+    <div ng-if="layout" af-gui-container="layout" entity-name="" />
+  </div>
+  <div class="panel-body" ng-if="canvasTab === 'markup'">
+    <p class="help-block">{{ts('This is a read-only preview of the auto-generated markup.')}}</p>
+    <!-- Wiring up edit mode wouldn't be super-hard in itself, but it's not worthwhile until we have validation to ensure that GUI+raw content are exchangeable  -->
+    <div crm-monaco="{readOnly: true}" ng-model="layoutHtml"></div>
+  </div>
+
+</div>

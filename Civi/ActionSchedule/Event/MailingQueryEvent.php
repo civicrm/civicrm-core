@@ -13,20 +13,20 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * The basic mailing query looks a bit like this (depending on configuration):
  *
- * @code
+ * ```
  * SELECT reminder.id AS reminderID, reminder.contact_id as contactID, ...
  * FROM `civicrm_action_log` reminder
  * ... JOIN `target_entity` e ON e.id = reminder.entity_id ...
  * WHERE reminder.action_schedule_id = #casActionScheduleId
- * @endcode
+ * ```
  *
  * Listeners may modify the query. For example, suppose we want to load
  * additional fields from the related 'foo' entity:
  *
- * @code
+ * ```
  * $event->query->join('foo', '!casMailingJoinType civicrm_foo foo ON foo.myentity_id = e.id')
  *   ->select('foo.bar_value AS bar');
- * @endcode
+ * ```
  *
  * There are several parameters pre-set for use in queries:
  *  - 'casActionScheduleId'
@@ -37,6 +37,8 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * (Note: When adding more JOINs, it seems typical to use !casMailingJoinType, although
  * some hard-code a LEFT JOIN. Don't have an explanation for why.)
+ *
+ * Event name: 'civi.actionSchedule.prepareMailingQuery'
  */
 class MailingQueryEvent extends Event {
 

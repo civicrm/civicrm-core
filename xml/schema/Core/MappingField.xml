@@ -79,14 +79,6 @@
     <add>1.2</add>
   </foreignKey>
   <field>
-    <name>phone_type</name>
-    <type>varchar</type>
-    <length>64</length>
-    <comment>Phone type, if required</comment>
-    <add>1.2</add>
-    <drop>2.2</drop>
-  </field>
-  <field>
     <name>phone_type_id</name>
     <title>Phone Type</title>
     <type>int unsigned</type>

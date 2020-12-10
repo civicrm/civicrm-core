@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
@@ -162,16 +146,22 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $params = [];
-
     $low = CRM_Utils_Array::value('postal_code_low',
       $this->_formValues
     );
     $high = CRM_Utils_Array::value('postal_code_high',
       $this->_formValues
     );
+    $errorMessage = NULL;
     if ($low == NULL || $high == NULL) {
-      CRM_Core_Error::statusBounce(ts('Please provide start and end postal codes'),
+      $errorMessage = ts('Please provide start and end postal codes.');
+    }
+
+    if (!is_numeric($low) || !is_numeric($high)) {
+      $errorMessage = ts('This search only supports numeric postal codes.');
+    }
+    if ($errorMessage) {
+      CRM_Core_Error::statusBounce($errorMessage,
         CRM_Utils_System::url('civicrm/contact/search/custom',
           "reset=1&csid={$this->_formValues['customSearchID']}",
           FALSE, NULL, FALSE, TRUE

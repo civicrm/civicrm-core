@@ -12,8 +12,8 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
    * @return array
    */
   public static function record($rg) {
-    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params);
-    $civicrm_address = CRM_Utils_Array::value('civicrm_address', $rg->params);
+    $civicrm_contact = $rg->params['civicrm_contact'] ?? NULL;
+    $civicrm_address = $rg->params['civicrm_address'] ?? NULL;
 
     // Since definitely have first and last name, escape them upfront.
     $first_name = CRM_Core_DAO::escapeString(CRM_Utils_Array::value('first_name', $civicrm_contact, ''));

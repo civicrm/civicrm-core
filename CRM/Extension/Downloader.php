@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,16 +13,18 @@
  * This class handles downloads of remotely-provided extensions
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Extension_Downloader {
   /**
-   * @var CRM_Extension_Container_Basic the place where downloaded extensions are ultimately stored
+   * @var CRM_Extension_Container_Basic
+   * The place where downloaded extensions are ultimately stored
    */
   public $container;
 
   /**
-   * @var string local path to a temporary data directory
+   * @var string
+   * Local path to a temporary data directory
    */
   public $tmpDir;
 
@@ -57,11 +43,13 @@ class CRM_Extension_Downloader {
   /**
    * Determine whether downloading is supported.
    *
+   * @param \CRM_EXtension_Info $extensionInfo Optional info for (updated) extension
+   *
    * @return array
    *   list of error messages; empty if OK
    */
-  public function checkRequirements() {
-    $errors = array();
+  public function checkRequirements($extensionInfo = NULL) {
+    $errors = [];
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
@@ -85,7 +73,19 @@ class CRM_Extension_Downloader {
 
     if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
       CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
-      CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
+      Civi::log()->debug('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
+    }
+
+    if ($extensionInfo) {
+      $requiredExtensions = CRM_Extension_System::singleton()->getManager()->findInstallRequirements([$extensionInfo->key], $extensionInfo);
+      foreach ($requiredExtensions as $extension) {
+        if (CRM_Extension_System::singleton()->getManager()->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && $extension !== $extensionInfo->key) {
+          $errors[] = [
+            'title' => ts('Missing Requirement: %1', [1 => $extension]),
+            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->key, 2 => $extension]),
+          ];
+        }
+      }
     }
 
     return $errors;
@@ -107,7 +107,7 @@ class CRM_Extension_Downloader {
     $destDir = $this->containerDir . DIRECTORY_SEPARATOR . $key;
 
     if (!$downloadUrl) {
-      CRM_Core_Error::fatal('Cannot install this extension - downloadUrl is not set!');
+      throw new CRM_Extension_Exception(ts('Cannot install this extension - downloadUrl is not set!'));
     }
 
     if (!$this->fetch($downloadUrl, $filename)) {
@@ -198,6 +198,7 @@ class CRM_Extension_Downloader {
    * @param $extractedZipPath
    *
    * @return bool
+   * @throws CRM_Core_Exception
    */
   public function validateFiles($key, $extractedZipPath) {
     $filename = $extractedZipPath . DIRECTORY_SEPARATOR . CRM_Extension_Info::FILENAME;
@@ -215,7 +216,7 @@ class CRM_Extension_Downloader {
     }
 
     if ($newInfo->key != $key) {
-      CRM_Core_Error::fatal('Cannot install - there are differences between extdir XML file and archive XML file!');
+      throw new CRM_Core_Exception(ts('Cannot install - there are differences between extdir XML file and archive XML file!'));
     }
 
     return TRUE;

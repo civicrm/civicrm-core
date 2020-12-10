@@ -3,7 +3,9 @@
 <table>
   <base>CRM/Event/Cart</base>
   <class>EventInCart</class>
+  <useBao>1</useBao>
   <name>civicrm_events_in_carts</name>
+  <component>CiviEvent</component>
   <field>
     <name>id</name>
     <title>Event In Cart</title>

@@ -8,12 +8,12 @@ namespace Civi\Angular;
  * The AngularLoader stops short of bootstrapping AngularJS. You may
  * need to `<div ng-app="..."></div>` or `angular.bootstrap(...)`.
  *
- * @code
+ * ```
  * $loader = new AngularLoader();
  * $loader->setPageName('civicrm/case/a');
  * $loader->setModules(array('crmApp'));
  * $loader->load();
- * @endCode
+ * ```
  *
  * @link https://docs.angularjs.org/guide/bootstrap
  */
@@ -73,7 +73,7 @@ class AngularLoader {
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
-    $this->pageName = isset($_GET['q']) ? $_GET['q'] : NULL;
+    $this->pageName = $_GET['q'] ?? NULL;
     $this->modules = [];
   }
 
@@ -115,8 +115,23 @@ class AngularLoader {
     }
 
     $res->addSettingsFactory(function () use (&$moduleNames, $angular, $res, $assetParams) {
+      // Merge static settings with the results of settingsFactory functions
+      $settingsByModule = $angular->getResources($moduleNames, 'settings', 'settings');
+      foreach ($angular->getResources($moduleNames, 'settingsFactory', 'settingsFactory') as $moduleName => $factory) {
+        $settingsByModule[$moduleName] = array_merge($settingsByModule[$moduleName] ?? [], $factory());
+      }
+      // Add clientside permissions
+      $permissions = [];
+      $toCheck  = $angular->getResources($moduleNames, 'permissions', 'permissions');
+      foreach ($toCheck as $perms) {
+        foreach ((array) $perms as $perm) {
+          if (!isset($permissions[$perm])) {
+            $permissions[$perm] = \CRM_Core_Permission::check($perm);
+          }
+        }
+      }
       // TODO optimization; client-side caching
-      $result = array_merge($angular->getResources($moduleNames, 'settings', 'settings'), [
+      return array_merge($settingsByModule, ['permissions' => $permissions], [
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
         'angular' => [
           'modules' => $moduleNames,
@@ -125,7 +140,6 @@ class AngularLoader {
           'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
         ],
       ]);
-      return $result;
     });
 
     $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->getRegion(), FALSE);
@@ -160,6 +174,10 @@ class AngularLoader {
       foreach ($this->angular->getResources($moduleNames, 'css', 'cacheUrl') as $url) {
         $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
       }
+    }
+    // Add bundles
+    foreach ($this->angular->getResources($moduleNames, 'bundles', 'bundles') as $bundles) {
+      $res->addBundle($bundles);
     }
 
     return $this;

@@ -2,43 +2,24 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
 namespace api\v4\Entity;
 
 use Civi\Api4\Entity;
-use api\v4\Traits\TableDropperTrait;
 use api\v4\UnitTestCase;
 
 /**
@@ -46,7 +27,7 @@ use api\v4\UnitTestCase;
  */
 class ConformanceTest extends UnitTestCase {
 
-  use TableDropperTrait;
+  use \api\v4\Traits\TableDropperTrait;
   use \api\v4\Traits\OptionCleanupTrait {
     setUp as setUpOptionCleanup;
   }
@@ -73,51 +54,117 @@ class ConformanceTest extends UnitTestCase {
     $this->loadDataSet('ConformanceTest');
     $this->creationParamProvider = \Civi::container()->get('test.param_provider');
     parent::setUp();
-    // calculateTaxAmount() for contribution triggers a deprecation notice
-    \PHPUnit\Framework\Error\Deprecated::$enabled = FALSE;
-  }
-
-  public function getEntities() {
-    return Entity::get()->setCheckPermissions(FALSE)->execute()->column('name');
   }
 
   /**
-   * Fixme: This should use getEntities as a dataProvider but that fails for some reason
+   * Get entities to test.
+   *
+   * This is the hi-tech list as generated via Civi's runtime services. It
+   * is canonical, but relies on services that may not be available during
+   * early parts of PHPUnit lifecycle.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testConformance() {
-    $entities = $this->getEntities();
-    $this->assertNotEmpty($entities);
-
-    foreach ($entities as $data) {
-      $entity = $data;
-      $entityClass = 'Civi\Api4\\' . $entity;
-
-      $actions = $this->checkActions($entityClass);
-
-      // Go no further if it's not a CRUD entity
-      if (array_diff(['get', 'create', 'update', 'delete'], array_keys($actions))) {
-        continue;
-      }
-
-      $this->checkFields($entityClass, $entity);
-      $id = $this->checkCreation($entity, $entityClass);
-      $this->checkGet($entityClass, $id, $entity);
-      $this->checkGetCount($entityClass, $id, $entity);
-      $this->checkUpdateFailsFromCreate($entityClass, $id);
-      $this->checkWrongParamType($entityClass);
-      $this->checkDeleteWithNoId($entityClass);
-      $this->checkDeletion($entityClass, $id);
-      $this->checkPostDelete($entityClass, $id, $entity);
-    }
+  public function getEntitiesHitech() {
+    // Ensure all components are enabled so their entities show up
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviGrant');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviPledge');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviReport');
+    return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
   /**
-   * @param string $entityClass
-   * @param $entity
+   * Get entities to test.
+   *
+   * This is the low-tech list as generated by manual-overrides and direct inspection.
+   * It may be summoned at any time during PHPUnit lifecycle, but it may require
+   * occasional twiddling to give correct results.
+   *
+   * @return array
+   */
+  public function getEntitiesLotech() {
+    $manual['add'] = [];
+    $manual['remove'] = ['CustomValue'];
+
+    $scanned = [];
+    $srcDir = dirname(__DIR__, 5);
+    foreach ((array) glob("$srcDir/Civi/Api4/*.php") as $name) {
+      $scanned[] = preg_replace('/\.php/', '', basename($name));
+    }
+
+    $names = array_diff(
+      array_unique(array_merge($scanned, $manual['add'])),
+      $manual['remove']
+    );
+
+    return $this->toDataProviderArray($names);
+  }
+
+  /**
+   * Ensure that "getEntitiesLotech()" (which is the 'dataProvider') is up to date
+   * with "getEntitiesHitech()" (which is a live feed available entities).
+   */
+  public function testEntitiesProvider() {
+    $this->assertEquals($this->getEntitiesHitech(), $this->getEntitiesLotech(), "The lo-tech list of entities does not match the hi-tech list. You probably need to update getEntitiesLotech().");
+  }
+
+  /**
+   * @param string $entity
+   *   Ex: 'Contact'
+   *
+   * @dataProvider getEntitiesLotech
+   *
+   * @throws \API_Exception
+   */
+  public function testConformance($entity): void {
+    $entityClass = 'Civi\Api4\\' . $entity;
+
+    $this->checkEntityInfo($entityClass);
+    $actions = $this->checkActions($entityClass);
+
+    // Go no further if it's not a CRUD entity
+    if (array_diff(['get', 'create', 'update', 'delete'], array_keys($actions))) {
+      $this->markTestSkipped("The API \"$entity\" does not implement CRUD actions");
+    }
+
+    $this->checkFields($entityClass, $entity);
+    $id = $this->checkCreation($entity, $entityClass);
+    $this->checkGet($entityClass, $id, $entity);
+    $this->checkGetCount($entityClass, $id, $entity);
+    $this->checkUpdateFailsFromCreate($entityClass, $id);
+    $this->checkWrongParamType($entityClass);
+    $this->checkDeleteWithNoId($entityClass);
+    $this->checkDeletion($entityClass, $id);
+    $this->checkPostDelete($entityClass, $id, $entity);
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   */
+  protected function checkEntityInfo($entityClass): void {
+    $info = $entityClass::getInfo();
+    $this->assertNotEmpty($info['name']);
+    $this->assertNotEmpty($info['title']);
+    $this->assertNotEmpty($info['title_plural']);
+    $this->assertNotEmpty($info['type']);
+    $this->assertNotEmpty($info['description']);
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   * @param string $entity
+   *
+   * @throws \API_Exception
    */
   protected function checkFields($entityClass, $entity) {
-    $fields = $entityClass::getFields()
-      ->setCheckPermissions(FALSE)
+    $fields = $entityClass::getFields(FALSE)
       ->setIncludeCustom(FALSE)
       ->execute()
       ->indexBy('name');
@@ -129,11 +176,14 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
-   * @param string $entityClass
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   *
+   * @return array
+   *
+   * @throws \API_Exception
    */
-  protected function checkActions($entityClass) {
-    $actions = $entityClass::getActions()
-      ->setCheckPermissions(FALSE)
+  protected function checkActions($entityClass): array {
+    $actions = $entityClass::getActions(FALSE)
       ->execute()
       ->indexBy('name');
 
@@ -167,11 +217,10 @@ class ConformanceTest extends UnitTestCase {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param int $id
    */
-  protected function checkUpdateFailsFromCreate($entityClass, $id) {
+  protected function checkUpdateFailsFromCreate($entityClass, $id): void {
     $exceptionThrown = '';
     try {
-      $entityClass::create()
-        ->setCheckPermissions(FALSE)
+      $entityClass::create(FALSE)
         ->addValue('id', $id)
         ->execute();
     }
@@ -187,8 +236,7 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkGet($entityClass, $id, $entity) {
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
@@ -202,17 +250,15 @@ class ConformanceTest extends UnitTestCase {
    * @param int $id
    * @param string $entity
    */
-  protected function checkGetCount($entityClass, $id, $entity) {
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+  protected function checkGetCount($entityClass, $id, $entity): void {
+    $getResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entity);
     $this->assertEquals(1, $getResult->count(), $errMsg);
 
-    $getResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getResult = $entityClass::get(FALSE)
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entity);
@@ -241,13 +287,13 @@ class ConformanceTest extends UnitTestCase {
     $exceptionThrown = '';
     try {
       $entityClass::get()
-        ->setCheckPermissions('nada')
+        ->setDebug('not a bool')
         ->execute();
     }
     catch (\API_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
-    $this->assertContains('checkPermissions', $exceptionThrown);
+    $this->assertContains('debug', $exceptionThrown);
     $this->assertContains('type', $exceptionThrown);
   }
 
@@ -256,8 +302,7 @@ class ConformanceTest extends UnitTestCase {
    * @param int $id
    */
   protected function checkDeletion($entityClass, $id) {
-    $deleteResult = $entityClass::delete()
-      ->setCheckPermissions(FALSE)
+    $deleteResult = $entityClass::delete(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
@@ -271,13 +316,30 @@ class ConformanceTest extends UnitTestCase {
    * @param string $entity
    */
   protected function checkPostDelete($entityClass, $id, $entity) {
-    $getDeletedResult = $entityClass::get()
-      ->setCheckPermissions(FALSE)
+    $getDeletedResult = $entityClass::get(FALSE)
       ->addWhere('id', '=', $id)
       ->execute();
 
     $errMsg = sprintf('Entity "%s" was not deleted', $entity);
     $this->assertEquals(0, count($getDeletedResult), $errMsg);
+  }
+
+  /**
+   * @param array $names
+   *   List of entity names.
+   *   Ex: ['Foo', 'Bar']
+   * @return array
+   *   List of data-provider arguments, one for each entity-name.
+   *   Ex: ['Foo' => ['Foo'], 'Bar' => ['Bar']]
+   */
+  protected function toDataProviderArray($names) {
+    sort($names);
+
+    $result = [];
+    foreach ($names as $name) {
+      $result[$name] = [$name];
+    }
+    return $result;
   }
 
 }

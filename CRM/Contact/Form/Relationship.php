@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -223,14 +207,14 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (!empty($this->_values)) {
         $defaults['relationship_type_id'] = $this->_rtypeId;
-        $defaults['start_date'] = CRM_Utils_Array::value('start_date', $this->_values);
-        $defaults['end_date'] = CRM_Utils_Array::value('end_date', $this->_values);
-        $defaults['description'] = CRM_Utils_Array::value('description', $this->_values);
-        $defaults['is_active'] = CRM_Utils_Array::value('is_active', $this->_values);
+        $defaults['start_date'] = $this->_values['start_date'] ?? NULL;
+        $defaults['end_date'] = $this->_values['end_date'] ?? NULL;
+        $defaults['description'] = $this->_values['description'] ?? NULL;
+        $defaults['is_active'] = $this->_values['is_active'] ?? NULL;
 
         // The postprocess function will swap these fields if it is a b_a relationship, so we compensate here
-        $defaults['is_permission_a_b'] = CRM_Utils_Array::value('is_permission_' . $this->_rtype, $this->_values);
-        $defaults['is_permission_b_a'] = CRM_Utils_Array::value('is_permission_' . strrev($this->_rtype), $this->_values);
+        $defaults['is_permission_a_b'] = $this->_values['is_permission_' . $this->_rtype] ?? NULL;
+        $defaults['is_permission_b_a'] = $this->_values['is_permission_' . strrev($this->_rtype)] ?? NULL;
 
         $defaults['is_current_employer'] = $this->_isCurrentEmployer;
 
@@ -255,7 +239,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
           'version' => 3,
         ];
         $note = civicrm_api('Note', 'getsingle', $noteParams);
-        $defaults['note'] = CRM_Utils_Array::value('note', $note);
+        $defaults['note'] = $note['note'] ?? NULL;
       }
     }
     else {

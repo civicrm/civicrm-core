@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -91,7 +75,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
    */
   public function buildQuickForm() {
     if ($this->_batchStatus == 'Closed') {
-      $this->add('submit', 'export_batch', ts('Export Batch'));
+      $this->add('xbutton', 'export_batch', ts('Export Batch'), ['type' => 'submit']);
     }
 
     // do not build rest of form unless it is open/reopened batch
@@ -101,9 +85,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
 
     parent::buildQuickForm();
     if (CRM_Batch_BAO_Batch::checkBatchPermission('close', $this->_values['created_id'])) {
-      $this->add('submit', 'close_batch', ts('Close Batch'));
+      $this->add('xbutton', 'close_batch', ts('Close Batch'), ['type' => 'submit']);
       if (CRM_Batch_BAO_Batch::checkBatchPermission('export', $this->_values['created_id'])) {
-        $this->add('submit', 'export_batch', ts('Close & Export Batch'));
+        $this->add('xbutton', 'export_batch', ts('Close and Export Batch'), ['type' => 'submit']);
       }
     }
 
@@ -115,8 +99,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Remove' => ts('Remove from Batch')]);
 
-    $this->add('submit', 'rSubmit', ts('Go'),
+    $this->add('xbutton', 'rSubmit', ts('Go'),
       [
+        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'GoRemove',
       ]);
@@ -139,8 +124,9 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       ts('Task'),
       ['' => ts('- actions -')] + ['Assign' => ts('Assign to Batch')]);
 
-    $this->add('submit', 'submit', ts('Go'),
+    $this->add('xbutton', 'submit', ts('Go'),
       [
+        'type' => 'submit',
         'class' => 'crm-form-submit',
         'id' => 'Go',
       ]);

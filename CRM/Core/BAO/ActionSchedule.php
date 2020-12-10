@@ -1,36 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-   +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,15 +23,18 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * @param array $filters
    *   Filter by property (e.g. 'id').
+   *
    * @return array
    *   Array(scalar $id => Mapping $mapping).
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getMappings($filters = NULL) {
     static $_action_mapping;
 
     if ($_action_mapping === NULL) {
-      $event = \Civi\Core\Container::singleton()->get('dispatcher')
-        ->dispatch(\Civi\ActionSchedule\Events::MAPPINGS,
+      $event = \Civi::dispatcher()
+        ->dispatch('civi.actionSchedule.getMappings',
           new \Civi\ActionSchedule\Event\MappingRegisterEvent());
       $_action_mapping = $event->getMappings();
     }
@@ -73,7 +58,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    */
   public static function getMapping($id) {
     $mappings = self::getMappings();
-    return isset($mappings[$id]) ? $mappings[$id] : NULL;
+    return $mappings[$id] ?? NULL;
   }
 
   /**
@@ -239,6 +224,7 @@ FROM civicrm_action_schedule cas
    * @param int $id
    *   ID of the Reminder to be deleted.
    *
+   * @throws CRM_Core_Exception
    */
   public static function del($id) {
     if ($id) {
@@ -249,7 +235,7 @@ FROM civicrm_action_schedule cas
         return;
       }
     }
-    CRM_Core_Error::fatal(ts('Invalid value passed to delete function.'));
+    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
   }
 
   /**
@@ -336,14 +322,21 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param int $mappingID
-   * @param $now
+   * Build a list of the contacts to send to.
+   *
+   * @param string $mappingID
+   *   Value from the mapping_id field in the civicrm_action_schedule able. It might be a string like
+   *  'contribpage' for an older class like CRM_Contribute_ActionMapping_ByPage of for ones following
+   *   more recent patterns, an integer.
+   * @param string $now
    * @param array $params
    *
    * @throws API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function buildRecipientContacts($mappingID, $now, $params = []) {
+  public static function buildRecipientContacts(string $mappingID, $now, $params = []) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+
     $actionSchedule->mapping_id = $mappingID;
     $actionSchedule->is_active = 1;
     if (!empty($params)) {
@@ -362,25 +355,22 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param null $now
+   * Main processing callback for sending out scheduled reminders.
+   *
+   * @param string $now
    * @param array $params
    *
-   * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
     foreach ($mappings as $mappingID => $mapping) {
-      CRM_Core_BAO_ActionSchedule::buildRecipientContacts($mappingID, $now, $params);
+      CRM_Core_BAO_ActionSchedule::buildRecipientContacts((string) $mappingID, $now, $params);
       CRM_Core_BAO_ActionSchedule::sendMailings($mappingID, $now);
     }
-
-    $result = [
-      'is_error' => 0,
-      'messages' => ts('Sent all scheduled reminders successfully'),
-    ];
-    return $result;
   }
 
   /**
@@ -523,9 +513,9 @@ FROM civicrm_action_schedule cas
       $select->where("e.id = reminder.entity_id OR reminder.entity_table = 'civicrm_contact'");
     }
 
-    \Civi\Core\Container::singleton()->get('dispatcher')
+    \Civi::dispatcher()
       ->dispatch(
-        \Civi\ActionSchedule\Events::MAILING_QUERY,
+        'civi.actionSchedule.prepareMailingQuery',
         new \Civi\ActionSchedule\Event\MailingQueryEvent($actionSchedule, $mapping, $select)
       );
 
@@ -574,12 +564,17 @@ FROM civicrm_action_schedule cas
 
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
-    CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contactId'],
-      $sms_body_text,
-      $smsParams,
-      $activity->id,
-      $userID
-    );
+    try {
+      CRM_Activity_BAO_Activity::sendSMSMessage($tokenRow->context['contactId'],
+        $sms_body_text,
+        $smsParams,
+        $activity->id,
+        $userID
+      );
+    }
+    catch (CRM_Core_Exception $e) {
+      return ["sms_send_error" => $e->getMessage()];
+    }
 
     return [];
   }
@@ -607,7 +602,7 @@ FROM civicrm_action_schedule cas
    *   List of error messages.
    */
   protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
-    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID);
+    $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID, TRUE);
     if (!$toEmail) {
       return ["email_missing" => "Couldn't find recipient's email address."];
     }
@@ -655,7 +650,7 @@ FROM civicrm_action_schedule cas
    * @return \Civi\Token\TokenProcessor
    */
   protected static function createTokenProcessor($schedule, $mapping) {
-    $tp = new \Civi\Token\TokenProcessor(\Civi\Core\Container::singleton()->get('dispatcher'), [
+    $tp = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
@@ -684,7 +679,7 @@ FROM civicrm_action_schedule cas
     //to get primary mobile ph,if not get a first mobile phONE
     if (!empty($toPhoneNumbers)) {
       $toPhoneNumberDetails = reset($toPhoneNumbers);
-      $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
+      $toPhoneNumber = $toPhoneNumberDetails['phone'] ?? NULL;
       return $toPhoneNumber;
     }
     return NULL;

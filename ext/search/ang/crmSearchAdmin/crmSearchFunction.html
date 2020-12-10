@@ -1,0 +1,8 @@
+<div class="form-inline">
+  <label>{{ $ctrl.field.label }}:</label>
+  <input class="form-control" style="width: 15em;" ng-model="$ctrl.fn" crm-ui-select="{data: $ctrl.functions, placeholder: ts('Select')}" ng-change="$ctrl.selectFunction()">
+  <label ng-if="$ctrl.modifierAllowed">
+    <input type="checkbox" ng-model="$ctrl.modifier" ng-change="$ctrl.writeExpr()" ng-true-value="'DISTINCT'" ng-false-value="null">
+    {{ ts('Distinct') }}
+  </label>
+</div>

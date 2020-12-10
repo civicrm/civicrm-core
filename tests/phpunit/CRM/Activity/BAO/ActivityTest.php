@@ -8,6 +8,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   private $allowedContactsACL = [];
 
+  private $loggedInUserId = NULL;
+
+  private $someContacts = [];
+
+  /**
+   * Set up for test.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->prepareForACLs();
@@ -17,6 +26,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Clean up after tests.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown() {
     $tablesToTruncate = [
@@ -34,6 +46,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test case for create() method.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreate() {
     $contactId = $this->individualCreate();
@@ -73,6 +87,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test case for getContactActivity() method.
    *
    * getContactActivity() method get activities detail for given target contact id.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetContactActivity() {
     $contactId = $this->individualCreate();
@@ -198,6 +214,35 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check for errors when viewing a contact's activity tab when there
+   * is an activity that doesn't have a target (With Contact).
+   */
+  public function testActivitySelectorNoTargets() {
+    $contact_id = $this->individualCreate([], 0, TRUE);
+    $activity = $this->callAPISuccess('activity', 'create', [
+      'source_contact_id' => $contact_id,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Lonely Meeting',
+      'details' => 'Here at this meeting all by myself and no other contacts.',
+    ]);
+    $input = [
+      '_raw_values' => [],
+      'offset' => 0,
+      'rp' => 25,
+      'page' => 1,
+      'context' => 'activity',
+      'contact_id' => $contact_id,
+    ];
+    $output = CRM_Activity_BAO_Activity::getContactActivitySelector($input);
+    $this->assertEquals($activity['id'], $output['data'][0]['DT_RowId']);
+    $this->assertEquals('<em>n/a</em>', $output['data'][0]['target_contact_name']);
+    $this->assertEquals('Lonely Meeting', $output['data'][0]['subject']);
+
+    $this->callAPISuccess('activity', 'delete', ['id' => $activity['id']]);
+    $this->callAPISuccess('contact', 'delete', ['id' => $contact_id]);
+  }
+
+  /**
    * Test case for deleteActivity() method.
    *
    * deleteActivity($params) method deletes activity for given params.
@@ -229,6 +274,24 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'id', 'contact_id',
       'Database check for created activity target.'
     );
+
+    $paramOptions = ['0))+and+0+--+-f', ['0))+and+0+--+-f']];
+    $paramField = ['source_record_id', 'activity_type_id'];
+    foreach ($paramField as $field) {
+      foreach ($paramOptions as $paramOption) {
+        $params = [
+          $field => $paramOption,
+        ];
+        try {
+          CRM_Activity_BAO_Activity::deleteActivity($params);
+        }
+        catch (Exception $e) {
+          if ($e->getMessage() === 'DB Error: syntax error') {
+            $this->fail('Delete Activity function did not validate field: ' . $field);
+          }
+        }
+      }
+    }
     $params = [
       'source_contact_id' => $contactId,
       'source_record_id' => $contactId,
@@ -246,9 +309,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test case for deleteActivityTarget() method.
-   *
-   * deleteActivityTarget($activityId) method deletes activity target for given activity id.
+   * Test case for deleteActivityContact() method.
    */
   public function testDeleteActivityTarget() {
     $contactId = $this->individualCreate();
@@ -331,18 +392,36 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test getActivities BAO method for getting count.
+   *
    */
   public function testGetActivitiesCountForAdminDashboard() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
+    $this->assertEquals(9, $activityCount);
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method for getting count
+   *
    */
   public function testGetActivitiesCountforNonAdminDashboard() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
       'contact_id' => 9,
@@ -358,15 +437,27 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     //since we are loading activities from dataset, we know total number of activities for this contact
-    // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
+    // 5 activities ( 2 scheduled, 3 Completed, 1 Scheduled Case activity ),
+    // note that dashboard shows only scheduled activities
     $this->assertEquals(2, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $this->assertEquals(3, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method for getting count
+   *
    */
   public function testGetActivitiesCountforContactSummary() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
       'contact_id' => 9,
@@ -380,8 +471,14 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     //since we are loading activities from dataset, we know total number of activities for this contact
-    // 5 activities, Contact Summary should show all activities
+    // 5 activities
     $this->assertEquals(5, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+
+    // If we're showing case activities, we exepct to see one more (the scheduled meeting)...
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $this->assertEquals(6, CRM_Activity_BAO_Activity::getActivitiesCount($params));
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -397,13 +494,18 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'cid' => 9,
       'context' => 'activity',
       'activity_type_id' => 1,
-      'is_unit_test' => 1,
     ];
     $expectedFilters = [
       'activity_type_filter_id' => 1,
     ];
 
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     //Assert whether filters are correctly set.
     $this->checkArrayEquals($expectedFilters, $activityFilter);
     // This should include activities of type Meeting only.
@@ -413,7 +515,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     unset($_GET['activity_type_id']);
 
     $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
-    list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $activityFilter = Civi::contactSettings()->get('activity_tab_filter');
+      $activities = $e->errorData;
+    }
     $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
@@ -447,7 +555,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesForAdminDashboard() {
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->setUpForActivityDashboardTests();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
+
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
     // $this->assertEquals($activities, $activitiesDeprecatedFn);
 
@@ -455,7 +567,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // with no contact ID and there should be 8 schedule activities shown on dashboard
     $count = 8;
     foreach ([$activitiesNew] as $activities) {
-      $this->assertEquals($count, count($activities));
+      $this->assertCount($count, $activities);
 
       foreach ($activities as $key => $value) {
         $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
@@ -463,6 +575,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
+    $this->assertCount(9, $activitiesNew);
+    // Scan through to find the meeting.
+    $this->assertContains('test meeting activity', array_column($activitiesNew, 'subject'), "failed to find scheduled case Meeting activity");
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -473,7 +594,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->setUpForActivityDashboardTests();
     foreach ([CRM_Activity_BAO_Activity::getActivities($this->_params)] as $activities) {
       // Skipped until we get back to the upgraded version properly.
-      $this->assertEquals(0, count($activities));
+      $this->assertCount(0, $activities);
     }
   }
 
@@ -492,7 +613,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforNonAdminDashboard() {
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $contactID = 9;
     $params = [
@@ -527,6 +651,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         }
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->assertEquals(3, count($activities));
+    // Scan through to find the meeting.
+    $this->assertTrue(in_array('test meeting activity', array_column($activities, 'subject')),
+      "failed to find scheduled case Meeting activity");
+
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
@@ -586,7 +721,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesForContactSummary() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
+    $this->addCaseWithActivity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $contactID = 9;
     $params = [
@@ -635,12 +774,24 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
       }
     }
+
+    // Now check that we get the scheduled meeting, if civicaseShowCaseActivities is set.
+    $this->setShowCaseActivitiesInCore(TRUE);
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->assertEquals(6, count($activities));
+    // Scan through to find the meeting.
+    $this->assertTrue(in_array('test meeting activity', array_column($activities, 'subject')),
+      "failed to find scheduled case Meeting activity");
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
   }
 
   /**
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummaryWithActivities() {
+    // Reset to default
+    $this->setShowCaseActivitiesInCore(FALSE);
     $this->createTestActivities();
 
     // parameters for different test cases, check each array key for the specific test-case
@@ -1048,9 +1199,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
 
     // create a logged in USER since the code references it for sendEmail user.
-    $this->createLoggedInUser();
-    $session = CRM_Core_Session::singleton();
-    $loggedInUser = $session->get('userID');
+    $loggedInUser = $this->createLoggedInUser();
 
     $contact = $this->civicrm_api('contact', 'getsingle', ['id' => $contactId, 'version' => $this->_apiversion]);
     $contactDetailsIntersectKeys = [
@@ -1178,7 +1327,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1193,7 +1342,7 @@ $text
     $this->assertEquals($activity['status_id'], $activityStatusCompleted, 'Expected activity status Completed.');
     $this->assertEquals($activity['subject'], 'createSendSmsTest subject', 'Activity subject does not match.');
     $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0]->message, "Expected error doesn't match");
+    $this->assertEquals("Recipient phone number is invalid or recipient does not want to receive SMS", $sent[0], "Expected error doesn't match");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
 
@@ -1229,7 +1378,7 @@ $text
   public function testSendSMSMobileInToProviderParamWithDoNotSMS() {
     list($sent, $activityId, $success) = $this->createSendSmsTest(2, TRUE, ['do_not_sms' => 1]);
     foreach ($sent as $error) {
-      $this->assertEquals('Contact Does not accept SMS', $error->getMessage());
+      $this->assertEquals('Contact Does not accept SMS', $error);
     }
     $this->assertEquals(1, count($sent), "Expected sent should a PEAR Error");
     $this->assertEquals(0, $success, "Expected success to be 0");
@@ -1341,6 +1490,834 @@ $text
       $contact_id_list = implode(',', $this->allowedContactsACL);
       $where = " contact_a.id IN ($contact_id_list)";
     }
+  }
+
+  public function testCaseTokens() {
+    $caseTest = new CiviCaseTestCase();
+    $caseTest->setUp();
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+
+    // create a case for this user
+    $result = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $contactId,
+      'case_type_id' => '1',
+      'subject' => "my case",
+      'status_id' => "Open",
+    ]);
+
+    $caseId = $result['id'];
+    $html_message = "<p>This is a test case with id: {case.id} and subject: {case.subject}</p>";
+    $html_message = CRM_Utils_Token::replaceCaseTokens($caseId, $html_message);
+
+    $this->assertTrue(strpos($html_message, 'id: ' . $caseId) !== 0);
+    $this->assertTrue(strpos($html_message, 'subject: my case') !== 0);
+    $caseTest->tearDown();
+  }
+
+  public function testSendEmailWithCaseId() {
+    $caseTest = new CiviCaseTestCase();
+    $caseTest->setUp();
+    // Create a contact and contactDetails array.
+    $contactId = $this->individualCreate();
+    $contact = $this->callAPISuccess('Contact', 'get', ['id' => $contactId]);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM', 'access all cases and activities', 'administer CiviCase'];
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+
+    // create a case for this user
+    $result = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $contactId,
+      'case_type_id' => 1,
+      'subject' => "my case",
+      'status_id' => "Open",
+    ]);
+
+    $caseId = $result['id'];
+
+    $subject = __FUNCTION__ . ' subject {case.subject}';
+    $html = __FUNCTION__ . ' html {case.subject}';
+    $text = __FUNCTION__ . ' text';
+
+    $mut = new CiviMailUtils($this, TRUE);
+    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+      $contact['values'],
+      $subject,
+      $text,
+      $html,
+      $contact['values'][$contactId]['email'],
+      $loggedInUser,
+      $from = __FUNCTION__ . '@example.com',
+      NULL,
+      NULL,
+      NULL,
+      [$contactId],
+      NULL,
+      NULL,
+      NULL,
+      $caseId
+    );
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity_id, 'return' => ['case_id']]);
+    $this->assertEquals($caseId, $activity['case_id'][0], 'Activity case_id does not match.');
+    $mut->checkMailLog(['subject my case']);
+    $mut->stop();
+  }
+
+  /**
+   * Adds a case with one activity.
+   *
+   */
+  protected function addCaseWithActivity() {
+    // case is not enabled by default do that now.
+    $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
+
+    // We need a minimal case setup.
+    $case_type_id = civicrm_api3('CaseType', 'get', ['return' => 'id', 'name' => 'test_case_type'])['id'] ?? NULL;
+    if (!$case_type_id) {
+      $params = [
+        'name'  => 'test_case_type',
+        'title' => 'test_case_type',
+        "is_active" => "1",
+        "definition" => [
+          "activityTypes" => [
+            ["name" => "Open Case", "max_instances" => "1"],
+            ["name" => "Meeting"],
+          ],
+          "activitySets" => [
+            [
+              "name" => "standard_timeline",
+              "label" => "Standard Timeline",
+              "timeline" => "1",
+              "activityTypes" => [
+                [
+                  "name" => "Open Case",
+                  "status" => "Completed",
+                  "label" => "Open Case",
+                  "default_assignee_type" => "1",
+                ],
+              ],
+            ],
+          ],
+          "timelineActivityTypes" => [
+            [
+              "name" => "Open Case",
+              "status" => "Completed",
+              "label" => "Open Case",
+              "default_assignee_type" => "1",
+            ],
+          ],
+          "caseRoles" => [
+            [
+              "name" => "Case Coordinator",
+              "creator" => "1",
+              "manager" => "1",
+            ],
+          ],
+        ],
+      ];
+      $case_type_id = $this->callAPISuccess('CaseType', 'create', $params)['id'];
+    }
+
+    // Create a case with Contact #3 as the client.
+    $case_id = civicrm_api3('case', 'get', ['subject' => 'test case 1'])['id'] ?? NULL;
+    if (!$case_id) {
+      // Create case
+      $params = [
+        'subject'       => 'test case 1',
+        'contact_id'    => 3,
+        'status_id'     => 'Open',
+        'case_type_id'  => $case_type_id,
+        'creator_id'    => 3,
+      ];
+      $case_id = $this->callAPISuccess('case', 'create', $params)['id'];
+    }
+
+    // Create a scheduled 'Meeting' activity that belongs to this case, but is
+    // assigned to contact #9
+    $activity_id = $this->callAPISuccess('Activity', 'create', [
+      'activity_type_id' => 'Meeting',
+      'status_id' => 'Scheduled',
+      'case_id' => $case_id,
+      'source_contact_id' => 3,
+      'assignee_id' => [9],
+      'subject' => 'test meeting activity',
+    ])['id'] ?? NULL;
+  }
+
+  /**
+   * Change setting, and the cache of it.
+   */
+  protected function setShowCaseActivitiesInCore(bool $val) {
+    Civi::settings()->set('civicaseShowCaseActivities', $val ? 1 : 0);
+    CRM_Core_Component::getEnabledComponents();
+    Civi::$statics['CRM_Core_Component']['info']['CiviCase'] = new CRM_Case_Info('CiviCase', 'CRM_Case', 7);
+    Civi::$statics['CRM_Core_Component']['info']['CiviCase']->info['showActivitiesInCore'] = $val;
+  }
+
+  /**
+   * Test multiple variations of target and assignee contacts in create
+   * and edit mode.
+   *
+   * @dataProvider targetAndAssigneeProvider
+   * @param array $do_first
+   * @param array $do_second
+   */
+  public function testTargetAssigneeVariations(array $do_first, array $do_second) {
+    // Originally wanted to put this in setUp() but it broke other tests.
+    $this->loggedInUserId = $this->createLoggedInUser();
+    for ($i = 1; $i <= 4; $i++) {
+      $this->someContacts[$i] = $this->individualCreate([], $i - 1, TRUE);
+    }
+
+    $params = [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Meeting'),
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->loggedInUserId,
+    ];
+
+    // Create an activity first if specified.
+    $activity = NULL;
+    if (!empty($do_first)) {
+      if (!empty($do_first['targets'])) {
+        // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
+        // pick $someContacts[1] and $someContacts[2].
+        $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['targets'])));
+      }
+      if (!empty($do_first['assignees'])) {
+        $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['assignees'])));
+      }
+
+      $activity = CRM_Activity_BAO_Activity::create($params);
+      $this->assertNotEmpty($activity->id);
+
+      $params['id'] = $activity->id;
+    }
+
+    // Now do the second one, which will either create or update depending what
+    // we did first.
+    $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['targets'])));
+    $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['assignees'])));
+    $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // Check targets
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
+    ];
+    $this->assertEquals($params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Check assignees
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
+    ];
+    $this->assertEquals($params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Clean up
+    foreach ($this->someContacts as $cid) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $cid]);
+    }
+  }
+
+  /**
+   * Same as testTargetAssigneeVariations but passes the target/assignee
+   * in as a scalar when there's only one of them.
+   *
+   * @dataProvider targetAndAssigneeProvider
+   * @param array $do_first
+   * @param array $do_second
+   */
+  public function testTargetAssigneeVariationsWithScalars(array $do_first, array $do_second) {
+    // Originally wanted to put this in setUp() but it broke other tests.
+    $this->loggedInUserId = $this->createLoggedInUser();
+    for ($i = 1; $i <= 4; $i++) {
+      $this->someContacts[$i] = $this->individualCreate([], $i - 1, TRUE);
+    }
+
+    $params = [
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Meeting'),
+      'subject' => 'Test Meeting',
+      'source_contact_id' => $this->loggedInUserId,
+    ];
+
+    // Create an activity first if specified.
+    $activity = NULL;
+    if (!empty($do_first)) {
+      if (!empty($do_first['targets'])) {
+        // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
+        // pick $someContacts[1] and $someContacts[2].
+        $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['targets'])));
+        if (count($params['target_contact_id']) == 1) {
+          $params['target_contact_id'] = $params['target_contact_id'][0];
+        }
+      }
+      if (!empty($do_first['assignees'])) {
+        $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_first['assignees'])));
+        if (count($params['assignee_contact_id']) == 1) {
+          $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+        }
+      }
+
+      $activity = CRM_Activity_BAO_Activity::create($params);
+      $this->assertNotEmpty($activity->id);
+
+      $params['id'] = $activity->id;
+    }
+
+    // Now do the second one, which will either create or update depending what
+    // we did first.
+    $params['target_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['targets'])));
+    if (count($params['target_contact_id']) == 1) {
+      $params['target_contact_id'] = $params['target_contact_id'][0];
+    }
+    $params['assignee_contact_id'] = array_values(array_intersect_key($this->someContacts, array_flip($do_second['assignees'])));
+    if (count($params['assignee_contact_id']) == 1) {
+      $params['assignee_contact_id'] = $params['assignee_contact_id'][0];
+    }
+    $activity = CRM_Activity_BAO_Activity::create($params);
+
+    // Check targets
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Check assignees
+    $queryParams = [
+      1 => [$activity->id, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
+    ];
+    $this->assertEquals((array) $params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    // Clean up
+    foreach ($this->someContacts as $cid) {
+      $this->callAPISuccess('Contact', 'delete', ['id' => $cid]);
+    }
+  }
+
+  /**
+   * Dataprovider for testTargetAssigneeVariations
+   * @return array
+   */
+  public function targetAndAssigneeProvider():array {
+    return [
+      // Explicit index so that it's easy to see which one has failed without
+      // having to finger count.
+      0 => [
+        'do first' => [
+          // Completely empty array means don't create any activity first,
+          // as opposed to the ones we do later where "do first" has member
+          // elements but those are empty, which means create an activity first
+          // but with no contacts.
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      1 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      2 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      3 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      4 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      5 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      6 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      7 => [
+        'do first' => [],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      // The next sets test the same thing again but updating an activity
+      // that has no contacts
+      8 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      9 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      10 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      11 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      12 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      13 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      14 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      15 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      // And again but updating an activity with 1 contact
+      16 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      17 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      18 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      19 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      20 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      21 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      22 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      23 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      24 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+        'do second' => [
+          // a little different variation where we're changing the target as
+          // opposed to adding one or deleting
+          'targets' => [2],
+          'assignees' => [],
+        ],
+      ],
+      // And again but updating an activity with 2 contacts
+      25 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      26 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      27 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      28 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      29 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      30 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      31 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      32 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      33 => [
+        'do first' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+        'do second' => [
+          'targets' => [2],
+          'assignees' => [],
+        ],
+      ],
+      // And again but now start with assignees
+      34 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      35 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      36 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      37 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      38 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      39 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      40 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      41 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      42 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [4],
+        ],
+      ],
+      // And again but now start with 2 assignees
+      43 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [],
+        ],
+      ],
+      44 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [],
+        ],
+      ],
+      45 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [],
+        ],
+      ],
+      46 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3],
+        ],
+      ],
+      47 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+      ],
+      48 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+      ],
+      49 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3],
+        ],
+      ],
+      50 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [1, 2],
+          'assignees' => [3, 4],
+        ],
+      ],
+      51 => [
+        'do first' => [
+          'targets' => [],
+          'assignees' => [3, 4],
+        ],
+        'do second' => [
+          'targets' => [],
+          'assignees' => [4],
+        ],
+      ],
+    ];
   }
 
 }

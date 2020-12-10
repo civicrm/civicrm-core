@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,9 +15,7 @@
  * and similar across all objects (thus providing both reuse and standards)
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Action {
 
@@ -156,7 +138,7 @@ class CRM_Core_Action {
    *   the action mask corresponding to the input string
    */
   public static function mapItem($item) {
-    $mask = CRM_Utils_Array::value(trim($item), self::$_names);
+    $mask = self::$_names[trim($item)] ?? NULL;
     return $mask ? $mask : 0;
   }
 
@@ -196,6 +178,12 @@ class CRM_Core_Action {
    * @param null $op
    * @param null $objectName
    * @param int $objectId
+   * @param string $iconMode
+   *   - `text`: even if `icon` is set for a link, display the `name`
+   *   - `icon`: display only the `icon` for each link if it's available, and
+   *     don't tuck anything under "more >"
+   *   - `both`: if `icon` is available, display it next to the `name` for each
+   *     link
    *
    * @return string
    *   the html string
@@ -208,7 +196,8 @@ class CRM_Core_Action {
     $enclosedAllInSingleUL = FALSE,
     $op = NULL,
     $objectName = NULL,
-    $objectId = NULL
+    $objectId = NULL,
+    $iconMode = 'text'
   ) {
     if (empty($links)) {
       return NULL;
@@ -232,7 +221,7 @@ class CRM_Core_Action {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {
         $extra = isset($link['extra']) ? self::replace($link['extra'], $values) : NULL;
 
-        $frontend = (isset($link['fe'])) ? TRUE : FALSE;
+        $frontend = isset($link['fe']);
 
         if (isset($link['qs']) && !CRM_Utils_System::isNull($link['qs'])) {
           $urlPath = CRM_Utils_System::url(self::replace($link['url'], $values),
@@ -261,11 +250,22 @@ class CRM_Core_Action {
         if (strpos($urlPath, '/delete') || strpos($urlPath, 'action=delete')) {
           $classes .= " small-popup";
         }
+
+        $linkContent = $link['name'];
+        if (!empty($link['icon'])) {
+          if ($iconMode == 'icon') {
+            $linkContent = CRM_Core_Page::crmIcon($link['icon'], $link['name'], TRUE, ['title' => '']);
+          }
+          elseif ($iconMode == 'both') {
+            $linkContent = CRM_Core_Page::crmIcon($link['icon']) . ' ' . $linkContent;
+          }
+        }
+
         $url[] = sprintf('<a href="%s" class="%s" %s' . $extra . '>%s</a>',
           $urlPath,
           $classes,
           !empty($link['title']) ? "title='{$link['title']}' " : '',
-          $link['name']
+          $linkContent
         );
       }
     }
@@ -279,11 +279,13 @@ class CRM_Core_Action {
     }
     else {
       $extra = '';
-      $extraLinks = array_splice($url, 2);
-      if (count($extraLinks) > 1) {
-        $mainLinks = array_slice($url, 0, 2);
-        CRM_Utils_String::append($extra, '</li><li>', $extraLinks);
-        $extra = "{$extraULName}<ul class='panel'><li>{$extra}</li></ul>";
+      if ($iconMode != 'icon') {
+        $extraLinks = array_splice($url, 2);
+        if (count($extraLinks) > 1) {
+          $mainLinks = array_slice($url, 0, 2);
+          CRM_Utils_String::append($extra, '</li><li>', $extraLinks);
+          $extra = "{$extraULName}<ul class='panel'><li>{$extra}</li></ul>";
+        }
       }
       $resultLinks = '';
       CRM_Utils_String::append($resultLinks, '', $mainLinks);
@@ -330,7 +332,7 @@ class CRM_Core_Action {
 
     // make links indexed sequentially instead of by bitmask
     // otherwise it's next to impossible to reliably add new ones
-    $seqLinks = array();
+    $seqLinks = [];
     foreach ($links as $bit => $link) {
       $link['bit'] = $bit;
       $seqLinks[] = $link;

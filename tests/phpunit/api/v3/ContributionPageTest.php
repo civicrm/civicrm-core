@@ -1,29 +1,15 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\PriceFieldValue;
 
 /**
  *  Test APIv3 civicrm_contribute_recur* functions
@@ -37,7 +23,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected $params;
   protected $id = 0;
   protected $contactIds = [];
-  protected $_entity = 'contribution_page';
+  protected $_entity = 'ContributionPage';
   protected $contribution_result = NULL;
   protected $_priceSetParams = [];
   protected $_membershipBlockAmount = 2;
@@ -56,18 +42,28 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   protected $_ids = [];
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
-  public $DBResetRequired = TRUE;
-
+  /**
+   * Setup for test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->contactIds[] = $this->individualCreate();
     $this->params = [
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
       'goal_amount' => $this->testAmount,
       'is_pay_later' => 1,
+      'pay_later_text' => 'Send check',
       'is_monetary' => TRUE,
       'is_email_receipt' => TRUE,
       'receipt_from_email' => 'yourconscience@donate.com',
@@ -82,6 +78,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Tear down after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
     foreach ($this->contactIds as $id) {
       $this->callAPISuccess('contact', 'delete', ['id' => $id]);
@@ -91,20 +92,24 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test creating a contribution page.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPage($version) {
-    $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count']);
-    $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($this->params, $result['id'], $this->_entity);
+    $this->basicCreateTest($version);
   }
 
   /**
+   * Test getting a contribution page.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetBasicContributionPage($version) {
     $this->_apiversion = $version;
@@ -118,6 +123,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(1, $getResult['count']);
   }
 
+  /**
+   * Test get with amount as a parameter.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testGetContributionPageByAmount() {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->id = $createResult['id'];
@@ -132,18 +142,22 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test page deletion.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testDeleteContributionPage($version) {
-    $this->_apiversion = $version;
-    $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = ['id' => $createResult['id']];
-    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->basicDeleteTest($version);
   }
 
+  /**
+   * Test getfields function.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testGetFieldsContributionPage() {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(12, $result['values']['start_date']['type']);
@@ -151,6 +165,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test form submission with basic price set.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmit() {
     $this->setUpContributionPage();
@@ -164,6 +180,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test form submission with basic price set.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitZeroDollar() {
     $this->setUpContributionPage();
@@ -186,6 +204,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test form submission with billing first & last name where the contact does NOT
    * otherwise have one.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitNewBillingNameData() {
     $this->setUpContributionPage();
@@ -226,6 +246,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test form submission with billing first & last name where the contact does
    * otherwise have one and should not be overwritten.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitNewBillingNameDoNotOverwrite() {
     $this->setUpContributionPage();
@@ -271,7 +293,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test process with instant payment when more than one configured for the page.
    *
-   * CRM-16923
+   * @see https://issues.civicrm.org/jira/browse/CRM-16923
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecurMultiProcessorInstantPayment() {
     $this->setUpContributionPage();
@@ -324,21 +349,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockNotSeparatePayment() {
     $this->setUpMembershipContributionPage();
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
-
+      'selectMembership' => $this->_ids['membership_type'][0],
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
     $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id'], 'entity_id' => $membershipPayment['id']]);
@@ -356,11 +381,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -394,6 +418,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockNotSeparatePaymentWithEmail() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -403,11 +429,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-bridge.net',
       'payment_processor_id' => $this->_paymentProcessor['id'],
       'credit_card_number' => '4111111111111111',
@@ -421,6 +446,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
     $mut->checkMailLog([
       'Membership Type: General',
+      'Test Frontend title',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -428,21 +454,24 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \Exception
    */
   public function testSubmitMembershipBlockNotSeparatePaymentZeroDollarsWithEmail() {
     $mut = new CiviMailUtils($this, TRUE);
     $this->_ids['membership_type'] = [$this->membershipTypeCreate(['minimum_fee' => 0])];
     $this->setUpMembershipContributionPage();
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+    $priceFieldValueID = reset($this->_ids['price_field_value']);
+    PriceFieldValue::update()->addWhere('id', '=', $priceFieldValueID)->setValues(['amount' => 0])->execute();
 
     $submitParams = [
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'price_' . $this->_ids['price_field'][0] => $priceFieldValueID,
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 0,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruffier',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-new-bridge.net',
       'payment_processor_id' => $this->params['payment_processor_id'],
     ];
@@ -465,26 +494,28 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test submit with a pay later abnd check line item in mails.
+   * Test submit with a pay later and check line item in mails.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPayLaterWithEmail() {
     $mut = new CiviMailUtils($this, TRUE);
-    $this->setUpMembershipContributionPage();
+    $this->setUpMembershipContributionPage(TRUE);
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'is_pay_later' => 1,
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'email-Primary' => 'billy-goat@the-bridge.net',
     ];
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page']]);
-    $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']])['values'];
+    $this->assertCount(2, $contributions);
+    $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => ['IN' => array_keys($contributions)]]);
     $mut->checkMailLog([
       'Membership Amount -...             $ 2.00',
     ]);
@@ -494,6 +525,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePayment() {
     $this->setUpMembershipContributionPage(TRUE);
@@ -501,19 +534,18 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
     ];
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $this->assertCount(2, $contributions['values']);
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1]);
-    $this->assertEquals(10, $lines['values'][0]['line_total']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
+    $this->assertEquals(2, $lines['values'][0]['line_total']);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle');
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
@@ -521,6 +553,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentWithPayLater() {
     $this->setUpMembershipContributionPage(TRUE);
@@ -529,7 +563,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 0,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
@@ -541,25 +574,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $this->assertCount(2, $contributions['values']);
     foreach ($contributions['values'] as $val) {
-      $this->assertEquals('Pending', $val['contribution_status']);
+      $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $val['contribution_status_id']);
     }
 
     //Membership should be in Pending state.
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
     $this->assertTrue(in_array($membershipPayment['contribution_id'], array_keys($contributions['values'])));
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
-    $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', [
-      'return' => ["id"],
-      'name' => "Pending",
-    ]);
+    $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', ['return' => ['id'], 'name' => 'Pending']);
     $this->assertEquals($membership['status_id'], $pendingStatus['id']);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentWithEmail() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
@@ -605,8 +639,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentZeroDollarsPayLaterWithEmail() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $mut = new CiviMailUtils($this, TRUE);
     $this->_ids['membership_type'] = [$this->membershipTypeCreate(['minimum_fee' => 0])];
     $this->setUpMembershipContributionPage(TRUE);
@@ -642,8 +680,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockTwoTypesIsSeparatePayment() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->_ids['membership_type'] = [$this->membershipTypeCreate(['minimum_fee' => 6])];
     $this->_ids['membership_type'][] = $this->membershipTypeCreate(['name' => 'Student', 'minimum_fee' => 50]);
     $this->setUpMembershipContributionPage(TRUE);
@@ -673,8 +715,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test submit with a membership block in place.
    *
    * We are expecting a separate payment for the membership vs the contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNow() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage(TRUE);
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
@@ -731,6 +778,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   *
    * @dataProvider getThousandSeparators
    */
   public function testSubmitMembershipBlockIsSeparatePaymentPaymentProcessorNowChargesCorrectAmounts($thousandSeparator) {
@@ -760,8 +810,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // set custom hook
     $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'hook_civicrm_alterPaymentProcessorParams']);
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
-    $contributions = $this->callAPISuccess('contribution', 'get', [
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $this->callAPISuccess('contribution', 'get', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
     ]);
@@ -804,6 +854,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test that when a transaction fails the pending contribution remains.
    *
    * An activity should also be created. CRM-16417.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPaymentProcessorFailure() {
     $this->setUpContributionPage();
@@ -842,8 +894,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentYear() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(['duration_unit' => 'year', 'recur_frequency_unit' => 'year']);
   }
 
@@ -854,8 +910,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPaymentMonth() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment(['duration_unit' => 'month', 'recur_frequency_unit' => 'month']);
   }
 
@@ -876,9 +936,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @param array $params
    *
    * @throws \CRM_Core_Exception
-   * @throws \Exception
    */
   public function doSubmitMembershipPriceSetPaymentPaymentProcessorRecurInstantPayment($params = []) {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = $params['recur_frequency_unit'];
     $membershipTypeParams['duration_unit'] = $params['duration_unit'];
@@ -935,6 +996,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals($expectedMembershipStatus, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+    $this->assertEquals($contribution['contribution_recur_id'], $membership['contribution_recur_id']);
 
     $this->callAPISuccess('line_item', 'getsingle', ['contribution_id' => $contribution['id'], 'entity_id' => $membership['id']]);
     //renew it with processor setting completed - should extend membership
@@ -964,8 +1026,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipComplexNonPriceSetPaymentPaymentProcessorRecurInstantPayment() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->params['is_recur'] = 1;
     $this->params['recur_frequency_unit'] = $membershipTypeParams['duration_unit'] = 'year';
     // Add a membership so membership & contribution are not both 1.
@@ -1048,6 +1114,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipComplexPriceSetPaymentPaymentProcessorRecurInstantPayment() {
     $this->params['is_recur'] = 1;
@@ -1067,7 +1135,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'price_' . $this->_ids['price_field']['org1'] => $this->_ids['price_field_value']['org1'],
       'price_' . $this->_ids['price_field']['org2'] => $this->_ids['price_field_value']['org2'],
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
@@ -1129,6 +1196,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Extend the price set with a second organisation's membership.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addSecondOrganizationMembershipToPriceSet() {
     $organization2ID = $this->organizationCreate();
@@ -1182,6 +1251,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * processor (IATS style - denoted by returning trxn_id)
    * - the first creates a new membership, completed contribution, in progress recurring. Check these
    * - create another - end date should be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorSeparatePaymentRecurInstantPayment() {
 
@@ -1197,7 +1268,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -1209,7 +1280,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'frequency_unit' => 'month',
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
     $contribution = $this->callAPISuccess('contribution', 'get', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
@@ -1219,7 +1290,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
     $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertNotEmpty($contribution['values'][$membershipPayment['contribution_id']]['contribution_recur_id']);
-    $this->callAPISuccess('contribution_recur', 'getsingle', []);
+    $this->callAPISuccess('contribution_recur', 'getsingle');
   }
 
   /**
@@ -1229,6 +1300,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * - the first creates a pending membership, pending contribution, penging recurring. Check these
    * - complete the transaction
    * - create another - end date should NOT be extended
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipPriceSetPaymentPaymentProcessorRecurDelayed() {
     $this->params['is_recur'] = 1;
@@ -1247,12 +1320,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -1319,6 +1391,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test non-recur contribution with membership payment
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipIsSeparatePaymentNotRecur() {
     //Create recur contribution page.
@@ -1326,7 +1400,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $dummyPP = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
 
-    //Sumbit payment with recur disabled.
+    //Submit payment with recur disabled.
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
@@ -1337,7 +1411,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->_ids['membership_type'],
+      'selectMembership' => $this->_ids['membership_type'][0],
       'payment_processor_id' => 1,
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
@@ -1353,9 +1427,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Set up membership contribution page.
+   *
    * @param bool $isSeparatePayment
    * @param bool $isRecur
    * @param array $membershipTypeParams Parameters to pass to membershiptype.create API
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpMembershipContributionPage($isSeparatePayment = FALSE, $isRecur = FALSE, $membershipTypeParams = []) {
     $this->setUpMembershipBlockPriceSet($membershipTypeParams);
@@ -1391,6 +1468,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * The default data set does not include a complete default membership price set - not quite sure why.
    *
    * This function ensures it exists & populates $this->_ids with it's data
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpMembershipBlockPriceSet($membershipTypeParams = []) {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', [
@@ -1467,6 +1546,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Add text field other amount to the price set.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addOtherAmountFieldToMembershipPriceSet() {
     $this->_ids['price_field']['other_amount'] = $this->callAPISuccess('price_field', 'create', [
@@ -1488,13 +1569,17 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Help function to set up contribution page with some defaults.
+   *
    * @param bool $isRecur
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpContributionPage($isRecur = FALSE) {
     if ($isRecur) {
       $this->params['is_recur'] = 1;
       $this->params['recur_frequency_unit'] = 'month';
     }
+    $this->params['frontend_title'] = 'Test Frontend title';
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
@@ -1545,8 +1630,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Helper function to set up contribution page which can be used to purchase a
    * membership type for different intervals.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpMultiIntervalMembershipContributionPage() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->setupPaymentProcessor();
     $contributionPage = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->_ids['contribution_page'] = $contributionPage['id'];
@@ -1557,7 +1646,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'duration_unit' => 'month',
     ]);
 
-    $priceSet = civicrm_api3('PriceSet', 'create', [
+    $priceSet = $this->callAPISuccess('PriceSet', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
       'financial_type_id' => 'Member Dues',
@@ -1609,6 +1698,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMultiIntervalMembershipContributionPage() {
     $this->setUpMultiIntervalMembershipContributionPage();
@@ -1645,21 +1736,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \Exception
-   */
-  public static function tearDownAfterClass() {
-    $tablesToTruncate = [
-      'civicrm_contact',
-      'civicrm_financial_type',
-      'civicrm_contribution',
-      'civicrm_contribution_page',
-    ];
-    $unitTest = new CiviUnitTestCase();
-    $unitTest->quickCleanup($tablesToTruncate);
-  }
-
-  /**
    * Create a payment processor instance.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function setupPaymentProcessor() {
     $this->params['payment_processor_id'] = $this->_ids['payment_processor'] = $this->paymentProcessorCreate([
@@ -1674,8 +1753,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test submit recurring pledge.
    *
    * - we process 1 pledge with a future start date. A recur contribution and the pledge should be created with first payment date in the future.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->params['adjust_recur_start_date'] = TRUE;
     $this->params['is_pay_later'] = FALSE;
     $this->setUpContributionPage();
@@ -1742,8 +1825,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Test submit pledge payment.
    *
    * - test submitting a pledge payment using contribution form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPledgePayment() {
+    // Need to work on valid financials on this test.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
     $pledge = $this->callAPISuccess('pledge', 'getsingle', []);
     $params = [
@@ -1783,7 +1870,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $this->assertEquals(100.00, $contribution['total_amount']);
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
-    $this->assertEquals($pledgePayment['values'][2]['status_id'], 1, "This pledge payment should have been completed");
+    $this->assertEquals($pledgePayment['values'][2]['status_id'], 1, 'This pledge payment should have been completed');
     $this->assertEquals($pledgePayment['values'][2]['contribution_id'], $contribution['id']);
   }
 
@@ -1794,6 +1881,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitContributionPageWithPriceSet($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -1802,7 +1890,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = [
       'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 80,
       'first_name' => 'Billy',
       'last_name' => 'Gruff',
       'email' => 'billy@goat.gruff',
@@ -1810,7 +1897,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
     $this->addPriceFields($submitParams);
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $contribution = $this->callAPISuccessGetSingle('contribution', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 'Pending',
@@ -1822,14 +1909,17 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(3, $lineItems['count']);
     $totalLineAmount = 0;
     foreach ($lineItems['values'] as $lineItem) {
-      $totalLineAmount = $totalLineAmount + $lineItem['line_total'];
+      $totalLineAmount += $lineItem['line_total'];
     }
     $this->assertEquals(80, $totalLineAmount);
   }
 
   /**
    * Function to add additional price fields to priceset.
+   *
    * @param array $params
+   *
+   * @throws \CRM_Core_Exception
    */
   public function addPriceFields(&$params) {
     $priceSetID = reset($this->_ids['price_set']);
@@ -1865,6 +1955,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitContributionPageWithPriceSetQuantity($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -1873,11 +1964,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $financialType = $this->createFinancialType();
     $financialTypeId = $financialType['id'];
     // This function sets the Tax Rate at 10% - it currently has no way to pass Tax Rate into it - so let's work with 10%
-    $this->relationForFinancialTypeWithFinancialAccount($financialType['id'], 5);
+    $this->addTaxAccountToFinancialType($financialType['id']);
 
     $this->setUpContributionPage();
     $submitParams = [
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
       'id' => (int) $this->_ids['contribution_page'],
       'first_name' => 'J',
       'last_name' => 'T',
@@ -1886,14 +1976,19 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d H:i:s'),
     ];
 
-    // Create PriceSet/PriceField
+    // Add Existing PriceField
+    // This is a Shoe-eating Goat; qty = 1; unit_price = $10.00; There is no sales tax on Goats
+    $submitParams['price_' . $this->_ids['price_field'][0]] = reset($this->_ids['price_field_value']);
+
+    // Create additional PriceSet/PriceField
     $priceSetID = reset($this->_ids['price_set']);
     $priceField = $this->callAPISuccess('price_field', 'create', [
       'price_set_id' => $priceSetID,
       'label' => 'Printing Rights',
       'html_type' => 'Text',
     ]);
-    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+
+    $this->callAPISuccess('price_field_value', 'create', [
       'price_set_id' => $priceSetID,
       'price_field_id' => $priceField['id'],
       'label' => 'Printing Rights',
@@ -1905,30 +2000,60 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Set quantity for our test
     $submitParams['price_' . $priceFieldId] = 180;
 
-    // contribution_page submit requires amount and tax_amount - and that's ok we're not testing that - we're testing at the LineItem level
-    $submitParams['amount'] = $this->formatMoneyInput(180 * 16.95);
-    // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
-    $submitParams['tax_amount'] = $this->formatMoneyInput(180 * 16.95 * 0.10);
+    $priceField = $this->callAPISuccess('price_field', 'create', [
+      'price_set_id' => $priceSetID,
+      'label' => 'Another Line Item',
+      'html_type' => 'Text',
+    ]);
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $this->callAPISuccess('price_field_value', 'create', [
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Another Line Item',
+      'financial_type_id' => $financialTypeId,
+      'amount' => '2.95',
+    ]);
+    $priceFieldId = $priceField['id'];
+
+    // Set quantity for our test
+    $submitParams['price_' . $priceFieldId] = 110;
+
+    // This is the correct Tax Amount - use it later to compare to what the CiviCRM Core came up with at the LineItem level
+    $submitParams['tax_amount'] = (180 * 16.95 * 0.10 + 110 * 2.95 * 0.10);
+
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $this->validateAllContributions();
+
     $contribution = $this->callAPISuccessGetSingle('contribution', [
       'contribution_page_id' => $this->_ids['contribution_page'],
     ]);
 
+    // Retrieve the lineItem that belongs to the Goat
+    $lineItem1 = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'label' => 'Shoe-eating Goat',
+    ]);
+
     // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
-    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+    $lineItem2 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Printing Rights',
     ]);
 
-    $lineItem_TaxAmount = round($lineItem['tax_amount'], 2);
+    // Retrieve the lineItem that belongs to the Another Line Item and check the tax_amount CiviCRM Core calculated for it
+    $lineItem3 = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'label' => 'Another Line Item',
+    ]);
 
-    $this->assertEquals($lineItem['line_total'], $contribution['total_amount'], 'Contribution total should match line total');
-    $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
+    $this->assertEquals($lineItem1['line_total'] + $lineItem2['line_total'] + $lineItem3['line_total'], round(10 + 180 * 16.95 + 110 * 2.95, 2), 'Line Item Total is incorrect.');
+    $this->assertEquals(round($lineItem1['tax_amount'] + $lineItem2['tax_amount'] + $lineItem3['tax_amount'], 2), round(180 * 16.95 * 0.10 + 110 * 2.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
   /**
    * Test validating a contribution page submit.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testValidate() {
     $this->setUpContributionPage();
@@ -1944,6 +2069,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * For example Paypal Checkout will replace the confirm button with it's own but we are able to validate
    * before paypal launches it's modal. In this case the $_REQUEST is post but we need validation to succeed.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testValidatePost() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -1955,6 +2082,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test that an error is generated if required fields are not submitted.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testValidateOutputOnMissingRecurFields() {
     $this->params['is_recur_interval'] = 1;
@@ -1974,8 +2103,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function hook_civicrm_alterPaymentProcessorParams($paymentObj, &$rawParams, &$cookedParams) {
     // Ensure total_amount are the same if they're both given.
-    $total_amount = CRM_Utils_Array::value('total_amount', $rawParams);
-    $amount = CRM_Utils_Array::value('amount', $rawParams);
+    $total_amount = $rawParams['total_amount'] ?? NULL;
+    $amount = $rawParams['amount'] ?? NULL;
     if (!empty($total_amount) && !empty($amount) && $total_amount != $amount) {
       throw new Exception("total_amount '$total_amount' and amount '$amount' differ.");
     }
@@ -2000,14 +2129,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   protected function getBasicSubmitParams() {
     $priceFieldID = reset($this->_ids['price_field']);
     $priceFieldValueID = reset($this->_ids['price_field_value']);
-    $submitParams = [
+    return [
       'price_' . $priceFieldID => $priceFieldValueID,
       'id' => (int) $this->_ids['contribution_page'],
       'amount' => 10,
       'priceSetId' => $this->_ids['price_set'][0],
       'payment_processor_id' => 0,
     ];
-    return $submitParams;
   }
 
 }

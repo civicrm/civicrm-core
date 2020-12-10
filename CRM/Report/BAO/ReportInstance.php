@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
@@ -66,7 +50,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
       $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
       // CRM-17256 set created_id on report creation.
-      $params['created_id'] = isset($params['created_id']) ? $params['created_id'] : CRM_Core_Session::getLoggedInContactID();
+      $params['created_id'] = $params['created_id'] ?? CRM_Core_Session::getLoggedInContactID();
     }
 
     if ($instanceID) {
@@ -77,7 +61,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     $instance = new CRM_Report_DAO_ReportInstance();
-    $instance->copyValues($params, TRUE);
+    $instance->copyValues($params);
 
     if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';
@@ -130,10 +114,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    */
   public static function &create(&$params) {
     if (isset($params['report_header'])) {
-      $params['header'] = CRM_Utils_Array::value('report_header', $params);
+      $params['header'] = $params['report_header'];
     }
     if (isset($params['report_footer'])) {
-      $params['footer'] = CRM_Utils_Array::value('report_footer', $params);
+      $params['footer'] = $params['report_footer'];
     }
 
     // build navigation parameters
@@ -147,8 +131,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       $navigationParams['label'] = $params['title'];
       $navigationParams['name'] = $params['title'];
 
-      $navigationParams['current_parent_id'] = CRM_Utils_Array::value('parent_id', $navigationParams);
-      $navigationParams['parent_id'] = CRM_Utils_Array::value('parent_id', $params);
+      $navigationParams['current_parent_id'] = $navigationParams['parent_id'] ?? NULL;
+      $navigationParams['parent_id'] = $params['parent_id'] ?? NULL;
       $navigationParams['is_active'] = 1;
 
       if ($permission = CRM_Utils_Array::value('permission', $params)) {
@@ -160,7 +144,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
       unset($params['is_navigation']);
     }
 
-    $viewMode = !empty($params['view_mode']) ? $params['view_mode'] : FALSE;
+    $viewMode = !empty($params['view_mode']);
     if ($viewMode) {
       // Do not save to the DB - it's saved in the url.
       unset($params['view_mode']);

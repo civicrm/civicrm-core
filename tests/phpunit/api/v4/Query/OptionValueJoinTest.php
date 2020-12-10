@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -64,17 +46,23 @@ class OptionValueJoinTest extends UnitTestCase {
   }
 
   public function testCommunicationMethodJoin() {
-    $query = new Api4SelectQuery('Contact', FALSE, civicrm_api4('Contact', 'getFields', ['includeCustom' => FALSE, 'checkPermissions' => FALSE, 'action' => 'get'], 'name'));
-    $query->select[] = 'first_name';
-    $query->select[] = 'preferred_communication_method.label';
-    $query->where[] = ['preferred_communication_method', 'IS NOT NULL'];
+    $api = \Civi\API\Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['first_name', 'preferred_communication_method:label'],
+      'where' => [['preferred_communication_method', 'IS NOT NULL']],
+    ]);
+    $query = new Api4SelectQuery($api);
     $results = $query->run();
     $first = array_shift($results);
-    $firstPreferredMethod = array_shift($first['preferred_communication_method']);
+    $keys = array_keys($first);
+    sort($keys);
+    $this->assertEquals(['first_name', 'id', 'preferred_communication_method:label'], $keys);
+    $firstPreferredMethod = array_shift($first['preferred_communication_method:label']);
 
     $this->assertEquals(
       'Phone',
-      $firstPreferredMethod['label']
+      $firstPreferredMethod
     );
   }
 

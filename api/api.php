@@ -15,42 +15,85 @@
  *   create, get, delete or some special action name.
  * @param array $params
  *   array to be passed to function
- * @param null $extra
  *
  * @return array|int
  */
-function civicrm_api($entity, $action, $params, $extra = NULL) {
-  return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params, $extra);
+function civicrm_api(string $entity, string $action, array $params) {
+  return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
 }
 
 /**
- * Procedural wrapper for the OO api version 4.
+ * CiviCRM API version 4.
  *
- * @param string $entity
- * @param string $action
- * @param array $params
- * @param string|int $index
- *   If $index is a string, the results array will be indexed by that key.
- *   If $index is an integer, only the result at that index will be returned.
+ * This API (Application Programming Interface) is used to access and manage data in CiviCRM.
+ *
+ * APIv4 is the latest stable version.
+ *
+ * @see https://docs.civicrm.org/dev/en/latest/api/v4/usage/
+ *
+ * @param string $entity Name of the CiviCRM entity to access.
+ *   All entity names are capitalized CamelCase, e.g. `ContributionPage`.
+ *   Most entities correspond to a database table (e.g. `Contact` is the table `civicrm_contact`).
+ *   For a complete list of available entities, call `civicrm_api4('Entity', 'get');`
+ *
+ * @param string $action The "verb" of the api call.
+ *   For a complete list of actions for a given entity (e.g. `Contact`), call `civicrm_api4('Contact', 'getActions');`
+ *
+ * @param array $params An array of API input keyed by parameter name.
+ *   The easiest way to discover all available parameters is to visit the API Explorer on your CiviCRM site.
+ *   The API Explorer is listed in the CiviCRM menu under Support -> Developer.
+ *
+ * @param string|int|array $index Controls the Result array format.
+ *   By default the api Result contains a non-associative array of data. Passing an $index tells the api to
+ *   automatically reformat the array, depending on the variable type passed:
+ *   - **Integer:** return a single result array;
+ *     e.g. `$index = 0` will return the first result, 1 will return the second, and -1 will return the last.
+ *   - **String:** index the results by a field value;
+ *     e.g. `$index = "name"` will return an associative array with the field 'name' as keys.
+ *   - **Non-associative array:** return a single value from each result;
+ *     e.g. `$index = ['title']` will return a non-associative array of strings - the 'title' field from each result.
+ *   - **Associative array:** a combination of the previous two modes;
+ *     e.g. `$index = ['name' => 'title']` will return an array of strings - the 'title' field keyed by the 'name' field.
  *
  * @return \Civi\Api4\Generic\Result
  * @throws \API_Exception
  * @throws \Civi\API\Exception\NotImplementedException
  */
-function civicrm_api4($entity, $action, $params = [], $index = NULL) {
-  $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
-  foreach ($params as $name => $param) {
-    $setter = 'set' . ucfirst($name);
-    $apiCall->$setter($param);
+function civicrm_api4(string $entity, string $action, array $params = [], $index = NULL) {
+  $indexField = $index && is_string($index) && !CRM_Utils_Rule::integer($index) ? $index : NULL;
+  $removeIndexField = FALSE;
+
+  // If index field is not part of the select query, we add it here and remove it below
+  if ($indexField && !empty($params['select']) && is_array($params['select']) && !\Civi\Api4\Utils\SelectUtil::isFieldSelected($indexField, $params['select'])) {
+    $params['select'][] = $indexField;
+    $removeIndexField = TRUE;
   }
+  $apiCall = \Civi\API\Request::create($entity, $action, ['version' => 4] + $params);
+
+  if ($index && is_array($index)) {
+    $indexCol = reset($index);
+    $indexField = key($index);
+    if (property_exists($apiCall, 'select')) {
+      $apiCall->setSelect([$indexCol]);
+      if ($indexField && $indexField != $indexCol) {
+        $apiCall->addSelect($indexField);
+      }
+    }
+  }
+
   $result = $apiCall->execute();
 
   // Index results by key
-  if ($index && is_string($index) && !CRM_Utils_Rule::integer($index)) {
-    $result->indexBy($index);
+  if ($indexField) {
+    $result->indexBy($indexField);
+    if ($removeIndexField) {
+      foreach ($result as $key => $value) {
+        unset($result[$key][$indexField]);
+      }
+    }
   }
   // Return result at index
-  if (CRM_Utils_Rule::integer($index)) {
+  elseif (CRM_Utils_Rule::integer($index)) {
     $item = $result->itemAt($index);
     if (is_null($item)) {
       throw new \API_Exception("Index $index not found in api results");
@@ -60,7 +103,9 @@ function civicrm_api4($entity, $action, $params = [], $index = NULL) {
       return $item;
     }
     $result->exchangeArray($item);
-
+  }
+  if (!empty($indexCol)) {
+    $result->exchangeArray($result->column($indexCol));
   }
   return $result;
 }
@@ -81,7 +126,7 @@ function civicrm_api4($entity, $action, $params = [], $index = NULL) {
  *
  * @return array
  */
-function civicrm_api3($entity, $action, $params = []) {
+function civicrm_api3(string $entity, string $action, array $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
@@ -139,12 +184,7 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
  *   true if error, false otherwise
  */
 function civicrm_error($result) {
-  if (is_array($result)) {
-    return (array_key_exists('is_error', $result) &&
-      $result['is_error']
-    ) ? TRUE : FALSE;
-  }
-  return FALSE;
+  return is_array($result) && !empty($result['is_error']);
 }
 
 /**
@@ -155,7 +195,7 @@ function civicrm_error($result) {
  * @return string|null
  */
 function _civicrm_api_get_camel_name($entity) {
-  return is_string($entity) ? CRM_Utils_String::convertStringToCamel($entity) : NULL;
+  return is_string($entity) ? \Civi\API\Request::normalizeEntityName($entity) : NULL;
 }
 
 /**
@@ -222,7 +262,7 @@ function _civicrm_api_replace_variable($value, $parentResult, $separator) {
       if (array_key_exists($fieldname, $parentResult) && is_array($parentResult[$fieldname])) {
         $arrayLocation = $parentResult[$fieldname];
         foreach ($stringParts as $key => $innerValue) {
-          $arrayLocation = CRM_Utils_Array::value($innerValue, $arrayLocation);
+          $arrayLocation = $arrayLocation[$innerValue] ?? NULL;
         }
         $value = $arrayLocation;
       }
@@ -241,33 +281,25 @@ function _civicrm_api_replace_variable($value, $parentResult, $separator) {
  *
  * @return string
  *   Entity name in underscore separated format.
+ *
+ * @deprecated
  */
 function _civicrm_api_get_entity_name_from_camel($entity) {
-  if (!$entity || $entity === strtolower($entity)) {
-    return $entity;
+  if (!$entity) {
+    // @todo - this should not be called when empty.
+    return '';
   }
-  elseif ($entity == 'PCP') {
-    return 'pcp';
-  }
-  else {
-    $entity = ltrim(strtolower(str_replace('U_F',
-          'uf',
-          // That's CamelCase, beside an odd UFCamel that is expected as uf_camel
-          preg_replace('/(?=[A-Z])/', '_$0', $entity)
-        )), '_');
-  }
-  return $entity;
+  return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity);
 }
 
 /**
  * Having a DAO object find the entity name.
  *
- * @param object $bao
+ * @param CRM_Core_DAO $bao
  *   DAO being passed in.
  *
  * @return string
  */
 function _civicrm_api_get_entity_name_from_dao($bao) {
-  $daoName = str_replace("BAO", "DAO", get_class($bao));
-  return CRM_Core_DAO_AllCoreTables::getBriefName($daoName);
+  return CRM_Core_DAO_AllCoreTables::getBriefName(get_class($bao));
 }

@@ -1,0 +1,53 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{ $ctrl.entityTitle + ': ' + $ctrl.savedSearch.label }}</h1>
+  <div crm-ui-debug="$ctrl.savedSearch"></div>
+
+  <!--This warning will show if bootstrap is unavailable. Normally it will be hidden by the bootstrap .collapse class.-->
+  <div class="messages warning no-popup collapse">
+    <p>
+      <i class="crm-i fa-exclamation-triangle" aria-hidden="true"></i>
+      <strong>{{:: ts('Bootstrap theme not found.') }}</strong>
+    </p>
+    <p>{{:: ts('This screen may not work correctly without a bootstrap-based theme such as Shoreditch installed.') }}</p>
+  </div>
+
+  <form>
+    <div class="crm-flex-box">
+      <div class="nav-stacked">
+        <input id="crm-saved-search-label" class="form-control" ng-model="$ctrl.savedSearch.label" type="text" required placeholder="{{ ts('Untitled Search') }}" />
+      </div>
+      <div class="crm-flex-4 form-inline">
+        <label for="crm-search-main-entity">{{:: ts('Search for:') }}</label>
+        <input id="crm-search-main-entity" class="form-control huge" ng-model="$ctrl.savedSearch.api_entity" crm-ui-select="::{allowClear: false, data: entities}" ng-disabled="$ctrl.savedSearch.id" />
+        <div class="btn-group btn-group-md pull-right">
+          <button type="submit" class="btn" ng-class="{'btn-primary': status === 'unsaved', 'btn-warning': status === 'saving', 'btn-success': status === 'saved'}" ng-disabled="status !== 'unsaved'" ng-click="$ctrl.save()">
+            <i class="crm-i" ng-class="{'fa-check': status !== 'saving', 'fa-spin fa-spinner': status === 'saving'}"></i>
+            <span ng-if="status === 'saved'">{{ ts('Saved') }}</span>
+            <span ng-if="status === 'unsaved'">{{ ts('Save') }}</span>
+            <span ng-if="status === 'saving'">{{ ts('Saving...') }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="crm-flex-box">
+      <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
+      <div class="crm-flex-4" ng-switch="controls.tab">
+        <div ng-switch-when="compose">
+          <div ng-include="'~/crmSearchAdmin/compose/criteria.html'"></div>
+          <div ng-include="'~/crmSearchAdmin/compose/controls.html'"></div>
+          <div ng-include="'~/crmSearchAdmin/compose/debug.html'" ng-if="$ctrl.debug"></div>
+          <div ng-include="'~/crmSearchAdmin/compose/results.html'" class="crm-search-results"></div>
+          <div ng-include="'~/crmSearchAdmin/compose/pager.html'"></div>
+        </div>
+        <div ng-switch-when="group">
+          <fieldset ng-include="'~/crmSearchAdmin/group.html'"></fieldset>
+        </div>
+        <div ng-switch-default>
+          <div ng-repeat="display in $ctrl.savedSearch.displays" ng-if="controls.tab === ('display_' + $index)">
+            <crm-search-admin-display display="display" saved-search="$ctrl.savedSearch"></crm-search-admin-display>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

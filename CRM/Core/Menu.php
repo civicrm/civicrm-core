@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * This file contains the various menus of the CiviCRM module
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'CRM/Core/I18n.php';
@@ -90,7 +74,7 @@ class CRM_Core_Menu {
       // lets call a hook and get any additional files if needed
       CRM_Utils_Hook::xmlMenu($files);
 
-      self::$_items = array();
+      self::$_items = [];
       foreach ($files as $file) {
         self::read($file, self::$_items);
       }
@@ -112,7 +96,7 @@ class CRM_Core_Menu {
    * @throws Exception
    */
   public static function read($name, &$menu) {
-    $xml = simplexml_load_file($name);
+    $xml = simplexml_load_string(file_get_contents($name));
     self::readXML($xml, $menu);
   }
 
@@ -121,22 +105,24 @@ class CRM_Core_Menu {
    *   An XML document defining a list of menu items.
    * @param array $menu
    *   An alterable list of menu items.
+   *
+   * @throws CRM_Core_Exception
    */
   public static function readXML($xml, &$menu) {
     $config = CRM_Core_Config::singleton();
     foreach ($xml->item as $item) {
       if (!(string ) $item->path) {
         CRM_Core_Error::debug('i', $item);
-        CRM_Core_Error::fatal();
+        throw new CRM_Core_Exception('Unable to read XML file');
       }
       $path = (string ) $item->path;
-      $menu[$path] = array();
+      $menu[$path] = [];
       unset($item->path);
 
       if ($item->ids_arguments) {
-        $ids = array();
+        $ids = [];
         foreach (array('json' => 'json', 'html' => 'html', 'exception' => 'exceptions') as $tag => $attr) {
-          $ids[$attr] = array();
+          $ids[$attr] = [];
           foreach ($item->ids_arguments->{$tag} as $value) {
             $ids[$attr][] = (string) $value;
           }
@@ -168,7 +154,7 @@ class CRM_Core_Menu {
               $elements = explode(';', $value);
               $op = 'or';
             }
-            $items = array();
+            $items = [];
             foreach ($elements as $element) {
               $items[] = $element;
             }
@@ -220,7 +206,7 @@ class CRM_Core_Menu {
    * @param array $menu
    * @param string $path
    *
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function fillMenuValues(&$menu, $path) {
     $fieldsToPropagate = array(
@@ -230,9 +216,9 @@ class CRM_Core_Menu {
       'page_arguments',
       'is_ssl',
     );
-    $fieldsPresent = array();
+    $fieldsPresent = [];
     foreach ($fieldsToPropagate as $field) {
-      $fieldsPresent[$field] = CRM_Utils_Array::value($field, $menu[$path]) !== NULL ? TRUE : FALSE;
+      $fieldsPresent[$field] = isset($menu[$path][$field]);
     }
 
     $args = explode('/', $path);
@@ -243,9 +229,10 @@ class CRM_Core_Menu {
 
       foreach ($fieldsToPropagate as $field) {
         if (!$fieldsPresent[$field]) {
-          if (CRM_Utils_Array::value($field, CRM_Utils_Array::value($parentPath, $menu)) !== NULL) {
+          $fieldInParentMenu = $menu[$parentPath][$field] ?? NULL;
+          if ($fieldInParentMenu !== NULL) {
             $fieldsPresent[$field] = TRUE;
-            $menu[$path][$field] = $menu[$parentPath][$field];
+            $menu[$path][$field] = $fieldInParentMenu;
           }
         }
       }
@@ -255,15 +242,15 @@ class CRM_Core_Menu {
       return;
     }
 
-    $messages = array();
+    $messages = [];
     foreach ($fieldsToPropagate as $field) {
       if (!$fieldsPresent[$field]) {
         $messages[] = ts("Could not find %1 in path tree",
-          array(1 => $field)
+          [1 => $field]
         );
       }
     }
-    CRM_Core_Error::fatal("'$path': " . implode(', ', $messages));
+    throw new CRM_Core_Exception("'$path': " . implode(', ', $messages));
   }
 
   /**
@@ -320,7 +307,7 @@ class CRM_Core_Menu {
         CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_menu', 'module_data', FALSE)
       ) {
         // Move unrecognized fields to $module_data.
-        $module_data = array();
+        $module_data = [];
         foreach (array_keys($item) as $key) {
           if (!isset($daoFields[$key])) {
             $module_data[$key] = $item[$key];
@@ -354,7 +341,7 @@ class CRM_Core_Menu {
    * @param array $menu
    */
   public static function buildAdminLinks(&$menu) {
-    $values = array();
+    $values = [];
 
     foreach ($menu as $path => $item) {
       if (empty($item['adminGroup'])) {
@@ -365,7 +352,7 @@ class CRM_Core_Menu {
 
       $value = array(
         'title' => $item['title'],
-        'desc' => CRM_Utils_Array::value('desc', $item),
+        'desc' => $item['desc'] ?? NULL,
         'id' => strtr($item['title'], array(
           '(' => '_',
           ')' => '',
@@ -381,20 +368,18 @@ class CRM_Core_Menu {
           // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
           TRUE
         ),
-        'icon' => CRM_Utils_Array::value('icon', $item),
-        'extra' => CRM_Utils_Array::value('extra', $item),
+        'icon' => $item['icon'] ?? NULL,
+        'extra' => $item['extra'] ?? NULL,
       );
       if (!array_key_exists($item['adminGroup'], $values)) {
-        $values[$item['adminGroup']] = array();
-        $values[$item['adminGroup']]['fields'] = array();
+        $values[$item['adminGroup']] = [];
+        $values[$item['adminGroup']]['fields'] = [];
       }
-      $weight = CRM_Utils_Array::value('weight', $item, 0);
       $values[$item['adminGroup']]['fields']["{weight}.{$item['title']}"] = $value;
       $values[$item['adminGroup']]['component_id'] = $item['component_id'];
     }
 
     foreach ($values as $group => $dontCare) {
-      $values[$group]['perColumn'] = round(count($values[$group]['fields']) / 2);
       ksort($values[$group]);
     }
 
@@ -431,7 +416,7 @@ class CRM_Core_Menu {
    *   The breadcrumb for this path
    */
   public static function buildBreadcrumb(&$menu, $path) {
-    $crumbs = array();
+    $crumbs = [];
 
     $pathElements = explode('/', $path);
     array_pop($pathElements);
@@ -517,9 +502,11 @@ class CRM_Core_Menu {
   /**
    * @param $menu
    * @param $path
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function fillComponentIds(&$menu, $path) {
-    static $cache = array();
+    static $cache = [];
 
     if (array_key_exists('component_id', $menu[$path])) {
       return;
@@ -540,7 +527,7 @@ class CRM_Core_Menu {
       $menu[$path]['component_id'] = $cache[$compPath];
     }
     else {
-      if (CRM_Utils_Array::value('component', CRM_Utils_Array::value($compPath, $menu))) {
+      if (!empty($menu[$compPath]['component'])) {
         $componentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component',
           $menu[$compPath]['component'],
           'id', 'name'
@@ -564,7 +551,7 @@ class CRM_Core_Menu {
 
     $args = explode('/', $path);
 
-    $elements = array();
+    $elements = [];
     while (!empty($args)) {
       $string = implode('/', $args);
       $string = CRM_Core_DAO::escapeString($string);
@@ -600,22 +587,22 @@ UNION (
     $menu = new CRM_Core_DAO_Menu();
     $menu->query($query);
 
-    self::$_menuCache = array();
+    self::$_menuCache = [];
     $menuPath = NULL;
     while ($menu->fetch()) {
-      self::$_menuCache[$menu->path] = array();
+      self::$_menuCache[$menu->path] = [];
       CRM_Core_DAO::storeValues($menu, self::$_menuCache[$menu->path]);
 
       // Move module_data into main item.
       if (isset(self::$_menuCache[$menu->path]['module_data'])) {
         CRM_Utils_Array::extend(self::$_menuCache[$menu->path],
-          unserialize(self::$_menuCache[$menu->path]['module_data']));
+          CRM_Utils_String::unserialize(self::$_menuCache[$menu->path]['module_data']));
         unset(self::$_menuCache[$menu->path]['module_data']);
       }
 
       // Unserialize other elements.
       foreach (self::$_serializedElements as $element) {
-        self::$_menuCache[$menu->path][$element] = unserialize($menu->$element);
+        self::$_menuCache[$menu->path][$element] = CRM_Utils_String::unserialize($menu->$element);
 
         if (strpos($path, $menu->path) !== FALSE) {
           $menuPath = &self::$_menuCache[$menu->path];
@@ -660,7 +647,7 @@ UNION (
     if (!is_string($pathArgs)) {
       return;
     }
-    $args = array();
+    $args = [];
 
     $elements = explode(',', $pathArgs);
     foreach ($elements as $keyVal) {
@@ -669,7 +656,7 @@ UNION (
     }
 
     if (array_key_exists('urlToSession', $arr)) {
-      $urlToSession = array();
+      $urlToSession = [];
 
       $params = explode(';', $arr['urlToSession']);
       $count = 0;

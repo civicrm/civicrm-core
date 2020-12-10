@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Payment_Manual extends CRM_Core_Payment {
 
@@ -38,6 +22,19 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    * This function checks to see if we have the right config values.
    */
   public function checkConfig() {}
+
+  /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->_paymentProcessor = [
+      'payment_type' => 0,
+      'billing_mode' => 0,
+      'id' => 0,
+      'url_recur' => '',
+      'is_recur' => 0,
+    ];
+  }
 
   /**
    * Get billing fields required for this processor.
@@ -133,7 +130,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    */
   protected function getResult() {
     if (!$this->result) {
-      $this->setResult(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'status_id', 'Pending'));
+      $this->setResult(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
     }
     return $this->result;
   }
@@ -177,6 +174,24 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Are live payments supported - e.g dummy doesn't support this.
+   *
+   * @return bool
+   */
+  protected function supportsLiveMode() {
+    return TRUE;
+  }
+
+  /**
+   * Are test payments supported.
+   *
+   * @return bool
+   */
+  protected function supportsTestMode() {
+    return TRUE;
+  }
+
+  /**
    * Declare that more than one payment can be processed at once.
    *
    * @return bool
@@ -195,6 +210,19 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
+   * Does the processor support the user having a choice as to whether to cancel the recurring with the processor?
+   *
+   * If this returns TRUE then there will be an option to send a cancellation request in the cancellation form.
+   *
+   * This would normally be false for processors where CiviCRM maintains the schedule.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurringNotifyOptional() {
+    return FALSE;
+  }
+
+  /**
    * Are back office payments supported.
    *
    * @return bool
@@ -204,22 +232,10 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
   }
 
   /**
-   * Submit a manual payment.
-   *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
-   *
-   * @return array
+   * Does the processor work without an email address?
    */
-  public function doDirectPayment(&$params) {
-    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
-    if ($params['is_pay_later']) {
-      $result['payment_status_id'] = array_search('Pending', $statuses);
-    }
-    else {
-      $result['payment_status_id'] = array_search('Completed', $statuses);
-    }
-    return $result;
+  protected function supportsNoEmailProvided() {
+    return TRUE;
   }
 
   /**
@@ -254,7 +270,18 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         }
         return ts('To complete your contribution, click the <strong>Continue</strong> button below.');
 
+      default:
+        return parent::getText($context, $params);
     }
+  }
+
+  /**
+   * Does this processor support cancelling recurring contributions through code.
+   *
+   * @return bool
+   */
+  protected function supportsCancelRecurring() {
+    return TRUE;
   }
 
 }

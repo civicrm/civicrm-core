@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -80,13 +64,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    * @var object
    */
   protected $_query;
-
-  /**
-   * Cache the expanded options list if any.
-   *
-   * @var object
-   */
-  protected $_options;
 
   /**
    * The group id that we are editing.
@@ -196,8 +173,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     //the below is done for query building for multirecord custom field listing
     //to show all the custom field multi valued records of a particular contact
     $this->setMultiRecordTableName($this->_fields);
-
-    $this->_options = &$this->_query->_options;
   }
 
   /**
@@ -323,9 +298,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
           if (strpos($name, '-') !== FALSE) {
             $value = explode('-', $name);
-            $fieldName = CRM_Utils_Array::value(0, $value);
-            $lType = CRM_Utils_Array::value(1, $value);
-            $type = CRM_Utils_Array::value(2, $value);
+            $fieldName = $value[0] ?? NULL;
+            $lType = $value[1] ?? NULL;
+            $type = $value[2] ?? NULL;
 
             if (!in_array($fieldName, $multipleFields)) {
               if ($lType == 'Primary') {
@@ -396,7 +371,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     if ($this->_multiRecordTableName &&
       !array_key_exists($this->_multiRecordTableName, $this->_query->_whereTables)
     ) {
-      $additionalFromClause = CRM_Utils_Array::value($this->_multiRecordTableName, $this->_query->_tables);
+      $additionalFromClause = $this->_query->_tables[$this->_multiRecordTableName] ?? NULL;
       $returnQuery = TRUE;
     }
 
@@ -452,7 +427,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       foreach ($vars as $key => $field) {
         $field = $vars[$key];
         $fieldArray = explode('-', $field['name']);
-        $fieldType = CRM_Utils_Array::value('2', $fieldArray);
+        $fieldType = $fieldArray['2'] ?? NULL;
         if (is_numeric(CRM_Utils_Array::value('1', $fieldArray))) {
           if (!in_array($fieldType, $multipleFields)) {
             $locationType = new CRM_Core_DAO_LocationType();
@@ -507,7 +482,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     if ($editLink && ($mask & CRM_Core_Permission::EDIT)) {
       // do not allow edit for anon users in joomla frontend, CRM-4668
       $config = CRM_Core_Config::singleton();
-      if (!$config->userFrameworkFrontend || CRM_Core_Session::singleton()->getLoggedInContactID()) {
+      if (!$config->userFrameworkFrontend || CRM_Core_Session::getLoggedInContactID()) {
         $this->_editLink = TRUE;
       }
     }
@@ -529,14 +504,14 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       ) {
         if (strpos($key, '-') !== FALSE) {
           $value = explode('-', $key);
-          $fieldName = CRM_Utils_Array::value(0, $value);
-          $id = CRM_Utils_Array::value(1, $value);
-          $type = CRM_Utils_Array::value(2, $value);
+          $fieldName = $value[0] ?? NULL;
+          $id = $value[1] ?? NULL;
+          $type = $value[2] ?? NULL;
 
           if (!in_array($fieldName, $multipleFields)) {
             $locationTypeName = NULL;
             if (is_numeric($id)) {
-              $locationTypeName = CRM_Utils_Array::value($id, $locationTypes);
+              $locationTypeName = $locationTypes[$id] ?? NULL;
             }
             else {
               if ($id == 'Primary') {

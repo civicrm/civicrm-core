@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -80,14 +64,14 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
   public function preProcess() {
     Civi::resources()->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
-    $this->_unscheduled = $this->_archived = $archiveLinks = FALSE;
+    $this->_unscheduled = $archiveLinks = FALSE;
     $this->_mailingId = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
     $this->_sms = CRM_Utils_Request::retrieve('sms', 'Positive', $this);
 
     if ($this->_sms) {
       // if this is an SMS page, check that the user has permission to browse SMS
       if (!CRM_Core_Permission::check('send SMS')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to send SMS'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to send SMS'));
       }
     }
     else {
@@ -95,7 +79,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       // permission (specific permissions have been copied from
       // CRM/Mailing/xml/Menu/Mailing.xml)
       if (!CRM_Core_Permission::check([['access CiviMail', 'approve mailings', 'create mailings', 'schedule mailings']])) {
-        CRM_Core_Error::fatal(ts('You do not have permission to view this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to view this page.'));
       }
     }
 
@@ -135,6 +119,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $newArgs = func_get_args();
     // since we want only first function argument
     $newArgs = $newArgs[0];
+    $this->_isArchived = $this->isArchived($newArgs);
     if (isset($_GET['runJobs']) || CRM_Utils_Array::value('2', $newArgs) == 'queue') {
       $mailerJobSize = Civi::settings()->get('mailerJobSize');
       CRM_Mailing_BAO_MailingJob::runJobs_pre($mailerJobSize);
@@ -156,10 +141,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     $this->set('unscheduled', $this->_unscheduled);
 
-    if (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
-      $this->_archived = TRUE;
-    }
-    $this->set('archived', $this->_archived);
+    $this->set('archived', $this->isArchived($newArgs));
 
     if (CRM_Utils_Array::value(3, $newArgs) == 'scheduled') {
       $this->_scheduled = TRUE;
@@ -195,7 +177,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     elseif ($this->_action & CRM_Core_Action::CLOSE) {
       if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
@@ -203,7 +185,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
     elseif ($this->_action & CRM_Core_Action::REOPEN) {
       if (!CRM_Core_Permission::checkActionPermission('CiviMail', CRM_Core_Action::CLOSE)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
       CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been resumed.'), ts('Resumed'), 'success');
@@ -214,7 +196,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
 
         // check for action permissions.
         if (!CRM_Core_Permission::checkActionPermission('CiviMail', $this->_action)) {
-          CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
         }
 
         CRM_Mailing_BAO_Mailing::del($this->_mailingId);
@@ -261,11 +243,6 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $controller->setEmbedded(TRUE);
     $controller->run();
 
-    // hack to display results as per search
-    $rows = $controller->getRows($controller);
-
-    $this->assign('rows', $rows);
-
     $urlParams = 'reset=1';
     $urlString = 'civicrm/mailing/browse';
     if ($this->get('sms')) {
@@ -276,7 +253,8 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $urlParams .= '&scheduled=false';
       $this->assign('unscheduled', TRUE);
     }
-    elseif (CRM_Utils_Array::value(3, $newArgs) == 'archived') {
+
+    if ($this->isArchived($newArgs)) {
       $urlString .= '/archived';
       $this->assign('archived', TRUE);
     }
@@ -367,6 +345,19 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     }
 
     return implode(' AND ', $clauses);
+  }
+
+  /**
+   * Is the search limited to archived mailings.
+   *
+   * @param array $urlArguments
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isArchived($urlArguments): bool {
+    return in_array('archived', $urlArguments, TRUE) || CRM_Utils_Request::retrieveValue('is_archived', 'Boolean');
   }
 
 }

@@ -1,14 +1,14 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {if $formValues.receipt_text}
 {$formValues.receipt_text}
-{else}{ts}Thank you for your support.{/ts}{/if}
-
-{ts}Please print this receipt for your records.{/ts}
-
+{else}{ts}Below you will find a receipt for this contribution.{/ts}{/if}
 
 ===========================================================
 {ts}Contribution Information{/ts}
 
 ===========================================================
+{ts}Contributor{/ts}: {contact.display_name}
 {ts}Financial Type{/ts}: {$formValues.contributionType_name}
 {if $lineItem}
 {foreach from=$lineItem item=value key=priceset}

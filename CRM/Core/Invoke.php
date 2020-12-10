@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -31,7 +15,7 @@
  * Serves as a wrapper between the UserFrameWork and Core CRM
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Invoke {
 
@@ -71,7 +55,7 @@ class CRM_Core_Invoke {
       return NULL;
     }
     // CRM-15901: Turn off PHP errors display for all ajax calls
-    if (CRM_Utils_Array::value(1, $args) == 'ajax' || CRM_Utils_Array::value('snippet', $_REQUEST)) {
+    if (CRM_Utils_Array::value(1, $args) == 'ajax' || !empty($_REQUEST['snippet'])) {
       ini_set('display_errors', 0);
     }
 
@@ -118,7 +102,7 @@ class CRM_Core_Invoke {
         return CRM_Utils_System::redirect();
       }
       else {
-        CRM_Core_Error::fatal('You do not have permission to execute this url');
+        CRM_Core_Error::statusBounce('You do not have permission to execute this url');
       }
     }
   }
@@ -167,6 +151,48 @@ class CRM_Core_Invoke {
   }
 
   /**
+   * Register an alternative phar:// stream wrapper to filter out insecure Phars
+   *
+   * PHP makes it possible to trigger Object Injection vulnerabilities by using
+   * a side-effect of the phar:// stream wrapper that unserializes Phar
+   * metadata. To mitigate this vulnerability, projects such as TYPO3 and Drupal
+   * have implemented an alternative Phar stream wrapper that disallows
+   * inclusion of phar files based on certain parameters.
+   *
+   * This code attempts to register the TYPO3 Phar stream wrapper using the
+   * interceptor defined in \Civi\Core\Security\PharExtensionInterceptor. In an
+   * environment where the stream wrapper was already registered via
+   * \TYPO3\PharStreamWrapper\Manager (i.e. Drupal), this code does not do
+   * anything. In other environments (e.g. WordPress, at the time of this
+   * writing), the TYPO3 library is used to register the interceptor to mitigate
+   * the vulnerability.
+   */
+  private static function registerPharHandler() {
+    try {
+      // try to get the existing stream wrapper, registered e.g. by Drupal
+      \TYPO3\PharStreamWrapper\Manager::instance();
+    }
+    catch (\LogicException $e) {
+      if ($e->getCode() === 1535189872) {
+        // no phar stream wrapper was registered by \TYPO3\PharStreamWrapper\Manager.
+        // This means we're probably not on Drupal and need to register our own.
+        \TYPO3\PharStreamWrapper\Manager::initialize(
+          (new \TYPO3\PharStreamWrapper\Behavior())
+            ->withAssertion(new \Civi\Core\Security\PharExtensionInterceptor())
+        );
+        if (in_array('phar', stream_get_wrappers())) {
+          stream_wrapper_unregister('phar');
+          stream_wrapper_register('phar', \TYPO3\PharStreamWrapper\PharStreamWrapper::class);
+        }
+      }
+      else {
+        // this is not an exception we can handle
+        throw $e;
+      }
+    }
+  }
+
+  /**
    * Given a menu item, call the appropriate controller and return the response
    *
    * @param array $item
@@ -176,6 +202,8 @@ class CRM_Core_Invoke {
   public static function runItem($item) {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
+
+    self::registerPharHandler();
 
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Joomla' && $item) {
@@ -193,16 +221,10 @@ class CRM_Core_Invoke {
     $template->assign('formTpl', 'default');
 
     if ($item) {
-      // CRM-7656 - make sure we send a clean sanitized path to create printer friendly url
-      $printerFriendly = CRM_Utils_System::makeURL(
-          'snippet', FALSE, FALSE,
-          CRM_Utils_Array::value('path', $item)
-        ) . '2';
-      $template->assign('printerFriendly', $printerFriendly);
 
       if (!array_key_exists('page_callback', $item)) {
         CRM_Core_Error::debug('Bad item', $item);
-        CRM_Core_Error::fatal(ts('Bad menu record in database'));
+        CRM_Core_Error::statusBounce(ts('Bad menu record in database'));
       }
 
       // check that we are permissioned to access this page
@@ -255,12 +277,12 @@ class CRM_Core_Invoke {
       if (is_array($item['page_callback']) || strpos($item['page_callback'], ':')) {
         $result = call_user_func(Civi\Core\Resolver::singleton()->get($item['page_callback']));
       }
-      elseif (strstr($item['page_callback'], '_Form')) {
+      elseif (strpos($item['page_callback'], '_Form') !== FALSE) {
         $wrapper = new CRM_Utils_Wrapper();
         $result = $wrapper->run(
-          CRM_Utils_Array::value('page_callback', $item),
-          CRM_Utils_Array::value('title', $item),
-          isset($pageArgs) ? $pageArgs : NULL
+          $item['page_callback'] ?? NULL,
+          $item['title'] ?? NULL,
+          $pageArgs ?? NULL
         );
       }
       else {
@@ -270,7 +292,7 @@ class CRM_Core_Invoke {
           $mode = $pageArgs['mode'];
           unset($pageArgs['mode']);
         }
-        $title = CRM_Utils_Array::value('title', $item);
+        $title = $item['title'] ?? NULL;
         if (strstr($item['page_callback'], '_Page') || strstr($item['page_callback'], '\\Page\\')) {
           $object = new $item['page_callback']($title, $mode);
           $object->urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
@@ -285,7 +307,7 @@ class CRM_Core_Invoke {
           $object = new $item['page_callback']($title, TRUE, $mode, NULL, $addSequence);
         }
         else {
-          CRM_Core_Error::fatal();
+          throw new CRM_Core_Exception('Execute supplied menu action');
         }
         $result = $object->run($newArgs, $pageArgs);
       }

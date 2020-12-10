@@ -6,6 +6,7 @@
   <name>civicrm_mailing_recipients</name>
   <comment>Stores information about the recipients of a mailing.</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Mailing Recipients ID</title>

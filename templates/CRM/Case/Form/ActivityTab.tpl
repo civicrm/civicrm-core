@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {*this template is used for activity accordion*}
@@ -31,46 +15,44 @@
       {ts}Activities{/ts}
     </div>
 
-    <div id="activities" class="crm-accordion-body">
-    <div class="crm-accordion-wrapper crm-accordion-inner crm-search_filters-accordion collapsed">
-      <div class="crm-accordion-header">
+    <div id="activities" class="crm-accordion-body padded">
+    <div class="crm-collapsible crm-search_filters-accordion collapsed">
+      <div class="collapsible-title">
         {ts}Search Filters{/ts}
-      </div><!-- /.crm-accordion-header -->
-      <div class="crm-accordion-body">
-        <table class="no-border form-layout-compressed" id="searchOptions">
-          <tr>
-            <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
-              {$form.reporter_id.html|crmAddClass:twenty}
-            </td>
-            <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
-              {$form.status_id.html}
+      </div>
+      <table class="no-border form-layout-compressed" id="searchOptions">
+        <tr>
+          <td class="crm-case-caseview-form-block-repoter_id"colspan="2"><label for="reporter_id">{ts}Reporter/Role{/ts}</label><br />
+            {$form.reporter_id.html|crmAddClass:twenty}
+          </td>
+          <td class="crm-case-caseview-form-block-status_id"><label for="status_id">{$form.status_id.label}</label><br />
+            {$form.status_id.html}
+          </td>
+        </tr>
+        <tr>
+          <td class="crm-case-caseview-form-block-activity_date_low">
+            {assign var=activitylow  value=activity_date_low_$caseID}
+            {$form.$activitylow.label}<br />
+            {$form.$activitylow.html}
+          </td>
+          <td class="crm-case-caseview-form-block-activity_date_high">
+            {assign var=activityhigh  value=activity_date_high_$caseID}
+            {$form.$activityhigh.label}<br />
+            {$form.$activityhigh.html}
+          </td>
+          <td class="crm-case-caseview-form-block-activity_type_filter_id">
+            {$form.activity_type_filter_id.label}<br />
+            {$form.activity_type_filter_id.html}
+          </td>
+        </tr>
+        {if $form.activity_deleted}
+          <tr class="crm-case-caseview-form-block-activity_deleted">
+            <td>
+              {$form.activity_deleted.html}{$form.activity_deleted.label}
             </td>
           </tr>
-          <tr>
-            <td class="crm-case-caseview-form-block-activity_date_low">
-              {assign var=activitylow  value=activity_date_low_$caseID}
-              {$form.$activitylow.label}<br />
-              {$form.$activitylow.html}
-            </td>
-            <td class="crm-case-caseview-form-block-activity_date_high">
-              {assign var=activityhigh  value=activity_date_high_$caseID}
-              {$form.$activityhigh.label}<br />
-              {$form.$activityhigh.html}
-            </td>
-            <td class="crm-case-caseview-form-block-activity_type_filter_id">
-              {$form.activity_type_filter_id.label}<br />
-              {$form.activity_type_filter_id.html}
-            </td>
-          </tr>
-          {if $form.activity_deleted}
-            <tr class="crm-case-caseview-form-block-activity_deleted">
-              <td>
-                {$form.activity_deleted.html}{$form.activity_deleted.label}
-              </td>
-            </tr>
-          {/if}
-        </table>
-      </div><!-- /.crm-accordion-body -->
+        {/if}
+      </table>
     </div><!-- /.crm-accordion-wrapper -->
 {/if}
 

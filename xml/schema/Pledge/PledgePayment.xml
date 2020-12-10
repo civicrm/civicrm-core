@@ -7,6 +7,7 @@
   <comment>Pledge Payment</comment>
   <add>2.1</add>
   <log>true</log>
+  <component>CiviPledge</component>
   <field>
     <name>id</name>
     <uniqueName>pledge_payment_id</uniqueName>

@@ -26,9 +26,9 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
-          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
       </div>
       <div crm-ui-field="{name: 'subform.msg_template_idA', title: ts('Template (A)')}" ng-if="fields.msg_template_idA">
@@ -42,9 +42,9 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.a, abtest.mailings.a.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
-          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.a)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
       </div>
       <div crm-ui-field="{name: 'subform.msg_template_idB', title: ts('Template (B)')}" ng-if="fields.msg_template_idB">
@@ -58,9 +58,9 @@ processed by Angular; if false, the field will be hidden and completely ignored 
             ng-change="loadTemplate(abtest.mailings.b, abtest.mailings.b.msg_template_id)"
             >
             <option value=""></option>
-            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" ng-value="frm.id">{{frm.msg_title}}</option>
+            <option ng-repeat="frm in crmMsgTemplates.getAll() | orderBy:'msg_title'" value="{{ frm.id }}">{{frm.msg_title}}</option>
           </select>
-          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button" title="{{ts('Save As')}}"></a>
+          <a crm-icon="fa-floppy-o" ng-click="saveTemplate(abtest.mailings.b)" class="crm-hover-button" title="{{:: ts('Save As') }}"></a>
         </div>
       </div>
     </div>

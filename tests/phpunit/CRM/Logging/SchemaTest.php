@@ -6,7 +6,10 @@
  */
 class CRM_Logging_SchemaTest extends CiviUnitTestCase {
 
+  protected $databaseVersion;
+
   public function setUp() {
+    $this->databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
     parent::setUp();
   }
 
@@ -18,6 +21,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   public function tearDown() {
     $schema = new CRM_Logging_Schema();
     $schema->disableLogging();
+    $this->databaseVersion = NULL;
     parent::tearDown();
     $this->quickCleanup(['civicrm_contact'], TRUE);
     $schema->dropAllLogTables();
@@ -155,6 +159,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that autoincrement keys are handled sensibly in logging table reconciliation.
+   */
   public function testAutoIncrementNonIdColumn() {
     CRM_Core_DAO::executeQuery("CREATE TABLE `civicrm_test_table` (
       test_id  int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -163,10 +170,20 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");
-    // Test that just havving a non id nanmed column with Auto Increment doesn't create diffs
+    // Test that just having a non id named column with Auto Increment doesn't create diffs
     $this->assertTrue(empty($diffs['MODIFY']));
     $this->assertTrue(empty($diffs['ADD']));
     $this->assertTrue(empty($diffs['OBSOLETE']));
+
+    // Check we can add a primary key to the log table and it will not be treated as obsolete.
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE log_civicrm_test_table ADD COLUMN `log_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+      ADD PRIMARY KEY (`log_id`)
+   ");
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
+    $diffs = $schema->columnsWithDiffSpecs('civicrm_test_table', "log_civicrm_test_table");
+    $this->assertTrue(empty($diffs['OBSOLETE']));
+
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_table ADD COLUMN test_varchar varchar(255) DEFAULT NULL");
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     // Check that it still picks up new columns added.
@@ -235,13 +252,17 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals('int', $ci['test_id']['DATA_TYPE']);
     $this->assertEquals('NO', $ci['test_id']['IS_NULLABLE']);
     $this->assertEquals('auto_increment', $ci['test_id']['EXTRA']);
-    $this->assertEquals('10', $ci['test_id']['LENGTH']);
+    if (!$this->isMySQL8()) {
+      $this->assertEquals('10', $ci['test_id']['LENGTH']);
+    }
 
     $this->assertEquals('varchar', $ci['test_varchar']['DATA_TYPE']);
     $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
 
     $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
-    $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    if (!$this->isMySQL8()) {
+      $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+    }
     $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
 
     $this->assertEquals('decimal', $ci['test_decimal']['DATA_TYPE']);
@@ -279,27 +300,24 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       CHANGE COLUMN test_integer test_integer int(6) NULL,
       CHANGE COLUMN test_decimal test_decimal decimal(22,2) NULL"
     );
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
-    // need to do it twice so the columnSpecs static is refreshed
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
-    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    if (!$this->isMySQL8()) {
+      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    }
     $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
       CHANGE COLUMN test_integer test_integer int(4) NULL,
       CHANGE COLUMN test_decimal test_decimal decimal(20,2) NULL"
     );
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
-    $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    if (!$this->isMySQL8()) {
+      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+    }
     $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }
 
@@ -314,12 +332,114 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_enum_change CHANGE COLUMN test_enum test_enum enum('A','B','C','D') NULL");
     \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $schema->fixSchemaDifferences();
-    // need to do it twice so the columnSpecs static is refreshed
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
-    $schema->fixSchemaDifferences();
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // new enum value should be included
     $this->assertEquals("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
+  }
+
+  /**
+   * Test editing a custom field
+   */
+  public function testCustomFieldEdit() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $customGroup = $this->entityCustomGroupWithSingleFieldCreate('Contact', 'ContactTest.php');
+
+    // get the custom group table name
+    $params = ['id' => $customGroup['custom_group_id']];
+    $custom_group = $this->callAPISuccess('custom_group', 'getsingle', $params);
+
+    // get the field db column name
+    $params = ['id' => $customGroup['custom_field_id']];
+    $custom_field = $this->callAPISuccess('custom_field', 'getsingle', $params);
+
+    // check it
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_{$custom_group['table_name']}`");
+    $dao->fetch();
+    $this->assertStringContainsString("`{$custom_field['column_name']}` varchar(255)", $dao->Create_Table);
+
+    // Edit the field
+    $params = [
+      'id' => $customGroup['custom_field_id'],
+      'label' => 'Label changed',
+      'text_length' => 768,
+    ];
+    $this->callAPISuccess('custom_field', 'create', $params);
+
+    // update logging schema
+    $schema->fixSchemaDifferences();
+
+    // verify
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_{$custom_group['table_name']}`");
+    $dao->fetch();
+    $this->assertStringContainsString("`{$custom_field['column_name']}` varchar(768)", $dao->Create_Table);
+  }
+
+  /**
+   * Test creating a table with SchemaHandler::createTable when logging
+   * is enabled.
+   */
+  public function testCreateTableWithLogging() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    CRM_Core_BAO_SchemaHandler::createTable([
+      'name' => 'civicrm_test_table',
+      'is_multiple' => FALSE,
+      'attributes' => 'ENGINE=InnoDB',
+      'fields' => [
+        [
+          'name' => 'id',
+          'type' => 'int unsigned',
+          'primary' => TRUE,
+          'required' => TRUE,
+          'attributes' => 'AUTO_INCREMENT',
+          'comment' => 'Default MySQL primary key',
+        ],
+        [
+          'name' => 'activity_id',
+          'type' => 'int unsigned',
+          'required' => TRUE,
+          'comment' => 'FK to civicrm_activity',
+          'fk_table_name' => 'civicrm_activity',
+          'fk_field_name' => 'id',
+          'fk_attributes' => 'ON DELETE CASCADE',
+        ],
+        [
+          'name' => 'texty',
+          'type' => 'varchar(255)',
+          'required' => FALSE,
+        ],
+      ],
+    ]);
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_table");
+    $dao->fetch();
+    // using regex since not sure it's always int(10), so accept int(10), int(11), integer, etc...
+    $this->assertRegExp('/`id` int(.+) unsigned NOT NULL AUTO_INCREMENT/', $dao->Create_Table);
+    $this->assertRegExp('/`activity_id` int(.+) unsigned NOT NULL/', $dao->Create_Table);
+    $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
+    $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
+    $this->assertStringContainsString('FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE', $dao->Create_Table);
+
+    // Check log table.
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_test_table");
+    $dao->fetch();
+    $this->assertStringNotContainsString('AUTO_INCREMENT', $dao->Create_Table);
+    // This seems debatable whether `id` should lose its NOT NULL status
+    $this->assertRegExp('/`id` int(.+) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertRegExp('/`activity_id` int(.+) unsigned DEFAULT NULL/', $dao->Create_Table);
+    $this->assertStringContainsString('`texty` varchar(255)', $dao->Create_Table);
+    $this->assertStringContainsString('ENGINE=InnoDB', $dao->Create_Table);
+    $this->assertStringNotContainsString('FOREIGN KEY', $dao->Create_Table);
+  }
+
+  /**
+   * Determine if we are running on MySQL 8 version 8.0.19 or later.
+   *
+   * @return bool
+   */
+  protected function isMySQL8() {
+    return (bool) (version_compare($this->databaseVersion, '8.0.19', '>=') && stripos($this->databaseVersion, 'mariadb') === FALSE);
   }
 
 }

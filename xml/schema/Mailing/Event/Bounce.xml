@@ -6,6 +6,7 @@
   <name>civicrm_mailing_event_bounce</name>
   <comment>Tracks when and why an email bounced.</comment>
   <archive>true</archive>
+  <component>CiviMail</component>
   <field>
     <name>id</name>
     <title>Bounce ID</title>

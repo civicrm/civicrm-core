@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -181,8 +165,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $user = NULL;
 
     if (!empty($row)) {
-      $dbName = CRM_Utils_Array::value('name', $row);
-      $dbEmail = CRM_Utils_Array::value('mail', $row);
+      $dbName = $row['name'] ?? NULL;
+      $dbEmail = $row['mail'] ?? NULL;
       if (strtolower($dbName) == strtolower($name)) {
         $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.',
           [1 => $name]
@@ -316,9 +300,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
 
     $config = CRM_Core_Config::singleton();
 
-    $dbDrupal = DB::connect($config->userFrameworkDSN);
+    $ufDSN = CRM_Utils_SQL::autoSwitchDSN($config->userFrameworkDSN);
+    $dbDrupal = DB::connect($ufDSN);
     if (DB::isError($dbDrupal)) {
-      CRM_Core_Error::fatal("Cannot connect to drupal db via $config->userFrameworkDSN, " . $dbDrupal->getMessage());
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $ufDSN, " . $dbDrupal->getMessage());
     }
 
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
@@ -476,7 +461,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
     global $user;
     // If $uid is passed in, authentication has been done already.
-    $uid = CRM_Utils_Array::value('uid', $params);
+    $uid = $params['uid'] ?? NULL;
     if (!$uid) {
       //load user, we need to check drupal permissions.
       $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
@@ -703,7 +688,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     $result = [];
     $q = db_query('SELECT name, status FROM {system} WHERE type = \'module\' AND schema_version <> -1');
     while ($row = db_fetch_object($q)) {
-      $result[] = new CRM_Core_Module('drupal.' . $row->name, ($row->status == 1) ? TRUE : FALSE);
+      $result[] = new CRM_Core_Module('drupal.' . $row->name, $row->status == 1);
     }
     return $result;
   }
@@ -822,6 +807,14 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
     ];
+  }
+
+  /**
+   * Return the CMS-specific url for its permissions page
+   * @return array
+   */
+  public function getCMSPermissionsUrlParams() {
+    return ['ufAccessURL' => url('admin/user/permissions')];
   }
 
 }

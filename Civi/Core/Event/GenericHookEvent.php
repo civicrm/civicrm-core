@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -42,7 +26,7 @@ namespace Civi\Core\Event;
  * and methods. This requires some kind of mapping. `GenericHookEvent`
  * maps each parameter to a field (using magic methods):
  *
- * @code
+ * ```
  * // Creating an event object.
  * $event = GenericHookEvent::create(array(
  *   'bar' => 'abc',
@@ -56,8 +40,8 @@ namespace Civi\Core\Event;
  * $event->bang->objProperty = 'abcd';
  *
  * // Dispatching an event.
- * Civi::service('dispatcher')->dispatch('hook_civicrm_foo', $event);
- * @endCode
+ * Civi::dispatcher()->dispatch('hook_civicrm_foo', $event);
+ * ```
  *
  * Design Discussion:
  *
@@ -72,10 +56,10 @@ namespace Civi\Core\Event;
  * as an array, and all the returned values are merged into one big array.
  * You can add and retrieve return-values using these methods:
  *
- * @code
+ * ```
  * $event->addReturnValues(array(...));
  * foreach ($event->getReturnValues() as $retVal) { ... }
- * @endCode
+ * ```
  */
 class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
 

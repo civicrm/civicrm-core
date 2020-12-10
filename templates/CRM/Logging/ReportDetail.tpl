@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-content-block crm-report-form-block">
@@ -28,7 +12,7 @@
     {if $raw}
       <div class="status">
         <dl>
-          <dt><div class="icon inform-icon"></div></dt>
+          <dt>{icon icon="fa-info-circle"}{/icon}</dt>
           <dd>
             {ts}WARNING: Are you sure you want to revert the below changes?{/ts}
           </dd>
@@ -43,13 +27,13 @@
     {/if}
   {else}
     <div class='messages status'>
-        <div class='icon inform-icon'></div>&nbsp; {ts}This report can not be displayed because there are no relevant entries in the logging tables.{/ts}
+      {icon icon="fa-info-circle"}{/icon}{ts}This report can not be displayed because there are no relevant entries in the logging tables.{/ts}
     </div>
   {/if}
   {if $layout neq 'overlay'}
   <div class="action-link">
-      <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left"></i> {ts}Back to Logging Summary{/ts}</span></a>
-      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm}');"><span><i class="crm-i fa-undo"></i> {ts}Revert These Changes{/ts}</span></a>
+      <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Logging Summary{/ts}</span></a>
+      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm}');"><span><i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Revert These Changes{/ts}</span></a>
   </div>
   {/if}
 </div>

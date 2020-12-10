@@ -1,34 +1,18 @@
 <?php
 /*
-  +--------------------------------------------------------------------+
-  | CiviCRM version 5                                                  |
-  +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2019                                |
-  +--------------------------------------------------------------------+
-  | This file is a part of CiviCRM.                                    |
-  |                                                                    |
-  | CiviCRM is free software; you can copy, modify, and distribute it  |
-  | under the terms of the GNU Affero General Public License           |
-  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
-  |                                                                    |
-  | CiviCRM is distributed in the hope that it will be useful, but     |
-  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
-  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
-  | See the GNU Affero General Public License for more details.        |
-  |                                                                    |
-  | You should have received a copy of the GNU Affero General Public   |
-  | License and the CiviCRM Licensing Exception along                  |
-  | with this program; if not, contact CiviCRM LLC                     |
-  | at info[AT]civicrm[DOT]org. If you have questions about the        |
-  | GNU Affero General Public License or the licensing of CiviCRM,     |
-  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
-  +--------------------------------------------------------------------+
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
 
@@ -353,7 +337,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => NULL,
           ),
         ),
@@ -420,7 +404,7 @@ WHERE ce.entity_table = 'civicrm_event'
 ORDER BY  cv.label
 ";
     $dao = CRM_Core_DAO::executeQuery($query);
-    $elements = array();
+    $elements = [];
     while ($dao->fetch()) {
       $elements[$dao->id] = "$dao->label\n";
     }
@@ -433,8 +417,8 @@ ORDER BY  cv.label
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
 
     //add blank column at the Start
     if (array_key_exists('options', $this->_params) &&
@@ -462,16 +446,16 @@ ORDER BY  cv.label
             }
             $alias = "{$tableName}_{$fieldName}";
             $select[] = "{$field['dbAlias']} as $alias";
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = CRM_Utils_Array::value('no_display', $field);
-            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = CRM_Utils_Array::value('title', $field);
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = $field['type'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = $field['no_display'] ?? NULL;
+            $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'] ?? NULL;
             $this->_selectAliases[] = $alias;
           }
         }
       }
     }
     //add blank column at the end
-    $blankcols = CRM_Utils_Array::value('blank_column_end', $this->_params);
+    $blankcols = $this->_params['blank_column_end'] ?? NULL;
     if ($blankcols) {
       for ($i = 1; $i <= $blankcols; $i++) {
         $select[] = " '' as blankColumnEnd_{$i}";
@@ -491,7 +475,7 @@ ORDER BY  cv.label
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     return $errors;
   }
 
@@ -546,26 +530,26 @@ ORDER BY  cv.label
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
 
           if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
+            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
+            $from = $this->_params["{$fieldName}_from"] ?? NULL;
+            $to = $this->_params["{$fieldName}_to"] ?? NULL;
 
             if ($relative || $from || $to) {
               $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
             }
           }
           else {
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
+            $op = $this->_params["{$fieldName}_op"] ?? NULL;
 
             if ($fieldName == 'rid') {
-              $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
+              $value = $this->_params["{$fieldName}_value"] ?? NULL;
               if (!empty($value)) {
                 $operator = '';
                 if ($op == 'notin') {
@@ -651,7 +635,7 @@ ORDER BY  cv.label
     $entryFound = FALSE;
     $eventType = CRM_Core_OptionGroup::values('event_type');
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     foreach ($rows as $rowNum => $row) {
@@ -689,7 +673,7 @@ ORDER BY  cv.label
         $roleId = $row['civicrm_participant_role_id'];
         if ($roleId) {
           $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $roleId);
-          $roleId = array();
+          $roleId = [];
           foreach ($roles as $role) {
             $roleId[$role] = CRM_Event_PseudoConstant::participantRole($role, FALSE);
           }
@@ -709,7 +693,7 @@ ORDER BY  cv.label
         }
       }
 
-      // Handle value seperator in Fee Level
+      // Handle value separator in Fee Level
       if (array_key_exists('civicrm_participant_participant_fee_level', $row)) {
         $feeLevel = $row['civicrm_participant_participant_fee_level'];
         if ($feeLevel) {
@@ -720,9 +704,9 @@ ORDER BY  cv.label
       }
 
       // Convert display name to link
-      $displayName = CRM_Utils_Array::value('civicrm_contact_sort_name_linked', $row);
-      $cid = CRM_Utils_Array::value('civicrm_contact_id', $row);
-      $id = CRM_Utils_Array::value('civicrm_participant_participant_record', $row);
+      $displayName = $row['civicrm_contact_sort_name_linked'] ?? NULL;
+      $cid = $row['civicrm_contact_id'] ?? NULL;
+      $id = $row['civicrm_participant_participant_record'] ?? NULL;
 
       if ($displayName && $cid && $id) {
         $url = CRM_Report_Utils_Report::getNextUrl('contact/detail',
@@ -739,7 +723,7 @@ ORDER BY  cv.label
 
         $rows[$rowNum]['civicrm_contact_sort_name_linked'] = "<a title='$contactTitle' href=$url>$displayName</a>";
         // Add a "View" link to the participant record if this isn't a CSV/PDF/printed document.
-        if ($this->_outputMode !== 'csv' && $this->_outputMode !== 'pdf' && $this->_outputMode !== 'print') {
+        if (empty($this->getOutputMode())) {
           $rows[$rowNum]['civicrm_contact_sort_name_linked'] .=
             "<span style='float: right;'><a title='$participantTitle' href=$viewUrl>" .
             ts('View') . "</a></span>";

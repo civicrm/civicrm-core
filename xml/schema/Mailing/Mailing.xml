@@ -6,6 +6,12 @@
   <name>civicrm_mailing</name>
   <comment>Stores information about a mailing.</comment>
   <archive>true</archive>
+  <icon>fa-envelope-o</icon>
+  <component>CiviMail</component>
+  <paths>
+    <add>civicrm/a/#/mailing/new</add>
+    <update>civicrm/a/#/mailing/[id]</update>
+  </paths>
   <field>
     <name>id</name>
     <title>Mailing ID</title>
@@ -120,6 +126,7 @@
   </foreignKey>
   <field>
     <name>name</name>
+    <uniqueName>mailing_name</uniqueName>
     <title>Mailing Name</title>
     <type>varchar</type>
     <length>128</length>
@@ -264,7 +271,7 @@
     <type>boolean</type>
     <default>0</default>
     <add>2.2</add>
-    <comment>Should we overrite VERP address in Reply-To</comment>
+    <comment>Overwrite the VERP address in Reply-To</comment>
     <html>
       <type>CheckBox</type>
     </html>

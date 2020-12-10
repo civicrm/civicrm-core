@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -85,6 +69,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
   /**
    * Status of personal campaign page
    * @var array
+   * @deprecated
    */
   private static $pcpStatus;
 
@@ -124,7 +109,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialType);
+      $result = self::$financialType[$id] ?? NULL;
       return $result;
     }
     return self::$financialType;
@@ -165,7 +150,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
 
     }
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$financialAccount[$cacheKey]);
+      $result = self::$financialAccount[$cacheKey][$id] ?? NULL;
       return $result;
     }
     return self::$financialAccount[$cacheKey];
@@ -213,7 +198,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       );
     }
     if ($id) {
-      $pageTitle = CRM_Utils_Array::value($id, $cacheVarToUse);
+      $pageTitle = $cacheVarToUse[$id] ?? NULL;
       return $pageTitle;
     }
     return $cacheVarToUse;
@@ -316,7 +301,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$contributionStatus[$cacheKey];
     if ($id) {
-      $result = CRM_Utils_Array::value($id, $result);
+      $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -347,7 +332,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
     $result = self::$pcPage[$pageType];
     if ($id) {
-      return $result = CRM_Utils_Array::value($id, $result);
+      return $result = $result[$id] ?? NULL;
     }
 
     return $result;
@@ -358,12 +343,13 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * The static array pcpStatus is returned
    *
-   *
+   * @deprecated
    * @param string $column
    * @return array
    *   array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
+    CRM_Core_Error::deprecatedFunctionWarning('Function pcpStatus will be removed');
     if (NULL === self::$pcpStatus) {
       self::$pcpStatus = [];
     }
@@ -428,7 +414,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
     }
 
     if ($id) {
-      $result = CRM_Utils_Array::value($id, self::$batch);
+      $result = self::$batch[$id] ?? NULL;
       return $result;
     }
     return self::$batch;

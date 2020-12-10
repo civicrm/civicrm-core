@@ -1,0 +1,29 @@
+.af-api4-action-running {
+    cursor: not-allowed;
+    color: black;
+}
+a.af-api4-action-idle {
+    cursor: pointer;
+}
+
+.af-container.af-layout-cols {
+    display: flex;
+}
+.af-container.af-layout-cols > * {
+    flex: 1;
+}
+.af-container.af-layout-inline > * {
+    display: inline-block;
+    margin-right: .5em;
+    vertical-align: bottom;
+}
+
+[af-repeat-item] {
+  position: relative;
+}
+#bootstrap-theme [af-repeat-item] .af-repeat-remove-btn {
+  min-width: 30px;
+  position: absolute;
+  top: 0;
+  right: 0;
+}

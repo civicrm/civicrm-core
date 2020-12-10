@@ -2,56 +2,45 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
 namespace Civi\Api4\Utils;
 
-use CRM_Utils_Array as UtilsArray;
+use Civi\Api4\Query\SqlExpression;
 
 require_once 'api/v3/utils.php';
 
 class FormattingUtil {
 
+  public static $pseudoConstantContexts = [
+    'name' => 'validate',
+    'abbr' => 'abbreviate',
+    'label' => 'get',
+  ];
+
+  public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon'];
+
   /**
    * Massage values into the format the BAO expects for a write operation
    *
-   * @param $params
-   * @param $entity
-   * @param $fields
+   * @param array $params
+   * @param array $fields
    * @throws \API_Exception
    */
-  public static function formatWriteParams(&$params, $entity, $fields) {
+  public static function formatWriteParams(&$params, $fields) {
     foreach ($fields as $name => $field) {
       if (!empty($params[$name])) {
         $value =& $params[$name];
@@ -59,7 +48,7 @@ class FormattingUtil {
         if ($value === 'null') {
           $value = 'Null';
         }
-        FormattingUtil::formatValue($value, $field, $entity);
+        self::formatInputValue($value, $name, $field, 'create');
         // Ensure we have an array for serialized fields
         if (!empty($field['serialize'] && !is_array($value))) {
           $value = (array) $value;
@@ -81,6 +70,8 @@ class FormattingUtil {
         $params[$name] = 'null';
       }
     }
+
+    \CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($params);
   }
 
   /**
@@ -89,23 +80,27 @@ class FormattingUtil {
    * This is used by read AND write actions (Get, Create, Update, Replace)
    *
    * @param $value
-   * @param $fieldSpec
-   * @param string $entity
-   *   Ex: 'Contact', 'Domain'
+   * @param string $fieldName
+   * @param array $fieldSpec
+   * @param string $action
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function formatValue(&$value, $fieldSpec, $entity) {
-    if (is_array($value)) {
+  public static function formatInputValue(&$value, $fieldName, $fieldSpec, $action = 'get') {
+    // Evaluate pseudoconstant suffix
+    $suffix = strpos($fieldName, ':');
+    if ($suffix) {
+      $options = self::getPseudoconstantList($fieldSpec, substr($fieldName, $suffix + 1), $action);
+      $value = self::replacePseudoconstant($options, $value, TRUE);
+      return;
+    }
+    elseif (is_array($value)) {
       foreach ($value as &$val) {
-        self::formatValue($val, $fieldSpec, $entity);
+        self::formatInputValue($val, $fieldName, $fieldSpec, $action);
       }
       return;
     }
-    $fk = UtilsArray::value('fk_entity', $fieldSpec);
-    if ($fieldSpec['name'] == 'id') {
-      $fk = $entity;
-    }
-    $dataType = UtilsArray::value('data_type', $fieldSpec);
+    $fk = $fieldSpec['name'] == 'id' ? $fieldSpec['entity'] : $fieldSpec['fk_entity'] ?? NULL;
 
     if ($fk === 'Domain' && $value === 'current_domain') {
       $value = \CRM_Core_Config::domainID();
@@ -118,7 +113,7 @@ class FormattingUtil {
       }
     }
 
-    switch ($dataType) {
+    switch ($fieldSpec['data_type'] ?? NULL) {
       case 'Timestamp':
         $value = date('Y-m-d H:i:s', strtotime($value));
         break;
@@ -127,6 +122,187 @@ class FormattingUtil {
         $value = date('Ymd', strtotime($value));
         break;
     }
+
+    $hic = \CRM_Utils_API_HTMLInputCoder::singleton();
+    if (!$hic->isSkippedField($fieldSpec['name']) && is_string($value)) {
+      $value = $hic->encodeValue($value);
+    }
+  }
+
+  /**
+   * Unserialize raw DAO values and convert to correct type
+   *
+   * @param array $results
+   * @param array $fields
+   * @param string $entity
+   * @param string $action
+   * @param array $selectAliases
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function formatOutputValues(&$results, $fields, $entity, $action = 'get', $selectAliases = []) {
+    $fieldOptions = [];
+    foreach ($results as &$result) {
+      $contactTypePaths = [];
+      foreach ($result as $key => $value) {
+        $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
+        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
+        $field = $fieldName && isset($fields[$fieldName]) ? $fields[$fieldName] : NULL;
+        $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
+        // If Sql Function e.g. GROUP_CONCAT or COUNT wants to do its own formatting, apply and skip dataType conversion
+        if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
+          $result[$key] = $value = $fieldExpr->formatOutputValue($value);
+          $dataType = NULL;
+        }
+        if (!$field) {
+          continue;
+        }
+        // Evaluate pseudoconstant suffixes
+        $suffix = strrpos($fieldName, ':');
+        if ($suffix) {
+          $fieldOptions[$fieldName] = $fieldOptions[$fieldName] ?? self::getPseudoconstantList($field, substr($fieldName, $suffix + 1), $result, $action);
+          $dataType = NULL;
+        }
+        if ($fieldExpr->supportsExpansion) {
+          if (!empty($field['serialize']) && is_string($value)) {
+            $value = \CRM_Core_DAO::unSerializeField($value, $field['serialize']);
+          }
+          if (isset($fieldOptions[$fieldName])) {
+            $value = self::replacePseudoconstant($fieldOptions[$fieldName], $value);
+          }
+        }
+        // Keep track of contact types for self::contactFieldsToRemove
+        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+          $prefix = strrpos($fieldName, '.');
+          $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
+        }
+        $result[$key] = self::convertDataType($value, $dataType);
+      }
+      // Remove inapplicable contact fields
+      foreach ($contactTypePaths as $prefix => $contactType) {
+        \CRM_Utils_Array::remove($result, self::contactFieldsToRemove($contactType, $prefix));
+      }
+    }
+  }
+
+  /**
+   * Retrieves pseudoconstant option list for a field.
+   *
+   * @param array $field
+   * @param string $valueType
+   *   name|label|abbr from self::$pseudoConstantContexts
+   * @param array $params
+   *   Other values for this object
+   * @param string $action
+   * @return array
+   * @throws \API_Exception
+   */
+  public static function getPseudoconstantList($field, $valueType, $params = [], $action = 'get') {
+    $context = self::$pseudoConstantContexts[$valueType] ?? NULL;
+    // For create actions, only unique identifiers can be used.
+    // For get actions any valid suffix is ok.
+    if (($action === 'create' && !$context) || !in_array($valueType, self::$pseudoConstantSuffixes, TRUE)) {
+      throw new \API_Exception('Illegal expression');
+    }
+    $baoName = $context ? CoreUtil::getBAOFromApiName($field['entity']) : NULL;
+    // Use BAO::buildOptions if possible
+    if ($baoName) {
+      $fieldName = empty($field['custom_field_id']) ? $field['name'] : 'custom_' . $field['custom_field_id'];
+      $options = $baoName::buildOptions($fieldName, $context, $params);
+    }
+    // Fallback for option lists that exist in the api but not the BAO
+    if (!isset($options) || $options === FALSE) {
+      $options = civicrm_api4($field['entity'], 'getFields', ['action' => $action, 'loadOptions' => ['id', $valueType], 'where' => [['name', '=', $field['name']]]])[0]['options'] ?? NULL;
+      $options = $options ? array_column($options, $valueType, 'id') : $options;
+    }
+    if (is_array($options)) {
+      return $options;
+    }
+    throw new \API_Exception("No option list found for '{$field['name']}'");
+  }
+
+  /**
+   * Replaces value (or an array of values) with options from a pseudoconstant list.
+   *
+   * The direction of lookup defaults to transforming ids to option values for api output;
+   * for api input, set $reverse = TRUE to transform option values to ids.
+   *
+   * @param array $options
+   * @param string|string[] $value
+   * @param bool $reverse
+   *   Is this a reverse lookup (for transforming input instead of output)
+   * @return array|mixed|null
+   */
+  public static function replacePseudoconstant($options, $value, $reverse = FALSE) {
+    $matches = [];
+    foreach ((array) $value as $val) {
+      if (!$reverse && isset($options[$val])) {
+        $matches[] = $options[$val];
+      }
+      elseif ($reverse && array_search($val, $options) !== FALSE) {
+        $matches[] = array_search($val, $options);
+      }
+    }
+    return is_array($value) ? $matches : $matches[0] ?? NULL;
+  }
+
+  /**
+   * @param mixed $value
+   * @param string $dataType
+   * @return mixed
+   */
+  public static function convertDataType($value, $dataType) {
+    if (isset($value) && $dataType) {
+      if (is_array($value)) {
+        foreach ($value as $key => $val) {
+          $value[$key] = self::convertDataType($val, $dataType);
+        }
+        return $value;
+      }
+
+      switch ($dataType) {
+        case 'Boolean':
+          return (bool) $value;
+
+        case 'Integer':
+          return (int) $value;
+
+        case 'Money':
+        case 'Float':
+          return (float) $value;
+      }
+    }
+    return $value;
+  }
+
+  /**
+   * Lists all field names (including suffixed variants) that should be removed for a given contact type.
+   *
+   * @param string $contactType
+   *   Individual|Organization|Household
+   * @param string $prefix
+   *   Path at which these fields are found, e.g. "address.contact."
+   * @return array
+   */
+  public static function contactFieldsToRemove($contactType, $prefix) {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$contactType])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__][$contactType] = [];
+      foreach (\CRM_Contact_DAO_Contact::fields() as $field) {
+        if (!empty($field['contactType']) && $field['contactType'] != $contactType) {
+          \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'];
+          // Include suffixed variants like prefix_id:label
+          if (!empty($field['pseudoconstant'])) {
+            foreach (self::$pseudoConstantSuffixes as $suffix) {
+              \Civi::$statics[__CLASS__][__FUNCTION__][$contactType][] = $field['name'] . ':' . $suffix;
+            }
+          }
+        }
+      }
+    }
+    // Add prefix paths
+    return array_map(function($name) use ($prefix) {
+      return $prefix . $name;
+    }, \Civi::$statics[__CLASS__][__FUNCTION__][$contactType]);
   }
 
 }

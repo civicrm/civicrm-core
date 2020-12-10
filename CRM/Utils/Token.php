@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -51,6 +35,7 @@ class CRM_Utils_Token {
     ],
     'mailing' => [
       'id',
+      'key',
       'name',
       'group',
       'subject',
@@ -265,7 +250,7 @@ class CRM_Utils_Token {
 
   /**
    * @param $token
-   * @param $domain
+   * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
    * @param bool $escapeSmarty
    *
@@ -276,7 +261,7 @@ class CRM_Utils_Token {
     // we have to do this because this function is
     // called only when we find a token in the string
 
-    $loc = &$domain->getLocationValues();
+    $loc = $domain->getLocationValues();
 
     if (!in_array($token, self::$_tokens['domain'])) {
       $value = "{domain.$token}";
@@ -466,6 +451,14 @@ class CRM_Utils_Token {
         $value = $mailing ? $mailing->id : 'undefined';
         break;
 
+      // Key is the ID, or the hash when the hash URLs setting is enabled
+      case 'key':
+        $value = $mailing->id;
+        if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($value)) {
+          $value = $hash;
+        }
+        break;
+
       case 'name':
         $value = $mailing ? $mailing->name : 'Mailing Name';
         break;
@@ -608,10 +601,10 @@ class CRM_Utils_Token {
       $value = "{action.$token}";
     }
     else {
-      $value = CRM_Utils_Array::value($token, $addresses);
+      $value = $addresses[$token] ?? NULL;
 
       if ($value == NULL) {
-        $value = CRM_Utils_Array::value($token, $urls);
+        $value = $urls[$token] ?? NULL;
       }
 
       if ($value && $html) {
@@ -729,7 +722,7 @@ class CRM_Utils_Token {
       $noReplace = TRUE;
     }
     elseif ($token == 'checksum') {
-      $hash = CRM_Utils_Array::value('hash', $contact);
+      $hash = $contact['hash'] ?? NULL;
       $contactID = CRM_Utils_Array::retrieveValueRecursive($contact, 'contact_id');
       $cs = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID,
         NULL,
@@ -851,7 +844,7 @@ class CRM_Utils_Token {
     $html = FALSE,
     $escapeSmarty = FALSE
   ) {
-    $value = CRM_Utils_Array::value("{$category}.{$token}", $contact);
+    $value = $contact["{$category}.{$token}"] ?? NULL;
 
     if ($value && !$html) {
       $value = str_replace('&amp;', '&', $value);
@@ -1167,11 +1160,11 @@ class CRM_Utils_Token {
    *   Extra params.
    * @param array $tokens
    *   The list of tokens we've extracted from the content.
-   * @param null $className
-   * @param int $jobID
+   * @param string|null $className
+   * @param int|null $jobID
    *   The mailing list jobID - this is a legacy param.
    *
-   * @return array
+   * @return array - e.g [[1 => ['first_name' => 'bob'...], 34 => ['first_name' => 'fred'...]]]
    */
   public static function getTokenDetails(
     $contactIDs,
@@ -1234,9 +1227,7 @@ class CRM_Utils_Token {
       }
     }
 
-    $details = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
-
-    $contactDetails = &$details[0];
+    [$contactDetails] = CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, count($contactIDs), TRUE, FALSE, TRUE, CRM_Contact_BAO_Query::MODE_CONTACTS, NULL, TRUE);
 
     foreach ($contactIDs as $contactID) {
       if (array_key_exists($contactID, $contactDetails)) {
@@ -1270,14 +1261,15 @@ class CRM_Utils_Token {
       }
     }
 
+    // $contactDetails = &$details[0] = is an array of [ contactID => contactDetails ]
     // also call a hook and get token details
-    CRM_Utils_Hook::tokenValues($details[0],
+    CRM_Utils_Hook::tokenValues($contactDetails,
       $contactIDs,
       $jobID,
       $tokens,
       $className
     );
-    return $details;
+    return [$contactDetails];
   }
 
   /**
@@ -1298,9 +1290,7 @@ class CRM_Utils_Token {
    * @return array
    *   contactDetails with hooks swapped out
    */
-  public static function getAnonymousTokenDetails($contactIDs = [
-    0,
-  ],
+  public static function getAnonymousTokenDetails($contactIDs = [0],
                                            $returnProperties = NULL,
                                            $skipOnHold = TRUE,
                                            $skipDeceased = TRUE,
@@ -1619,7 +1609,7 @@ class CRM_Utils_Token {
 
   /**
    * @param int $caseId
-   * @param int $str
+   * @param string $str
    * @param array $knownTokens
    * @param bool $escapeSmarty
    * @return string
@@ -1648,7 +1638,7 @@ class CRM_Utils_Token {
     }
     $field = civicrm_api3($entity, 'getfield', ['action' => 'get', 'name' => $token, 'get_options' => 'get']);
     $field = $field['values'];
-    $fieldType = CRM_Utils_Array::value('type', $field);
+    $fieldType = $field['type'] ?? NULL;
     // Boolean fields
     if ($fieldType == CRM_Utils_Type::T_BOOLEAN && empty($field['options'])) {
       $field['options'] = [ts('No'), ts('Yes')];
@@ -1681,7 +1671,7 @@ class CRM_Utils_Token {
    */
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     $key = 'contribution';
-    if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
+    if (!$knownTokens || empty($knownTokens[$key])) {
       //early return
       return $str;
     }
@@ -1811,12 +1801,17 @@ class CRM_Utils_Token {
       case 'net_amount':
       case 'fee_amount':
       case 'non_deductible_amount':
-        $value = CRM_Utils_Money::format(CRM_Utils_Array::retrieveValueRecursive($contribution, $token));
+        // FIXME: Is this ever a multi-dimensional array?  Why use retrieveValueRecursive()?
+        $amount = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
+        $currency = CRM_Utils_Array::retrieveValueRecursive($contribution, 'currency');
+        $value = CRM_Utils_Money::format($amount, $currency);
         break;
 
       case 'receive_date':
+      case 'receipt_date':
         $value = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
-        $value = CRM_Utils_Date::customFormat($value, NULL, ['j', 'm', 'Y']);
+        $config = CRM_Core_Config::singleton();
+        $value = CRM_Utils_Date::customFormat($value, $config->dateformatDatetime);
         break;
 
       default:
@@ -1891,7 +1886,7 @@ class CRM_Utils_Token {
       else {
         $split = explode('.', trim($k, '{}'));
         if (isset($split[1])) {
-          $entity = array_key_exists($split[1], CRM_Core_DAO_Address::export()) ? 'Address' : ucfirst($split[0]);
+          $entity = array_key_exists($split[1], CRM_Core_DAO_Address::export()) ? 'Address' : ucwords(str_replace('_', ' ', $split[0]));
         }
         else {
           $entity = 'Contact';

@@ -1,0 +1,27 @@
+<div class="form-inline" ng-if="$ctrl.settings.actions">
+  <crm-search-actions entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-actions>
+</div>
+<table>
+  <thead>
+    <tr>
+      <th class="crm-search-result-select" ng-if="$ctrl.settings.actions">
+        <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" >
+      </th>
+      <th ng-repeat="col in $ctrl.columns" ng-click="setOrderBy(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
+        <i class="crm-i {{ getOrderBy(col) }}"></i>
+        <span>{{ col.label }}</span>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="row in $ctrl.results">
+      <td ng-if="$ctrl.settings.actions">
+        <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(!loadingAllRows && row.id)">
+      </td>
+      <td ng-repeat="col in $ctrl.columns" ng-bind-html="formatResult(row, col)" title="{{:: col.title }}" class="{{:: col.alignment }}">
+      </td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+<div ng-include="'~/crmSearchDisplay/Pager.html'"></div>

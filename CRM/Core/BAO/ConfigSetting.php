@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -57,6 +41,9 @@ class CRM_Core_BAO_ConfigSetting {
    *
    * @param array $params
    *   Associated array of civicrm variables.
+   * @deprecated
+   *   This method was historically used to access civicrm_domain.config_backend.
+   *   However, that has been fully replaced by the settings system since v4.7.
    */
   public static function add(&$params) {
     $domain = new CRM_Core_DAO_Domain();
@@ -85,6 +72,9 @@ class CRM_Core_BAO_ConfigSetting {
    * @param $defaults
    *
    * @return array
+   * @deprecated
+   *   This method was historically used to access civicrm_domain.config_backend.
+   *   However, that has been fully replaced by the settings system since v4.7.
    */
   public static function retrieve(&$defaults) {
     $domain = new CRM_Core_DAO_Domain();
@@ -96,7 +86,8 @@ class CRM_Core_BAO_ConfigSetting {
       $urlVar = 'task';
     }
 
-    if ($isUpgrade && CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend')) {
+    $hasBackend = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend');
+    if ($isUpgrade && $hasBackend) {
       $domain->selectAdd('config_backend');
     }
     else {
@@ -105,7 +96,10 @@ class CRM_Core_BAO_ConfigSetting {
 
     $domain->id = CRM_Core_Config::domainID();
     $domain->find(TRUE);
-    if ($domain->config_backend) {
+    if ($hasBackend && $domain->config_backend) {
+      // This whole branch can probably be removed; the transitional loading
+      // is in SettingBag::loadValues(). Moreover, since 4.7.alpha1 dropped
+      // the column, anyone calling ::retrieve() has likely not gotten any data.
       $defaults = unserialize($domain->config_backend);
       if ($defaults === FALSE || !is_array($defaults)) {
         $defaults = [];
@@ -125,104 +119,120 @@ class CRM_Core_BAO_ConfigSetting {
   }
 
   /**
-   * Evaluate locale preferences and activate a chosen locale by
-   * updating session+global variables.
+   * Activate a chosen locale.
+   *
+   * The locale is set by updating the session and global variables.
+   *
+   * When there is a choice of permitted languages (set on the "Administer" ->
+   * "Localisation" -> "Languages, Currency, Locations" screen) the locale to
+   * be applied can come from a variety of sources. The list below is the order
+   * of priority for deciding which of the sources "wins":
+   *
+   * - The request - when the "lcMessages" query variable is present in the URL.
+   * - The session - when the "lcMessages" session variable has been set.
+   * - Inherited from the CMS - when the "inheritLocale" setting is set.
+   * - CiviCRM settings - the fallback when none of the above set the locale.
+   *
+   * Single-language installs skip this and always set the default locale.
    *
    * @param \Civi\Core\SettingsBag $settings
    * @param string $activatedLocales
    *   Imploded list of locales which are supported in the DB.
    */
   public static function applyLocale($settings, $activatedLocales) {
-    // are we in a multi-language setup?
-    $multiLang = $activatedLocales ? TRUE : FALSE;
 
-    // set the current language
-    $chosenLocale = NULL;
+    // Declare access to locale globals.
+    global $dbLocale, $tsLocale;
 
+    // Grab session reference.
     $session = CRM_Core_Session::singleton();
 
-    $permittedLanguages = CRM_Core_I18n::uiLanguages(TRUE);
+    // Set flag for multi-language setup.
+    $multiLang = (bool) $activatedLocales;
 
-    // The locale to be used can come from various places:
-    // - the request (url)
-    // - the session
-    // - civicrm_uf_match
-    // - inherited from the CMS
-    // Only look at this if there is actually a choice of permitted languages
+    // Initialise the default and chosen locales.
+    $defaultLocale = $settings->get('lcMessages');
+    $chosenLocale = NULL;
+
+    // When there is a choice of permitted languages.
+    $permittedLanguages = CRM_Core_I18n::uiLanguages(TRUE);
     if (count($permittedLanguages) >= 2) {
+
+      // Is the "lcMessages" query variable present in the URL?
       $requestLocale = CRM_Utils_Request::retrieve('lcMessages', 'String');
       if (in_array($requestLocale, $permittedLanguages)) {
         $chosenLocale = $requestLocale;
-
-        //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
-        // Ed: This doesn't sound good.
-        // Civi::cache('navigation')->flush();
-      }
-      else {
-        $requestLocale = NULL;
       }
 
-      if (!$requestLocale) {
+      // Check the session if the chosen locale hasn't been set yet.
+      if (empty($chosenLocale)) {
         $sessionLocale = $session->get('lcMessages');
         if (in_array($sessionLocale, $permittedLanguages)) {
           $chosenLocale = $sessionLocale;
         }
-        else {
-          $sessionLocale = NULL;
+      }
+
+      /*
+       * Maybe inherit the language from the CMS.
+       *
+       * If the language is specified via "lcMessages" we skip this, since the
+       * intention of the URL query var is to override all other sources.
+       */
+      if ($settings->get('inheritLocale')) {
+
+        /*
+         * FIXME: On multi-language installs, CRM_Utils_System::getUFLocale() in
+         * many cases returns nothing if $dbLocale is not set, so set it to the
+         * default - even if it's overridden later.
+         */
+        $dbLocale = $multiLang && $defaultLocale ? "_{$defaultLocale}" : '';
+
+        // Retrieve locale as reported by CMS.
+        $cmsLocale = CRM_Utils_System::getUFLocale();
+        if (in_array($cmsLocale, $permittedLanguages)) {
+          $chosenLocale = $cmsLocale;
         }
-      }
 
-      if ($requestLocale) {
-        $ufm = new CRM_Core_DAO_UFMatch();
-        $ufm->contact_id = $session->get('userID');
-        if ($ufm->find(TRUE)) {
-          $ufm->language = $chosenLocale;
-          $ufm->save();
+        // Clear chosen locale if not activated in multi-language CiviCRM.
+        if ($activatedLocales && !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
+          $chosenLocale = NULL;
         }
-        $session->set('lcMessages', $chosenLocale);
+
       }
 
-      if (!$chosenLocale and $session->get('userID')) {
-        $ufm = new CRM_Core_DAO_UFMatch();
-        $ufm->contact_id = $session->get('userID');
-        if ($ufm->find(TRUE) &&
-          in_array($ufm->language, $permittedLanguages)
-        ) {
-          $chosenLocale = $ufm->language;
-        }
-        $session->set('lcMessages', $chosenLocale);
+      // Assign the system default if the chosen locale hasn't been set.
+      if (empty($chosenLocale)) {
+        $chosenLocale = $defaultLocale;
       }
-    }
-    global $dbLocale;
 
-    // try to inherit the language from the hosting CMS
-    if ($settings->get('inheritLocale')) {
-      // FIXME: On multilanguage installs, CRM_Utils_System::getUFLocale() in many cases returns nothing if $dbLocale is not set
-      $lcMessages = $settings->get('lcMessages');
-      $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
-      $chosenLocale = CRM_Utils_System::getUFLocale();
-      if ($activatedLocales and !in_array($chosenLocale, explode(CRM_Core_DAO::VALUE_SEPARATOR, $activatedLocales))) {
-        $chosenLocale = NULL;
-      }
+      // Always assign the chosen locale to the session.
+      $session->set('lcMessages', $chosenLocale);
+
+    }
+    else {
+
+      // CRM-11993 - Use default when it's a single-language install.
+      $chosenLocale = $defaultLocale;
+
     }
 
-    if (empty($chosenLocale)) {
-      //CRM-11993 - if a single-lang site, use default
-      $chosenLocale = $settings->get('lcMessages');
-    }
-
-    // set suffix for table names - use views if more than one language
+    /*
+     * Set suffix for table names in multi-language installs.
+     * Use views if more than one language.
+     */
     $dbLocale = $multiLang && $chosenLocale ? "_{$chosenLocale}" : '';
 
-    // FIXME: an ugly hack to fix CRM-4041
-    global $tsLocale;
+    // FIXME: an ugly hack to fix CRM-4041.
     $tsLocale = $chosenLocale;
 
-    // FIXME: as bad aplace as any to fix CRM-5428
-    // (to be moved to a sane location along with the above)
+    /*
+     * FIXME: as bad a place as any to fix CRM-5428.
+     * (to be moved to a sane location along with the above)
+     */
     if (function_exists('mb_internal_encoding')) {
       mb_internal_encoding('UTF-8');
     }
+
   }
 
   /**
@@ -269,8 +279,7 @@ class CRM_Core_BAO_ConfigSetting {
       'Boolean',
       CRM_Core_DAO::$_nullArray,
       FALSE,
-      FALSE,
-      'REQUEST'
+      FALSE
     );
     if ($config->userSystem->is_drupal &&
       $resetSessionTable

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -32,13 +16,11 @@
  * @group headless
  */
 class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [
@@ -50,7 +32,11 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testCreateStatusPreference() {
+  /**
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateStatusPreference($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument('StatusPreference', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $id = $result['id'];
@@ -60,7 +46,11 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->callAPISuccess('StatusPreference', 'delete', ['id' => $result['id']]);
   }
 
-  public function testDeleteStatusPreference() {
+  /**
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteStatusPreference($version) {
+    $this->_apiversion = $version;
     // create one
     $create = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
 
@@ -75,15 +65,19 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
 
   /**
    * Test a get with empty params.
+   * @dataProvider versionThreeAndFour
    */
-  public function testStatusPreferenceGetEmptyParams() {
+  public function testStatusPreferenceGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('StatusPreference', 'Get', []);
   }
 
   /**
    * Test a StatusPreference get.
+   * @dataProvider versionThreeAndFour
    */
-  public function testStatusPreferenceGet() {
+  public function testStatusPreferenceGet($version) {
+    $this->_apiversion = $version;
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $id = $statusPreference['id'];
     $params = [
@@ -98,16 +92,20 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
 
   /**
    * Ensure you can't create a StatusPref with ignore_severity > 7.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateInvalidMinimumReportSeverity() {
+  public function testCreateInvalidMinimumReportSeverity($version) {
+    $this->_apiversion = $version;
     $this->_params['ignore_severity'] = 45;
     $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
   }
 
   /**
    * Test creating a severity by name, not integer.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateSeverityByName() {
+  public function testCreateSeverityByName($version) {
+    $this->_apiversion = $version;
     // Any permutation of uppercase/lowercase should work.
     $this->_params['ignore_severity'] = 'cRItical';
     $result = $this->callAPIAndDocument('StatusPreference', 'create', $this->_params, __FUNCTION__, __FILE__);
@@ -117,8 +115,10 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
 
   /**
    * Test creating an invalid severity by name.
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateSeverityWithInvalidName() {
+  public function testCreateSeverityWithInvalidName($version) {
+    $this->_apiversion = $version;
     $this->_params['ignore_severity'] = 'wdsadasdarning';
     $result = $this->callAPIFailure('StatusPreference', 'create', $this->_params);
   }

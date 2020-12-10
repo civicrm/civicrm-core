@@ -3,17 +3,32 @@
 /**
  * Class CRM_Core_RegionTest
  * @group headless
+ * @group resources
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    require_once 'CRM/Core/Smarty.php';
-    require_once 'CRM/Core/Region.php';
 
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation
     require_once 'CRM/Core/Smarty/resources/String.php';
     civicrm_smarty_register_string_resource();
+
+    $this->useTransaction();
+  }
+
+  use CRM_Core_Resources_CollectionTestTrait;
+
+  /**
+   * @return \CRM_Core_Resources_CollectionInterface
+   */
+  public function createEmptyCollection() {
+    @++Civi::$statics['CRM_Core_RegionTestId'];
+    $r = new CRM_Core_Region('region_' . Civi::$statics['CRM_Core_RegionTestId']);
+    $r->filter(function($snippet) {
+      return $snippet['name'] !== 'default';
+    });
+    return $r;
   }
 
   /**

@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatusType {
 
@@ -118,6 +100,29 @@ class CRM_Event_BAO_ParticipantStatusType extends CRM_Event_DAO_ParticipantStatu
   }
 
   /**
+   * Checks if status_id (id or string (eg. 5 or "Pending from pay later") is allowed for class
+   *
+   * @param int|string $status_id
+   * @param string $class
+   *
+   * @return bool
+   */
+  public static function getIsValidStatusForClass($status_id, $class = 'Pending') {
+    $classParticipantStatuses = civicrm_api3('ParticipantStatusType', 'get', [
+      'class' => $class,
+      'is_active' => 1,
+    ])['values'];
+    $allowedParticipantStatuses = [];
+    foreach ($classParticipantStatuses as $id => $detail) {
+      $allowedParticipantStatuses[$id] = $detail['name'];
+    }
+    if (in_array($status_id, $allowedParticipantStatuses) || array_key_exists($status_id, $allowedParticipantStatuses)) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * @param array $params
    *
    * @return array
@@ -184,7 +189,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
           continue;
         }
 
-        $expirationTime = CRM_Utils_Array::value('expiration_time', $values);
+        $expirationTime = $values['expiration_time'] ?? NULL;
         if ($expirationTime && array_key_exists($values['status_id'], $pendingStatuses)) {
 
           //get the expiration and registration pending time.

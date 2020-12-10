@@ -54,8 +54,8 @@
 
     function initialize() {
       var
-        browseUrl = CRM.config.resourceBase + "packages/kcfinder/browse.php?cms=civicrm",
-        uploadUrl = CRM.config.resourceBase + "packages/kcfinder/upload.php?cms=civicrm&format=json",
+        browseUrl = CRM.config.packagesBase + "kcfinder/browse.php?cms=civicrm",
+        uploadUrl = CRM.config.packagesBase + "kcfinder/upload.php?cms=civicrm&format=json",
         preset = $(item).data('preset') || 'default',
         // This variable is always an array but a legacy extension could be setting it as a string.
         customConfig = (typeof CRM.config.CKEditorCustomConfig === 'string') ? CRM.config.CKEditorCustomConfig :

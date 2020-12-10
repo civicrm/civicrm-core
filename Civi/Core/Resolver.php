@@ -95,7 +95,7 @@ class Resolver {
       // Callback: Constant value.
       return new ResolverConstantCallback((int) $id);
     }
-    elseif ($id{0} >= 'A' && $id{0} <= 'Z') {
+    elseif ($id[0] >= 'A' && $id[0] <= 'Z') {
       // Object: New/default instance.
       return new $id();
     }
@@ -197,7 +197,7 @@ class ResolverApi {
     }
 
     $result = civicrm_api3($this->url['host'], ltrim($this->url['path'], '/'), $apiParams);
-    return isset($result['values']) ? $result['values'] : NULL;
+    return $result['values'] ?? NULL;
   }
 
   /**
@@ -222,11 +222,11 @@ class ResolverApi {
   /**
    * Recursively interpolate values.
    *
-   * @code
+   * ```
    * $params = array('foo' => '@1');
    * $this->interpolate($params, array('@1'=> $object))
    * assert $data['foo'] == $object;
-   * @endcode
+   * ```
    *
    * @param array $array
    *   Array which may or many not contain a mix of tokens.

@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -29,7 +13,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Utils_Address {
 
@@ -75,7 +59,7 @@ class CRM_Utils_Address {
 
     $formatted = $format;
 
-    $fullPostalCode = CRM_Utils_Array::value('postal_code', $fields);
+    $fullPostalCode = $fields['postal_code'] ?? NULL;
     if (!empty($fields['postal_code_suffix'])) {
       $fullPostalCode .= "-$fields[postal_code_suffix]";
     }
@@ -117,54 +101,54 @@ class CRM_Utils_Address {
     if (!$microformat) {
       // replacements in case of Individual Name Format
       $replacements = [
-        'contact.display_name' => CRM_Utils_Array::value('display_name', $fields),
-        'contact.individual_prefix' => CRM_Utils_Array::value('individual_prefix', $fields),
-        'contact.formal_title' => CRM_Utils_Array::value('formal_title', $fields),
-        'contact.first_name' => CRM_Utils_Array::value('first_name', $fields),
-        'contact.middle_name' => CRM_Utils_Array::value('middle_name', $fields),
-        'contact.last_name' => CRM_Utils_Array::value('last_name', $fields),
-        'contact.individual_suffix' => CRM_Utils_Array::value('individual_suffix', $fields),
-        'contact.address_name' => CRM_Utils_Array::value('address_name', $fields),
-        'contact.street_address' => CRM_Utils_Array::value('street_address', $fields),
-        'contact.supplemental_address_1' => CRM_Utils_Array::value('supplemental_address_1', $fields),
-        'contact.supplemental_address_2' => CRM_Utils_Array::value('supplemental_address_2', $fields),
-        'contact.supplemental_address_3' => CRM_Utils_Array::value('supplemental_address_3', $fields),
-        'contact.city' => CRM_Utils_Array::value('city', $fields),
-        'contact.state_province_name' => CRM_Utils_Array::value('state_province_name', $fields),
-        'contact.county' => CRM_Utils_Array::value('county', $fields),
-        'contact.state_province' => CRM_Utils_Array::value('state_province', $fields),
+        'contact.display_name' => $fields['display_name'] ?? NULL,
+        'contact.individual_prefix' => $fields['individual_prefix'] ?? NULL,
+        'contact.formal_title' => $fields['formal_title'] ?? NULL,
+        'contact.first_name' => $fields['first_name'] ?? NULL,
+        'contact.middle_name' => $fields['middle_name'] ?? NULL,
+        'contact.last_name' => $fields['last_name'] ?? NULL,
+        'contact.individual_suffix' => $fields['individual_suffix'] ?? NULL,
+        'contact.address_name' => $fields['address_name'] ?? NULL,
+        'contact.street_address' => $fields['street_address'] ?? NULL,
+        'contact.supplemental_address_1' => $fields['supplemental_address_1'] ?? NULL,
+        'contact.supplemental_address_2' => $fields['supplemental_address_2'] ?? NULL,
+        'contact.supplemental_address_3' => $fields['supplemental_address_3'] ?? NULL,
+        'contact.city' => $fields['city'] ?? NULL,
+        'contact.state_province_name' => $fields['state_province_name'] ?? NULL,
+        'contact.county' => $fields['county'] ?? NULL,
+        'contact.state_province' => $fields['state_province'] ?? NULL,
         'contact.postal_code' => $fullPostalCode,
-        'contact.country' => CRM_Utils_Array::value('country', $fields),
-        'contact.world_region' => CRM_Utils_Array::value('world_region', $fields),
-        'contact.geo_code_1' => CRM_Utils_Array::value('geo_code_1', $fields),
-        'contact.geo_code_2' => CRM_Utils_Array::value('geo_code_2', $fields),
-        'contact.current_employer' => CRM_Utils_Array::value('current_employer', $fields),
-        'contact.nick_name' => CRM_Utils_Array::value('nick_name', $fields),
-        'contact.email' => CRM_Utils_Array::value('email', $fields),
-        'contact.im' => CRM_Utils_Array::value('im', $fields),
-        'contact.do_not_email' => CRM_Utils_Array::value('do_not_email', $fields),
-        'contact.do_not_phone' => CRM_Utils_Array::value('do_not_phone', $fields),
-        'contact.do_not_mail' => CRM_Utils_Array::value('do_not_mail', $fields),
-        'contact.do_not_sms' => CRM_Utils_Array::value('do_not_sms', $fields),
-        'contact.do_not_trade' => CRM_Utils_Array::value('do_not_trade', $fields),
-        'contact.job_title' => CRM_Utils_Array::value('job_title', $fields),
-        'contact.birth_date' => CRM_Utils_Array::value('birth_date', $fields),
-        'contact.gender' => CRM_Utils_Array::value('gender', $fields),
-        'contact.is_opt_out' => CRM_Utils_Array::value('is_opt_out', $fields),
-        'contact.preferred_mail_format' => CRM_Utils_Array::value('preferred_mail_format', $fields),
-        'contact.phone' => CRM_Utils_Array::value('phone', $fields),
-        'contact.home_URL' => CRM_Utils_Array::value('home_URL', $fields),
-        'contact.contact_source' => CRM_Utils_Array::value('contact_source', $fields),
-        'contact.external_identifier' => CRM_Utils_Array::value('external_identifier', $fields),
-        'contact.contact_id' => CRM_Utils_Array::value('id', $fields),
-        'contact.household_name' => CRM_Utils_Array::value('display_name', $fields),
-        'contact.organization_name' => CRM_Utils_Array::value('display_name', $fields),
-        'contact.legal_name' => CRM_Utils_Array::value('legal_name', $fields),
-        'contact.preferred_communication_method' => CRM_Utils_Array::value('preferred_communication_method', $fields),
-        'contact.communication_style' => CRM_Utils_Array::value('communication_style', $fields),
-        'contact.addressee' => CRM_Utils_Array::value('addressee_display', $fields),
-        'contact.email_greeting' => CRM_Utils_Array::value('email_greeting_display', $fields),
-        'contact.postal_greeting' => CRM_Utils_Array::value('postal_greeting_display', $fields),
+        'contact.country' => $fields['country'] ?? NULL,
+        'contact.world_region' => $fields['world_region'] ?? NULL,
+        'contact.geo_code_1' => $fields['geo_code_1'] ?? NULL,
+        'contact.geo_code_2' => $fields['geo_code_2'] ?? NULL,
+        'contact.current_employer' => $fields['current_employer'] ?? NULL,
+        'contact.nick_name' => $fields['nick_name'] ?? NULL,
+        'contact.email' => $fields['email'] ?? NULL,
+        'contact.im' => $fields['im'] ?? NULL,
+        'contact.do_not_email' => $fields['do_not_email'] ?? NULL,
+        'contact.do_not_phone' => $fields['do_not_phone'] ?? NULL,
+        'contact.do_not_mail' => $fields['do_not_mail'] ?? NULL,
+        'contact.do_not_sms' => $fields['do_not_sms'] ?? NULL,
+        'contact.do_not_trade' => $fields['do_not_trade'] ?? NULL,
+        'contact.job_title' => $fields['job_title'] ?? NULL,
+        'contact.birth_date' => $fields['birth_date'] ?? NULL,
+        'contact.gender' => $fields['gender'] ?? NULL,
+        'contact.is_opt_out' => $fields['is_opt_out'] ?? NULL,
+        'contact.preferred_mail_format' => $fields['preferred_mail_format'] ?? NULL,
+        'contact.phone' => $fields['phone'] ?? NULL,
+        'contact.home_URL' => $fields['home_URL'] ?? NULL,
+        'contact.contact_source' => $fields['contact_source'] ?? NULL,
+        'contact.external_identifier' => $fields['external_identifier'] ?? NULL,
+        'contact.contact_id' => $fields['id'] ?? NULL,
+        'contact.household_name' => $fields['display_name'] ?? NULL,
+        'contact.organization_name' => $fields['display_name'] ?? NULL,
+        'contact.legal_name' => $fields['legal_name'] ?? NULL,
+        'contact.preferred_communication_method' => $fields['preferred_communication_method'] ?? NULL,
+        'contact.communication_style' => $fields['communication_style'] ?? NULL,
+        'contact.addressee' => $fields['addressee_display'] ?? NULL,
+        'contact.email_greeting' => $fields['email_greeting_display'] ?? NULL,
+        'contact.postal_greeting' => $fields['postal_greeting_display'] ?? NULL,
       ];
     }
     else {
@@ -210,7 +194,7 @@ class CRM_Utils_Address {
     // also sub all token fields
     if ($tokenFields) {
       foreach ($tokenFields as $token) {
-        $replacements["{$token}"] = CRM_Utils_Array::value("{$token}", $fields);
+        $replacements["{$token}"] = $fields["{$token}"] ?? NULL;
       }
     }
 
@@ -336,7 +320,7 @@ class CRM_Utils_Address {
 
     $addressFields = [];
     foreach ($addressParts as $name => $field) {
-      $value = CRM_Utils_Array::value($field, $params);
+      $value = $params[$field] ?? NULL;
       $alternateName = 'billing_' . $name . '_id-' . $billingLocationTypeID;
       $alternate2 = 'billing_' . $name . '-' . $billingLocationTypeID;
       if (isset($params[$alternate2]) && !isset($params[$alternateName])) {

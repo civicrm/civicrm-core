@@ -1,17 +1,21 @@
 <?php
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  *
  * Generated from {$table.sourceFile}
  * {$generated}
  * (GenCodeChecksum:{$genCodeChecksum})
  */
-
+{$useHelper}
 /**
  * Database access object for the {$table.entity} entity.
  */
 class {$table.className} extends CRM_Core_DAO {ldelim}
+
+     const EXT = {$ext};
+     const TABLE_ADDED = '{$table.add}';
+     {if !empty($table.component)}const COMPONENT = '{$table.component}';{/if}
 
      /**
       * Static instance to hold the table name.
@@ -20,12 +24,28 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       */
       public static $_tableName = '{$table.name}';
 
+   {if $table.icon}
+     /**
+      * Icon associated with this entity.
+      *
+      * @var string
+      */
+      public static $_icon = '{$table.icon}';
+   {/if}
       /**
        * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
        * @var bool
        */
       public static $_log = {$table.log|strtoupper};
+      {if $table.paths}
+     /**
+      * Paths for accessing this entity in the UI.
+      *
+      * @var string[]
+      */
+      protected static $_paths = {$table.paths|@print_array};
+   {/if}
 
 {foreach from=$table.fields item=field}
     /**
@@ -47,6 +67,18 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
         parent::__construct( );
     {rdelim}
+
+    /**
+     * Returns localized title of this entity.
+     *
+     * @param bool $plural
+     *   Whether to return the plural version of the title.
+     */
+    public static function getEntityTitle($plural = FALSE) {ldelim}
+        return $plural ? {$tsFunctionName}('{$table.titlePlural}') : {$tsFunctionName}('{$table.title}');
+    {rdelim}
+
+
 
 {if $table.foreignKey || $table.dynamicForeignKey}
     /**
@@ -124,7 +156,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.export}
                       'export'    => {$field.export|strtoupper},
 {/if} {* field.export *}
-
+{if $field.contactType}
+                      'contactType' => {if $field.contactType == 'null'}NULL{else}'{$field.contactType}'{/if},
+{/if}
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
@@ -158,7 +192,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if}
 {if $field.pseudoconstant}
   'pseudoconstant' => {$field.pseudoconstant|@print_array},
-{/if} {* field.pseudoconstant *}                                                                    ),
+{/if}
+  'add' => {if $field.add}'{$field.add}'{else}NULL{/if},
+),
 {/foreach} {* table.fields *}
                                       );
             CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

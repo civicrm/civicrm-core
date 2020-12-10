@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    * Label Format ID.
    * @var int
    */
-  protected $_id = NULL;
+  public $_id = NULL;
 
   /**
    * Group name, label format or name badge
@@ -155,6 +155,7 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
   public function setDefaultValues() {
     if ($this->_action & CRM_Core_Action::ADD) {
       $defaults['weight'] = CRM_Utils_Array::value('weight', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), 0);
+      $defaults['font_name'] = CRM_Utils_Array::value('font-name', CRM_Core_BAO_LabelFormat::getDefaultValues($this->_group), '');
     }
     else {
       $defaults = $this->_values;

@@ -63,19 +63,13 @@
     <add>3.1</add>
   </field>
   <field>
-    <name>content</name>
-    <type>text</type>
-    <comment>dashlet content</comment>
-    <add>3.1</add>
-    <drop>3.3</drop>
-  </field>
-  <field>
     <name>permission</name>
     <type>varchar</type>
     <title>Dashlet Permission</title>
     <length>255</length>
     <comment>Permission for the dashlet</comment>
     <add>3.1</add>
+    <serialize>COMMA</serialize>
   </field>
   <field>
     <name>permission_operator</name>
@@ -155,11 +149,11 @@
     <add>4.7</add>
   </field>
   <field>
-    <name>created_date</name>
-    <type>datetime</type>
-    <title>Dashlet Created Date</title>
-    <comment>When was content populated</comment>
-    <add>3.1</add>
-    <drop>3.3</drop>
+    <name>directive</name>
+    <type>varchar</type>
+    <title>Angular directive</title>
+    <length>255</length>
+    <comment>Element name of angular directive to invoke (lowercase hyphenated format)</comment>
+    <add>5.33</add>
   </field>
 </table>

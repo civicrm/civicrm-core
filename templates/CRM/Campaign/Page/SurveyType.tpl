@@ -47,8 +47,8 @@
 </div>
 {else}
     <div class="messages status no-popup">
-         <div class="icon inform-icon"> &nbsp;
-         {ts p=$addSurveyType.0 q=$addSurveyType.1}There are no survey types entered. You can <a href='%1'>add one</a>.{/ts}</div>
+      {icon icon="fa-info-circle"}{/icon}
+      {ts p=$addSurveyType.0 q=$addSurveyType.1}There are no survey types entered. You can <a href='%1'>add one</a>.{/ts}
     </div>
 {/if}
 {/if}

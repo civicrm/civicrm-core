@@ -5,6 +5,8 @@
   <class>StateProvince</class>
   <name>civicrm_state_province</name>
   <add>1.1</add>
+  <title>State/Province</title>
+  <titlePlural>States/Provinces</titlePlural>
   <field>
     <name>id</name>
     <title>State ID</title>

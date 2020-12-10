@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -105,13 +89,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   public function getDefaultEntity() {
     return 'UFGroup';
   }
-
-  /**
-   * The form id saved to the session for an update.
-   *
-   * @var int
-   */
-  protected $_id;
 
   /**
    * The title for group.
@@ -254,7 +231,10 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'"]);
+      $this->addElement('xbutton', 'done', ts('Done'), [
+        'type' => 'button',
+        'onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'",
+      ]);
     }
 
     $this->addFormRule(['CRM_UF_Form_Group', 'formRule'], $this);
@@ -287,14 +267,14 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
       $params = ['id' => $this->_id];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
-      $defaults['group'] = CRM_Utils_Array::value('limit_listings_group_id', $defaults);
-      $defaults['add_contact_to_group'] = CRM_Utils_Array::value('add_to_group_id', $defaults);
+      $defaults['group'] = $defaults['limit_listings_group_id'] ?? NULL;
+      $defaults['add_contact_to_group'] = $defaults['add_to_group_id'] ?? NULL;
       //get the uf join records for current uf group
       $ufJoinRecords = CRM_Core_BAO_UFGroup::getUFJoinRecord($this->_id);
       foreach ($ufJoinRecords as $key => $value) {
         $checked[$value] = 1;
       }
-      $defaults['uf_group_type'] = isset($checked) ? $checked : "";
+      $defaults['uf_group_type'] = $checked ?? "";
 
       $showAdvanced = 0;
       $advFields = [
@@ -383,7 +363,6 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     }
     else {
       // get the submitted form values.
-      $ids = [];
       $params = $this->controller->exportValues($this->_name);
 
       if (!array_key_exists('is_active', $params)) {
@@ -391,7 +370,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       if ($this->_action & (CRM_Core_Action::UPDATE)) {
-        $ids['ufgroup'] = $this->_id;
+        $params['id'] = $this->_id;
         // CRM-5284
         // lets skip trying to mess around with profile weights and allow the user to do as needed.
       }
@@ -402,11 +381,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
 
       // create uf group
-      $ufGroup = CRM_Core_BAO_UFGroup::add($params, $ids);
+      $ufGroup = CRM_Core_BAO_UFGroup::add($params);
 
       if (!empty($params['is_active'])) {
         //make entry in uf join table
-        CRM_Core_BAO_UFGroup::createUFJoin($params, $ufGroup->id);
+        CRM_Core_BAO_UFGroup::createUFJoin($params['weight'], $params['uf_group_type'] ?? [], $ufGroup->id);
       }
       elseif ($this->_id) {
         // this profile has been set to inactive, delete all corresponding UF Join's

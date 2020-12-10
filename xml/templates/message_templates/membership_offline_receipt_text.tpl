@@ -1,13 +1,11 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {if $formValues.receipt_text_signup}
 {$formValues.receipt_text_signup}
 {elseif $formValues.receipt_text_renewal}
 {$formValues.receipt_text_renewal}
-{else}{ts}Thank you for your support.{/ts}{/if}
+{else}{ts}Thank you for this contribution.{/ts}{/if}
 
-{if ! $cancelled}{ts}Please print this receipt for your records.{/ts}
-
-
-{/if}
 {if !$lineItem}
 ===========================================================
 {ts}Membership Information{/ts}
@@ -81,7 +79,7 @@
 {/if}
 
 {if $isPrimary }
-{if $contributeMode ne 'notify' and !$isAmountzero and !$is_pay_later  }
+{if $billingName}
 
 ===========================================================
 {ts}Billing Name and Address{/ts}
@@ -91,7 +89,7 @@
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero and !$is_pay_later}
+{if $credit_card_type}
 ===========================================================
 {ts}Credit Card Information{/ts}
 

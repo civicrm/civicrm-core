@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -246,7 +230,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
       'delete contributions of type Donation',
     ]);
-    $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
+    $this->callAPIFailure('Contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
 
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', []);
@@ -330,6 +314,22 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
 
     $this->assertEquals($contribution['count'], 1);
+  }
+
+  public function testMembersipTypeACLFinancialTypeACL() {
+    $contactID = $this->individualCreate();
+    $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $this->enableFinancialACLs();
+    $this->setPermissions([
+      'access CiviCRM',
+      'access CiviContribute',
+      'view all contacts',
+      'add contributions of type Donation',
+      'view contributions of type Donation',
+    ]);
+    $this->assertEquals(0, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
+    $this->addFinancialAclPermissions([['view', 'Member Dues']]);
+    $this->assertEquals(1, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
   }
 
 }

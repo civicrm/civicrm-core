@@ -2,36 +2,18 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 
@@ -96,8 +78,7 @@ class SpecGathererTest extends UnitTestCase {
   }
 
   public function testPseudoConstantOptionsWillBeAdded() {
-    $customGroupId = CustomGroup::create()
-      ->setCheckPermissions(FALSE)
+    $customGroupId = CustomGroup::create(FALSE)
       ->addValue('name', 'FavoriteThings')
       ->addValue('extends', 'Contact')
       ->execute()
@@ -105,8 +86,7 @@ class SpecGathererTest extends UnitTestCase {
 
     $options = ['r' => 'Red', 'g' => 'Green', 'p' => 'Pink'];
 
-    CustomField::create()
-      ->setCheckPermissions(FALSE)
+    CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('option_values', $options)
@@ -119,12 +99,12 @@ class SpecGathererTest extends UnitTestCase {
 
     $regularField = $spec->getFieldByName('contact_type');
     $this->assertNotEmpty($regularField->getOptions());
-    $this->assertContains('Individual', $regularField->getOptions());
+    $this->assertContains('Individual', array_column($regularField->getOptions([], ['id', 'label']), 'label', 'id'));
 
     $customField = $spec->getFieldByName('FavoriteThings.FavColor');
-    $this->assertNotEmpty($customField->getOptions());
-    $this->assertContains('Green', $customField->getOptions());
-    $this->assertEquals('Pink', $customField->getOptions()['p']);
+    $options = array_column($customField->getOptions([], ['id', 'name', 'label']), NULL, 'id');
+    $this->assertEquals('Green', $options['g']['name']);
+    $this->assertEquals('Pink', $options['p']['label']);
   }
 
 }

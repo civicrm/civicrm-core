@@ -1,36 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -141,12 +123,15 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get tab  Links for events.
    *
-   * @param $enableCart
-   *
    * @return array
    *   (reference) of tab links
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function &tabs($enableCart) {
+  public static function &tabs() {
+    // @todo Move to eventcart extension
+    // check if we're in shopping cart mode for events
+    $enableCart = (bool) Civi::settings()->get('enable_cart');
+
     $cacheKey = $enableCart ? 1 : 0;
     if (!(self::$_tabLinks)) {
       self::$_tabLinks = [];
@@ -180,7 +165,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
       // @fixme I don't understand the event permissions check here - can we just get rid of it?
       $permissions = CRM_Event_BAO_Event::getAllPermissions();
-      if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
+      if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
         self::$_tabLinks[$cacheKey]['reminder']
           = [
             'title' => ts('Schedule Reminders'),
@@ -240,6 +225,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     // assign vars to templates
     $this->assign('action', $action);
+    $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks());
     $id = CRM_Utils_Request::retrieve('id', 'Positive',
       $this, FALSE, 0, 'REQUEST'
     );
@@ -356,9 +342,6 @@ ORDER BY start_date desc
     while ($pcpDao->fetch()) {
       $eventPCPS[$pcpDao->entity_id] = $pcpDao->entity_id;
     }
-    // check if we're in shopping cart mode for events
-    $enableCart = Civi::settings()->get('enable_cart');
-    $this->assign('eventCartEnabled', $enableCart);
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
     ]));
@@ -432,17 +415,17 @@ ORDER BY start_date desc
         }
 
         //show campaigns on selector.
-        $manageEvent[$dao->id]['campaign'] = CRM_Utils_Array::value($dao->campaign_id, $allCampaigns);
+        $manageEvent[$dao->id]['campaign'] = $allCampaigns[$dao->campaign_id] ?? NULL;
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mapping->getId());
-        $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
-        $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
+        $manageEvent[$dao->id]['is_pcp_enabled'] = $eventPCPS[$dao->id] ?? NULL;
+        $manageEvent[$dao->id]['event_type'] = $eventType[$manageEvent[$dao->id]['event_type_id']] ?? NULL;
         $manageEvent[$dao->id]['is_repeating_event'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_RecurringEntity', $dao->id, 'parent_id', 'entity_id');
         // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
         CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, ['event_id' => $dao->id]);
       }
     }
 
-    $manageEvent['tab'] = self::tabs($enableCart);
+    $manageEvent['tab'] = self::tabs();
     $this->assign('rows', $manageEvent);
 
     $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1', 'label');

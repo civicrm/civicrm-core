@@ -1,0 +1,9 @@
+// Default values for creating a new entity.
+// Note this is not strict JSON - it passes through angular.$parse - $scope variables are available.
+{
+  data: {
+    contact_type: 'Individual',
+    source: afform.title
+  },
+  'url-autofill': '1'
+}

@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 require_once 'Contact/Vcard/Build.php';
@@ -66,7 +50,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
         CRM_Utils_Array::value('prefix', $defaults),
         CRM_Utils_Array::value('suffix', $defaults)
       );
-      $organizationName = CRM_Utils_Array::value('organization_name', $defaults);
+      $organizationName = $defaults['organization_name'] ?? NULL;
       if ($organizationName !== NULL) {
         $vcard->addOrganization($organizationName);
       }
@@ -89,7 +73,7 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
     }
 
     if (!empty($defaults['birth_date'])) {
-      $vcard->setBirthday(CRM_Utils_Array::value('birth_date', $defaults));
+      $vcard->setBirthday($defaults['birth_date']);
     }
 
     if (!empty($defaults['home_URL'])) {
@@ -103,25 +87,25 @@ class CRM_Contact_Page_View_Vcard extends CRM_Contact_Page_View {
       foreach ($defaults['address'] as $location) {
         // we don't keep PO boxes in separate fields
         $pob = '';
-        $extend = CRM_Utils_Array::value('supplemental_address_1', $location);
+        $extend = $location['supplemental_address_1'] ?? NULL;
         if (!empty($location['supplemental_address_2'])) {
           $extend .= ', ' . $location['supplemental_address_2'];
         }
         if (!empty($location['supplemental_address_3'])) {
           $extend .= ', ' . $location['supplemental_address_3'];
         }
-        $street = CRM_Utils_Array::value('street_address', $location);
-        $locality = CRM_Utils_Array::value('city', $location);
+        $street = $location['street_address'] ?? NULL;
+        $locality = $location['city'] ?? NULL;
         $region = NULL;
         if (!empty($location['state_province_id'])) {
-          $region = $stateProvices[CRM_Utils_Array::value('state_province_id', $location)];
+          $region = $stateProvices[$location['state_province_id']];
         }
         $country = NULL;
         if (!empty($location['country_id'])) {
-          $country = $countries[CRM_Utils_Array::value('country_id', $location)];
+          $country = $countries[$location['country_id']];
         }
 
-        $postcode = CRM_Utils_Array::value('postal_code', $location);
+        $postcode = $location['postal_code'] ?? NULL;
         if (!empty($location['postal_code_suffix'])) {
           $postcode .= '-' . $location['postal_code_suffix'];
         }

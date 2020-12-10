@@ -1,0 +1,16 @@
+<div class="text-center" ng-if="$ctrl.rowCount && $ctrl.settings.pager">
+  <ul uib-pagination
+      class="pagination"
+      boundary-links="true"
+      total-items="$ctrl.rowCount"
+      ng-model="$ctrl.page"
+      ng-change="$ctrl.getResults()"
+      items-per-page="$ctrl.limit"
+      max-size="6"
+      force-ellipses="true"
+      previous-text="&lsaquo;"
+      next-text="&rsaquo;"
+      first-text="&laquo;"
+      last-text="&raquo;"
+  ></ul>
+</div>

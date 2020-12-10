@@ -1,28 +1,12 @@
 <?php
-/**
- * +--------------------------------------------------------------------+
- * | CiviCRM version 5                                                  |
- * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2019                                |
- * +--------------------------------------------------------------------+
- * | This file is a part of CiviCRM.                                    |
- * |                                                                    |
- * | CiviCRM is free software; you can copy, modify, and distribute it  |
- * | under the terms of the GNU Affero General Public License           |
- * | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- * |                                                                    |
- * | CiviCRM is distributed in the hope that it will be useful, but     |
- * | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- * | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- * | See the GNU Affero General Public License for more details.        |
- * |                                                                    |
- * | You should have received a copy of the GNU Affero General Public   |
- * | License and the CiviCRM Licensing Exception along                  |
- * | with this program; if not, contact CiviCRM LLC                     |
- * | at info[AT]civicrm[DOT]org. If you have questions about the        |
- * | GNU Affero General Public License or the licensing of CiviCRM,     |
- * | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- * +--------------------------------------------------------------------+
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
  */
 
 /**
@@ -144,7 +128,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($employer, $organisation);
 
     //Update relationship type
-    $update = $this->callAPISuccess('Relationship', 'create', [
+    $this->callAPISuccess('Relationship', 'create', [
       'id' => $employerRelationship['id'],
       'relationship_type_id' => $this->_relTypeID,
     ]);
@@ -945,9 +929,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 2);
-    $this->AssertEquals([$rel1['id'], $rel4['id']], array_keys($result['values']));
+    $this->assertEquals([$rel1['id'], $rel4['id']], array_keys($result['values']));
 
-    $description = "Demonstrates use of BETWEEN filter.";
+    $description = 'Demonstrates use of BETWEEN filter.';
     $subfile = 'BetweenRelationshipType';
     $getParams = [
       'relationship_type_id' => ['BETWEEN' => [$relationType2, $relationType4]],
@@ -956,14 +940,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($result['count'], 3);
     $this->AssertEquals([$rel2['id'], $rel3['id'], $rel4['id']], array_keys($result['values']));
 
-    $description = "Demonstrates use of Not BETWEEN filter.";
+    $description = 'Demonstrates use of Not BETWEEN filter.';
     $subfile = 'NotBetweenRelationshipType';
     $getParams = [
       'relationship_type_id' => ['NOT BETWEEN' => [$relationType2, $relationType4]],
     ];
     $result = $this->callAPIAndDocument('relationship', 'get', $getParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals($result['count'], 1);
-    $this->AssertEquals([$rel1['id']], array_keys($result['values']));
+    $this->assertEquals([$rel1['id']], array_keys($result['values']));
 
     foreach ([$relationType2, $relationType3, $relationType4] as $id) {
       $this->callAPISuccess('RelationshipType', 'delete', ['id' => $id]);
@@ -1185,8 +1169,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    *
    * We should get 1 result without or with correct relationship type id & 0 with
    * an incorrect one
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetRelationshipByMembershipTypeDAO($version) {
     $this->_apiversion = $version;
@@ -1199,8 +1186,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate([
-      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
-      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_type_id' => [$relType1, $relType3],
+      'relationship_direction' => ['a_b', 'b_a'],
     ]);
 
     // Relationship 2.
@@ -1231,6 +1218,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id_a' => $this->_cId_a,
       'membership_type_id' => $memberType,
+      // Pass version here as there is no intention to replicate support for passing in membership_type_id
+      'version' => 3,
     ]);
     // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
     $this->assertEquals(1, $result['count']);
@@ -1245,8 +1234,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    *
    * We should get 1 result without or with correct relationship type id & 0 with
    * an incorrect one
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testGetRelationshipByMembershipTypeReciprocal($version) {
     $this->_apiversion = $version;
@@ -1258,8 +1250,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate([
-      'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,
-      'relationship_direction' => CRM_Core_DAO::VALUE_SEPARATOR . 'a_b' . CRM_Core_DAO::VALUE_SEPARATOR . 'b_a' . CRM_Core_DAO::VALUE_SEPARATOR,
+      'relationship_type_id' => [$relType1, $relType3],
+      'relationship_direction' => ['a_b', 'b_a'],
     ]);
 
     // Relationship 2.
@@ -1290,6 +1282,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id' => $this->_cId_a,
       'membership_type_id' => $memberType,
+      // There is no intention to replicate support for passing in membership_type_id
+      // in apiv4 so pass version as 3
+      'version' => 3,
     ]);
     // Although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
     $this->assertEquals(2, $result['count']);
@@ -1301,8 +1296,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Check for e-notices on enable & disable as reported in CRM-14350
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSetActive($version) {
     $this->_apiversion = $version;
@@ -1313,8 +1312,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Test creating related memberships.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateRelatedMembership($version) {
     $this->_apiversion = $version;

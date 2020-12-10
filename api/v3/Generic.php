@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -76,8 +60,8 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
   }
   $entity = $apiRequest['entity'];
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
-  $subentity    = CRM_Utils_Array::value('contact_type', $apiRequest['params']);
-  $action = CRM_Utils_Array::value('action', $apiRequest['params']);
+  $subentity    = $apiRequest['params']['contact_type'] ?? NULL;
+  $action = $apiRequest['params']['action'] ?? NULL;
   $sequential = empty($apiRequest['params']['sequential']) ? 0 : 1;
   $apiRequest['params']['options'] = CRM_Utils_Array::value('options', $apiRequest['params'], []);
   $optionsToResolve = (array) CRM_Utils_Array::value('get_options', $apiRequest['params']['options'], []);
@@ -422,6 +406,7 @@ function civicrm_api3_generic_replace($apiRequest) {
  *
  * @return array
  *   Array of results
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_generic_getoptions($apiRequest) {
   // Resolve aliases.
@@ -430,7 +415,7 @@ function civicrm_api3_generic_getoptions($apiRequest) {
     return civicrm_api3_create_error("The field '{$apiRequest['params']['field']}' doesn't exist.");
   }
   // Validate 'context' from params
-  $context = CRM_Utils_Array::value('context', $apiRequest['params']);
+  $context = $apiRequest['params']['context'] ?? NULL;
   CRM_Core_DAO::buildOptionsContext($context);
   unset($apiRequest['params']['context'], $apiRequest['params']['field'], $apiRequest['params']['condition']);
 
@@ -518,10 +503,10 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   }
 
   // Allow caller to specify context
-  $context = CRM_Utils_Array::value('get_options_context', $apiRequest['params']['options']);
+  $context = $apiRequest['params']['options']['get_options_context'] ?? NULL;
   // Default to api action if it is a supported context.
   if (!$context) {
-    $action = CRM_Utils_Array::value('action', $apiRequest['params']);
+    $action = $apiRequest['params']['action'] ?? NULL;
     $contexts = CRM_Core_DAO::buildOptionsContext();
     if (isset($contexts[$action])) {
       $context = $action;
@@ -529,7 +514,7 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
   }
 
   $options = civicrm_api($apiRequest['entity'], 'getoptions', ['version' => 3, 'field' => $fieldname, 'context' => $context]);
-  if (is_array(CRM_Utils_Array::value('values', $options))) {
+  if (isset($options['values']) && is_array($options['values'])) {
     $metadata[$fieldname]['options'] = $options['values'];
   }
 }

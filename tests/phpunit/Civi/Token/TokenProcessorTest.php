@@ -22,12 +22,51 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->dispatcher = new EventDispatcher();
-    $this->dispatcher->addListener(Events::TOKEN_REGISTER, [$this, 'onListTokens']);
-    $this->dispatcher->addListener(Events::TOKEN_EVALUATE, [$this, 'onEvalTokens']);
+    $this->dispatcher->addListener('civi.token.list', [$this, 'onListTokens']);
+    $this->dispatcher->addListener('civi.token.eval', [$this, 'onEvalTokens']);
     $this->counts = [
       'onListTokens' => 0,
       'onEvalTokens' => 0,
     ];
+  }
+
+  /**
+   * Test that a row can be added via "addRow(array $context)".
+   */
+  public function testAddRow() {
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+    ]);
+    $createdRow = $p->addRow(['one' => 'Apple'])
+      ->context('two', 'Banana');
+    $gotRow = $p->getRow(0);
+    foreach ([$createdRow, $gotRow] as $row) {
+      $this->assertEquals('Apple', $row->context['one']);
+      $this->assertEquals('Banana', $row->context['two']);
+    }
+  }
+
+  /**
+   * Test that multiple rows can be added via "addRows(array $contexts)".
+   */
+  public function testAddRows() {
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+    ]);
+    $createdRows = $p->addRows([
+      ['one' => 'Apple', 'two' => 'Banana'],
+      ['one' => 'Pomme', 'two' => 'Banane'],
+    ]);
+    $gotRow0 = $p->getRow(0);
+    foreach ([$createdRows[0], $gotRow0] as $row) {
+      $this->assertEquals('Apple', $row->context['one']);
+      $this->assertEquals('Banana', $row->context['two']);
+    }
+    $gotRow1 = $p->getRow(1);
+    foreach ([$createdRows[1], $gotRow1] as $row) {
+      $this->assertEquals('Pomme', $row->context['one']);
+      $this->assertEquals('Banane', $row->context['two']);
+    }
   }
 
   /**

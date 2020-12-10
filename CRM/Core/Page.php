@@ -1,34 +1,18 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
 /**
@@ -399,7 +383,7 @@ class CRM_Core_Page {
    * @return null
    */
   public function getVar($name) {
-    return isset($this->$name) ? $this->$name : NULL;
+    return $this->$name ?? NULL;
   }
 
   /**
@@ -432,6 +416,60 @@ class CRM_Core_Page {
       }
     }
     $this->assign('fields', $dateFields);
+  }
+
+  /**
+   * Handy helper to produce the standard markup for an icon with alternative
+   * text for a title and screen readers.
+   *
+   * See also the smarty block function `icon`
+   *
+   * @param string $icon
+   *   The class name of the icon to display.
+   * @param string $text
+   *   The translated text to display.
+   * @param bool $condition
+   *   Whether to display anything at all. This helps simplify code when a
+   *   checkmark should appear if something is true.
+   * @param array $attribs
+   *   Attributes to set or override on the icon element.  Any standard
+   *   attribute can be unset by setting the value to an empty string.
+   *
+   * @return string
+   *   The whole bit to drop in.
+   */
+  public static function crmIcon($icon, $text = NULL, $condition = TRUE, $attribs = []) {
+    if (!$condition) {
+      return '';
+    }
+
+    // Add icon classes to any that might exist in $attribs
+    $classes = array_key_exists('class', $attribs) ? explode(' ', $attribs['class']) : [];
+    $classes[] = 'crm-i';
+    $classes[] = $icon;
+    $attribs['class'] = implode(' ', array_unique($classes));
+
+    $standardAttribs = ['aria-hidden' => 'true'];
+    if ($text === NULL || $text === '') {
+      $title = $sr = '';
+    }
+    else {
+      $standardAttribs['title'] = $text;
+      $sr = "<span class=\"sr-only\">$text</span>";
+    }
+
+    // Assemble attribs
+    $attribString = '';
+    // Strip out title if $attribs specifies a blank title
+    $attribs = array_merge($standardAttribs, $attribs);
+    foreach ($attribs as $attrib => $val) {
+      if (strlen($val)) {
+        $val = htmlspecialchars($val);
+        $attribString .= " $attrib=\"$val\"";
+      }
+    }
+
+    return "<i$attribString></i>$sr";
   }
 
 }

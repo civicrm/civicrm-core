@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<extension key="org.civicrm.flexmailer" type="module">
+  <file>flexmailer</file>
+  <name>FlexMailer</name>
+  <description>Flexible APIs for email delivery</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Tim Otten</author>
+    <email>totten@civicrm.org</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">https://github.com/civicrm/org.civicrm.flexmailer</url>
+    <url desc="Documentation">https://docs.civicrm.org/flexmailer/en/latest/</url>
+    <url desc="Support">http://civicrm.stackexchange.com/</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2020-08-05</releaseDate>
+  <version>1.1.2</version>
+  <develStage>stable</develStage>
+  <comments>
+    FlexMailer is an email delivery engine which replaces the internal guts
+    of CiviMail.  It is a drop-in replacement which enables *other* extensions
+    to provide richer email features.
+  </comments>
+  <compatibility>
+    <ver>5.29</ver>
+  </compatibility>
+  <classloader>
+    <psr4 prefix="Civi\FlexMailer\" path="src"/>
+  </classloader>
+  <civix>
+    <namespace>CRM/Flexmailer</namespace>
+  </civix>
+</extension>

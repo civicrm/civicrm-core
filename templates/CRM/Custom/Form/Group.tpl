@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 {* add/update/view custom data group *}
@@ -51,6 +35,10 @@
     <tr id="style_row" class="hiddenElement">
         <td class="label">{$form.style.label}</td>
         <td>{$form.style.html} {help id="id-display_style"}</td>
+    </tr>
+    <tr id="icon_row" class="hiddenElement">
+        <td class="label">{$form.icon.label}</td>
+        <td>{$form.icon.html}</td>
     </tr>
     <tr class="html-adjust">
         <td>&nbsp;</td>
@@ -104,7 +92,9 @@ CRM.$(function($) {
     if ($(this).val() == 'Tab') {
       $('#collapse_display').prop('checked', false);
     }
+    $('#icon_row').toggle($(this).val() !== 'Inline');
   });
+  $('#icon_row').toggle($("select#style").val() !== 'Inline');
 
   /**
    * Check if this is a contact-related set and show/hide other options accordingly
@@ -154,12 +144,12 @@ CRM.$(function($) {
       $("tr#multiple_row").show();
       if (onFormLoad !== true) {
         $('#collapse_display').prop('checked', false);
-        $("select#style").append(tabWithTableOption);
-        $("select#style").val('Tab with table');
+        $("select#style").append(tabWithTableOption).val('Tab with table');
       }
+      $('#icon_row').toggle($("select#style").val() !== 'Inline');
     }
     else {
-      $("tr#multiple_row").hide();
+      $("tr#multiple_row, #icon_row").hide();
       if ($("select#style").val() === 'Tab with table') {
         $("select#style").val('Inline');
       }

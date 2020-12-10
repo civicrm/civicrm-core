@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -35,9 +19,7 @@
  * implement the Selector/Api.interface.php class
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Core_Selector_Controller {
 
@@ -324,6 +306,7 @@ class CRM_Core_Selector_Controller {
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
       if ($this->_output == self::EXPORT) {
         // export the rows.
+        CRM_Core_Error::deprecatedFunctionWarning('This code is believed to be unreachable & to be later removed. Please log how you reached it in gitlab');
         CRM_Core_Report_Excel::writeCSVFile($this->_object->getExportFileName(),
           $columnHeaders,
           $rows
@@ -357,7 +340,6 @@ class CRM_Core_Selector_Controller {
       // Merge headers not containing weight to ordered headers
       $finalColumnHeaders = array_merge($reorderedHeaders, $noWeightHeaders);
 
-      $rowsEmpty = count($rows) ? FALSE : TRUE;
       $qill = $this->getQill();
       $summary = $this->getSummary();
       // if we need to store in session, lets update session
@@ -368,7 +350,7 @@ class CRM_Core_Selector_Controller {
         }
         $this->_store->set("{$this->_prefix}rows", $rows);
         $this->_store->set("{$this->_prefix}rowCount", $this->_total);
-        $this->_store->set("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        $this->_store->set("{$this->_prefix}rowsEmpty", !$rows);
         $this->_store->set("{$this->_prefix}qill", $qill);
         $this->_store->set("{$this->_prefix}summary", $summary);
       }
@@ -378,7 +360,7 @@ class CRM_Core_Selector_Controller {
 
         self::$_template->assign_by_ref("{$this->_prefix}columnHeaders", $finalColumnHeaders);
         self::$_template->assign_by_ref("{$this->_prefix}rows", $rows);
-        self::$_template->assign("{$this->_prefix}rowsEmpty", $rowsEmpty);
+        self::$_template->assign("{$this->_prefix}rowsEmpty", !$rows);
         self::$_template->assign("{$this->_prefix}qill", $qill);
         self::$_template->assign("{$this->_prefix}summary", $summary);
       }

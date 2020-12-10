@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -30,6 +14,8 @@
  * @group headless
  */
 class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
+
+  use CRMTraits_ACL_PermissionTrait;
 
   public function setUp() {
     parent::setUp();
@@ -70,7 +56,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   }
 
   public function testViewOwnEvent() {
-    self::setViewOwnEventPermissions();
+    $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::VIEW);
     $this->assertTrue($permissions);
@@ -81,7 +67,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   }
 
   public function testEditOwnEvent() {
-    self::setViewOwnEventPermissions();
+    $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::EDIT);
@@ -93,7 +79,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
    */
   public function testDeleteOwnEvent() {
     // Check that you can't delete your own event without "Delete in CiviEvent" permission
-    self::setViewOwnEventPermissions();
+    $this->setViewOwnEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_ownEventId, CRM_Core_Permission::DELETE);
     $this->assertFalse($permissions);
@@ -115,9 +101,18 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
     $this->assertTrue($permissions);
   }
 
+  /**
+   * Test that the contact can view an event with an ACL permitting everyone to view it.
+   */
+  public function testViewAclEventAllowed() {
+    $this->setupScenarioCoreACLEveryonePermittedToEvent();
+    $permittedEventID = CRM_Core_Permission::event(CRM_Core_Permission::VIEW, $this->scenarioIDs['Event']['permitted_event']);
+    $this->assertEquals($this->scenarioIDs['Event']['permitted_event'], $permittedEventID);
+  }
+
   public function testEditOtherEventDenied() {
     $this->_loggedInUser = CRM_Core_Session::singleton()->get('userID');
-    self::setViewAllEventPermissions();
+    $this->setViewAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::EDIT);
     $this->assertFalse($permissions);
@@ -140,10 +135,20 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
   public function testDeleteOtherEventDenied() {
     // FIXME: This test could be improved, but for now it checks that we can't delete if we don't have "Delete in CiviEvent"
-    self::setEditAllEventPermissions();
+    $this->setEditAllEventPermissions();
     unset(\Civi::$statics['CRM_Event_BAO_Event']['permissions']);
     $permissions = CRM_Event_BAO_Event::checkPermission($this->_otherEventId, CRM_Core_Permission::DELETE);
     $this->assertFalse($permissions);
+  }
+
+  /**
+   * Test get complete info function returns all info for contacts with view all info.
+   */
+  public function testGetCompleteInfo() {
+    $this->setupScenarioCoreACLEveryonePermittedToEvent();
+    $info = CRM_Event_BAO_Event::getCompleteInfo('20000101');
+    $this->assertEquals('Annual CiviCRM meet', $info[0]['title']);
+    $this->assertEquals('Annual CiviCRM meet', $info[1]['title']);
   }
 
 }

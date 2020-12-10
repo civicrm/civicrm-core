@@ -1,26 +1,10 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
 
@@ -34,7 +18,7 @@
     <tr>
       <td>
         <a href="{$newCaseURL}" class="button">
-          <span><i class="crm-i fa-plus-circle"></i> {ts}New Case{/ts}</span>
+          <span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Case{/ts}</span>
         </a>
       </td>
     </tr>
@@ -42,19 +26,19 @@
    {if $myCases}
     <tr>
       <td class="right">
-        <a href="{crmURL p="civicrm/case" q="reset=1&all=1"}"><span>&raquo; {ts}Show ALL Cases with Upcoming Activities{/ts}</span></a>
+        <a href="{crmURL p="civicrm/case" q="reset=1&all=1"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show ALL Cases with Upcoming Activities{/ts}</span></a>
       </td>
     </tr>
    {else}
     <tr>
       <td class="right">
-        <a href="{crmURL p="civicrm/case" q="reset=1&all=0"}"><span>&raquo; {ts}Show My Cases with Upcoming Activities{/ts}</span></a>
+        <a href="{crmURL p="civicrm/case" q="reset=1&all=0"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show My Cases with Upcoming Activities{/ts}</span></a>
       </td>
     </tr>
    {/if}
    <tr>
      <td class="right">
-       <a href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=1&force=1"}"><span>&raquo; {ts}Show My Cases{/ts}</span></a>
+       <a href="{crmURL p="civicrm/case/search" q="reset=1&case_owner=1&force=1"}"><span><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Show My Cases{/ts}</span></a>
      </td>
    </tr>
   </table>

@@ -10,6 +10,18 @@ function dm_reset_dirs() {
   mkdir -p "$@"
 }
 
+## Assert that a folder contains no symlinks
+##
+## ex: dev/core#1393, dev/core#1990
+## usage: dm_assert_no_symlinks <basedir>
+function dm_assert_no_symlinks() {
+  local SYMLINKS=$( find "$1" -type l )
+  if [ -n "$SYMLINKS" ]; then
+    echo "ERROR: Folder $1 contains unexpected symlink(s): $SYMLINKS"
+    exit 10
+  fi
+}
+
 ## Copy files from one dir into another dir
 ## usage: dm_install_dir <from-dir> <to-dir>
 function dm_install_dir() {
@@ -41,7 +53,7 @@ function dm_remove_files() {
   shift
 
   for file in "$@" ; do
-    [ -f "$tgt/$file" ] && rm -f "$tgt/$file"
+    [ -f "$tgt/$file" -o -L "$tgt/$file" ] && rm -f "$tgt/$file"
   done
 }
 
@@ -65,7 +77,7 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml setup ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
@@ -87,6 +99,35 @@ function dm_install_core() {
   set +e
   rm -rf $to/sql/civicrm_*.??_??.mysql
   set -e
+}
+
+## Copy built-in extensions
+## usage: dm_install_core <core_repo_path> <to_path> <ext-dirs...>
+function dm_install_coreext() {
+  local repo="$1"
+  local to="$2"
+  shift
+  shift
+
+  for relext in "$@" ; do
+    [ ! -d "$to/$relext" ] && mkdir -p "$to/$relext"
+    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/$relext/./" "$to/$relext/./"
+  done
+}
+
+## Get a list of default/core extension directories (space-delimited)
+## reldirs=$(dm_core_exts)
+function dm_core_exts() {
+  echo ext/search
+  echo ext/sequentialcreditnotes
+  echo ext/flexmailer
+  echo ext/eventcart
+  echo ext/ewaysingle
+  echo ext/financialacls
+  echo ext/afform
+  echo ext/greenwich
+  echo ext/contributioncancelactions
+  echo ext/oauth-client
 }
 
 ## Copy all packages
@@ -163,12 +204,14 @@ function dm_install_vendor() {
 
   local excludes_rsync=""
   ## CRM-21729 - .idea test-cases unit-test come from phpquery package.
-  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} .idea test-cases unit-test; do
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} .idea test-cases unit-test README.rst; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
   [ ! -d "$to" ] && mkdir "$to"
   ${DM_RSYNC:-rsync} -avC $excludes_rsync "$repo/./" "$to/./"
+  ## We don't this use CLI script in production, and the symlink breaks D7/BD URL installs
+  dm_remove_files "$to" "bin/pscss" "bin/cssmin"
 }
 
 ##  usage: dm_install_wordpress <wp_repo_path> <to_path>
@@ -190,6 +233,7 @@ function dm_install_wordpress() {
   ## Need --exclude=civicrm for self-building on WP site
 
   dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
+  dm_preg_edit "/^define\( \'CIVICRM_PLUGIN_VERSION\',\W'[0-9\.]+/m" "define( 'CIVICRM_PLUGIN_VERSION', '$DM_VERSION" "$to/civicrm.php"
 }
 
 ## Generate the composer "vendor" folder
@@ -233,6 +277,21 @@ function dm_install_cvext() {
   # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
   cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
 }
+
+## Export a list of patch files from a git repo
+## usage: dm_export_patches <src-repo> <out-dir> <range>
+## ex: dm_export_patches "$HOME/src/somerepo" "/tmp/export" 5.1.2..5.1.6
+function dm_export_patches() {
+  if [ ! -d "$1" ]; then
+    echo "ignore: $1"
+    return
+  fi
+  echo "Export \"$1\" ($3) to \"$2\""
+  pushd "$1" >> /dev/null
+    git format-patch "$3" -o "$2"
+  popd >> /dev/null
+}
+
 
 ## Edit a file by applying a regular expression.
 ## Note: We'd rather just call "sed", but it differs on GNU+BSD.

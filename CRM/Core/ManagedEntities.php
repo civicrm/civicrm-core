@@ -112,10 +112,15 @@ class CRM_Core_ManagedEntities {
   /**
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
+   * @param bool $ignoreUpgradeMode
    *
    * @throws Exception
    */
-  public function reconcile() {
+  public function reconcile($ignoreUpgradeMode = FALSE) {
+    // Do not reconcile whilst we are in upgrade mode
+    if (CRM_Core_Config::singleton()->isUpgradeMode() && !$ignoreUpgradeMode) {
+      return;
+    }
     if ($error = $this->validate($this->getDeclarations())) {
       throw new Exception($error);
     }
@@ -241,12 +246,12 @@ class CRM_Core_ManagedEntities {
     $dao->name = $todo['name'];
     $dao->entity_type = $todo['entity'];
     $dao->entity_id = $result['id'];
-    $dao->cleanup = CRM_Utils_Array::value('cleanup', $todo);
+    $dao->cleanup = $todo['cleanup'] ?? NULL;
     $dao->save();
   }
 
   /**
-   * Update an entity which (a) is believed to exist and which (b) ought to be active.
+   * Update an entity which is believed to exist.
    *
    * @param CRM_Core_DAO_Managed $dao
    * @param array $todo
@@ -257,12 +262,26 @@ class CRM_Core_ManagedEntities {
     $doUpdate = ($policy == 'always');
 
     if ($doUpdate) {
-      $defaults = [
-        'id' => $dao->entity_id,
-      // FIXME: test whether is_active is valid
-        'is_active' => 1,
-      ];
+      $defaults = ['id' => $dao->entity_id, 'is_active' => 1];
       $params = array_merge($defaults, $todo['params']);
+
+      $manager = CRM_Extension_System::singleton()->getManager();
+      if ($dao->entity_type === 'Job' && !$manager->extensionIsBeingInstalledOrEnabled($dao->module)) {
+        // Special treatment for scheduled jobs:
+        //
+        // If we're being called as part of enabling/installing a module then
+        // we want the default behaviour of setting is_active = 1.
+        //
+        // However, if we're just being called by a normal cache flush then we
+        // should not re-enable a job that an administrator has decided to disable.
+        //
+        // Without this logic there was a problem: site admin might disable
+        // a job, but then when there was a flush op, the job was re-enabled
+        // which can cause significant embarrassment, depending on the job
+        // ("Don't worry, sending mailings is disabled right now...").
+        unset($params['is_active']);
+      }
+
       $result = civicrm_api($dao->entity_type, 'create', $params);
       if ($result['is_error']) {
         $this->onApiError($dao->entity_type, 'create', $params, $result);

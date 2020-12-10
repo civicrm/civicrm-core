@@ -1,27 +1,11 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
+ | Copyright CiviCRM LLC. All rights reserved.                        |
  |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
 
@@ -198,14 +182,16 @@ function _civicrm_api3_job_geocode_spec(&$params) {
 }
 
 /**
- * Send the scheduled reminders for all contacts (either for activities or events).
+ * Send the scheduled reminders as configured.
  *
  * @param array $params
- *   (reference ) input parameters.
- *                        now - the time to use, in YmdHis format
- *                            - makes testing a bit simpler since we can simulate past/future time
+ *  - now - the time to use, in YmdHis format
+ *  - makes testing a bit simpler since we can simulate past/future time
  *
  * @return array
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_send_reminder($params) {
   //note that $params['rowCount' can be overridden by one of the preferred syntaxes ($options['limit'] = x
@@ -215,18 +201,12 @@ function civicrm_api3_job_send_reminder($params) {
   $params['rowCount'] = 0;
   $lock = Civi::lockManager()->acquire('worker.core.ActionSchedule');
   if (!$lock->isAcquired()) {
-    return civicrm_api3_create_error('Could not acquire lock, another ActionSchedule process is running');
+    throw new API_Exception('Could not acquire lock, another ActionSchedule process is running');
   }
 
-  $result = CRM_Core_BAO_ActionSchedule::processQueue(CRM_Utils_Array::value('now', $params), $params);
+  CRM_Core_BAO_ActionSchedule::processQueue($params['now'] ?? NULL, $params);
   $lock->release();
-
-  if ($result['is_error'] == 0) {
-    return civicrm_api3_create_success();
-  }
-  else {
-    return civicrm_api3_create_error($result['messages']);
-  }
+  return civicrm_api3_create_success(1, $params, 'ActionSchedule', 'send_reminder');
 }
 
 /**
@@ -486,7 +466,14 @@ function civicrm_api3_job_process_membership($params) {
     return civicrm_api3_create_error('Could not acquire lock, another Membership Processing process is running');
   }
 
-  $result = CRM_Member_BAO_Membership::updateAllMembershipStatus();
+  // We need to pass this through as a simple array of membership status IDs as values.
+  if (!empty($params['exclude_membership_status_ids'])) {
+    is_array($params['exclude_membership_status_ids']) ?: $params['exclude_membership_status_ids'] = [$params['exclude_membership_status_ids']];
+  }
+  if (!empty($params['exclude_membership_status_ids']['IN'])) {
+    $params['exclude_membership_status_ids'] = $params['exclude_membership_status_ids']['IN'];
+  }
+  $result = CRM_Member_BAO_Membership::updateAllMembershipStatus($params);
   $lock->release();
 
   if ($result['is_error'] == 0) {
@@ -495,6 +482,25 @@ function civicrm_api3_job_process_membership($params) {
   else {
     return civicrm_api3_create_error($result['messages']);
   }
+}
+
+function _civicrm_api3_job_process_membership_spec(&$params) {
+  $params['exclude_test_memberships']['api.default'] = TRUE;
+  $params['exclude_test_memberships']['title'] = 'Exclude test memberships';
+  $params['exclude_test_memberships']['description'] = 'Exclude test memberships from calculations (default = TRUE)';
+  $params['exclude_test_memberships']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $params['only_active_membership_types']['api.default'] = TRUE;
+  $params['only_active_membership_types']['title'] = 'Exclude disabled membership types';
+  $params['only_active_membership_types']['description'] = 'Exclude disabled membership types from calculations (default = TRUE)';
+  $params['only_active_membership_types']['type'] = CRM_Utils_Type::T_BOOLEAN;
+  $params['exclude_membership_status_ids']['title'] = 'Exclude membership status IDs from calculations';
+  $params['exclude_membership_status_ids']['description'] = 'Default: Exclude Pending, Cancelled, Expired. Deceased will always be excluded';
+  $params['exclude_membership_status_ids']['type'] = CRM_Utils_Type::T_INT;
+  $params['exclude_membership_status_ids']['pseudoconstant'] = [
+    'table' => 'civicrm_membership_status',
+    'keyColumn' => 'id',
+    'labelColumn' => 'label',
+  ];
 }
 
 /**
@@ -528,7 +534,7 @@ function civicrm_api3_job_process_respondent($params) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_job_process_batch_merge($params) {
-  $rule_group_id = CRM_Utils_Array::value('rule_group_id', $params);
+  $rule_group_id = $params['rule_group_id'] ?? NULL;
   if (!$rule_group_id) {
     $rule_group_id = civicrm_api3('RuleGroup', 'getvalue', [
       'contact_type' => 'Individual',
@@ -537,8 +543,8 @@ function civicrm_api3_job_process_batch_merge($params) {
       'options' => ['limit' => 1],
     ]);
   }
-  $rgid = CRM_Utils_Array::value('rgid', $params);
-  $gid = CRM_Utils_Array::value('gid', $params);
+  $rgid = $params['rgid'] ?? NULL;
+  $gid = $params['gid'] ?? NULL;
   $mode = CRM_Utils_Array::value('mode', $params, 'safe');
 
   $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params), NULL, $params['search_limit']);
@@ -694,7 +700,7 @@ function civicrm_api3_job_group_rebuild($params) {
     throw new API_Exception('Could not acquire lock, another GroupRebuild process is running');
   }
 
-  $limit = CRM_Utils_Array::value('limit', $params, 0);
+  $limit = $params['limit'] ?? 0;
 
   CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();
