@@ -418,22 +418,6 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
         return;
 
-      case 'case_from_start_date_low':
-      case 'case_from_start_date_high':
-        CRM_Core_Error::deprecatedFunctionWarning('case_from is deprecated');
-        $query->dateQueryBuilder($values,
-          'civicrm_case', 'case_from_start_date', 'start_date', 'Start Date'
-        );
-        return;
-
-      case 'case_to_end_date_low':
-      case 'case_to_end_date_high':
-        CRM_Core_Error::deprecatedFunctionWarning('case_to is deprecated');
-        $query->dateQueryBuilder($values,
-          'civicrm_case', 'case_to_end_date', 'end_date', 'End Date'
-        );
-        return;
-
       case 'case_start_date':
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_case.start_date", $op, $value, 'Int');
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
