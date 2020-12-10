@@ -4138,4 +4138,7 @@ INSERT INTO civicrm_state_province (id, country_id, abbreviation, name) VALUES
 (NULL, 1226, "RCT", "Rhondda, Cynon, Taff"),
 (NULL, 1226, "SWA", "Swansea"),
 (NULL, 1226, "TOF", "Torfaen"),
-(NULL, 1226, "WRX", "Wrexham");
+(NULL, 1226, "WRX", "Wrexham"),
+
+-- Add missing state for South Korea
+(NULL, 1115, "50", "Sejong");
