@@ -594,7 +594,9 @@ class Api4SelectQuery {
   }
 
   /**
-   * Join onto a Bridge table
+   * Join via a Bridge table
+   *
+   * This creates a double-join in sql that appears to the API user like a single join.
    *
    * @param array $joinTree
    * @param string $joinEntity
@@ -606,75 +608,93 @@ class Api4SelectQuery {
     $bridgeEntity = array_shift($joinTree);
     /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
     $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
-    if (!in_array('EntityBridge', $bridgeEntityClass::getInfo()['type'], TRUE)) {
-      throw new \API_Exception("Illegal bridge entity specified: " . $bridgeEntity);
-    }
     $bridgeAlias = $alias . '_via_' . strtolower($bridgeEntity);
-    $bridgeTable = CoreUtil::getTableName($bridgeEntity);
+    $bridgeInfo = $bridgeEntityClass::getInfo();
+    $bridgeFields = $bridgeInfo['bridge'] ?? [];
+    // Sanity check - bridge entity should declare exactly 2 FK fields
+    if (count($bridgeFields) !== 2) {
+      throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
+    }
+    /* @var \CRM_Core_DAO $bridgeDAO */
+    $bridgeDAO = $bridgeInfo['dao'];
+    $bridgeTable = $bridgeDAO::getTableName();
+
     $joinTable = CoreUtil::getTableName($joinEntity);
     $bridgeEntityGet = $bridgeEntityClass::get($this->getCheckPermissions());
-    $fkToJoinField = $fkToBaseField = NULL;
-    // Find the bridge field that links to the joinEntity (either an explicit FK or an entity_id/entity_table combo)
-    foreach ($bridgeEntityGet->entityFields() as $name => $field) {
-      if ($field['fk_entity'] === $joinEntity || (!$fkToJoinField && $name === 'entity_id')) {
-        $fkToJoinField = $name;
+    // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
+    $joinRef = $baseRef = NULL;
+    foreach ($bridgeDAO::getReferenceColumns() as $ref) {
+      if (in_array($ref->getReferenceKey(), $bridgeFields)) {
+        if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
+          $joinRef = $ref;
+        }
+        else {
+          $baseRef = $ref;
+        }
       }
     }
-    // Get list of entities allowed for entity_table
-    if (array_key_exists('entity_id', $bridgeEntityGet->entityFields())) {
-      $entityTables = (array) civicrm_api4($bridgeEntity, 'getFields', [
-        'checkPermissions' => FALSE,
-        'where' => [['name', '=', 'entity_table']],
-        'loadOptions' => TRUE,
-      ], ['options'])->first();
-    }
-    // If bridge field to joinEntity is entity_id, validate entity_table is allowed
-    if (!$fkToJoinField || ($fkToJoinField === 'entity_id' && !array_key_exists($joinTable, $entityTables))) {
+    if (!$joinRef || !$baseRef) {
       throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
     }
     // Create link between bridge entity and join entity
     $joinConditions = [
-      "`$bridgeAlias`.`$fkToJoinField` = `$alias`.`id`",
+      "`$bridgeAlias`.`{$joinRef->getReferenceKey()}` = `$alias`.`{$joinRef->getTargetKey()}`",
     ];
-    if ($fkToJoinField === 'entity_id') {
-      $joinConditions[] = "`$bridgeAlias`.`entity_table` = '$joinTable'";
+    // For dynamic references, also add the type column (e.g. `entity_table`)
+    if ($joinRef->getTypeColumn()) {
+      $joinConditions[] = "`$bridgeAlias`.`{$joinRef->getTypeColumn()}` = '$joinTable'";
     }
-    // Register fields from the bridge entity as if they belong to the join entity
+    // Register fields (other than bridge FK fields) from the bridge entity as if they belong to the join entity
+    $fakeFields = [];
     foreach ($bridgeEntityGet->entityFields() as $name => $field) {
-      if ($name == 'id' || $name == $fkToJoinField || ($name == 'entity_table' && $fkToJoinField == 'entity_id')) {
+      if ($name === 'id' || $name === $joinRef->getReferenceKey() || $name === $joinRef->getTypeColumn() || $name === $baseRef->getReferenceKey() || $name === $baseRef->getTypeColumn()) {
         continue;
-      }
-      if ($field['fk_entity'] || (!$fkToBaseField && $name == 'entity_id')) {
-        $fkToBaseField = $name;
       }
       // Note these fields get a sql alias pointing to the bridge entity, but an api alias pretending they belong to the join entity
       $field['sql_name'] = '`' . $bridgeAlias . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($alias . '.' . $field['name'], $field);
+      $fakeFields[] = $alias . '.' . $field['name'];
     }
     // Move conditions for the bridge join out of the joinTree
     $bridgeConditions = [];
-    $joinTree = array_filter($joinTree, function($clause) use ($fkToBaseField, $alias, $bridgeAlias, &$bridgeConditions) {
+    $isExplicit = FALSE;
+    $joinTree = array_filter($joinTree, function($clause) use ($baseRef, $alias, $bridgeAlias, $fakeFields, &$bridgeConditions, &$isExplicit) {
       list($sideA, $op, $sideB) = array_pad((array) $clause, 3, NULL);
-      if ($op === '=' && $sideB && ($sideA === "$alias.$fkToBaseField" || $sideB === "$alias.$fkToBaseField")) {
-        $expr = $sideA === "$alias.$fkToBaseField" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`$fkToBaseField` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+      // Skip AND/OR/NOT branches
+      if (!$sideB) {
+        return TRUE;
+      }
+      // If this condition makes an explicit link between the bridge and another entity
+      if ($op === '=' && $sideB && ($sideA === "$alias.{$baseRef->getReferenceKey()}" || $sideB === "$alias.{$baseRef->getReferenceKey()}")) {
+        $expr = $sideA === "$alias.{$baseRef->getReferenceKey()}" ? $sideB : $sideA;
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+        $isExplicit = TRUE;
         return FALSE;
       }
-      elseif ($op === '=' && $fkToBaseField == 'entity_id' && ($sideA === "$alias.entity_table" || $sideB === "$alias.entity_table")) {
-        $expr = $sideA === "$alias.entity_table" ? $sideB : $sideA;
-        $bridgeConditions[] = "`$bridgeAlias`.`entity_table` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+      // Explicit link with dynamic "entity_table" column
+      elseif ($op === '=' && $baseRef->getTypeColumn() && ($sideA === "$alias.{$baseRef->getTypeColumn()}" || $sideB === "$alias.{$baseRef->getTypeColumn()}")) {
+        $expr = $sideA === "$alias.{$baseRef->getTypeColumn()}" ? $sideB : $sideA;
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = " . $this->getExpression($expr)->render($this->apiFieldSpec);
+        $isExplicit = TRUE;
         return FALSE;
+      }
+      // Other conditions that apply only to the bridge table should be
+      foreach ([$sideA, $sideB] as $expr) {
+        if (is_string($expr) && in_array(explode(':', $expr)[0], $fakeFields)) {
+          $bridgeConditions[] = $this->composeClause($clause, 'ON');
+          return FALSE;
+        }
       }
       return TRUE;
     });
     // If no bridge conditions were specified, link it to the base entity
-    if (!$bridgeConditions) {
-      $bridgeConditions[] = "`$bridgeAlias`.`$fkToBaseField` = a.id";
-      if ($fkToBaseField == 'entity_id') {
-        if (!array_key_exists($this->getFrom(), $entityTables)) {
-          throw new \API_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
-        }
-        $bridgeConditions[] = "`$bridgeAlias`.`entity_table` = '" . $this->getFrom() . "'";
+    if (!$isExplicit) {
+      if (!in_array($this->getEntity(), $baseRef->getTargetEntities())) {
+        throw new \API_Exception("Unable to join $bridgeEntity to " . $this->getEntity());
+      }
+      $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getReferenceKey()}` = a.`{$baseRef->getTargetKey()}`";
+      if ($baseRef->getTypeColumn()) {
+        $bridgeConditions[] = "`$bridgeAlias`.`{$baseRef->getTypeColumn()}` = '" . $this->getFrom() . "'";
       }
     }
 

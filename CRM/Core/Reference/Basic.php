@@ -72,6 +72,14 @@ class CRM_Core_Reference_Basic implements CRM_Core_Reference_Interface {
   }
 
   /**
+   * @return array
+   *   [table_name => EntityName]
+   */
+  public function getTargetEntities(): array {
+    return [$this->targetTable => CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->targetTable)];
+  }
+
+  /**
    * @param CRM_Core_DAO $targetDao
    *
    * @return Object

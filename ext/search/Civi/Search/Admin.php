@@ -142,25 +142,13 @@ class Admin {
           ) {
             continue;
           }
-          // Dynamic references use a column like "entity_table"
-          $dynamicCol = $reference->getTypeColumn();
-          if ($dynamicCol) {
-            $targetTables = $daoClass::buildOptions($dynamicCol);
-            if (!$targetTables) {
-              continue;
-            }
-            $targetTables = array_keys($targetTables);
-          }
-          else {
-            $targetTables = [$reference->getTargetTable()];
-          }
-          foreach ($targetTables as $targetTable) {
-            $targetDao = \CRM_Core_DAO_AllCoreTables::getClassForTable($targetTable);
-            $targetEntityName = \CRM_Core_DAO_AllCoreTables::getBriefName($targetDao);
+          foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
             if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
               continue;
             }
             $targetEntity = $allowedEntities[$targetEntityName];
+            // Dynamic references use a column like "entity_table"
+            $dynamicCol = $reference->getTypeColumn();
             // Non-bridge joins directly between 2 entities
             if (!$bridge) {
               // Add the straight 1-1 join

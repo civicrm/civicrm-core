@@ -25,6 +25,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Phone;
+use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
 
 /**
@@ -200,6 +201,91 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
     $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
     $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
+  }
+
+  public function testBridgeJoinRelationshipContactActivity() {
+    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Aaa')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Meeting')
+        ->addValue('source_contact_id', '$id')
+        ->addValue('target_contact_id', '$id')
+      )
+      ->execute()
+      ->first()['id'];
+    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Bbb')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Phone Call')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('r1', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+      )
+      ->execute()
+      ->first()['id'];
+    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+      ->addValue('first_name', 'Ccc')
+      ->addChain('activity', Activity::create()
+        ->addValue('activity_type_id:name', 'Meeting')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('activity2', Activity::create()
+        ->addValue('activity_type_id:name', 'Phone Call')
+        ->addValue('source_contact_id', $cid1)
+        ->addValue('target_contact_id', '$id')
+      )
+      ->addChain('r1', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+      )
+      ->addChain('r2', Relationship::create()
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id' => 2])
+      )
+      ->execute()
+      ->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', 'act.id')
+      ->addJoin('Activity AS act', TRUE, 'ActivityContact', ['act.record_type_id:name', '=', "'Activity Targets'"])
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(4, $result);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id', 'act.id')
+      ->addJoin('Activity AS act', TRUE, 'ActivityContact', ['act.activity_type_id:name', '=', "'Meeting'"], ['act.record_type_id:name', '=', "'Activity Targets'"])
+      ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(2, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id', 'contact.id')
+      ->addJoin('Contact', FALSE, 'ActivityContact')
+      ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
+      ->execute();
+    $this->assertCount(8, $result);
+
+    $result = Activity::get(FALSE)
+      ->addSelect('id', 'contact.id', 'rel.id')
+      ->addJoin('Contact', FALSE, 'ActivityContact', ['contact.record_type_id:name', '=', "'Activity Targets'"])
+      ->addJoin('Contact AS rel', FALSE, 'RelationshipCache', ['rel.far_contact_id', '=', 'contact.id'], ['rel.near_relation:name', '=', '"Child of"'])
+      ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(5, $result);
+    $this->assertEquals($cid1, $result[0]['contact.id']);
+    $this->assertEquals($cid2, $result[0]['rel.id']);
+    $this->assertEquals($cid1, $result[1]['contact.id']);
+    $this->assertEquals($cid3, $result[1]['rel.id']);
+    $this->assertEquals($cid2, $result[2]['contact.id']);
+    $this->assertNull($result[2]['rel.id']);
+    $this->assertEquals($cid3, $result[3]['contact.id']);
+    $this->assertNull($result[3]['rel.id']);
+    $this->assertEquals($cid3, $result[4]['contact.id']);
+    $this->assertNull($result[3]['rel.id']);
+
   }
 
 }
