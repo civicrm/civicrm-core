@@ -1560,13 +1560,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //@todo direct call to API function not supported.
     // setting required check to false, CRM-2839
     // plus we do our own required check in import
-    $error = _civicrm_api3_deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
-
-    if ((is_null($error)) && (civicrm_error(_civicrm_api3_deprecated_validate_formatted_contact($formatted)))) {
-      $error = _civicrm_api3_deprecated_validate_formatted_contact($formatted);
+    try {
+      $error = _civicrm_api3_deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
+      if ($error) {
+        return $error;
+      }
+      _civicrm_api3_deprecated_validate_formatted_contact($formatted);
     }
-    if (!is_null($error)) {
-      return $error;
+    catch (CRM_Core_Exception $e) {
+      return ['error_message' => $e->getMessage(), 'is_error' => 1, 'code' => $e->getCode()];
     }
 
     if ($contactId) {
