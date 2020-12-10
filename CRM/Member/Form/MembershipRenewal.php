@@ -727,7 +727,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $ids = [];
     $currentMembership = civicrm_api3('Membership', 'getsingle', ['id' => $memParams['id']]);
 
-    $memParams['join_date'] = $currentMembership['join_date'];
     // Do NOT do anything.
     //1. membership with status : PENDING/CANCELLED (CRM-2395)
     //2. Paylater/IPN renew. CRM-4556.
@@ -736,14 +735,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       // CRM-15475
       array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
     ])) {
-      $memParams = array_merge($memParams, [
-        'status_id' => $currentMembership['status_id'],
-        'start_date' => $currentMembership['start_date'],
-        'end_date' => $currentMembership['end_date'],
-      ]);
       return CRM_Member_BAO_Membership::create($memParams);
     }
-
+    $memParams['join_date'] = date('Ymd', strtotime($currentMembership['join_date']));
     $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
