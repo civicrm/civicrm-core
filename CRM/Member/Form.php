@@ -416,7 +416,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return array
    */
-  protected static function getPriceSetDetails($params) {
+  protected function getPriceSetDetails(array $params): ?array {
     $priceSetID = $params['price_set_id'] ?? NULL;
     if ($priceSetID) {
       return CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
@@ -436,10 +436,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return int
    */
-  protected static function getPriceSetID($params) {
+  protected function getPriceSetID(array $params): int {
     $priceSetID = $params['price_set_id'] ?? NULL;
     if (!$priceSetID) {
-      $priceSetDetails = self::getPriceSetDetails($params);
+      $priceSetDetails = $this->getPriceSetDetails($params);
       return (int) key($priceSetDetails);
     }
     return (int) $priceSetID;
@@ -452,9 +452,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @return array
    */
-  protected function setPriceSetParameters($formValues) {
-    $this->_priceSetId = self::getPriceSetID($formValues);
-    $priceSetDetails = self::getPriceSetDetails($formValues);
+  protected function setPriceSetParameters(array $formValues): array {
+    $this->_priceSetId = $this->getPriceSetID($formValues);
+    $priceSetDetails = $this->getPriceSetDetails($formValues);
     $this->_priceSet = $priceSetDetails[$this->_priceSetId];
     // process price set and get total amount and line items.
     $this->ensurePriceParamsAreSet($formValues);
