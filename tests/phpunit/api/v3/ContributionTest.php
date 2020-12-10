@@ -2806,10 +2806,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test financial_type_id override behaviour with a single line item.
    *
-   * CRM-17718 a passed in financial_type_id is not allowed to override the original contribution where there
-   * is more than one line item.
+   * CRM-17718 a passed in financial_type_id is not allowed to override the
+   * original contribution where there is more than one line item.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionPassedInFinancialTypeTwoLineItems() {
+  public function testRepeatTransactionPassedInFinancialTypeTwoLineItems(): void {
     $this->_params = $this->getParticipantOrderParams();
     $originalContribution = $this->setUpRecurringContribution();
 
@@ -2837,7 +2839,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * CRM-17718 test appropriate action if financial type has changed for single line items.
    */
-  public function testRepeatTransactionUpdatedFinancialType() {
+  public function testRepeatTransactionUpdatedFinancialType(): void {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
 
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -3348,12 +3350,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCompleteTransactionWithParticipantRecord() {
+  public function testCompleteTransactionWithParticipantRecord(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $this->_individualId = $this->createLoggedInUser();
-    // Unset source to test whether one is generated if not set already on the contribution.
-    unset($this->_params['source']);
+    $this->_params['source'] = 'Online Event Registration: Annual CiviCRM meet';
     $contributionID = $this->createPendingParticipantContribution();
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event']);
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 2], ['name' => 'post_1', 'title' => 'title_post_2', 'frontend_title' => 'public 2']);
@@ -3923,7 +3924,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Create a pending contribution & linked pending participant record (along with an event).
+   * Create a pending contribution & linked pending participant record (along
+   * with an event).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function createPendingParticipantContribution() {
     $this->_ids['event']['test'] = $this->eventCreate(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org'])['id'];
