@@ -47,14 +47,9 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     // Find the email address/contact, if it exists.
 
     $contact = CRM_Contact_BAO_Contact::getTableName();
-    $location = CRM_Core_BAO_Location::getTableName();
     $email = CRM_Core_BAO_Email::getTableName();
     $queueTable = CRM_Mailing_Event_BAO_Queue::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
-    $mailing = CRM_Mailing_BAO_Mailing::getTableName();
-    $forward = self::getTableName();
-
-    $domain = CRM_Core_BAO_Domain::getDomain();
 
     $dao = new CRM_Core_DAO();
     $dao->query("
