@@ -353,7 +353,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function calculateMissingAmountParams(&$params, $contributionID) {
-    if (!$contributionID && !isset($params['fee_amount'])) {
+    if (!$contributionID && (!isset($params['fee_amount']) || $params['fee_amount'] === '')) {
       if (isset($params['total_amount']) && isset($params['net_amount'])) {
         $params['fee_amount'] = $params['total_amount'] - $params['net_amount'];
       }
