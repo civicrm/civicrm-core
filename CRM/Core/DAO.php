@@ -2284,7 +2284,6 @@ SELECT contact_id
     // test for create view and trigger permissions and if allowed, add the option to go multilingual
     // and logging
     // I'm not sure why we use the getStaticProperty for an error, rather than checking for DB_Error
-    CRM_Core_TemporaryErrorScope::ignoreException();
     $dao = new CRM_Core_DAO();
     if ($view) {
       $result = $dao->query('CREATE OR REPLACE VIEW civicrm_domain_view AS SELECT * FROM civicrm_domain');
