@@ -363,13 +363,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'contributionStatus' => $values['contribution_status'] ?? NULL,
       ];
 
-      if ($contributionTypeId = CRM_Utils_Array::value('financial_type_id', $values)) {
-        $tplParams['financialTypeId'] = $contributionTypeId;
+      if (!empty($values['financial_type_id'])) {
+        $tplParams['financialTypeId'] = $values['financial_type_id'];
         $tplParams['financialTypeName'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-          $contributionTypeId);
+          $values['financial_type_id']);
         // Legacy support
         $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
-        $tplParams['contributionTypeId'] = $contributionTypeId;
+        $tplParams['contributionTypeId'] = $values['financial_type_id'];
       }
 
       if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
