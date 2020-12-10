@@ -706,27 +706,21 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @param int $id
    * @param array $params
    */
-  public function updateImportRecord($id, &$params) {
+  public function updateImportRecord(int $id, array $params): void {
     $statusFieldName = $this->_statusFieldName;
     $primaryKeyName = $this->_primaryKeyName;
 
     if ($statusFieldName && $primaryKeyName) {
-      $dao = new CRM_Core_DAO();
-      $db = $dao->getDatabaseConnection();
-
       $query = "UPDATE $this->_tableName
                       SET    $statusFieldName = ?,
                              ${statusFieldName}Msg = ?
                       WHERE  $primaryKeyName = ?";
-      $args = [
-        $params[$statusFieldName],
-        CRM_Utils_Array::value("${statusFieldName}Msg", $params),
-        $id,
-      ];
 
-      //print "Running query: $query<br/>With arguments: ".$params[$statusFieldName].", ".$params["${statusFieldName}Msg"].", $id<br/>";
-
-      $db->query($query, $args);
+      CRM_Core_DAO::executeQuery($query, [
+        [$params[$statusFieldName], 'String'],
+        [$params[$statusFieldName . 'Msg'] ?? '', 'String'],
+        [$id, 'Integer'],
+      ]);
     }
   }
 
