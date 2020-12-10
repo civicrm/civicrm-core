@@ -335,12 +335,14 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['skipLineItem'] = TRUE;
 
     // Record contribution for this membership and create a MembershipPayment
+    // @todo deprecate this.
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, ['membership_id' => $membership->id]);
       $params['contribution'] = self::recordMembershipContribution($memInfo);
     }
 
     // Add/update MembershipPayment record for this membership if it is a related contribution
+    // @todo remove this - called from one remaining place in CRM_Member_Form_Membership
     if (!empty($params['relate_contribution_id'])) {
       $membershipPaymentParams = [
         'membership_id' => $membership->id,
@@ -2405,7 +2407,6 @@ WHERE {$whereClause}";
    * @throws \CiviCRM_API3_Exception
    */
   public static function recordMembershipContribution(&$params) {
-    $membershipId = $params['membership_id'];
     $contributionParams = [];
     $config = CRM_Core_Config::singleton();
     $contributionParams['currency'] = $config->defaultCurrency;
@@ -2487,7 +2488,7 @@ WHERE {$whereClause}";
     ]);
     if (empty($membershipPayment['count'])) {
       civicrm_api3('MembershipPayment', 'create', [
-        'membership_id' => $membershipId,
+        'membership_id' => $params['membership_id'],
         'contribution_id' => $contribution->id,
       ]);
     }
