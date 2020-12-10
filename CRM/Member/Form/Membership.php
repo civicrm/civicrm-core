@@ -986,20 +986,8 @@ DESC limit 1");
         $form->_receiptContactId = $formValues['contact_id'];
       }
     }
-    // @todo determine isEmailPdf in calling function.
-    $template = CRM_Core_Smarty::singleton();
-    $taxAmt = $template->get_template_vars('dataArray');
-    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $prefixValue['invoicing'] ?? NULL;
-    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-      $isEmailPdf = TRUE;
-    }
-    else {
-      $isEmailPdf = FALSE;
-    }
 
-    list($mailSend, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_membership',
         'valueName' => 'membership_offline_receipt',
@@ -1008,7 +996,7 @@ DESC limit 1");
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => $isEmailPdf,
+        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('is_email_pdf'),
         'contributionId' => $formValues['contribution_id'],
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
       ]
