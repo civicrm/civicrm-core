@@ -797,11 +797,11 @@ class CRM_Export_BAO_ExportProcessor {
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
-    if ($this->getRequestedFields() && $this->getComponentTable() &&  $this->getComponentTable() !== 'civicrm_contact') {
-      $from .= " INNER JOIN " . $this->getComponentTable() . " ctTable ON ctTable.contact_id = contact_a.id ";
-    }
-    elseif ($this->getComponentClause()) {
+    if ($this->getComponentClause()) {
       $whereClauses[] = $this->getComponentClause();
+    }
+    elseif ($this->getRequestedFields() && $this->getComponentTable() &&  $this->getComponentTable() !== 'civicrm_contact') {
+      $from .= " INNER JOIN " . $this->getComponentTable() . " ctTable ON ctTable.contact_id = contact_a.id ";
     }
 
     // CRM-13982 - check if is deleted
