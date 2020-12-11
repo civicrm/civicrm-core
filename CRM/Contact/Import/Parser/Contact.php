@@ -542,16 +542,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $createNewContact = FALSE;
       // @todo - it feels like all the rows from here to the end of the IF
       // could be removed in favour of a simple check for whether the contact_type & id match
-      // the call to the deprecated function seems to add no value other that to do an additional
-      // check for the contact_id & type.
-      $error = _civicrm_api3_deprecated_duplicate_formatted_contact($formatted);
-      if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
-        if (is_array($error['error_message']['params'][0])) {
-          $matchedIDs = $error['error_message']['params'][0];
-        }
-        else {
-          $matchedIDs = explode(',', $error['error_message']['params'][0]);
-        }
+      $matchedIDs = $this->getIdsOfMatchingContacts($formatted);
+      if (!empty($matchedIDs)) {
         if (count($matchedIDs) >= 1) {
           $updateflag = TRUE;
           foreach ($matchedIDs as $contactId) {
@@ -640,10 +632,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
 
       if (isset($newContact) && is_a($newContact, 'CRM_Contact_BAO_Contact')) {
-        $relationship = TRUE;
-      }
-      elseif (is_a($error, 'CRM_Core_Error')) {
-        $newContact = $error;
         $relationship = TRUE;
       }
     }
@@ -925,7 +913,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                 'contact' => $primaryContactId,
               ];
 
-              list($valid, $invalid, $duplicate, $saved, $relationshipIds) = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
+              [$valid, $invalid, $duplicate, $saved, $relationshipIds] = CRM_Contact_BAO_Relationship::legacyCreateMultiple($relationParams, $relationIds);
 
               if ($valid || $duplicate) {
                 $relationIds['contactTarget'] = $relContactId;
@@ -1195,7 +1183,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
         }
         if (!empty($relation)) {
-          list($id, $first, $second) = CRM_Utils_System::explode('_', $relation, 3);
+          [$id, $first, $second] = CRM_Utils_System::explode('_', $relation, 3);
           $direction = "contact_sub_type_$second";
           $relationshipType = new CRM_Contact_BAO_RelationshipType();
           $relationshipType->id = $id;
@@ -1609,7 +1597,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       $formatted['updateBlankLocInfo'] = FALSE;
     }
 
-    list($data, $contactDetails) = CRM_Contact_BAO_Contact::formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
+    [$data, $contactDetails] = CRM_Contact_BAO_Contact::formatProfileContactParams($formatted, $contactFields, $contactId, NULL, $formatted['contact_type']);
 
     // manage is_opt_out
     if (array_key_exists('is_opt_out', $contactFields) && array_key_exists('is_opt_out', $formatted)) {
