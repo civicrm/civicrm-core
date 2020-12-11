@@ -182,10 +182,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
     switch ($name) {
       case 'member_join_date_low':
       case 'member_join_date_high':
-        Civi::log()->warning(
-          'member_join_date field is deprecated please use membership_join_date field instead',
-          ['civi.tag' => 'deprecated']
-        );
+        CRM_Core_Error::deprecatedWarning('member_join_date field is deprecated please use membership_join_date field instead');
         $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
           'civicrm_membership', $fldName, 'join_date',
@@ -195,10 +192,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'member_start_date_low':
       case 'member_start_date_high':
-        Civi::log()->warning(
-          'member_start_date field is deprecated please use membership_start_date field instead',
-          ['civi.tag' => 'deprecated']
-        );
+        CRM_Core_Error::deprecatedWarning('member_start_date field is deprecated please use membership_start_date field instead');
         $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
           'civicrm_membership', $fldName, 'start_date',
@@ -208,10 +202,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'member_end_date_low':
       case 'member_end_date_high':
-        Civi::log()->warning(
-          'member_end_date field is deprecated please use membership_end_date field instead',
-          ['civi.tag' => 'deprecated']
-        );
+        CRM_Core_Error::deprecatedWarning('member_end_date field is deprecated please use membership_end_date field instead');
         $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
           'civicrm_membership', $fldName, 'end_date',

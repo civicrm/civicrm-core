@@ -1446,7 +1446,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $id = $params['id'] ?? $ids['mailing_id'] ?? NULL;
 
     if (empty($params['id']) && !empty($ids)) {
-      \Civi::log('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
+      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::add. Use the api or just pass $params');
     }
 
     if ($id) {
@@ -1525,7 +1525,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     if (empty($params['id']) && (array_filter($ids) !== [])) {
       $params['id'] = $ids['mailing_id'] ?? $ids['id'];
-      \Civi::log('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params', ['civi.tag' => 'deprecated']);
+      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params');
     }
 
     // CRM-#1843
@@ -2493,7 +2493,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
       throw new CRM_Core_Exception(ts('No id passed to mailing delJob function'));
     }
 
-    \Civi::log('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead', ['civi.tag' => 'deprecated']);
+    CRM_Core_Error::deprecatedWarning('This function is deprecated, use CRM_Mailing_BAO_MailingJob::del instead');
 
     CRM_Mailing_BAO_MailingJob::del($id);
   }

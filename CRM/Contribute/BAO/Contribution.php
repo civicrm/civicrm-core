@@ -4761,8 +4761,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     elseif (empty($lineItemDetails['line_total'])) {
       // follow legacy code path
-      Civi::log()
-        ->warning('Deprecated bit of code, please log a ticket explaining how you got here!', ['civi.tag' => 'deprecated']);
+      CRM_Core_Error::deprecatedWarning('Deprecated bit of code, please log a ticket explaining how you got here!');
       return $params['total_amount'];
     }
     else {
