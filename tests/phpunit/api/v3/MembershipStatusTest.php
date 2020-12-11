@@ -16,7 +16,6 @@
 class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   protected $_contactID;
-  protected $_contributionTypeID;
   protected $_membershipTypeID;
   protected $_membershipStatusID;
 
