@@ -249,7 +249,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       if (CRM_Utils_Array::value('error_data', $formatError) == 'soft_credit') {
         return CRM_Contribute_Import_Parser::SOFT_CREDIT_ERROR;
       }
-      elseif (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
+      if (CRM_Utils_Array::value('error_data', $formatError) == 'pledge_payment') {
         return CRM_Contribute_Import_Parser::PLEDGE_PAYMENT_ERROR;
       }
       return CRM_Import_Parser::ERROR;
@@ -335,21 +335,19 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
           return CRM_Import_Parser::VALID;
         }
-        else {
-          $labels = [
-            'id' => 'Contribution ID',
-            'trxn_id' => 'Transaction ID',
-            'invoice_id' => 'Invoice ID',
-          ];
-          foreach ($dupeIds as $k => $v) {
-            if ($v) {
-              $errorMsg[] = "$labels[$k] $v";
-            }
+        $labels = [
+          'id' => 'Contribution ID',
+          'trxn_id' => 'Transaction ID',
+          'invoice_id' => 'Invoice ID',
+        ];
+        foreach ($dupeIds as $k => $v) {
+          if ($v) {
+            $errorMsg[] = "$labels[$k] $v";
           }
-          $errorMsg = implode(' AND ', $errorMsg);
-          array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
-          return CRM_Import_Parser::ERROR;
         }
+        $errorMsg = implode(' AND ', $errorMsg);
+        array_unshift($values, 'Matching Contribution record not found for ' . $errorMsg . '. Row was skipped.');
+        return CRM_Import_Parser::ERROR;
       }
     }
 
@@ -367,108 +365,100 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           array_unshift($values, 'Multiple matching contact records detected for this row. The contribution was not imported');
           return CRM_Import_Parser::ERROR;
         }
-        else {
-          $cid = $matchedIDs[0];
-          $formatted['contact_id'] = $cid;
+        $cid = $matchedIDs[0];
+        $formatted['contact_id'] = $cid;
 
-          $newContribution = civicrm_api('contribution', 'create', $formatted);
-          if (civicrm_error($newContribution)) {
-            if (is_array($newContribution['error_message'])) {
-              array_unshift($values, $newContribution['error_message']['message']);
-              if ($newContribution['error_message']['params'][0]) {
-                return CRM_Import_Parser::DUPLICATE;
-              }
+        $newContribution = civicrm_api('contribution', 'create', $formatted);
+        if (civicrm_error($newContribution)) {
+          if (is_array($newContribution['error_message'])) {
+            array_unshift($values, $newContribution['error_message']['message']);
+            if ($newContribution['error_message']['params'][0]) {
+              return CRM_Import_Parser::DUPLICATE;
             }
-            else {
-              array_unshift($values, $newContribution['error_message']);
-              return CRM_Import_Parser::ERROR;
-            }
-          }
-
-          $this->_newContributions[] = $newContribution['id'];
-          $formatted['contribution_id'] = $newContribution['id'];
-
-          //return soft valid since we need to show how soft credits were added
-          if (!empty($formatted['soft_credit'])) {
-            return CRM_Contribute_Import_Parser::SOFT_CREDIT;
-          }
-
-          // process pledge payment assoc w/ the contribution
-          return self::processPledgePayments($formatted);
-
-          return CRM_Import_Parser::VALID;
-        }
-      }
-      else {
-        // Using new Dedupe rule.
-        $ruleParams = [
-          'contact_type' => $this->_contactType,
-          'used' => 'Unsupervised',
-        ];
-        $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
-        $disp = NULL;
-        foreach ($fieldsArray as $value) {
-          if (array_key_exists(trim($value), $params)) {
-            $paramValue = $params[trim($value)];
-            if (is_array($paramValue)) {
-              $disp .= $params[trim($value)][0][trim($value)] . " ";
-            }
-            else {
-              $disp .= $params[trim($value)] . " ";
-            }
-          }
-        }
-
-        if (!empty($params['external_identifier'])) {
-          if ($disp) {
-            $disp .= "AND {$params['external_identifier']}";
           }
           else {
-            $disp = $params['external_identifier'];
+            array_unshift($values, $newContribution['error_message']);
+            return CRM_Import_Parser::ERROR;
           }
         }
 
-        array_unshift($values, 'No matching Contact found for (' . $disp . ')');
+        $this->_newContributions[] = $newContribution['id'];
+        $formatted['contribution_id'] = $newContribution['id'];
+
+        //return soft valid since we need to show how soft credits were added
+        if (!empty($formatted['soft_credit'])) {
+          return CRM_Contribute_Import_Parser::SOFT_CREDIT;
+        }
+
+        // process pledge payment assoc w/ the contribution
+        return self::processPledgePayments($formatted);
+      }
+
+      // Using new Dedupe rule.
+      $ruleParams = [
+        'contact_type' => $this->_contactType,
+        'used' => 'Unsupervised',
+      ];
+      $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
+      $disp = NULL;
+      foreach ($fieldsArray as $value) {
+        if (array_key_exists(trim($value), $params)) {
+          $paramValue = $params[trim($value)];
+          if (is_array($paramValue)) {
+            $disp .= $params[trim($value)][0][trim($value)] . " ";
+          }
+          else {
+            $disp .= $params[trim($value)] . " ";
+          }
+        }
+      }
+
+      if (!empty($params['external_identifier'])) {
+        if ($disp) {
+          $disp .= "AND {$params['external_identifier']}";
+        }
+        else {
+          $disp = $params['external_identifier'];
+        }
+      }
+
+      array_unshift($values, 'No matching Contact found for (' . $disp . ')');
+      return CRM_Import_Parser::ERROR;
+    }
+
+    if (!empty($paramValues['external_identifier'])) {
+      $checkCid = new CRM_Contact_DAO_Contact();
+      $checkCid->external_identifier = $paramValues['external_identifier'];
+      $checkCid->find(TRUE);
+      if ($checkCid->id != $formatted['contact_id']) {
+        array_unshift($values, 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
         return CRM_Import_Parser::ERROR;
       }
     }
-    else {
-      if (!empty($paramValues['external_identifier'])) {
-        $checkCid = new CRM_Contact_DAO_Contact();
-        $checkCid->external_identifier = $paramValues['external_identifier'];
-        $checkCid->find(TRUE);
-        if ($checkCid->id != $formatted['contact_id']) {
-          array_unshift($values, 'Mismatch of External ID:' . $paramValues['external_identifier'] . ' and Contact Id:' . $formatted['contact_id']);
-          return CRM_Import_Parser::ERROR;
+    $newContribution = civicrm_api('contribution', 'create', $formatted);
+    if (civicrm_error($newContribution)) {
+      if (is_array($newContribution['error_message'])) {
+        array_unshift($values, $newContribution['error_message']['message']);
+        if ($newContribution['error_message']['params'][0]) {
+          return CRM_Import_Parser::DUPLICATE;
         }
       }
-      $newContribution = civicrm_api('contribution', 'create', $formatted);
-      if (civicrm_error($newContribution)) {
-        if (is_array($newContribution['error_message'])) {
-          array_unshift($values, $newContribution['error_message']['message']);
-          if ($newContribution['error_message']['params'][0]) {
-            return CRM_Import_Parser::DUPLICATE;
-          }
-        }
-        else {
-          array_unshift($values, $newContribution['error_message']);
-          return CRM_Import_Parser::ERROR;
-        }
+      else {
+        array_unshift($values, $newContribution['error_message']);
+        return CRM_Import_Parser::ERROR;
       }
-
-      $this->_newContributions[] = $newContribution['id'];
-      $formatted['contribution_id'] = $newContribution['id'];
-
-      //return soft valid since we need to show how soft credits were added
-      if (!empty($formatted['soft_credit'])) {
-        return CRM_Contribute_Import_Parser::SOFT_CREDIT;
-      }
-
-      // process pledge payment assoc w/ the contribution
-      return self::processPledgePayments($formatted);
-
-      return CRM_Import_Parser::VALID;
     }
+
+    $this->_newContributions[] = $newContribution['id'];
+    $formatted['contribution_id'] = $newContribution['id'];
+
+    //return soft valid since we need to show how soft credits were added
+    if (!empty($formatted['soft_credit'])) {
+      return CRM_Contribute_Import_Parser::SOFT_CREDIT;
+    }
+
+    // process pledge payment assoc w/ the contribution
+    return self::processPledgePayments($formatted);
   }
 
   /**
@@ -719,19 +709,20 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
             // get the contact id from duplicate contact rule, if more than one contact is returned
             // we should return error, since current interface allows only one-one mapping
-            $emailParams = ['email' => $email, 'contact_type' => $params['contact_type']];
+            $emailParams = [
+              'email' => $email,
+              'contact_type' => $params['contact_type'],
+            ];
             $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($emailParams);
             if (!$checkDedupe['is_error']) {
               return civicrm_api3_create_error("Invalid email address(doesn't exist) $email. Row was skipped");
             }
-            else {
-              $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-              if (count($matchingContactIds) > 1) {
-                return civicrm_api3_create_error("Invalid email address(duplicate) $email. Row was skipped");
-              }
-              elseif (count($matchingContactIds) == 1) {
-                $params['contribution_contact_id'] = $matchingContactIds[0];
-              }
+            $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
+            if (count($matchingContactIds) > 1) {
+              return civicrm_api3_create_error("Invalid email address(duplicate) $email. Row was skipped");
+            }
+            if (count($matchingContactIds) == 1) {
+              $params['contribution_contact_id'] = $matchingContactIds[0];
             }
           }
           elseif (!empty($params['contribution_id']) || !empty($params['trxn_id']) || !empty($params['invoice_id'])) {
@@ -839,21 +830,22 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
                 // get the contact id from duplicate contact rule, if more than one contact is returned
                 // we should return error, since current interface allows only one-one mapping
-                $emailParams = ['email' => $email, 'contact_type' => $params['contact_type']];
+                $emailParams = [
+                  'email' => $email,
+                  'contact_type' => $params['contact_type'],
+                ];
                 $checkDedupe = _civicrm_api3_deprecated_duplicate_formatted_contact($emailParams);
                 if (!$checkDedupe['is_error']) {
                   return civicrm_api3_create_error("Invalid email address(doesn't exist) $email for Soft Credit. Row was skipped");
                 }
-                else {
-                  $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
-                  if (count($matchingContactIds) > 1) {
-                    return civicrm_api3_create_error("Invalid email address(duplicate) $email for Soft Credit. Row was skipped");
-                  }
-                  elseif (count($matchingContactIds) == 1) {
-                    $contactId = $matchingContactIds[0];
-                    unset($softParam['email']);
-                    $values[$key][$softKey] = $softParam + ['contact_id' => $contactId];
-                  }
+                $matchingContactIds = explode(',', $checkDedupe['error_message']['params'][0]);
+                if (count($matchingContactIds) > 1) {
+                  return civicrm_api3_create_error("Invalid email address(duplicate) $email for Soft Credit. Row was skipped");
+                }
+                if (count($matchingContactIds) == 1) {
+                  $contactId = $matchingContactIds[0];
+                  unset($softParam['email']);
+                  $values[$key][$softKey] = $softParam + ['contact_id' => $contactId];
                 }
               }
             }
@@ -928,9 +920,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
                 if (count($matchedIDs) > 1) {
                   return civicrm_api3_create_error($error['error_message']['message']);
                 }
-                else {
-                  $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
-                }
+                $contributionContactID = $params['contribution_contact_id'] = $values['contribution_contact_id'] = $matchedIDs[0];
               }
               else {
                 return civicrm_api3_create_error('No match found for specified contact in contribution data. Row was skipped.');
@@ -952,7 +942,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             if (empty($pledgeDetails)) {
               return civicrm_api3_create_error('No open pledges found for this contact. Contribution row was skipped.');
             }
-            elseif (count($pledgeDetails) > 1) {
+            if (count($pledgeDetails) > 1) {
               return civicrm_api3_create_error('This contact has more than one open pledge. Unable to determine which pledge to apply the contribution to. Contribution row was skipped.');
             }
 
