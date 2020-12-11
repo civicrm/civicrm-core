@@ -772,27 +772,24 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               array_unshift($values, $errorMessage);
               return CRM_Import_Parser::NO_MATCH;
             }
-            else {
-              //validation of related contact subtype for update mode
-              //CRM-5125
-              $relatedCsType = NULL;
-              if (!empty($formatting['contact_sub_type'])) {
-                $relatedCsType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_sub_type');
-              }
 
-              if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
-                  $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))
-              ) {
-                $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.") . ' ' . ts("ID: %1", [1 => $params[$key]['id']]);
-                array_unshift($values, $errorMessage);
-                return CRM_Import_Parser::NO_MATCH;
-              }
-              else {
-                // get related contact id to format data in update/fill mode,
-                //if external identifier is present, CRM-4423
-                $formatting['id'] = $params[$key]['id'];
-              }
+            //validation of related contact subtype for update mode
+            //CRM-5125
+            $relatedCsType = NULL;
+            if (!empty($formatting['contact_sub_type'])) {
+              $relatedCsType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_sub_type');
             }
+
+            if (!empty($relatedCsType) && (!CRM_Contact_BAO_ContactType::isAllowEdit($params[$key]['id'], $relatedCsType) &&
+                $relatedCsType != CRM_Utils_Array::value('contact_sub_type', $formatting))
+            ) {
+              $errorMessage = ts("Mismatched or Invalid contact subtype found for this related contact.") . ' ' . ts("ID: %1", [1 => $params[$key]['id']]);
+              array_unshift($values, $errorMessage);
+              return CRM_Import_Parser::NO_MATCH;
+            }
+            // get related contact id to format data in update/fill mode,
+            //if external identifier is present, CRM-4423
+            $formatting['id'] = $params[$key]['id'];
           }
 
           //format common data, CRM-4062
@@ -962,17 +959,16 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if (($code = CRM_Utils_Array::value('code', $newContact['error_message'])) && ($code == CRM_Core_Error::DUPLICATE_CONTACT)) {
         return $this->handleDuplicateError($newContact, $statusFieldName, $values, $onDuplicate, $formatted, $contactFields);
       }
-      else {
-        // Not a dupe, so we had an error
-        $errorMessage = $newContact['error_message'];
-        array_unshift($values, $errorMessage);
-        $importRecordParams = [
-          $statusFieldName => 'ERROR',
-          "${statusFieldName}Msg" => $errorMessage,
-        ];
-        $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
-        return CRM_Import_Parser::ERROR;
-      }
+      // Not a dupe, so we had an error
+      $errorMessage = $newContact['error_message'];
+      array_unshift($values, $errorMessage);
+      $importRecordParams = [
+        $statusFieldName => 'ERROR',
+        "${statusFieldName}Msg" => $errorMessage,
+      ];
+      $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
+      return CRM_Import_Parser::ERROR;
+
     }
     // sleep(3);
     return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
@@ -1345,13 +1341,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   if (self::in_value($stateValue['country'], $limitCodes) || self::in_value($stateValue['country'], CRM_Core_PseudoConstant::country())) {
                     continue;
                   }
+                  if (self::in_value($stateValue['country'], $countryIsoCodes) || self::in_value($stateValue['country'], $countryNames)) {
+                    self::addToErrorMsg(ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages Currency Locations." '), $errorMessage);
+                  }
                   else {
-                    if (self::in_value($stateValue['country'], $countryIsoCodes) || self::in_value($stateValue['country'], $countryNames)) {
-                      self::addToErrorMsg(ts('Country input value is in table but not "available": "This Country is valid but is NOT in the list of Available Countries currently configured for your site. This can be viewed and modifed from Administer > Localization > Languages Currency Locations." '), $errorMessage);
-                    }
-                    else {
-                      self::addToErrorMsg(ts('Country input value not in country table: "The Country value appears to be invalid. It does not match any value in CiviCRM table of countries."'), $errorMessage);
-                    }
+                    self::addToErrorMsg(ts('Country input value not in country table: "The Country value appears to be invalid. It does not match any value in CiviCRM table of countries."'), $errorMessage);
                   }
                 }
               }
@@ -1378,9 +1372,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   if (CRM_Utils_Rule::numeric($codeValue['geo_code_1'])) {
                     continue;
                   }
-                  else {
-                    self::addToErrorMsg(ts('Geo code 1'), $errorMessage);
-                  }
+                  self::addToErrorMsg(ts('Geo code 1'), $errorMessage);
                 }
               }
             }
@@ -1393,9 +1385,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
                   if (CRM_Utils_Rule::numeric($codeValue['geo_code_2'])) {
                     continue;
                   }
-                  else {
-                    self::addToErrorMsg(ts('Geo code 2'), $errorMessage);
-                  }
+                  self::addToErrorMsg(ts('Geo code 2'), $errorMessage);
                 }
               }
             }
@@ -1694,7 +1684,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if (array_key_exists($key, $locationFields)) {
         continue;
       }
-      elseif (in_array($key, [
+      if (in_array($key, [
         'email_greeting',
         'postal_greeting',
         'addressee',
@@ -1926,10 +1916,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if (in_array($extIDMatch, array_keys($possibleMatches['values']))) {
         return [$extIDMatch];
       }
-      else {
-        throw new CRM_Core_Exception(ts(
-          'Matching this contact based on the de-dupe rule would cause an external ID conflict'));
-      }
+      throw new CRM_Core_Exception(ts(
+        'Matching this contact based on the de-dupe rule would cause an external ID conflict'));
     }
     return [$extIDMatch];
   }
