@@ -155,16 +155,17 @@ function financialacls_civicrm_themes(&$themes) {
  * @throws \CRM_Core_Exception
  */
 function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
   if ($objectName === 'LineItem' && !empty($params['check_permissions'])) {
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $operationMap[$op]);
-      if (empty($params['financial_type_id'])) {
-        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
-      }
-      if (!in_array($params['financial_type_id'], array_keys($types))) {
-        throw new API_Exception('You do not have permission to ' . $op . ' this line item');
-      }
+    $operationMap = ['delete' => CRM_Core_Action::DELETE, 'edit' => CRM_Core_Action::UPDATE, 'create' => CRM_Core_Action::ADD];
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $operationMap[$op]);
+    if (empty($params['financial_type_id'])) {
+      $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
+    }
+    if (!in_array($params['financial_type_id'], array_keys($types))) {
+      throw new API_Exception('You do not have permission to ' . $op . ' this line item');
     }
   }
 }
@@ -175,23 +176,24 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_selectWhereClause
  */
 function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
   if ($entity === 'LineItem') {
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      $types = [];
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-      if ($types) {
-        $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
-      }
-      else {
-        $clauses['financial_type_id'] = '= 0';
-      }
+    $types = [];
+    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+    if ($types) {
+      $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
+    }
+    else {
+      $clauses['financial_type_id'] = '= 0';
     }
   }
 
 }
 
 /**
- * Remove un.
+ * Remove unpermitted options.
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildAmount
  *
@@ -200,16 +202,18 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
  * @param array $feeBlock
  */
 function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
-  if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-    foreach ($feeBlock as $key => $value) {
-      foreach ($value['options'] as $k => $options) {
-        if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-          unset($feeBlock[$key]['options'][$k]);
-        }
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+
+  foreach ($feeBlock as $key => $value) {
+    foreach ($value['options'] as $k => $options) {
+      if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+        unset($feeBlock[$key]['options'][$k]);
       }
-      if (empty($feeBlock[$key]['options'])) {
-        unset($feeBlock[$key]);
-      }
+    }
+    if (empty($feeBlock[$key]['options'])) {
+      unset($feeBlock[$key]);
     }
   }
 }
@@ -223,6 +227,9 @@ function financialacls_civicrm_buildAmount($component, $form, &$feeBlock) {
  * @param array $membershipTypeValues
  */
 function financialacls_civicrm_membershipTypeValues($form, &$membershipTypeValues) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
   $financialTypes = NULL;
   $financialTypes = CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
   foreach ($membershipTypeValues as $id => $type) {
@@ -247,6 +254,9 @@ function financialacls_civicrm_membershipTypeValues($form, &$membershipTypeValue
  * @param array $params
  */
 function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
   if ($entity === 'Contribution' && $field === 'financial_type_id' && $params['context'] === 'search') {
     $action = CRM_Core_Action::VIEW;
     // At this stage we are only considering the view action. Code from
@@ -268,6 +278,18 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
     }
     $options = \Civi::$statics['CRM_Financial_BAO_FinancialType'][$cacheKey];
   }
+}
+
+/**
+ * Is financial acl limiting enabled.
+ *
+ * Once this extension is detangled enough to be optional this will go
+ * and the status of the extension rather than the setting will dictate.
+ *
+ * @return bool
+ */
+function financialacls_is_acl_limiting_enabled() {
+  return (bool) Civi::settings()->get('acl_financial_type');
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
