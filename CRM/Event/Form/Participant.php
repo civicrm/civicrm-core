@@ -2299,6 +2299,10 @@ INNER JOIN civicrm_price_field_value value ON ( value.id = lineItem.price_field_
 
       CRM_Utils_System::appendBreadCrumb($breadCrumbs);
     }
+    else {
+      $this->assign('id', $this->_id);
+      $this->assign('contact_id', $this->_contactId);
+    }
   }
 
 }
