@@ -563,11 +563,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           //passing contribution id is already registered.
           $contribution = $this->processContribution($this, $value, $result, $contactID, $pending, $this->_paymentProcessor);
           $value['contributionID'] = $contribution->id;
-          $value['contributionTypeID'] = $contribution->financial_type_id;
           $value['receive_date'] = $contribution->receive_date;
           $value['trxn_id'] = $contribution->trxn_id;
           $value['contributionID'] = $contribution->id;
-          $value['contributionTypeID'] = $contribution->financial_type_id;
         }
         $value['contactID'] = $contactID;
         $value['eventID'] = $this->_eventId;

@@ -1114,7 +1114,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     );
 
     $paymentParams['contributionID'] = $contribution->id;
-    $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
     $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
     $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
 
