@@ -649,8 +649,8 @@ DESC limit 1");
   public static function formRule($params, $files, $self) {
     $errors = [];
 
-    $priceSetId = self::getPriceSetID($params);
-    $priceSetDetails = self::getPriceSetDetails($params);
+    $priceSetId = $self->getPriceSetID($params);
+    $priceSetDetails = $self->getPriceSetDetails($params);
 
     $selectedMemberships = self::getSelectedMemberships($priceSetDetails[$priceSetId], $params);
 

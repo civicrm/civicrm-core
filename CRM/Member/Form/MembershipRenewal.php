@@ -782,7 +782,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected function getOrderParams(): array {
     $order = new CRM_Financial_BAO_Order();
     $order->setPriceSelectionFromUnfilteredInput($this->_params);
-    $order->setPriceSetID(self::getPriceSetID($this->_params));
+    $order->setPriceSetID($this->getPriceSetID($this->_params));
     $order->setOverrideTotalAmount($this->_params['total_amount']);
     $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
     return [
