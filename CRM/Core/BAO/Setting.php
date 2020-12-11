@@ -186,7 +186,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
     foreach ($fieldsToSet as $settingField => &$settingValue) {
       if (empty($fields['values'][$settingField])) {
-        Civi::log()->warning('Deprecated Path: There is a setting (' . $settingField . ') not correctly defined. You may see unpredictability due to this. CRM_Core_Setting::setItems', ['civi.tag' => 'deprecated']);
+        CRM_Core_Error::deprecatedWarning('Deprecated Path: There is a setting (' . $settingField . ') not correctly defined. You may see unpredictability due to this. CRM_Core_Setting::setItems');
         $fields['values'][$settingField] = [];
       }
       self::validateSetting($settingValue, $fields['values'][$settingField]);

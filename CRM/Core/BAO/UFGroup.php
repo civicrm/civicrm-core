@@ -1437,7 +1437,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   public static function add(&$params, $ids = []) {
     if (empty($params['id']) && !empty($ids['ufgroup'])) {
       $params['id'] = $ids['ufgroup'];
-      Civi::log()->warning('ids parameter is deprecated', ['civi.tag' => 'deprecated']);
+      CRM_Core_Error::deprecatedWarning('ids parameter is deprecated');
     }
     $fields = [
       'is_active',

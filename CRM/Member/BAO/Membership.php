@@ -255,7 +255,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', strtotime(trim($params[$dateField])))) !== 0) {
           $params[$dateField] = date('Ymd', strtotime(trim($params[$dateField])));
           // @todo enable this once core is using the api.
-          // Civi::log()->warning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api', ['civi.tag' => 'deprecated']);
+          // CRM_Core_Error::deprecatedWarning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api');
         }
         if (!empty($params['id']) && empty($params[$dateField])) {
           $fieldsToLoad[] = $dateField;

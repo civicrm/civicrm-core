@@ -155,7 +155,7 @@ abstract class CRM_Utils_Hook {
     if (!is_array($names)) {
       // We were called with the old contract wherein $names is actually an int.
       // Symfony dispatcher requires some kind of name.
-      Civi::log()->warning("hook_$fnSuffix should be updated to pass an array of parameter names to CRM_Utils_Hook::invoke().", ['civi.tag' => 'deprecated']);
+      CRM_Core_Error::deprecatedWarning("hook_$fnSuffix should be updated to pass an array of parameter names to CRM_Utils_Hook::invoke().");
       $compatNames = ['arg1', 'arg2', 'arg3', 'arg4', 'arg5', 'arg6'];
       $names = array_slice($compatNames, 0, (int) $names);
     }
