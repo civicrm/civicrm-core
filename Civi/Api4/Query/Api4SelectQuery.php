@@ -369,7 +369,7 @@ class Api4SelectQuery {
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
       $field = $this->getField($expr, TRUE);
-      FormattingUtil::formatInputValue($value, $expr, $field);
+      FormattingUtil::formatInputValue($value, $expr, $field, $operator);
       $fieldAlias = $field['sql_name'];
     }
     // For HAVING, expr must be an item in the SELECT clause
@@ -380,7 +380,7 @@ class Api4SelectQuery {
         // Attempt to format if this is a real field
         if (isset($this->apiFieldSpec[$expr])) {
           $field = $this->getField($expr);
-          FormattingUtil::formatInputValue($value, $expr, $field);
+          FormattingUtil::formatInputValue($value, $expr, $field, $operator);
         }
       }
       // Expr references a non-field expression like a function; convert to alias
@@ -394,7 +394,7 @@ class Api4SelectQuery {
           list($selectField) = explode(':', $selectAlias);
           if ($selectAlias === $selectExpr && $fieldName === $selectField && isset($this->apiFieldSpec[$fieldName])) {
             $field = $this->getField($fieldName);
-            FormattingUtil::formatInputValue($value, $expr, $field);
+            FormattingUtil::formatInputValue($value, $expr, $field, $operator);
             $fieldAlias = $selectAlias;
             break;
           }
@@ -412,13 +412,13 @@ class Api4SelectQuery {
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
         if ($fieldName && $valExpr->getType() === 'SqlString') {
-          FormattingUtil::formatInputValue($valExpr->expr, $fieldName, $this->apiFieldSpec[$fieldName]);
+          FormattingUtil::formatInputValue($valExpr->expr, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
         }
         return sprintf('%s %s %s', $fieldAlias, $operator, $valExpr->render($this->apiFieldSpec));
       }
       elseif ($fieldName) {
         $field = $this->getField($fieldName);
-        FormattingUtil::formatInputValue($value, $fieldName, $field);
+        FormattingUtil::formatInputValue($value, $fieldName, $field, $operator);
       }
     }
 
