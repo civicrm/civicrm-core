@@ -58,6 +58,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->assign('isShare', CRM_Utils_Array::value('is_share', $this->_values));
     $this->assign('isConfirmEnabled', CRM_Utils_Array::value('is_confirm_enabled', $this->_values));
 
+    // Required for currency formatting in the JS layer
+    // this is a temporary fix intended to resolve a regression quickly
+    // And assigning moneyFormat for js layer formatting
+    // will only work until that is done.
+    // https://github.com/civicrm/civicrm-core/pull/19151
+    $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56));
+
     $this->assign('reset', CRM_Utils_Request::retrieve('reset', 'Boolean'));
     $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
       CRM_Core_DAO::$_nullObject));

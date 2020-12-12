@@ -409,6 +409,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       return TRUE;
     }
 
+    $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
+    if ($upgradeInProcess) {
+      return TRUE;
+    }
+
     if (!$path) {
       // note: do not re-initialize config here, since this function is part of
       // config initialization itself
