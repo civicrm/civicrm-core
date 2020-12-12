@@ -27,17 +27,23 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
   /**
    *  Test civicrm_contact_check_params with no contact type.
    */
-  public function testCheckParamsWithNoContactType() {
+  public function testCheckParamsWithNoContactType(): void {
     $params = ['foo' => 'bar'];
-    $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
-    $this->assertEquals(1, $contact['is_error']);
+    try {
+      _civicrm_api3_deprecated_contact_check_params($params, FALSE);
+    }
+    catch (CRM_Core_Exception $e) {
+      return;
+    }
+    $this->fail('An exception should have been thrown');
   }
 
   /**
-   *  Test civicrm_contact_check_params with a duplicate.
-   *  and request the error in array format
+   * Test civicrm_contact_check_params with a duplicate.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCheckParamsWithDuplicateContact2() {
+  public function testCheckParamsWithDuplicateContact2(): void {
     $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact', 'email' => 'TestContact@example.com']);
 
     $params = [
@@ -46,21 +52,31 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
       'email' => 'TestContact@example.com',
       'contact_type' => 'Individual',
     ];
-    $contact = _civicrm_api3_deprecated_contact_check_params($params, TRUE);
-    $this->assertEquals(1, $contact['is_error']);
-    $this->assertRegexp("/matching contacts.*1/s",
-      $contact['error_message']['message']
-    );
+    try {
+      $error = _civicrm_api3_deprecated_contact_check_params($params, TRUE);
+      $this->assertEquals(1, $error['is_error']);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertRegexp("/matching contacts.*1/s",
+        $e->getMessage()
+      );
+      return;
+    }
+    // $this->fail('Exception was not optional');
   }
 
   /**
-   *  Test civicrm_contact_check_params with check for required
-   *  params and no params
+   *  Test civicrm_contact_check_params with check for required params.
    */
-  public function testCheckParamsWithNoParams() {
+  public function testCheckParamsWithNoParams(): void {
     $params = [];
-    $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
-    $this->assertEquals(1, $contact['is_error']);
+    try {
+      _civicrm_api3_deprecated_contact_check_params($params, FALSE);
+    }
+    catch (CRM_Core_Exception $e) {
+      return;
+    }
+    $this->fail('Exception required');
   }
 
 }

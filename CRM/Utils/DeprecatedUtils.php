@@ -567,9 +567,9 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
  * @param array $params
  *   Structured parameter list (as in crm_format_params).
  *
- * @return bool|CRM_Core_Error
+ * @throw CRM_Core_Error
  */
-function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
+function _civicrm_api3_deprecated_validate_formatted_contact(&$params): void {
   // Look for offending email addresses
 
   if (array_key_exists('email', $params)) {
@@ -580,12 +580,12 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
       if ($email = CRM_Utils_Array::value('email', $values)) {
         // validate each email
         if (!CRM_Utils_Rule::email($email)) {
-          return civicrm_api3_create_error('No valid email address');
+          throw new CRM_Core_Exception('No valid email address');
         }
 
         // check for loc type id.
         if (empty($values['location_type_id'])) {
-          return civicrm_api3_create_error('Location Type Id missing.');
+          throw new CRM_Core_Exception('Location Type Id missing.');
         }
       }
     }
@@ -600,8 +600,8 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
             CRM_Utils_Array::value('value', $value)
           );
           if (!$valid && $value['is_required']) {
-            return civicrm_api3_create_error('Invalid value for custom field \'' .
-              CRM_Utils_Array::value('name', $custom) . '\''
+            throw new CRM_Core_Exception('Invalid value for custom field \'' .
+              $custom['name'] . '\''
             );
           }
           if (CRM_Utils_Array::value('type', $custom) == 'Date') {
@@ -611,8 +611,6 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
       }
     }
   }
-
-  return civicrm_api3_create_success(TRUE);
 }
 
 /**
@@ -698,9 +696,9 @@ function _civicrm_api3_deprecated_participant_check_params($params, $checkDuplic
 /**
  * @param array $params
  * @param bool $dupeCheck
- * @param int $dedupeRuleGroupID
+ * @param null|int $dedupeRuleGroupID
  *
- * @return array|null
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_deprecated_contact_check_params(
   &$params,
@@ -731,16 +729,16 @@ function _civicrm_api3_deprecated_contact_check_params(
 
     // contact_type has a limited number of valid values
     if (empty($params['contact_type'])) {
-      return civicrm_api3_create_error("No Contact Type");
+      throw new CRM_Core_Exception("No Contact Type");
     }
     $fields = $required[$params['contact_type']] ?? NULL;
     if ($fields == NULL) {
-      return civicrm_api3_create_error("Invalid Contact Type: {$params['contact_type']}");
+      throw new CRM_Core_Exception("Invalid Contact Type: {$params['contact_type']}");
     }
 
     if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
       if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
-        return civicrm_api3_create_error("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
+        throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
       }
     }
 
@@ -769,7 +767,7 @@ function _civicrm_api3_deprecated_contact_check_params(
       }
 
       if (!$valid) {
-        return civicrm_api3_create_error("Required fields not found for {$params['contact_type']} : $error");
+        throw new CRM_Core_Exception("Required fields not found for {$params['contact_type']} : $error");
       }
     }
   }
@@ -796,7 +794,7 @@ function _civicrm_api3_deprecated_contact_check_params(
     // check for mismatch employer name and id
     if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)
     ) {
-      return civicrm_api3_create_error('Employer name and Employer id Mismatch');
+      throw new CRM_Core_Exception('Employer name and Employer id Mismatch');
     }
 
     // show error if multiple organisation with same name exist
@@ -805,8 +803,6 @@ function _civicrm_api3_deprecated_contact_check_params(
       return civicrm_api3_create_error('Found more than one Organisation with same Name.');
     }
   }
-
-  return NULL;
 }
 
 /**
