@@ -1846,16 +1846,11 @@ class CRM_Utils_System {
    * Is in upgrade mode.
    *
    * @return bool
+   * @deprecated
+   * @see CRM_Core_Config::isUpgradeMode()
    */
   public static function isInUpgradeMode() {
-    $args = explode('/', CRM_Utils_Array::value('q', $_GET));
-    $upgradeInProcess = CRM_Core_Session::singleton()->get('isUpgradePending');
-    if ((isset($args[1]) && $args[1] == 'upgrade') || $upgradeInProcess) {
-      return TRUE;
-    }
-    else {
-      return FALSE;
-    }
+    return CRM_Core_Config::isUpgradeMode();
   }
 
   /**
