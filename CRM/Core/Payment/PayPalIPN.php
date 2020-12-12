@@ -95,9 +95,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $now = date('YmdHis');
 
-    $subscriptionPaymentStatus = NULL;
     // set transaction type
-    $txnType = $this->retrieve('txn_type', 'String');
+    $txnType = $this->getTrxnType();
     $contributionStatuses = array_flip(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate'));
     switch ($txnType) {
       case 'subscr_signup':
@@ -112,7 +111,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
         $recur->processor_id = $this->retrieve('subscr_id', 'String');
         $recur->trxn_id = $recur->processor_id;
-        $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_START;
         break;
 
       case 'subscr_eot':
@@ -120,7 +118,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           $recur->contribution_status_id = $contributionStatuses['Completed'];
         }
         $recur->end_date = $now;
-        $subscriptionPaymentStatus = CRM_Core_Payment::RECURRING_PAYMENT_END;
         break;
 
       case 'subscr_cancel':
@@ -156,7 +153,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $recur->save();
 
-    if (in_array($this->retrieve('txn_type', 'String'), ['subscr_signup', 'subscr_eot'])) {
+    if ($this->getFirstOrLastInSeriesStatus()) {
       $autoRenewMembership = FALSE;
       if ($recur->id &&
         isset($ids['membership']) && $ids['membership']
@@ -165,7 +162,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       }
 
       //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify($subscriptionPaymentStatus,
+      CRM_Contribute_BAO_ContributionPage::recurringNotify($this->getFirstOrLastInSeriesStatus(),
         $ids['contact'],
         $ids['contributionPage'],
         $recur,
@@ -500,6 +497,35 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       throw new CRM_Core_Exception('PayPalIPN: Could not get Payment Processor ID');
     }
     return $paymentProcessorID;
+  }
+
+  /**
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  protected function getTrxnType() {
+    $txnType = $this->retrieve('txn_type', 'String');
+    return $txnType;
+  }
+
+  /**
+   * Get status code for first or last recurring in the series.
+   *
+   * If this is the first or last then return the status code, else
+   * null.
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFirstOrLastInSeriesStatus(): ?string {
+    $subscriptionPaymentStatus = NULL;
+    if ($this->getTrxnType() === 'subscr_signup') {
+      return CRM_Core_Payment::RECURRING_PAYMENT_START;
+    }
+    if ($this->getTrxnType() === 'subscr_eot') {
+      return CRM_Core_Payment::RECURRING_PAYMENT_END;
+    }
+    return NULL;
   }
 
 }
