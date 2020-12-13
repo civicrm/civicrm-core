@@ -1516,6 +1516,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       }
       unset($entity['xdebug']);
       unset($checkEntity['xdebug']);
+      unset($update['xdebug']);
       $this->assertAPIArrayComparison($entity, $checkEntity, [], "checking if $fieldName was correctly updated\n" . print_r([
         'update-params' => $updateParams,
         'update-result' => $update,
