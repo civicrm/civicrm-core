@@ -2018,10 +2018,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       civicrm_api('contact', 'delete', $vals);
       $cid = CRM_Contact_BAO_Contact::createProfileContact($formatted, $contactFields, $contactId, NULL, NULL, $formatted['contact_type']);
     }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
-    }
-    elseif ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
+    if (in_array((int) $onDuplicate, [CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::DUPLICATE_FILL], TRUE)) {
       $newContact = $this->createContact($formatted, $contactFields, $onDuplicate, $contactId);
     }
     // else skip does nothing and just returns an error code.
