@@ -423,6 +423,34 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check That any associated Mapping Field Entries are also removed.
+   */
+  public function testCustomFieldDeleteWithMappingField() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_group']);
+    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
+    $this->assertNotNull($customField['id']);
+    $mapping = $this->callAPISuccess('Mapping', 'create', [
+      'name' => 'test mapping',
+      'mapping_type_id' => 'Export Contact',
+    ]);
+    $mappingField = $this->callAPISuccess('MappingField', 'create', [
+      'mapping_id' => $mapping['id'],
+      'name' => 'custom_' . $customField['id'],
+      'grouping' => 1,
+      'column_number' => 0,
+    ]);
+    $mappingFieldCheck = $this->callAPISuccess('MappingField', 'get', ['mapping_id' => $mapping['id']]);
+    $this->assertCount(1, $mappingFieldCheck['values']);
+    $params = [
+      'id' => $customField['id'],
+    ];
+    $this->callAPISuccess('custom_field', 'delete', $params);
+    $mappingFieldCheck = $this->callAPISuccess('MappingField', 'get', ['mapping_id' => $mapping['id']]);
+    $this->assertCount(0, $mappingFieldCheck['values']);
+    $this->callAPISuccess('Mapping', 'delete', ['id' => $mapping['id']]);
+  }
+
+  /**
    * Check for Option Value.
    */
   public function testCustomFieldOptionValueDelete() {
