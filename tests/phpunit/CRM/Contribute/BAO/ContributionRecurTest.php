@@ -564,4 +564,32 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test Recurring Contribution Email Receipt Flag
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionEmailReceipt() {
+    $createParams = $this->_params;
+    unset($createParams['trxn_id'], $createParams['invoice_id']);
+
+    // pass null value to is_email_receipt
+    $createParams['is_email_receipt'] = NULL;
+    $recurring1 = CRM_Contribute_BAO_ContributionRecur::add($createParams);
+    $recurring1Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring1->id]);
+    // default is_email_receipt column value is 1
+    $this->assertEquals('1', $recurring1Get['is_email_receipt']);
+
+    // pass empty value to is_email_receipt
+    $createParams['is_email_receipt'] = '';
+    $recurring2 = CRM_Contribute_BAO_ContributionRecur::add($createParams);
+    $this->assertEquals('null', $recurring2->is_email_receipt);
+
+    // pass 0 value to is_email_receipt
+    $createParams['is_email_receipt'] = 0;
+    $recurring3 = CRM_Contribute_BAO_ContributionRecur::add($createParams);
+    $recurring3Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring3->id]);
+    $this->assertEquals('0', $recurring3Get['is_email_receipt']);
+  }
+
 }
