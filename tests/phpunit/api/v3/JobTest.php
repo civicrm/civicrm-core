@@ -462,8 +462,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Note the group combinations & expected results:
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testBatchMergeWithAssets() {
+  public function testBatchMergeWithAssets(): void {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID]);

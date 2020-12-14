@@ -517,18 +517,24 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ])->execute()->first();
 
       $campaignParams = isset($params['campaign_id']) ? ['campaign_id' => ($params['campaign_id'] ?? NULL)] : [];
-      Activity::save(FALSE)->addRecord(array_merge([
+      $activityParams = array_merge([
         'activity_type_id:name' => 'Contribution',
         'source_record_id' => $contribution->id,
-        'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ?: $contribution->contact_id,
-        'target_contact_id' => CRM_Core_Session::getLoggedInContactID() ? [$contribution->contact_id] : [],
         'activity_date_time' => $contribution->receive_date,
         'is_test' => (bool) $contribution->is_test,
         'status_id:name' => $isCompleted ? 'Completed' : 'Scheduled',
         'skipRecentView' => TRUE,
         'subject' => CRM_Activity_BAO_Activity::getActivitySubject($contribution),
         'id' => $existingActivity['id'] ?? NULL,
-      ], $campaignParams))->execute();
+      ], $campaignParams);
+      if (!$activityParams['id']) {
+        // Don't set target contacts on update as these will have been
+        // correctly created and we risk overwriting them with
+        // 'best guess' params.
+        $activityParams['source_contact_id'] = (int) ($params['source_contact_id'] ?? (CRM_Core_Session::getLoggedInContactID() ?: $contribution->contact_id));
+        $activityParams['target_contact_id'] = ($activityParams['source_contact_id'] === (int) $contribution->contact_id) ? [] : [$contribution->contact_id];
+      }
+      Activity::save(FALSE)->addRecord($activityParams)->execute();
     }
 
     // do not add to recent items for import, CRM-4399
