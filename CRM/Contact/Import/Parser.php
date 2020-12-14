@@ -1040,17 +1040,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     }
 
     if (isset($values['addressee'])) {
-      if (!empty($params['addressee_id'])) {
-        $addresseeFilter = [
-          'contact_type' => $params['contact_type'] ?? NULL,
-          'greeting_type' => 'addressee',
-        ];
-        $addressee = CRM_Core_PseudoConstant::addressee($addresseeFilter);
-        $params['addressee'] = $addressee[$params['addressee_id']];
-      }
-      else {
-        $params['addressee'] = $values['addressee'];
-      }
+      $params['addressee'] = $values['addressee'];
       return TRUE;
     }
 
