@@ -467,7 +467,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testStaleMembership() {
+  public function testStaleMembership(): void {
     $statusId = 3;
     $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
@@ -501,7 +501,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'Database checked on membership log record.'
     );
 
-    list($MembershipRenew) = CRM_Member_BAO_Membership::processMembership(
+    [$MembershipRenew] = CRM_Member_BAO_Membership::processMembership(
       $contactId,
       $this->_membershipTypeID,
       FALSE,

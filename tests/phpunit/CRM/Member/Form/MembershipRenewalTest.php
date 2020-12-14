@@ -696,7 +696,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitRenewExpired() {
+  public function testSubmitRenewExpired(): void {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
