@@ -317,14 +317,14 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $params['membership_id'] = $membership->id;
     // @todo further cleanup required to remove use of $ids['contribution'] from here
     if (isset($ids['membership'])) {
-      $ids['contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
+      $contributionID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
         $membership->id,
         'contribution_id',
         'membership_id'
       );
       // @todo this is a temporary step to removing $ids['contribution'] completely
-      if (empty($params['contribution_id']) && !empty($ids['contribution'])) {
-        $params['contribution_id'] = $ids['contribution'];
+      if (empty($params['contribution_id']) && !empty($contributionID)) {
+        $params['contribution_id'] = $contributionID;
       }
     }
 
@@ -352,41 +352,45 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
     }
 
-    if (!empty($params['lineItems'])) {
-      $params['line_item'] = $params['lineItems'];
-    }
+    // If the membership has no associated contribution then we ensure
+    // the line items are 'correct' here. This is a lazy legacy
+    // hack whereby they are deleted and recreated
+    if (empty($contributionID)) {
+      if (!empty($params['lineItems'])) {
+        $params['line_item'] = $params['lineItems'];
+      }
+      // do cleanup line items if membership edit the Membership type.
+      if (!empty($ids['membership'])) {
+        CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
+      }
+      // @todo - we should ONLY do the below if a contribution is created. Let's
+      // get some deprecation notices in here & see where it's hit & work to eliminate.
+      // This could happen if there is no contribution or we are in one of many
+      // weird and wonderful flows. This is scary code. Keep adding tests.
+      if (!empty($params['line_item']) && empty($params['contribution_id'])) {
 
-    // do cleanup line items if membership edit the Membership type.
-    if (empty($ids['contribution']) && !empty($ids['membership'])) {
-      CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
-    }
-    // @todo - we should ONLY do the below if a contribution is created. Let's
-    // get some deprecation notices in here & see where it's hit & work to eliminate.
-    // This could happen if there is no contribution or we are in one of many
-    // weird and wonderful flows. This is scary code. Keep adding tests.
-    if (!empty($params['line_item']) && empty($ids['contribution']) && empty($params['contribution_id'])) {
-
-      foreach ($params['line_item'] as $priceSetId => $lineItems) {
-        foreach ($lineItems as $lineIndex => $lineItem) {
-          $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
-          if (!empty($params['contribution'])) {
-            $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
-          }
-          if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
-            $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
-            $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
-          }
-          elseif (!$lineMembershipType && !empty($params['contribution'])) {
-            $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $params['contribution']->id;
-            $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_contribution';
+        foreach ($params['line_item'] as $priceSetId => $lineItems) {
+          foreach ($lineItems as $lineIndex => $lineItem) {
+            $lineMembershipType = $lineItem['membership_type_id'] ?? NULL;
+            if (!empty($params['contribution'])) {
+              $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
+            }
+            if ($lineMembershipType && $lineMembershipType == ($params['membership_type_id'] ?? NULL)) {
+              $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
+              $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
+            }
+            elseif (!$lineMembershipType && !empty($params['contribution'])) {
+              $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $params['contribution']->id;
+              $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_contribution';
+            }
           }
         }
+        CRM_Price_BAO_LineItem::processPriceSet(
+          $membership->id,
+          $params['line_item'],
+          $params['contribution'] ?? NULL
+        );
       }
-      CRM_Price_BAO_LineItem::processPriceSet(
-        $membership->id,
-        $params['line_item'],
-        $params['contribution'] ?? NULL
-      );
     }
 
     $transaction->commit();
