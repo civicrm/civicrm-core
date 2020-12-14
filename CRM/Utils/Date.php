@@ -867,7 +867,7 @@ class CRM_Utils_Date {
    * @return array
    *   start date, end date
    */
-  public static function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
+  public static function getFromTo($relative, $from = NULL, $to = NULL, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
       list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);

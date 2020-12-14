@@ -180,6 +180,29 @@ class ParticipantTest extends UnitTestCase {
       $otherParticipantResult->offsetExists($firstParticipantId),
       'excluded wrong record');
 
+    // check syntax for date-range
+
+    $getParticipantsById = function($wheres = []) {
+      return Participant::get(FALSE)
+        ->setWhere($wheres)
+        ->execute()
+        ->indexBy('id');
+    };
+
+    $thisYearParticipants = $getParticipantsById([['register_date', '=', 'this.year']]);
+    $this->assertFalse(isset($thisYearParticipants[$firstParticipantId]));
+
+    $otherYearParticipants = $getParticipantsById([['register_date', '!=', 'this.year']]);
+    $this->assertTrue(isset($otherYearParticipants[$firstParticipantId]));
+
+    Participant::update()->setCheckPermissions(FALSE)
+      ->addWhere('id', '=', $firstParticipantId)
+      ->addValue('register_date', 'now')
+      ->execute();
+
+    $thisYearParticipants = $getParticipantsById([['register_date', '=', 'this.year']]);
+    $this->assertTrue(isset($thisYearParticipants[$firstParticipantId]));
+
     // retrieve a participant record and update some records
     $patchRecord = [
       'source' => "not " . $firstResult['source'],
