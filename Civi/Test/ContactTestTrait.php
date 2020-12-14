@@ -53,8 +53,10 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Organisation created
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function organizationCreate($params = [], $seq = 0) {
+  public function organizationCreate($params = [], $seq = 0): int {
     if (!$params) {
       $params = [];
     }
@@ -76,7 +78,7 @@ trait ContactTestTrait {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function individualCreate($params = [], $seq = 0, $random = FALSE) {
+  public function individualCreate($params = [], $seq = 0, $random = FALSE): int {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
     return $this->_contactCreate($params);
   }
@@ -160,7 +162,7 @@ trait ContactTestTrait {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  private function _contactCreate($params) {
+  private function _contactCreate($params): int {
     $result = civicrm_api3('contact', 'create', $params);
     return (int) $result['id'];
   }
