@@ -473,4 +473,27 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->submit();
   }
 
+  /**
+   * Get order related params.
+   *
+   * In practice these are contribution params but later they cann be used with the Order api.
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getOrderParams(): array {
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($this->_params);
+    $order->setPriceSetID($this->getPriceSetID($this->_params));
+    $order->setOverrideTotalAmount($this->_params['total_amount']);
+    $order->setOverrideFinancialTypeID((int) $this->_params['financial_type_id']);
+    return [
+      'lineItems' => [$this->_priceSetId => $order->getLineItems()],
+      // This is one of those weird & wonderful legacy params we aim to get rid of.
+      'processPriceSet' => TRUE,
+      'tax_amount' => $order->getTotalTaxAmount(),
+    ];
+  }
+
 }
