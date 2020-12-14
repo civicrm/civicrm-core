@@ -347,4 +347,43 @@
     <comment>Used for multilingual installation</comment>
     <add>4.7</add>
   </field>
+  <field>
+    <name>created_date</name>
+    <title>Created Date</title>
+    <uniqueName>action_schedule_created_date</uniqueName>
+    <type>timestamp</type>
+    <comment>When was the scheduled reminder created.</comment>
+    <required>false</required>
+    <export>true</export>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.34</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the reminder was created or modified.</comment>
+    <required>false</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.34</add>
+  </field>
+  <field>
+    <name>effective_start_date</name>
+    <title>Effective start date</title>
+    <uniqueName>action_schedule_effective_start_date</uniqueName>
+    <type>timestamp</type>
+    <comment>Earliest date to consider start events from.</comment>
+    <required>false</required>
+    <export>true</export>
+    <add>5.34</add>
+  </field>
+  <field>
+    <name>effective_end_date</name>
+    <title>Effective end date</title>
+    <uniqueName>action_schedule_effective_end_date</uniqueName>
+    <type>timestamp</type>
+    <comment>Latest date to consider end events from.</comment>
+    <required>false</required>
+    <export>true</export>
+    <add>5.34</add>
+  </field>
 </table>
