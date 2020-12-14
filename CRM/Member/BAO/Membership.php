@@ -242,7 +242,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @throws CRM_Core_Exception
    */
-  public static function create(&$params, &$ids = []) {
+  public static function create(&$params, $ids = []) {
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
