@@ -1379,17 +1379,12 @@ DESC limit 1");
         // unset send-receipt option, since receipt will be sent when ipn is received.
         unset($formValues['send_receipt'], $formValues['send_receipt']);
         //as membership is pending set dates to null.
-        $memberDates = [
-          'join_date' => 'joinDate',
-          'start_date' => 'startDate',
-          'end_date' => 'endDate',
-        ];
-        foreach ($memberDates as $dv) {
-          $$dv = NULL;
-          foreach ($this->_memTypeSelected as $memType) {
-            $membershipTypeValues[$memType][$dv] = NULL;
-          }
+        foreach ($this->_memTypeSelected as $memType) {
+          $membershipTypeValues[$memType]['joinDate'] = NULL;
+          $membershipTypeValues[$memType]['startDate'] = NULL;
+          $membershipTypeValues[$memType]['endDate'] = NULL;
         }
+        $endDate = $startDate = NULL;
       }
       $now = date('YmdHis');
       $params['receive_date'] = date('Y-m-d H:i:s');
