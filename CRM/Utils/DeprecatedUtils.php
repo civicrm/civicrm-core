@@ -267,17 +267,7 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
   }
 
   if (isset($values['addressee'])) {
-    if (!empty($params['addressee_id'])) {
-      $addresseeFilter = [
-        'contact_type' => $params['contact_type'] ?? NULL,
-        'greeting_type' => 'addressee',
-      ];
-      $addressee = CRM_Core_PseudoConstant::addressee($addresseeFilter);
-      $params['addressee'] = $addressee[$params['addressee_id']];
-    }
-    else {
-      $params['addressee'] = $values['addressee'];
-    }
+    $params['addressee'] = $values['addressee'];
     return TRUE;
   }
 
