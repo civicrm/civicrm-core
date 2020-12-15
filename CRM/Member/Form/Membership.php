@@ -1899,15 +1899,6 @@ DESC limit 1");
     $contactID = $contributionParams['contact_id'];
 
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
-    $isSeparateMembershipPayment = !empty($params['separate_membership_payment']);
-    $pledgeID = !empty($params['pledge_id']) ? $params['pledge_id'] : $form->_values['pledge_id'] ?? NULL;
-    if (!$isSeparateMembershipPayment && !empty($form->_values['pledge_block_id']) &&
-      (!empty($params['is_pledge']) || $pledgeID)) {
-      $isPledge = TRUE;
-    }
-    else {
-      $isPledge = FALSE;
-    }
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
@@ -1980,10 +1971,6 @@ DESC limit 1");
     //CRM-13981, processing honor contact into soft-credit contribution
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
-    if ($isPledge) {
-      $form = CRM_Contribute_Form_Contribution_Confirm::handlePledge($form, $params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt);
-    }
-
     if ($online && $contribution) {
       CRM_Core_BAO_CustomValueTable::postProcess($params,
         'civicrm_contribution',
@@ -2012,13 +1999,6 @@ DESC limit 1");
       CRM_Core_BAO_Note::add($noteParams, []);
     }
 
-    if (isset($params['related_contact'])) {
-      $contactID = $params['related_contact'];
-    }
-    elseif (isset($params['cms_contactID'])) {
-      $contactID = $params['cms_contactID'];
-    }
-
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
     $actParams = [];
@@ -2037,12 +2017,6 @@ DESC limit 1");
     }
 
     $transaction->commit();
-    // CRM-13074 - create the CMSUser after the transaction is completed as it
-    // is not appropriate to delete a valid contribution if a user create problem occurs
-    CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
-      $contactID,
-      'email-' . $billingLocationID
-    );
     return $contribution;
   }
 
