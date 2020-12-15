@@ -1985,7 +1985,7 @@ SET    addressee = %1, postal_greeting = %2, email_greeting = %3
 WHERE  id = %4
 ";
       $params = [
-        1 => [$values['addressee'], 'String'],
+        1 => [CRM_Utils_String::ellipsify($values['addressee'], 255), 'String'],
         2 => [$values['postalGreeting'], 'String'],
         3 => [$values['emailGreeting'], 'String'],
         4 => [$masterID, 'Integer'],
