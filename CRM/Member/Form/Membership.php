@@ -1325,8 +1325,7 @@ DESC limit 1");
           ],
           $financialType,
           FALSE,
-          $this->_bltID,
-          TRUE
+          $this->_bltID
         );
 
         //create new soft-credit record, CRM-13981
@@ -1877,8 +1876,6 @@ DESC limit 1");
    *
    * @param int $billingLocationID
    *   ID of billing location type.
-   * @param bool $isRecur
-   *   Is this recurring?
    *
    * @return \CRM_Contribute_DAO_Contribution
    *
@@ -1892,8 +1889,7 @@ DESC limit 1");
     $contributionParams,
     $financialType,
     $online,
-    $billingLocationID,
-    $isRecur
+    $billingLocationID
   ) {
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
@@ -1914,7 +1910,7 @@ DESC limit 1");
     if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
       $params['is_email_receipt'] = $isEmailReceipt;
     }
-    $params['is_recur'] = $isRecur;
+    $params['is_recur'] = TRUE;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = CRM_Contribute_Form_Contribution_Confirm::processRecurringContribution($form, $params, $contactID, $financialType);
 
