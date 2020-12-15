@@ -24,7 +24,8 @@ class CRM_Core_Reference_Dynamic extends CRM_Core_Reference_Basic {
   public function getTargetEntities(): array {
     $targetEntities = [];
     $bao = CRM_Core_DAO_AllCoreTables::getClassForTable($this->refTable);
-    foreach ($bao::buildOptions($this->refTypeColumn) as $table => $label) {
+    $targetTables = (array) $bao::buildOptions($this->refTypeColumn);
+    foreach ($targetTables as $table => $label) {
       $targetEntities[$table] = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table);
     }
     return $targetEntities;
