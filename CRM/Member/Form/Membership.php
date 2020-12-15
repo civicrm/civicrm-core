@@ -932,9 +932,6 @@ DESC limit 1");
 
       $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($form->_params);
       $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-
-      $form->assign('contributeMode', 'direct');
-      $form->assign('isAmountzero', 0);
       $form->assign('is_pay_later', 0);
       $form->assign('isPrimary', 1);
     }
