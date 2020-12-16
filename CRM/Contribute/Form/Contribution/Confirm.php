@@ -1000,13 +1000,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       CRM_Core_BAO_Note::add($noteParams, []);
     }
 
-    if (isset($params['related_contact'])) {
-      $contactID = $params['related_contact'];
-    }
-    elseif (isset($params['cms_contactID'])) {
-      $contactID = $params['cms_contactID'];
-    }
-
     //create contribution activity w/ individual and target
     //activity w/ organisation contact id when onbelf, CRM-4027
     $actParams = [];
@@ -1025,12 +1018,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
 
     $transaction->commit();
-    // CRM-13074 - create the CMSUser after the transaction is completed as it
-    // is not appropriate to delete a valid contribution if a user create problem occurs
-    CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
-      $contactID,
-      'email-' . $billingLocationID
-    );
     return $contribution;
   }
 
@@ -1726,10 +1713,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
     $form->set('membership_amount', $minimumFee);
     $form->assign('membership_amount', $minimumFee);
-
-    // we don't need to create the user twice, so lets disable cms_create_account
-    // irrespective of the value, CRM-2888
-    $tempParams['cms_create_account'] = 0;
 
     //set this variable as we are not creating pledge for
     //separate membership payment contribution.
@@ -2634,6 +2617,18 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         TRUE,
         $form->_bltID,
         $isRecur
+      );
+      // CRM-13074 - create the CMSUser after the transaction is completed as it
+      // is not appropriate to delete a valid contribution if a user create problem occurs
+      if (isset($params['related_contact'])) {
+        $contactID = $params['related_contact'];
+      }
+      elseif (isset($params['cms_contactID'])) {
+        $contactID = $params['cms_contactID'];
+      }
+      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
+        $contactID,
+        'email-' . $form->_bltID
       );
 
       $paymentParams['item_name'] = $form->_params['description'];
