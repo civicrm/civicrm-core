@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'skipLineItem' => 0,
     ];
 
-    $processConfirmResult = CRM_Contribute_Form_Contribution_Confirm::processConfirm($form,
+    $processConfirmResult = $form->processConfirm(
       $form->_params,
       $contactID,
       $form->_values['financial_type_id'],
@@ -155,7 +155,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'relationship_type_id' => 5,
       'is_current_employer' => 1,
     ]);
-    CRM_Contribute_Form_Contribution_Confirm::processConfirm($form,
+    $form->processConfirm(
       $form->_params,
       $form->_params['onbehalf_contact_id'],
       $form->_values['financial_type_id'],
