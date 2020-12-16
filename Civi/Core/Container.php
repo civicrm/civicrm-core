@@ -219,7 +219,7 @@ class Container {
       ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
 
     $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoService'))
-      ->setFactory(__CLASS__ . '::createCryptoRegistry')->setPublic(TRUE);
+      ->setFactory('Civi\Crypto\CryptoRegistry::createDefaultRegistry')->setPublic(TRUE);
 
     $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
       ->setPublic(TRUE);
@@ -499,49 +499,6 @@ class Container {
     $settings = \CRM_Utils_Cache::getCacheSettings($driver);
     $settings['driver'] = $driver;
     return new \ArrayObject($settings);
-  }
-
-  /**
-   * Initialize the cryptogrpahic registry. It tracks available ciphers and keys.
-   *
-   * @return \Civi\Crypto\CryptoRegistry
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\Crypto\Exception\CryptoException
-   */
-  public static function createCryptoRegistry() {
-    $crypto = new \Civi\Crypto\CryptoRegistry();
-    $crypto->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
-
-    $crypto->addPlainText(['tags' => ['CRED']]);
-    if (defined('CIVICRM_CRED_KEYS')) {
-      foreach (explode(' ', CIVICRM_CRED_KEYS) as $n => $keyExpr) {
-        $crypto->addSymmetricKey($crypto->parseKey($keyExpr) + [
-          'tags' => ['CRED'],
-          'weight' => $n,
-        ]);
-      }
-    }
-    if (defined('CIVICRM_SITE_KEY')) {
-      // Recent upgrades may not have CIVICRM_CRED_KEYS. Transitional support - the CIVICRM_SITE_KEY is last-priority option for credentials.
-      $crypto->addSymmetricKey([
-        'key' => hash_hkdf('sha256', CIVICRM_SITE_KEY),
-        'suite' => 'aes-cbc',
-        'tags' => ['CRED'],
-        'weight' => 30000,
-      ]);
-    }
-    //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
-    //  $crypto->addSymmetricKey([
-    //    'key' => base64_decode($_COOKIE['CIVICRM_FORM_KEY']),
-    //    'suite' => 'aes-cbc',
-    //    'tag' => ['FORM'],
-    //  ]);
-    //  // else: somewhere in CRM_Core_Form, we may need to initialize CIVICRM_FORM_KEY
-    //}
-
-    // Allow plugins to add/replace any keys and ciphers.
-    \CRM_Utils_Hook::crypto($crypto);
-    return $crypto;
   }
 
   /**
