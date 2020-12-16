@@ -507,6 +507,7 @@ class Container {
    */
   public static function createCryptoRegistry() {
     $crypto = new \Civi\Crypto\CryptoRegistry();
+    $crypto->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
 
     $crypto->addPlainText(['tags' => ['CRED']]);
     if (defined('CIVICRM_CRED_KEYS')) {
