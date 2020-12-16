@@ -1323,9 +1323,7 @@ DESC limit 1");
             'thankyou_date' => $paymentParams['thankyou_date'] ?? NULL,
             'payment_instrument_id' => $paymentInstrumentID,
           ],
-          $financialType,
-          FALSE,
-          $this->_bltID
+          $financialType
         );
 
         //create new soft-credit record, CRM-13981
@@ -1871,11 +1869,6 @@ DESC limit 1");
    *   - thankyou_date (not all forms will set this)
    *
    * @param CRM_Financial_DAO_FinancialType $financialType
-   * @param bool $online
-   *   Is the form a front end form? If so set a bunch of unpredictable things that should be passed in from the form.
-   *
-   * @param int $billingLocationID
-   *   ID of billing location type.
    *
    * @return \CRM_Contribute_DAO_Contribution
    *
@@ -1887,9 +1880,7 @@ DESC limit 1");
     $params,
     $result,
     $contributionParams,
-    $financialType,
-    $online,
-    $billingLocationID
+    $financialType
   ) {
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
@@ -1898,8 +1889,6 @@ DESC limit 1");
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $financialType->id;
-
-    $contributionParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params, $billingLocationID);
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
@@ -1926,7 +1915,7 @@ DESC limit 1");
         $result, $receiptDate,
         $recurringContributionID), $contributionParams
       );
-      $contributionParams['non_deductible_amount'] = CRM_Contribute_Form_Contribution_Confirm::getNonDeductibleAmount($params, $financialType, $online, $form);
+      $contributionParams['non_deductible_amount'] = CRM_Contribute_Form_Contribution_Confirm::getNonDeductibleAmount($params, $financialType, FALSE, $form);
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
@@ -1967,14 +1956,7 @@ DESC limit 1");
     //CRM-13981, processing honor contact into soft-credit contribution
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
-    if ($online && $contribution) {
-      CRM_Core_BAO_CustomValueTable::postProcess($params,
-        'civicrm_contribution',
-        $contribution->id,
-        'Contribution'
-      );
-    }
-    elseif ($contribution) {
+    if ($contribution) {
       //handle custom data.
       $params['contribution_id'] = $contribution->id;
       if (!empty($params['custom']) &&
