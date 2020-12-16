@@ -17,7 +17,7 @@
       <div ng-if="!$ctrl.conjunctions[clause[0]]" class="api4-input-group">
         <input class="form-control" ng-model="clause[0]" crm-ui-select="{data: $ctrl.fields, allowClear: true, placeholder: 'Field'}" ng-change="$ctrl.changeClauseField(clause, index)" />
         <select class="form-control api4-operator" ng-model="clause[1]" ng-options="o.key as o.value for o in $ctrl.operators" ng-change="$ctrl.changeClauseOperator(clause)" ></select>
-        <input class="form-control" ng-model="clause[2]" crm-search-value="{field: $ctrl.getField(clause[0]), optionKey: $ctrl.getOptionKey(clause[0]), op: clause[1], format: $ctrl.format}" />
+        <crm-search-input ng-if="clause[1] !== 'IS NULL' && clause[1] !== 'IS NOT NULL'" ng-model="clause[2]" field="$ctrl.getField(clause[0])" option-key="$ctrl.getOptionKey(clause[0])" op="clause[1]" format="$ctrl.format" class="form-group"></crm-search-input>
       </div>
       <fieldset class="clearfix" ng-if="$ctrl.conjunctions[clause[0]]">
         <crm-search-clause clauses="clause[1]" format="{{ $ctrl.format }}" op="{{ clause[0] }}" fields="$ctrl.fields" delete-group="$ctrl.deleteRow(index)" ></crm-search-clause>

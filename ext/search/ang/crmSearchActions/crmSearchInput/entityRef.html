@@ -1,0 +1,6 @@
+<div class="form-group" ng-if="!$ctrl.multi">
+  <input class="form-control" ng-model="$ctrl.value" crm-entityref="{entity: $ctrl.field.fk_entity}">
+</div>
+<div class="form-group" ng-if="$ctrl.multi">
+  <input class="form-control" ng-model="$ctrl.value" crm-entityref="{entity: $ctrl.field.fk_entity, select: {multiple: true}}" ng-list >
+</div>
