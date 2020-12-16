@@ -221,10 +221,8 @@ class Container {
     $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoService'))
       ->setFactory(__CLASS__ . '::createCryptoRegistry')->setPublic(TRUE);
 
-    $container->setDefinition('crypto.token', new Definition(
-      'Civi\Crypto\CryptoToken',
-      [new Reference('crypto.registry')]
-    ))->setPublic(TRUE);
+    $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
+      ->setPublic(TRUE);
 
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');

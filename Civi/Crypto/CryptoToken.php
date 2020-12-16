@@ -45,20 +45,13 @@ class CryptoToken {
 
   const VERSION_1 = 'CTK0';
 
-  /**
-   * @var CryptoRegistry
-   */
-  protected $registry;
-
   protected $delim;
 
   /**
    * CryptoToken constructor.
-   * @param \Civi\Crypto\CryptoRegistry $registry
    */
-  public function __construct(\Civi\Crypto\CryptoRegistry $registry) {
+  public function __construct() {
     $this->delim = chr(2);
-    $this->registry = $registry;
   }
 
   /**
@@ -83,7 +76,10 @@ class CryptoToken {
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public function encrypt($plainText, $keyIdOrTag) {
-    $key = $this->registry->findKey($keyIdOrTag);
+    /** @var CryptoRegistry $registry */
+    $registry = \Civi::service('crypto.registry');
+
+    $key = $registry->findKey($keyIdOrTag);
     if ($key['suite'] === 'plain') {
       if (!$this->isPlainText($plainText)) {
         throw new CryptoException("Cannot use plaintext encoding for data with reserved delimiter.");
@@ -92,7 +88,7 @@ class CryptoToken {
     }
 
     /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */
-    $cipherSuite = $this->registry->findSuite($key['suite']);
+    $cipherSuite = $registry->findSuite($key['suite']);
     $cipherText = $cipherSuite->encrypt($plainText, $key);
     return $this->delim . self::VERSION_1 . $this->delim . $key['id'] . $this->delim . base64_encode($cipherText);
   }
@@ -119,6 +115,9 @@ class CryptoToken {
       }
     }
 
+    /** @var CryptoRegistry $registry */
+    $registry = \Civi::service('crypto.registry');
+
     $parts = explode($this->delim, $token);
     if ($parts[1] !== self::VERSION_1) {
       throw new CryptoException("Unrecognized encoding");
@@ -126,13 +125,13 @@ class CryptoToken {
     $keyId = $parts[2];
     $cipherText = base64_decode($parts[3]);
 
-    $key = $this->registry->findKey($keyId);
+    $key = $registry->findKey($keyId);
     if (!in_array('*', $keyIdOrTag) && !in_array($keyId, $keyIdOrTag) && empty(array_intersect($keyIdOrTag, $key['tags']))) {
       throw new CryptoException("Cannot decrypt token. Unexpected key: $keyId");
     }
 
     /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */
-    $cipherSuite = $this->registry->findSuite($key['suite']);
+    $cipherSuite = $registry->findSuite($key['suite']);
     $plainText = $cipherSuite->decrypt($cipherText, $key);
     return $plainText;
   }
