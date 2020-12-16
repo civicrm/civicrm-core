@@ -1760,6 +1760,23 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Initialize the cryptographic service.
+   *
+   * This may be used to register additional keys or cipher-suites.
+   *
+   * @param \Civi\Crypto\CryptoRegistry $crypto
+   *
+   * @return mixed
+   */
+  public static function crypto($crypto) {
+    return self::singleton()->invoke(['crypto'], $crypto, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_crypto'
+    );
+  }
+
+  /**
    * This hook collects the trigger definition from all components.
    *
    * @param $info
