@@ -66,4 +66,12 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals($inputText, $actualText);
   }
 
+  public function testReadPlainTextWithoutRegistry() {
+    // This is performance optimization - don't initialize crypto.registry unless
+    // you actually need it.
+    $this->assertFalse(\Civi::container()->initialized('crypto.registry'));
+    $this->assertEquals("Hello world", \Civi::service('crypto.token')->decrypt("Hello world"));
+    $this->assertFalse(\Civi::container()->initialized('crypto.registry'));
+  }
+
 }
