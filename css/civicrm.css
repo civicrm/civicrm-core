@@ -21,6 +21,7 @@
 
 .crm-container .crm-flex-box {
   display: flex;
+  flex-wrap: wrap;
 }
 .crm-container .crm-flex-box > * {
   flex: 1;

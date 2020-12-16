@@ -2,6 +2,13 @@
   min-height: 200px;
 }
 
+#civicrm-dashboard > .crm-flex-box > .crm-flex-2 {
+  min-width: 300px;
+}
+#civicrm-dashboard > .crm-flex-box > .crm-flex-3 {
+  min-width: 450px;
+}
+
 .crm-container .crm-dashlet {
   margin: 10px;
   box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
