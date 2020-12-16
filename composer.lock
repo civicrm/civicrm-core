@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f32350338fcd33fb89de9bcea7a49125",
+    "content-hash": "3877832b2ea8b061992a614b7a73a456",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -258,21 +258,21 @@
         },
         {
             "name": "civicrm/civicrm-cxn-rpc",
-            "version": "v0.19.01.09",
+            "version": "v0.20.12.01",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/civicrm-cxn-rpc.git",
-                "reference": "3ea668bc651adb4d61e96276f55e76ae22baea7a"
+                "reference": "b097258a642dc3e0dd9c264cb75b72d5274cac2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/3ea668bc651adb4d61e96276f55e76ae22baea7a",
-                "reference": "3ea668bc651adb4d61e96276f55e76ae22baea7a",
+                "url": "https://api.github.com/repos/civicrm/civicrm-cxn-rpc/zipball/b097258a642dc3e0dd9c264cb75b72d5274cac2f",
+                "reference": "b097258a642dc3e0dd9c264cb75b72d5274cac2f",
                 "shasum": ""
             },
             "require": {
-                "phpseclib/phpseclib": "1.0.*",
-                "psr/log": "~1.0"
+                "phpseclib/phpseclib": "~2.0",
+                "psr/log": "~1.1"
             },
             "type": "library",
             "autoload": {
@@ -291,7 +291,7 @@
                 }
             ],
             "description": "RPC library for CiviConnect",
-            "time": "2020-02-05T03:24:26+00:00"
+            "time": "2020-12-16T02:35:45+00:00"
         },
         {
             "name": "civicrm/composer-compile-lib",
@@ -2040,50 +2040,42 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "1.0.7",
+            "version": "2.0.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "0bb6c9b974cada100cad40f72ef186a199274f9b"
+                "reference": "497856a8d997f640b4a516062f84228a772a48a8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/0bb6c9b974cada100cad40f72ef186a199274f9b",
-                "reference": "0bb6c9b974cada100cad40f72ef186a199274f9b",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/497856a8d997f640b4a516062f84228a772a48a8",
+                "reference": "497856a8d997f640b4a516062f84228a772a48a8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.0.0"
+                "php": ">=5.3.3"
             },
             "require-dev": {
                 "phing/phing": "~2.7",
-                "phpunit/phpunit": "~4.0",
-                "sami/sami": "~2.0",
+                "phpunit/phpunit": "^4.8.35|^5.7|^6.0",
                 "squizlabs/php_codesniffer": "~2.0"
             },
             "suggest": {
                 "ext-gmp": "Install the GMP (GNU Multiple Precision) extension in order to speed up arbitrary precision integer arithmetic operations.",
-                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a wide variety of cryptographic operations.",
-                "pear-pear/PHP_Compat": "Install PHP_Compat to get phpseclib working on PHP < 5.0.0."
+                "ext-libsodium": "SSH2/SFTP can make use of some algorithms provided by the libsodium-php extension.",
+                "ext-mcrypt": "Install the Mcrypt extension in order to speed up a few other cryptographic operations.",
+                "ext-openssl": "Install the OpenSSL extension in order to speed up a wide variety of cryptographic operations."
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Crypt": "phpseclib/",
-                    "File": "phpseclib/",
-                    "Math": "phpseclib/",
-                    "Net": "phpseclib/",
-                    "System": "phpseclib/"
-                },
                 "files": [
-                    "phpseclib/bootstrap.php",
-                    "phpseclib/Crypt/Random.php"
-                ]
+                    "phpseclib/bootstrap.php"
+                ],
+                "psr-4": {
+                    "phpseclib\\": "phpseclib/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                "phpseclib/"
-            ],
             "license": [
                 "MIT"
             ],
@@ -2135,7 +2127,21 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2017-06-05T06:30:30+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/terrafrost",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/phpseclib",
+                    "type": "patreon"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/phpseclib/phpseclib",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-09-08T04:24:43+00:00"
         },
         {
             "name": "psr/cache",
