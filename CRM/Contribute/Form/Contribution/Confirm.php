@@ -1429,8 +1429,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         CRM_Price_BAO_LineItem::getLineItemArray($membershipParams);
 
       }
-      $paymentResult = self::processConfirm(
-        $form,
+      $paymentResult = $form->processConfirm(
         $membershipParams,
         $contactID,
         $financialTypeID,
@@ -2284,7 +2283,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
       }
 
-      $result = self::processConfirm($this, $paymentParams,
+      $result = $this->processConfirm($paymentParams,
         $contactID,
         $this->wrangleFinancialTypeID($this->_values['financial_type_id']),
         ($this->_mode == 'test') ? 1 : 0,
@@ -2505,8 +2504,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   /**
    * Process payment after confirmation.
    *
-   * @param CRM_Core_Form $form
-   *   Form object.
    * @param array $paymentParams
    *   Array with payment related key.
    *   value pairs
@@ -2522,14 +2519,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return array
    *   associated array
    */
-  public static function processConfirm(
-    &$form,
+  public function processConfirm(
     &$paymentParams,
     $contactID,
     $financialTypeID,
     $isTest,
     $isRecur
   ): array {
+    $form = $this;
     CRM_Core_Payment_Form::mapParams($form->_bltID, $form->_params, $paymentParams, TRUE);
     $isPaymentTransaction = self::isPaymentTransaction($form);
 
