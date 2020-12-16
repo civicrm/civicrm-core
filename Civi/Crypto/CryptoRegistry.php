@@ -54,6 +54,49 @@ class CryptoRegistry {
 
   protected $cipherSuites = [];
 
+  /**
+   * Initialize a default instance of the registry.
+   *
+   * @return \Civi\Crypto\CryptoRegistry
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public static function createDefaultRegistry() {
+    $registry = new static();
+    $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
+
+    $registry->addPlainText(['tags' => ['CRED']]);
+    if (defined('CIVICRM_CRED_KEYS')) {
+      foreach (explode(' ', CIVICRM_CRED_KEYS) as $n => $keyExpr) {
+        $registry->addSymmetricKey($registry->parseKey($keyExpr) + [
+          'tags' => ['CRED'],
+          'weight' => $n,
+        ]);
+      }
+    }
+    if (defined('CIVICRM_SITE_KEY')) {
+      // Recent upgrades may not have CIVICRM_CRED_KEYS. Transitional support - the CIVICRM_SITE_KEY is last-priority option for credentials.
+      $registry->addSymmetricKey([
+        'key' => hash_hkdf('sha256', CIVICRM_SITE_KEY),
+        'suite' => 'aes-cbc',
+        'tags' => ['CRED'],
+        'weight' => 30000,
+      ]);
+    }
+    //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
+    //  $crypto->addSymmetricKey([
+    //    'key' => base64_decode($_COOKIE['CIVICRM_FORM_KEY']),
+    //    'suite' => 'aes-cbc',
+    //    'tag' => ['FORM'],
+    //  ]);
+    //  // else: somewhere in CRM_Core_Form, we may need to initialize CIVICRM_FORM_KEY
+    //}
+
+    // Allow plugins to add/replace any keys and ciphers.
+    \CRM_Utils_Hook::crypto($registry);
+    return $registry;
+  }
+
   public function __construct() {
     $this->cipherSuites['plain'] = TRUE;
     $this->keys['plain'] = [
