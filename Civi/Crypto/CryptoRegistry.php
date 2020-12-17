@@ -74,15 +74,7 @@ class CryptoRegistry {
         ]);
       }
     }
-    if (defined('CIVICRM_SITE_KEY')) {
-      // Recent upgrades may not have CIVICRM_CRED_KEYS. Transitional support - the CIVICRM_SITE_KEY is last-priority option for credentials.
-      $registry->addSymmetricKey([
-        'key' => hash_hkdf('sha256', CIVICRM_SITE_KEY),
-        'suite' => 'aes-cbc',
-        'tags' => ['CRED'],
-        'weight' => 30000,
-      ]);
-    }
+
     //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
     //  $crypto->addSymmetricKey([
     //    'key' => base64_decode($_COOKIE['CIVICRM_FORM_KEY']),
