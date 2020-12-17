@@ -44,13 +44,17 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
       $email->email = $strtolower($email->email);
     }
 
-    /*
-     * since we're setting bulkmail for 1 of this contact's emails, first reset all their other emails to is_bulkmail false
-     *  We shouldn't set the current email to false even though we
-     *  are about to reset it to avoid contaminating the changelog if logging is enabled.
-     * (only 1 email address can have is_bulkmail = true)
-     */
-    if ($email->is_bulkmail && !empty($params['contact_id']) && !self::isMultipleBulkMail()) {
+    //
+    // Since we're setting bulkmail for 1 of this contact's emails, first reset
+    // all their other emails to is_bulkmail false. We shouldn't set the current
+    // email to false even though we are about to reset it to avoid
+    // contaminating the changelog if logging is enabled.  (only 1 email
+    // address can have is_bulkmail = true)
+    //
+    // Note setting a the is_bulkmail to '' in $params results in $email->is_bulkmail === 'null'.
+    // @see https://lab.civicrm.org/dev/core/-/issues/2254
+    //
+    if ($email->is_bulkmail == 1 && !empty($params['contact_id']) && !self::isMultipleBulkMail()) {
       $sql = "
 UPDATE civicrm_email
 SET    is_bulkmail = 0
