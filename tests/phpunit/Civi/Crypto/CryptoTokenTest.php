@@ -11,6 +11,8 @@
 
 namespace Civi\Crypto;
 
+use Civi\Crypto\Exception\CryptoException;
+
 /**
  * Test major use-cases of the 'crypto.token' service.
  */
@@ -33,6 +35,29 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertTrue($token->isPlainText(""));
     $this->assertTrue($token->isPlainText("\r"));
     $this->assertTrue($token->isPlainText("\n"));
+  }
+
+  public function testDecryptInvalid() {
+    $cryptoToken = \Civi::service('crypto.token');
+    try {
+      $cryptoToken->decrypt(chr(2) . 'CTK0' . chr(2));
+      $this->fail("Expected CryptoException");
+    }
+    catch (CryptoException $e) {
+      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+    }
+
+    $goodExample = $cryptoToken->encrypt('mess with me', 'UNIT-TEST');
+    $this->assertEquals('mess with me', $cryptoToken->decrypt($goodExample));
+
+    try {
+      $badExample = preg_replace(';CTK0;', 'ctk9', $goodExample);
+      $cryptoToken->decrypt($badExample);
+      $this->fail("Expected CryptoException");
+    }
+    catch (CryptoException $e) {
+      $this->assertRegExp(';Cannot decrypt token. Invalid format.;', $e->getMessage());
+    }
   }
 
   public function getExampleTokens() {

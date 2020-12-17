@@ -118,9 +118,9 @@ class CryptoToken {
     /** @var CryptoRegistry $registry */
     $registry = \Civi::service('crypto.registry');
 
-    $parts = explode($this->delim, $token);
-    if ($parts[1] !== self::VERSION_1) {
-      throw new CryptoException("Unrecognized encoding");
+    $parts = explode($this->delim, $token, 4);
+    if (count($parts) !== 4 || $parts[1] !== self::VERSION_1) {
+      throw new CryptoException("Cannot decrypt token. Invalid format.");
     }
     $keyId = $parts[2];
     $cipherText = base64_decode($parts[3]);
