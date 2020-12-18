@@ -17,16 +17,16 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
   /**
    * Test the to csv function.
    *
-   * @param string $fileName
+   * @param array $fileData
    *
    * @dataProvider getCsvFiles
    * @throws \CRM_Core_Exception
    */
-  public function testToCsv($fileName) {
+  public function testToCsv(array $fileData) {
     $dataSource = new CRM_Import_DataSource_CSV();
     $params = [
       'uploadFile' => [
-        'name' => __DIR__ . '/' . $fileName,
+        'name' => __DIR__ . '/' . $fileData['filename'],
       ],
       'skipColumnHeader' => TRUE,
     ];
@@ -40,14 +40,10 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 
     $dataSource->postProcess($params, $db, $form);
     $tableName = $form->get('importTableName');
-    $this->assertEquals(4,
-      CRM_Core_DAO::singleValueQuery("SELECT LENGTH(last_name) FROM $tableName"),
-      $fileName . ' failed on last_name'
-    );
-    $this->assertEquals(21,
-      CRM_Core_DAO::singleValueQuery("SELECT LENGTH(email) FROM $tableName"),
-      $fileName . ' failed on email'
-    );
+    foreach (['first_name', 'last_name', 'email'] as $field) {
+      $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT $field FROM $tableName"));
+      $this->assertEquals($fileData["{$field}_json"], $json, "{$fileData['filename']} failed on $field");
+    }
     CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
   }
 
@@ -57,7 +53,76 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCsvFiles() {
-    return [['import.csv'], ['yogi.csv']];
+    return [
+      // import.csv is utf8-encoded, with no BOM
+      [
+        [
+          'filename' => 'import.csv',
+          'first_name_json' => '"Yogi"',
+          'last_name_json' => '"Bear"',
+          'email_json' => '"yogi@yellowstone.park"',
+        ],
+      ],
+      // yogi.csv is latin1-encoded
+      [
+        [
+          'filename' => 'yogi.csv',
+          'first_name_json' => '"Yogi"',
+          'last_name_json' => '"Bear"',
+          'email_json' => '"yogi@yellowstone.park"',
+        ],
+      ],
+      // specialchar.csv is utf8-encoded, with no BOM
+      [
+        [
+          'filename' => 'specialchar.csv',
+          // note that json uses unicode representation not utf8 byte sequences
+          'first_name_json' => '"Yog\u00e0"',
+          'last_name_json' => '"Ber\u00e0"',
+          'email_json' => '"yogi@yellowstone.park"',
+        ],
+      ],
+      // specialchar_with_BOM.csv is utf8-encoded with BOM
+      [
+        [
+          'filename' => 'specialchar_with_BOM.csv',
+          'first_name_json' => '"Yog\u00e0"',
+          'last_name_json' => '"Ber\u00e0"',
+          'email_json' => '"yogi@yellowstone.park"',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Test the trim function
+   * @dataProvider trimDataProvider
+   * @param string $input
+   * @param string $expected
+   */
+  public function testTrim(string $input, string $expected) {
+    $this->assertSame($expected, CRM_Import_DataSource_CSV::trimNonBreakingSpaces($input));
+  }
+
+  /**
+   * Dataprovider for testTrim
+   * @return array
+   */
+  public function trimDataProvider(): array {
+    return [
+      'plain' => ['plain', 'plain'],
+      'non-breaking-space-at-end-latin1' => ['foo' . chr(0xA0), 'foo'],
+      'non-breaking-space-at-end-utf8' => ["foo\u{a0}", 'foo'],
+      'non-breaking-space-at-start-latin1' => [chr(0xA0) . 'foo', 'foo'],
+      'non-breaking-space-at-start-utf8' => ["\u{a0}foo", 'foo'],
+      'non-breaking-space-at-both-latin1' => [chr(0xA0) . 'foo' . chr(0xA0), 'foo'],
+      'non-breaking-space-at-both-utf8' => ["\u{a0}foo\u{a0}", 'foo'],
+      'sharing-same-byte' => ['fooà', 'fooà'],
+      'sharing-same-byte-plus-space-end' => ["fooà\u{a0}", 'fooà'],
+      'sharing-same-byte-plus-space-start' => ["\u{a0}àfoo", 'àfoo'],
+      'sharing-same-byte-plus-space-both' => ["\u{a0}àfooà\u{a0}", 'àfooà'],
+      'multiple-spaces' => ["\u{a0}\u{a0}foo\u{a0}\u{a0}", 'foo'],
+    ];
   }
 
 }
