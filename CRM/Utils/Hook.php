@@ -1760,9 +1760,12 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Initialize the cryptographic service.
+   * Register cryptographic resources, such as keys and cipher-suites.
    *
-   * This may be used to register additional keys or cipher-suites.
+   * Ex: $crypto->addSymmetricKey([
+   *   'key' => hash_hkdf('sha256', 'abcd1234'),
+   *   'suite' => 'aes-cbc-hs',
+   * ]);
    *
    * @param \Civi\Crypto\CryptoRegistry $crypto
    *
