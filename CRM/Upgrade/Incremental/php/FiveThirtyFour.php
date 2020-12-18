@@ -33,6 +33,30 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
         }
       }
     }
+
+    if ($rev === '5.34.alpha1') {
+      if (extension_loaded('mcrypt') && !empty(self::findSmtpPasswords())) {
+        // NOTE: We don't re-encrypt automatically because the old "civicrm.settings.php" lacks a good key, and we don't keep the old encryption because the format is ambiguous.
+        // The admin may forget to re-enable. That's OK -- this only affects 1 field, this is a secondary defense, and (in the future) we can remind the admin via status-checks.
+        $preUpgradeMessage .= '<p>' . ts('This system has an SMTP password which should be migrated to a new encryption mechanism. The upgrader will remove the old encryption. After upgrading, you may enable the new encryption.') . '</p>';
+      }
+      foreach ($GLOBALS['civicrm_setting'] ?? [] as $entity => $overrides) {
+        if (extension_loaded('mcrypt') && !empty($overrides['mailing_backend']['smtpPassword']) && $overrides['mailing_backend']['outBound_option'] == 0) {
+          // This is a fairly unlikely situation. I'm sure it's *useful* to set smtpPassword via $civicrm_setting (eg for dev or multitenant).
+          // But historically it had to follow the rules of CRM_Utils_Crypt:
+          // - For non-mcrypt servers, that was easy/plaintext. That'll work just as well going forward. We don't show any warnings about that.
+          // - For mcrypt servers, the value had to be encrypted. It's not easy to pick the right value for that. Maybe someone with multitenant would have had
+          //   enough incentive to figure this out... but they'd probably get stymied by the fact that each tenant has a different SITE_KEY.
+          // All of which is to say: if someone has gotten into a valid+working scenario of overriding smtpPassword on an mcrypt-enabled system, then they're
+          // savvy enough to figure out the migration details. We just need to point them at the problem.
+          $settingPath = sprintf('$civicrm_setting[%s][%s][%s]', var_export($entity, 1), var_export('mailing_backend', 1), var_export('smtpPassword', 1));
+          $prose = ts('This system has a PHP override for the SMTP password (%1). The override was most likely encrypted with an old mechanism. After upgrading, you must verify and/or revise this setting.', [
+            1 => $settingPath,
+          ]);
+          $preUpgradeMessage = '<p>' . $prose . '</p>';
+        }
+      }
+    }
   }
 
   /**
@@ -67,6 +91,11 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_34_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+
+    if (extension_loaded('mcrypt') && !empty(self::findSmtpPasswords())) {
+      $this->addTask('Migrate SMTP password', 'migrateSmtpPasswords');
+    }
+
     $this->addTask('core-issue#365 - Add created_date to civicrm_action_schedule', 'addColumn',
       'civicrm_action_schedule', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When was the schedule reminder created.'");
 
@@ -83,6 +112,48 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
     $this->addTask('Set defaults and required on pledge fields', 'updatePledgeTable');
 
     $this->addTask('Remove never used IMAP_XOAUTH2 option value', 'removeUnusedXOAUTH2');
+  }
+
+  /**
+   * @return array
+   *   A list of "civicrm_setting" records which have
+   *   SMTP passwords, or NULL.
+   */
+  protected static function findSmtpPasswords() {
+    $query = CRM_Utils_SQL_Select::from('civicrm_setting')
+      ->where('name = "mailing_backend"');
+
+    $matches = [];
+    foreach ($query->execute()->fetchAll() as $setting) {
+      $value = unserialize($setting['value']);
+      if (!empty($value['smtpPassword'])) {
+        $matches[] = $setting;
+      }
+    }
+
+    return $matches;
+  }
+
+  /**
+   * Find any SMTP passwords. Remove the CRM_Utils_Crypt encryption.
+   *
+   * Note: This task is only enqueued if mcrypt is active.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function migrateSmtpPasswords(CRM_Queue_TaskContext $ctx) {
+    $settings = self::findSmtpPasswords();
+    foreach ($settings as $setting) {
+      $value = unserialize($setting['value']);
+      $value['smtpPassword'] = CRM_Utils_Crypt::decrypt($value['smtpPassword']);
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = %2 WHERE id = %1', [
+        1 => [$setting['id'], 'Positive'],
+        2 => [serialize($value), 'String'],
+      ]);
+    }
+    return TRUE;
   }
 
   /**
