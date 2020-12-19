@@ -46,5 +46,4 @@ questions and ideas in the [Developer Discussion room](https://chat.civicrm.org/
 
 Installing the latest developmental code requires some [special steps](https://docs.civicrm.org/dev/en/latest/tools/git/). 
 
-Report all issues to CiviCRM via GitLab:
-https://lab.civicrm.org/
+Report all issues to CiviCRM via GitLab: https://lab.civicrm.org/dev/core
