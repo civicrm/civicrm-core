@@ -34,17 +34,25 @@ use Civi\Crypto\Exception\CryptoException;
  *
  *   - Plain text: Any string which does not begin with chr(2)
  *   - Encrypted text: A string in the format:
- *        TOKEN := DLM + VERSION + DLM + KEY_ID + DLM + CIPHERTEXT
- *        DLM := ASCII CHAR #2
- *        VERSION := String, 4-digit, alphanumeric (as in "CTK0")
- *        KEY_ID := String, alphanumeric and symbols "_-.,:;=+/\"
+ *        TOKEN := DLM + FMT + QUERY
+ *        DLM := ASCII char #2
+ *        FMT := String, 4-digit, alphanumeric (as in "CTK?")
+ *        QUERY := String, URL-encoded key-value pairs,
+ *           "k", the key ID (alphanumeric and symbols "_-.,:;=+/\")
+ *           "t", the text (base64-encoded ciphertext)
  *
  * @package Civi\Crypto
  */
 class CryptoToken {
 
-  const VERSION_1 = 'CTK0';
+  /**
+   * Format identification code
+   */
+  const FMT_QUERY = 'CTK?';
 
+  /**
+   * @var string
+   */
   protected $delim;
 
   /**
@@ -90,7 +98,11 @@ class CryptoToken {
     /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */
     $cipherSuite = $registry->findSuite($key['suite']);
     $cipherText = $cipherSuite->encrypt($plainText, $key);
-    return $this->delim . self::VERSION_1 . $this->delim . $key['id'] . $this->delim . base64_encode($cipherText);
+
+    return $this->delim . self::FMT_QUERY . \http_build_query([
+      'k' => $key['id'],
+      't' => \CRM_Utils_String::base64UrlEncode($cipherText),
+    ]);
   }
 
   /**
@@ -118,16 +130,21 @@ class CryptoToken {
     /** @var CryptoRegistry $registry */
     $registry = \Civi::service('crypto.registry');
 
-    $parts = explode($this->delim, $token, 4);
-    if (count($parts) !== 4 || $parts[1] !== self::VERSION_1) {
-      throw new CryptoException("Cannot decrypt token. Invalid format.");
+    $fmt = substr($token, 1, 4);
+    switch ($fmt) {
+      case self::FMT_QUERY:
+        parse_str(substr($token, 5), $tokenData);
+        $keyId = $tokenData['k'];
+        $cipherText = \CRM_Utils_String::base64UrlDecode($tokenData['t']);
+        break;
+
+      default:
+        throw new CryptoException("Cannot decrypt token. Invalid format.");
     }
-    $keyId = $parts[2];
-    $cipherText = base64_decode($parts[3]);
 
     $key = $registry->findKey($keyId);
     if (!in_array('*', $keyIdOrTag) && !in_array($keyId, $keyIdOrTag) && empty(array_intersect($keyIdOrTag, $key['tags']))) {
-      throw new CryptoException("Cannot decrypt token. Unexpected key: $keyId");
+      throw new CryptoException("Cannot decrypt token. Unexpected key: {$keyId}");
     }
 
     /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */

@@ -51,7 +51,8 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals('mess with me', $cryptoToken->decrypt($goodExample));
 
     try {
-      $badExample = preg_replace(';CTK0;', 'ctk9', $goodExample);
+      $badExample = preg_replace(';CTK\?;', 'ctk9', $goodExample);
+      $this->assertTrue($badExample !== $goodExample);
       $cryptoToken->decrypt($badExample);
       $this->fail("Expected CryptoException");
     }
@@ -64,11 +65,11 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     return [
       // [ 'Plain text', 'Encryption Key ID', 'expectTokenRegex', 'expectTokenLen', 'expectPlain' ]
       ['hello world. can you see me', 'plain', '/^hello world. can you see me/', 27, TRUE],
-      ['hello world. i am secret.', 'UNIT-TEST', '/^.CTK0.asdf-key-1./', 81, FALSE],
-      ['hello world. we b secret.', 'asdf-key-0', '/^.CTK0.asdf-key-0./', 81, FALSE],
-      ['hello world. u ur secret.', 'asdf-key-1', '/^.CTK0.asdf-key-1./', 81, FALSE],
-      ['hello world. he z secret.', 'asdf-key-2', '/^.CTK0.asdf-key-2./', 73, FALSE],
-      ['hello world. whos secret.', 'asdf-key-3', '/^.CTK0.asdf-key-3./', 125, FALSE],
+      ['hello world. i am secret.', 'UNIT-TEST', '/^.CTK\?k=asdf-key-1&/', 84, FALSE],
+      ['hello world. we b secret.', 'asdf-key-0', '/^.CTK\?k=asdf-key-0&/', 84, FALSE],
+      ['hello world. u ur secret.', 'asdf-key-1', '/^.CTK\?k=asdf-key-1&/', 84, FALSE],
+      ['hello world. he z secret.', 'asdf-key-2', '/^.CTK\?k=asdf-key-2&/', 75, FALSE],
+      ['hello world. whos secret.', 'asdf-key-3', '/^.CTK\?k=asdf-key-3&/', 127, FALSE],
     ];
   }
 
