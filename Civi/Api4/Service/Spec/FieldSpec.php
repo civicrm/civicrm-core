@@ -435,7 +435,9 @@ class FieldSpec {
   }
 
   /**
-   * Supplement the data from
+   * Augment the 2 values returned by BAO::buildOptions (id, label) with extra properties (name, description, color, icon, etc).
+   *
+   * We start with BAO::buildOptions in order to respect hooks which may be adding/removing items, then we add the extra data.
    *
    * @param \CRM_Core_DAO $baoName
    * @param string $fieldName
@@ -470,7 +472,9 @@ class FieldSpec {
         foreach ($extraStuff as $item) {
           if (isset($optionIndex[$item[$keyColumn]])) {
             foreach ($return as $ret) {
-              $this->options[$optionIndex[$item[$keyColumn]]][$ret] = $item[$ret] ?? NULL;
+              // Note: our schema is inconsistent about whether `description` fields allow html,
+              // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
+              $this->options[$optionIndex[$item[$keyColumn]]][$ret] = ($ret === 'description' && isset($item[$ret])) ? strip_tags($item[$ret]) : $item[$ret] ?? NULL;
             }
           }
         }
@@ -488,7 +492,9 @@ class FieldSpec {
           while ($query->fetch()) {
             foreach ($return as $ret) {
               if (property_exists($query, $ret)) {
-                $this->options[$optionIndex[$query->id]][$ret] = $query->$ret;
+                // Note: our schema is inconsistent about whether `description` fields allow html,
+                // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
+                $this->options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret) : $query->$ret;
               }
             }
           }
