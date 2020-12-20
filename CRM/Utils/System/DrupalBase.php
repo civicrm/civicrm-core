@@ -675,7 +675,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       }
       $_SESSION = [];
     }
-    else {
+    elseif (!preg_match('/kcfinder/', $_SERVER['SCRIPT_NAME'])) {
       session_start();
     }
   }
