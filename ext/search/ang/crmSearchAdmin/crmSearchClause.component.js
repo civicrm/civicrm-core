@@ -83,12 +83,24 @@
         }
       };
 
-      // Add/remove value if operator allows for one
       this.changeClauseOperator = function(clause) {
+        // Add/remove value if operator allows for one
         if (_.contains(clause[1], 'NULL')) {
           clause.length = 2;
-        } else if (clause.length === 2) {
-          clause.push('');
+        } else {
+          if (clause.length === 2) {
+            clause.push('');
+          }
+          // Change multi/single value to/from an array
+          var shouldBeArray = (clause[1] === 'IN' || clause[1] === 'NOT IN' || clause[1] === 'BETWEEN' || clause[1] === 'NOT BETWEEN');
+          if (!_.isArray(clause[2]) && shouldBeArray) {
+            clause[2] = [];
+          } else if (_.isArray(clause[2]) && !shouldBeArray) {
+            clause[2] = '';
+          }
+          if (clause[1] === 'BETWEEN' || clause[1] === 'NOT BETWEEN') {
+            clause[2].length = 2;
+          }
         }
       };
 

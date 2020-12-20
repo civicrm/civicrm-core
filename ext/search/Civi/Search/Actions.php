@@ -24,6 +24,7 @@ class Actions {
     return [
       'tasks' => self::getTasks(),
       'groupOptions' => self::getGroupOptions(),
+      'dateRanges' => \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'text'),
     ];
   }
 

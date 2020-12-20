@@ -1,0 +1,9 @@
+<div class="form-group" ng-if="$ctrl.field.options === true">
+  <input disabled class="form-control loading" crm-ui-select="{data: []}">
+</div>
+<div class="form-group" ng-if="!$ctrl.multi && $ctrl.field.options !== true">
+  <input class="form-control" ng-model="$ctrl.value" crm-ui-select="{data: $ctrl.getFieldOptions}">
+</div>
+<div class="form-group" ng-if="$ctrl.multi && $ctrl.field.options !== true">
+  <input class="form-control" ng-model="$ctrl.value" crm-ui-select="{data: $ctrl.getFieldOptions, multiple: true}" ng-list >
+</div>

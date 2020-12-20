@@ -130,6 +130,10 @@
   width: 110px;
 }
 
+#bootstrap-theme.crm-search input[type=number] {
+  width: 90px;
+}
+
 #bootstrap-theme.crm-search .api4-add-where-group-menu {
   min-width: 80px;
   background-color: rgba(186, 225, 251, 0.94);
