@@ -130,27 +130,40 @@ class CryptoToken {
     /** @var CryptoRegistry $registry */
     $registry = \Civi::service('crypto.registry');
 
+    $tokenData = $this->parse($token);
+
+    $key = $registry->findKey($tokenData['k']);
+    if (!in_array('*', $keyIdOrTag) && !in_array($tokenData['k'], $keyIdOrTag) && empty(array_intersect($keyIdOrTag, $key['tags']))) {
+      throw new CryptoException("Cannot decrypt token. Unexpected key: {$tokenData['k']}");
+    }
+
+    /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */
+    $cipherSuite = $registry->findSuite($key['suite']);
+    $plainText = $cipherSuite->decrypt($tokenData['t'], $key);
+    return $plainText;
+  }
+
+  /**
+   * Parse the content of a token (without decrypting it).
+   *
+   * @param string $token
+   *
+   * @return array
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function parse($token): array {
     $fmt = substr($token, 1, 4);
     switch ($fmt) {
       case self::FMT_QUERY:
+        $tokenData = [];
         parse_str(substr($token, 5), $tokenData);
-        $keyId = $tokenData['k'];
-        $cipherText = \CRM_Utils_String::base64UrlDecode($tokenData['t']);
+        $tokenData['t'] = \CRM_Utils_String::base64UrlDecode($tokenData['t']);
         break;
 
       default:
         throw new CryptoException("Cannot decrypt token. Invalid format.");
     }
-
-    $key = $registry->findKey($keyId);
-    if (!in_array('*', $keyIdOrTag) && !in_array($keyId, $keyIdOrTag) && empty(array_intersect($keyIdOrTag, $key['tags']))) {
-      throw new CryptoException("Cannot decrypt token. Unexpected key: {$keyId}");
-    }
-
-    /** @var \Civi\Crypto\CipherSuiteInterface $cipherSuite */
-    $cipherSuite = $registry->findSuite($key['suite']);
-    $plainText = $cipherSuite->decrypt($cipherText, $key);
-    return $plainText;
+    return $tokenData;
   }
 
 }
