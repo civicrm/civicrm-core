@@ -615,9 +615,11 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return CRM_Core_DAO
    */
   public function save($hook = TRUE) {
+    $eventID = uniqid();
     if (!empty($this->id)) {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preUpdate", $preEvent);
       }
 
@@ -625,6 +627,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.postUpdate", $event);
       }
       $this->clearDbColumnValueCache();
@@ -632,6 +635,7 @@ class CRM_Core_DAO extends DB_DataObject {
     else {
       if ($hook) {
         $preEvent = new \Civi\Core\DAO\Event\PreUpdate($this);
+        $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
       }
 
@@ -639,6 +643,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
+        $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
     }
