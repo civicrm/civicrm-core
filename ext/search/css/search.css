@@ -1,3 +1,7 @@
+#bootstrap-theme .crm-search-criteria-column {
+  min-width: 500px;
+}
+
 #bootstrap-theme #crm-search-results-page-size {
   width: 5em;
 }
