@@ -37,8 +37,13 @@
         ctrl.writeExpr();
       };
 
+      // Make a sql-friendly alias for this expression
+      function makeAlias() {
+        return (ctrl.fn + '_' + (ctrl.modifier ? ctrl.modifier + '_' : '') + ctrl.path).replace(/[.:]/g, '_');
+      }
+
       this.writeExpr = function() {
-        ctrl.expr = ctrl.fn ? (ctrl.fn + '(' + (ctrl.modifier ? ctrl.modifier + ' ' : '') + ctrl.path + ')') : ctrl.path;
+        ctrl.expr = ctrl.fn ? (ctrl.fn + '(' + (ctrl.modifier ? ctrl.modifier + ' ' : '') + ctrl.path + ') AS ' + makeAlias()) : ctrl.path;
       };
     }
   });
