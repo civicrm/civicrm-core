@@ -1565,7 +1565,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       if ($error) {
         return $error;
       }
-      _civicrm_api3_deprecated_validate_formatted_contact($formatted);
+      $this->deprecated_validate_formatted_contact($formatted);
     }
     catch (CRM_Core_Exception $e) {
       return ['error_message' => $e->getMessage(), 'is_error' => 1, 'code' => $e->getCode()];
@@ -2068,6 +2068,58 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $this->updateImportRecord($values[count($values) - 1], $importRecordParams);
     //return warning if street address is not parsed, CRM-5886
     return $this->processMessage($values, $statusFieldName, CRM_Import_Parser::VALID);
+  }
+
+  /**
+   * Validate a formatted contact parameter list.
+   *
+   * @param array $params
+   *   Structured parameter list (as in crm_format_params).
+   *
+   * @throw CRM_Core_Error
+   */
+  public function deprecated_validate_formatted_contact(&$params): void {
+    // Look for offending email addresses
+
+    if (array_key_exists('email', $params)) {
+      foreach ($params['email'] as $count => $values) {
+        if (!is_array($values)) {
+          continue;
+        }
+        if ($email = CRM_Utils_Array::value('email', $values)) {
+          // validate each email
+          if (!CRM_Utils_Rule::email($email)) {
+            throw new CRM_Core_Exception('No valid email address');
+          }
+
+          // check for loc type id.
+          if (empty($values['location_type_id'])) {
+            throw new CRM_Core_Exception('Location Type Id missing.');
+          }
+        }
+      }
+    }
+
+    // Validate custom data fields
+    if (array_key_exists('custom', $params) && is_array($params['custom'])) {
+      foreach ($params['custom'] as $key => $custom) {
+        if (is_array($custom)) {
+          foreach ($custom as $fieldId => $value) {
+            $valid = CRM_Core_BAO_CustomValue::typecheck(CRM_Utils_Array::value('type', $value),
+              CRM_Utils_Array::value('value', $value)
+            );
+            if (!$valid && $value['is_required']) {
+              throw new CRM_Core_Exception('Invalid value for custom field \'' .
+                $custom['name'] . '\''
+              );
+            }
+            if (CRM_Utils_Array::value('type', $custom) == 'Date') {
+              $params['custom'][$key][$fieldId]['value'] = str_replace('-', '', $params['custom'][$key][$fieldId]['value']);
+            }
+          }
+        }
+      }
+    }
   }
 
 }
