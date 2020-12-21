@@ -102,69 +102,6 @@ function _civicrm_api3_deprecated_check_contact_dedupe($params) {
 }
 
 /**
- * take the input parameter list as specified in the data model and
- * convert it into the same format that we use in QF and BAO object
- *
- * @param array $params
- *   Associative array of property name/value.
- *                             pairs to insert in new contact.
- * @param array $values
- *   The reformatted properties that we can use internally.
- *
- * @param array|bool $create Is the formatted Values array going to
- *                             be used for CRM_Activity_BAO_Activity::create()
- *
- * @return array|CRM_Error
- */
-function _civicrm_api3_deprecated_activity_formatted_param(&$params, &$values, $create = FALSE) {
-  // copy all the activity fields as is
-  $fields = CRM_Activity_DAO_Activity::fields();
-  _civicrm_api3_store_values($fields, $params, $values);
-
-  require_once 'CRM/Core/OptionGroup.php';
-  $customFields = CRM_Core_BAO_CustomField::getFields('Activity');
-
-  foreach ($params as $key => $value) {
-    // ignore empty values or empty arrays etc
-    if (CRM_Utils_System::isNull($value)) {
-      continue;
-    }
-
-    //Handling Custom Data
-    if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-      $values[$key] = $value;
-      $type = $customFields[$customFieldID]['html_type'];
-      if (CRM_Core_BAO_CustomField::isSerialized($customFields[$customFieldID])) {
-        $values[$key] = CRM_Import_Parser::unserializeCustomValue($customFieldID, $value, $type);
-      }
-      elseif ($type == 'Select' || $type == 'Radio') {
-        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-        foreach ($customOption as $customFldID => $customValue) {
-          $val = $customValue['value'] ?? NULL;
-          $label = $customValue['label'] ?? NULL;
-          $label = strtolower($label);
-          $value = strtolower(trim($value));
-          if (($value == $label) || ($value == strtolower($val))) {
-            $values[$key] = $val;
-          }
-        }
-      }
-    }
-
-    if ($key == 'target_contact_id') {
-      if (!CRM_Utils_Rule::integer($value)) {
-        return civicrm_api3_create_error("contact_id not valid: $value");
-      }
-      $contactID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value");
-      if (!$contactID) {
-        return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
-      }
-    }
-  }
-  return NULL;
-}
-
-/**
  * This function adds the contact variable in $values to the
  * parameter list $params.  For most cases, $values should have length 1.  If
  * the variable being added is a child of Location, a location_type_id must
