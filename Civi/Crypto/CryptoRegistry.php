@@ -68,10 +68,13 @@ class CryptoRegistry {
     $registry->addPlainText(['tags' => ['CRED']]);
     if (defined('CIVICRM_CRED_KEYS')) {
       foreach (explode(' ', CIVICRM_CRED_KEYS) as $n => $keyExpr) {
-        $registry->addSymmetricKey($registry->parseKey($keyExpr) + [
-          'tags' => ['CRED'],
-          'weight' => $n,
-        ]);
+        $key = ['tags' => ['CRED'], 'weight' => $n];
+        if ($keyExpr === 'plain') {
+          $registry->addPlainText($key);
+        }
+        else {
+          $registry->addSymmetricKey($registry->parseKey($keyExpr) + $key);
+        }
       }
     }
 
@@ -169,14 +172,15 @@ class CryptoRegistry {
    * @return array
    */
   public function addPlainText($options) {
-    if (!isset($this->keys['plain'])) {
-    }
-    if (isset($options['tags'])) {
-      $this->keys['plain']['tags'] = array_merge(
-        $options['tags']
-      );
-    }
-    return $this->keys['plain'];
+    static $n = 0;
+    $defaults = [
+      'suite' => 'plain',
+      'weight' => self::LAST_WEIGHT,
+    ];
+    $options = array_merge($defaults, $options);
+    $options['id'] = 'plain' . ($n++);
+    $this->keys[$options['id']] = $options;
+    return $options;
   }
 
   /**
