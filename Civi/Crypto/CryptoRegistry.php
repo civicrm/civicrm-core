@@ -234,6 +234,24 @@ class CryptoRegistry {
   }
 
   /**
+   * Find all the keys that apply to a tag.
+   *
+   * @param string $keyTag
+   *
+   * @return array
+   *   List of keys, indexed by id, ordered by weight.
+   */
+  public function findKeysByTag($keyTag) {
+    $keys = array_filter($this->keys, function ($key) use ($keyTag) {
+      return in_array($keyTag, $key['tags'] ?? []);
+    });
+    uasort($keys, function($a, $b) {
+      return ($a['weight'] ?? 0) - ($b['weight'] ?? 0);
+    });
+    return $keys;
+  }
+
+  /**
    * @param string $name
    * @return \Civi\Crypto\CipherSuiteInterface
    * @throws \Civi\Crypto\Exception\CryptoException
