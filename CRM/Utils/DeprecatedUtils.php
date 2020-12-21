@@ -489,28 +489,6 @@ function _civicrm_api3_deprecated_duplicate_formatted_contact($params) {
 }
 
 /**
- * @deprecated - this is part of the import parser not the API & needs to be moved on out
- *
- * @param array $params
- * @param $onDuplicate
- *
- * @return array|bool
- *   <type>
- */
-function _civicrm_api3_deprecated_create_participant_formatted($params, $onDuplicate) {
-  require_once 'CRM/Event/Import/Parser.php';
-  if ($onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
-    CRM_Core_Error::reset();
-    $error = _civicrm_api3_deprecated_participant_check_params($params, TRUE);
-    if (civicrm_error($error)) {
-      return $error;
-    }
-  }
-  require_once "api/v3/Participant.php";
-  return civicrm_api3_participant_create($params);
-}
-
-/**
  *
  * @param array $params
  *
