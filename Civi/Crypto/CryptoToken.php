@@ -144,6 +144,40 @@ class CryptoToken {
   }
 
   /**
+   * Re-encrypt an existing token with a newer version of the key.
+   *
+   * @param string $oldToken
+   * @param string $keyTag
+   *   Ex: 'CRED'
+   *
+   * @return string|null
+   *   A re-encrypted version of $oldToken, or NULL if there should be no change.
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function rekey($oldToken, $keyTag) {
+    /** @var \Civi\Crypto\CryptoRegistry $registry */
+    $registry = \Civi::service('crypto.registry');
+
+    $sourceKeys = $registry->findKeysByTag($keyTag);
+    $targetKey = array_shift($sourceKeys);
+
+    if ($this->isPlainText($oldToken)) {
+      if ($targetKey['suite'] === 'plain') {
+        return NULL;
+      }
+    }
+    else {
+      $tokenData = $this->parse($oldToken);
+      if ($tokenData['k'] === $targetKey['id'] || !isset($sourceKeys[$tokenData['k']])) {
+        return NULL;
+      }
+    }
+
+    $decrypted = $this->decrypt($oldToken);
+    return $this->encrypt($decrypted, $targetKey['id']);
+  }
+
+  /**
    * Parse the content of a token (without decrypting it).
    *
    * @param string $token
