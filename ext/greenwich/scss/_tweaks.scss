@@ -6,3 +6,7 @@
 label input[type=checkbox]:not(:checked) + * {
   font-weight: normal;
 }
+/* Fix tagging-style select2 */
+.select2-choices {
+  margin-bottom: 0;
+}
