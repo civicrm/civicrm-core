@@ -92,6 +92,66 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals($inputText, $actualText);
   }
 
+  public function testRekeyCiphertext() {
+    /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
+    $cryptoRegistry = \Civi::service('crypto.registry');
+    /** @var \Civi\Crypto\CryptoToken $cryptoToken */
+    $cryptoToken = \Civi::service('crypto.token');
+
+    $first = $cryptoToken->encrypt("hello world", 'UNIT-TEST');
+    $this->assertRegExp(';k=asdf-key-1;', $first);
+    $this->assertEquals('hello world', $cryptoToken->decrypt($first));
+
+    // If the keys haven't changed yet, then rekey() is a null-op.
+    $second = $cryptoToken->rekey($first, 'UNIT-TEST');
+    $this->assertTrue($second === NULL);
+
+    // But if we add a newer key, then rekey() will yield new token.
+    $cryptoRegistry->addSymmetricKey($cryptoRegistry->parseKey('::foo') + [
+      'tags' => ['UNIT-TEST'],
+      'weight' => -100,
+      'id' => 'new-key',
+    ]);
+    $third = $cryptoToken->rekey($first, 'UNIT-TEST');
+    $this->assertNotRegExp(';k=asdf-key-1;', $third);
+    $this->assertRegExp(';k=new-key;', $third);
+    $this->assertEquals('hello world', $cryptoToken->decrypt($third));
+  }
+
+  public function testRekeyUpgradeDowngradePlaintext() {
+    /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
+    $cryptoRegistry = \Civi::service('crypto.registry');
+    /** @var \Civi\Crypto\CryptoToken $cryptoToken */
+    $cryptoToken = \Civi::service('crypto.token');
+
+    // In the first pass, we have no real key.
+    $cryptoRegistry->addPlainText(['tags' => ['APPLE'], 'weight' => -1]);
+    $first = $cryptoToken->encrypt("hello world", 'APPLE');
+    $this->assertEquals('hello world', $first);
+    $this->assertEquals('hello world', $cryptoToken->decrypt($first));
+
+    // If the keys haven't changed yet, then rekey() is a null-op.
+    $second = $cryptoToken->rekey($first, 'APPLE');
+    $this->assertTrue($second === NULL);
+
+    // But if we add a key, then it takes precedence.
+    $cryptoRegistry->addSymmetricKey($cryptoRegistry->parseKey('::applepie') + [
+      'tags' => ['APPLE'],
+      'weight' => -3,
+      'id' => 'interim-key',
+    ]);
+    $third = $cryptoToken->rekey($first, 'APPLE');
+    $this->assertRegExp(';k=interim-key;', $third);
+    $this->assertEquals('hello world', $cryptoToken->decrypt($third));
+
+    // But if we add another key with earlier priority,
+    $cryptoRegistry->addPlainText(['tags' => ['APPLE'], 'weight' => -4]);
+    $fourth = $cryptoToken->rekey($third, 'APPLE');
+    $this->assertEquals('hello world', $fourth);
+    $this->assertEquals('hello world', $cryptoToken->decrypt($fourth));
+
+  }
+
   public function testReadPlainTextWithoutRegistry() {
     // This is performance optimization - don't initialize crypto.registry unless
     // you actually need it.
