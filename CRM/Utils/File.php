@@ -332,9 +332,6 @@ class CRM_Utils_File {
     if (PEAR::isError($db)) {
       die("Cannot open $dsn: " . $db->getMessage());
     }
-    if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      $db->query('SET SESSION sql_mode = STRICT_TRANS_TABLES');
-    }
     $db->query('SET NAMES utf8mb4');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
     $db->query('SET @uniqueID = ' . "'$transactionId'");
