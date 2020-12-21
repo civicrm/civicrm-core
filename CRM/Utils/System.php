@@ -1829,7 +1829,17 @@ class CRM_Utils_System {
   }
 
   /**
-   * Determine whether this is a developmental system.
+   * Determine whether this system is deployed using version control.
+   *
+   * Normally sites would tune their php error settings to prevent deprecation
+   * notices appearing on a live site. However, on some systems the user
+   * does not have control over this setting. Sites with version-controlled
+   * deployments are unlikely to be in a situation where they cannot alter their
+   * php error level reporting so we can trust that the are able to set them
+   * to suppress deprecation / php error level warnings if appropriate but
+   * in order to phase in deprecation warnings we originally chose not to
+   * show them on sites who might not be able to set their error_level in
+   * a way that is appropriate to their site.
    *
    * @return bool
    */

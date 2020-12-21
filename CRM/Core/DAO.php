@@ -186,16 +186,6 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     $factory = new CRM_Contact_DAO_Factory();
     CRM_Core_DAO::setFactory($factory);
-    $currentModes = CRM_Utils_SQL::getSqlModes();
-    if (CRM_Utils_Constant::value('CIVICRM_MYSQL_STRICT', CRM_Utils_System::isDevelopment())) {
-      if (CRM_Utils_SQL::supportsFullGroupBy() && !in_array('ONLY_FULL_GROUP_BY', $currentModes) && CRM_Utils_SQL::isGroupByModeInDefault()) {
-        $currentModes[] = 'ONLY_FULL_GROUP_BY';
-      }
-      if (!in_array('STRICT_TRANS_TABLES', $currentModes)) {
-        $currentModes = array_merge(['STRICT_TRANS_TABLES'], $currentModes);
-      }
-      CRM_Core_DAO::executeQuery("SET SESSION sql_mode = %1", [1 => [implode(',', $currentModes), 'String']]);
-    }
     CRM_Core_DAO::executeQuery('SET NAMES utf8mb4');
     CRM_Core_DAO::executeQuery('SET @uniqueID = %1', [1 => [CRM_Utils_Request::id(), 'String']]);
   }

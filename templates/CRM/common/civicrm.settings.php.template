@@ -468,19 +468,8 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
  */
 define('CIVICRM_DEADLOCK_RETRIES', 3);
 
-/**
- * Configure MySQL to throw more errors when encountering unusual SQL expressions.
- *
- * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
- * to FALSE; for SVN checkouts, it defaults to TRUE.
- */
-// if (!defined('CIVICRM_MYSQL_STRICT')) {
-// define('CIVICRM_MYSQL_STRICT', TRUE );
-// }
-
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
-  if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);
 }
 
 /**
