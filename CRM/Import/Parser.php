@@ -524,7 +524,7 @@ abstract class CRM_Import_Parser {
    */
   protected function checkContactDuplicate(&$formatValues) {
     //retrieve contact id using contact dedupe rule
-    $formatValues['contact_type'] = $this->_contactType;
+    $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->_contactType;
     $formatValues['version'] = 3;
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);

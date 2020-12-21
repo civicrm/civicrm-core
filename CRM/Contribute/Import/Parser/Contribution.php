@@ -352,10 +352,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     }
 
     if ($this->_contactIdIndex < 0) {
-      // set the contact type if its not set
-      if (!isset($paramValues['contact_type'])) {
-        $paramValues['contact_type'] = $this->_contactType;
-      }
 
       $error = $this->checkContactDuplicate($paramValues);
 
@@ -911,7 +907,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
             }
             else {
               // we need to get contribution contact using de dupe
-              $error = _civicrm_api3_deprecated_check_contact_dedupe($params);
+              $error = $this->checkContactDuplicate($params);
 
               if (isset($error['error_message']['params'][0])) {
                 $matchedIDs = explode(',', $error['error_message']['params'][0]);
