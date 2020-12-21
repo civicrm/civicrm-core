@@ -4254,8 +4254,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
 
-    CRM_Core_Error::debug_log_message('Contribution record updated successfully');
     $transaction->commit();
+    \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
 
     // @todo - check if Contribution::create does this, test, remove.
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
@@ -4278,10 +4278,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'id' => $contributionID,
         'payment_processor_id' => $paymentProcessorId,
       ]);
-      CRM_Core_Error::debug_log_message("Receipt sent");
+      \Civi::log()->info("Contribution {$contributionParams['id']} Receipt sent");
     }
 
-    CRM_Core_Error::debug_log_message("Success: Database updated");
     return $contributionResult;
   }
 
