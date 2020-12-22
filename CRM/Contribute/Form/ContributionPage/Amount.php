@@ -752,7 +752,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
             $deletePledgeBlk = FALSE;
             $pledgeBlockParams = [
               'entity_id' => $contributionPageID,
-              'entity_table' => ts('civicrm_contribution_page'),
+              'entity_table' => 'civicrm_contribution_page',
             ];
             if ($this->_pledgeBlockID) {
               $pledgeBlockParams['id'] = $this->_pledgeBlockID;
