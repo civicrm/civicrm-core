@@ -5,19 +5,23 @@
   angular.module('crmSearchDisplay', CRM.angRequires('crmSearchDisplay'))
 
     .factory('searchDisplayUtils', function() {
+
+      function replaceTokens(str, data) {
+        if (!str) {
+          return '';
+        }
+        _.each(data, function(value, key) {
+          str = str.replace('[' + key + ']', value);
+        });
+        return str;
+      }
+
       function getUrl(link, row) {
         var url = replaceTokens(link, row);
         if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
           url = CRM.url(url);
         }
         return _.escape(url);
-      }
-
-      function replaceTokens(str, data) {
-        _.each(data, function(value, key) {
-          str = str.replace('[' + key + ']', value);
-        });
-        return str;
       }
 
       function formatSearchValue(row, col, value) {
@@ -99,7 +103,8 @@
         formatSearchValue: formatSearchValue,
         canAggregate: canAggregate,
         prepareColumns: prepareColumns,
-        prepareParams: prepareParams
+        prepareParams: prepareParams,
+        replaceTokens: replaceTokens
       };
     });
 

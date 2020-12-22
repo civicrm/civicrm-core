@@ -45,11 +45,12 @@
       </div>
       <div class="form-inline">
         <label>{{:: ts('Link:') }}</label>
-        <crm-search-admin-link-select column="col" links="$ctrl.links"></crm-search-admin-link-select>
+        <crm-search-admin-link-select column="col" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-select>
       </div>
       <div class="form-inline">
         <label>{{:: ts('Tooltip:') }}</label>
         <input class="form-control" type="text" ng-model="col.title" />
+        <crm-search-admin-token-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="title"></crm-search-admin-token-select>
       </div>
     </fieldset>
   </fieldset>

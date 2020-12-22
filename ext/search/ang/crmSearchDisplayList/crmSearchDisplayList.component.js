@@ -18,6 +18,7 @@
         this.apiParams = _.cloneDeep(this.apiParams);
         this.apiParams.limit = parseInt(this.settings.limit || 0, 10);
         this.columns = searchDisplayUtils.prepareColumns(this.settings.columns, this.apiParams);
+        $scope.displayUtils = searchDisplayUtils;
       };
 
       this.getResults = function() {
