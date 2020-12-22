@@ -24,7 +24,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
       'expr' => 1,
-      'must_be' => ['SqlField'],
+      'must_be' => ['SqlField', 'sqlFunction'],
       'optional' => FALSE,
     ],
     [

@@ -76,6 +76,18 @@ class SqlFunctionTest extends UnitTestCase {
 
     $this->assertTrue(4 === $agg['count']);
     $this->assertContains('Donation', $agg['GROUP_CONCAT:financial_type_id:name']);
+
+    // Test GROUP_CONCAT with a CONCAT as well
+    $agg = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect("GROUP_CONCAT(CONCAT(financial_type_id, ', ', contact_id, ', ', total_amount))")
+      ->addSelect('COUNT(*) AS count')
+      ->execute()
+      ->first();
+
+    $this->assertTrue(4 === $agg['count']);
+    $this->assertContains('1, ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
   }
 
   public function testGroupHaving() {
