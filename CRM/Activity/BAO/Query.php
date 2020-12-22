@@ -290,8 +290,12 @@ class CRM_Activity_BAO_Query {
           $names[] = $activityTags[$v];
         }
 
-        $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
-        $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_activity_tag.tag_id", $op, $value);
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Core_DAO_EntityTag', 'tag_id', $value, $op);
+        $query->_qill[$grouping][] = ts('Activity Tag %1 %2', [
+          1 => $op,
+          2 => $value,
+        ]);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
         break;
 
