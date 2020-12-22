@@ -28,6 +28,8 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
@@ -36,8 +38,12 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of payment edit form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testSubmitOnPaymentInstrumentChange() {
+  public function testSubmitOnPaymentInstrumentChange(): void {
     // First create a contribution using 'Check' as payment instrument
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit([
@@ -61,7 +67,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
       'pan_truncation' => 1111,
-      'trnx_id' => 'txn_12AAAA',
+      'trxn_id' => 'txn_12AAAA',
       'trxn_date' => date('Y-m-d H:i:s'),
       'contribution_id' => $contribution['id'],
     ];
@@ -81,7 +87,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
         'total_amount' => -50.00,
         'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
-        'status' => 'Completed',
+        'status' => 'Refunded Label**',
         'receive_date' => $params['trxn_date'],
         'check_number' => '123XA',
       ],

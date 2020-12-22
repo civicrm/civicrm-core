@@ -174,6 +174,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    *
    * @param array $submittedValues
    *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function submit($submittedValues) {
     // if payment instrument is changed then
@@ -181,29 +182,17 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     //  2. Record a new financial transaction with new payment instrument
     //  3. Add EntityFinancialTrxn records to relate with corresponding financial item and contribution
     if ($submittedValues['payment_instrument_id'] != $this->_values['payment_instrument_id']) {
-      $previousFinanciaTrxn = $this->_values;
+      civicrm_api3('Payment', 'cancel', [
+        'id' => $this->_values['id'],
+        'trxn_date' => $submittedValues['trxn_date'],
+      ]);
+
       $newFinancialTrxn = $submittedValues;
-      unset($previousFinanciaTrxn['id'], $newFinancialTrxn['id']);
-      $previousFinanciaTrxn['trxn_date'] = CRM_Utils_Array::value('trxn_date', $submittedValues, date('YmdHis'));
-      $previousFinanciaTrxn['total_amount'] = -$previousFinanciaTrxn['total_amount'];
-      $previousFinanciaTrxn['net_amount'] = -$previousFinanciaTrxn['net_amount'];
-      $previousFinanciaTrxn['fee_amount'] = -$previousFinanciaTrxn['fee_amount'];
-      $previousFinanciaTrxn['contribution_id'] = $newFinancialTrxn['contribution_id'] = $this->_contributionID;
-
+      unset($newFinancialTrxn['id']);
       $newFinancialTrxn['to_financial_account_id'] = CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($submittedValues['payment_instrument_id']);
-      foreach (['total_amount', 'currency', 'is_payment', 'status_id'] as $fieldName) {
-        $newFinancialTrxn[$fieldName] = $this->_values[$fieldName];
-      }
-
-      foreach ([$previousFinanciaTrxn, $newFinancialTrxn] as $financialTrxnParams) {
-        $financialTrxn = civicrm_api3('FinancialTrxn', 'create', $financialTrxnParams);
-        $trxnParams = [
-          'total_amount' => $financialTrxnParams['total_amount'],
-          'contribution_id' => $this->_contributionID,
-        ];
-        $contributionTotalAmount = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->_contributionID, 'total_amount');
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($trxnParams, $financialTrxn['id'], $contributionTotalAmount);
-      }
+      $newFinancialTrxn['total_amount'] = $this->_values['total_amount'];
+      $newFinancialTrxn['currency'] = $this->_values['currency'];
+      civicrm_api3('Payment', 'create', $newFinancialTrxn);
     }
     else {
       // simply update the financial trxn
@@ -217,8 +206,10 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * Wrapper for unit testing the post process submit function.
    *
    * @param array $params
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit($params) {
+  public function testSubmit(array $params): void {
     $this->_id = $params['id'];
     $this->_contributionID = $params['contribution_id'];
     $this->_values = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $params['id']]);
