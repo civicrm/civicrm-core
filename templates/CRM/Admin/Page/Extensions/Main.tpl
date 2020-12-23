@@ -19,19 +19,19 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
       </thead>
       <tbody>
         {foreach from=$localExtensionRows key=extKey item=row}
-        <tr id="extension-{$row.file}" class="crm-entity crm-extension-{$row.file}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
+        <tr id="extension-{$row.file|escape}" class="crm-entity crm-extension-{$row.file|escape}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
-              <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>{$row.description}
+              <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label|escape}</strong><br/>{$row.description|escape}
               {if $extAddNewEnabled && $remoteExtensionRows[$extKey] && $remoteExtensionRows[$extKey].upgradelink}
                 <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink}</div>
               {/if}
           </td>
           <td class="crm-extensions-label">{$row.statusLabel} {if $row.upgradable}<br/>({ts}Outdated{/ts}){/if}</td>
-          <td class="crm-extensions-label">{$row.version} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
-          <td class="crm-extensions-description">{$row.type|capitalize}</td>
+          <td class="crm-extensions-label">{$row.version|escape} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
+          <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
-        <tr class="hiddenElement" id="crm-extensions-details-{$row.file}">
+        <tr class="hiddenElement" id="crm-extensions-details-{$row.file|escape}">
             <td>
                 {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
             </td>

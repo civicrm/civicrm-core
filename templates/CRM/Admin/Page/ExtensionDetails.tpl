@@ -1,24 +1,24 @@
 <table class="crm-info-panel">
         {foreach from=$extension.urls key=label item=url}
-            <tr><td class="label">{$label}</td><td><a href="{$url}">{$url}</a></td></tr>
+            <tr><td class="label">{$label|escape}</td><td><a href="{$url|escape}">{$url|escape}</a></td></tr>
         {/foreach}
     <tr>
-        <td class="label">{ts}Author{/ts}</td><td>{$extension.maintainer.author} (<a href="mailto:{$extension.maintainer.email}">{$extension.maintainer.email}</a>)</td>
+        <td class="label">{ts}Author{/ts}</td><td>{$extension.maintainer.author|escape} (<a href="mailto:{$extension.maintainer.email|escape}">{$extension.maintainer.email|escape}</a>)</td>
     </tr>
     <tr>
-      <td class="label">{ts}Comments{/ts}</td><td>{$extension.comments}</td>
+      <td class="label">{ts}Comments{/ts}</td><td>{$extension.comments|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}Version{/ts}</td><td>{$extension.version}</td>
+        <td class="label">{ts}Version{/ts}</td><td>{$extension.version|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate}</td>
+        <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}License{/ts}</td><td>{$extension.license}</td>
+        <td class="label">{ts}License{/ts}</td><td>{$extension.license|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage}</td>
+        <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage|escape}</td>
     </tr>
     <tr>
         <td class="label">{ts}Requires{/ts}</td>
@@ -39,17 +39,17 @@
         <td class="label">{ts}Compatible with{/ts}</td>
         <td>
             {foreach from=$extension.compatibility.ver item=ver}
-                {$ver} &nbsp;
+                {$ver|escape} &nbsp;
             {/foreach}
         </td>
     </tr>
     <tr>
-      <td class="label">{ts}Local path{/ts}</td><td>{$extension.path}</td>
+      <td class="label">{ts}Local path{/ts}</td><td>{$extension.path|escape}</td>
     </tr>
     <tr>
-      <td class="label">{ts}Download location{/ts}</td><td>{$extension.downloadUrl}</td>
+      <td class="label">{ts}Download location{/ts}</td><td>{$extension.downloadUrl|escape}</td>
     </tr>
     <tr>
-      <td class="label">{ts}Key{/ts}</td><td>{$extension.key}</td>
+      <td class="label">{ts}Key{/ts}</td><td>{$extension.key|escape}</td>
     </tr>
 </table>
