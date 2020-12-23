@@ -438,7 +438,11 @@ VALUES $sqlValueString
 
       $relationshipJoin = $relationshipClause = '';
       if (!$selectAll && $componentTable) {
-        $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.contact_id = {$contactA}";
+        $field = 'contact_id';
+        if ($componentTable === 'civicrm_contact') {
+          $field = 'id';
+        }
+        $relationshipJoin = " INNER JOIN {$componentTable} ctTable ON ctTable.$field = {$contactA}";
       }
       elseif (!empty($relIDs)) {
         $relID = implode(',', $relIDs);
