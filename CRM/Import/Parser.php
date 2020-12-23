@@ -527,8 +527,71 @@ abstract class CRM_Import_Parser {
     $formatValues['contact_type'] = $formatValues['contact_type'] ?? $this->_contactType;
     $formatValues['version'] = 3;
     require_once 'CRM/Utils/DeprecatedUtils.php';
-    $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
-    return $error;
+    $params = $formatValues;
+    static $cIndieFields = NULL;
+    static $defaultLocationId = NULL;
+
+    $contactType = $params['contact_type'];
+    if ($cIndieFields == NULL) {
+      $cTempIndieFields = CRM_Contact_BAO_Contact::importableFields($contactType);
+      $cIndieFields = $cTempIndieFields;
+
+      $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+
+      // set the value to default location id else set to 1
+      if (!$defaultLocationId = (int) $defaultLocation->id) {
+        $defaultLocationId = 1;
+      }
+    }
+
+    $locationFields = CRM_Contact_BAO_Query::$_locationSpecificFields;
+
+    $contactFormatted = [];
+    foreach ($params as $key => $field) {
+      if ($field == NULL || $field === '') {
+        continue;
+      }
+      // CRM-17040, Considering only primary contact when importing contributions. So contribution inserts into primary contact
+      // instead of soft credit contact.
+      if (is_array($field) && $key != "soft_credit") {
+        foreach ($field as $value) {
+          $break = FALSE;
+          if (is_array($value)) {
+            foreach ($value as $name => $testForEmpty) {
+              if ($name !== 'phone_type' &&
+                ($testForEmpty === '' || $testForEmpty == NULL)
+              ) {
+                $break = TRUE;
+                break;
+              }
+            }
+          }
+          else {
+            $break = TRUE;
+          }
+          if (!$break) {
+            _civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
+          }
+        }
+        continue;
+      }
+
+      $value = [$key => $field];
+
+      // check if location related field, then we need to add primary location type
+      if (in_array($key, $locationFields)) {
+        $value['location_type_id'] = $defaultLocationId;
+      }
+      elseif (array_key_exists($key, $cIndieFields)) {
+        $value['contact_type'] = $contactType;
+      }
+
+      _civicrm_api3_deprecated_add_formatted_param($value, $contactFormatted);
+    }
+
+    $contactFormatted['contact_type'] = $contactType;
+
+    return _civicrm_api3_deprecated_duplicate_formatted_contact($contactFormatted);
   }
 
   /**
