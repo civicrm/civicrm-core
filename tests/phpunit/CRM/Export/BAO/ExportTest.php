@@ -665,6 +665,40 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exporting contacts merged into households
+   *
+   * This is to ensure that dev/core#2272 remains fixed.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $includeHouseHold
+   *
+   * @throws CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testExportMergeToHousehold($includeHouseHold) {
+    list($householdID, $houseHoldTypeID) = $this->setUpHousehold();
+
+    if ($includeHouseHold) {
+      $this->contactIDs[] = $householdID;
+    }
+    $selectedFields = [
+      ['contact_type' => 'Individual', 'name' => 'contact_source', 'location_type_id' => ''],
+    ];
+    $this->doExportTest([
+      'ids' => $this->contactIDs,
+      'fields' => $selectedFields,
+      'mergeSameHousehold' => TRUE,
+      'componentTable' => 'civicrm_contact',
+      'componentClause' => 'contact_a.id IN (' . implode(',', $this->contactIDs) . ')',
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertCount(1, $this->csv);
+    $this->assertEquals($householdID, $row['Household ID']);
+
+  }
+
+  /**
    * Test exporting relationships.
    *
    * @throws \CRM_Core_Exception
