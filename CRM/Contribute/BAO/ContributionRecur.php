@@ -450,6 +450,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       }
       $result = array_merge($templateContribution, $overrides);
       $result['line_item'] = self::reformatLineItemsForRepeatContribution($result['total_amount'], $result['financial_type_id'], $lineItems, (array) $templateContribution);
+      // If the template contribution was made on-behalf then add the
+      // relevant values to ensure the activity reflects that.
+      $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($result['id']);
+      if (!empty($relatedContact['individual_id'])) {
+        $result['on_behalf'] = TRUE;
+        $result['source_contact_id'] = $relatedContact['individual_id'];
+      }
       return $result;
     }
     return [];

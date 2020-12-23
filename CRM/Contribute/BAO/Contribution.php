@@ -2442,7 +2442,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       else {
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
-      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id'] as $fieldName) {
+      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id'] as $fieldName) {
         if (isset($templateContribution[$fieldName])) {
           $contributionParams[$fieldName] = $templateContribution[$fieldName];
         }
@@ -4266,18 +4266,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // @todo - check if Contribution::create does this, test, remove.
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);
-
-    // create an activity record
-    // @todo - check if Contribution::create does this, test, remove.
-    if ($input['component'] == 'contribute') {
-      //CRM-4027
-      $targetContactID = NULL;
-      if ($contributionContactID) {
-        $targetContactID = $contribution->contact_id;
-        $contribution->contact_id = $contributionContactID;
-      }
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID);
-    }
 
     if (self::isEmailReceipt($input, $contribution->contribution_page_id, $recurringContributionID)) {
       civicrm_api3('Contribution', 'sendconfirmation', [
