@@ -51,7 +51,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
     // Initialize new form
     if (!$this->_blockCount) {
       $this->_blockCount = 4;
-      $this->set('newBlock', 1);
+      if (!$this->_ssID) {
+        $this->set('newBlock', 1);
+      }
     }
 
     //get the column count
