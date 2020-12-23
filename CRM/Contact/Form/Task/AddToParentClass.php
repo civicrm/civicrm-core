@@ -52,12 +52,17 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
           $chekFlag = $id;
         }
 
-        $checkBoxes[$id] = $this->createElement('radio', NULL, NULL, NULL, $id);
+        $checkBoxes[$id] = NULL;
       }
 
-      $this->addGroup($checkBoxes, 'contact_check');
+      $group = $this->addRadio('contact_check', NULL, $checkBoxes);
+      $groupElements = $group->getElements();
       if ($chekFlag) {
-        $checkBoxes[$chekFlag]->setChecked(TRUE);
+        foreach ($groupElements as $groupElement) {
+          if ($groupElement->getValue() == $chekFlag) {
+            $groupElement->setChecked(TRUE);
+          }
+        }
       }
       $this->assign('searchRows', $searchRows);
     }

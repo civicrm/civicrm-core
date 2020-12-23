@@ -130,7 +130,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       $membership = $membershipDefault = $params = [];
       foreach ($membershipTypes as $k => $v) {
         $membership[] = $this->createElement('advcheckbox', $k, NULL, $v);
-        $membershipDefault[] = $this->createElement('radio', NULL, NULL, NULL, $k);
+        $membershipDefault[$k] = NULL;
         $membershipRequired[$k] = NULL;
         if ($isRecur) {
           $autoRenew = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $k, 'auto_renew');
@@ -160,8 +160,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $this->assign('auto_renew', $this->_renewOption);
       }
       $this->addGroup($membership, 'membership_type', ts('Membership Types'));
-      $this->addGroup($membershipDefault, 'membership_type_default', ts('Membership Types Default'))
-        ->setAttribute('allowClear', TRUE);
+      $this->addRadio('membership_type_default', ts('Membership Types Default'), $membershipDefault, ['allowClear' => TRUE]);
 
       $this->addFormRule(['CRM_Member_Form_MembershipBlock', 'formRule'], $this->_id);
     }

@@ -171,7 +171,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
     }
 
-    $radio[$productDAO->id] = $form->createElement('radio', NULL, NULL, NULL, $productDAO->id, NULL);
+    $radio[$productDAO->id] = NULL;
     $options = $temp = [];
     $temp = explode(',', $productDAO->options);
     foreach ($temp as $value) {
@@ -181,7 +181,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
       $form->add('select', 'options_' . $productDAO->id, NULL, $options);
     }
 
-    $form->addGroup($radio, 'selectProduct', NULL);
+    $form->addRadio('selectProduct', NULL, $radio);
 
     $form->assign('showRadio', TRUE);
     $form->assign('showSelectOptions', TRUE);

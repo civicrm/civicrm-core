@@ -881,9 +881,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         // radio button for Honor Type
         foreach ($form->_values['soft_credit_types'] as $value) {
-          $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
+          $honorTypes[$value] = $softCreditTypes[$value];
         }
-        $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
+        $form->addRadio('soft_credit_type_id', NULL, $honorTypes, ['allowClear' => TRUE]);
 
         $honoreeProfileFields = CRM_Core_BAO_UFGroup::getFields(
           $this->_values['honoree_profile_id'], FALSE,
@@ -1175,7 +1175,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
 
-      $membershipTypeIds = $membershipTypes = $radio = [];
+      $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
       $allowAutoRenewMembership = $autoRenewOption = FALSE;
@@ -1262,9 +1262,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
 
             //add membership type.
-            $radio[$memType['id']] = $this->createElement('radio', NULL, NULL, NULL,
-              $memType['id'], $javascriptMethod
-            );
+            $radio[$memType['id']] = NULL;
+            $radioOptAttrs[$memType['id']] = $javascriptMethod;
             if ($cid) {
               $membership = new CRM_Member_DAO_Membership();
               $membership->contact_id = $cid;
@@ -1284,6 +1283,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               if ($membership->find(TRUE)) {
                 if (!$membership->end_date) {
                   unset($radio[$memType['id']]);
+                  unset($radioOptAttrs[$memType['id']]);
                   $this->assign('islifetime', TRUE);
                   continue;
                 }
@@ -1329,8 +1329,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if (!$membershipPriceset) {
           if (!$this->_membershipBlock['is_required']) {
             $this->assign('showRadioNoThanks', TRUE);
-            $radio[''] = $this->createElement('radio', NULL, NULL, NULL, 'no_thanks', NULL);
-            $this->addGroup($radio, 'selectMembership', NULL);
+            $radio['no_thanks'] = NULL;
+            $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
           }
           elseif ($this->_membershipBlock['is_required'] && count($radio) == 1) {
             $temp = array_keys($radio);
@@ -1339,7 +1339,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             $this->assign('showRadio', FALSE);
           }
           else {
-            $this->addGroup($radio, 'selectMembership', NULL);
+            foreach ($radioOptAttrs as $opt => $attrs) {
+              $attrs['class'] = ' required';
+            }
+            $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
           }
 
           $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');

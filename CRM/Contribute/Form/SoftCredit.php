@@ -43,9 +43,9 @@ class CRM_Contribute_Form_SoftCredit {
 
           // radio button for Honor Type
           foreach ($jsonData['soft_credit_types'] as $value) {
-            $honorTypes[$value] = $form->createElement('radio', NULL, NULL, $softCreditTypes[$value], $value);
+            $honorTypes[$value] = $softCreditTypes[$value];
           }
-          $form->addGroup($honorTypes, 'soft_credit_type_id', NULL)->setAttribute('allowClear', TRUE);
+          $form->addRadio('soft_credit_type_id', NULL, $honorTypes, ['allowClear' => TRUE]);
         }
       }
       return $form;

@@ -334,14 +334,14 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       // is active ?
       $this->add('checkbox', "option_status[$i]", ts('Active?'));
 
-      $defaultOption[$i] = $this->createElement('radio', NULL, NULL, NULL, $i);
+      $defaultOption[$i] = NULL;
 
       //for checkbox handling of default option
       $this->add('checkbox', "default_checkbox_option[$i]", NULL);
     }
 
     //default option selection
-    $this->addGroup($defaultOption, 'default_option');
+    $this->addRadio('default_option', NULL, $defaultOption);
 
     $_showHide->addToTemplate();
 

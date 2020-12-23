@@ -428,7 +428,8 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->assign('membershipFieldID', $field->id);
           }
 
-          $choice[$opId] = $qf->createElement('radio', NULL, '', $opt['label'], $opt['id'], $extra);
+          $choice[$opt['id']] = $opt['label'];
+          $choiceAttrs[$opt['id']] = $extra;
           if ($is_pay_later) {
             $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
           }
@@ -437,17 +438,16 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (in_array($opId, $freezeOptions)) {
             self::freezeIfEnabled($choice[$opId], $customOption[$opId]);
             // CRM-14696 - Improve display for sold out price set options
-            $choice[$opId]->setText('<span class="sold-out-option">' . $choice[$opId]->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
+            $choice[$opt['id']] = '<span class="sold-out-option">' . $opt['label'] . '&nbsp;(' . ts('Sold out') . ')</span>';
           }
         }
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
-          $choice[] = $qf->createElement('radio', NULL, '', ts('No thank you'), '-1',
-            [
-              'price' => json_encode([$elementName, '0|0']),
-              'data-currency' => $currencyName,
-              'onclick' => 'clearAmountOther();',
-            ]
-          );
+          $choice['-1'] = ts('No thank you');
+          $choiceAttrs['-1'] = [
+            'price' => json_encode([$elementName, '0|0']),
+            'data-currency' => $currencyName,
+            'onclick' => 'clearAmountOther();',
+          ];
         }
 
         if (!$field->is_required) {
@@ -462,12 +462,11 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $none = ts('- none -');
           }
 
-          $choice[] = $qf->createElement('radio', NULL, '', $none, '0',
-            ['price' => json_encode([$elementName, '0'])]
-          );
+          $choice['0'] = $none;
+          $choiceAttrs['0'] = ['price' => json_encode([$elementName, '0'])];
         }
 
-        $element = &$qf->addGroup($choice, $elementName, $label);
+        $element = &$qf->addRadio($elementName, $label, $choice, [], NULL, FALSE, $choiceAttrs);
 
         // make contribution field required for quick config when membership block is enabled
         if (($field->name == 'membership_amount' || $field->name == 'contribution_amount')
