@@ -165,46 +165,24 @@ FROM   {$this->_componentTable}
    */
   public function buildQuickForm() {
     //export option
-    $exportOptions = $mergeOptions = $postalMailing = [];
-    $exportOptions[] = $this->createElement('radio',
-      NULL, NULL,
-      ts('Export PRIMARY fields'),
-      self::EXPORT_ALL,
-      ['onClick' => 'showMappingOption( );']
-    );
-    $exportOptions[] = $this->createElement('radio',
-      NULL, NULL,
-      ts('Select fields for export'),
-      self::EXPORT_SELECTED,
-      ['onClick' => 'showMappingOption( );']
-    );
-
-    $mergeOptions[] = $this->createElement('radio',
-      NULL, NULL,
-      ts('Do not merge'),
-      self::EXPORT_MERGE_DO_NOT_MERGE,
-      ['onclick' => 'showGreetingOptions( );']
-    );
-    $mergeOptions[] = $this->createElement('radio',
-      NULL, NULL,
-      ts('Merge All Contacts with the Same Address'),
-      self::EXPORT_MERGE_SAME_ADDRESS,
-      ['onclick' => 'showGreetingOptions( );']
-    );
-    $mergeOptions[] = $this->createElement('radio',
-      NULL, NULL,
-      ts('Merge Household Members into their Households'),
-      self::EXPORT_MERGE_HOUSEHOLD,
-      ['onclick' => 'showGreetingOptions( );']
-    );
-
+    $exportOptions = $exportOptionsJS = $mergeOptions = $mergeOptionsJS = $postalMailing = [];
+    $exportOptions[self::EXPORT_ALL] = ts('Export PRIMARY fields');
+    $exportOptions[self::EXPORT_SELECTED] = ts('Select fields for export');
+    $mergeOptions[self::EXPORT_MERGE_DO_NOT_MERGE] = ts('Do not merge');
+    $mergeOptions[self::EXPORT_MERGE_SAME_ADDRESS] = ts('Merge All Contacts with the Same Address');
+    $mergeOptions[self::EXPORT_MERGE_HOUSEHOLD] = ts('Merge Household Members into their Households');
+    foreach (array_keys($exportOptions) as $key) {
+      $exportOptionsJS[$key] = ['onClick' => 'showMappingOption( );'];
+    }
+    foreach (array_keys($mergeOptions) as $key) {
+      $mergeOptionsJS[$key] = ['onclick' => 'showGreetingOptions( );'];
+    }
+    $this->addRadio('exportOption', ts('Export Type'), $exportOptions, [], '<br/>', FALSE, $exportOptionsJS);
     $postalMailing[] = $this->createElement('advcheckbox',
       'postal_mailing_export',
       NULL,
       NULL
     );
-
-    $this->addGroup($exportOptions, 'exportOption', ts('Export Type'), '<br/>');
 
     if ($this->_matchingContacts) {
       $this->_greetingOptions = self::getGreetingOptions();
@@ -219,7 +197,7 @@ FROM   {$this->_componentTable}
     }
 
     if ($this->_exportMode == self::CONTACT_EXPORT) {
-      $this->addGroup($mergeOptions, 'mergeOption', ts('Merge Options'), '<br/>');
+      $this->addRadio('mergeOption', ts('Merge Options'), $mergeOptions, [], '<br/>', FALSE, $mergeOptionsJS);
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
 
       $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
