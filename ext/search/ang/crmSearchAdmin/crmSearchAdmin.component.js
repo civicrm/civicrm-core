@@ -373,7 +373,7 @@
         if (ctrl.savedSearch.api_params.groupBy.length) {
           _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
             if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(' + col + ')';
+              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + col + ')';
             }
           });
         }
@@ -578,8 +578,7 @@
 
       $scope.formatResult = function(row, col) {
         var info = searchMeta.parseExpr(col),
-          key = info.fn ? (info.fn.name + ':' + info.path + info.suffix) : col,
-          value = row[key];
+          value = row[info.alias];
         if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }

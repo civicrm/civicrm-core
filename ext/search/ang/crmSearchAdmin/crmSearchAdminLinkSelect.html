@@ -7,4 +7,7 @@
     {{ ts('Other...') }}
   </option>
 </select>
-<input class="form-control" type="text" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" ng-show="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" />
+<div class="form-group" ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)">
+  <input class="form-control" type="text" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" />
+  <crm-search-admin-token-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="$ctrl.column" field="link"></crm-search-admin-token-select>
+</div>

@@ -65,21 +65,6 @@
         }
       };
 
-      // Return all possible links to main entity or join entities
-      this.getLinks = function() {
-        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []);
-        _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinName = join[0].split(' AS '),
-            joinEntity = searchMeta.getEntity(joinName[0]);
-          _.each(joinEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
-            links.push(link);
-          });
-        });
-        return links;
-      };
-
       this.preview = this.stale = false;
 
       this.previewDisplay = function() {

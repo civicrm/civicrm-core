@@ -39,7 +39,6 @@
           };
         }
         ctrl.hiddenColumns = ctrl.crmSearchAdminDisplay.initColumns();
-        ctrl.links = ctrl.crmSearchAdminDisplay.getLinks();
       };
 
     }
