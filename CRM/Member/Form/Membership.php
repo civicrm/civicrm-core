@@ -1321,7 +1321,6 @@ DESC limit 1");
 
         $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
-        $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         $params['contribution_id'] = $paymentParams['contributionID'];

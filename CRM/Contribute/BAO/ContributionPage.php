@@ -369,7 +369,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           $values['financial_type_id']);
         // Legacy support
         $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
-        $tplParams['contributionTypeId'] = $values['financial_type_id'];
       }
 
       if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
