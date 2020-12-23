@@ -975,7 +975,7 @@ DESC limit 1");
       // & we should aim to move this function to the BAO layer in future.
       // however, we can assume that the contact_id passed in by the batch
       // function will be the recipient
-      list($form->_contributorDisplayName, $form->_contributorEmail)
+      [$form->_contributorDisplayName, $form->_contributorEmail]
         = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
       if (empty($form->_receiptContactId) || $isBatchProcess) {
         $form->_receiptContactId = $formValues['contact_id'];
@@ -1170,7 +1170,7 @@ DESC limit 1");
     }
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
+    [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
@@ -1295,7 +1295,7 @@ DESC limit 1");
         $financialType->find(TRUE);
         $this->_params = $formValues;
 
-        $contribution = self::processFormContribution($this,
+        $contribution = $this->processContribution(
           $paymentParams,
           NULL,
           [
@@ -1839,7 +1839,6 @@ DESC limit 1");
    * It's like the contribution create being done here is actively bad and
    * being fixed later.
    *
-   * @param CRM_Core_Form $form
    * @param array $params
    * @param array $result
    * @param array $contributionParams
@@ -1862,13 +1861,13 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function processFormContribution(
-    &$form,
+  protected function processContribution(
     $params,
     $result,
     $contributionParams,
     $financialType
   ) {
+    $form = $this;
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
 
@@ -1919,44 +1918,6 @@ DESC limit 1");
 
     //CRM-13981, processing honor contact into soft-credit contribution
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
-
-    if ($contribution) {
-      //handle custom data.
-      $params['contribution_id'] = $contribution->id;
-      if (!empty($params['custom']) &&
-        is_array($params['custom'])
-      ) {
-        CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
-      }
-    }
-    // Save note
-    if ($contribution && !empty($params['contribution_note'])) {
-      $noteParams = [
-        'entity_table' => 'civicrm_contribution',
-        'note' => $params['contribution_note'],
-        'entity_id' => $contribution->id,
-        'contact_id' => $contribution->contact_id,
-      ];
-
-      CRM_Core_BAO_Note::add($noteParams, []);
-    }
-
-    //create contribution activity w/ individual and target
-    //activity w/ organisation contact id when onbelf, CRM-4027
-    $actParams = [];
-    $targetContactID = NULL;
-    if (!empty($params['onbehalf_contact_id'])) {
-      $actParams = [
-        'source_contact_id' => $params['onbehalf_contact_id'],
-        'on_behalf' => TRUE,
-      ];
-      $targetContactID = $contribution->contact_id;
-    }
-
-    // create an activity record
-    if ($contribution) {
-      CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
-    }
 
     $transaction->commit();
     return $contribution;
