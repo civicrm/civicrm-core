@@ -1561,7 +1561,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     // setting required check to false, CRM-2839
     // plus we do our own required check in import
     try {
-      $error = _civicrm_api3_deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
+      $error = $this->deprecated_contact_check_params($formatted, $dupeCheck, $dedupeRuleGroupID);
       if ($error) {
         return $error;
       }
@@ -2118,6 +2118,118 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             }
           }
         }
+      }
+    }
+  }
+
+  /**
+   * @param array $params
+   * @param bool $dupeCheck
+   * @param null|int $dedupeRuleGroupID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function deprecated_contact_check_params(
+    &$params,
+    $dupeCheck = TRUE,
+    $dedupeRuleGroupID = NULL) {
+
+    $requiredCheck = TRUE;
+
+    if (isset($params['id']) && is_numeric($params['id'])) {
+      $requiredCheck = FALSE;
+    }
+    if ($requiredCheck) {
+      if (isset($params['id'])) {
+        $required = ['Individual', 'Household', 'Organization'];
+      }
+      $required = [
+        'Individual' => [
+          ['first_name', 'last_name'],
+          'email',
+        ],
+        'Household' => [
+          'household_name',
+        ],
+        'Organization' => [
+          'organization_name',
+        ],
+      ];
+
+      // contact_type has a limited number of valid values
+      if (empty($params['contact_type'])) {
+        throw new CRM_Core_Exception("No Contact Type");
+      }
+      $fields = $required[$params['contact_type']] ?? NULL;
+      if ($fields == NULL) {
+        throw new CRM_Core_Exception("Invalid Contact Type: {$params['contact_type']}");
+      }
+
+      if ($csType = CRM_Utils_Array::value('contact_sub_type', $params)) {
+        if (!(CRM_Contact_BAO_ContactType::isExtendsContactType($csType, $params['contact_type']))) {
+          throw new CRM_Core_Exception("Invalid or Mismatched Contact Subtype: " . implode(', ', (array) $csType));
+        }
+      }
+
+      if (empty($params['contact_id']) && !empty($params['id'])) {
+        $valid = FALSE;
+        $error = '';
+        foreach ($fields as $field) {
+          if (is_array($field)) {
+            $valid = TRUE;
+            foreach ($field as $element) {
+              if (empty($params[$element])) {
+                $valid = FALSE;
+                $error .= $element;
+                break;
+              }
+            }
+          }
+          else {
+            if (!empty($params[$field])) {
+              $valid = TRUE;
+            }
+          }
+          if ($valid) {
+            break;
+          }
+        }
+
+        if (!$valid) {
+          throw new CRM_Core_Exception("Required fields not found for {$params['contact_type']} : $error");
+        }
+      }
+    }
+
+    if ($dupeCheck) {
+      // @todo switch to using api version
+      // $dupes = civicrm_api3('Contact', 'duplicatecheck', (array('match' => $params, 'dedupe_rule_id' => $dedupeRuleGroupID)));
+      // $ids = $dupes['count'] ? implode(',', array_keys($dupes['values'])) : NULL;
+      $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, $params['contact_type'], 'Unsupervised', [], CRM_Utils_Array::value('check_permissions', $params), $dedupeRuleGroupID);
+      if ($ids != NULL) {
+        $error = CRM_Core_Error::createError("Found matching contacts: " . implode(',', $ids),
+          CRM_Core_Error::DUPLICATE_CONTACT,
+          'Fatal', $ids
+        );
+        return civicrm_api3_create_error($error->pop());
+      }
+    }
+
+    // check for organisations with same name
+    if (!empty($params['current_employer'])) {
+      $organizationParams = ['organization_name' => $params['current_employer']];
+      $dupeIds = CRM_Contact_BAO_Contact::getDuplicateContacts($organizationParams, 'Organization', 'Supervised', [], FALSE);
+
+      // check for mismatch employer name and id
+      if (!empty($params['employer_id']) && !in_array($params['employer_id'], $dupeIds)
+      ) {
+        throw new CRM_Core_Exception('Employer name and Employer id Mismatch');
+      }
+
+      // show error if multiple organisation with same name exist
+      if (empty($params['employer_id']) && (count($dupeIds) > 1)
+      ) {
+        return civicrm_api3_create_error('Found more than one Organisation with same Name.');
       }
     }
   }
