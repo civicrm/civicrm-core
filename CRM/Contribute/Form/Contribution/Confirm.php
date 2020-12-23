@@ -1227,21 +1227,24 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * This is used by contribution and also event PCPs.
    *
    * @param object $contribution
-   * @param object $contributionSoft
+   * @param array $contributionSoft
    *   Contribution object.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function pcpNotifyOwner($contribution, $contributionSoft) {
-    $params = ['id' => $contributionSoft->pcp_id];
+  public static function pcpNotifyOwner($contribution, array $contributionSoft) {
+    $params = ['id' => $contributionSoft['pcp_id']];
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
     $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
     $ownerNotifyOption = CRM_Core_PseudoConstant::getName('CRM_PCP_DAO_PCPBlock', 'owner_notify_id', $ownerNotifyID);
 
     if ($ownerNotifyOption != 'no_notifications' &&
         (($ownerNotifyOption == 'owner_chooses' &&
-        CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft->pcp_id, 'is_notify')) ||
+        CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft['pcp_id'], 'is_notify')) ||
         $ownerNotifyOption == 'all_owners')) {
       $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
-        "reset=1&id={$contributionSoft->pcp_id}",
+        "reset=1&id={$contributionSoft['pcp_id']}",
         TRUE, NULL, FALSE, TRUE
       );
       // set email in the template here
@@ -1254,22 +1257,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!$email) {
         [$donorName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id);
       }
-      [$ownerName, $ownerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contributionSoft->contact_id);
+      [$ownerName, $ownerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contributionSoft['contact_id']);
       $tplParams = [
         'page_title' => $pcpInfo['title'],
         'receive_date' => $contribution->receive_date,
-        'total_amount' => $contributionSoft->amount,
+        'total_amount' => $contributionSoft['amount'],
         'donors_display_name' => $donorName,
         'donors_email' => $email,
         'pcpInfoURL' => $pcpInfoURL,
-        'is_honor_roll_enabled' => $contributionSoft->pcp_display_in_roll,
-        'currency' => $contributionSoft->currency,
+        'is_honor_roll_enabled' => $contributionSoft['pcp_display_in_roll'],
+        'currency' => $contributionSoft['currency'],
       ];
       $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
       $sendTemplateParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'pcp_owner_notify',
-        'contactId' => $contributionSoft->contact_id,
+        'contactId' => $contributionSoft['contact_id'],
         'toEmail' => $ownerEmail,
         'toName' => $ownerName,
         'from' => "$domainValues[0] <$domainValues[1]>",
@@ -1291,7 +1294,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @return array
    */
-  public static function processPcp(&$page, $params) {
+  public static function processPcp(&$page, $params): array {
     $params['pcp_made_through_id'] = $page->_pcpId;
     $page->assign('pcpBlock', TRUE);
     if (!empty($params['pcp_display_in_roll']) && empty($params['pcp_roll_nickname'])) {
@@ -1327,7 +1330,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Line items specifically relating to memberships.
    */
   protected function processMembership($membershipParams, $contactID, $customFieldsFormatted, $fieldTypes, $premiumParams,
-                                $membershipLineItems) {
+                                $membershipLineItems): void {
 
     $membershipTypeIDs = (array) $membershipParams['selectMembership'];
     $membershipTypes = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIDs);
