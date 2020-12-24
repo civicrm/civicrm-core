@@ -2066,7 +2066,7 @@ ORDER BY civicrm_email.is_primary DESC";
     else {
       //we should get contact type only if contact
       if ($ufGroupId) {
-        $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId);
+        $data['contact_type'] = CRM_Core_BAO_UFField::getProfileType($ufGroupId,TRUE, FALSE, TRUE);
 
         //special case to handle profile with only contact fields
         if ($data['contact_type'] == 'Contact') {
