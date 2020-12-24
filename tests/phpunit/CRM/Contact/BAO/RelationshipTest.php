@@ -58,18 +58,22 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'contact_type_b' => 'Organization',
     ]);
 
-    $result = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions(
-      ['contact_type' => 'Organization']
-    );
-    $this->assertContains($orgToOrgType, $result);
-    $this->assertContains($orgToOrgReverseType, $result);
+    $result = civicrm_api3('Relationship', 'getoptions', [
+      'field' => 'relationship_type_id',
+      'is_form' => TRUE,
+      'contact_type' => 'Organization',
+    ]);
+    $this->assertContains($orgToOrgType, $result['values']);
+    $this->assertContains($orgToOrgReverseType, $result['values']);
 
-    $result = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions(
-      ['contact_type' => 'Individual']
-    );
+    $result = civicrm_api3('Relationship', 'getoptions', [
+      'field' => 'relationship_type_id',
+      'is_form' => TRUE,
+      'contact_type' => 'Individual',
+    ]);
 
-    $this->assertNotContains($orgToOrgType, $result);
-    $this->assertNotContains($orgToOrgReverseType, $result);
+    $this->assertNotContains($orgToOrgType, $result['values']);
+    $this->assertNotContains($orgToOrgReverseType, $result['values']);
   }
 
   public function testContactIdAndRelationshipIdWillBeUsedInFilter() {
@@ -109,30 +113,34 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $orgToPersonTypeId,
     ]);
 
-    $options = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions([
+    $options = civicrm_api3('Relationship', 'getoptions', [
+      'field' => 'relationship_type_id',
+      'is_form' => TRUE,
       'relationship_id' => (string) $relationship['id'],
       'contact_id' => $individual['id'],
     ]);
 
     // for this relationship only individual=>organization is possible
-    $this->assertContains($personToOrgType, $options);
-    $this->assertNotContains($orgToPersonType, $options);
+    $this->assertContains($personToOrgType, $options['values']);
+    $this->assertNotContains($orgToPersonType, $options['values']);
 
     // by passing relationship ID we know that the "B" side is an organization
-    $this->assertNotContains($personToPersonType, $options);
-    $this->assertNotContains($personToPersonReverseType, $options);
+    $this->assertNotContains($personToPersonType, $options['values']);
+    $this->assertNotContains($personToPersonReverseType, $options['values']);
 
-    $options = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions([
+    $options = civicrm_api3('Relationship', 'getoptions', [
+      'field' => 'relationship_type_id',
+      'is_form' => TRUE,
       'contact_id' => $individual['id'],
     ]);
 
     // for this result we only know that "A" must be an individual
-    $this->assertContains($personToOrgType, $options);
-    $this->assertNotContains($orgToPersonType, $options);
+    $this->assertContains($personToOrgType, $options['values']);
+    $this->assertNotContains($orgToPersonType, $options['values']);
 
     // unlike when we pass relationship type ID there is no filter by "B" type
-    $this->assertContains($personToPersonType, $options);
-    $this->assertContains($personToPersonReverseType, $options);
+    $this->assertContains($personToPersonType, $options['values']);
+    $this->assertContains($personToPersonReverseType, $options['values']);
   }
 
   /**
