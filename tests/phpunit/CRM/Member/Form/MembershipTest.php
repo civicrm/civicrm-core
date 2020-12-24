@@ -177,7 +177,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testFormRuleEmptyContact() {
+  public function testFormRuleEmptyContact(): void {
     $params = [
       'contact_select_id' => 0,
       'membership_type_id' => [1 => NULL],

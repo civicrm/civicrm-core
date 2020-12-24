@@ -1096,10 +1096,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
       CRM_Utils_System::redirect(CRM_Utils_System::url($urlString, $urlParams));
     }
-    // Only set contribution recur ID for contributions since offline membership recur payments are handled somewhere else.
-    if (!is_a($form, "CRM_Member_Form_Membership")) {
-      $form->_params['contributionRecurID'] = $recurring->id;
-    }
+    $form->_params['contributionRecurID'] = $recurring->id;
 
     return $recurring->id;
   }
