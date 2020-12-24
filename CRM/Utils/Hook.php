@@ -1760,6 +1760,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Register cryptographic resources, such as keys and cipher-suites.
+   *
+   * Ex: $crypto->addSymmetricKey([
+   *   'key' => hash_hkdf('sha256', 'abcd1234'),
+   *   'suite' => 'aes-cbc-hs',
+   * ]);
+   *
+   * @param \Civi\Crypto\CryptoRegistry $crypto
+   *
+   * @return mixed
+   */
+  public static function crypto($crypto) {
+    return self::singleton()->invoke(['crypto'], $crypto, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_crypto'
+    );
+  }
+
+  /**
    * This hook collects the trigger definition from all components.
    *
    * @param $info
