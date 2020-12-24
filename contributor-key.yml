@@ -142,6 +142,8 @@
   organization: Apple Street Market
   jira        : ASMC
 
+- github      : AsylumSeekersCentre
+
 - github      : artfulrobot
   name        : Rich Lott
   organization: Artful Robot
@@ -379,6 +381,10 @@
   jira        : dkguru
 
 - github      : don-alejandro-z
+
+- github      : dwoods-encircle
+  organization: enCircle Solutions Ltd.
+  name        : Darren Woods
 
 - github      : Erioldoesdesign
   organization: Third Sector Design
@@ -1041,7 +1047,7 @@
 - github      : mglaman
   name        : Matt Glaman
   organization: Bluehorn Digital
-     
+
 - github      : mgribaudo
   name        : Marcello Gribaudo
   jira        : mgribaudo
