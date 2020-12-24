@@ -4721,8 +4721,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Test Repeat Transaction Contribution with Tax amount.
    * https://lab.civicrm.org/dev/core/issues/806
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatContributionWithTaxAmount() {
+  public function testRepeatContributionWithTaxAmount(): void {
     $this->enableTaxAndInvoicing();
     $financialType = $this->callAPISuccess('financial_type', 'create', [
       'name' => 'Test taxable financial Type',
@@ -4740,7 +4742,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => 'test',
     ]);
     $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
     //Assert if first payment and repeated payment has the same contribution amount.

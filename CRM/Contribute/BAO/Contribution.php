@@ -2442,7 +2442,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       else {
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
-      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id'] as $fieldName) {
+      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount'] as $fieldName) {
         if (isset($templateContribution[$fieldName])) {
           $contributionParams[$fieldName] = $templateContribution[$fieldName];
         }
@@ -2464,9 +2464,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       // but per CRM-19478 it seems it can be 'null'
       if (isset($contribution->contribution_page_id) && is_numeric($contribution->contribution_page_id)) {
         $contributionParams['contribution_page_id'] = $contribution->contribution_page_id;
-      }
-      if (!empty($contribution->tax_amount)) {
-        $contributionParams['tax_amount'] = $contribution->tax_amount;
       }
 
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
