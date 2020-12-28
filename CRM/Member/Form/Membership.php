@@ -1980,19 +1980,6 @@ DESC limit 1");
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
-    // CRM-14354: For an auto-renewing membership with an additional contribution,
-    // if separate payments is not enabled, make sure only the membership fee recurs
-    if (!empty($form->_membershipBlock)
-      && $form->_membershipBlock['is_separate_payment'] === '0'
-      && isset($params['selectMembership'])
-      && $form->_values['is_allow_other_amount'] == '1'
-      // CRM-16331
-      && !empty($form->_membershipTypeValues)
-      && !empty($form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'])
-    ) {
-      $recurParams['amount'] = $form->_membershipTypeValues[$params['selectMembership']]['minimum_fee'];
-    }
-
     $recurParams['is_test'] = 0;
     if (($form->_action & CRM_Core_Action::PREVIEW) ||
       (isset($form->_mode) && ($form->_mode == 'test'))
