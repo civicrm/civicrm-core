@@ -180,6 +180,7 @@ class Manager {
    * @return array
    *   List of Angular modules, include all dependencies.
    *   Ex: array('crmMailing', 'crmUi', 'crmUtil', 'ngRoute').
+   * @throws \CRM_Core_Exception
    */
   public function resolveDependencies($names) {
     $allModules = $this->getModules();
@@ -189,10 +190,7 @@ class Manager {
       foreach ($missingModules as $module) {
         $visited[$module] = 1;
         if (!isset($allModules[$module])) {
-          \Civi::log()->warning('Unrecognized Angular module {name}. Please ensure that all Angular modules are declared.', [
-            'name' => $module,
-            'civi.tag' => 'deprecated',
-          ]);
+          throw new \CRM_Core_Exception("Unrecognized Angular module {$module}. Please ensure that all Angular modules are declared.");
         }
         elseif (isset($allModules[$module]['requires'])) {
           $result = array_unique(array_merge($result, $allModules[$module]['requires']));

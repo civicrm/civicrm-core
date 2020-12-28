@@ -126,7 +126,7 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function getEntityTitle() {
     $className = static::class;
-    Civi::log()->warning("$className needs to be regenerated. Missing getEntityTitle method.", ['civi.tag' => 'deprecated']);
+    CRM_Core_Error::deprecatedWarning("$className needs to be regenerated. Missing getEntityTitle method.");
     return CRM_Core_DAO_AllCoreTables::getBriefName($className);
   }
 
