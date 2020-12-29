@@ -222,10 +222,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       $first = FALSE;
 
       // CRM-17859 Trim non-breaking spaces from columns.
-      $row = array_map(
-        function($string) {
-          return trim($string, chr(0xC2) . chr(0xA0));
-        }, $row);
+      $row = array_map(['CRM_Import_DataSource_CSV', 'trimNonBreakingSpaces'], $row);
       $row = array_map(['CRM_Core_DAO', 'escapeString'], $row);
       $sql .= "('" . implode("', '", $row) . "')";
       $count++;
@@ -249,6 +246,30 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
     $result['import_table_name'] = $tableName;
 
     return $result;
+  }
+
+  /**
+   * Trim non-breaking spaces in a multibyte-safe way.
+   * See also dev/core#2127 - avoid breaking strings ending in à or any other
+   * unicode character sharing the same 0xA0 byte as a non-breaking space.
+   *
+   * @param string $string
+   * @return string The trimmed string
+   */
+  public static function trimNonBreakingSpaces(string $string): string {
+    $encoding = mb_detect_encoding($string, NULL, TRUE);
+    if ($encoding === FALSE) {
+      // This could mean a couple things. One is that the string is
+      // ASCII-encoded but contains a non-breaking space, which causes
+      // php to fail to detect the encoding. So let's just do what we
+      // did before which works in that situation and is at least no
+      // worse in other situations.
+      return trim($string, chr(0xC2) . chr(0xA0));
+    }
+    elseif ($encoding !== 'UTF-8') {
+      $string = mb_convert_encoding($string, 'UTF-8', [$encoding]);
+    }
+    return preg_replace("/^(\u{a0})+|(\u{a0})+$/", '', $string);
   }
 
 }
