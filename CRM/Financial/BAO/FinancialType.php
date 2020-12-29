@@ -70,7 +70,28 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
+   * Create a financial type.
+   *
+   * @param array $params
+   *
+   * @return \CRM_Financial_DAO_FinancialType
+   */
+  public static function create(array $params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'FinancialType', $params['id'] ?? NULL, $params);
+    $financialType = self::add($params);
+    CRM_Utils_Hook::post($hook, 'FinancialType', $financialType->id, $financialType);
+    return $financialType;
+  }
+
+  /**
    * Add the financial types.
+   *
+   * Note that add functions are being deprecated in favour of create.
+   * The steps here are to remove direct calls to this function from
+   * core & then move the innids of the function to the create function.
+   * This function would remain for 6 months or so as a wrapper of create with
+   * a deprecation notice.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -80,6 +101,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return object
    */
   public static function add(&$params, &$ids = []) {
+    // @todo deprecate this, move the code to create & call create from add.
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
@@ -89,18 +111,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     // action is taken depending upon the mode
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->copyValues($params);
-    if (!empty($ids['financialType'])) {
-      $financialType->id = $ids['financialType'] ?? NULL;
-      if (self::isACLFinancialTypeStatus()) {
-        $prevName = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $financialType->id, 'name');
-        if ($prevName != $params['name']) {
-          CRM_Core_Session::setStatus(ts("Changing the name of a Financial Type will result in losing the current permissions associated with that Financial Type.
-            Before making this change you should likely note the existing permissions at Administer > Users and Permissions > Permissions (Access Control),
-            then clicking the Access Control link for your Content Management System, then noting down the permissions for 'CiviCRM: {financial type name} view', etc.
-            Then after making the change of name, reset the permissions to the way they were."), ts('Warning'), 'warning');
-        }
-      }
-    }
     $financialType->save();
     // CRM-12470
     if (empty($ids['financialType']) && empty($params['id'])) {
