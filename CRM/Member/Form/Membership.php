@@ -1303,9 +1303,7 @@ DESC limit 1");
             'line_item' => $lineItem,
             'is_test' => $isTest,
             'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
-            'contribution_page_id' => $formValues['contribution_page_id'] ?? NULL,
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-            'thankyou_date' => $paymentParams['thankyou_date'] ?? NULL,
             'payment_instrument_id' => $paymentInstrumentID,
           ],
           $financialType
@@ -1321,7 +1319,6 @@ DESC limit 1");
 
         $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
-        $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
         $params['contribution_id'] = $paymentParams['contributionID'];
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
@@ -1848,10 +1845,8 @@ DESC limit 1");
    *   - line_item
    *   - is_test
    *   - campaign_id
-   *   - contribution_page_id
    *   - source
    *   - payment_type_id
-   *   - thankyou_date (not all forms will set this)
    *
    * @param CRM_Financial_DAO_FinancialType $financialType
    *
@@ -1899,15 +1894,9 @@ DESC limit 1");
         'financial_type_id' => $financialType->id,
         'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
         'tax_amount' => $params['tax_amount'] ?? NULL,
-        'amount_level' => $params['amount_level'] ?? NULL,
         'invoice_id' => $params['invoiceID'],
         'currency' => $params['currencyID'],
         'is_pay_later' => $params['is_pay_later'] ?? 0,
-        //configure cancel reason, cancel date and thankyou date
-        //from 'contribution' type profile if included
-        'cancel_reason' => $params['cancel_reason'] ?? 0,
-        'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
-        'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
         //setting to make available to hook - although seems wrong to set on form for BAO hook availability
         'skipLineItem' => $params['skipLineItem'] ?? 0,
       ], $contributionParams);
