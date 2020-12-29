@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialType;
+
 /**
  * Class CRM_Financial_BAO_FinancialAccountTest
  * @group headless
@@ -105,36 +108,37 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method del()
+   * Check delete fails if a related contribution exists.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testdelIfHasContribution() {
-    $params = [
+  public function testDeleteIfHasContribution(): void {
+    $financialType = FinancialType::create(FALSE)->setValues([
       'name' => 'Donation Test',
-      'is_active' => 1,
-      'is_deductible' => 1,
       'is_reserved' => 1,
-    ];
-    $financialType = CRM_Financial_BAO_FinancialType::add($params);
-    $defaults = [];
-    $params = [
-      'name' => 'Donation Test',
-      'is_active' => 1,
-    ];
-    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
+    ])->execute()->first();
+
+    $financialAccount = FinancialAccount::get(FALSE)->setWhere([
+      ['name', '=', 'Donation Test'],
+      ['is_active', '=', TRUE],
+    ])->setSelect(['id'])->execute()->first();
 
     $contactId = $this->individualCreate();
     $contributionParams = [
       'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $contactId,
-      'financial_type_id' => $financialType->id,
+      'financial_type_id' => $financialType['id'],
       'contribution_status_id' => 1,
     ];
     $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    CRM_Financial_BAO_FinancialAccount::del($result->id);
-    $params = ['id' => $result->id];
-    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), FALSE, 'Verify financial account record deletion.');
+    CRM_Financial_BAO_FinancialAccount::del($financialAccount['id']);
+
+    $this->assertCount(1, FinancialAccount::get(FALSE)->setWhere([
+      ['id', '=', $financialAccount['id']],
+    ])->selectRowCount()->execute(), 'Financial account should not be deleted as it is in use.');
   }
 
   /**
