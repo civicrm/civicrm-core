@@ -27,6 +27,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Campaign_DAO_Campaign
+   * @throws \CRM_Core_Exception
    */
   public static function create(&$params) {
     if (empty($params)) {
@@ -47,6 +48,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
       }
     }
 
+    /* @var \CRM_Campaign_DAO_Campaign $campaign */
     $campaign = self::writeRecord($params);
 
     /* Create the campaign group record */
@@ -123,7 +125,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * Return the all eligible campaigns w/ cache.
    *
    * @param int $includeId
-   *   Lets inlcude this campaign by force.
+   *   Lets include this campaign by force.
    * @param int $excludeId
    *   Do not include this campaign.
    * @param bool $onlyActive
@@ -343,14 +345,14 @@ Order By  camp.title";
 
       //need to lookup tables.
       $orderOnCampaignTable = TRUE;
-      if ($sortParams['sort'] == 'status') {
+      if ($sortParams['sort'] === 'status') {
         $orderOnCampaignTable = FALSE;
         $lookupTableJoins = "
  LEFT JOIN civicrm_option_value status ON ( status.value = campaign.status_id OR campaign.status_id IS NULL )
 INNER JOIN civicrm_option_group grp ON ( status.option_group_id = grp.id AND grp.name = 'campaign_status' )";
         $orderByClause = "ORDER BY status.label {$sortParams['sortOrder']}";
       }
-      elseif ($sortParams['sort'] == 'campaign_type') {
+      elseif ($sortParams['sort'] === 'campaign_type') {
         $orderOnCampaignTable = FALSE;
         $lookupTableJoins = "
  LEFT JOIN civicrm_option_value campaign_type ON ( campaign_type.value = campaign.campaign_type_id
@@ -358,7 +360,7 @@ INNER JOIN civicrm_option_group grp ON ( status.option_group_id = grp.id AND grp
 INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id AND grp.name = 'campaign_type' )";
         $orderByClause = "ORDER BY campaign_type.label {$sortParams['sortOrder']}";
       }
-      elseif ($sortParams['sort'] == 'isActive') {
+      elseif ($sortParams['sort'] === 'isActive') {
         $sortParams['sort'] = 'is_active';
       }
       if ($orderOnCampaignTable) {
@@ -463,8 +465,9 @@ SELECT  campaign.id               as id,
   /**
    * Get the campaign count.
    *
+   * @return int
    */
-  public static function getCampaignCount() {
+  public static function getCampaignCount(): int {
     return (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_campaign');
   }
 
@@ -589,10 +592,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {
     $campaignInfo = [];
     $campaignDetails = self::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-    $fields = ['campaigns', 'hasAccessCampaign', 'isCampaignEnabled'];
-    foreach ($fields as $fld) {
-      $$fld = $campaignDetails[$fld] ?? NULL;
-    }
+    $campaigns = $campaignDetails['campaigns'] ?? NULL;
+    $hasAccessCampaign = $campaignDetails['hasAccessCampaign'] ?? NULL;
+    $isCampaignEnabled = $campaignDetails['isCampaignEnabled'] ?? NULL;
+
     $showCampaignInSearch = FALSE;
     if ($isCampaignEnabled && $hasAccessCampaign && !empty($campaigns)) {
       //get the current campaign only.
