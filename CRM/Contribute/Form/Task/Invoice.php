@@ -363,6 +363,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         'resourceBase' => $config->userFrameworkResourceURL,
         'defaultCurrency' => $config->defaultCurrency,
         'amount' => $contribution->total_amount,
+        'currency' => $contribution->currency,
         'amountDue' => $amountDue,
         'amountPaid' => $amountPaid,
         'invoice_date' => $invoiceDate,
