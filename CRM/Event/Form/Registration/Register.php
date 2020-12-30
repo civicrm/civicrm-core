@@ -640,7 +640,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $form->assign('priceSet', $form->_priceSet);
     }
     else {
-      $eventFeeBlockValues = [];
+      $eventFeeBlockValues = $elements = $elementJS = [];
       foreach ($form->_feeBlock as $fee) {
         if (is_array($fee)) {
 
@@ -651,18 +651,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           }
 
           $eventFeeBlockValues['amount_id_' . $fee['amount_id']] = $fee['value'];
-          $elements[] = &$form->createElement('radio', NULL, '',
-            CRM_Utils_Money::format($fee['value']) . ' ' .
-            $fee['label'],
-            $fee['amount_id'],
-            $totalAmountJs
-          );
+          $elements[$fee['amount_id']] = CRM_Utils_Money::format($fee['value']) . ' ' . $fee['label'];
+          $elementJS[$fee['amount_id']] = $totalAmountJs;
         }
       }
       $form->assign('eventFeeBlockValues', json_encode($eventFeeBlockValues));
 
       $form->_defaults['amount'] = $form->_values['event']['default_fee_id'] ?? NULL;
-      $element = &$form->addGroup($elements, 'amount', ts('Event Fee(s)'), '<br />');
+      $element = &$form->addRadio('amount', ts('Event Fee(s)'), $elements, [], '<br />', FALSE, $elementJS);
       if (isset($form->_online) && $form->_online) {
         $element->freeze();
       }

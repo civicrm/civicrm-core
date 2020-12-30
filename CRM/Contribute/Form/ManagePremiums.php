@@ -86,13 +86,17 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
     $this->add('textarea', 'description', ts('Description'), ['cols' => 60, 'rows' => 3]);
+    $imageJS = [];
+    $image['image'] = ts('Upload from my computer');
+    $imageJS['image'] = ['onclick' => 'add_upload_file_block(\'image\');', 'class' => 'required'];
+    $image['thumbnail'] = ts('Display image and thumbnail from these locations on the web:');
+    $imageJS['thumbnail'] = ['onclick' => 'add_upload_file_block(\'thumbnail\');', 'class' => 'required'];
+    $image['default_image'] = ts('Use default image');
+    $imageJS['default_image'] = ['onclick' => 'add_upload_file_block(\'default\');', 'class' => 'required'];
+    $image['noImage'] = ts('Do not display an image');
+    $imageJS['noImage'] = ['onclick' => 'add_upload_file_block(\'noImage\');', 'class' => 'required'];
 
-    $image['image'] = $this->createElement('radio', NULL, NULL, ts('Upload from my computer'), 'image', 'onclick="add_upload_file_block(\'image\');');
-    $image['thumbnail'] = $this->createElement('radio', NULL, NULL, ts('Display image and thumbnail from these locations on the web:'), 'thumbnail', 'onclick="add_upload_file_block(\'thumbnail\');');
-    $image['default_image'] = $this->createElement('radio', NULL, NULL, ts('Use default image'), 'default_image', 'onclick="add_upload_file_block(\'default\');');
-    $image['noImage'] = $this->createElement('radio', NULL, NULL, ts('Do not display an image'), 'noImage', 'onclick="add_upload_file_block(\'noImage\');');
-
-    $this->addGroup($image, 'imageOption', ts('Premium Image'));
+    $this->addRadio('imageOption', ts('Premium Image'), $image, [], NULL, FALSE, $imageJS);
     $this->addRule('imageOption', ts('Please select an option for the premium image.'), 'required');
 
     $this->addElement('text', 'imageUrl', ts('Image URL'));

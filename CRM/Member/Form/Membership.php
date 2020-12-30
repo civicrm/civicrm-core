@@ -1936,7 +1936,6 @@ DESC limit 1");
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
       $contributionParams['total_amount'] = $params['amount'];
-
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
       // lets store it in the form variable so postProcess hook can get to this and use it
