@@ -76,7 +76,7 @@
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts}Unit Price{/ts}</font></th>
                 <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{$taxTerm}</font></th>
-                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$defaultCurrency}Amount %1{/ts}</font></th>
+                <th style="text-align:right;font-weight:bold;white-space: nowrap"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=taxpricevalue}
                 {if $smarty.foreach.taxpricevalue.index eq 0}
@@ -123,7 +123,7 @@
               {/foreach}
               <tr>
                 <td colspan="3"></td>
-                <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1=$defaultCurrency}TOTAL %1{/ts}</font></b></td>
+                <td style="text-align:right;white-space: nowrap"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
                 <td style="text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
               </tr>
               <tr>
@@ -302,7 +302,7 @@
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Quantity{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts}Unit Price{/ts}</font></th>
                 <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{$taxTerm}</font></th>
-                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1=$defaultCurrency}Amount %1{/ts}</font></th>
+                <th style="padding-left:28px;text-align:right;font-weight:bold;"><font size="1">{ts 1=$currency}Amount %1{/ts}</font></th>
               </tr>
               {foreach from=$lineItem item=value key=priceset name=pricevalue}
                 {if $smarty.foreach.pricevalue.index eq 0}
@@ -357,7 +357,7 @@
               </tr>
               <tr>
                 <td colspan="3"></td>
-                <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1=$defaultCurrency}TOTAL %1{/ts}</font></b></td>
+                <td style="padding-left:28px;text-align:right;"><b><font size="1">{ts 1=$currency}TOTAL %1{/ts}</font></b></td>
                 <td style="padding-left:28px;text-align:right;"><font size="1">{$amount|crmMoney:$currency}</font></td>
               </tr>
               {if $is_pay_later == 0}
