@@ -584,38 +584,20 @@ AND  civicrm_group_contact.group_id = $groupID ";
    * it ensure that all contact groups are loaded in the cache
    *
    * @param int $contactID
-   * @param bool $showHidden
-   *   Hidden groups are shown only if this flag is set.
    *
    * @return array
    *   an array of groups that this contact belongs to
    */
-  public static function contactGroup($contactID, $showHidden = FALSE) {
-    if (empty($contactID)) {
-      return NULL;
-    }
-
-    if (is_array($contactID)) {
-      $contactIDs = $contactID;
-    }
-    else {
-      $contactIDs = [$contactID];
-    }
+  public static function contactGroup(int $contactID): array {
 
     self::loadAll();
 
-    $hiddenClause = '';
-    if (!$showHidden) {
-      $hiddenClause = ' AND (g.is_hidden = 0 OR g.is_hidden IS NULL) ';
-    }
-
-    $contactIDString = CRM_Core_DAO::escapeString(implode(', ', $contactIDs));
     $sql = "
 SELECT     gc.group_id, gc.contact_id, g.title, g.children, g.description
 FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
-WHERE      gc.contact_id IN ($contactIDString)
-           $hiddenClause
+WHERE      gc.contact_id = $contactID
+            AND (g.is_hidden = 0 OR g.is_hidden IS NULL)
 ORDER BY   gc.contact_id, g.children
 ";
 
@@ -649,12 +631,10 @@ ORDER BY   gc.contact_id, g.children
       $contactGroup[$prevContactID]['groupTitle'] = implode(', ', $contactGroup[$prevContactID]['groupTitle']);
     }
 
-    if ((!empty($contactGroup[$contactID]) && is_numeric($contactID))) {
+    if ((!empty($contactGroup[$contactID]))) {
       return $contactGroup[$contactID];
     }
-    else {
-      return $contactGroup;
-    }
+    return $contactGroup;
   }
 
   /**
