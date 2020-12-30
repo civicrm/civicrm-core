@@ -39,7 +39,11 @@
     </html>
     <add>3.3</add>
   </field>
-
+  <index>
+    <name>UI_campaign_name</name>
+    <fieldName>name</fieldName>
+    <add>5.34</add>
+  </index>
   <field>
     <name>title</name>
     <title>Campaign Title</title>
