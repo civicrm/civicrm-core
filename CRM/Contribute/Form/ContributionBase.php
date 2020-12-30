@@ -843,9 +843,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @param int $id
    * @param CRM_Core_Form $form
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function buildComponentForm($id, $form) {
+  public function buildComponentForm($id, $form): void {
     if (empty($id)) {
       return;
     }
@@ -969,7 +971,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $form->assign('fieldSetTitle', CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id']));
+        $form->assign('fieldSetTitle', CRM_Core_BAO_UFGroup::getFrontEndTitle($form->_values['onbehalf_profile_id']));
 
         if (!empty($form->_values['is_for_organization'])) {
           if ($form->_values['is_for_organization'] == 2) {
@@ -1007,7 +1009,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
         foreach ($profileFields as $name => $field) {
           if (in_array($field['field_type'], $fieldTypes)) {
-            list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
+            [$prefixName, $index] = CRM_Utils_System::explode('-', $name, 2);
             if (in_array($prefixName, ['organization_name', 'email']) && empty($field['is_required'])) {
               $field['is_required'] = 1;
             }
