@@ -390,8 +390,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
 
     $afterGroup = $this->callAPISuccessGetSingle('Group', ['id' => $group->id]);
-    $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
-    $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
+    $this->assertTrue(empty($afterGroup['cache_date']), 'cache date should not be set as the cache is not built');
   }
 
   /**
