@@ -29,31 +29,7 @@ function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $ob
     )) {
       contributioncancelactions_cancel_related_pending_memberships((int) $objectId);
       contributioncancelactions_cancel_related_pending_participant_records((int) $objectId);
-      contributioncancelactions_update_related_pledge((int) $objectId, (int) $objectRef->contribution_status_id);
     }
-  }
-}
-
-/**
- * Update any related pledge when a contribution is cancelled.
- *
- * This updates the status of the pledge and amount paid.
- *
- * The functionality should probably be give more thought in that it currently
- * does not un-assign the contribution id from the pledge payment. However,
- * at time of writing the goal is to move rather than fix functionality.
- *
- * @param int $contributionID
- * @param int $contributionStatusID
- *
- * @throws CiviCRM_API3_Exception
- */
-function contributioncancelactions_update_related_pledge(int $contributionID, int $contributionStatusID) {
-  $pledgePayments = civicrm_api3('PledgePayment', 'get', ['contribution_id' => $contributionID])['values'];
-  if (!empty($pledgePayments)) {
-    $pledgePaymentIDS = array_keys($pledgePayments);
-    $pledgePayment = reset($pledgePayments);
-    CRM_Pledge_BAO_PledgePayment::updatePledgePaymentStatus($pledgePayment['pledge_id'], $pledgePaymentIDS, $contributionStatusID);
   }
 }
 

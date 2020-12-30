@@ -13,6 +13,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\ContributionPage;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\PaymentProcessor;
+use Civi\Api4\PledgePayment;
 
 /**
  *
@@ -501,6 +502,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
+    if (!empty($params['id']) && !empty($params['contribution_status_id'])
+    ) {
+      self::disconnectPledgePaymentsIfCancelled((int) $params['id'], CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']));
+    }
     $transaction->commit();
 
     if (empty($contribution->contact_id)) {
@@ -1279,6 +1284,44 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // This would be the case for backoffice (where is_email_receipt is not passed in) or events, where Event::sendMail will filter
     // again anyway.
     return TRUE;
+  }
+
+  /**
+   * Disconnect pledge payments from cancelled or failed contributions.
+   *
+   * If the contribution has been cancelled or has failed check to
+   * see if it is linked to a pledge and unlink it.
+   *
+   * @param int $pledgePaymentID
+   * @param string $contributionStatus
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected static function disconnectPledgePaymentsIfCancelled(int $pledgePaymentID, $contributionStatus): void {
+    if (!in_array($contributionStatus, ['Failed', 'Cancelled'], TRUE)) {
+      return;
+    }
+    // Check first since just doing an update could be locking under load.
+    $pledgePayment = PledgePayment::get(FALSE)
+      ->addWhere('contribution_id', '=', $pledgePaymentID)
+      ->setSelect(['id', 'pledge_id', 'scheduled_date', 'scheduled_amount'])
+      ->execute()
+      ->first();
+    if (!empty($pledgePayment)) {
+      PledgePayment::update(FALSE)->setValues([
+        'contribution_id' => NULL,
+        'actual_amount' => NULL,
+        'status_id:name' => 'Pending',
+        // We need to set these fields for now because the PledgePayment::create
+        // function doesn't handled updates well at the moment. Test cover
+        // in testCancelOrderWithPledge.
+        'scheduled_date' => $pledgePayment['scheduled_date'],
+        'installment_amount' => $pledgePayment['scheduled_amount'],
+        'installments' => 1,
+        'pledge_id' => $pledgePayment['pledge_id'],
+      ])->addWhere('id', '=', $pledgePayment['id'])->execute();
+    }
   }
 
   /**

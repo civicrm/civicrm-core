@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\Activity;
+use Civi\Api4\PledgePayment;
 
 /**
  * Class CRM_Contribute_BAO_ContributionTest
@@ -1658,6 +1659,33 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $input = ['receipt_update' => 1];
     CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionId, $values, TRUE);
     $this->assertDBNotNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After sendMail with the permission to allow update receipt date must be set');
+  }
+
+  /**
+   * Test cancel order api when a pledge is linked.
+   *
+   * The pledge status should be updated. I believe the contribution should
+   * also be unlinked but the goal at this point is no change.
+   *
+   * @throws CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   */
+  public function testCancelOrderWithPledge(): void {
+    $this->ids['contact'][0] = $this->individualCreate();
+    $pledgeID = (int) $this->callAPISuccess('Pledge', 'create', ['contact_id' => $this->ids['contact'][0], 'amount' => 4, 'installments' => 2, 'frequency_unit' => 'month', 'original_installment_amount' => 2, 'create_date' => 'now', 'financial_type_id' => 'Donation', 'start_date' => '+5 days'])['id'];
+    $orderID = (int) $this->callAPISuccess('Order', 'create', ['contact_id' => $this->ids['contact'][0], 'total_amount' => 2, 'financial_type_id' => 'Donation', 'api.Payment.create' => ['total_amount' => 2]])['id'];
+    $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
+    $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
+    $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
+    $this->assertEquals(2, $beforePledge['pledge_total_paid']);
+    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
+
+    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $afterPledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
+    $this->assertEquals('', $afterPledge['pledge_total_paid']);
+    $payments = PledgePayment::get(FALSE)->addWhere('contribution_id', 'IS NOT NULL')->execute();
+    $this->assertCount(0, $payments);
   }
 
 }
