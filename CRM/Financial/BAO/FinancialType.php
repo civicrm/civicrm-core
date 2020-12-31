@@ -94,21 +94,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * a deprecation notice.
    *
    * @param array $params
-   *   Reference array contains the values submitted by the form.
+   *   Values from the database object.
    * @param array $ids
-   *   Reference array contains the id.
+   *   Array that we wish to deprecate and remove.
    *
    * @return object
    */
-  public static function add(&$params, &$ids = []) {
-    // @todo deprecate this, move the code to create & call create from add.
-    if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-    }
-
-    // action is taken depending upon the mode
+  public static function add(array $params, $ids = []) {
+    // @todo deprecate this function, move the code to create & call create from add.
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->copyValues($params);
     $financialType->save();
