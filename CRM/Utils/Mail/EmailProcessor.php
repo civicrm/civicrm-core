@@ -244,8 +244,7 @@ class CRM_Utils_Mail_EmailProcessor {
             continue;
           }
 
-          require_once 'CRM/Utils/DeprecatedUtils.php';
-          $params = _civicrm_api3_deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
+          $params = self::deprecated_activity_buildmailparams($mailParams, $emailActivityTypeId);
 
           $params['version'] = 3;
           if (!empty($dao->activity_status)) {
@@ -533,6 +532,52 @@ class CRM_Utils_Mail_EmailProcessor {
       }
     }
     return $text;
+  }
+
+  /**
+   * @param array $result
+   * @param int $activityTypeID
+   *
+   * @return array
+   *   <type> $params
+   */
+  protected static function deprecated_activity_buildmailparams($result, $activityTypeID) {
+    // get ready for collecting data about activity to be created
+    $params = [];
+
+    $params['activity_type_id'] = $activityTypeID;
+
+    $params['status_id'] = 'Completed';
+    if (!empty($result['from']['id'])) {
+      $params['source_contact_id'] = $params['assignee_contact_id'] = $result['from']['id'];
+    }
+    $params['target_contact_id'] = [];
+    $keys = ['to', 'cc', 'bcc'];
+    foreach ($keys as $key) {
+      if (is_array($result[$key])) {
+        foreach ($result[$key] as $key => $keyValue) {
+          if (!empty($keyValue['id'])) {
+            $params['target_contact_id'][] = $keyValue['id'];
+          }
+        }
+      }
+    }
+    $params['subject'] = $result['subject'];
+    $params['activity_date_time'] = $result['date'];
+    $params['details'] = $result['body'];
+
+    $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
+    for ($i = 1; $i <= $numAttachments; $i++) {
+      if (isset($result["attachFile_$i"])) {
+        $params["attachFile_$i"] = $result["attachFile_$i"];
+      }
+      else {
+        // No point looping 100 times if there's only one attachment
+        break;
+      }
+    }
+
+    return $params;
   }
 
 }
