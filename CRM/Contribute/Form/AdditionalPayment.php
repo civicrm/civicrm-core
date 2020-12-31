@@ -154,7 +154,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     }
 
     if ($this->isARefund() && $this->amountDue < 0) {
-      $defaults['total_amount'] = CRM_Utils_Money::format(abs($this->amountDue), NULL, NULL, TRUE);
+      $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(abs($this->amountDue));
     }
     elseif ($this->_owed && $this->amountDue > 0) {
       $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_owed);
