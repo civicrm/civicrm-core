@@ -179,6 +179,7 @@ class CryptoRegistry {
     ];
     $options = array_merge($defaults, $options);
     $options['id'] = 'plain' . ($n++);
+    $options['tags'] = array_merge($options['tags'] ?? [], ['PLAIN']);
     $this->keys[$options['id']] = $options;
     return $options;
   }
@@ -207,20 +208,26 @@ class CryptoRegistry {
    * @param string|string[] $keyIds
    *   List of IDs or tags. The first match in the list is returned.
    *   If multiple keys match the same tag, then the one with lowest 'weight' is returned.
+   * @param string|NULL $suite
+   *   Filter by suite. NULL allows any suite.
    * @return array
    * @throws \Civi\Crypto\Exception\CryptoException
    */
-  public function findKey($keyIds) {
+  public function findKey($keyIds, $suite = NULL) {
+    $matchSuite = function($k) use ($suite) {
+      return $suite === NULL || $k['suite'] === $suite;
+    };
+
     $keyIds = (array) $keyIds;
     foreach ($keyIds as $keyIdOrTag) {
-      if (isset($this->keys[$keyIdOrTag])) {
+      if (isset($this->keys[$keyIdOrTag]) && $matchSuite($this->keys[$keyIdOrTag])) {
         return $this->keys[$keyIdOrTag];
       }
 
       $matchKeyId = NULL;
       $matchWeight = self::LAST_WEIGHT;
       foreach ($this->keys as $key) {
-        if (in_array($keyIdOrTag, $key['tags']) && $key['weight'] <= $matchWeight) {
+        if (in_array($keyIdOrTag, $key['tags']) && $key['weight'] <= $matchWeight && $matchSuite($key)) {
           $matchKeyId = $key['id'];
           $matchWeight = $key['weight'];
         }

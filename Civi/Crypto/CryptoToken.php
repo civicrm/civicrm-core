@@ -127,12 +127,16 @@ class CryptoToken {
     $keyIdOrTag = (array) $keyIdOrTag;
 
     if ($this->isPlainText($token)) {
-      if (in_array('*', $keyIdOrTag) || in_array('plain', $keyIdOrTag)) {
+      // We can see if this is authorized (even without initializing the registry).
+      if (in_array('*', $keyIdOrTag) || in_array('PLAIN', $keyIdOrTag)) {
         return $token;
       }
-      else {
-        throw new CryptoException("Cannot decrypt token. Unexpected key: plain");
+      if (\Civi::service('crypto.registry')->findKey($keyIdOrTag, 'plain')) {
+        return $token;
       }
+      // In practice, the next line shouldn't be reachable (due to findKey's sanity checks).
+      // So it's just a fail-safe.
+      throw new CryptoException("Cannot decrypt token. Unexpected key: plain");
     }
 
     /** @var CryptoRegistry $registry */

@@ -61,6 +61,44 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testDecryptPlain() {
+    /** @var \Civi\Crypto\CryptoRegistry $cryptoRegistry */
+    $cryptoRegistry = \Civi::service('crypto.registry');
+    /** @var \Civi\Crypto\CryptoToken $cryptoToken */
+    $cryptoToken = \Civi::service('crypto.token');
+
+    $plainText = 'hello world';
+
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, '*'));
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, ['*']));
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, 'PLAIN'));
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, ['PLAIN']));
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, ['UNIT-TEST', 'PLAIN']));
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, ['PLAIN', 'UNIT-TEST']));
+
+    try {
+      $cryptoToken->decrypt($plainText, 'UNIT-TEST');
+      $this->fail('decrypt() should raise exception because UNIT-TEST does not have plain-text support.');
+    }
+    catch (CryptoException $e) {
+      $this->assertRegExp(';Failed to find.*UNIT-TEST;', $e->getMessage());
+    }
+
+    try {
+      $cryptoToken->decrypt($plainText, 'NON-EXISTENT-KEY');
+      $this->fail('decrypt() should raise exception because NON-EXISTENT-KEY does not have plain-text support.');
+    }
+    catch (CryptoException $e) {
+      $this->assertRegExp(';Failed to find.*NON-EXISTENT-KEY;', $e->getMessage());
+    }
+
+    // decrypt() should succeed because UNIT-TEST now has plain-text support.
+    $cryptoRegistry->addPlainText([
+      'tags' => ['UNIT-TEST'],
+    ]);
+    $this->assertEquals($plainText, $cryptoToken->decrypt($plainText, 'UNIT-TEST'));
+  }
+
   public function getExampleTokens() {
     return [
       // [ 'Plain text', 'Encryption Key ID', 'expectTokenRegex', 'expectTokenLen', 'expectPlain' ]
@@ -88,7 +126,10 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $this->assertEquals($expectTokenLen, strlen($token));
     $this->assertEquals($expectPlain, \Civi::service('crypto.token')->isPlainText($token));
 
-    $actualText = \Civi::service('crypto.token')->decrypt($token);
+    $actualText = \Civi::service('crypto.token')->decrypt($token, '*');
+    $this->assertEquals($inputText, $actualText);
+
+    $actualText = \Civi::service('crypto.token')->decrypt($token, $inputKeyIdOrTag);
     $this->assertEquals($inputText, $actualText);
   }
 
