@@ -71,6 +71,7 @@
     <length>4</length>
     <comment>Is this a predefined system object?</comment>
     <add>1.3</add>
+    <default>0</default>
     <html>
       <type>CheckBox</type>
       <label>Reserved?</label>
@@ -79,6 +80,7 @@
   <field>
     <name>is_active</name>
     <type>boolean</type>
+    <default>1</default>
     <title>Financial Type Is Active?</title>
     <length>4</length>
     <comment>Is this property active?</comment>
