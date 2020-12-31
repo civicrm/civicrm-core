@@ -21,12 +21,37 @@
 trait CRM_Utils_Cache_SerializationTrait {
 
   /**
+   * @var callable|null
+   */
+  private $serializer = NULL;
+
+  /**
+   * @var callable|null
+   */
+  private $unserializer = NULL;
+
+  /**
+   * @param callable|null $encode
+   * @param callable|null $decode
+   */
+  public function useSerializer($encode, $decode) {
+    $this->serializer = $encode;
+    $this->unserializer = $decode;
+  }
+
+  /**
    * @param mixed $data
    * @return string
    * @see \serialize()
    */
   protected function serialize($data) {
-    return serialize($data);
+    if ($this->serializer === NULL) {
+      return serialize($data);
+    }
+    else {
+      $f = $this->serializer;
+      return $f($data);
+    }
   }
 
   /**
@@ -35,7 +60,13 @@ trait CRM_Utils_Cache_SerializationTrait {
    * @see \unserialize()
    */
   protected function unserialize($data) {
-    return unserialize($data);
+    if ($this->serializer === NULL) {
+      return unserialize($data);
+    }
+    else {
+      $f = $this->unserializer;
+      return $f($data);
+    }
   }
 
 }
