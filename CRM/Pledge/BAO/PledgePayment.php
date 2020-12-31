@@ -76,11 +76,13 @@ WHERE     pledge_id = %1
   }
 
   /**
+   * Create pledge payments.
+   *
    * @param array $params
    *
-   * @return pledge
+   * @return CRM_Pledge_DAO_PledgePayment
    */
-  public static function create($params) {
+  public static function createMultiple(array $params) {
     $transaction = new CRM_Core_Transaction();
     $overdueStatusID = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Overdue');
     $pendingStatusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Pending');
@@ -145,20 +147,34 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Add pledge payment.
+   * Create individual pledge payment.
    *
    * @param array $params
-   *   Associate array of field.
    *
    * @return CRM_Pledge_DAO_PledgePayment
-   *   pledge payment id
+   * @throws \CRM_Core_Exception
    */
-  public static function add($params) {
+  public static function create(array $params): CRM_Pledge_DAO_PledgePayment {
     // set currency for CRM-1496
     if (empty($params['id']) && !isset($params['currency'])) {
       $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
     }
     return self::writeRecord($params);
+  }
+
+  /**
+   * Add pledge payment.
+   *
+   * @deprecated - use the api which will use create (soon).
+   *
+   * @param array $params
+   *   Fields in line with the database entity.
+   *
+   * @return CRM_Pledge_DAO_PledgePayment
+   * @throws \CRM_Core_Exception
+   */
+  public static function add(array $params): CRM_Pledge_DAO_PledgePayment {
+    return self::create($params);
   }
 
   /**
