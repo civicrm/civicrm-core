@@ -17,8 +17,10 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
   /**
    * Test Create, Read, Update Financial type with custom field.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateUpdateFinancialTypeCustomField() {
+  public function testCreateUpdateFinancialTypeCustomField(): void {
     $this->callAPISuccess('OptionValue', 'create', [
       'label' => ts('Financial Type'),
       'name' => 'civicrm_financial_type',
@@ -81,7 +83,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
 
       // get financial type to check custom field value
       $expectedResult = array_filter(array_merge($params, $customFields), function($var) {
-        return (!is_null($var) && $var != '');
+        return (!is_null($var) && $var !== '');
       });
       $this->callAPISuccessGetSingle('FinancialType', [
         'id' => $financialType['id'],
