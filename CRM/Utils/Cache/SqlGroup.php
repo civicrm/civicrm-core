@@ -26,8 +26,11 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   const DEFAULT_TTL = 21600;
 
   const TS_FMT = 'Y-m-d H:i:s';
+
   // TODO Consider native implementation.
   use CRM_Utils_Cache_NaiveMultipleTrait;
+
+  use CRM_Utils_Cache_SerializationTrait;
 
   /**
    * The host name of the memcached server.
@@ -121,7 +124,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
     $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
 
-    $dataSerialized = CRM_Core_BAO_Cache::encode(serialize($value));
+    $dataSerialized = CRM_Core_BAO_Cache::encode($this->serialize($value));
 
     // This table has a wonky index, so we cannot use REPLACE or
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
@@ -148,7 +151,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
     $lock->release();
 
-    $this->valueCache[$key] = unserialize(CRM_Core_BAO_Cache::decode($dataSerialized));
+    $this->valueCache[$key] = $this->unserialize(CRM_Core_BAO_Cache::decode($dataSerialized));
     $this->expiresCache[$key] = $expires;
     return TRUE;
   }
@@ -168,7 +171,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         $this->expiresCache[$key] = $dao->expires;
-        $this->valueCache[$key] = unserialize(CRM_Core_BAO_Cache::decode($dao->data));
+        $this->valueCache[$key] = $this->unserialize(CRM_Core_BAO_Cache::decode($dao->data));
       }
     }
     return (isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key]) ? $this->reobjectify($this->valueCache[$key]) : $default;
@@ -244,7 +247,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     $this->valueCache = [];
     $this->expiresCache = [];
     while ($dao->fetch()) {
-      $this->valueCache[$dao->path] = unserialize(CRM_Core_BAO_Cache::decode($dao->data));
+      $this->valueCache[$dao->path] = $this->unserialize(CRM_Core_BAO_Cache::decode($dao->data));
       $this->expiresCache[$dao->path] = $dao->expires;
     }
   }

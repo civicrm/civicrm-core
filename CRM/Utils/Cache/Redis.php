@@ -21,6 +21,8 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   // TODO Native implementation
   use CRM_Utils_Cache_NaiveHasTrait;
 
+  use CRM_Utils_Cache_SerializationTrait;
+
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
   const DEFAULT_TIMEOUT = 3600;
@@ -113,7 +115,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
       return $this->delete($key);
     }
     $ttl = CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TIMEOUT);
-    if (!$this->_cache->setex($this->_prefix . $key, $ttl, serialize($value))) {
+    if (!$this->_cache->setex($this->_prefix . $key, $ttl, $this->serialize($value))) {
       if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
         throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed: " . $this->_cache->getLastError());
       }
@@ -135,7 +137,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
     $result = $this->_cache->get($this->_prefix . $key);
-    return ($result === FALSE) ? $default : unserialize($result);
+    return ($result === FALSE) ? $default : $this->unserialize($result);
   }
 
   /**

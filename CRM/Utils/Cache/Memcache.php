@@ -19,6 +19,8 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   // TODO Consider native implementation.
   use CRM_Utils_Cache_NaiveMultipleTrait;
 
+  use CRM_Utils_Cache_SerializationTrait;
+
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
@@ -121,7 +123,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
       return $this->delete($key);
     }
     $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, $this->_timeout);
-    return $this->_cache->set($this->getTruePrefix() . $key, serialize($value), FALSE, $expires);
+    return $this->_cache->set($this->getTruePrefix() . $key, $this->serialize($value), FALSE, $expires);
   }
 
   /**
@@ -133,7 +135,7 @@ class CRM_Utils_Cache_Memcache implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
     $result = $this->_cache->get($this->getTruePrefix() . $key);
-    return ($result === FALSE) ? $default : unserialize($result);
+    return ($result === FALSE) ? $default : $this->unserialize($result);
   }
 
   /**
