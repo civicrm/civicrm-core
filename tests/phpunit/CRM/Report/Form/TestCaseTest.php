@@ -11,6 +11,8 @@
 
 require_once 'CiviTest/CiviReportTestCase.php';
 
+use Civi\Test\Invasive;
+
 /**
  * Verify that the CiviReportTestCase provides a working set of
  * primitives for tests. Do this by running various scenarios
@@ -174,25 +176,19 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
    * Test processReportMode() Function in Reports
    */
   public function testOutputMode() {
-    $clazz = new ReflectionClass('CRM_Report_Form');
     $reportForm = new CRM_Report_Form();
 
-    $params = $clazz->getProperty('_params');
-    $params->setAccessible(TRUE);
-    $outputMode = $clazz->getProperty('_outputMode');
-    $outputMode->setAccessible(TRUE);
-
-    $params->setValue($reportForm, ['groups' => 4]);
+    Invasive::set([$reportForm, '_params'], ['groups' => 4]);
     $reportForm->processReportMode();
-    $this->assertEquals('group', $outputMode->getValue($reportForm));
+    $this->assertEquals('group', Invasive::get([$reportForm, '_outputMode']));
 
-    $params->setValue($reportForm, ['task' => 'copy']);
+    Invasive::set([$reportForm, '_params'], ['task' => 'copy']);
     $reportForm->processReportMode();
-    $this->assertEquals('copy', $outputMode->getValue($reportForm));
+    $this->assertEquals('copy', Invasive::get([$reportForm, '_outputMode']));
 
-    $params->setValue($reportForm, ['task' => 'print']);
+    Invasive::set([$reportForm, '_params'], ['task' => 'print']);
     $reportForm->processReportMode();
-    $this->assertEquals('print', $outputMode->getValue($reportForm));
+    $this->assertEquals('print', Invasive::get([$reportForm, '_outputMode']));
   }
 
 }
