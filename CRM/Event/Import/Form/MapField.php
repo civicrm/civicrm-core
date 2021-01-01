@@ -277,7 +277,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $errors = [];
     // define so we avoid notices below
     $errors['_qf_default'] = '';
-    $fieldMessage = NULL;
+    $contactFieldsBelowWeightMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
       $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
@@ -295,25 +295,12 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
         CRM_Import_Parser::CONTACT_HOUSEHOLD => 'Household',
         CRM_Import_Parser::CONTACT_ORGANIZATION => 'Organization',
       );
-      $params = array(
-        'used' => 'Unsupervised',
-        'contact_type' => $contactTypes[$contactTypeId],
-      );
-      list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
-      $weightSum = 0;
-      foreach ($importKeys as $key => $val) {
-        if (array_key_exists($val, $ruleFields)) {
-          $weightSum += $ruleFields[$val];
-        }
-      }
-      foreach ($ruleFields as $field => $weight) {
-        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-      }
+      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields($contactTypes[$contactTypeId], $importKeys);
 
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $importKeys)) {
           if ($field == 'participant_contact_id') {
-            if ($weightSum >= $threshold || in_array('external_identifier', $importKeys) ||
+            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys) ||
               in_array('participant_id', $importKeys)
             ) {
               continue;
@@ -322,9 +309,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
               $errors['_qf_default'] .= ts('Missing required field: Provide Participant ID') . '<br />';
             }
             else {
-              $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                1 => $threshold,
-              )) . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
+              $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $contactFieldsBelowWeightMessage " . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
             }
           }
           elseif (!in_array('event_title', $importKeys)) {
