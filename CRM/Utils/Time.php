@@ -43,6 +43,17 @@ class CRM_Utils_Time {
   }
 
   /**
+   * Evaluate a time expression (relative to current time).
+   *
+   * @param string $str
+   * @return false|int
+   * @see \strtotime
+   */
+  public static function strtotime($str) {
+    return strtotime($str, self::getTimeRaw());
+  }
+
+  /**
    * Get the time.
    *
    * @return int
