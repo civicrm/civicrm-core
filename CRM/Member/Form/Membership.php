@@ -290,7 +290,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     //setting default join date and receive date
     if ($this->_action == CRM_Core_Action::ADD) {
-      $defaults['receive_date'] = date('Y-m-d H:i:s');
+      $defaults['receive_date'] = CRM_Utils_Time::getTime('Y-m-d H:i:s');
     }
 
     $defaults['num_terms'] = 1;
@@ -352,7 +352,7 @@ DESC limit 1");
 
     //setting default join date if there is no join date
     if (empty($defaults['join_date'])) {
-      $defaults['join_date'] = date('Y-m-d');
+      $defaults['join_date'] = CRM_Utils_Time::getTime('Y-m-d');
     }
 
     if (!empty($defaults['membership_end_date'])) {
@@ -554,7 +554,7 @@ DESC limit 1");
         CRM_Member_StatusOverrideTypes::getSelectOptions()
       );
 
-      $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, ['minDate' => date('Y-m-d'), 'time' => FALSE]);
+      $this->add('datepicker', 'status_override_end_date', ts('Status Override End Date'), '', FALSE, ['minDate' => CRM_Utils_Time::getTime('Y-m-d'), 'time' => FALSE]);
 
       $this->addElement('checkbox', 'record_contribution', ts('Record Membership Payment?'));
 
@@ -1256,7 +1256,7 @@ DESC limit 1");
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
-      $params['register_date'] = date('YmdHis');
+      $params['register_date'] = CRM_Utils_Time::getTime('YmdHis');
 
       // add all the additional payment params we need
       $formValues['amount'] = $params['total_amount'];
@@ -1367,8 +1367,8 @@ DESC limit 1");
         }
         $endDate = $startDate = NULL;
       }
-      $now = date('YmdHis');
-      $params['receive_date'] = date('Y-m-d H:i:s');
+      $now = CRM_Utils_Time::getTime('YmdHis');
+      $params['receive_date'] = CRM_Utils_Time::getTime('Y-m-d H:i:s');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
@@ -1441,7 +1441,7 @@ DESC limit 1");
 
         // @todo figure out why recieve_date isn't being set right here.
         if (empty($params['receive_date'])) {
-          $params['receive_date'] = date('Y-m-d H:i:s');
+          $params['receive_date'] = CRM_Utils_Time::getTime('Y-m-d H:i:s');
         }
         $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
 
@@ -1888,7 +1888,7 @@ DESC limit 1");
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID, $financialType);
 
-    $now = date('YmdHis');
+    $now = CRM_Utils_Time::getTime('YmdHis');
     $receiptDate = $params['receipt_date'] ?? NULL;
     if ($isEmailReceipt) {
       $receiptDate = $now;
@@ -1897,7 +1897,7 @@ DESC limit 1");
     if (isset($params['amount'])) {
       $contributionParams = array_merge([
         'financial_type_id' => $financialType->id,
-        'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
+        'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : CRM_Utils_Time::getTime('YmdHis'),
         'tax_amount' => $params['tax_amount'] ?? NULL,
         'amount_level' => $params['amount_level'] ?? NULL,
         'invoice_id' => $params['invoiceID'],
@@ -1986,7 +1986,7 @@ DESC limit 1");
       $recurParams['is_test'] = 1;
     }
 
-    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
+    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::getTime('YmdHis');
     if (!empty($params['receive_date'])) {
       $recurParams['start_date'] = date('YmdHis', CRM_Utils_Time::strtotime($params['receive_date']));
     }

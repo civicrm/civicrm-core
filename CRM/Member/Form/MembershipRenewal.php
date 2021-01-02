@@ -180,9 +180,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
-    $now = date('Y-m-d');
+    $now = CRM_Utils_Time::getTime('Y-m-d');
     $defaults['renewal_date'] = $now;
-    $defaults['receive_date'] = $now . ' ' . date('H:i:s');
+    $defaults['receive_date'] = $now . ' ' . CRM_Utils_Time::getTime('H:i:s');
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
@@ -487,7 +487,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
-    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $this->_params, date('Y-m-d H:i:s')));
+    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $this->_params, CRM_Utils_Time::getTime('Y-m-d H:i:s')));
     $this->processBillingAddress();
 
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
