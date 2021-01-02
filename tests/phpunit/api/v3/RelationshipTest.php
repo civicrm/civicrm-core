@@ -1041,7 +1041,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id' => $this->_cId_a,
-      'relationship_type_id' => $this->_relTypeID + 1,
+      'relationship_type_id' => 1,
     ]);
     $this->assertEquals(0, $result['count']);
     $this->callAPISuccess($this->entity, 'delete', ['id' => $created['id']]);
@@ -1070,7 +1070,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id_a' => $this->_cId_a,
-      'relationship_type_id' => $this->_relTypeID + 1,
+      'relationship_type_id' => 1,
     ]);
     $this->assertEquals(0, $result['count']);
   }
