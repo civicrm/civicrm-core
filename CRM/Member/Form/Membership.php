@@ -1988,7 +1988,7 @@ DESC limit 1");
 
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
     if (!empty($params['receive_date'])) {
-      $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
+      $recurParams['start_date'] = date('YmdHis', CRM_Utils_Time::strtotime($params['receive_date']));
     }
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
