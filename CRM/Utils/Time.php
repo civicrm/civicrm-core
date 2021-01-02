@@ -35,11 +35,13 @@ class CRM_Utils_Time {
    *
    * @param string $returnFormat
    *   Format in which date is to be retrieved.
+   * @param int $timestamp
+   *   Current time. With NULL, the time is determined automatically.
    *
    * @return string
    */
-  public static function getTime($returnFormat = 'YmdHis') {
-    return date($returnFormat, self::getTimeRaw());
+  public static function getTime($returnFormat = 'YmdHis', $timestamp = NULL) {
+    return date($returnFormat, $timestamp ?: self::getTimeRaw());
   }
 
   /**
