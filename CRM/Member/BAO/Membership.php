@@ -2713,7 +2713,7 @@ WHERE {$whereClause}";
         return $updateMembershipMsg;
       }
 
-      $today = time();
+      $today = CRM_Utils_Time::time();
       if ($deceasedDate && CRM_Utils_Time::strtotime($deceasedDate) > $today) {
         return $updateMembershipMsg;
       }

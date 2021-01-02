@@ -117,7 +117,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     }
     if ($statusID) {
       $this->progressImport($statusID);
-      $startTimestamp = $currTimestamp = $prevTimestamp = time();
+      $startTimestamp = $currTimestamp = $prevTimestamp = CRM_Utils_Time::time();
     }
 
     while (!feof($fd)) {
