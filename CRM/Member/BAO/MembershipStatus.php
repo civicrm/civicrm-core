@@ -218,7 +218,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       CRM_Core_Error::deprecatedFunctionWarning('pass now rather than today in');
     }
 
-    $statusDate = date('Ymd', strtotime($statusDate));
+    $statusDate = date('Ymd', CRM_Utils_Time::strtotime($statusDate));
 
     //fix for CRM-3570, if we have statuses with is_admin=1,
     //exclude these statuses from calculatation during import.
@@ -236,9 +236,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     $membershipStatus = CRM_Core_DAO::executeQuery($query);
 
     $dates = [
-      'start' => ($startDate && $startDate !== 'null') ? date('Ymd', strtotime($startDate)) : '',
-      'end' => ($endDate && $endDate !== 'null') ? date('Ymd', strtotime($endDate)) : '',
-      'join' => ($joinDate && $joinDate !== 'null') ? date('Ymd', strtotime($joinDate)) : '',
+      'start' => ($startDate && $startDate !== 'null') ? date('Ymd', CRM_Utils_Time::strtotime($startDate)) : '',
+      'end' => ($endDate && $endDate !== 'null') ? date('Ymd', CRM_Utils_Time::strtotime($endDate)) : '',
+      'join' => ($joinDate && $joinDate !== 'null') ? date('Ymd', CRM_Utils_Time::strtotime($joinDate)) : '',
     ];
 
     while ($membershipStatus->fetch()) {
@@ -253,9 +253,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
             if ($membershipStatus->{$eve . '_event_adjust_unit'} &&
               $membershipStatus->{$eve . '_event_adjust_interval'}
             ) {
-              $month = date('m', strtotime($date));
-              $day = date('d', strtotime($date));
-              $year = date('Y', strtotime($date));
+              $month = date('m', CRM_Utils_Time::strtotime($date));
+              $day = date('d', CRM_Utils_Time::strtotime($date));
+              $year = date('Y', CRM_Utils_Time::strtotime($date));
               // add in months
               if ($membershipStatus->{$eve . '_event_adjust_unit'} === 'month') {
                 ${$eve . 'Event'} = date('Ymd', mktime(0, 0, 0,

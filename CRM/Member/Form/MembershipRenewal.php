@@ -737,7 +737,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     ])) {
       return CRM_Member_BAO_Membership::create($memParams);
     }
-    $memParams['join_date'] = date('Ymd', strtotime($currentMembership['join_date']));
+    $memParams['join_date'] = date('Ymd', CRM_Utils_Time::strtotime($currentMembership['join_date']));
     $isMembershipCurrent = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $currentMembership['status_id'], 'is_current_member');
 
     // CRM-7297 Membership Upsell - calculate dates based on new membership type
