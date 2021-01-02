@@ -77,6 +77,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
+    timecop_travel(mktime(1, 0, 0, 8, 1, 2020));
+
     $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
     $this->financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues');
@@ -125,6 +127,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     foreach ($this->ids['contact'] as $contactID) {
       $this->callAPISuccess('contact', 'delete', ['id' => $contactID, 'skip_undelete' => TRUE]);
     }
+    timecop_return();
   }
 
   /**
