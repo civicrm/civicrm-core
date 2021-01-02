@@ -98,7 +98,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       'status_id' => $membership->status_id,
       'start_date' => $logStartDate,
       'end_date' => CRM_Utils_Date::isoToMysql($membership->end_date),
-      'modified_date' => date('Ymd'),
+      'modified_date' => CRM_Utils_Time::date('Ymd'),
       'membership_type_id' => $values[$membership->id]['membership_type_id'],
       'max_related' => $membership->max_related,
     ];
@@ -283,7 +283,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
       );
       if (empty($calcStatus)) {
-        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . date('Y-m-d H:i:s')));
+        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
       }
       $params['status_id'] = $calcStatus['id'];
     }
@@ -2739,7 +2739,7 @@ WHERE {$whereClause}";
           'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
           'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
           'modified_id' => $userId,
-          'modified_date' => date('Ymd'),
+          'modified_date' => CRM_Utils_Time::date('Ymd'),
           'membership_type_id' => $dao->membership_type_id,
           'max_related' => $dao->max_related,
         ];
@@ -2756,7 +2756,7 @@ WHERE {$whereClause}";
           'status_id' => 2,
           'version' => 3,
           'priority_id' => 2,
-          'activity_date_time' => date('Y-m-d H:i:s'),
+          'activity_date_time' => CRM_Utils_Time::date('Y-m-d H:i:s'),
           'is_auto' => 0,
           'is_current_revision' => 1,
           'is_deleted' => 0,
