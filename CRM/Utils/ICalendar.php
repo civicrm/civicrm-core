@@ -85,8 +85,7 @@ class CRM_Utils_ICalendar {
 
   /**
    * Send the ICalendar to the browser with the specified content type
-   * - 'text/calendar' : used for downloaded ics file
-   * - 'text/plain'    : used for iCal formatted feed
+   * - 'text/calendar' : used for iCal formatted feed
    * - 'text/xml'      : used for gData or rss formatted feeds
    *
    *
@@ -106,7 +105,7 @@ class CRM_Utils_ICalendar {
     CRM_Utils_System::setHttpHeader("Content-Language", $lang);
     CRM_Utils_System::setHttpHeader("Content-Type", "$content_type; charset=$charset");
 
-    if ($content_type == 'text/calendar') {
+    if ($fileName) {
       CRM_Utils_System::setHttpHeader('Content-Length', strlen($calendar));
       CRM_Utils_System::setHttpHeader("Content-Disposition", "$disposition; filename=\"$fileName\"");
       CRM_Utils_System::setHttpHeader("Pragma", "no-cache");
