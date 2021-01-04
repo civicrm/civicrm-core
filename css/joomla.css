@@ -331,11 +331,9 @@ div#toolbar-box, div#toolbar-box div.m{
 .ac_results .ac_odd {
   background-color: #444;
 }
-
 #crm-notification-container {
   top: 100px;
 }
-
 .crm-container textarea,
 .crm-container input,
 .crm-container select {
@@ -355,16 +353,13 @@ div#toolbar-box, div#toolbar-box div.m{
 .crm-container button[type=submit] {
   height: auto;
 }
-
 .crm-container .disabled {
   font-weight: normal;
 }
-
 #crm-container .form-layout td.label,
 .crm-container .form-layout td.label {
   width: inherit;
 }
-
 #crm-container .crm-event-form-fee-block .label {
   background-color: inherit;
   width: inherit;
@@ -398,4 +393,81 @@ body.admin.com_civicrm #content-right {
 /* Make footer admin bar hide behind popup windows (CRM-15723) */
 body.ui-dialog-open #status {
   z-index: 100 !important;
+}
+
+/* 
+	Joomla 4.0 
+*/
+
+body.admin.com_civicrm.layout-default #crm-qsearch label {
+	color: #fff;
+}
+body.admin.com_civicrm.layout-default #subhead {
+	display: none;
+}
+body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
+	padding: 0;
+}
+body.admin.com_civicrm.layout-default.crm-menubar-over-cms-menu #content {
+	margin-top: 43px;
+}
+body.admin.com_civicrm.layout-default #civicrm-menu-nav .crm-menubar-toggle-btn-icon {
+  left: 45px;
+}
+@media (min-width: 768px) {
+  body.admin.com_civicrm.layout-default.crm-menubar-below-cms-menu > #civicrm-menu-nav #civicrm-menu {
+    top: 0;
+    z-index: 10000;
+  }
+  body.admin.com_civicrm.layout-default.crm-menubar-over-cms-menu #civicrm-menu {
+    position: absolute;
+    top: 69px;
+    left: 48px;
+    width: calc(100% - 48px);
+    height: 45px;
+  }
+  body.admin.com_civicrm.layout-default.crm-menubar-over-cms-menu.crm-menubar-visible {
+    padding-top: 0;
+  }
+}
+@media (max-width: 767px) {
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav .crm-menubar-toggle-btn {
+    top: 66px;
+    left: 42px;
+    height: 44px;
+    width: calc(100% - 48px);
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu {
+    top: 66px;
+    width: calc(100% - 48px);
+    left: 48px;
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu li a {
+    text-align: left;
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav .crm-menubar-toggle-btn span.crm-menu-logo {
+    margin: 7px;
+  }
+  body.admin.com_civicrm.layout-default #content {
+    margin-top: 41px;
+  }
+}
+@media (max-width: 575px) {
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav .crm-menubar-toggle-btn {
+    top: 55px;
+    left: 0;
+    width: 100%;
+    margin: 0;
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu {
+    top: 55px;
+    width: 100%;
+    left: 0;
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav {
+    z-index: 1000;
+  }
+  body.admin.com_civicrm.layout-default #civicrm-menu li a {
+    text-align: left;
+  }
 }
