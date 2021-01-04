@@ -650,8 +650,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'return' => 'contact_id.api_key',
     ]);
-    $field = $this->_apiversion == 4 ? 'contact.api_key' : 'contact_id.api_key';
-    $this->assertEquals('abcd1234', $joinResult[$field]);
+    $this->assertEquals('abcd1234', $joinResult['contact_id.api_key']);
 
     // Restricted return -- because we don't have permission
     $config->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
