@@ -425,10 +425,9 @@ trait Api3TestTrait {
             $v4Params['select'][] = 'id';
           }
           // Convert join syntax
-          foreach ($v4Params['select'] as &$select) {
+          foreach ($v4Params['select'] as $idx => $select) {
             if (strstr($select, '_id.')) {
-              $joins[$select] = explode('.', str_replace('_id.', '.', $select));
-              $select = str_replace('_id.', '.', $select);
+              $joins[$select] = $v4Params['select'][$idx] = str_replace('_id.', '.', $select);
             }
           }
         }
@@ -598,8 +597,8 @@ trait Api3TestTrait {
         $result[$index][$key] = $this->runApi4LegacyChain($key, $params, $v4Entity, $row, $sequential);
       }
       // Convert join format
-      foreach ($joins as $api3Key => $api4Path) {
-        $result[$index][$api3Key] = \CRM_Utils_Array::pathGet($result[$index], $api4Path);
+      foreach ($joins as $api3Key => $api4Key) {
+        $result[$index][$api3Key] = $result[$index][$api4Key] ?? NULL;
       }
       // Resolve custom field names
       foreach ($custom as $group => $fields) {
