@@ -2749,8 +2749,9 @@ WHERE  civicrm_mailing_job.id = %1
     $config = CRM_Core_Config::singleton();
 
     if ($mode == NULL && CRM_Core_BAO_MailSettings::defaultDomain() == "EXAMPLE.ORG") {
+      // Using forceBackend=TRUE because WordPress sometimes fails to detect cron
       throw new CRM_Core_Exception(ts('The <a href="%1">default mailbox</a> has not been configured. You will find <a href="%2">more info in the online system administrator guide</a>', [
-        1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1'),
+        1 => CRM_Utils_System::url('civicrm/admin/mailSettings', 'reset=1', FALSE, NULL, TRUE, FALSE, TRUE),
         2 => "https://docs.civicrm.org/sysadmin/en/latest/setup/civimail/",
       ]));
     }
