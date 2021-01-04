@@ -70,7 +70,7 @@ class CRM_Event_ICalendar extends CRM_Core_Page {
         CRM_Utils_ICalendar::send($calendar, 'text/xml', 'utf-8');
       }
       else {
-        CRM_Utils_ICalendar::send($calendar, 'text/plain', 'utf-8');
+        CRM_Utils_ICalendar::send($calendar, 'text/calendar', 'utf-8');
       }
     }
     else {
