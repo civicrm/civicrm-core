@@ -262,30 +262,16 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         'activity_type_id' => ts('Activity Type ID'),
       ];
 
-      $params = [
-        'used' => 'Unsupervised',
-        'contact_type' => 'Individual',
-      ];
-      list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
-      $weightSum = 0;
-      foreach ($importKeys as $key => $val) {
-        if (array_key_exists($val, $ruleFields)) {
-          $weightSum += $ruleFields[$val];
-        }
-      }
-      foreach ($ruleFields as $field => $weight) {
-        $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
-      }
+      $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields('Individual', $importKeys);
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $importKeys)) {
           if ($field == 'target_contact_id') {
-            if ($weightSum >= $threshold || in_array('external_identifier', $importKeys)) {
+            if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)) {
               continue;
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.')
-                . $fieldMessage . ' '
-                . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold])
+                . $contactFieldsBelowWeightMessage
                 . '<br />';
             }
           }

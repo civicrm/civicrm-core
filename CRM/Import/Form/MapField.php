@@ -170,4 +170,36 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
     $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
   }
 
+  /**
+   * Validate that sufficient fields have been supplied to match to a contact.
+   *
+   * @param string $contactType
+   * @param array $importKeys
+   *
+   * @return string
+   *   Message if insufficient fields are present. Empty string otherwise.
+   */
+  protected static function validateRequiredContactMatchFields(string $contactType, array $importKeys): string {
+    [$ruleFields, $threshold] = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight([
+      'used' => 'Unsupervised',
+      'contact_type' => $contactType,
+    ]);
+    $weightSum = 0;
+    foreach ($importKeys as $key => $val) {
+      if (array_key_exists($val, $ruleFields)) {
+        $weightSum += $ruleFields[$val];
+      }
+    }
+    $fieldMessage = '';
+    foreach ($ruleFields as $field => $weight) {
+      $fieldMessage .= ' ' . $field . '(weight ' . $weight . ')';
+    }
+    if ($weightSum < $threshold) {
+      return $fieldMessage . ' ' . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
+        1 => $threshold,
+      ));
+    }
+    return '';
+  }
+
 }
