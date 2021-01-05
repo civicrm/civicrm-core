@@ -2084,6 +2084,47 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Rotate the cryptographic key used in the database.
+   *
+   * The purpose of this hook is to visit any encrypted values in the database
+   * and re-encrypt the content.
+   *
+   * For values encoded via `CryptoToken`, you can use `CryptoToken::rekey($oldToken, $tag)`
+   *
+   * @param string $tag
+   *   The type of crypto-key that is currently being rotated.
+   *   The hook-implementer should use this to decide which (if any) fields to visit.
+   *   Ex: 'CRED'
+   * @param \Psr\Log\LoggerInterface $log
+   *   List of messages about re-keyed values.
+   *
+   * @code
+   * function example_civicrm_rekey($tag, &$log) {
+   *   if ($tag !== 'CRED') return;
+   *
+   *   $cryptoToken = Civi::service('crypto.token');
+   *   $rows = sql('SELECT id, secret_column FROM some_table');
+   *   foreach ($rows as $row) {
+   *     $new = $cryptoToken->rekey($row['secret_column']);
+   *     if ($new !== NULL) {
+   *       sql('UPDATE some_table SET secret_column = %1 WHERE id = %2',
+   *         $new, $row['id']);
+   *     }
+   *   }
+   * }
+   * @endCode
+   *
+   * @return null
+   *   The return value is ignored
+   */
+  public static function cryptoRotateKey($tag, $log) {
+    return self::singleton()->invoke(['tag', 'log'], $tag, $log, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_cryptoRotateKey'
+    );
+  }
+
+  /**
    * @param CRM_Core_Exception $exception
    * @param mixed $request
    *   Reserved for future use.
