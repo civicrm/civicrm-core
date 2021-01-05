@@ -318,9 +318,11 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
     $config = CRM_Core_Config::singleton();
 
     $ufDSN = CRM_Utils_SQL::autoSwitchDSN($config->userFrameworkDSN);
-    $dbDrupal = DB::connect($ufDSN);
-    if (DB::isError($dbDrupal)) {
-      throw new CRM_Core_Exception("Cannot connect to drupal db via $ufDSN, " . $dbDrupal->getMessage());
+    try {
+      $dbDrupal = DB::connect($ufDSN);
+    }
+    catch (Exception $e) {
+      throw new CRM_Core_Exception("Cannot connect to drupal db via $ufDSN, " . $e->getMessage());
     }
 
     $account = $userUid = $userMail = NULL;

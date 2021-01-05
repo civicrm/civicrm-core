@@ -75,7 +75,6 @@ CRM_Core_Config::singleton();
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
 try {
-  $scope = CRM_Core_TemporaryErrorScope::useException();
   // Generate reproducible data-set
   // $gcd = new CRM_Core_CodeGen_GenerateData('1234', strtotime(date('Y') . '-01-01 02:03:04'));
   // Generate unique data-set

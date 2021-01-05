@@ -56,7 +56,6 @@ class CRM_Queue_ErrorPolicy {
     }
     set_error_handler([$this, 'onError'], $this->level);
     // FIXME make this temporary/reversible
-    $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
 
   /**

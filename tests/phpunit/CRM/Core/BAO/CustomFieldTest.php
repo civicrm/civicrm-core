@@ -345,7 +345,6 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     CRM_Core_BAO_CustomField::moveField($fields['countryB']['id'], $groupB['id']);
 
     // Group[A] no longer has fields[countryB]
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
     try {
       $this->assertDBQuery(1, "SELECT {$fields['countryB']['column_name']} FROM " . $groupA['table_name']);
       $this->fail('Expected exception when querying column on wrong table');

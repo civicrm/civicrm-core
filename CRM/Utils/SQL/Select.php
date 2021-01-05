@@ -557,7 +557,6 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     // Don't pass through $abort, $trapException. Just use straight-up exceptions.
     $abort = TRUE;
     $trapException = FALSE;
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
 
     // Don't pass through freeDAO. You can do it yourself.
     $freeDAO = FALSE;

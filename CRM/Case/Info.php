@@ -275,9 +275,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       foreach ($queries as $query) {
         $query = trim($query);
         if (!empty($query)) {
-          $res = &$db->query($query);
-          if (PEAR::isError($res)) {
-            die("Cannot execute $query: " . $res->getMessage());
+          try {
+            $res = &$db->query($query);
+          }
+          catch (Exception $e) {
+            die("Cannot execute $query: " . $e->getMessage());
           }
         }
       }
@@ -290,9 +292,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
 
         $string = trim($string);
         if (!empty($string)) {
-          $res = &$db->query($string);
-          if (PEAR::isError($res)) {
-            die("Cannot execute $string: " . $res->getMessage());
+          try {
+            $res = &$db->query($string);
+          }
+          catch (Exception $e) {
+            die("Cannot execute $string: " . $e->getMessage());
           }
         }
       }
