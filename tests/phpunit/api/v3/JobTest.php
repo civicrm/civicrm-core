@@ -47,10 +47,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Set up for tests.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->membershipTypeID = $this->membershipTypeCreate(['name' => 'General']);
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
     $this->_params = [
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -69,7 +69,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
@@ -82,7 +82,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check with no name.
    */
-  public function testCreateWithoutName() {
+  public function testCreateWithoutName(): void {
     $params = [
       'is_active' => 1,
     ];
@@ -94,7 +94,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Create job with an invalid "run_frequency" value.
    */
-  public function testCreateWithInvalidFrequency() {
+  public function testCreateWithInvalidFrequency(): void {
     $params = [
       'sequential' => 1,
       'name' => 'API_Test_Job',
@@ -111,7 +111,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Create job.
    */
-  public function testCreate() {
+  public function testCreate(): void {
     $result = $this->callAPIAndDocument('job', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertNotNull($result['values'][0]['id']);
 
@@ -126,7 +126,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testClone() {
+  public function testClone(): void {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
     $cloneResult = $this->callAPIAndDocument('job', 'clone', $params, __FUNCTION__, __FILE__);
@@ -142,7 +142,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Check if required fields are not passed.
    */
-  public function testDeleteWithoutRequired() {
+  public function testDeleteWithoutRequired(): void {
     $params = [
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
@@ -150,13 +150,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPIFailure('job', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+    $this->assertEquals('Mandatory key(s) missing from params array: id', $result['error_message']);
   }
 
   /**
    * Check with incorrect required fields.
    */
-  public function testDeleteWithIncorrectData() {
+  public function testDeleteWithIncorrectData(): void {
     $params = [
       'id' => 'abcd',
     ];
@@ -165,8 +165,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Check job delete.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDelete() {
+  public function testDelete(): void {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
     $params = ['id' => $createResult['id']];
     $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
@@ -180,7 +182,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCallUpdateGreetingSuccess() {
+  public function testCallUpdateGreetingSuccess(): void {
     $this->callAPISuccess($this->_entity, 'update_greeting', [
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
@@ -192,25 +194,29 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
+  public function testCallUpdateGreetingCommaSeparatedParamsSuccess(): void {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
     $this->callAPISuccess($this->_entity, 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
   }
 
   /**
-   * Test the call reminder success sends more than 25 reminders & is not incorrectly limited.
+   * Test the call reminder success sends more than 25 reminders & is not
+   * incorrectly limited.
    *
-   * Note that this particular test sends the reminders to the additional recipients only
-   * as no real reminder person is configured
+   * Note that this particular test sends the reminders to the additional
+   * recipients only as no real reminder person is configured
    *
-   * Also note that this is testing a 'job' api so is in this class rather than scheduled_reminder - which
-   * seems a cleaner place to build up a collection of scheduled reminder testing functions. However, it seems
-   * that the api itself would need to be moved to the scheduled_reminder fn to do that  with the job wrapper being respected for legacy functions
+   * Also note that this is testing a 'job' api so is in this class rather than
+   * scheduled_reminder - which seems a cleaner place to build up a collection
+   * of scheduled reminder testing functions. However, it seems that the api
+   * itself would need to be moved to the scheduled_reminder fn to do that
+   * with the job wrapper being respected for legacy functions
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCallSendReminderSuccessMoreThanDefaultLimit() {
+  public function testCallSendReminderSuccessMoreThanDefaultLimit(): void {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 30;
@@ -249,8 +255,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testCallSendReminderLimitToSMS() {
-    list($membershipTypeID, $groupID, $theChosenOneID, $provider) = $this->setUpMembershipSMSReminders();
+  public function testCallSendReminderLimitToSMS(): void {
+    [$membershipTypeID, $groupID, $theChosenOneID, $provider] = $this->setUpMembershipSMSReminders();
     $this->callAPISuccess('action_schedule', 'create', [
       'title' => ' remind all Texans',
       'subject' => 'drawling renewal',
@@ -267,7 +273,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('job', 'send_reminder', []);
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
-    $this->assertEquals($successfulCronCount, 1);
+    $this->assertEquals(1, $successfulCronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
     $this->assertEquals($sentToID, $theChosenOneID);
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT is_error FROM civicrm_action_log"));
@@ -278,8 +284,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test disabling expired relationships.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCallDisableExpiredRelationships() {
+  public function testCallDisableExpiredRelationships(): void {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', [$this, 'hookPreRelationship']);
@@ -384,7 +391,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testCallSendReminderLimitToSMSWithDeletedProvider() {
-    list($membershipTypeID, $groupID, $theChosenOneID, $provider) = $this->setUpMembershipSMSReminders();
+    [$membershipTypeID, $groupID, $theChosenOneID, $provider] = $this->setUpMembershipSMSReminders();
     $this->callAPISuccess('action_schedule', 'create', [
       'title' => ' remind all Texans',
       'subject' => 'drawling renewal',
@@ -623,6 +630,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test that we handle cache entries without clashes.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMergeCaches() {
     $contactID = $this->individualCreate();
@@ -639,11 +648,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test that we handle cache entries without clashes.
+   *
+   * @throws \CiviCRM_API3_Exception|\CRM_Core_Exception
    */
-  public function testMergeSharedActivity() {
+  public function testMergeSharedActivity(): void {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
-    $activityID = $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
+    $this->activityCreate(['target_contact_id' => [$contactID, $contact2ID]]);
     $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
   }
 
@@ -679,7 +690,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchMergesAddresses($dataSet) {
+  public function testBatchMergesAddresses($dataSet): void {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     foreach ($dataSet['contact_1'] as $address) {
@@ -885,13 +896,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test the batch merge does not create duplicate emails.
    *
-   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate
+   * emails.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testBatchMergeEmailHandling() {
+  public function testBatchMergeEmailHandling(): void {
     for ($x = 0; $x <= 4; $x++) {
-      $id = $this->individualCreate(['email' => 'batman@gotham.met']);
+      $this->individualCreate(['email' => 'batman@gotham.met']);
     }
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
     $this->assertCount(4, $result['values']['merged']);
@@ -1014,11 +1027,13 @@ class api_v3_JobTest extends CiviUnitTestCase {
   /**
    * Test the batch merge does not create duplicate emails.
    *
-   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate emails.
+   * Test CRM-18546, a 4.7 regression whereby a merged contact gets duplicate
+   * emails.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testBatchMergeMatchingAddress() {
+  public function testBatchMergeMatchingAddress(): void {
     for ($x = 0; $x <= 2; $x++) {
       $this->individualCreate([
         'api.address.create' => [
@@ -1576,7 +1591,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $id
    * @param array $params
    */
-  public function hookPreRelationship($op, $objectName, $id, &$params) {
+  public function hookPreRelationship(string $op, string $objectName, $id, &$params): void {
     if ($op === 'delete') {
       return;
     }
@@ -1711,7 +1726,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'location_type_id' => 'Main',
               // When dealing with email we don't have a clean slate - the existing
               // primary will be primary.
-              'is_primary' => ($entity == 'Email' ? 0 : 1),
+              'is_primary' => ($entity === 'Email' ? 0 : 1),
             ], $locationParams1),
             array_merge([
               'location_type_id' => 'Work',
@@ -1740,7 +1755,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
               'location_type_id' => 'Main',
               // When dealing with email we don't have a clean slate - the existing
               // primary will be primary.
-              'is_primary' => ($entity == 'Email' ? 0 : 1),
+              'is_primary' => ($entity === 'Email' ? 0 : 1),
             ], $locationParams1),
             array_merge([
               'location_type_id' => 'Work',
@@ -2093,7 +2108,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     }
 
     /*
-     * Create membership type with inheritence and check processing of secondary memberships.
+     * Create membership type with inheritance and check processing of secondary memberships.
      */
     $employerRelationshipId = $this->callAPISuccessGetValue('RelationshipType', [
       'return' => 'id',
@@ -2156,11 +2171,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test procesing membership where is_override is set to 0 rather than NULL
+   * Test processing membership where is_override is set to 0 rather than NULL
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function testProcessMembershipIsOverrideNotNullNot1either() {
+  public function testProcessMembershipIsOverrideNotNullNot1either(): void {
     $membershipTypeId = $this->membershipTypeCreate();
 
     // Create admin-only membership status and get all statuses.
@@ -2367,8 +2382,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * As with the print and pdf we're not super-concerned about report
    * functionality itself - we're more concerned with the mailing part,
    * but since it's csv we can easily check the output.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testMailReportForCsv() {
+  public function testMailReportForCsv(): void {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -2429,6 +2446,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Helper to create a report instance of the contact summary report.
+   *
+   * @throws \CRM_Core_Exception
    */
   private function createReportInstance() {
     return $this->callAPISuccess('ReportInstance', 'create', [
