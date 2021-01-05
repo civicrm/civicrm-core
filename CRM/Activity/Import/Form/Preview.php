@@ -100,28 +100,12 @@ class CRM_Activity_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
     $mapperKeys = [];
-    $mapperLocType = [];
-    $mapperPhoneType = [];
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
-
-      if (!empty($mapper[$key][1]) && is_numeric($mapper[$key][1])) {
-        $mapperLocType[$key] = $mapper[$key][1];
-      }
-      else {
-        $mapperLocType[$key] = NULL;
-      }
-
-      if (!empty($mapper[$key][2]) && (!is_numeric($mapper[$key][2]))) {
-        $mapperPhoneType[$key] = $mapper[$key][2];
-      }
-      else {
-        $mapperPhoneType[$key] = NULL;
-      }
     }
 
-    $parser = new CRM_Activity_Import_Parser_Activity($mapperKeys, $mapperLocType, $mapperPhoneType);
+    $parser = new CRM_Activity_Import_Parser_Activity($mapperKeys);
 
     $mapFields = $this->get('fields');
 

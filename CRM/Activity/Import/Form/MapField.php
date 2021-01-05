@@ -357,26 +357,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
     $mapperKeysMain = [];
-    $mapperLocType = [];
-    $mapperPhoneType = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
       $mapperKeysMain[$i] = $mapperKeys[$i][0];
-
-      if ((CRM_Utils_Array::value(1, $mapperKeys[$i])) && (is_numeric($mapperKeys[$i][1]))) {
-        $mapperLocType[$i] = $mapperKeys[$i][1];
-      }
-      else {
-        $mapperLocType[$i] = NULL;
-      }
-
-      if ((CRM_Utils_Array::value(2, $mapperKeys[$i])) && (!is_numeric($mapperKeys[$i][2]))) {
-        $mapperPhoneType[$i] = $mapperKeys[$i][2];
-      }
-      else {
-        $mapperPhoneType[$i] = NULL;
-      }
     }
 
     $this->set('mapper', $mapper);
@@ -430,7 +414,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->set('savedMapping', $saveMappingFields->mapping_id);
     }
 
-    $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain, $mapperLocType, $mapperPhoneType);
+    $parser = new CRM_Activity_Import_Parser_Activity($mapperKeysMain);
     $parser->run($fileName, $separator, $mapper, $skipColumnHeader,
       CRM_Import_Parser::MODE_PREVIEW
     );
