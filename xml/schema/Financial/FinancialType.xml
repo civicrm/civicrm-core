@@ -55,8 +55,9 @@
     <name>is_deductible</name>
     <title>Is Tax Deductible?</title>
     <type>boolean</type>
+    <required>true</required>
     <length>4</length>
-    <default>1</default>
+    <default>0</default>
     <comment>Is this financial type tax-deductible? If true, contributions of this type may be fully OR partially deductible - non-deductible amount is stored in the Contribution record.</comment>
     <add>1.3</add>
     <html>
@@ -69,6 +70,7 @@
     <title>Financial Type is Reserved?</title>
     <type>boolean</type>
     <length>4</length>
+    <required>true</required>
     <comment>Is this a predefined system object?</comment>
     <add>1.3</add>
     <default>0</default>
@@ -83,6 +85,7 @@
     <default>1</default>
     <title>Financial Type Is Active?</title>
     <length>4</length>
+    <required>true</required>
     <comment>Is this property active?</comment>
     <add>1.3</add>
     <html>
