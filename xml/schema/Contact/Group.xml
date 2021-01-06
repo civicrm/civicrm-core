@@ -142,6 +142,11 @@
     <comment>Date when we created the cache for a smart group</comment>
     <add>2.1</add>
   </field>
+  <index>
+    <name>UI_cache_date</name>
+    <fieldName>cache_date</fieldName>
+    <add>5.34</add>
+  </index>
   <field>
     <name>refresh_date</name>
     <type>timestamp</type>
