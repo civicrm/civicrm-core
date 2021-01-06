@@ -43,7 +43,7 @@ if (!defined('CIVI_SETUP')) {
     $ssl_params = \Civi\Setup\DrupalUtil::guessSslParams($connectionOptions);
     // @todo Does Drupal support unixsocket in config? Set 'server' => 'unix(/path/to/socket.sock)'
     $model->db = $model->cmsDb = array(
-      'server' => \Civi\Setup\DbUtil::encodeHostPort($connectionOptions['host'], $connectionOptions['port'] ?: NULL),
+      'server' => \Civi\Setup\DbUtil::encodeHostPort($connectionOptions['host'], $connectionOptions['port'] ?? NULL),
       'username' => $connectionOptions['username'],
       'password' => $connectionOptions['password'],
       'database' => $connectionOptions['database'],
