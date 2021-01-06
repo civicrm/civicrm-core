@@ -994,7 +994,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
 
     // don't check for duplicates during registration validation: CRM-375
-    if (!$register && empty($fields['_qf_Edit_upload_duplicate'])) {
+    if (!$register && !array_key_exists('_qf_Edit_upload_duplicate', $fields)) {
       // fix for CRM-3240
       if (!empty($fields['email-Primary'])) {
         $fields['email'] = $fields['email-Primary'] ?? NULL;
