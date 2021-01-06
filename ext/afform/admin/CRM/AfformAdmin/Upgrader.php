@@ -23,7 +23,7 @@ class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
       if (!$existing) {
         civicrm_api3('Navigation', 'create', [
           'parent_id' => 'Customize Data and Screens',
-          'label' => ts('Forms'),
+          'label' => E::ts('Forms'),
           'weight' => 1,
           'name' => 'afform_gui',
           'permission' => 'administer CiviCRM',

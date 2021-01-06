@@ -1,6 +1,6 @@
 <div class="af-gui-columns">
   <fieldset class="af-gui-entity-values">
-    <legend>{{ ts('Values:') }}</legend>
+    <legend>{{:: ts('Values:') }}</legend>
     <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in entity.data">
       <label>{{ getMeta().fields[fieldName].label }}:</label><br />
       <input class="form-control" af-gui-field-value="editor.getField(entity.type, fieldName)" ng-model="entity.data[fieldName]" />
@@ -16,12 +16,12 @@
 
   <fieldset class="af-gui-entity-palette">
     <legend class="form-inline">
-      {{ ts('Add:') }}
-      <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{ ts('Search fields') }}" />
+      {{:: ts('Add:') }}
+      <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{:: ts('Search fields') }}" />
     </legend>
     <div class="af-gui-entity-palette-select-list">
       <div ng-if="blockList.length">
-        <label>{{ ts('Blocks') }}</label>
+        <label>{{:: ts('Blocks') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="blockList">
           <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
             {{ blockTitles[$index] }}
@@ -29,7 +29,7 @@
         </div>
       </div>
       <div ng-if="elementList.length">
-        <label>{{ ts('Elements') }}</label>
+        <label>{{:: ts('Elements') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="editor.onDrop" ng-model="elementList">
           <div ng-repeat="element in elementList" >
             {{ elementTitles[$index] }}
@@ -55,6 +55,6 @@
 </a>
 
 <fieldset>
-  <legend>{{ ts('Options') }}</legend>
+  <legend>{{:: ts('Options') }}</legend>
   <div ng-include="'~/afGuiEditor/entityConfig/' + entity.type + '.html'"></div>
 </fieldset>

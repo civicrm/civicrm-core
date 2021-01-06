@@ -175,7 +175,7 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
     'entities' => [
       'Contact' => [
         'entity' => 'Contact',
-        'label' => ts('Contact'),
+        'label' => E::ts('Contact'),
         'fields' => (array) civicrm_api4('Contact', 'getFields', $getFieldParams, 'name'),
       ],
     ],
@@ -216,7 +216,7 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
     if (!isset($data['entities'][$block['join']]['fields'])) {
       $data['entities'][$block['join']]['entity'] = $block['join'];
       // Normally you shouldn't pass variables to ts() but very common strings like "Email" should already exist
-      $data['entities'][$block['join']]['label'] = ts($block['join']);
+      $data['entities'][$block['join']]['label'] = E::ts($block['join']);
       $data['entities'][$block['join']]['fields'] = (array) civicrm_api4($block['join'], 'getFields', $getFieldParams, 'name');
     }
   }
@@ -224,7 +224,7 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
   // Todo: add method for extensions to define other elements
   $data['elements'] = [
     'container' => [
-      'title' => ts('Container'),
+      'title' => E::ts('Container'),
       'element' => [
         '#tag' => 'div',
         'class' => 'af-container',
@@ -232,17 +232,17 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
       ],
     ],
     'text' => [
-      'title' => ts('Text box'),
+      'title' => E::ts('Text box'),
       'element' => [
         '#tag' => 'p',
         'class' => 'af-text',
         '#children' => [
-          ['#text' => ts('Enter text')],
+          ['#text' => E::ts('Enter text')],
         ],
       ],
     ],
     'markup' => [
-      'title' => ts('Rich content'),
+      'title' => E::ts('Rich content'),
       'element' => [
         '#tag' => 'div',
         'class' => 'af-markup',
@@ -250,19 +250,19 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
       ],
     ],
     'submit' => [
-      'title' => ts('Submit Button'),
+      'title' => E::ts('Submit Button'),
       'element' => [
         '#tag' => 'button',
         'class' => 'af-button btn-primary',
         'crm-icon' => 'fa-check',
         'ng-click' => 'afform.submit()',
         '#children' => [
-          ['#text' => ts('Submit')],
+          ['#text' => E::ts('Submit')],
         ],
       ],
     ],
     'fieldset' => [
-      'title' => ts('Fieldset'),
+      'title' => E::ts('Fieldset'),
       'element' => [
         '#tag' => 'fieldset',
         'af-fieldset' => NULL,
@@ -272,7 +272,7 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
             'class' => 'af-text',
             '#children' => [
               [
-                '#text' => ts('Enter title'),
+                '#text' => E::ts('Enter title'),
               ],
             ],
           ],
@@ -303,12 +303,12 @@ function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content)
   }
 
   $data['styles'] = [
-    'default' => ts('Default'),
-    'primary' => ts('Primary'),
-    'success' => ts('Success'),
-    'info' => ts('Info'),
-    'warning' => ts('Warning'),
-    'danger' => ts('Danger'),
+    'default' => E::ts('Default'),
+    'primary' => E::ts('Primary'),
+    'success' => E::ts('Success'),
+    'info' => E::ts('Info'),
+    'warning' => E::ts('Warning'),
+    'danger' => E::ts('Danger'),
   ];
 
   $data['permissions'] = [];

@@ -2,7 +2,7 @@
     <ul id="afGuiEditor-palette-tabs" class="panel-heading nav nav-tabs">
       <li role="presentation" ng-class="{active: selectedEntityName === null}">
         <a href ng-click="editor.selectEntity(null)">
-          <span>{{ ts('Form Settings') }}</span>
+          <span>{{:: ts('Form Settings') }}</span>
         </a>
       </li>
       <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntityName === entity.name}">
