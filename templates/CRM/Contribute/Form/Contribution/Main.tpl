@@ -150,7 +150,7 @@
               {$form.frequency_interval.html}
             {/if}
             {if $one_frequency_unit}
-              {$frequency_unit}
+              {ts}{$frequency_unit}{/ts}
             {else}
               {$form.frequency_unit.html}
             {/if}
