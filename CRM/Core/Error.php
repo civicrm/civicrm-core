@@ -1047,7 +1047,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string $message
    */
   public static function deprecatedWarning($message) {
+    // Even though the tag is no longer used within the log() function,
+    // \Civi\API\LogObserver instances may still be monitoring it.
     Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    trigger_error($message, E_USER_DEPRECATED);
   }
 
 }
