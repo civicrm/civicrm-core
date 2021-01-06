@@ -89,10 +89,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'handle']);
       $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'simpleHandler']);
 
-      if (defined('E_DEPRECATED')) {
-        error_reporting(error_reporting() & ~E_DEPRECATED);
-      }
-
       self::$_singleton = new CRM_Core_Config();
       \Civi\Core\Container::boot($loadFromDB);
       if ($loadFromDB && self::$_singleton->dsn) {
