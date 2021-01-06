@@ -811,12 +811,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       // For all select elements
       case 'Select':
-        $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-select2');
         if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
           $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $fieldAttributes);
           $qf->add('text', $elementName . '_to', ts('To'), $fieldAttributes);
         }
         else {
+          $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-select2');
           if (empty($fieldAttributes['multiple'])) {
             $options = ['' => $placeholder] + $options;
           }
