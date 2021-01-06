@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<extension key="org.civicrm.afform-gui" type="module">
-  <file>afform_gui</file>
+<extension key="org.civicrm.afform_admin" type="module">
+  <file>afform_admin</file>
   <name>Afform: Form Builder</name>
   <description>GUI for designing forms</description>
   <license>AGPL-3.0</license>
@@ -20,12 +20,11 @@
   <compatibility>
     <ver>5.23</ver>
   </compatibility>
-  <comments>Drag-n-drop form builder for CiviCRM Afforms.</comments>
+  <comments>Administer, edit and compose CiviCRM Afforms.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
-    <ext>org.civicrm.api4</ext>
   </requires>
   <civix>
-    <namespace>CRM/AfformGui</namespace>
+    <namespace>CRM/AfformAdmin</namespace>
   </civix>
 </extension>

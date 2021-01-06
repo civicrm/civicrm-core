@@ -1,10 +1,10 @@
 <?php
-use CRM_AfformGui_ExtensionUtil as E;
+use CRM_AfformAdmin_ExtensionUtil as E;
 
 /**
  * Collection of upgrade steps.
  */
-class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
+class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
 
   // By convention, functions that look like "function upgrade_NNNN()" are
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
@@ -12,7 +12,7 @@ class CRM_AfformGui_Upgrader extends CRM_AfformGui_Upgrader_Base {
   /**
    * Setup navigation item on new installs.
    *
-   * Note: this path is not in the menu.xml because it is handled by afform
+   * Note: this path is not in the menu.xml because routing is handled by afform
    */
   public function install() {
     try {

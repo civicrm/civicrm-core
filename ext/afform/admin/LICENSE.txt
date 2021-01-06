@@ -1,4 +1,4 @@
-Package: org.civicrm.afform-gui
+Package: org.civicrm.afform_admin
 Copyright (C) 2019, Tim Otten <totten@civicrm.org>
 Licensed under the GNU Affero Public License 3.0 (below).
 

@@ -1,15 +1,15 @@
 <?php
 
 // AUTO-GENERATED FILE -- Civix may overwrite any changes made to this file
-use CRM_AfformGui_ExtensionUtil as E;
+use CRM_AfformAdmin_ExtensionUtil as E;
 
 /**
  * Base class which provides helpers to execute upgrade logic
  */
-class CRM_AfformGui_Upgrader_Base {
+class CRM_AfformAdmin_Upgrader_Base {
 
   /**
-   * @var CRM_AfformGui_Upgrader_Base
+   * @var CRM_AfformAdmin_Upgrader_Base
    */
   public static $instance;
 
@@ -48,8 +48,8 @@ class CRM_AfformGui_Upgrader_Base {
   public static function instance() {
     if (!self::$instance) {
       // FIXME auto-generate
-      self::$instance = new CRM_AfformGui_Upgrader(
-        'org.civicrm.afform-gui',
+      self::$instance = new CRM_AfformAdmin_Upgrader(
+        'org.civicrm.afform_admin',
         realpath(__DIR__ . '/../../../')
       );
     }
@@ -63,7 +63,7 @@ class CRM_AfformGui_Upgrader_Base {
    * task-context; otherwise, this will be non-reentrant.
    *
    * ```
-   * CRM_AfformGui_Upgrader_Base::_queueAdapter($ctx, 'methodName', 'arg1', 'arg2');
+   * CRM_AfformAdmin_Upgrader_Base::_queueAdapter($ctx, 'methodName', 'arg1', 'arg2');
    * ```
    */
   public static function _queueAdapter() {
@@ -76,7 +76,7 @@ class CRM_AfformGui_Upgrader_Base {
   }
 
   /**
-   * CRM_AfformGui_Upgrader_Base constructor.
+   * CRM_AfformAdmin_Upgrader_Base constructor.
    *
    * @param $extensionName
    * @param $extensionDir

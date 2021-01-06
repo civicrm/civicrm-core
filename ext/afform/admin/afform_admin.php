@@ -1,15 +1,15 @@
 <?php
 
-require_once 'afform_gui.civix.php';
-use CRM_AfformGui_ExtensionUtil as E;
+require_once 'afform_admin.civix.php';
+use CRM_AfformAdmin_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function afform_gui_civicrm_config(&$config) {
-  _afform_gui_civix_civicrm_config($config);
+function afform_admin_civicrm_config(&$config) {
+  _afform_admin_civix_civicrm_config($config);
 }
 
 /**
@@ -17,8 +17,8 @@ function afform_gui_civicrm_config(&$config) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function afform_gui_civicrm_xmlMenu(&$files) {
-  _afform_gui_civix_civicrm_xmlMenu($files);
+function afform_admin_civicrm_xmlMenu(&$files) {
+  _afform_admin_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -26,8 +26,8 @@ function afform_gui_civicrm_xmlMenu(&$files) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function afform_gui_civicrm_install() {
-  _afform_gui_civix_civicrm_install();
+function afform_admin_civicrm_install() {
+  _afform_admin_civix_civicrm_install();
 }
 
 /**
@@ -35,8 +35,8 @@ function afform_gui_civicrm_install() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
  */
-function afform_gui_civicrm_postInstall() {
-  _afform_gui_civix_civicrm_postInstall();
+function afform_admin_civicrm_postInstall() {
+  _afform_admin_civix_civicrm_postInstall();
 }
 
 /**
@@ -44,8 +44,8 @@ function afform_gui_civicrm_postInstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function afform_gui_civicrm_uninstall() {
-  _afform_gui_civix_civicrm_uninstall();
+function afform_admin_civicrm_uninstall() {
+  _afform_admin_civix_civicrm_uninstall();
 }
 
 /**
@@ -53,8 +53,8 @@ function afform_gui_civicrm_uninstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function afform_gui_civicrm_enable() {
-  _afform_gui_civix_civicrm_enable();
+function afform_admin_civicrm_enable() {
+  _afform_admin_civix_civicrm_enable();
 }
 
 /**
@@ -62,8 +62,8 @@ function afform_gui_civicrm_enable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
-function afform_gui_civicrm_disable() {
-  _afform_gui_civix_civicrm_disable();
+function afform_admin_civicrm_disable() {
+  _afform_admin_civix_civicrm_disable();
 }
 
 /**
@@ -71,8 +71,8 @@ function afform_gui_civicrm_disable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function afform_gui_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _afform_gui_civix_civicrm_upgrade($op, $queue);
+function afform_admin_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  return _afform_admin_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -83,8 +83,8 @@ function afform_gui_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function afform_gui_civicrm_managed(&$entities) {
-  _afform_gui_civix_civicrm_managed($entities);
+function afform_admin_civicrm_managed(&$entities) {
+  _afform_admin_civix_civicrm_managed($entities);
 }
 
 /**
@@ -96,8 +96,8 @@ function afform_gui_civicrm_managed(&$entities) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function afform_gui_civicrm_caseTypes(&$caseTypes) {
-  _afform_gui_civix_civicrm_caseTypes($caseTypes);
+function afform_admin_civicrm_caseTypes(&$caseTypes) {
+  _afform_admin_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -110,8 +110,8 @@ function afform_gui_civicrm_caseTypes(&$caseTypes) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
  */
-function afform_gui_civicrm_angularModules(&$angularModules) {
-  _afform_gui_civix_civicrm_angularModules($angularModules);
+function afform_admin_civicrm_angularModules(&$angularModules) {
+  _afform_admin_civix_civicrm_angularModules($angularModules);
 }
 
 /**
@@ -119,8 +119,8 @@ function afform_gui_civicrm_angularModules(&$angularModules) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function afform_gui_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _afform_gui_civix_civicrm_alterSettingsFolders($metaDataFolders);
+function afform_admin_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _afform_admin_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**
@@ -130,21 +130,21 @@ function afform_gui_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
  */
-function afform_gui_civicrm_entityTypes(&$entityTypes) {
-  _afform_gui_civix_civicrm_entityTypes($entityTypes);
+function afform_admin_civicrm_entityTypes(&$entityTypes) {
+  _afform_admin_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**
  * Implements hook_civicrm_themes().
  */
-function afform_gui_civicrm_themes(&$themes) {
-  _afform_gui_civix_civicrm_themes($themes);
+function afform_admin_civicrm_themes(&$themes) {
+  _afform_admin_civix_civicrm_themes($themes);
 }
 
 /**
  * Implements hook_civicrm_pageRun().
  */
-function afform_gui_civicrm_pageRun(&$page) {
+function afform_admin_civicrm_pageRun(&$page) {
   if (get_class($page) == 'CRM_Afform_Page_AfformBase' && $page->get('afModule') == 'afGuiAdmin') {
     Civi::resources()->addScriptUrl(Civi::service('asset_builder')->getUrl('af-gui-vars.js'));
   }
@@ -157,7 +157,7 @@ function afform_gui_civicrm_pageRun(&$page) {
  *
  * FIXME: This is a prototype and should get broken out into separate callbacks with hooks, events, etc.
  */
-function afform_gui_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
+function afform_admin_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   if ($asset !== 'af-gui-vars.js') {
     return;
   }

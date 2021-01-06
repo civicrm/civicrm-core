@@ -1,4 +1,4 @@
-# org.civicrm.afform-gui
+# org.civicrm.afform_admin
 
 ![Screenshot](/images/screenshot.png)
 
@@ -22,7 +22,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl org.civicrm.afform-gui@https://github.com/FIXME/org.civicrm.afform-gui/archive/master.zip
+cv dl org.civicrm.afform_admin@https://github.com/FIXME/org.civicrm.afform_admin/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
@@ -31,8 +31,8 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/org.civicrm.afform-gui.git
-cv en afform_gui
+git clone https://github.com/FIXME/org.civicrm.afform_admin.git
+cv en afform_admin
 ```
 
 ## Usage
