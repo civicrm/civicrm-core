@@ -812,27 +812,22 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       // For all select elements
       case 'Select':
         $fieldAttributes['class'] = ltrim(($fieldAttributes['class'] ?? '') . ' crm-select2');
-        if ($field->is_search_range && $search && in_array($field->data_type, $rangeDataTypes)) {
-          $qf->add('text', $elementName . '_from', $label . ' ' . ts('From'), $fieldAttributes);
-          $qf->add('text', $elementName . '_to', ts('To'), $fieldAttributes);
-        }
-        else {
-          if (empty($fieldAttributes['multiple'])) {
-            $options = ['' => $placeholder] + $options;
-          }
-          $element = $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $fieldAttributes);
 
-          // Add and/or option for fields that store multiple values
-          if ($search && self::isSerialized($field)) {
-            $qf->addRadio($elementName . '_operator', '', [
-              'or' => ts('Any'),
-              'and' => ts('All'),
-            ], [], NULL, FALSE, [
-              'or' => ['title' => ts('Results may contain any of the selected options')],
-              'and' => ['title' => ts('Results must have all of the selected options')],
-            ]);
-            $qf->setDefaults([$elementName . '_operator' => 'or']);
-          }
+        if (empty($fieldAttributes['multiple'])) {
+          $options = ['' => $placeholder] + $options;
+        }
+        $element = $qf->add('select', $elementName, $label, $options, $useRequired && !$search, $fieldAttributes);
+
+        // Add and/or option for fields that store multiple values
+        if ($search && self::isSerialized($field)) {
+          $qf->addRadio($elementName . '_operator', '', [
+            'or' => ts('Any'),
+            'and' => ts('All'),
+          ], [], NULL, FALSE, [
+            'or' => ['title' => ts('Results may contain any of the selected options')],
+            'and' => ['title' => ts('Results must have all of the selected options')],
+          ]);
+          $qf->setDefaults([$elementName . '_operator' => 'or']);
         }
         break;
 
@@ -929,7 +924,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     switch ($field->data_type) {
       case 'Int':
         // integers will have numeric rule applied to them.
-        if ($field->is_search_range && $search) {
+        if ($field->is_search_range && $search && $widget != 'Select') {
           $qf->addRule($elementName . '_from', ts('%1 From must be an integer (whole number).', [1 => $label]), 'integer');
           $qf->addRule($elementName . '_to', ts('%1 To must be an integer (whole number).', [1 => $label]), 'integer');
         }

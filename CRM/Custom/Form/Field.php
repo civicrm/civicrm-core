@@ -836,7 +836,7 @@ AND    option_group_id = %2";
 
     //fix for 'is_search_range' field.
     if (in_array($params['data_type'], ['Int', 'Float', 'Money', 'Date'])) {
-      if (empty($params['is_searchable'])) {
+      if (empty($params['is_searchable']) || in_array($params['html_type'], ['Radio', 'Select'])) {
         $params['is_search_range'] = 0;
       }
     }
