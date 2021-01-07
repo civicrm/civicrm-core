@@ -1005,12 +1005,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       //not delete the option group and related option values
       self::checkOptionGroup($field->option_group_id);
     }
-
     // next drop the column from the custom value table
     self::createField($field, 'delete');
 
     $field->delete();
     CRM_Core_BAO_UFField::delUFField($field->id);
+    CRM_Core_BAO_Mapping::removeFieldFromMapping('custom_' . $field->id);
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
 
     CRM_Utils_Hook::post('delete', 'CustomField', $field->id, $field);
