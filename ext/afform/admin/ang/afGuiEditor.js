@@ -2,7 +2,7 @@
   "use strict";
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
 
-    .service('afAdmin', function(crmApi4, $parse) {
+    .service('afAdmin', function(crmApi4, $parse, $q) {
 
       // Parse strings of javascript that php couldn't interpret
       function evaluate(collection) {
@@ -118,9 +118,26 @@
         splitClass: splitClass,
         modifyClasses: modifyClasses,
         getStyles: getStyles,
-        setStyle: setStyle
+        setStyle: setStyle,
+
+        pickIcon: function() {
+          var deferred = $q.defer();
+          $('#af-gui-icon-picker').off('change').siblings('.crm-icon-picker-button').click();
+          $('#af-gui-icon-picker').on('change', function() {
+            deferred.resolve($(this).val());
+          });
+          return deferred.promise;
+        }
       };
     });
+
+  // Shoehorn in a non-angular widget for picking icons
+  $(function() {
+    $('#crm-container').append('<div style="display:none"><input id="af-gui-icon-picker"></div>');
+    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+      $('#af-gui-icon-picker').crmIconPicker();
+    });
+  });
 
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/main.html',
@@ -146,18 +163,6 @@
       };
 
       this.$onInit = function() {
-        // Shoehorn in a non-angular widget for picking icons
-        CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
-          $('#af-gui-icon-picker').crmIconPicker().change(function() {
-            if (editingIcon) {
-              $scope.$apply(function() {
-                editingIcon[editingIconProp] = $('#af-gui-icon-picker').val();
-                editingIcon = null;
-                $('#af-gui-icon-picker').val('').change();
-              });
-            }
-          });
-        });
         // Fetch the current form plus all blocks
         afAdmin.initialize(editor.name)
           .then(initializeForm);
@@ -579,7 +584,9 @@
         };
 
         $scope.pickAddIcon = function() {
-          openIconPicker($scope.node, 'add-icon');
+          afAdmin.pickIcon().then(function(val) {
+            $scope.node['add-icon'] = val;
+          });
         };
 
         function getBlockNode() {
@@ -1124,7 +1131,9 @@
         };
 
         $scope.pickIcon = function() {
-          openIconPicker($scope.node, 'crm-icon');
+          afAdmin.pickIcon().then(function(val) {
+            $scope.node['crm-icon'] = val;
+          });
         };
 
       }
@@ -1214,12 +1223,5 @@
       }
     };
   });
-
-  var editingIcon, editingIconProp;
-  function openIconPicker(node, propName) {
-    editingIcon = node;
-    editingIconProp = propName;
-    $('#af-gui-icon-picker ~ .crm-icon-picker-button').click();
-  }
 
 })(angular, CRM.$, CRM._);
