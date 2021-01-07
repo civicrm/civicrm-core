@@ -197,7 +197,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       foreach ($paymentKeys as $key) {
         $paymentParams[$key] = $params[$key] ?? NULL;
       }
-      CRM_Pledge_BAO_PledgePayment::create($paymentParams);
+      CRM_Pledge_BAO_PledgePayment::createMultiple($paymentParams);
     }
 
     $transaction->commit();
