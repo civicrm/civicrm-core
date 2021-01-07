@@ -58,8 +58,8 @@
   <tr>
     <td colspan="3">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td>
   </tr>
+
   {if $caseGroupTree}
-    <tr> <td colspan="3">Keboom</td></tr>
     <tr>
       <td colspan="3">
         {include file="CRM/Custom/Form/Search.tpl" groupTree=$caseGroupTree showHideLinks=false}
