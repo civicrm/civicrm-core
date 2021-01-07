@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionRecur;
+
 /**
  * Class CRM_Contribute_BAO_ContributionRecurTest
  * @group headless
@@ -20,11 +22,11 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Set up for test.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
-    $this->_ids['payment_processor'] = $this->paymentProcessorCreate();
+    $this->ids['payment_processor'] = $this->paymentProcessorCreate();
     $this->_params = [
       'contact_id' => $this->individualCreate(),
       'amount' => 3.00,
@@ -47,7 +49,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'failure_retry_date' => NULL,
       'auto_renew' => 0,
       'currency' => 'USD',
-      'payment_processor_id' => $this->_ids['payment_processor'],
+      'payment_processor_id' => $this->ids['payment_processor'],
       'is_email_receipt' => 1,
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
@@ -60,7 +62,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function teardown() {
+  public function teardown():void {
     $this->quickCleanUpFinancialEntities();
   }
 
@@ -71,7 +73,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testFindSave() {
+  public function testFindSave(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     $dao = new CRM_Contribute_BAO_ContributionRecur();
     $dao->id = $contributionRecur['id'];
@@ -87,7 +89,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCancelRecur() {
+  public function testCancelRecur(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
@@ -95,9 +97,9 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Test checking if contribution recur object can allow for changes to financial types.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function testSupportFinancialTypeChange() {
+  public function testSupportFinancialTypeChange(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
@@ -117,7 +119,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testUpdateRecur() {
+  public function testUpdateRecur(): void {
     $createParams = $this->_params;
     $createParams['currency'] = 'XAU';
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
@@ -140,7 +142,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testGetTemplateContributionMatchTest1() {
+  public function testGetTemplateContributionMatchTest1(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     // Create a first contrib
     $firstContrib = $this->callAPISuccess('Contribution', 'create', [
@@ -177,7 +179,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testGetTemplateContributionMatchTest() {
+  public function testGetTemplateContributionMatchTest(): void {
     $params = $this->_params;
     $params['is_test'] = 1;
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $params);
@@ -218,7 +220,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testGetTemplateContributionNewTemplate() {
+  public function testGetTemplateContributionNewTemplate(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     // Create the template
     $templateContrib = $this->callAPISuccess('Contribution', 'create', [
@@ -260,9 +262,9 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * Test to check if correct membership is auto renewed.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function testAutoRenewalWhenOneMemberIsDeceased() {
+  public function testAutoRenewalWhenOneMemberIsDeceased(): void {
     $contactId1 = $this->individualCreate();
     $contactId2 = $this->individualCreate();
     $membershipOrganizationId = $this->organizationCreate();
@@ -277,7 +279,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // create membership type
-    $membershipTypeId1 = $this->callAPISuccess('MembershipType', 'create', [
+    $membershipTypeId1 = (int) $this->callAPISuccess('MembershipType', 'create', [
       'domain_id' => 1,
       'member_of_contact_id' => $membershipOrganizationId,
       'financial_type_id' => 'Member Dues',
@@ -288,7 +290,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'name' => 'Parent',
     ])['id'];
 
-    $membershipTypeID = $this->callAPISuccess('MembershipType', 'create', [
+    $membershipTypeID = (int) $this->callAPISuccess('MembershipType', 'create', [
       'domain_id' => 1,
       'member_of_contact_id' => $membershipOrganizationId,
       'financial_type_id' => 'Member Dues',
@@ -320,7 +322,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
     foreach ($priceFields as $priceField) {
       $lineItems = [];
-      $contactId = array_search($priceField['membership_type_id'], $contactIDs);
+      $contactId = array_search((int) $priceField['membership_type_id'], $contactIDs, TRUE);
       $lineItems[1] = [
         'price_field_id' => $priceField['priceFieldID'],
         'price_field_value_id' => $priceField['priceFieldValueID'],
@@ -476,7 +478,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function validateAllCounts($membershipId, $count) {
+  public function validateAllCounts(int $membershipId, int $count): void {
     $memPayParams = [
       'membership_id' => $membershipId,
     ];
@@ -498,16 +500,16 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * we want Nov 31.
    *
    * @param int $offset
-   * @param int $year Optional input year to start
-   * @param int $month Optional input month to start
+   * @param int|null $year Optional input year to start
+   * @param int|null $month Optional input month to start
    *
    * @return array
    *   ['year' => int, 'month' => int]
    */
-  private function getYearAndMonthFromOffset(int $offset, int $year = NULL, int $month = NULL) {
+  private function getYearAndMonthFromOffset(int $offset, int $year = NULL, int $month = NULL): array {
     $dateInfo = [
-      'year' => $year ?? date('Y'),
-      'month' => ($month ?? date('m')) + $offset,
+      'year' => $year ?? (int) date('Y'),
+      'month' => ($month ?? (int) date('m')) + $offset,
     ];
     if ($dateInfo['month'] > 12) {
       $dateInfo['year']++;
@@ -522,19 +524,20 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
   /**
    * Test getYearAndMonthFromOffset
+   *
    * @dataProvider yearMonthProvider
    *
    * @param array $input
    * @param array $expected
    */
-  public function testGetYearAndMonthFromOffset($input, $expected) {
+  public function testGetYearAndMonthFromOffset(array $input, array $expected): void {
     $this->assertEquals($expected, $this->getYearAndMonthFromOffset($input[0], $input[1], $input[2]));
   }
 
   /**
    * data provider for testGetYearAndMonthFromOffset
    */
-  public function yearMonthProvider() {
+  public function yearMonthProvider(): array {
     return [
       // input = offset, year, current month
       ['input' => [4, 2020, 1], 'output' => ['year' => '2020', 'month' => '05']],
@@ -562,6 +565,35 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ['input' => [4, 2020, 12], 'output' => ['year' => '2021', 'month' => '04']],
       ['input' => [6, 2020, 12], 'output' => ['year' => '2021', 'month' => '06']],
     ];
+  }
+
+  /**
+   * Test Recurring Contribution Email Receipt Flag
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionEmailReceipt(): void {
+    $createParams = $this->_params;
+    unset($createParams['trxn_id'], $createParams['invoice_id']);
+
+    // pass null value to is_email_receipt
+    $createParams['is_email_receipt'] = NULL;
+    $recurring1 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
+    $recurring1Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring1['id']]);
+    // default is_email_receipt column value is 1
+    $this->assertEquals('1', $recurring1Get['is_email_receipt']);
+
+    // pass empty value to is_email_receipt
+    $createParams['is_email_receipt'] = '';
+    $recurring2 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
+    $recurring2 = ContributionRecur::get(FALSE)->addWhere('id', '=', $recurring2['id'])->addSelect('is_email_receipt')->execute()->first();
+    $this->assertEquals(NULL, $recurring2['is_email_receipt']);
+
+    // Pass 0 value to is_email_receipt.
+    $createParams['is_email_receipt'] = 0;
+    $recurring3 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
+    $recurring3Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring3['id']]);
+    $this->assertEquals('0', $recurring3Get['is_email_receipt']);
   }
 
 }

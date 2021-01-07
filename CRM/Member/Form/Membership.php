@@ -1993,7 +1993,7 @@ DESC limit 1");
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
-    $recurParams['is_email_receipt'] = $params['is_email_receipt'] ?? NULL;
+    $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
