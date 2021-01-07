@@ -4183,7 +4183,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // @todo see if we even need this - it's used further down to create an activity
     // but the BAO layer should create that - we just need to add a test to cover it & can
     // maybe remove $ids altogether.
-    $contributionContactID = $ids['related_contact'];
     $participantID = $ids['participant'];
     $recurringContributionID = $ids['contributionRecur'];
 

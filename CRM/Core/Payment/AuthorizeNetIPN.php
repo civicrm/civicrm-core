@@ -89,11 +89,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         $contribution->receive_date = $input['receive_date'];
       }
       $input['payment_processor_id'] = $paymentProcessorID;
-      $isFirstOrLastRecurringPayment = $this->recur($input, [
-        'related_contact' => $ids['related_contact'] ?? NULL,
-        'participant' => NULL,
-        'contributionRecur' => $contributionRecur->id,
-      ], $contributionRecur, $contribution, $first);
+      $isFirstOrLastRecurringPayment = $this->recur($input, $contributionRecur, $contribution, $first);
 
       if ($isFirstOrLastRecurringPayment) {
         //send recurring Notification email for user
@@ -115,7 +111,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * @param array $input
-   * @param array $ids
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
    * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $first
@@ -124,7 +119,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function recur($input, $ids, $recur, $contribution, $first) {
+  public function recur($input, $recur, $contribution, $first) {
 
     // do a subscription check
     if ($recur->processor_id != $input['subscription_id']) {
@@ -183,7 +178,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, [
+      'participant' => NULL,
+      'contributionRecur' => $recur->id,
+    ], $contribution);
     return $isFirstOrLastRecurringPayment;
   }
 
