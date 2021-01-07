@@ -755,8 +755,6 @@ SET    version = '$version'
     $upgrade->setVersion($rev);
     CRM_Utils_System::flushCache();
 
-    $config = CRM_Core_Config::singleton();
-    $config->userSystem->flush();
     return TRUE;
   }
 
@@ -770,6 +768,9 @@ SET    version = '$version'
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
     $upgrade->setVersion($latestVer);
+
+    $config = CRM_Core_Config::singleton();
+    $config->userSystem->flush();
 
     CRM_Core_Invoke::rebuildMenuAndCaches(FALSE, TRUE);
     // NOTE: triggerRebuild is FALSE becaues it will run again in a moment (via fixSchemaDifferences).
