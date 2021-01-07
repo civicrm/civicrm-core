@@ -2297,6 +2297,13 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       'template_title',
     ];
     $defaults = array_diff_key($defaults, array_flip($fieldsToExclude));
+    foreach ($defaults as $key => $value) {
+      $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
+      if (!empty($customFieldInfo[1])) {
+        $defaults[str_replace($customFieldInfo[1], '-' . $customFieldInfo[1], $key)] = $value;
+        unset($defaults[$key]);
+      }
+    }
     return $defaults;
   }
 

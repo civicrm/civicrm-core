@@ -228,13 +228,6 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     //merge params with defaults from templates
     if (!empty($params['template_id'])) {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);
-      foreach ($params as $key => $value) {
-        $customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
-        if (!empty($customFieldInfo[1])) {
-          $params[str_replace($customFieldInfo[1], '-' . $customFieldInfo[1], $key)] = $value;
-          unset($params[$key]);
-        }
-      }
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
