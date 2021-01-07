@@ -279,34 +279,39 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('friendURL', $url);
     }
 
-    $isPendingOutcome = TRUE;
-    try {
-      // A payment notification update could have come in at any time. Check at the last minute.
-      $contributionStatusID = civicrm_api3('Contribution', 'getvalue', [
-        'id' => $params['contributionID'] ?? NULL,
-        'return' => 'contribution_status_id',
-        'is_test'   => ($this->_mode == 'test') ? 1 : 0,
-        'invoice_id' => $params['invoiceID'] ?? NULL,
-      ]);
-      if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID) === 'Pending'
-        && !empty($params['payment_processor_id'])
-      ) {
-        $isPendingOutcome = TRUE;
-      }
-      else {
-        $isPendingOutcome = FALSE;
-      }
-    }
-    catch (CiviCRM_API3_Exception $e) {
-
-    }
-    $this->assign('isPendingOutcome', $isPendingOutcome);
-
+    $this->assign('isPendingOutcome', $this->isPendingOutcome($params));
     $this->freeze();
 
     // can we blow away the session now to prevent hackery
     // CRM-9491
     $this->controller->reset();
+  }
+
+  /**
+   * Is the outcome of this contribution still pending.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected function isPendingOutcome(array $params): bool {
+    if (empty($params['payment_processor_id'])) {
+      return FALSE;
+    }
+    try {
+      // A payment notification update could have come in at any time. Check at the last minute.
+      civicrm_api3('Contribution', 'getvalue', [
+        'id' => $params['contributionID'] ?? NULL,
+        'contribution_status_id' => 'Pending',
+        'is_test' => '',
+        'return' => 'id',
+        'invoice_id' => $params['invoiceID'] ?? NULL,
+      ]);
+      return TRUE;
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      return FALSE;
+    }
   }
 
 }
