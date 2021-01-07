@@ -25,9 +25,9 @@
         {ts 1=$displayName}Use this form to submit a new contribution.{/ts}
       {/if}
       {if $contributionMode == 'live'}
-        <strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts}<strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
       {else}
-        <strong>A TEST transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts}<strong>A TEST transaction will be submitted</strong> using the selected payment processor.{/ts}
       {/if}
     </div>
   {/if}
