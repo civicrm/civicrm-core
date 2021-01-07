@@ -1290,14 +1290,10 @@ DESC limit 1");
       // we do need contribution and recurring records.
       $result = NULL;
       if (!empty($paymentParams['is_recur'])) {
-        $financialType = new CRM_Financial_DAO_FinancialType();
-        $financialType->id = $params['financial_type_id'];
-        $financialType->find(TRUE);
         $this->_params = $formValues;
 
         $contribution = $this->processContribution(
           $paymentParams,
-          NULL,
           [
             'contact_id' => $this->_contributorContactID,
             'line_item' => $lineItem,
@@ -1307,8 +1303,8 @@ DESC limit 1");
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'thankyou_date' => $paymentParams['thankyou_date'] ?? NULL,
             'payment_instrument_id' => $paymentInstrumentID,
-          ],
-          $financialType
+            'financial_type_id' => $params['financial_type_id'],
+          ]
         );
 
         //create new soft-credit record, CRM-13981
@@ -1839,7 +1835,6 @@ DESC limit 1");
    * being fixed later.
    *
    * @param array $params
-   * @param array $result
    * @param array $contributionParams
    *   Parameters to be passed to contribution create action.
    *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
@@ -1853,8 +1848,6 @@ DESC limit 1");
    *   - payment_type_id
    *   - thankyou_date (not all forms will set this)
    *
-   * @param CRM_Financial_DAO_FinancialType $financialType
-   *
    * @return \CRM_Contribute_DAO_Contribution
    *
    * @throws \CRM_Core_Exception
@@ -1862,9 +1855,7 @@ DESC limit 1");
    */
   protected function processContribution(
     $params,
-    $result,
-    $contributionParams,
-    $financialType
+    $contributionParams
   ) {
     $form = $this;
     $transaction = new CRM_Core_Transaction();
@@ -1873,7 +1864,7 @@ DESC limit 1");
     $isEmailReceipt = !empty($form->_values['is_email_receipt']);
 
     // add these values for the recurringContrib function ,CRM-10188
-    $params['financial_type_id'] = $financialType->id;
+    $params['financial_type_id'] = $contributionParams['financial_type_id'];
 
     //@todo - this is being set from the form to resolve CRM-10188 - an
     // eNotice caused by it not being set @ the front end
@@ -1886,7 +1877,7 @@ DESC limit 1");
     }
     $params['is_recur'] = TRUE;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
-    $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID, $financialType);
+    $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
     $now = date('YmdHis');
     $receiptDate = $params['receipt_date'] ?? NULL;
@@ -1896,7 +1887,6 @@ DESC limit 1");
 
     if (isset($params['amount'])) {
       $contributionParams = array_merge([
-        'financial_type_id' => $financialType->id,
         'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : date('YmdHis'),
         'tax_amount' => $params['tax_amount'] ?? NULL,
         'amount_level' => $params['amount_level'] ?? NULL,
@@ -1959,11 +1949,10 @@ DESC limit 1");
    *
    * @param array $params
    * @param int $contactID
-   * @param string $contributionType
    *
    * @return int|null
    */
-  protected function legacyProcessRecurringContribution(&$params, $contactID, $contributionType) {
+  protected function legacyProcessRecurringContribution(&$params, $contactID) {
     $form = $this;
     if (empty($params['is_recur'])) {
       return NULL;
@@ -1975,7 +1964,7 @@ DESC limit 1");
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
-    $recurParams['financial_type_id'] = $params['financial_type_id'] ?? NULL;
+    $recurParams['financial_type_id'] = $params['financial_type_id'];
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
@@ -1997,7 +1986,6 @@ DESC limit 1");
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
-    $recurParams['financial_type_id'] = $contributionType->id;
 
     $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
     $recurParams['campaign_id'] = $campaignId;
