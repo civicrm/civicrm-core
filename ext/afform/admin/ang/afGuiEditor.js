@@ -1,6 +1,126 @@
 (function(angular, $, _) {
   "use strict";
-  angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'));
+  angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
+
+    .service('afAdmin', function(crmApi4, $parse) {
+
+      // Parse strings of javascript that php couldn't interpret
+      function evaluate(collection) {
+        _.each(collection, function(item) {
+          if (_.isPlainObject(item)) {
+            evaluate(item['#children']);
+            _.each(item, function(node, idx) {
+              if (_.isString(node)) {
+                var str = _.trim(node);
+                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
+                  item[idx] = $parse(str)({ts: CRM.ts('afform')});
+                }
+              }
+            });
+          }
+        });
+      }
+
+      function getStyles(node) {
+        return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
+          var keyVal = _.map(style.split(':'), _.trim);
+          if (keyVal.length > 1 && keyVal[1].length) {
+            styles[keyVal[0]] = keyVal[1];
+          }
+        }, {});
+      }
+
+      function setStyle(node, name, val) {
+        var styles = getStyles(node);
+        styles[name] = val;
+        if (!val) {
+          delete styles[name];
+        }
+        if (_.isEmpty(styles)) {
+          delete node.style;
+        } else {
+          node.style = _.transform(styles, function(combined, val, name) {
+            combined.push(name + ': ' + val);
+          }, []).join('; ');
+        }
+      }
+
+      // Turns a space-separated list (e.g. css classes) into an array
+      function splitClass(str) {
+        if (_.isArray(str)) {
+          return str;
+        }
+        return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
+      }
+
+      function modifyClasses(node, toRemove, toAdd) {
+        var classes = splitClass(node['class']);
+        if (toRemove) {
+          classes = _.difference(classes, splitClass(toRemove));
+        }
+        if (toAdd) {
+          classes = _.unique(classes.concat(splitClass(toAdd)));
+        }
+        node['class'] = classes.join(' ');
+      }
+
+      return {
+        // Initialize/refresh data about the current afform + available blocks
+        initialize: function(afName) {
+          var promise = crmApi4('Afform', 'get', {
+            layoutFormat: 'shallow',
+            formatWhitespace: true,
+            where: [afName ? ["OR", [["name", "=", afName], ["block", "IS NOT NULL"]]] : ["block", "IS NOT NULL"]]
+          });
+          promise.then(function(afforms) {
+            CRM.afGuiEditor.blocks = {};
+            _.each(afforms, function(form) {
+              evaluate(form.layout);
+              if (form.block) {
+                CRM.afGuiEditor.blocks[form.directive_name] = form;
+              }
+            });
+          });
+          return promise;
+        },
+
+        meta: CRM.afGuiEditor,
+
+        getField: function(entityType, fieldName) {
+          return CRM.afGuiEditor.entities[entityType].fields[fieldName];
+        },
+
+        // Recursively searches a collection and its children using _.filter
+        // Returns an array of all matches, or an object if the indexBy param is used
+        findRecursive: function findRecursive(collection, predicate, indexBy) {
+          var items = _.filter(collection, predicate);
+          _.each(collection, function(item) {
+            if (_.isPlainObject(item) && item['#children']) {
+              var childMatches = findRecursive(item['#children'], predicate);
+              if (childMatches.length) {
+                Array.prototype.push.apply(items, childMatches);
+              }
+            }
+          });
+          return indexBy ? _.indexBy(items, indexBy) : items;
+        },
+
+        // Applies _.remove() to an item and its children
+        removeRecursive: function removeRecursive(collection, removeParams) {
+          _.remove(collection, removeParams);
+          _.each(collection, function(item) {
+            if (_.isPlainObject(item) && item['#children']) {
+              removeRecursive(item['#children'], removeParams);
+            }
+          });
+        },
+
+        splitClass: splitClass,
+        modifyClasses: modifyClasses,
+        getStyles: getStyles,
+        setStyle: setStyle
+      };
+    });
 
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/main.html',
@@ -8,12 +128,12 @@
       name: '<'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, $parse, $timeout, $location) {
-      var ts = $scope.ts = CRM.ts();
+    controller: function($scope, crmApi4, afAdmin, $parse, $timeout, $location) {
+      var ts = $scope.ts = CRM.ts('afform');
       $scope.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
-      $scope.meta = this.meta = CRM.afGuiEditor;
+      this.meta = afAdmin.meta;
       var editor = this;
       var newForm = {
         title: '',
@@ -39,23 +159,13 @@
           });
         });
         // Fetch the current form plus all blocks
-        crmApi4('Afform', 'get', {where: [["OR", [["name", "=", editor.name], ["block", "IS NOT NULL"]]]], layoutFormat: 'shallow', formatWhitespace: true})
-          .then(initialize);
+        afAdmin.initialize(editor.name)
+          .then(initializeForm);
       };
 
-
-      // Initialize the current form + list of blocks
-      function initialize(afforms) {
-        $scope.meta.blocks = {};
-        _.each(afforms, function(form) {
-          evaluate(form.layout);
-          if (form.block) {
-            $scope.meta.blocks[form.directive_name] = form;
-          }
-          if (form.name === editor.name) {
-            $scope.afform = form;
-          }
-        });
+      // Initialize the current form
+      function initializeForm(afforms) {
+        $scope.afform = _.findWhere(afforms, {name: editor.name});
         if (!$scope.afform) {
           $scope.afform = _.cloneDeep(newForm);
           if (editor.name != '0') {
@@ -64,12 +174,12 @@
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-        $scope.entities = findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+        editor.layout = afAdmin.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
+        $scope.entities = afAdmin.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
         if (editor.name == '0') {
           editor.addEntity('Individual');
-          editor.layout['#children'].push($scope.meta.elements.submit.element);
+          editor.layout['#children'].push(afAdmin.meta.elements.submit.element);
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -91,7 +201,7 @@
       };
 
       this.addEntity = function(type) {
-        var meta = editor.meta.entities[type],
+        var meta = afAdmin.meta.entities[type],
           num = 1;
         // Give this new entity a unique name
         while (!!$scope.entities[type + num]) {
@@ -107,7 +217,7 @@
         var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
         editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
         // Create a new af-fieldset container for the entity
-        var fieldset = _.cloneDeep(editor.meta.elements.fieldset.element);
+        var fieldset = _.cloneDeep(afAdmin.meta.elements.fieldset.element);
         fieldset['af-fieldset'] = type + num;
         fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
         // Add default contact name block
@@ -126,17 +236,13 @@
 
       this.removeEntity = function(entityName) {
         delete $scope.entities[entityName];
-        removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
-        removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
+        afAdmin.removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
+        afAdmin.removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
         this.selectEntity(null);
       };
 
       this.selectEntity = function(entityName) {
         $scope.selectedEntityName = entityName;
-      };
-
-      this.getField = function(entityType, fieldName) {
-        return $scope.meta.entities[entityType].fields[fieldName];
       };
 
       this.getEntity = function(entityName) {
@@ -194,58 +300,8 @@
           });
         }
       });
-
-      // Parse strings of javascript that php couldn't interpret
-      function evaluate(collection) {
-        _.each(collection, function(item) {
-          if (_.isPlainObject(item)) {
-            evaluate(item['#children']);
-            _.each(item, function(node, idx) {
-              if (_.isString(node)) {
-                var str = _.trim(node);
-                if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[idx] = $parse(str)({ts: $scope.ts});
-                }
-              }
-            });
-          }
-        });
-      }
     }
   });
-
-  // Recursively searches a collection and its children using _.filter
-  // Returns an array of all matches, or an object if the indexBy param is used
-  function findRecursive(collection, predicate, indexBy) {
-    var items = _.filter(collection, predicate);
-    _.each(collection, function(item) {
-      if (_.isPlainObject(item) && item['#children']) {
-        var childMatches = findRecursive(item['#children'], predicate);
-        if (childMatches.length) {
-          Array.prototype.push.apply(items, childMatches);
-        }
-      }
-    });
-    return indexBy ? _.indexBy(items, indexBy) : items;
-  }
-
-  // Applies _.remove() to an item and its children
-  function removeRecursive(collection, removeParams) {
-    _.remove(collection, removeParams);
-    _.each(collection, function(item) {
-      if (_.isPlainObject(item) && item['#children']) {
-        removeRecursive(item['#children'], removeParams);
-      }
-    });
-  }
-
-  // Turns a space-separated list (e.g. css classes) into an array
-  function splitClass(str) {
-    if (_.isArray(str)) {
-      return str;
-    }
-    return str ? _.unique(_.trim(str).split(/\s+/g)) : [];
-  }
 
   angular.module('afGuiEditor').component('afGuiEntity', {
     templateUrl: '~/afGuiEditor/entity.html',
@@ -253,7 +309,7 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout) {
+    controller: function ($scope, $timeout, afAdmin) {
       var ts = $scope.ts = CRM.ts();
       var ctrl = this;
       $scope.controls = {};
@@ -268,8 +324,10 @@
       }
 
       $scope.getMeta = function() {
-        return ctrl.editor ? ctrl.editor.meta.entities[getEntityType()] : {};
+        return afAdmin.meta.entities[getEntityType()];
       };
+
+      $scope.getField = afAdmin.getField;
 
       $scope.valuesFields = function() {
         var fields = _.transform($scope.getMeta().fields, function(fields, field) {
@@ -298,7 +356,7 @@
           fields: filterFields($scope.getMeta().fields)
         });
 
-        _.each(ctrl.editor.meta.entities, function(entity, entityName) {
+        _.each(afAdmin.meta.entities, function(entity, entityName) {
           if (check(ctrl.editor.layout['#children'], {'af-join': entityName})) {
             $scope.fieldList.push({
               entityName: ctrl.entity.name + '-join-' + entityName,
@@ -324,7 +382,7 @@
       function buildBlockList(search) {
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
-        _.each(ctrl.editor.meta.blocks, function(block, directive) {
+        _.each(afAdmin.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
             (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type))
           ) {
@@ -349,7 +407,7 @@
       function buildElementList(search) {
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
-        _.each(ctrl.editor.meta.elements, function(element, name) {
+        _.each(afAdmin.meta.elements, function(element, name) {
           if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
@@ -387,7 +445,7 @@
         if (block['af-join']) {
           return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
         }
-        var fieldsInBlock = _.pluck(findRecursive(ctrl.editor.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        var fieldsInBlock = _.pluck(afAdmin.findRecursive(afAdmin.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return check(ctrl.editor.layout['#children'], function(item) {
           return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
         });
@@ -413,8 +471,8 @@
               check(item['#children'], criteria, found);
             }
             // Recurse into block directives
-            else if (item['#tag'] && item['#tag'] in ctrl.editor.meta.blocks) {
-              check(ctrl.editor.meta.blocks[item['#tag']].layout, criteria, found);
+            else if (item['#tag'] && item['#tag'] in afAdmin.meta.blocks) {
+              check(afAdmin.meta.blocks[item['#tag']].layout, criteria, found);
             }
           }
         });
@@ -435,7 +493,7 @@
     }
   });
 
-  angular.module('afGuiEditor').directive('afGuiContainer', function(crmApi4, dialogService) {
+  angular.module('afGuiEditor').directive('afGuiContainer', function(crmApi4, dialogService, afAdmin) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/container.html',
@@ -557,7 +615,7 @@
           if (!$scope.node) {
             return '';
           }
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+          return _.intersection(afAdmin.splitClass($scope.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
         };
 
         $scope.setLayout = function(val) {
@@ -565,7 +623,7 @@
           if (val !== 'af-layout-rows') {
             classes.push(val);
           }
-          modifyClasses($scope.node, _.keys($scope.layouts), classes);
+          afAdmin.modifyClasses($scope.node, _.keys($scope.layouts), classes);
         };
 
         $scope.selectBlockDirective = function() {
@@ -651,7 +709,7 @@
         };
 
       },
-      controller: function($scope) {
+      controller: function($scope, afAdmin) {
         var container = $scope.container = this;
         this.node = $scope.node;
 
@@ -671,14 +729,14 @@
           if (node['#tag'] && node['#tag'] in $scope.editor.meta.blocks) {
             return 'container';
           }
-          var classes = splitClass(node['class']),
+          var classes = afAdmin.splitClass(node['class']),
             types = ['af-container', 'af-text', 'af-button', 'af-markup'],
             type = _.intersection(types, classes);
           return type.length ? type[0].replace('af-', '') : null;
         };
 
         this.removeElement = function(element) {
-          removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
+          afAdmin.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
         };
 
         this.getEntityName = function() {
@@ -741,7 +799,7 @@
         $scope.editor = ctrls[0];
         $scope.container = ctrls[1];
       },
-      controller: function($scope) {
+      controller: function($scope, afAdmin) {
         var ts = $scope.ts = CRM.ts();
         $scope.editingOptions = false;
         var yesNo = [
@@ -754,7 +812,7 @@
         };
 
         $scope.getDefn = this.getDefn = function() {
-          return $scope.editor ? $scope.editor.getField($scope.container.getFieldEntityType(), $scope.node.name) : {};
+          return $scope.editor ? afAdmin.getField($scope.container.getFieldEntityType(), $scope.node.name) : {};
         };
 
         $scope.hasOptions = function() {
@@ -934,7 +992,7 @@
       link: function($scope, element, attrs, container) {
         $scope.container = container;
       },
-      controller: function($scope) {
+      controller: function($scope, afAdmin) {
         var ts = $scope.ts = CRM.ts();
 
         $scope.tags = {
@@ -956,11 +1014,11 @@
         };
 
         $scope.getAlign = function() {
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.alignments))[0] || 'text-left';
+          return _.intersection(afAdmin.splitClass($scope.node['class']), _.keys($scope.alignments))[0] || 'text-left';
         };
 
         $scope.setAlign = function(val) {
-          modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
+          afAdmin.modifyClasses($scope.node, _.keys($scope.alignments), val === 'text-left' ? null : val);
         };
 
         $scope.styles = _.transform(CRM.afGuiEditor.styles, function(styles, val, key) {
@@ -970,9 +1028,9 @@
         // Getter/setter for ng-model
         $scope.getSetStyle = function(val) {
           if (arguments.length) {
-            return modifyClasses($scope.node, _.keys($scope.styles), val === 'text-default' ? null : val);
+            return afAdmin.modifyClasses($scope.node, _.keys($scope.styles), val === 'text-default' ? null : val);
           }
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || 'text-default';
+          return _.intersection(afAdmin.splitClass($scope.node['class']), _.keys($scope.styles))[0] || 'text-default';
         };
 
       }
@@ -1045,7 +1103,7 @@
       link: function($scope, element, attrs, container) {
         $scope.container = container;
       },
-      controller: function($scope) {
+      controller: function($scope, afAdmin) {
         var ts = $scope.ts = CRM.ts();
 
         // TODO: Add action selector to UI
@@ -1060,9 +1118,9 @@
         // Getter/setter for ng-model
         $scope.getSetStyle = function(val) {
           if (arguments.length) {
-            return modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
+            return afAdmin.modifyClasses($scope.node, _.keys($scope.styles), ['btn', val]);
           }
-          return _.intersection(splitClass($scope.node['class']), _.keys($scope.styles))[0] || '';
+          return _.intersection(afAdmin.splitClass($scope.node['class']), _.keys($scope.styles))[0] || '';
         };
 
         $scope.pickIcon = function() {
@@ -1097,7 +1155,7 @@
   });
 
   // Menu item to control the border property of a node
-  angular.module('afGuiEditor').directive('afGuiMenuItemBorder', function() {
+  angular.module('afGuiEditor').directive('afGuiMenuItemBorder', function(afAdmin) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/menu-item-border.html',
@@ -1125,11 +1183,11 @@
             return border[idx];
           }
           border[idx] = val;
-          setStyle(node, 'border', val ? border.join(' ') : null);
+          afAdmin.setStyle(node, 'border', val ? border.join(' ') : null);
         }
 
         function getBorder(node) {
-          var border = _.map((getStyles(node).border || '').split(' '), _.trim);
+          var border = _.map((afAdmin.getStyles(node).border || '').split(' '), _.trim);
           return border.length > 2 ? border : null;
         }
       }
@@ -1137,7 +1195,7 @@
   });
 
   // Menu item to control the background property of a node
-  angular.module('afGuiEditor').directive('afGuiMenuItemBackground', function() {
+  angular.module('afGuiEditor').directive('afGuiMenuItemBackground', function(afAdmin) {
     return {
       restrict: 'A',
       templateUrl: '~/afGuiEditor/menu-item-background.html',
@@ -1149,186 +1207,13 @@
 
         $scope.getSetBackgroundColor = function(color) {
           if (!arguments.length) {
-            return getStyles($scope.node)['background-color'] || '#ffffff';
+            return afAdmin.getStyles($scope.node)['background-color'] || '#ffffff';
           }
-          setStyle($scope.node, 'background-color', color);
+          afAdmin.setStyle($scope.node, 'background-color', color);
         };
       }
     };
   });
-
-  // Editable titles using ngModel & html5 contenteditable
-  // Cribbed from ContactLayoutEditor
-  angular.module('afGuiEditor').directive("afGuiEditable", function() {
-    return {
-      restrict: "A",
-      require: "ngModel",
-      scope: {
-        defaultValue: '='
-      },
-      link: function(scope, element, attrs, ngModel) {
-        var ts = CRM.ts();
-
-        function read() {
-          var htmlVal = element.html();
-          if (!htmlVal) {
-            htmlVal = scope.defaultValue;
-            element.text(htmlVal);
-          }
-          ngModel.$setViewValue(htmlVal);
-        }
-
-        ngModel.$render = function() {
-          element.text(ngModel.$viewValue || scope.defaultValue);
-        };
-
-        // Special handling for enter and escape keys
-        element.on('keydown', function(e) {
-          // Enter: prevent line break and save
-          if (e.which === 13) {
-            e.preventDefault();
-            element.blur();
-          }
-          // Escape: undo
-          if (e.which === 27) {
-            element.html(ngModel.$viewValue || scope.defaultValue);
-            element.blur();
-          }
-        });
-
-        element.on("blur change", function() {
-          scope.$apply(read);
-        });
-
-        element.attr('contenteditable', 'true').addClass('crm-editable-enabled');
-      }
-    };
-  });
-
-  // Cribbed from the Api4 Explorer
-  angular.module('afGuiEditor').directive('afGuiFieldValue', function() {
-    return {
-      scope: {
-        field: '=afGuiFieldValue'
-      },
-      require: 'ngModel',
-      link: function (scope, element, attrs, ctrl) {
-        var ts = scope.ts = CRM.ts(),
-          multi;
-
-        function destroyWidget() {
-          var $el = $(element);
-          if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
-            $el.crmDatepicker('destroy');
-          }
-          if ($el.is('.select2-container + input')) {
-            $el.crmEntityRef('destroy');
-          }
-          $(element).removeData().removeAttr('type').removeAttr('placeholder').show();
-        }
-
-        function makeWidget(field) {
-          var $el = $(element),
-            inputType = field.input_type,
-            dataType = field.data_type;
-          multi = field.serialize || dataType === 'Array';
-          if (inputType === 'Date') {
-            $el.crmDatepicker({time: (field.input_attrs && field.input_attrs.time) || false});
-          }
-          else if (field.fk_entity || field.options || dataType === 'Boolean') {
-            if (field.fk_entity) {
-              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
-            } else if (field.options) {
-              var options = _.transform(field.options, function(options, val) {
-                options.push({id: val.key, text: val.label});
-              }, []);
-              $el.select2({data: options, multiple: multi});
-            } else if (dataType === 'Boolean') {
-              $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
-                {id: '1', text: ts('Yes')},
-                {id: '0', text: ts('No')}
-              ]});
-            }
-          } else if (dataType === 'Integer' && !multi) {
-            $el.attr('type', 'number');
-          }
-        }
-
-        // Copied from ng-list but applied conditionally if field is multi-valued
-        var parseList = function(viewValue) {
-          // If the viewValue is invalid (say required but empty) it will be `undefined`
-          if (_.isUndefined(viewValue)) return;
-
-          if (!multi) {
-            return viewValue;
-          }
-
-          var list = [];
-
-          if (viewValue) {
-            _.each(viewValue.split(','), function(value) {
-              if (value) list.push(_.trim(value));
-            });
-          }
-
-          return list;
-        };
-
-        // Copied from ng-list
-        ctrl.$parsers.push(parseList);
-        ctrl.$formatters.push(function(value) {
-          return _.isArray(value) ? value.join(', ') : value;
-        });
-
-        // Copied from ng-list
-        ctrl.$isEmpty = function(value) {
-          return !value || !value.length;
-        };
-
-        scope.$watchCollection('field', function(field) {
-          destroyWidget();
-          if (field) {
-            makeWidget(field);
-          }
-        });
-      }
-    };
-  });
-
-  function getStyles(node) {
-    return !node || !node.style ? {} : _.transform(node.style.split(';'), function(styles, style) {
-      var keyVal = _.map(style.split(':'), _.trim);
-      if (keyVal.length > 1 && keyVal[1].length) {
-        styles[keyVal[0]] = keyVal[1];
-      }
-    }, {});
-  }
-
-  function setStyle(node, name, val) {
-    var styles = getStyles(node);
-    styles[name] = val;
-    if (!val) {
-      delete styles[name];
-    }
-    if (_.isEmpty(styles)) {
-      delete node.style;
-    } else {
-      node.style = _.transform(styles, function(combined, val, name) {
-        combined.push(name + ': ' + val);
-      }, []).join('; ');
-    }
-  }
-
-  function modifyClasses(node, toRemove, toAdd) {
-    var classes = splitClass(node['class']);
-    if (toRemove) {
-      classes = _.difference(classes, splitClass(toRemove));
-    }
-    if (toAdd) {
-      classes = _.unique(classes.concat(splitClass(toAdd)));
-    }
-    node['class'] = classes.join(' ');
-  }
 
   var editingIcon, editingIconProp;
   function openIconPicker(node, propName) {

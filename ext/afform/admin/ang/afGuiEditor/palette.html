@@ -15,7 +15,7 @@
           <span><i class="crm-i fa-plus"></i></span>
         </a>
         <ul class="dropdown-menu">
-          <li ng-repeat="(entityName, entity) in meta.entities" ng-if="entity.defaults">
+          <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
             <a href ng-click="addEntity(entityName)">{{ entity.label }}</a>
           </li>
         </ul>
