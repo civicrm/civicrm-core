@@ -67,7 +67,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return string
    *   the sql query which lists the groups that need to be refreshed
    */
-  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE) {
+  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE): string {
     $smartGroupCacheTimeoutDateTime = self::getCacheInvalidDateTime();
 
     $query = "
@@ -78,7 +78,6 @@ AND     g.is_active = 1
 AND (
   g.cache_date IS NULL
   OR cache_date <= $smartGroupCacheTimeoutDateTime
-  OR NOW() >= g.refresh_date
 )";
 
     if (!$includeHiddenGroups) {
@@ -152,7 +151,7 @@ AND (
     $limitClause = $orderClause = NULL;
     if ($limit > 0) {
       $limitClause = " LIMIT 0, $limit";
-      $orderClause = " ORDER BY g.cache_date, g.refresh_date";
+      $orderClause = " ORDER BY g.cache_date";
     }
     // We ignore hidden groups and disabled groups
     $query .= "
@@ -177,12 +176,10 @@ AND (
 
     if (!empty($refreshGroupIDs)) {
       $refreshGroupIDString = CRM_Core_DAO::escapeString(implode(', ', $refreshGroupIDs));
-      $time = self::getRefreshDateTime();
       $query = "
 UPDATE civicrm_group g
-SET    g.refresh_date = $time
+SET    g.cache_date = NOW()
 WHERE  g.id IN ( {$refreshGroupIDString} )
-AND    g.refresh_date IS NULL
 ";
       CRM_Core_DAO::executeQuery($query);
     }
@@ -252,17 +249,15 @@ AND    g.refresh_date IS NULL
     if ($processed) {
       // also update the group with cache date information
       $now = date('YmdHis');
-      $refresh = 'null';
     }
     else {
       $now = 'null';
-      $refresh = 'null';
     }
 
     $groupIDs = implode(',', $groupID);
     $sql = "
 UPDATE civicrm_group
-SET    cache_date = $now, refresh_date = $refresh
+SET    cache_date = $now
 WHERE  id IN ( $groupIDs )
 ";
     CRM_Core_DAO::executeQuery($sql);
@@ -284,7 +279,7 @@ WHERE  id IN ( $groupIDs )
 
     $update = "
   UPDATE civicrm_group g
-    SET    cache_date = null, refresh_date = null
+    SET    cache_date = null
     WHERE  id = %1 ";
 
     $params = [
@@ -327,7 +322,7 @@ WHERE  id IN ( $groupIDs )
 
       // Clear these out without resetting them because we are not building caches here, only clearing them,
       // so the state is 'as if they had never been built'.
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL WHERE id IN ({$expiredGroups})");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL WHERE id IN ({$expiredGroups})");
     }
     $lock->release();
   }
@@ -381,7 +376,7 @@ WHERE  id IN ( $groupIDs )
   public static function deterministicCacheFlush() {
     if (self::smartGroupCacheTimeout() == 0) {
       CRM_Core_DAO::executeQuery("TRUNCATE civicrm_group_contact_cache");
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL, refresh_date = NULL");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL");
     }
     else {
       self::flushCaches();
@@ -670,23 +665,12 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * Get the date when the cache should be refreshed from.
-   *
-   * Ie. now + the offset & we will delete anything prior to then.
-   *
-   * @return string
-   */
-  public static function getRefreshDateTime() {
-    return date('YmdHis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
-  }
-
-  /**
    * Invalidates the smart group cache for a particular group
    * @param int $groupID - Group to invalidate
    */
   public static function invalidateGroupContactCache($groupID) {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_group
-      SET cache_date = NULL, refresh_date = NULL
+      SET cache_date = NULL
       WHERE id = %1", [
         1 => [$groupID, 'Positive'],
       ]);
