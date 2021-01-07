@@ -127,7 +127,14 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    */
   public static function create(&$params) {
     // FIXME: a cludgy hack to fix the dates to MySQL format
-    $dateFields = array('start_date', 'create_date', 'acknowledge_date', 'modified_date', 'cancel_date', 'end_date');
+    $dateFields = [
+      'start_date',
+      'create_date',
+      'acknowledge_date',
+      'modified_date',
+      'cancel_date',
+      'end_date',
+    ];
     foreach ($dateFields as $df) {
       if (isset($params[$df])) {
         $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
@@ -182,7 +189,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
       // building payment params
       $paymentParams['pledge_id'] = $pledge->id;
-      $paymentKeys = array(
+      $paymentKeys = [
         'amount',
         'installments',
         'scheduled_date',
@@ -193,7 +200,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
         'contribution_id',
         'installment_amount',
         'actual_amount',
-      );
+      ];
       foreach ($paymentKeys as $key) {
         $paymentParams[$key] = $params[$key] ?? NULL;
       }
@@ -235,15 +242,19 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
   }
 
   /**
-   * Is this a change to an existing pending pledge requiring payment schedule changes.
+   * Is this a change to an existing pending pledge requiring payment schedule
+   * changes.
    *
-   * If the pledge is pending the code (slightly lazily) deletes & recreates pledge payments.
+   * If the pledge is pending the code (slightly lazily) deletes & recreates
+   * pledge payments.
    *
-   * If the payment dates or amounts have been manually edited then this can cause data loss. We can mitigate this to
-   * some extent by making sure we have a change that could potentially affect the schedule (rather than just a
-   * custom data change or similar).
+   * If the payment dates or amounts have been manually edited then this can
+   * cause data loss. We can mitigate this to some extent by making sure we
+   * have a change that could potentially affect the schedule (rather than just
+   * a custom data change or similar).
    *
-   * This calculation needs to be performed before update takes place as previous & new pledges are compared.
+   * This calculation needs to be performed before update takes place as
+   * previous & new pledges are compared.
    *
    * @param array $params
    *
@@ -253,14 +264,14 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     if (empty($params['is_pledge_pending']) || empty($params['id'])) {
       return FALSE;
     }
-    $scheduleChangingParameters = array(
+    $scheduleChangingParameters = [
       'amount',
       'frequency_unit',
       'frequency_interval',
       'frequency_day',
       'installments',
       'start_date',
-    );
+    ];
     $existingPledgeDAO = new CRM_Pledge_BAO_Pledge();
     $existingPledgeDAO->id = $params['id'];
     $existingPledgeDAO->find(TRUE);
@@ -311,10 +322,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     CRM_Utils_Hook::post('delete', 'Pledge', $dao->id, $dao);
 
     // delete the recently created Pledge
-    $pledgeRecent = array(
+    $pledgeRecent = [
       'id' => $id,
       'type' => 'Pledge',
-    );
+    ];
     CRM_Utils_Recent::del($pledgeRecent);
 
     return $results;
@@ -372,13 +383,13 @@ GROUP BY  currency
       $pamount[] = CRM_Utils_Money::format($dao->pledge_amount, $dao->currency);
     }
 
-    $pledge_amount = array(
+    $pledge_amount = [
       'pledge_amount' => implode(', ', $pamount),
       'pledge_count' => $pCount,
       'purl' => CRM_Utils_System::url('civicrm/pledge/search',
         "reset=1&force=1&pstatus={$statusId}&pstart={$start}&pend={$end}&test=0"
       ),
-    );
+    ];
 
     $where = [];
     switch ($status) {
@@ -437,13 +448,13 @@ GROUP BY  currency
       }
 
       if ($count) {
-        return array_merge($pledge_amount, array(
+        return array_merge($pledge_amount, [
           'received_amount' => implode(', ', $amount),
           'received_count' => $count,
           'url' => CRM_Utils_System::url('civicrm/pledge/search',
             "reset=1&force=1&status={$statusId}&start={$start}&end={$end}&test=0"
           ),
-        ));
+        ]);
       }
     }
     else {
@@ -475,7 +486,7 @@ GROUP BY  currency
         $pledgeDAO = new CRM_Pledge_DAO_Pledge();
         $pledgeDAO->id = $pledgePaymentDAO->pledge_id;
         if ($pledgeDAO->find(TRUE)) {
-          $params[$pledgeDAO->id] = array(
+          $params[$pledgeDAO->id] = [
             'honor_type' => CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $honorDAO->soft_credit_type_id),
             'honorId' => $pledgeDAO->contact_id,
             'amount' => $pledgeDAO->amount,
@@ -488,7 +499,7 @@ GROUP BY  currency
             'display_name' => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
               $pledgeDAO->contact_id, 'display_name'
             ),
-          );
+          ];
         }
       }
     }
@@ -510,7 +521,12 @@ GROUP BY  currency
 
     // get All Payments status types.
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $returnProperties = array('status_id', 'scheduled_amount', 'scheduled_date', 'contribution_id');
+    $returnProperties = [
+      'status_id',
+      'scheduled_amount',
+      'scheduled_date',
+      'contribution_id',
+    ];
     // get all paymnets details.
     CRM_Core_DAO::commonRetrieveAll('CRM_Pledge_DAO_PledgePayment', 'pledge_id', $params['id'], $allPayments, $returnProperties);
 
@@ -518,21 +534,21 @@ GROUP BY  currency
       foreach ($allPayments as $payID => $values) {
         $contributionValue = $contributionStatus = [];
         if (isset($values['contribution_id'])) {
-          $contributionParams = array('id' => $values['contribution_id']);
-          $returnProperties = array('contribution_status_id', 'receive_date');
+          $contributionParams = ['id' => $values['contribution_id']];
+          $returnProperties = ['contribution_status_id', 'receive_date'];
           CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_Contribution',
             $contributionParams, $contributionStatus, $returnProperties
           );
-          $contributionValue = array(
+          $contributionValue = [
             'status' => $contributionStatus['contribution_status_id'] ?? NULL,
             'receive_date' => $contributionStatus['receive_date'] ?? NULL,
-          );
+          ];
         }
         $payments[$payID] = array_merge($contributionValue,
-          array(
+          [
             'amount' => $values['scheduled_amount'] ?? NULL,
             'due_date' => $values['scheduled_date'] ?? NULL,
-          )
+          ]
         );
 
         // get the first valid payment id.
@@ -546,7 +562,7 @@ GROUP BY  currency
     }
 
     // assign pledge fields value to template.
-    $pledgeFields = array(
+    $pledgeFields = [
       'create_date',
       'total_pledge_amount',
       'frequency_interval',
@@ -555,7 +571,7 @@ GROUP BY  currency
       'frequency_day',
       'scheduled_amount',
       'currency',
-    );
+    ];
     foreach ($pledgeFields as $field) {
       if (!empty($params[$field])) {
         $form->assign($field, $params[$field]);
@@ -569,10 +585,10 @@ GROUP BY  currency
 
     // handle domain token values
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = array(
-      'domain' => array('name', 'phone', 'address', 'email'),
+    $tokens = [
+      'domain' => ['name', 'phone', 'address', 'email'],
       'contact' => CRM_Core_SelectValues::contactTokens(),
-    );
+    ];
     $domainValues = [];
     foreach ($tokens['domain'] as $token) {
       $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
@@ -580,9 +596,9 @@ GROUP BY  currency
     $form->assign('domain', $domainValues);
 
     // handle contact token values.
-    $ids = array($params['contact_id']);
+    $ids = [$params['contact_id']];
     $fields = array_merge(array_keys(CRM_Contact_BAO_Contact::importableFields()),
-      array('display_name', 'checksum', 'contact_id')
+      ['display_name', 'checksum', 'contact_id']
     );
     foreach ($fields as $key => $val) {
       $returnProperties[$val] = TRUE;
@@ -598,7 +614,7 @@ GROUP BY  currency
     // handle custom data.
     if (!empty($params['hidden_custom'])) {
       $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
-      $pledgeParams = array(array('pledge_id', '=', $params['id'], 0, 0));
+      $pledgeParams = [['pledge_id', '=', $params['id'], 0, 0]];
       $customGroup = [];
       // retrieve custom data
       foreach ($groupTree as $groupID => $group) {
@@ -620,9 +636,7 @@ GROUP BY  currency
     }
 
     // handle acknowledgment email stuff.
-    list($pledgerDisplayName,
-      $pledgerEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
+    [$pledgerDisplayName, $pledgerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
 
     // check for online pledge.
     if (!empty($params['receipt_from_email'])) {
@@ -634,7 +648,10 @@ GROUP BY  currency
     }
     elseif ($userID = CRM_Core_Session::singleton()->get('userID')) {
       // check for logged in user.
-      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+      [
+        $userName,
+        $userEmail,
+      ] = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
     else {
       // set the domain values.
@@ -646,15 +663,15 @@ GROUP BY  currency
       $receiptFrom = "$userName <$userEmail>";
     }
 
-    list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
-      array(
+    [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
         'groupName' => 'msg_tpl_workflow_pledge',
         'valueName' => 'pledge_acknowledge',
         'contactId' => $params['contact_id'],
         'from' => $receiptFrom,
         'toName' => $pledgerDisplayName,
         'toEmail' => $pledgerEmail,
-      )
+      ]
     );
 
     // check if activity record exist for this pledge
@@ -671,7 +688,7 @@ GROUP BY  currency
     $details = 'Total Amount ' . CRM_Utils_Money::format($params['total_pledge_amount'], CRM_Utils_Array::value('currency', $params)) . ' To be paid in ' . $params['installments'] . ' installments of ' . CRM_Utils_Money::format($params['scheduled_amount'], CRM_Utils_Array::value('currency', $params)) . ' every ' . $params['frequency_interval'] . ' ' . $params['frequency_unit'] . '(s)';
 
     if (!$activity->find()) {
-      $activityParams = array(
+      $activityParams = [
         'subject' => $subject,
         'source_contact_id' => $params['contact_id'],
         'source_record_id' => $params['id'],
@@ -684,7 +701,7 @@ GROUP BY  currency
         'status_id' => 2,
         'details' => $details,
         'campaign_id' => $params['campaign_id'] ?? NULL,
-      );
+      ];
 
       // lets insert assignee record.
       if (!empty($params['contact_id'])) {
@@ -716,42 +733,42 @@ GROUP BY  currency
       $fields = array_merge($fields, CRM_Pledge_DAO_PledgePayment::export());
 
       // set title to calculated fields
-      $calculatedFields = array(
-        'pledge_total_paid' => array('title' => ts('Total Paid')),
-        'pledge_balance_amount' => array('title' => ts('Balance Amount')),
-        'pledge_next_pay_date' => array('title' => ts('Next Payment Date')),
-        'pledge_next_pay_amount' => array('title' => ts('Next Payment Amount')),
-        'pledge_payment_paid_amount' => array('title' => ts('Paid Amount')),
-        'pledge_payment_paid_date' => array('title' => ts('Paid Date')),
-        'pledge_payment_status' => array(
+      $calculatedFields = [
+        'pledge_total_paid' => ['title' => ts('Total Paid')],
+        'pledge_balance_amount' => ['title' => ts('Balance Amount')],
+        'pledge_next_pay_date' => ['title' => ts('Next Payment Date')],
+        'pledge_next_pay_amount' => ['title' => ts('Next Payment Amount')],
+        'pledge_payment_paid_amount' => ['title' => ts('Paid Amount')],
+        'pledge_payment_paid_date' => ['title' => ts('Paid Date')],
+        'pledge_payment_status' => [
           'title' => ts('Pledge Payment Status'),
           'name' => 'pledge_payment_status',
           'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-      );
+        ],
+      ];
 
-      $pledgeFields = array(
-        'pledge_status' => array(
+      $pledgeFields = [
+        'pledge_status' => [
           'title' => ts('Pledge Status'),
           'name' => 'pledge_status',
           'data_type' => CRM_Utils_Type::T_STRING,
-        ),
-        'pledge_frequency_unit' => array(
+        ],
+        'pledge_frequency_unit' => [
           'title' => ts('Pledge Frequency Unit'),
           'name' => 'pledge_frequency_unit',
           'data_type' => CRM_Utils_Type::T_ENUM,
-        ),
-        'pledge_frequency_interval' => array(
+        ],
+        'pledge_frequency_interval' => [
           'title' => ts('Pledge Frequency Interval'),
           'name' => 'pledge_frequency_interval',
           'data_type' => CRM_Utils_Type::T_INT,
-        ),
-        'pledge_contribution_page_id' => array(
+        ],
+        'pledge_contribution_page_id' => [
           'title' => ts('Pledge Contribution Page Id'),
           'name' => 'pledge_contribution_page_id',
           'data_type' => CRM_Utils_Type::T_INT,
-        ),
-      );
+        ],
+      ];
 
       $fields = array_merge($fields, $pledgeFields, $calculatedFields);
 
@@ -781,11 +798,7 @@ GROUP BY  currency
     $status = [];
 
     // get pending and in progress status
-    foreach (array(
-      'Pending',
-      'In Progress',
-      'Overdue',
-    ) as $name) {
+    foreach (['Pending', 'In Progress', 'Overdue'] as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
       }
@@ -803,7 +816,7 @@ GROUP BY  currency
   AND civicrm_pledge.contact_id = %1
 ";
 
-    $params[1] = array($contactID, 'Integer');
+    $params[1] = [$contactID, 'Integer'];
     $pledge = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($pledge->fetch()) {
@@ -885,7 +898,7 @@ SELECT  pledge.contact_id              as contact_id,
     while ($dao->fetch()) {
       $checksumValue = CRM_Contact_BAO_Contact_Utils::generateChecksum($dao->contact_id);
 
-      $pledgeDetails[$dao->payment_id] = array(
+      $pledgeDetails[$dao->payment_id] = [
         'scheduled_date' => $dao->scheduled_date,
         'amount_due' => $dao->amount_due,
         'amount' => $dao->amount,
@@ -905,7 +918,7 @@ SELECT  pledge.contact_id              as contact_id,
         'is_test' => $dao->is_test,
         'currency' => $dao->currency,
         'campaign_id' => $dao->campaign_id,
-      );
+      ];
 
       $contactIds[$dao->contact_id] = $dao->contact_id;
       $pledgeStatus[$dao->pledge_id] = $dao->pledge_status;
@@ -936,10 +949,10 @@ SELECT  pledge.contact_id              as contact_id,
     if ($sendReminders) {
       // retrieve domain tokens
       $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = array(
-        'domain' => array('name', 'phone', 'address', 'email'),
+      $tokens = [
+        'domain' => ['name', 'phone', 'address', 'email'],
         'contact' => CRM_Core_SelectValues::contactTokens(),
-      );
+      ];
 
       $domainValues = [];
       foreach ($tokens['domain'] as $token) {
@@ -953,7 +966,7 @@ SELECT  pledge.contact_id              as contact_id,
       // retrieve contact tokens
 
       // this function does NOT return Deceased contacts since we don't want to send them email
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds,
+      [$contactDetails] = CRM_Utils_Token::getTokenDetails($contactIds,
         NULL,
         FALSE, FALSE, NULL,
         $tokens, 'CRM_UpdatePledgeRecord'
@@ -1019,22 +1032,27 @@ SELECT  pledge.contact_id              as contact_id,
             $template->assign('amount', $details['amount']);
             $template->assign('create_date', $details['create_date']);
             $template->assign('currency', $details['currency']);
-            list($mailSent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
-              array(
+            [
+              $mailSent,
+              $subject,
+              $message,
+              $html,
+            ] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+              [
                 'groupName' => 'msg_tpl_workflow_pledge',
                 'valueName' => 'pledge_reminder',
                 'contactId' => $contactId,
                 'from' => $receiptFrom,
                 'toName' => $pledgerName,
                 'toEmail' => $toEmail,
-              )
+              ]
             );
 
             // 3. update pledge payment details
             if ($mailSent) {
               CRM_Pledge_BAO_PledgePayment::updateReminderDetails($paymentId);
               $activityType = 'Pledge Reminder';
-              $activityParams = array(
+              $activityParams = [
                 'subject' => $subject,
                 'source_contact_id' => $contactId,
                 'source_record_id' => $paymentId,
@@ -1047,13 +1065,13 @@ SELECT  pledge.contact_id              as contact_id,
                 'is_test' => $details['is_test'],
                 'status_id' => 2,
                 'campaign_id' => $details['campaign_id'],
-              );
+              ];
               try {
                 civicrm_api3('activity', 'create', $activityParams);
               }
               catch (CiviCRM_API3_Exception $e) {
                 $returnMessages[] = "Failed creating Activity for Pledge Reminder: " . $e->getMessage();
-                return array('is_error' => 1, 'message' => $returnMessages);
+                return ['is_error' => 1, 'message' => $returnMessages];
               }
               $returnMessages[] = "Payment reminder sent to: {$pledgerName} - {$toEmail}";
             }
@@ -1065,7 +1083,7 @@ SELECT  pledge.contact_id              as contact_id,
     // end if ( $sendReminders )
     $returnMessages[] = "{$updateCnt} records updated.";
 
-    return array('is_error' => 0, 'messages' => implode("\n\r", $returnMessages));
+    return ['is_error' => 0, 'messages' => implode("\n\r", $returnMessages)];
   }
 
   /**
@@ -1086,6 +1104,7 @@ SELECT  pledge.contact_id              as contact_id,
    * Find payments which can be safely canceled.
    *
    * @param int $pledgeID
+   *
    * @return array
    *   Array of int (civicrm_pledge_payment.id)
    */
@@ -1108,12 +1127,14 @@ SELECT  pledge.contact_id              as contact_id,
   }
 
   /**
-   * Is this pledge free from financial transactions (this is important to know as we allow editing
-   * when no transactions have taken place - the editing process currently involves deleting all pledge payments & contributions
+   * Is this pledge free from financial transactions (this is important to know
+   * as we allow editing when no transactions have taken place - the editing
+   * process currently involves deleting all pledge payments & contributions
    * & recreating so we want to block that if appropriate).
    *
    * @param int $pledgeID
    * @param int $pledgeStatusID
+   *
    * @return bool
    *   do financial transactions exist for this pledge?
    */
@@ -1127,14 +1148,16 @@ SELECT  pledge.contact_id              as contact_id,
       return TRUE;
     }
 
-    return civicrm_api3('pledge_payment', 'getcount', array(
+    return civicrm_api3('pledge_payment', 'getcount', [
       'pledge_id' => $pledgeID,
-      'contribution_id' => array('IS NOT NULL' => TRUE),
-    ));
+      'contribution_id' => ['IS NOT NULL' => TRUE],
+    ]);
   }
 
   /**
-   * Does this pledge / pledge payment status mean that a financial transaction has taken place?
+   * Does this pledge / pledge payment status mean that a financial transaction
+   * has taken place?
+   *
    * @param int $statusID
    *   Pledge status id.
    *
@@ -1150,28 +1173,30 @@ SELECT  pledge.contact_id              as contact_id,
 
   /**
    * Get array of non transactional statuses.
+   *
    * @return array
    *   non transactional status ids
    */
   protected static function getNonTransactionalStatus() {
     $paymentStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    return array_flip(array_intersect($paymentStatus, array('Overdue', 'Pending')));
+    return array_flip(array_intersect($paymentStatus, ['Overdue', 'Pending']));
   }
 
   /**
    * Create array for recur record for pledge.
+   *
    * @return array
    *   params for recur record
    */
   public static function buildRecurParams($params) {
-    $recurParams = array(
+    $recurParams = [
       'is_recur' => TRUE,
       'auto_renew' => TRUE,
       'frequency_unit' => $params['pledge_frequency_unit'],
       'frequency_interval' => $params['pledge_frequency_interval'],
       'installments' => $params['pledge_installments'],
       'start_date' => $params['receive_date'],
-    );
+    ];
     return $recurParams;
   }
 
@@ -1253,18 +1278,19 @@ SELECT  pledge.contact_id              as contact_id,
   /**
    * Override buildOptions to hack out some statuses.
    *
-   * @todo instead of using & hacking the shared optionGroup contribution_status use a separate one.
-   *
    * @param string $fieldName
    * @param string $context
    * @param array $props
    *
    * @return array|bool
+   * @todo instead of using & hacking the shared optionGroup
+   *   contribution_status use a separate one.
+   *
    */
   public static function buildOptions($fieldName, $context = NULL, $props = []) {
     $result = parent::buildOptions($fieldName, $context, $props);
     if ($fieldName == 'status_id') {
-      $result = array_diff($result, array('Failed'));
+      $result = array_diff($result, ['Failed']);
     }
     return $result;
   }
