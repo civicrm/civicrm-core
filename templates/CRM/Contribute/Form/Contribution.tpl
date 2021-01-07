@@ -18,13 +18,16 @@
   {if $contributionMode}
     <div class="help">
       {if $contactId && $payNow}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to edit a contribution on behalf of %1. <strong>A
-          %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts 1=$displayName}Use this form to edit a contribution on behalf of %1.{/ts}
       {elseif $contactId}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution on behalf of %1. <strong>A
-          %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts 1=$displayName}Use this form to submit a new contribution on behalf of %1.{/ts}
       {else}
-        {ts 1=$displayName 2=$contributionMode|upper}Use this form to submit a new contribution. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+        {ts 1=$displayName}Use this form to submit a new contribution.{/ts}
+      {/if}
+      {if $contributionMode == 'live'}
+        <strong>A LIVE transaction will be submitted</strong> using the selected payment processor.{/ts}
+      {else}
+        <strong>A TEST transaction will be submitted</strong> using the selected payment processor.{/ts}
       {/if}
     </div>
   {/if}

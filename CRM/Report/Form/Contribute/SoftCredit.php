@@ -567,7 +567,7 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
           $this->_absoluteUrl
         );
         $rows[$rowNum]['civicrm_contact_display_name_creditor_link'] = $url;
-        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("view contact summary");
+        $rows[$rowNum]['civicrm_contact_display_name_creditor_hover'] = ts("View contact summary");
       }
 
       // make subtotals look nicer
