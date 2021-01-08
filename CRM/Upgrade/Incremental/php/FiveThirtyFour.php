@@ -38,7 +38,9 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       if (extension_loaded('mcrypt') && !empty(self::findSmtpPasswords())) {
         // NOTE: We don't re-encrypt automatically because the old "civicrm.settings.php" lacks a good key, and we don't keep the old encryption because the format is ambiguous.
         // The admin may forget to re-enable. That's OK -- this only affects 1 field, this is a secondary defense, and (in the future) we can remind the admin via status-checks.
-        $preUpgradeMessage .= '<p>' . ts('This system has an SMTP password which should be migrated to a new encryption mechanism. The upgrader will remove the old encryption. After upgrading, you may enable the new encryption.') . '</p>';
+        $preUpgradeMessage .= '<p>' . ts('This system has an encrypted SMTP password. Encryption in v5.34+ requires CIVICRM_CRED_KEYS. You may <a href="%1" target="_blank">setup CIVICRM_CRED_KEYS</a> before or after upgrading. If you choose to wait, then the SMTP password will be stored as plain-text until you setup CIVICRM_CRED_KEYS.', [
+          1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#smtp-password',
+        ]) . '</p>';
       }
       foreach ($GLOBALS['civicrm_setting'] ?? [] as $entity => $overrides) {
         if (extension_loaded('mcrypt') && !empty($overrides['mailing_backend']['smtpPassword']) && $overrides['mailing_backend']['outBound_option'] == 0) {
@@ -92,7 +94,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
   public function upgrade_5_34_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-    if (extension_loaded('mcrypt') && !empty(self::findSmtpPasswords())) {
+    if (!empty(self::findSmtpPasswords())) {
       $this->addTask('Migrate SMTP password', 'migrateSmtpPasswords');
     }
 
@@ -145,9 +147,12 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
    */
   public static function migrateSmtpPasswords(CRM_Queue_TaskContext $ctx) {
     $settings = self::findSmtpPasswords();
+    $cryptoToken = new \Civi\Crypto\CryptoToken(\Civi\Crypto\CryptoRegistry::createDefaultRegistry());
+
     foreach ($settings as $setting) {
       $value = unserialize($setting['value']);
-      $value['smtpPassword'] = CRM_Utils_Crypt::decrypt($value['smtpPassword']);
+      $plain = CRM_Utils_Crypt::decrypt($value['smtpPassword']);
+      $value['smtpPassword'] = $cryptoToken->encrypt($plain, 'CRED');
       CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = %2 WHERE id = %1', [
         1 => [$setting['id'], 'Positive'],
         2 => [serialize($value), 'String'],
