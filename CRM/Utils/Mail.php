@@ -48,7 +48,7 @@ class CRM_Utils_Mail {
 
       if ($mailingInfo['smtpAuth']) {
         $params['username'] = $mailingInfo['smtpUsername'];
-        $params['password'] = CRM_Utils_Crypt::decrypt($mailingInfo['smtpPassword']);
+        $params['password'] = \Civi::service('crypto.token')->decrypt($mailingInfo['smtpPassword']);
         $params['auth'] = TRUE;
       }
       else {
