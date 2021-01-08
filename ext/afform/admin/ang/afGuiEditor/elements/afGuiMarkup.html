@@ -4,12 +4,12 @@
       <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
         <span><i class="crm-i fa-gear"></i></span>
       </button>
-      <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/markup-menu.html'"></ul>
+      <ul class="dropdown-menu" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiMarkup-menu.html'"></ul>
     </div>
   </div>
 </div>
-<div ng-if="!editingMarkup" ng-click="edit()" class="af-gui-markup-content crm-editable-enabled {{ node['class'] }}">
-  <div ng-bind-html="getMarkup()" style="{{ node.style }}"></div>
+<div ng-if="!editingMarkup" ng-click="edit()" class="af-gui-markup-content crm-editable-enabled {{ $ctrl.node['class'] }}">
+  <div ng-bind-html="getMarkup()" style="{{ $ctrl.node.style }}"></div>
   <div class="af-gui-markup-content-overlay"></div>
 </div>
 <div class="af-gui-content-editing-area">

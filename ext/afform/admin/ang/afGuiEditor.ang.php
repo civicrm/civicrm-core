@@ -4,6 +4,7 @@ return [
   'js' => [
     'ang/afGuiEditor.js',
     'ang/afGuiEditor/*.js',
+    'ang/afGuiEditor/*/*.js',
   ],
   'css' => ['ang/afGuiEditor.css'],
   'partials' => ['ang/afGuiEditor'],

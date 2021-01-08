@@ -132,6 +132,7 @@
 #afGuiEditor .af-gui-element {
   position: relative;
   padding: 0 3px 3px;
+  display: block;
 }
 
 #afGuiEditor .af-gui-container {
@@ -139,6 +140,12 @@
   position: relative;
   padding: 22px 3px 3px;
   min-height: 40px;
+  display: block;
+}
+
+#afGuiEditor af-gui-markup,
+#afGuiEditor af-gui-field {
+  display: block;
 }
 
 #afGuiEditor .af-gui-container-type-fieldset {

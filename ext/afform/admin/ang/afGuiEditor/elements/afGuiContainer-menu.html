@@ -1,9 +1,9 @@
-<li ng-if="!node['af-fieldset'] && !block.layout"><a href ng-click="saveBlock()">{{:: ts('Save as block') }}</a></li>
-<li ng-if="!node['af-fieldset'] && !block.layout" role="separator" class="divider"></li>
-<li ng-if="tags[node['#tag']]">
+<li ng-if="!$ctrl.node['af-fieldset'] && !block.layout"><a href ng-click="saveBlock()">{{:: ts('Save as block') }}</a></li>
+<li ng-if="!$ctrl.node['af-fieldset'] && !block.layout" role="separator" class="divider"></li>
+<li ng-if="tags[$ctrl.node['#tag']]">
   <div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
     {{:: ts('Element:') }}
-    <select class="form-control" ng-model="node['#tag']" title="{{:: ts('Container type') }}">
+    <select class="form-control" ng-model="$ctrl.node['#tag']" title="{{:: ts('Container type') }}">
       <option ng-repeat="(opt, label) in tags" value="{{ opt }}">{{ label }}</option>
     </select>
   </div>
@@ -11,10 +11,10 @@
 <li ng-if="isRepeatable()" ng-click="$event.stopPropagation()">
   <div class="af-gui-field-select-in-dropdown form-inline">
     <label ng-click="toggleRepeat()">
-      <i class="crm-i fa-{{ node['af-repeat'] || node['af-repeat'] === '' ? 'check-' : '' }}square-o"></i>
+      <i class="crm-i fa-{{ $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'check-' : '' }}square-o"></i>
       {{:: ts('Repeat') }}
     </label>
-    <span ng-style="{visibility: node['af-repeat'] || node['af-repeat'] === '' ? 'visible' : 'hidden'}">
+    <span ng-style="{visibility: $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'visible' : 'hidden'}">
       <input type="number" class="form-control" ng-model="getSetMin" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('min') }}" min="0" step="1" />
       - <input type="number" class="form-control" ng-model="getSetMax" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('max') }}" min="2" step="1" />
     </span>
@@ -30,7 +30,7 @@
     </div>
   </div>
 </li>
-<li af-gui-menu-item-border="node"></li>
-<li af-gui-menu-item-background="node"></li>
+<li af-gui-menu-item-border="$ctrl.node"></li>
+<li af-gui-menu-item-background="$ctrl.node"></li>
 <li role="separator" class="divider"></li>
-<li><a href ng-click="parentContainer.removeElement(node)"><span class="text-danger">{{ !block ? ts('Delete this container') : ts('Delete this block') }}</span></a></li>
+<li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger">{{ !block ? ts('Delete this container') : ts('Delete this block') }}</span></a></li>
