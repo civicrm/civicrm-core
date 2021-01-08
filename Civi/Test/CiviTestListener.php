@@ -85,6 +85,7 @@ else {
       if ($test instanceof HookInterface) {
         \CRM_Utils_Hook::singleton()->reset();
       }
+      \CRM_Utils_Time::resetTime();
       if ($this->isCiviTest($test)) {
         error_reporting(E_ALL & ~E_NOTICE);
         $this->errorScope = NULL;

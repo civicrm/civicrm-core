@@ -324,7 +324,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       }
     }
     if (!$joinDate) {
-      $joinDate = date('Y-m-d');
+      $joinDate = CRM_Utils_Time::date('Y-m-d');
     }
     $actualStartDate = $joinDate;
     if ($startDate) {
@@ -531,7 +531,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
       // CRM=7297 Membership Upsell: we need to handle null end_date in case we are switching
       // from a lifetime to a different membership type
       if (is_null($membershipDetails->end_date)) {
-        $date = date('Y-m-d');
+        $date = CRM_Utils_Time::date('Y-m-d');
       }
       else {
         $date = $membershipDetails->end_date;
@@ -581,14 +581,14 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
           $year
         ));
       }
-      $today = date('Y-m-d');
+      $today = CRM_Utils_Time::date('Y-m-d');
       $membershipDates['today'] = CRM_Utils_Date::customFormat($today, '%Y%m%d');
       $membershipDates['start_date'] = CRM_Utils_Date::customFormat($startDate, '%Y%m%d');
       $membershipDates['end_date'] = CRM_Utils_Date::customFormat($endDate, '%Y%m%d');
       $membershipDates['log_start_date'] = CRM_Utils_Date::customFormat($logStartDate, '%Y%m%d');
     }
     else {
-      $today = date('Y-m-d');
+      $today = CRM_Utils_Time::date('Y-m-d');
       if ($changeToday) {
         $today = CRM_Utils_Date::processDate($changeToday, NULL, FALSE, 'Y-m-d');
       }

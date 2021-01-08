@@ -98,7 +98,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       'status_id' => $membership->status_id,
       'start_date' => $logStartDate,
       'end_date' => CRM_Utils_Date::isoToMysql($membership->end_date),
-      'modified_date' => date('Ymd'),
+      'modified_date' => CRM_Utils_Time::date('Ymd'),
       'membership_type_id' => $values[$membership->id]['membership_type_id'],
       'max_related' => $membership->max_related,
     ];
@@ -252,8 +252,8 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
       $fieldsToLoad = [];
       foreach (['start_date', 'end_date', 'join_date'] as $dateField) {
-        if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', strtotime(trim($params[$dateField])))) !== 0) {
-          $params[$dateField] = date('Ymd', strtotime(trim($params[$dateField])));
+        if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField])))) !== 0) {
+          $params[$dateField] = date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField])));
           // @todo enable this once core is using the api.
           // CRM_Core_Error::deprecatedWarning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api');
         }
@@ -283,7 +283,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
       );
       if (empty($calcStatus)) {
-        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . date('Y-m-d H:i:s')));
+        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
       }
       $params['status_id'] = $calcStatus['id'];
     }
@@ -1012,7 +1012,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
     $dates = ['startDate', 'endDate'];
     foreach ($dates as $date) {
       if (strlen($$date) === 8) {
-        $$date = date('Y-m-d', strtotime($$date));
+        $$date = date('Y-m-d', CRM_Utils_Time::strtotime($$date));
       }
     }
 
@@ -1200,7 +1200,7 @@ AND civicrm_membership.is_test = %2";
           $currentMembership['end_date'],
           $format
         ),
-        'modified_date' => date('Y-m-d H:i:s', strtotime($today)),
+        'modified_date' => date('Y-m-d H:i:s', CRM_Utils_Time::strtotime($today)),
         'membership_type_id' => $currentMembership['membership_type_id'],
         'max_related' => $currentMembership['max_related'] ?? 0,
       ];
@@ -2102,7 +2102,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    */
   protected static function matchesRequiredMembership($params, $membership) {
     foreach (['start_date', 'end_date'] as $date) {
-      if (strtotime($params[$date]) !== strtotime($membership[$date])) {
+      if (CRM_Utils_Time::strtotime($params[$date]) !== CRM_Utils_Time::strtotime($membership[$date])) {
         return FALSE;
       }
       if ((int) $params['status_id'] !== (int) $membership['status_id']) {
@@ -2713,8 +2713,8 @@ WHERE {$whereClause}";
         return $updateMembershipMsg;
       }
 
-      $today = time();
-      if ($deceasedDate && strtotime($deceasedDate) > $today) {
+      $today = CRM_Utils_Time::time();
+      if ($deceasedDate && CRM_Utils_Time::strtotime($deceasedDate) > $today) {
         return $updateMembershipMsg;
       }
 
@@ -2739,7 +2739,7 @@ WHERE {$whereClause}";
           'start_date' => CRM_Utils_Date::isoToMysql($dao->start_date),
           'end_date' => CRM_Utils_Date::isoToMysql($dao->end_date),
           'modified_id' => $userId,
-          'modified_date' => date('Ymd'),
+          'modified_date' => CRM_Utils_Time::date('Ymd'),
           'membership_type_id' => $dao->membership_type_id,
           'max_related' => $dao->max_related,
         ];
@@ -2756,7 +2756,7 @@ WHERE {$whereClause}";
           'status_id' => 2,
           'version' => 3,
           'priority_id' => 2,
-          'activity_date_time' => date('Y-m-d H:i:s'),
+          'activity_date_time' => CRM_Utils_Time::date('Y-m-d H:i:s'),
           'is_auto' => 0,
           'is_current_revision' => 1,
           'is_deleted' => 0,

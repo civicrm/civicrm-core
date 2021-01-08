@@ -31,15 +31,36 @@ class CRM_Utils_Time {
   static private $callback = NULL;
 
   /**
-   * Get the time.
+   * Evaluate a time expression (relative to current time).
    *
-   * @param string $returnFormat
-   *   Format in which date is to be retrieved.
-   *
-   * @return string
+   * @param string $str
+   *   Ex: '2001-02-03 04:05:06' or '+2 days'
+   * @param string|int $now
+   *   For relative time strings, $now determines the base time.
+   * @return false|int
+   *   The indicated time (seconds since epoch)
+   * @see strtotime()
    */
-  public static function getTime($returnFormat = 'YmdHis') {
-    return date($returnFormat, self::getTimeRaw());
+  public static function strtotime($str, $now = 'time()') {
+    if ($now === NULL || $now === 'time()') {
+      $now = self::time();
+    }
+    return strtotime($str, $now);
+  }
+
+  /**
+   * Format a date/time expression.
+   *
+   * @param string $format
+   *   Ex: 'Y-m-d H:i:s'
+   * @param null|int $timestamp
+   *   The time (seconds since epoch). NULL will use current time.
+   * @return string
+   *   Ex: '2001-02-03 04:05:06'
+   * @see date()
+   */
+  public static function date($format, $timestamp = NULL) {
+    return date($format, $timestamp ?: self::time());
   }
 
   /**
@@ -47,9 +68,36 @@ class CRM_Utils_Time {
    *
    * @return int
    *   seconds since epoch
+   * @see time()
+   */
+  public static function time() {
+    return self::$callback === NULL ? time() : call_user_func(self::$callback);
+  }
+
+  /**
+   * Get the time.
+   *
+   * @param string $returnFormat
+   *   Format in which date is to be retrieved.
+   *
+   * @return string
+   * @deprecated
+   *   Prefer CRM_Utils_Time::date(), whose name looks similar to the stdlib work-a-like.
+   */
+  public static function getTime($returnFormat = 'YmdHis') {
+    return date($returnFormat, self::time());
+  }
+
+  /**
+   * Get the time.
+   *
+   * @return int
+   *   seconds since epoch
+   * @deprecated
+   *   Prefer CRM_Utils_Time::time(), whose name looks similar to the stdlib work-a-like.
    */
   public static function getTimeRaw() {
-    return self::$callback === NULL ? time() : call_user_func(self::$callback);
+    return self::time();
   }
 
   /**

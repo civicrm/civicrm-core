@@ -364,14 +364,14 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     }
 
     if ($params['fixed_period_start_day'] && !empty($params['fixed_period_start_day'])) {
-      $params['fixed_period_start_day']['Y'] = date('Y');
+      $params['fixed_period_start_day']['Y'] = CRM_Utils_Time::date('Y');
       if (!CRM_Utils_Rule::qfDate($params['fixed_period_start_day'])) {
         $errors['fixed_period_start_day'] = ts('Please enter valid Fixed Period Start Day');
       }
     }
 
     if ($params['fixed_period_rollover_day'] && !empty($params['fixed_period_rollover_day'])) {
-      $params['fixed_period_rollover_day']['Y'] = date('Y');
+      $params['fixed_period_rollover_day']['Y'] = CRM_Utils_Time::date('Y');
       if (!CRM_Utils_Rule::qfDate($params['fixed_period_rollover_day'])) {
         $errors['fixed_period_rollover_day'] = ts('Please enter valid Fixed Period Rollover Day');
       }
