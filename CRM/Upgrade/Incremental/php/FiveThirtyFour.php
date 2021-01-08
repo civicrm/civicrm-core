@@ -29,9 +29,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       $xoauth2Value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_MailSettings', 'protocol', 'IMAP_XOAUTH2');
       if (!empty($xoauth2Value)) {
         if ($this->isXOAUTH2InUse($xoauth2Value)) {
-          // Leaving out ts() since it's unlikely this message will ever
-          // be displayed to anyone.
-          $preUpgradeMessage .= '<p>This site appears to be using the IMAP_XOAUTH2 mail protocol which was part of pre-5.32 work towards OAUTH2 but was never functional and never released as an active option value. Please post at https://lab.civicrm.org/dev/core/-/issues/2264 describing how you are using this value.</p>';
+          $preUpgradeMessage .= '<p>' . $this->getXOAuth2Warning() . '</p>';
         }
       }
     }
@@ -50,9 +48,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       $xoauth2Value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_MailSettings', 'protocol', 'IMAP_XOAUTH2');
       if (!empty($xoauth2Value)) {
         if ($this->isXOAUTH2InUse($xoauth2Value)) {
-          // Leaving out ts() since it's unlikely this message will ever
-          // be displayed to anyone.
-          $postUpgradeMessage .= '<div class="crm-error"><ul><li>This site appears to be using the IMAP_XOAUTH2 mail protocol which was part of pre-5.32 work towards OAUTH2 but was never functional and never released as an active option value. Please post at https://lab.civicrm.org/dev/core/-/issues/2264 describing how you are using this value.</li></ul></div>';
+          $postUpgradeMessage .= '<div class="crm-error"><ul><li>' . $this->getXOAuth2Warning() . '</li></ul></div>';
         }
       }
     }
@@ -178,6 +174,20 @@ WHERE ov.value = %1",
       [1 => [$xoauth2Value, 'Positive']]);
     $usedInMailSettings = (bool) CRM_Core_DAO::SingleValueQuery("SELECT id FROM civicrm_mail_settings WHERE protocol = %1", [1 => [$xoauth2Value, 'Positive']]);
     return $enabled || $usedInMailSettings;
+  }
+
+  /**
+   * @return string
+   */
+  private function getXOAuth2Warning():string {
+    // Leaving out ts() since it's unlikely this message will ever
+    // be displayed to anyone.
+    return strtr(
+      'This system has enabled "IMAP_XOAUTH2" which was experimentally declared in CiviCRM v5.24. CiviCRM v5.33+ includes a supported replacement ("oauth-client"), and the experimental "IMAP_XOAUTH2" should be removed. Please visit %1 to discuss.',
+      [
+        '%1' => '<a target="_blank" href="https://lab.civicrm.org/dev/core/-/issues/2264">dev/core#2264</a>',
+      ]
+    );
   }
 
 }
