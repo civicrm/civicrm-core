@@ -243,7 +243,7 @@ class Paths {
     }
 
     $defaultContainer = self::DEFAULT_URL;
-    if ($value && $value{0} == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\](/(.*))$;', $value, $matches)) {
+    if ($value && $value[0] == '[' && preg_match(';^\[([a-zA-Z0-9\._]+)\](/(.*))$;', $value, $matches)) {
       $defaultContainer = $matches[1];
       $value = $matches[3];
     }
