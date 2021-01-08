@@ -31,11 +31,12 @@ class CRM_AfformAdmin_Utils {
 
     $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo();
 
-    // Scan all extensions for our list of supported entities
+    // Scan all extensions for entities & input types
     foreach (CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $dir = CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . 'afformEntities';
+      $dir = CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
       if (is_dir($dir)) {
-        foreach (glob($dir . '/*.php') as $file) {
+        // Scan for entities
+        foreach (glob($dir . 'afformEntities/*.php') as $file) {
           $entity = include $file;
           // Skip disabled contact types
           if (!empty($entity['contact_type']) && !isset($contactTypes[$entity['contact_type']])) {
@@ -49,6 +50,12 @@ class CRM_AfformAdmin_Utils {
           $afformEntity = $entity['contact_type'] ?? $entity['entity'];
           $entity['fields'] = (array) civicrm_api4($entity['entity'], 'getFields', $getFieldParams + ['values' => $values], 'name');
           $data['entities'][$afformEntity] = $entity;
+        }
+        // Scan for input types
+        foreach (glob($dir . 'ang/afGuiEditor/inputType/*.html') as $file) {
+          $matches = [];
+          preg_match('/([-a-z_A-Z0-9]*).html/', $file, $matches);
+          $data['inputType'][$matches[1]] = $matches[1];
         }
       }
     }
@@ -139,14 +146,6 @@ class CRM_AfformAdmin_Utils {
           unset($data['entities'][$entityName]['fields'][$name]['options']);
         }
       }
-    }
-
-    // Scan for input types
-    // FIXME: Need a way to load this from other extensions too
-    foreach (glob(__DIR__ . '/ang/afGuiEditor/inputType/*.html') as $file) {
-      $matches = [];
-      preg_match('/([-a-z_A-Z0-9]*).html/', $file, $matches);
-      $data['inputType'][$matches[1]] = $matches[1];
     }
 
     $data['styles'] = [
