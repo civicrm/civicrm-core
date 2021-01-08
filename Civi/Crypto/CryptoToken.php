@@ -56,10 +56,18 @@ class CryptoToken {
   protected $delim;
 
   /**
-   * CryptoToken constructor.
+   * @var \Civi\Crypto\CryptoRegistry|null
    */
-  public function __construct() {
+  private $registry;
+
+  /**
+   * CryptoToken constructor.
+   *
+   * @param CryptoRegistry $registry
+   */
+  public function __construct($registry = NULL) {
     $this->delim = chr(2);
+    $this->registry = $registry;
   }
 
   /**
@@ -85,7 +93,7 @@ class CryptoToken {
    */
   public function encrypt($plainText, $keyIdOrTag) {
     /** @var CryptoRegistry $registry */
-    $registry = \Civi::service('crypto.registry');
+    $registry = $this->getRegistry();
 
     $key = $registry->findKey($keyIdOrTag);
     if ($key['suite'] === 'plain') {
@@ -128,7 +136,7 @@ class CryptoToken {
     }
 
     /** @var CryptoRegistry $registry */
-    $registry = \Civi::service('crypto.registry');
+    $registry = $this->getRegistry();
 
     $tokenData = $this->parse($token);
 
@@ -156,7 +164,7 @@ class CryptoToken {
    */
   public function rekey($oldToken, $keyTag) {
     /** @var \Civi\Crypto\CryptoRegistry $registry */
-    $registry = \Civi::service('crypto.registry');
+    $registry = $this->getRegistry();
 
     $sourceKeys = $registry->findKeysByTag($keyTag);
     $targetKey = array_shift($sourceKeys);
@@ -198,6 +206,16 @@ class CryptoToken {
         throw new CryptoException("Cannot decrypt token. Invalid format.");
     }
     return $tokenData;
+  }
+
+  /**
+   * @return CryptoRegistry
+   */
+  protected function getRegistry(): CryptoRegistry {
+    if ($this->registry === NULL) {
+      $this->registry = \Civi::service('crypto.registry');
+    }
+    return $this->registry;
   }
 
 }
