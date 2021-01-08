@@ -66,7 +66,7 @@ class CryptoRegistry {
     $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
 
     $registry->addPlainText(['tags' => ['CRED']]);
-    if (defined('CIVICRM_CRED_KEYS')) {
+    if (defined('CIVICRM_CRED_KEYS') && CIVICRM_CRED_KEYS !== '') {
       foreach (explode(' ', CIVICRM_CRED_KEYS) as $n => $keyExpr) {
         $key = ['tags' => ['CRED'], 'weight' => $n];
         if ($keyExpr === 'plain') {
