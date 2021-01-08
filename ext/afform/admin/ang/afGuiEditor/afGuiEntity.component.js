@@ -1,0 +1,195 @@
+// https://civicrm.org/licensing
+(function(angular, $, _) {
+  "use strict";
+
+  angular.module('afGuiEditor').component('afGuiEntity', {
+    templateUrl: '~/afGuiEditor/afGuiEntity.html',
+    bindings: {
+      entity: '<'
+    },
+    require: {editor: '^^afGuiEditor'},
+    controller: function ($scope, $timeout, afAdmin) {
+      var ts = $scope.ts = CRM.ts();
+      var ctrl = this;
+      $scope.controls = {};
+      $scope.fieldList = [];
+      $scope.blockList = [];
+      $scope.blockTitles = [];
+      $scope.elementList = [];
+      $scope.elementTitles = [];
+
+      function getEntityType() {
+        return ctrl.entity.type === 'Contact' ? ctrl.entity.data.contact_type : ctrl.entity.type;
+      }
+
+      $scope.getMeta = function() {
+        return afAdmin.meta.entities[getEntityType()];
+      };
+
+      $scope.getField = afAdmin.getField;
+
+      $scope.valuesFields = function() {
+        var fields = _.transform($scope.getMeta().fields, function(fields, field) {
+          fields.push({id: field.name, text: field.label, disabled: $scope.fieldInUse(field.name)});
+        }, []);
+        return {results: fields};
+      };
+
+      $scope.removeValue = function(entity, fieldName) {
+        delete entity.data[fieldName];
+      };
+
+      function buildPaletteLists() {
+        var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+        buildFieldList(search);
+        buildBlockList(search);
+        buildElementList(search);
+      }
+
+      function buildFieldList(search) {
+        $scope.fieldList.length = 0;
+        $scope.fieldList.push({
+          entityName: ctrl.entity.name,
+          entityType: getEntityType(),
+          label: ts('%1 Fields', {1: $scope.getMeta().label}),
+          fields: filterFields($scope.getMeta().fields)
+        });
+
+        _.each(afAdmin.meta.entities, function(entity, entityName) {
+          if (check(ctrl.editor.layout['#children'], {'af-join': entityName})) {
+            $scope.fieldList.push({
+              entityName: ctrl.entity.name + '-join-' + entityName,
+              entityType: entityName,
+              label: ts('%1 Fields', {1: entity.label}),
+              fields: filterFields(entity.fields)
+            });
+          }
+        });
+
+        function filterFields(fields) {
+          return _.transform(fields, function(fieldList, field) {
+            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
+              fieldList.push({
+                "#tag": "af-field",
+                name: field.name
+              });
+            }
+          }, []);
+        }
+      }
+
+      function buildBlockList(search) {
+        $scope.blockList.length = 0;
+        $scope.blockTitles.length = 0;
+        _.each(afAdmin.meta.blocks, function(block, directive) {
+          if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
+            (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type))
+          ) {
+            var item = {"#tag": block.join ? "div" : directive};
+            if (block.join) {
+              item['af-join'] = block.join;
+              item['#children'] = [{"#tag": directive}];
+            }
+            if (block.repeat) {
+              item['af-repeat'] = ts('Add');
+              item.min = '1';
+              if (typeof block.repeat === 'number') {
+                item.max = '' + block.repeat;
+              }
+            }
+            $scope.blockList.push(item);
+            $scope.blockTitles.push(block.title);
+          }
+        });
+      }
+
+      function buildElementList(search) {
+        $scope.elementList.length = 0;
+        $scope.elementTitles.length = 0;
+        _.each(afAdmin.meta.elements, function(element, name) {
+          if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
+            var node = _.cloneDeep(element.element);
+            if (name === 'fieldset') {
+              node['af-fieldset'] = ctrl.entity.name;
+            }
+            $scope.elementList.push(node);
+            $scope.elementTitles.push(name === 'fieldset' ? ts('Fieldset for %1', {1: ctrl.entity.label}) : element.title);
+          }
+        });
+      }
+
+      $scope.clearSearch = function() {
+        $scope.controls.fieldSearch = '';
+      };
+
+      // This gets called from jquery-ui so we have to manually apply changes to scope
+      $scope.buildPaletteLists = function() {
+        $timeout(function() {
+          $scope.$apply(function() {
+            buildPaletteLists();
+          });
+        });
+      };
+
+      // Checks if a field is on the form or set as a value
+      $scope.fieldInUse = function(fieldName) {
+        var data = ctrl.entity.data || {};
+        if (fieldName in data) {
+          return true;
+        }
+        return check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
+      };
+
+      $scope.blockInUse = function(block) {
+        if (block['af-join']) {
+          return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
+        }
+        var fieldsInBlock = _.pluck(afAdmin.findRecursive(afAdmin.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        return check(ctrl.editor.layout['#children'], function(item) {
+          return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
+        });
+      };
+
+      // Check for a matching item for this entity
+      // Recursively checks the form layout, including block directives
+      function check(group, criteria, found) {
+        if (!found) {
+          found = {};
+        }
+        if (_.find(group, criteria)) {
+          found.match = true;
+          return true;
+        }
+        _.each(group, function(item) {
+          if (found.match) {
+            return false;
+          }
+          if (_.isPlainObject(item)) {
+            // Recurse through everything but skip fieldsets for other entities
+            if ((!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
+              check(item['#children'], criteria, found);
+            }
+            // Recurse into block directives
+            else if (item['#tag'] && item['#tag'] in afAdmin.meta.blocks) {
+              check(afAdmin.meta.blocks[item['#tag']].layout, criteria, found);
+            }
+          }
+        });
+        return found.match;
+      }
+
+      $scope.$watch('controls.addValue', function(fieldName) {
+        if (fieldName) {
+          if (!ctrl.entity.data) {
+            ctrl.entity.data = {};
+          }
+          ctrl.entity.data[fieldName] = '';
+          $scope.controls.addValue = '';
+        }
+      });
+
+      $scope.$watch('controls.fieldSearch', buildPaletteLists);
+    }
+  });
+
+})(angular, CRM.$, CRM._);
