@@ -69,12 +69,8 @@ class CRM_Mailing_MailStore {
   private static function getProtocolDefaults($protocol) {
     switch ($protocol) {
       case 'IMAP':
-      case 'IMAP_XOAUTH2':
         return [
-          // For backward compat with pre-release XOAuth2 configurations
-          'auth' => $protocol === 'IMAP_XOAUTH2' ? 'XOAuth2' : 'Password',
-          // In a simpler world:
-          // 'auth' => 'Password',
+          'auth' => 'Password',
           'factory' => function($mailSettings) {
             $useXOAuth2 = ($mailSettings['auth'] === 'XOAuth2');
             return new CRM_Mailing_MailStore_Imap($mailSettings['server'], $mailSettings['username'], $mailSettings['password'], (bool) $mailSettings['is_ssl'], $mailSettings['source'], $useXOAuth2);

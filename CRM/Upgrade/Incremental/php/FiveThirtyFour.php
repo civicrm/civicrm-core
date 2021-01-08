@@ -25,10 +25,14 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev === '5.34.alpha1') {
+      $xoauth2Value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_MailSettings', 'protocol', 'IMAP_XOAUTH2');
+      if (!empty($xoauth2Value)) {
+        if ($this->isXOAUTH2InUse($xoauth2Value)) {
+          $preUpgradeMessage .= '<p>' . $this->getXOAuth2Warning() . '</p>';
+        }
+      }
+    }
   }
 
   /**
@@ -40,10 +44,14 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    if ($rev === '5.34.alpha1') {
+      $xoauth2Value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_MailSettings', 'protocol', 'IMAP_XOAUTH2');
+      if (!empty($xoauth2Value)) {
+        if ($this->isXOAUTH2InUse($xoauth2Value)) {
+          $postUpgradeMessage .= '<div class="crm-error"><ul><li>' . $this->getXOAuth2Warning() . '</li></ul></div>';
+        }
+      }
+    }
   }
 
   /*
@@ -73,6 +81,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
 
     $this->addTask('Set defaults and required on financial type boolean fields', 'updateFinancialTypeTable');
     $this->addTask('Set defaults and required on pledge fields', 'updatePledgeTable');
+
+    $this->addTask('Remove never used IMAP_XOAUTH2 option value', 'removeUnusedXOAUTH2');
   }
 
   /**
@@ -128,6 +138,56 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       MODIFY COLUMN `is_test` tinyint(4) DEFAULT 0 NOT NULL
     ");
     return TRUE;
+  }
+
+  /**
+   * This option value was never used, but check anyway if someone happens
+   * to be using it and then ask them to report what they're doing with it.
+   * There's no way to send a message to the user during the task, so we have
+   * to check it here and also as a pre/post upgrade message.
+   * Similar to removeGooglePlusOption from 5.23 except there we know some
+   * people would have used it.
+   */
+  public static function removeUnusedXOAUTH2(CRM_Queue_TaskContext $ctx) {
+    $xoauth2Value = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_MailSettings', 'protocol', 'IMAP_XOAUTH2');
+    if (!empty($xoauth2Value)) {
+      if (!self::isXOAUTH2InUse($xoauth2Value)) {
+        CRM_Core_DAO::executeQuery("DELETE ov FROM civicrm_option_value ov
+INNER JOIN civicrm_option_group og
+ON (og.name = 'mail_protocol' AND ov.option_group_id = og.id)
+WHERE ov.value = %1",
+          [1 => [$xoauth2Value, 'Positive']]);
+      }
+    }
+    return TRUE;
+  }
+
+  /**
+   * Determine if option value is enabled or used in mail settings.
+   * @return bool
+   */
+  private static function isXOAUTH2InUse($xoauth2Value) {
+    $enabled = (bool) CRM_Core_DAO::SingleValueQuery("SELECT ov.is_active FROM civicrm_option_value ov
+INNER JOIN civicrm_option_group og
+ON (og.name = 'mail_protocol' AND ov.option_group_id = og.id)
+WHERE ov.value = %1",
+      [1 => [$xoauth2Value, 'Positive']]);
+    $usedInMailSettings = (bool) CRM_Core_DAO::SingleValueQuery("SELECT id FROM civicrm_mail_settings WHERE protocol = %1", [1 => [$xoauth2Value, 'Positive']]);
+    return $enabled || $usedInMailSettings;
+  }
+
+  /**
+   * @return string
+   */
+  private function getXOAuth2Warning():string {
+    // Leaving out ts() since it's unlikely this message will ever
+    // be displayed to anyone.
+    return strtr(
+      'This system has enabled "IMAP_XOAUTH2" which was experimentally declared in CiviCRM v5.24. CiviCRM v5.33+ includes a supported replacement ("oauth-client"), and the experimental "IMAP_XOAUTH2" should be removed. Please visit %1 to discuss.',
+      [
+        '%1' => '<a target="_blank" href="https://lab.civicrm.org/dev/core/-/issues/2264">dev/core#2264</a>',
+      ]
+    );
   }
 
 }
