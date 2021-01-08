@@ -173,7 +173,7 @@ class Requirements {
     if ($mem < $min && $mem > 0) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
     }
-    elseif ($mem < $recommended && $mem != 0) {
+    elseif ($mem < $recommended && $mem != 0 && $mem != -1) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
     }
     elseif ($mem == 0) {
