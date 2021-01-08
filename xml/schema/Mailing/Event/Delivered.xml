@@ -7,6 +7,8 @@
   <comment>Tracks when a queued email is actually delivered to the MTA</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Delivery Event</title>
+  <titlePlural>Mailing Delivery Events</titlePlural>
   <field>
     <name>id</name>
     <title>Delivered ID</title>

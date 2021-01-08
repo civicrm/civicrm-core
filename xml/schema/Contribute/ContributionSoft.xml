@@ -4,9 +4,13 @@
   <base>CRM/Contribute</base>
   <class>ContributionSoft</class>
   <name>civicrm_contribution_soft</name>
+  <title>Contribution Soft Credit</title>
+  <titlePlural>Contribution Soft Credits</titlePlural>
   <add>2.2</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <title>Contribution Soft Credit</title>
+  <titlePlural>Contribution Soft Credits</titlePlural>
   <field>
     <name>id</name>
     <uniqueName>contribution_soft_id</uniqueName>

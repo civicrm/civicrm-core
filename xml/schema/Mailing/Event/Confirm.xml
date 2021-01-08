@@ -7,6 +7,8 @@
   <comment>Tracks when a subscription event is confirmed by email</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Confirmation Event</title>
+  <titlePlural>Mailing Contribution Events</titlePlural>
   <field>
     <name>id</name>
     <title>Mailing Confirmation ID</title>

@@ -110,7 +110,7 @@ class CRM_Contribute_DAO_ContributionSoft extends CRM_Core_DAO {
    *   Whether to return the plural version of the title.
    */
   public static function getEntityTitle($plural = FALSE) {
-    return $plural ? ts('Contribution Softs') : ts('Contribution Soft');
+    return $plural ? ts('Contribution Soft Credits') : ts('Contribution Soft Credit');
   }
 
   /**
