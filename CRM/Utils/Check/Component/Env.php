@@ -360,7 +360,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     foreach ($settingNames as $settingName) {
       $settingValue = Civi::settings()->get($settingName);
-      if (!empty($settingValue) && $settingValue{0} != '[') {
+      if (!empty($settingValue) && $settingValue[0] != '[') {
         $hasOldStyle = TRUE;
         break;
       }
@@ -399,7 +399,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     foreach ($settingNames as $settingName) {
       $settingValue = Civi::settings()->get($settingName);
-      if (!empty($settingValue) && $settingValue{0} != '[') {
+      if (!empty($settingValue) && $settingValue[0] != '[') {
         $hasOldStyle = TRUE;
         break;
       }

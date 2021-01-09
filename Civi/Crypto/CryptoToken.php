@@ -77,7 +77,7 @@ class CryptoToken {
    * @return bool
    */
   public function isPlainText($plainText) {
-    return is_string($plainText) && ($plainText === '' || $plainText{0} !== $this->delim);
+    return is_string($plainText) && ($plainText === '' || $plainText[0] !== $this->delim);
   }
 
   /**
