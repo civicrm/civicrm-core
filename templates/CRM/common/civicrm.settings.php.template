@@ -301,6 +301,30 @@ if (!defined('CIVICRM_SITE_KEY')) {
 }
 
 /**
+ * If credentials are stored in the database, the CIVICRM_CRED_KEYS will be
+ * used to encrypt+decrypt them. This is a space-delimited list of keys (ordered by
+ * priority). Put the preferred key first. Any old/deprecated keys may be
+ * listed after.
+ *
+ * Each key is in format "<cipher-suite>:<key-encoding>:<key-content>", as in:
+ *
+ * Ex: define('CIVICRM_CRED_KEYS', 'aes-cbc:hkdf-sha256:RANDOM_1')
+ * Ex: define('CIVICRM_CRED_KEYS', 'aes-ctr-hs:b64:RANDOM_2 aes-ctr-hs:b64:RANDOM_3')
+ * Ex: define('CIVICRM_CRED_KEYS', '::MY_NEW_KEY ::MY_OLD_KEY')
+ *
+ * If cipher-suite or key-encoding is blank, they will use defaults ("aes-cbc"
+ * and "hkdf-sha256", respectively).
+ *
+ * More info at https://docs.civicrm.org/sysadmin/en/latest/setup/cred-key/
+ */
+if (!defined('CIVICRM_CRED_KEYS') ) {
+  define( '_CIVICRM_CRED_KEYS', '%%credKeys%%');
+  define( 'CIVICRM_CRED_KEYS', _CIVICRM_CRED_KEYS === '%%' . 'credKeys' . '%%' ? '' : _CIVICRM_CRED_KEYS );
+  // Some old installers may not set a decent value, and this extra complexity is a failsafe.
+  // Feel free to simplify post-install.
+}
+
+/**
  * Enable this constant, if you want to send your email through the smarty
  * templating engine(allows you to do conditional and more complex logic)
  *

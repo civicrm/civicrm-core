@@ -28,6 +28,8 @@ namespace Civi\Setup;
  *   Ex: ['server'=>'localhost:3306', 'username'=>'admin', 'password'=>'s3cr3t', 'database'=>'mydb']
  * @property string $siteKey
  *   Ex: 'abcd1234ABCD9876'.
+ * @property string[] $credKeys
+ *   Ex: ['::abcd1234ABCD9876'].
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.
@@ -108,6 +110,11 @@ class Model {
       'description' => 'Site key',
       'name' => 'siteKey',
       'type' => 'string',
+    ));
+    $this->addField(array(
+      'description' => 'Credential encryption keys',
+      'name' => 'credKeys',
+      'type' => 'array',
     ));
     $this->addField(array(
       'description' => 'Load example data',
