@@ -430,7 +430,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
     'api.address.get.2' => ['is_billing' => TRUE, 'return' => $addressFields],
     'api.email.get.1' => ['location_type_id' => 'Billing'],
     'api.email.get.2' => ['is_billing' => TRUE],
-    'return' => 'api.email.get, api.address.get, api.address.getoptions, country, state_province, email, first_name, last_name, middle_name, ' . implode($addressFields, ','),
+    'return' => 'api.email.get, api.address.get, api.address.getoptions, country, state_province, email, first_name, last_name, middle_name, ' . implode(',', $addressFields),
   ]
   );
 
