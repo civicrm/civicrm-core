@@ -65,7 +65,7 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
    *   Whether to return the plural version of the title.
    */
   public static function getEntityTitle($plural = FALSE) {
-    return $plural ? ts('Openeds') : ts('Opened');
+    return $plural ? ts('Mailing Opened Events') : ts('Mailing Opened Event');
   }
 
   /**

@@ -65,7 +65,7 @@ class CRM_Mailing_Event_DAO_Delivered extends CRM_Core_DAO {
    *   Whether to return the plural version of the title.
    */
   public static function getEntityTitle($plural = FALSE) {
-    return $plural ? ts('Delivereds') : ts('Delivered');
+    return $plural ? ts('Mailing Delivered Events') : ts('Mailing Delivered Event');
   }
 
   /**

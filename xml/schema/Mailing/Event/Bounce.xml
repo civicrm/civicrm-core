@@ -7,6 +7,8 @@
   <comment>Tracks when and why an email bounced.</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Bounce Event</title>
+  <titlePlural>Mailing Bounce Events</titlePlural>
   <field>
     <name>id</name>
     <title>Bounce ID</title>

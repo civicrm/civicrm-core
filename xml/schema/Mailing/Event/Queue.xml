@@ -7,6 +7,8 @@
   <comment>A collection of all intended recipients of a job</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Queue Event</title>
+  <titlePlural>Mailing Queue Events</titlePlural>
   <field>
     <name>id</name>
     <type>int unsigned</type>

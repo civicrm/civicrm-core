@@ -7,6 +7,8 @@
   <comment>Tracks when a contact forwards a mailing to a (new) contact</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Mailing Forwarded Event</title>
+  <titlePlural>Mailing Forwarded Events</titlePlural>
   <field>
     <name>id</name>
     <title>Forward ID</title>
