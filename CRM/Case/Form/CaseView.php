@@ -425,7 +425,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext($url);
 
-    if (!empty($params['timeline_id']) && !empty($_POST['_qf_CaseView_next'])) {
+    if (!empty($params['timeline_id']) && $buttonName == '_qf_CaseView_next') {
       civicrm_api3('Case', 'addtimeline', [
         'case_id' => $this->_caseID,
         'timeline' => $params['timeline_id'],
