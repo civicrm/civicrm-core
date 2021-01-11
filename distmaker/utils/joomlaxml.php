@@ -1,34 +1,9 @@
 <?php
 
-if (isset($GLOBALS['_SERVER']['DM_SOURCEDIR'])) {
-  $sourceCheckoutDir = $GLOBALS['_SERVER']['DM_SOURCEDIR'];
-}
-else {
-  $sourceCheckoutDir = $argv[1];
-}
-$sourceCheckoutDirLength = strlen($sourceCheckoutDir);
-
-if (isset($GLOBALS['_SERVER']['DM_TMPDIR'])) {
-  $targetDir = $GLOBALS['_SERVER']['DM_TMPDIR'] . '/com_civicrm';
-}
-else {
-  $targetDir = $argv[2];
-}
-$targetDirLength = strlen($targetDir);
-
-if (isset($GLOBALS['_SERVER']['DM_VERSION'])) {
-  $version = $GLOBALS['_SERVER']['DM_VERSION'];
-}
-else {
-  $version = $argv[3];
-}
-
-if (isset($GLOBALS['_SERVER']['DM_PKGTYPE'])) {
-  $pkgType = $GLOBALS['_SERVER']['DM_PKGTYPE'];
-}
-else {
-  $pkgType = $argv[4];
-}
+$sourceCheckoutDir = $GLOBALS['_SERVER']['DM_SOURCEDIR'] ?? $argv[1];
+$targetDir = $GLOBALS['_SERVER']['DM_TMPDIR'] . '/com_civicrm' ?? $argv[2];
+$version = $GLOBALS['_SERVER']['DM_VERSION'] ?? $argv[3];
+$pkgType = $GLOBALS['_SERVER']['DM_PKGTYPE'] ?? $argv[4];
 
 ini_set('include_path',
   "{$sourceCheckoutDir}:{$sourceCheckoutDir}/packages:" . ini_get('include_path')
