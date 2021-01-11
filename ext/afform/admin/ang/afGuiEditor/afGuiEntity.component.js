@@ -8,7 +8,7 @@
       entity: '<'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function ($scope, $timeout, afAdmin) {
+    controller: function ($scope, $timeout, afGui) {
       var ts = $scope.ts = CRM.ts();
       var ctrl = this;
       $scope.controls = {};
@@ -23,10 +23,10 @@
       }
 
       $scope.getMeta = function() {
-        return afAdmin.meta.entities[getEntityType()];
+        return afGui.meta.entities[getEntityType()];
       };
 
-      $scope.getField = afAdmin.getField;
+      $scope.getField = afGui.getField;
 
       $scope.valuesFields = function() {
         var fields = _.transform($scope.getMeta().fields, function(fields, field) {
@@ -55,7 +55,7 @@
           fields: filterFields($scope.getMeta().fields)
         });
 
-        _.each(afAdmin.meta.entities, function(entity, entityName) {
+        _.each(afGui.meta.entities, function(entity, entityName) {
           if (check(ctrl.editor.layout['#children'], {'af-join': entityName})) {
             $scope.fieldList.push({
               entityName: ctrl.entity.name + '-join-' + entityName,
@@ -81,7 +81,7 @@
       function buildBlockList(search) {
         $scope.blockList.length = 0;
         $scope.blockTitles.length = 0;
-        _.each(afAdmin.meta.blocks, function(block, directive) {
+        _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
             (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type))
           ) {
@@ -106,7 +106,7 @@
       function buildElementList(search) {
         $scope.elementList.length = 0;
         $scope.elementTitles.length = 0;
-        _.each(afAdmin.meta.elements, function(element, name) {
+        _.each(afGui.meta.elements, function(element, name) {
           if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
@@ -144,7 +144,7 @@
         if (block['af-join']) {
           return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
         }
-        var fieldsInBlock = _.pluck(afAdmin.findRecursive(afAdmin.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
         return check(ctrl.editor.layout['#children'], function(item) {
           return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
         });
@@ -170,8 +170,8 @@
               check(item['#children'], criteria, found);
             }
             // Recurse into block directives
-            else if (item['#tag'] && item['#tag'] in afAdmin.meta.blocks) {
-              check(afAdmin.meta.blocks[item['#tag']].layout, criteria, found);
+            else if (item['#tag'] && item['#tag'] in afGui.meta.blocks) {
+              check(afGui.meta.blocks[item['#tag']].layout, criteria, found);
             }
           }
         });

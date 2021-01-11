@@ -2,7 +2,7 @@
   "use strict";
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
 
-    .service('afAdmin', function(crmApi4, $parse, $q) {
+    .service('afGui', function(crmApi4, $parse, $q) {
 
       // Parse strings of javascript that php couldn't interpret
       function evaluate(collection) {

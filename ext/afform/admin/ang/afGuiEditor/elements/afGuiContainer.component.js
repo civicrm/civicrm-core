@@ -11,12 +11,12 @@
       deleteThis: '&'
     },
     require: {editor: '^^afGuiEditor'},
-    controller: function($scope, crmApi4, dialogService, afAdmin) {
+    controller: function($scope, crmApi4, dialogService, afGui) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
       this.$onInit = function() {
-        if ((ctrl.node['#tag'] in afAdmin.meta.blocks) || ctrl.join) {
+        if ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join) {
           initializeBlockContainer();
         }
       };
@@ -46,7 +46,7 @@
       };
 
       $scope.isRepeatable = function() {
-        return ctrl.node['af-fieldset'] || (block.directive && afAdmin.meta.blocks[block.directive].repeat) || ctrl.join;
+        return ctrl.node['af-fieldset'] || (block.directive && afGui.meta.blocks[block.directive].repeat) || ctrl.join;
       };
 
       $scope.toggleRepeat = function() {
@@ -92,7 +92,7 @@
       };
 
       $scope.pickAddIcon = function() {
-        afAdmin.pickIcon().then(function(val) {
+        afGui.pickIcon().then(function(val) {
           ctrl.node['add-icon'] = val;
         });
       };
@@ -130,7 +130,7 @@
         if (!ctrl.node) {
           return '';
         }
-        return _.intersection(afAdmin.splitClass(ctrl.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
+        return _.intersection(afGui.splitClass(ctrl.node['class']), _.keys($scope.layouts))[0] || 'af-layout-rows';
       };
 
       $scope.setLayout = function(val) {
@@ -138,12 +138,12 @@
         if (val !== 'af-layout-rows') {
           classes.push(val);
         }
-        afAdmin.modifyClasses(ctrl.node, _.keys($scope.layouts), classes);
+        afGui.modifyClasses(ctrl.node, _.keys($scope.layouts), classes);
       };
 
       $scope.selectBlockDirective = function() {
         if (block.directive) {
-          block.layout = _.cloneDeep(afAdmin.meta.blocks[block.directive].layout);
+          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
           block.original = block.directive;
           setBlockDirective(block.directive);
         }
@@ -167,7 +167,7 @@
           listeners: []
         };
 
-        _.each(afAdmin.meta.blocks, function(blockInfo, directive) {
+        _.each(afGui.meta.blocks, function(blockInfo, directive) {
           if (directive === ctrl.node['#tag'] || blockInfo.join === ctrl.getFieldEntityType()) {
             block.options.push({
               id: directive,
@@ -176,13 +176,13 @@
           }
         });
 
-        if (getBlockNode() && getBlockNode()['#tag'] in afAdmin.meta.blocks) {
+        if (getBlockNode() && getBlockNode()['#tag'] in afGui.meta.blocks) {
           block.directive = block.original = getBlockNode()['#tag'];
-          block.layout = _.cloneDeep(afAdmin.meta.blocks[block.directive].layout);
+          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
         }
 
         block.listeners.push($scope.$watch('block.layout', function (layout, oldVal) {
-          if (block.directive && layout && layout !== oldVal && !angular.equals(layout, afAdmin.meta.blocks[block.directive].layout)) {
+          if (block.directive && layout && layout !== oldVal && !angular.equals(layout, afGui.meta.blocks[block.directive].layout)) {
             overrideBlockContents(block.layout);
           }
         }, true));
@@ -204,16 +204,16 @@
           model.join = ctrl.join;
         }
         if ($scope.block && $scope.block.original) {
-          model.title = afAdmin.meta.blocks[$scope.block.original].title;
-          model.name = afAdmin.meta.blocks[$scope.block.original].name;
-          model.block = afAdmin.meta.blocks[$scope.block.original].block;
+          model.title = afGui.meta.blocks[$scope.block.original].title;
+          model.name = afGui.meta.blocks[$scope.block.original].name;
+          model.block = afGui.meta.blocks[$scope.block.original].block;
         }
         else {
           model.block = ctrl.container.getFieldEntityType() || '*';
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
           .then(function(block) {
-            afAdmin.meta.blocks[block.directive_name] = block;
+            afGui.meta.blocks[block.directive_name] = block;
             setBlockDirective(block.directive_name);
             initializeBlockContainer();
           });
@@ -234,17 +234,17 @@
         if (node['af-join']) {
           return 'join';
         }
-        if (node['#tag'] && node['#tag'] in afAdmin.meta.blocks) {
+        if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {
           return 'container';
         }
-        var classes = afAdmin.splitClass(node['class']),
+        var classes = afGui.splitClass(node['class']),
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],
           type = _.intersection(types, classes);
         return type.length ? type[0].replace('af-', '') : null;
       };
 
       this.removeElement = function(element) {
-        afAdmin.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
+        afGui.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
       };
 
       this.getEntityName = function() {

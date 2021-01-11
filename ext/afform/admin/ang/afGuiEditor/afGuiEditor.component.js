@@ -8,12 +8,12 @@
       name: '<'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afAdmin, $parse, $timeout, $location) {
+    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('afform');
       $scope.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
-      this.meta = afAdmin.meta;
+      this.meta = afGui.meta;
       var editor = this;
       var newForm = {
         title: '',
@@ -27,7 +27,7 @@
 
       this.$onInit = function() {
         // Fetch the current form plus all blocks
-        afAdmin.initialize(editor.name)
+        afGui.initialize(editor.name)
           .then(initializeForm);
       };
 
@@ -42,12 +42,12 @@
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = afAdmin.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-        $scope.entities = afAdmin.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+        editor.layout = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
+        $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
         if (editor.name == '0') {
           editor.addEntity('Individual');
-          editor.layout['#children'].push(afAdmin.meta.elements.submit.element);
+          editor.layout['#children'].push(afGui.meta.elements.submit.element);
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -69,7 +69,7 @@
       };
 
       this.addEntity = function(type) {
-        var meta = afAdmin.meta.entities[type],
+        var meta = afGui.meta.entities[type],
           num = 1;
         // Give this new entity a unique name
         while (!!$scope.entities[type + num]) {
@@ -85,7 +85,7 @@
         var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
         editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
         // Create a new af-fieldset container for the entity
-        var fieldset = _.cloneDeep(afAdmin.meta.elements.fieldset.element);
+        var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
         fieldset['af-fieldset'] = type + num;
         fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
         // Add default contact name block
@@ -104,8 +104,8 @@
 
       this.removeEntity = function(entityName) {
         delete $scope.entities[entityName];
-        afAdmin.removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
-        afAdmin.removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
+        afGui.removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
+        afGui.removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
         this.selectEntity(null);
       };
 

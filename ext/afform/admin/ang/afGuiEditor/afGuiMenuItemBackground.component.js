@@ -8,15 +8,15 @@
     bindings: {
       node: '='
     },
-    controller: function($scope, afAdmin) {
+    controller: function($scope, afGui) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
       $scope.getSetBackgroundColor = function(color) {
         if (!arguments.length) {
-          return afAdmin.getStyles(ctrl.node)['background-color'] || '#ffffff';
+          return afGui.getStyles(ctrl.node)['background-color'] || '#ffffff';
         }
-        afAdmin.setStyle(ctrl.node, 'background-color', color);
+        afGui.setStyle(ctrl.node, 'background-color', color);
       };
     }
   });

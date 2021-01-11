@@ -8,7 +8,7 @@
       node: '=',
       deleteThis: '&'
     },
-    controller: function($scope, afAdmin) {
+    controller: function($scope, afGui) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
@@ -24,13 +24,13 @@
       // Getter/setter for ng-model
       $scope.getSetStyle = function(val) {
         if (arguments.length) {
-          return afAdmin.modifyClasses(ctrl.node, _.keys($scope.styles), ['btn', val]);
+          return afGui.modifyClasses(ctrl.node, _.keys($scope.styles), ['btn', val]);
         }
-        return _.intersection(afAdmin.splitClass(ctrl.node['class']), _.keys($scope.styles))[0] || '';
+        return _.intersection(afGui.splitClass(ctrl.node['class']), _.keys($scope.styles))[0] || '';
       };
 
       $scope.pickIcon = function() {
-        afAdmin.pickIcon().then(function(val) {
+        afGui.pickIcon().then(function(val) {
           ctrl.node['crm-icon'] = val;
         });
       };
