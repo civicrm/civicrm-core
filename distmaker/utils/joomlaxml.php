@@ -33,7 +33,12 @@ else {
 ini_set('include_path',
   "{$sourceCheckoutDir}:{$sourceCheckoutDir}/packages:" . ini_get('include_path')
 );
-require_once "$sourceCheckoutDir/civicrm.config.php";
+
+define('CIVICRM_UF', 'Joomla');
+$GLOBALS['civicrm_root'] = $sourceCheckoutDir;
+require_once $sourceCheckoutDir . '/CRM/Core/ClassLoader.php';
+CRM_Core_ClassLoader::singleton()->register();
+
 require_once 'Smarty/Smarty.class.php';
 
 generateJoomlaConfig($version);
