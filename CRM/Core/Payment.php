@@ -1212,7 +1212,7 @@ abstract class CRM_Core_Payment {
   /**
    * Get URL to return the browser to on success.
    *
-   * @param $qfKey
+   * @param string $qfKey
    *
    * @return string
    */
