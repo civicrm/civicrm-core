@@ -238,7 +238,7 @@ function civicrm_api3_system_get($params) {
       ],
       'civi' => [
         'version' => CRM_Utils_System::version(),
-        'dev' => (bool) CRM_Utils_System::isDevelopment(),
+        'dev' => (\Civi::settings()->get('environment') === 'Development'),
         'components' => array_keys(CRM_Core_Component::getEnabledComponents()),
         'extensions' => preg_grep('/^uninstalled$/', CRM_Extension_System::singleton()->getManager()->getStatuses(), PREG_GREP_INVERT),
         'multidomain' => CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_domain') > 1,

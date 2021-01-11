@@ -1829,6 +1829,7 @@ class CRM_Utils_System {
   }
 
   /**
+   * @deprecated
    * Determine whether this system is deployed using version control.
    *
    * Normally sites would tune their php error settings to prevent deprecation
@@ -1844,6 +1845,7 @@ class CRM_Utils_System {
    * @return bool
    */
   public static function isDevelopment() {
+    CRM_Core_Error::deprecatedWarning('isDevelopment() is deprecated. Set your php error_reporting or MySQL settings appropriately instead.');
     static $cache = NULL;
     if ($cache === NULL) {
       global $civicrm_root;
