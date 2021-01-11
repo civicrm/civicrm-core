@@ -7,6 +7,8 @@
   <comment>Stores information about the recipients of a mailing.</comment>
   <archive>true</archive>
   <component>CiviMail</component>
+  <title>Recipient</title>
+  <titlePlural>Recipients</titlePlural>
   <field>
     <name>id</name>
     <title>Mailing Recipients ID</title>
