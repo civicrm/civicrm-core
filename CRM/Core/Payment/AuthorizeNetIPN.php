@@ -84,9 +84,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         //load new contribution object if required.
         // create a contribution and then get it processed
         $contribution = new CRM_Contribute_BAO_Contribution();
-        $contribution->contribution_page_id = $ids['contributionPage'];
-        $contribution->contribution_recur_id = $ids['contributionRecur'];
-        $contribution->receive_date = $input['receive_date'];
       }
       $input['payment_processor_id'] = $paymentProcessorID;
       $isFirstOrLastRecurringPayment = $this->recur($input, $contributionRecur, $contribution, $first);

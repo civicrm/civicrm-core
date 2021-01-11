@@ -2442,7 +2442,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       else {
         $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
       }
-      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount'] as $fieldName) {
+      foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id'] as $fieldName) {
         if (isset($templateContribution[$fieldName])) {
           $contributionParams[$fieldName] = $templateContribution[$fieldName];
         }
