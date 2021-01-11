@@ -1,14 +1,8 @@
-#afGuiEditor {
-  display: flex;
-}
-
 #afGuiEditor #afGuiEditor-palette {
-  flex: 1;
   margin-right: 5px;
 }
 
 #afGuiEditor #afGuiEditor-canvas {
-  flex: 1.5;
   margin-left: 5px;
 }
 
@@ -42,12 +36,9 @@
 }
 
 #afGuiEditor .af-gui-columns {
-  display: flex;
   position: relative;
-  flex-wrap: wrap;
 }
 #afGuiEditor .af-gui-columns > * {
-  flex: 1;
   min-width: 200px;
 }
 

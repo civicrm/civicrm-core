@@ -36,6 +36,9 @@
 .crm-container .crm-flex-box > .crm-flex-4 {
   flex: 4;
 }
+.crm-container .crm-flex-box > .crm-flex-5 {
+  flex: 5;
+}
 
 .crm-container .crm-draggable {
   cursor: move;
