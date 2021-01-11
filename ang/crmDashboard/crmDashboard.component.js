@@ -2,7 +2,7 @@
 
   angular.module('crmDashboard').component('crmDashboard', {
     templateUrl: '~/crmDashboard/Dashboard.html',
-    controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService) {
+    controller: function ($scope, $element, crmApi4, crmUiHelp, dialogService, crmStatus) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
       this.columns = [[], []];
@@ -54,18 +54,17 @@
               toSave.push(item);
             });
           });
-          var apiCall = crmApi4('DashboardContact', 'save', {
+          crmStatus({}, crmApi4('DashboardContact', 'save', {
             records: toSave,
             defaults: {contact_id: 'user_contact_id'}
-          }, 'dashboard_id');
-          apiCall.then(function(results) {
-            CRM.status(ts('Saved'));
-            _.each(ctrl.columns, function(dashlets) {
-              _.each(dashlets, function(dashlet) {
-                dashlet['dashboard_contact.id'] = results[dashlet.id].id;
+          }, 'dashboard_id'))
+            .then(function(results) {
+              _.each(ctrl.columns, function(dashlets) {
+                _.each(dashlets, function(dashlet) {
+                  dashlet['dashboard_contact.id'] = results[dashlet.id].id;
+                });
               });
             });
-          });
         });
       }, 2000);
 
@@ -75,9 +74,10 @@
       };
 
       this.deleteDashlet = function(index) {
-        crmApi4('Dashboard', 'delete', {where: [['id', '=', ctrl.inactive[index].id]]}).then(function() {
-          CRM.status(ts('Deleted'));
-        });
+        crmStatus(
+          {start: ts('Deleting'), success: ts('Deleted')},
+          crmApi4('Dashboard', 'delete', {where: [['id', '=', ctrl.inactive[index].id]]})
+        );
         ctrl.inactive.splice(index, 1);
       };
 
