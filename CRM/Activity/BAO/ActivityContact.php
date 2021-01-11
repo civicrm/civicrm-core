@@ -37,7 +37,6 @@ class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact 
    *   activity_contact object
    */
   public static function create($params) {
-    $errorScope = CRM_Core_TemporaryErrorScope::useException();
     $activityContact = new CRM_Activity_DAO_ActivityContact();
     $activityContact->copyValues($params);
     try {

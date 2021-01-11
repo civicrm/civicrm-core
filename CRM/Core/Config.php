@@ -86,7 +86,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    */
   public static function &singleton($loadFromDB = TRUE, $force = FALSE) {
     if (self::$_singleton === NULL || $force) {
-      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'handle']);
+      $GLOBALS['civicrm_default_error_scope'] = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'exceptionHandler'], 1);
       $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Core_Error', 'simpleHandler']);
 
       self::$_singleton = new CRM_Core_Config();

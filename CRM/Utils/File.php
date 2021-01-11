@@ -326,12 +326,14 @@ class CRM_Utils_File {
     else {
       require_once 'DB.php';
       $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
-      $db = DB::connect($dsn);
+      try {
+        $db = DB::connect($dsn);
+      }
+      catch (Exception $e) {
+        die("Cannot open $dsn: " . $e->getMessage());
+      }
     }
 
-    if (PEAR::isError($db)) {
-      die("Cannot open $dsn: " . $db->getMessage());
-    }
     $db->query('SET NAMES utf8mb4');
     $transactionId = CRM_Utils_Type::escape(CRM_Utils_Request::id(), 'String');
     $db->query('SET @uniqueID = ' . "'$transactionId'");
@@ -345,13 +347,15 @@ class CRM_Utils_File {
       $query = trim($query);
       if (!empty($query)) {
         CRM_Core_Error::debug_query($query);
-        $res = &$db->query($query);
-        if (PEAR::isError($res)) {
+        try {
+          $res = &$db->query($query);
+        }
+        catch (Exception $e) {
           if ($dieOnErrors) {
-            die("Cannot execute $query: " . $res->getMessage());
+            die("Cannot execute $query: " . $e->getMessage());
           }
           else {
-            echo "Cannot execute $query: " . $res->getMessage() . "<p>";
+            echo "Cannot execute $query: " . $e->getMessage() . "<p>";
           }
         }
       }

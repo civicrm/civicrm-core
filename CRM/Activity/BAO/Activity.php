@@ -1398,9 +1398,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $smsProviderParams['provider_id']]);
     $sendResult = $providerObj->send($recipient, $smsProviderParams, $tokenText, NULL, $sourceContactID);
-    if (PEAR::isError($sendResult)) {
-      throw new CRM_Core_Exception($sendResult->getMessage());
-    }
 
     // add activity target record for every sms that is sent
     $targetID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets');

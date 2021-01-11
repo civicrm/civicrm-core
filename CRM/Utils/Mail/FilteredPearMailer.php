@@ -56,6 +56,15 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
     $this->_delegate = $mailer;
   }
 
+  public function __destruct() {
+    try {
+      unset($this->_delegate);
+    }
+    catch (Exception $e) {
+      Civi::log()->error($e->getMessage());
+    }
+  }
+
   public function send($recipients, $headers, $body) {
     $filterArgs = [$this, &$recipients, &$headers, &$body];
     foreach ($this->_filters as $filter) {
