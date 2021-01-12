@@ -44,7 +44,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   protected $_haveColumnHeader;
 
   /**
-   * @param string $fileName
+   * @param array $fileName
    * @param string $separator
    * @param $mapper
    * @param bool $skipColumnHeader
@@ -57,7 +57,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @throws Exception
    */
   public function run(
-    $fileName,
+    array $fileName,
     $separator = ',',
     &$mapper,
     $skipColumnHeader = FALSE,
@@ -66,9 +66,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     $statusID = NULL,
     $totalRowCount = NULL
   ) {
-    if (!is_array($fileName)) {
-      throw new CRM_Core_Exception('Unable to determine import file');
-    }
+
     $fileName = $fileName['name'];
 
     $this->init();
