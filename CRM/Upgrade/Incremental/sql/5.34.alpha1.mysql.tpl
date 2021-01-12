@@ -9,9 +9,3 @@ INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`,
 DELETE FROM civicrm_mapping_field
 WHERE name NOT IN ( SELECT concat('custom_', id) FROM civicrm_custom_field)
 AND name LIKE 'custom_%';
-
--- Update permissions for CiviCRM Admin Menu -> CiviMail -> Message Templates
-UPDATE civicrm_navigation n
-SET n.permission = 'edit user-driven message templates,edit message templates,edit system workflow message templates', n.permission_operator = 'OR'
-WHERE n.name = 'Message Templates'
-AND n.permission = 'edit message templates';
