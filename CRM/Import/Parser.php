@@ -142,9 +142,10 @@ abstract class CRM_Import_Parser {
 
   /**
    * Set metadata for all importable fields in std getfields style format.
+   *
    * @param array $importableFieldsMetadata
    */
-  public function setImportableFieldsMetadata(array $importableFieldsMetadata) {
+  public function setImportableFieldsMetadata(array $importableFieldsMetadata): void {
     $this->importableFieldsMetadata = $importableFieldsMetadata;
   }
 
@@ -316,7 +317,7 @@ abstract class CRM_Import_Parser {
    * @param bool $startImport
    *   True when progress bar is to be initiated.
    * @param $startTimestamp
-   *   Initial timstamp when the import was started.
+   *   Initial timestamp when the import was started.
    * @param $prevTimestamp
    *   Previous timestamp when this function was last called.
    * @param $totalRowCount
@@ -325,8 +326,7 @@ abstract class CRM_Import_Parser {
    * @return NULL|$currTimestamp
    */
   public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
-    $config = CRM_Core_Config::singleton();
-    $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
+    $statusFile = CRM_Core_Config::singleton()->uploadDir . "status_{$statusID}.txt";
 
     if ($startImport) {
       $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
@@ -337,7 +337,6 @@ abstract class CRM_Import_Parser {
     else {
       $rowCount = $this->_rowCount ?? $this->_lineCount;
       $currTimestamp = time();
-      $totalTime = ($currTimestamp - $startTimestamp);
       $time = ($currTimestamp - $prevTimestamp);
       $recordsLeft = $totalRowCount - $rowCount;
       if ($recordsLeft < 0) {
@@ -366,7 +365,7 @@ abstract class CRM_Import_Parser {
   /**
    * @return array
    */
-  public function getSelectValues() {
+  public function getSelectValues(): array {
     $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
