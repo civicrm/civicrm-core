@@ -166,7 +166,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->addElement('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2]);
 
-    if (Civi::settings()->get('address_standardization_provider') == 'USPS') {
+    if (Civi::settings()->get('address_standardization_provider') === 'USPS') {
       $this->addElement('checkbox', 'disableUSPS', ts('Disable USPS address validation during import?'));
     }
 
@@ -233,7 +233,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     while (($dataSourceFile = readdir($dataSourceHandle)) !== FALSE) {
       $fileType = filetype($dataSourceDir . $dataSourceFile);
       $matches = [];
-      if (($fileType == 'file' || $fileType == 'link') &&
+      if (($fileType === 'file' || $fileType === 'link') &&
         preg_match('/^(.+)\.php$/', $dataSourceFile, $matches)
       ) {
         $dataSourceClass = "CRM_Import_DataSource_" . $matches[1];
@@ -278,8 +278,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->set('dataSource', $this->_params['dataSource']);
       $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
 
-      $session = CRM_Core_Session::singleton();
-      $session->set('dateTypes', $storeParams['dateFormats']);
+      CRM_Core_Session::singleton()->set('dateTypes', $storeParams['dateFormats']);
 
       // Get the PEAR::DB object
       $dao = new CRM_Core_DAO();
@@ -378,10 +377,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   /**
    * Return a descriptive name for the page, used in wizard header
    *
-   *
    * @return string
    */
-  public function getTitle() {
+  public function getTitle(): string {
     return ts('Choose Data Source');
   }
 
