@@ -689,4 +689,49 @@ abstract class CRM_Import_Parser {
     }
   }
 
+  /**
+   * Set the fieldMappings property from the weird quickForm format.
+   *
+   * The fieldMapping format is simply [1 => 'activity_detail', 2 => 'subject']
+   * where the indexes equate to the indexes that will be used in the incoming values
+   * arrays.
+   *
+   * The quick form mapperKeys have a weird format that just reflects the very specific form.
+   * eg.
+   * ['mapper[1][0]' 'activity_detail', 'mapper[2][0]' => 'subject']
+   *
+   * @param array $mapperKeys
+   */
+  protected function setFieldMappingFromQuickFormFormat(array $mapperKeys): void {
+    foreach ($mapperKeys as $mapperName => $fieldName) {
+      $mapperArray = explode('[', $mapperName);
+      $this->fieldMapping[str_replace(']', '', $mapperArray[1])] = $fieldName;
+    }
+  }
+
+  /**
+   * Get the value from the values array for the specific field name.
+   *
+   * Returns false if not set.
+   *
+   * @param array $values
+   * @param string $fieldName
+   *
+   * @return string|int|false
+   */
+  protected function getValueForField($values, $fieldName) {
+    return $values[$this->getIndexForField($fieldName)] ?? NULL;
+  }
+
+  /**
+   * Get the index for the specified field name.
+   *
+   * @param string $fieldName
+   *
+   * @return false|int
+   */
+  protected function getIndexForField(string $fieldName) {
+    return array_search($fieldName, $this->fieldMapping, TRUE);
+  }
+
 }

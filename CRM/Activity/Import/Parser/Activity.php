@@ -24,9 +24,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   protected $_mapperKeys;
 
   private $_contactIdIndex;
-  private $_activityTypeIndex;
-  private $_activityLabelIndex;
-  private $_activityDateIndex;
 
   /**
    * Array of successfully imported activity id's
@@ -36,12 +33,20 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   protected $_newActivity;
 
   /**
+   * Array of fields by the index the values array uses.
+   *
+   * @var array
+   */
+  protected $fieldMapping = [];
+
+  /**
    * Class constructor.
    *
    * @param array $mapperKeys
    */
-  public function __construct($mapperKeys) {
+  public function __construct(array $mapperKeys) {
     parent::__construct();
+    $this->setFieldMappingFromQuickFormFormat($mapperKeys);
     $this->_mapperKeys = $mapperKeys;
   }
 
@@ -84,9 +89,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     // FIXME: we should do this in one place together with Form/MapField.php
     $this->_contactIdIndex = -1;
-    $this->_activityTypeIndex = -1;
-    $this->_activityLabelIndex = -1;
-    $this->_activityDateIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
@@ -96,17 +98,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
           $this->_contactIdIndex = $index;
           break;
 
-        case 'activity_label':
-          $this->_activityLabelIndex = $index;
-          break;
-
-        case 'activity_type_id':
-          $this->_activityTypeIndex = $index;
-          break;
-
-        case 'activity_date_time':
-          $this->_activityDateIndex = $index;
-          break;
       }
       $index++;
     }
@@ -149,27 +140,13 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   public function summary(&$values) {
     $erroneousField = NULL;
     $this->setActiveFieldValues($values, $erroneousField);
-    $index = -1;
 
-    if ($this->_activityTypeIndex > -1 && $this->_activityLabelIndex > -1) {
+    if (!$this->getValueForField($values, 'activity_label') && !$this->getValueForField($values, 'activity_type_id')) {
       array_unshift($values, ts('Please select either Activity Type ID OR Activity Type Label.'));
       return CRM_Import_Parser::ERROR;
     }
-    elseif ($this->_activityLabelIndex > -1) {
-      $index = $this->_activityLabelIndex;
-    }
-    elseif ($this->_activityTypeIndex > -1) {
-      $index = $this->_activityTypeIndex;
-    }
 
-    if ($index < 0 or $this->_activityDateIndex < 0) {
-      $errorRequired = TRUE;
-    }
-    else {
-      $errorRequired = !CRM_Utils_Array::value($index, $values) || !CRM_Utils_Array::value($this->_activityDateIndex, $values);
-    }
-
-    if ($errorRequired) {
+    if ($this->getValueForField($values, 'activity_date_time') === FALSE) {
       array_unshift($values, ts('Missing required fields'));
       return CRM_Import_Parser::ERROR;
     }
