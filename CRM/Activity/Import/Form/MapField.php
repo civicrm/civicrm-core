@@ -265,7 +265,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $contactFieldsBelowWeightMessage = self::validateRequiredContactMatchFields('Individual', $importKeys);
       foreach ($requiredFields as $field => $title) {
         if (!in_array($field, $importKeys)) {
-          if ($field == 'target_contact_id') {
+          if ($field === 'target_contact_id') {
             if (!$contactFieldsBelowWeightMessage || in_array('external_identifier', $importKeys)) {
               continue;
             }
@@ -275,7 +275,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
                 . '<br />';
             }
           }
-          elseif ($field == 'activity_type_id') {
+          elseif ($field === 'activity_type_id') {
             if (in_array('activity_label', $importKeys)) {
               continue;
             }
