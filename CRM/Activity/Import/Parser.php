@@ -275,26 +275,6 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
   }
 
   /**
-   * Format the field values for input to the api.
-   *
-   * @return array
-   *   (reference ) associative array of name/value pairs
-   */
-  public function &getActiveFieldParams() {
-    $params = [];
-    for ($i = 0; $i < $this->_activeFieldCount; $i++) {
-      if (isset($this->_activeFields[$i]->_value)
-        && !isset($params[$this->_activeFields[$i]->_name])
-        && !isset($this->_activeFields[$i]->_related)
-      ) {
-
-        $params[$this->_activeFields[$i]->_name] = $this->_activeFields[$i]->_value;
-      }
-    }
-    return $params;
-  }
-
-  /**
    * @param string $name
    * @param $title
    * @param int $type
