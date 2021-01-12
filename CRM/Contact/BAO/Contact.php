@@ -2599,11 +2599,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       if ($contact->birth_date) {
         $birthDate = CRM_Utils_Date::customFormat($contact->birth_date, '%Y%m%d');
         if ($birthDate < date('Ymd')) {
-          $deceasedDate = NULL;
-          if (!empty($contact->is_deceased) && !empty($contact->deceased_date)) {
-            $deceasedDate = $contact->deceased_date;
-          }
-          $age = CRM_Utils_Date::calculateAge($birthDate, $deceasedDate);
+          $age = CRM_Utils_Date::calculateAge($birthDate, $contact->deceased_date ?? NULL);
           $values['age']['y'] = $age['years'] ?? NULL;
           $values['age']['m'] = $age['months'] ?? NULL;
         }

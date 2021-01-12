@@ -907,10 +907,7 @@ class CRM_Utils_Date {
     $birthYear = $bDate[0];
     $birthMonth = $bDate[1];
     $birthDay = $bDate[2];
-    if (empty($targetDate)) {
-      $targetDate = date('Y-m-d');
-    }
-    $targetDate = strtotime($targetDate);
+    $targetDate = strtotime($targetDate ?? date('Y-m-d'));
 
     $year_diff = date("Y", $targetDate) - $birthYear;
 
