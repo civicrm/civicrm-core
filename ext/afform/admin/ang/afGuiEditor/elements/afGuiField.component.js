@@ -18,8 +18,8 @@
 
       $scope.editingOptions = false;
       var yesNo = [
-        {key: '1', label: ts('Yes')},
-        {key: '0', label: ts('No')}
+        {id: '1', label: ts('Yes')},
+        {id: '0', label: ts('No')}
       ];
 
       this.$onInit = function() {

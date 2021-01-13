@@ -27,7 +27,7 @@ class CRM_AfformAdmin_Utils {
     $getFieldParams = [
       'checkPermissions' => FALSE,
       'includeCustom' => TRUE,
-      'loadOptions' => TRUE,
+      'loadOptions' => ['id', 'label'],
       'action' => 'create',
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
       'where' => [['input_type', 'IS NOT NULL']],
@@ -149,19 +149,6 @@ class CRM_AfformAdmin_Utils {
         ],
       ],
     ];
-
-    // Reformat options
-    // TODO: Teach the api to return options in this format
-    foreach ($data['entities'] as $entityName => $entity) {
-      foreach ($entity['fields'] as $name => $field) {
-        if (!empty($field['options'])) {
-          $data['entities'][$entityName]['fields'][$name]['options'] = CRM_Utils_Array::makeNonAssociative($field['options'], 'key', 'label');
-        }
-        else {
-          unset($data['entities'][$entityName]['fields'][$name]['options']);
-        }
-      }
-    }
 
     $data['styles'] = [
       'default' => E::ts('Default'),

@@ -386,7 +386,7 @@ function _af_fill_field_metadata($entityType, DOMElement $afField) {
     'action' => 'create',
     'where' => [['name', '=', $afField->getAttribute('name')]],
     'select' => ['label', 'input_type', 'input_attrs', 'options'],
-    'loadOptions' => TRUE,
+    'loadOptions' => ['id', 'label'],
   ];
   if (in_array($entityType, CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
     $params['values'] = ['contact_type' => $entityType];
@@ -401,10 +401,6 @@ function _af_fill_field_metadata($entityType, DOMElement $afField) {
     if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
       // If it's not an object, don't mess with it.
       continue;
-    }
-    // TODO: Teach the api to return options in this format
-    if (!empty($fieldInfo['options'])) {
-      $fieldInfo['options'] = CRM_Utils_Array::makeNonAssociative($fieldInfo['options'], 'key', 'label');
     }
     // Default placeholder for select inputs
     if ($fieldInfo['input_type'] === 'Select') {

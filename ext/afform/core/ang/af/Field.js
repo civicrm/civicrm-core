@@ -14,9 +14,9 @@
         var ts = $scope.ts = CRM.ts('afform'),
           closestController = $($el).closest('[af-fieldset],[af-join],[af-repeat-item]'),
           afForm = ctrls[0],
-          boolOptions = [{key: true, label: ts('Yes')}, {key: false, label: ts('No')}],
+          boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
           // Only used for is_primary radio button
-          noOptions = [{key: true, label: ''}];
+          noOptions = [{id: true, label: ''}];
         $scope.dataProvider = closestController.is('[af-repeat-item]') ? ctrls[3] : ctrls[2] || ctrls[1];
         $scope.fieldId = afForm.getFormMeta().name + '-' + $scope.fieldName + '-' + id++;
 
@@ -29,7 +29,7 @@
         $scope.select2Options = function() {
           return {
             results: _.transform($scope.getOptions(), function(result, opt) {
-              result.push({id: opt.key, text: opt.label});
+              result.push({id: opt.id, text: opt.label});
             }, [])
           };
         };
@@ -58,16 +58,13 @@
               var params = {
                 where: [['name', '=', $scope.fieldName]],
                 select: ['options'],
-                loadOptions: true,
+                loadOptions: ['id', 'label'],
                 values: {}
               };
               params.values[$scope.defn.input_attrs.controlField] = val;
               crmApi4($scope.dataProvider.getEntityType(), 'getFields', params, 0)
                 .then(function(data) {
-                  $scope.defn.options.length = 0;
-                  _.transform(data.options, function(options, label, key) {
-                    options.push({key: key, label: label});
-                  }, $scope.defn.options);
+                  $scope.defn.options = data.options;
                 });
             }
           });

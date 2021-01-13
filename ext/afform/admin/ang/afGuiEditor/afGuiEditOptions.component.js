@@ -11,12 +11,12 @@
 
       this.$onInit = function() {
         $scope.options = JSON.parse(angular.toJson(ctrl.field.getOptions()));
-        var optionKeys = _.map($scope.options, 'key');
+        var optionKeys = _.map($scope.options, 'id');
         $scope.deletedOptions = _.filter(JSON.parse(angular.toJson(ctrl.field.getDefn().options || [])), function (item) {
-          return !_.contains(optionKeys, item.key);
+          return !_.contains(optionKeys, item.id);
         });
         $scope.originalLabels = _.transform(ctrl.field.getDefn().options || [], function (originalLabels, item) {
-          originalLabels[item.key] = item.label;
+          originalLabels[item.id] = item.label;
         }, {});
       };
 
