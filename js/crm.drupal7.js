@@ -8,11 +8,17 @@
    * Hides the Menu Toggle Button when the Admin Menu is not available for the user.
    */
   function hideMenuToggleButtonForNonAdminUsers() {
-    $(document).ready(function() {
-      if (!$('#toolbar').length) {
-        CRM.menubar.removeToggleButton();
-      }
+    $(document).ready(function () {
+      setTimeout(function () {
+        if (!$('#toolbar').length) {
+          // check admin menu with different id present before remoding toggle button.
+          if (!$('#admin-menu').length) {
+            CRM.menubar.removeToggleButton();
+          }
+        }
+    }, 2000);
     });
   }
 
 })(CRM.$);
+
