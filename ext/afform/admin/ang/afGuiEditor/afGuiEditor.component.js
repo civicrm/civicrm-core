@@ -5,6 +5,7 @@
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/afGuiEditor.html',
     bindings: {
+      type: '<',
       name: '<'
     },
     controllerAs: 'editor',
@@ -18,6 +19,7 @@
       var newForm = {
         title: '',
         permission: 'access CiviCRM',
+        type: 'form',
         layout: [{
           '#tag': 'af-form',
           ctrl: 'afform',
@@ -36,7 +38,7 @@
         $scope.afform = _.findWhere(afforms, {name: editor.name});
         if (!$scope.afform) {
           $scope.afform = _.cloneDeep(newForm);
-          if (editor.name != '0') {
+          if (editor.name) {
             alert('Error: unknown form "' + editor.name + '"');
           }
         }
@@ -45,13 +47,13 @@
         editor.layout = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
         $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
-        if (editor.name == '0') {
+        if (!editor.name) {
           editor.addEntity('Individual');
           editor.layout['#children'].push(afGui.meta.elements.submit.element);
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
-        $scope.changesSaved = editor.name == '0' ? false : 1;
+        $scope.changesSaved = !editor.name ? false : 1;
         $scope.$watch('afform', function () {
           $scope.changesSaved = $scope.changesSaved === 1;
         }, true);
@@ -154,8 +156,7 @@
           .then(function (data) {
             $scope.saving = false;
             $scope.afform.name = data[0].name;
-            // FIXME: This causes an unnecessary reload when saving a new form
-            $location.search('name', data[0].name);
+            $location.url('/edit/' + data[0].name);
           });
       };
 

@@ -1,5 +1,6 @@
 {
   "title": "IM (default)",
+  "type": "block",
   "block": "Contact",
   "join": "IM",
   "repeat": true

@@ -1,5 +1,6 @@
 {
   "title": "Email (default)",
+  "type": "block",
   "block": "Contact",
   "join": "Email",
   "repeat": true

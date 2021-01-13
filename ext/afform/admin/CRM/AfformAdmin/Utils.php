@@ -4,11 +4,26 @@ use CRM_AfformAdmin_ExtensionUtil as E;
 class CRM_AfformAdmin_Utils {
 
   /**
+   * @return array
+   */
+  public static function getAdminSettings() {
+    return [
+      'afform_type' => \Civi\Api4\OptionValue::get(FALSE)
+        ->addSelect('name', 'label', 'icon')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('option_group_id:name', '=', 'afform_type')
+        ->addOrderBy('weight', 'ASC')
+        ->execute(),
+    ];
+  }
+
+  /**
    * Loads metadata for the gui editor.
    *
    * FIXME: This is a prototype and should get broken out into separate callbacks with hooks, events, etc.
+   * @return array
    */
-  public static function getAngularSettings() {
+  public static function getGuiSettings() {
     $getFieldParams = [
       'checkPermissions' => FALSE,
       'includeCustom' => TRUE,
