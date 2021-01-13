@@ -224,7 +224,7 @@ class CRM_Core_PseudoConstant {
 
       // if callback is specified..
       if (!empty($pseudoconstant['callback'])) {
-        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context);
+        $fieldOptions = call_user_func(Civi\Core\Resolver::singleton()->get($pseudoconstant['callback']), $context, $params);
         //CRM-18223: Allow additions to field options via hook.
         CRM_Utils_Hook::fieldOptions($entity, $fieldName, $fieldOptions, $params);
         return $fieldOptions;

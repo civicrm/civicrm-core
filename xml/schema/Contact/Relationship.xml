@@ -58,11 +58,17 @@
     <type>int unsigned</type>
     <title>Relationship Type</title>
     <required>true</required>
-    <comment>id of the relationship</comment>
+    <comment>Type of relationship</comment>
     <add>1.1</add>
     <html>
       <type>Select</type>
     </html>
+    <pseudoconstant>
+      <table>civicrm_relationship_type</table>
+      <keyColumn>id</keyColumn>
+      <nameColumn>name_a_b</nameColumn>
+      <labelColumn>label_a_b</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>relationship_type_id</name>
