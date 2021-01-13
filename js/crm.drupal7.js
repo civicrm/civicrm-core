@@ -11,7 +11,7 @@
     $(document).ready(function () {
       setTimeout(function () {
         if (!$('#toolbar').length) {
-          // check admin menu with different id present before remoding toggle button.
+          // check admin menu with different id present before removing toggle button.
           if (!$('#admin-menu').length) {
             CRM.menubar.removeToggleButton();
           }
