@@ -18,6 +18,6 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Pledge_Export_Form_Map extends CRM_Export_Form_Map {
+class CRM_Grant_Export_Form_Map extends CRM_Export_Form_Map {
 
 }
