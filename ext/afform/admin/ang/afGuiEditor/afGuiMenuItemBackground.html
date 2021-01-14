@@ -1,0 +1,7 @@
+<div class="af-gui-field-select-in-dropdown form-inline" ng-click="$event.stopPropagation()">
+  <label>{{:: ts('Background:') }}</label>
+  <input type="color" class="form-control" ng-model="getSetBackgroundColor" ng-model-options="{getterSetter: true}">
+  <a href class="" ng-click="getSetBackgroundColor(null)" ng-if="container.getStyles($ctrl.node)['background-color']">
+    <i class="crm-i fa-times"></i>
+  </a>
+</div>

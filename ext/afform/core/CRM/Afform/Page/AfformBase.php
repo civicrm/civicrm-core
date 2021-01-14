@@ -4,7 +4,8 @@ use CRM_Afform_ExtensionUtil as E;
 class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
 
   public function run() {
-    list ($pagePath, $pageArgs) = func_get_args();
+    // To avoid php complaints about the number of args passed to this function vs the base function
+    [$pagePath, $pageArgs] = func_get_args();
 
     $afform = civicrm_api4('Afform', 'get', [
       'checkPermissions' => FALSE,
@@ -29,7 +30,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     if (!empty($afform['title'])) {
       $title = strip_tags($afform['title']);
       CRM_Utils_System::setTitle($title);
-      CRM_Utils_System::appendBreadCrumb([['title' => $title, 'url' => CRM_Utils_System::url(implode('/', $pagePath), NULL, FALSE, '/')]]);
+      CRM_Utils_System::appendBreadCrumb([['title' => $title, 'url' => CRM_Utils_System::url(implode('/', $pagePath), NULL, FALSE, '!/')]]);
     }
 
     parent::run();

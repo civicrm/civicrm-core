@@ -1,4 +1,8 @@
 {
+  "org.civicrm.afform-gui": {
+    "obsolete": "5.35",
+    "force-uninstall": true
+  },
   "com.civibridge.quickmenu": {
     "obsolete": "5.24",
     "disable": true,
