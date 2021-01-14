@@ -325,7 +325,6 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params) {
-    $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params], 1);
 
     $allMessages = $this->runMailingSuccess($params + [
       'subject' => 'Example Subject',
@@ -341,11 +340,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       list($textPart, $htmlPart) = $message->body->getParts();
 
       if ($htmlUrlRegex) {
+        $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
         $this->assertEquals('html', $htmlPart->subType, "Should have HTML part in case: $caseName");
         $this->assertRegExp($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
       }
 
       if ($textUrlRegex) {
+        $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'textUrlRegex' => $textUrlRegex, 'textPart' => $textPart->text], 1);
         $this->assertEquals('plain', $textPart->subType, "Should have text part in case: $caseName");
         $this->assertRegExp($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
       }
