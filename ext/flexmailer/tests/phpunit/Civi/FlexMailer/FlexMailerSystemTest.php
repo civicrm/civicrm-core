@@ -119,7 +119,16 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
    */
   public function urlTrackingExamples() {
     $cases = parent::urlTrackingExamples();
-    unset($cases[6]);
+
+    // When it comes to URLs with embedded tokens, support diverges - Flexmailer
+    // can track them, but BAO mailer cannot.
+    $cases[6] = [
+      '<p><a href="http://example.net/?id={contact.contact_id}">Foo</a></p>',
+      ';<p><a href=[\'"].*(extern/url.php|civicrm/mailing/url)(\?|&amp\\;)u=\d+.*&amp\\;id=\d+.*[\'"]>Foo</a></p>;',
+      ';\\[1\\] .*(extern/url.php|civicrm/mailing/url)[\?&]u=\d+.*&id=\d+.*;',
+      ['url_tracking' => 1],
+    ];
+
     return $cases;
   }
 

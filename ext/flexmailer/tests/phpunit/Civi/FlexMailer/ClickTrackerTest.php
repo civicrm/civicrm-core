@@ -1,4 +1,5 @@
 <?php
+namespace Civi\FlexMailer;
 
 use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
@@ -6,14 +7,13 @@ use Civi\Test\TransactionalInterface;
 
 use Civi\FlexMailer\ClickTracker\TextClickTracker;
 use Civi\FlexMailer\ClickTracker\HtmlClickTracker;
-use Civi\FlexMailer\ClickTracker\BaseClickTracker;
 
 /**
  * Tests that URLs are converted to tracked ones if at all possible.
  *
  * @group headless
  */
-class Civi_FlexMailer_ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
+class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
   protected $mailing_id;
 
@@ -27,16 +27,17 @@ class Civi_FlexMailer_ClickTrackerTest extends \PHPUnit\Framework\TestCase imple
 
   public function setUp() {
     // Mock the getTrackerURL call; we don't need to test creating a row in a table.
-    BaseClickTracker::$getTrackerURL = function($a, $b, $c) {
-      return 'http://example.com/extern?u=1&qid=1';
-    };
-
+    // If you want this to work without runkit, then either (a) make the dummy rows or (b) switch this to a hook/event that is runtime-configurable.
+    require_once 'CRM/Mailing/BAO/TrackableURL.php';
+    runkit7_method_rename('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL', 'orig_getBasicTrackerURL');
+    runkit7_method_add('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL', '$a, $b, $c', 'return \'http://example.com/extern?u=1&qid=1\';', RUNKIT7_ACC_STATIC | RUNKIT7_ACC_PRIVATE);
     parent::setUp();
   }
 
   public function tearDown() {
     // Reset the class.
-    BaseClickTracker::$getTrackerURL = ['CRM_Mailing_BAO_TrackableURL', 'getTrackerURL'];
+    runkit7_method_remove('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL');
+    runkit7_method_rename('\CRM_Mailing_BAO_TrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
     parent::tearDown();
   }
 
