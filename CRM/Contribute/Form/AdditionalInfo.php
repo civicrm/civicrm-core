@@ -271,11 +271,11 @@ class CRM_Contribute_Form_AdditionalInfo {
       $formatted[$f] = $params[$f] ?? NULL;
     }
 
-    if (!empty($params['thankyou_date']) && !CRM_Utils_System::isNull($params['thankyou_date'])) {
-      $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date'], $params['thankyou_date_time']);
+    if (!empty($params['thankyou_date'])) {
+      $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date']);
     }
     else {
-      $formatted['thankyou_date'] = 'null';
+      $formatted['thankyou_date'] = NULL;
     }
 
     if (!empty($params['is_email_receipt'])) {
