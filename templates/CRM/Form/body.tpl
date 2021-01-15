@@ -14,7 +14,10 @@
 {if $form.hidden}
   <div>{$form.hidden}</div>
 {/if}
-
+{if (isset($form.errors))}
+    {*
+        If $form.errors isn't set, we get warning messages
+    *}
 {if ($snippet !== 'json') and !$suppressForm and count($form.errors) gt 0}
    <div class="messages crm-error">
        <i class="crm-i fa-exclamation-triangle crm-i-red" aria-hidden="true"></i>
@@ -29,6 +32,7 @@
      {/foreach}
      </ul>
    </div>
+{/if}
 {/if}
 
 {* Add all the form elements sent in by the hook *}
