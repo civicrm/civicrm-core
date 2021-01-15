@@ -526,15 +526,17 @@ if (CIVICRM_UF === 'UnitTests') {
  * the absolute path. Remember to use your system's DIRECTORY_SEPARATOR the
  * examples below assume /
  *
- * Example: This excludes node_modules (can be huge), various CiviCRM dirs that
+ * The default excludes node_modules (can be huge), various CiviCRM dirs that
  * are unlikely to have anything we need to scan inside, and (what could be
- * your) Drupal's private file storage area.
+ * your) Drupal's private file storage area. It does not exclude
+ * vendor but you are likely to see an improvement by adding it.
  *
- * '@/(\.|node_modules|js/|css/|bower_components|packages/|vendor/|sites/default/files/private)@'
+ * See https://docs.civicrm.org/sysadmin/en/latest/setup/optimizations/#exclude-dirs-that-do-not-need-to-be-scanned
+ * and also discussion on including vendor (excluded) in https://lab.civicrm.org/dev/core/-/issues/2031
  */
-// if (!defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
-//   define('CIVICRM_EXCLUDE_DIRS_PATTERN', '@/\.@');
-// }
+if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && !defined('CIVICRM_EXCLUDE_DIRS_PATTERN')) {
+  define('CIVICRM_EXCLUDE_DIRS_PATTERN', '@/(\.|node_modules|js/|css/|bower_components|packages/|sites/default/files/private)@');
+}
 
 /**
  *
@@ -552,7 +554,7 @@ if ( set_include_path( $include_path ) === false ) {
 }
 
 if (!defined('CIVICRM_CLEANURL')) {
-  if ( function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
+  if (function_exists('variable_get') && variable_get('clean_url', '0') != '0') {
     define('CIVICRM_CLEANURL', 1 );
   }
   elseif ( function_exists('config_get') && config_get('system.core', 'clean_url') != 0) {
