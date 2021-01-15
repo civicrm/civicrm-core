@@ -9,14 +9,12 @@
    */
   function hideMenuToggleButtonForNonAdminUsers() {
     $(document).ready(function () {
-      setTimeout(function () {
-        if (!$('#toolbar').length) {
+      setTimeout(function() {
+        if (!($('#toolbar').length || $('#admin-menu').length)) {
           // check admin menu with different id present before removing toggle button.
-          if (!$('#admin-menu').length) {
-            CRM.menubar.removeToggleButton();
-          }
+          CRM.menubar.removeToggleButton();
         }
-    }, 2000);
+      }, 1000);
     });
   }
 
