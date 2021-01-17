@@ -552,7 +552,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       // case insensitive check
       'LIKE' => "( contact_a.first_name LIKE '%Ad%' )",
       // case sensitive check
-      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )",
+      'RLIKE' => "(  CAST(contact_a.first_name AS BINARY) RLIKE BINARY '^A[a-z]{3}$'  )",
       // case sensitive check
       'IN' => '( contact_a.first_name IN ("Adam") )',
     ];
