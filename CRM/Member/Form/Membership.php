@@ -900,7 +900,6 @@ DESC limit 1");
    * @param array $formValues
    * @param object $membership
    *   Object.
-   * @param array $customValues
    *
    * @return bool
    *   true if mail was sent successfully
@@ -911,7 +910,7 @@ DESC limit 1");
    *   & needs rationalising.
    *
    */
-  public static function emailReceipt(&$form, &$formValues, &$membership, $customValues = NULL) {
+  public static function emailReceipt($form, &$formValues, $membership) {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
@@ -920,8 +919,6 @@ DESC limit 1");
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
-
-    $form->assign('customValues', $customValues);
 
     if ($form->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
@@ -959,13 +956,11 @@ DESC limit 1");
     $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
     $form->assign('formValues', $formValues);
 
-    if (empty($lineItem)) {
-      $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
-      if (!CRM_Utils_System::isNull($membership->end_date)) {
-        $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
-      }
-      $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
+    $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
+    if (!CRM_Utils_System::isNull($membership->end_date)) {
+      $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
     }
+    $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
 
     // @todo - if we have to figure out if this is for batch processing it doesn't belong in the shared function.
     $isBatchProcess = is_a($form, 'CRM_Batch_Form_Entry');
@@ -1769,8 +1764,9 @@ DESC limit 1");
    */
   protected function emailMembershipReceipt($formValues, $membership) {
     $customValues = $this->getCustomValuesForReceipt($formValues, $membership);
+    $this->assign('customValues', $customValues);
 
-    return self::emailReceipt($this, $formValues, $membership, $customValues);
+    return self::emailReceipt($this, $formValues, $membership);
   }
 
   /**
