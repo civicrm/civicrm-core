@@ -73,9 +73,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // NOTE: This will mock time for PHP. However, some values populated by MySQL ("modified_date") may leak through.
@@ -115,7 +115,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->validateAllPayments();
     $this->validateAllContributions();
     $this->quickCleanUpFinancialEntities();
@@ -135,10 +135,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmit() {
+  public function testSubmit(): void {
     $form = $this->getForm();
     $loggedInUserID = $this->createLoggedInUser();
     $loggedInUserDisplayName = Contact::get()->addWhere('id', '=', $loggedInUserID)->addSelect('display_name')->execute()->first()['display_name'];
@@ -186,7 +187,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitWithTax() {
+  public function testSubmitWithTax(): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->financialTypeID);
     $form = $this->getForm();
@@ -208,7 +209,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testSubmitWithTaxOfZero() {
+  public function testSubmitWithTaxOfZero(): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->financialTypeID, ['tax_rate' => 0]);
     $form = $this->getForm();
@@ -228,7 +229,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitChangeType() {
+  public function testSubmitChangeType(): void {
     $form = $this->getForm();
     $this->createLoggedInUser();
     $membershipBefore = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
@@ -255,7 +256,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitRecur() {
+  public function testSubmitRecur(): void {
     $form = $this->getForm();
 
     $this->callAPISuccess('MembershipType', 'create', [
@@ -293,7 +294,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_last_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -347,7 +348,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitRecurCompleteInstant() {
+  public function testSubmitRecurCompleteInstant(): void {
     $form = $this->getForm();
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
@@ -426,12 +427,13 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
-   * @dataProvider getThousandSeparators
-   *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @dataProvider getThousandSeparators
    */
-  public function testSubmitRecurCompleteInstantWithMail($thousandSeparator) {
+  public function testSubmitRecurCompleteInstantWithMail(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     // Visibility is 'Public Pages and Listings' in order to try to get to a specific line
     // of code to ensure it's tested - it might not be a 'real' use case.
@@ -480,7 +482,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitPayLater() {
+  public function testSubmitPayLater(): void {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
@@ -514,7 +516,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'return' => ['tax_amount', 'trxn_id'],
     ]);
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(777, $contribution['trxn_id']);
     $this->assertEquals(0.00, $contribution['tax_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
@@ -530,7 +532,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitPayLaterWithBilling() {
+  public function testSubmitPayLaterWithBilling(): void {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
@@ -571,7 +573,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 2,
     ]);
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(777, $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -591,7 +593,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitComplete() {
+  public function testSubmitComplete(): void {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
@@ -627,7 +629,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ]);
 
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertEquals(777, $contribution['trxn_id']);
     $this->assertEquals(.5, $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -648,7 +650,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getForm($mode = 'test') {
+  protected function getForm($mode = 'test'): CRM_Member_Form_MembershipRenewal {
     $form = new CRM_Member_Form_MembershipRenewal();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
@@ -664,7 +666,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  protected function getBaseSubmitParams() {
+  protected function getBaseSubmitParams(): array {
     return [
       'cid' => $this->_individualId,
       // This format reflects the key being the organisation & the value being the type.
@@ -684,7 +686,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_last_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -699,7 +701,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitRenewExpired() {
+  public function testSubmitRenewExpired(): void {
     $form = $this->getForm(NULL);
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', []);
