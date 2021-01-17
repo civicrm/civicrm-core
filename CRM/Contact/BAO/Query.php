@@ -5628,7 +5628,7 @@ civicrm_relationship.start_date > {$today}
         return $clause;
 
       case 'RLIKE':
-        return " {$clause} BINARY '{$value}' ";
+        return " CAST({$field} AS BINARY) RLIKE BINARY '{$value}' ";
 
       case 'IN':
       case 'NOT IN':
