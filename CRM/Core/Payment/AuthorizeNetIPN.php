@@ -37,6 +37,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @return bool|void
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function main() {
     try {
@@ -73,9 +74,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       if (!$contributionRecur->find(TRUE)) {
         throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
       }
-
-      $ids['paymentProcessor'] = $paymentProcessorID;
-      $contribution->loadRelatedObjects($input, $ids);
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
