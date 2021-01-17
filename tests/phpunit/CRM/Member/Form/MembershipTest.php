@@ -769,17 +769,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'label' => 'PendingEdited',
     ]);
 
-    $form = $this->getForm();
-
     $this->callAPISuccess('MembershipType', 'create', [
       'id' => $this->ids['membership_type']['AnnualFixed'],
       'duration_unit' => 'month',
       'duration_interval' => 1,
       'auto_renew' => TRUE,
     ]);
-    $form->preProcess();
-    $this->createLoggedInUser();
     $params = $this->getBaseSubmitParams();
+    $form = $this->getForm();
+    $this->createLoggedInUser();
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
@@ -813,9 +811,33 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ], CRM_Core_Session::singleton()->getStatus());
   }
 
-  public function testSubmitRecurTwoRows() {
-    $this->createMembershipPriceSet();
+  /**
+   * Test submit recurring with two line items.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSubmitRecurTwoRows(): void {
+    $pfvIDs = $this->createMembershipPriceSet();
     $form = $this->getForm();
+    $form->_mode = 'live';
+    $priceParams = [
+      'price_' . $this->getPriceFieldID() => $pfvIDs,
+      'price_set_id' => $this->getPriceSetID(),
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'membership_type_id' => NULL,
+    ];
+    $form->testSubmit(array_merge($this->getBaseSubmitParams(), $priceParams));
+    $memberships = $this->callAPISuccess('Membership', 'get')['values'];
+    $this->assertCount(2, $memberships);
+    $this->callAPISuccessGetSingle('Contribution', []);
+    $this->callAPISuccessGetCount('MembershipPayment', [], 2);
+    $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
+    $this->assertCount(2, $lines);
+    $this->assertEquals('civicrm_membership', $lines[0]['entity_table']);
+    $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
+
   }
 
   /**
@@ -1177,10 +1199,12 @@ Expires: ',
   /**
    * Get a membership form object.
    *
-   * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
+   * We need to instantiate the form to run preprocess, which means we have to
+   * trick it about the request method.
    *
    * @return \CRM_Member_Form_Membership
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function getForm() {
     if (isset($_REQUEST['cid'])) {
@@ -1189,6 +1213,7 @@ Expires: ',
     $form = new CRM_Member_Form_Membership();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
+    $form->preProcess();
     return $form;
   }
 
