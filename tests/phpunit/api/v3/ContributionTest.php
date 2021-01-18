@@ -2422,23 +2422,27 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test repeat contribution successfully creates is_test transaction.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionIsTest() {
+  public function testRepeatTransactionIsTest(): void {
     $this->_params['is_test'] = 1;
     $originalContribution = $this->setUpRepeatTransaction(['is_test' => 1], 'single');
 
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => '1234',
     ]);
     $this->callAPISuccessGetCount('Contribution', ['contribution_test' => 1], 2);
   }
 
   /**
    * Test repeat contribution passed in status.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionPassedInStatus() {
+  public function testRepeatTransactionPassedInStatus(): void {
     $originalContribution = $this->setUpRepeatTransaction($recurParams = [], 'single');
 
     $this->callAPISuccess('contribution', 'repeattransaction', [
