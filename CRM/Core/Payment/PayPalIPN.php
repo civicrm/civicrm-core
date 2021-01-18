@@ -154,23 +154,16 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $recur->save();
 
     if ($this->getFirstOrLastInSeriesStatus()) {
-      $autoRenewMembership = FALSE;
-      if ($recur->id &&
-        isset($ids['membership']) && $ids['membership']
-      ) {
-        $autoRenewMembership = TRUE;
-      }
-
       //send recurring Notification email for user
       CRM_Contribute_BAO_ContributionPage::recurringNotify($this->getFirstOrLastInSeriesStatus(),
         $ids['contact'],
         $ids['contributionPage'],
         $recur,
-        $autoRenewMembership
+        !empty($ids['membership'])
       );
     }
 
-    if ($txnType != 'subscr_payment') {
+    if ($txnType !== 'subscr_payment') {
       return;
     }
 
@@ -185,7 +178,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
 
-      if ($input['paymentStatus'] != 'Completed') {
+      if ($input['paymentStatus'] !== 'Completed') {
         throw new CRM_Core_Exception("Ignore all IPN payments that are not completed");
       }
 
