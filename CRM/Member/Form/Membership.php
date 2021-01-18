@@ -1935,13 +1935,10 @@ DESC limit 1");
    * @param array $params
    * @param int $contactID
    *
-   * @return int|null
+   * @return int
    */
-  protected function legacyProcessRecurringContribution(&$params, $contactID) {
+  protected function legacyProcessRecurringContribution(array $params, $contactID): int {
     $form = $this;
-    if (empty($params['is_recur'])) {
-      return NULL;
-    }
 
     $recurParams = ['contact_id' => $contactID];
     $recurParams['amount'] = $params['amount'] ?? NULL;
@@ -1974,12 +1971,7 @@ DESC limit 1");
 
     $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
     $recurParams['campaign_id'] = $campaignId;
-    $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
-    if (is_a($recurring, 'CRM_Core_Error')) {
-      throw new CRM_Core_Exception(CRM_Core_Error::getMessages($recurring));
-    }
-
-    return $recurring->id;
+    return CRM_Contribute_BAO_ContributionRecur::add($recurParams)->id;
   }
 
 }
