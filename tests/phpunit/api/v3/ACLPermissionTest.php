@@ -456,7 +456,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testContactGetPledgeNotChainable($version) {
+  public function testContactGetPledgeNotChainable(int $version): void {
     $this->_apiversion = $version;
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
