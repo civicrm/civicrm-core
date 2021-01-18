@@ -61,7 +61,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return CRM_Pledge_DAO_Pledge
    */
   public static function add(array $params): CRM_Pledge_DAO_Pledge {
-
+    CRM_Core_Error::deprecatedFunctionWarning('v4 api');
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Pledge', $params['id'] ?? NULL, $params);
 
@@ -117,7 +117,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @return CRM_Pledge_DAO_Pledge
    * @throws \CRM_Core_Exception
    */
-  public static function create($params) {
+  public static function create(array $params): CRM_Pledge_DAO_Pledge {
 
     $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
@@ -144,11 +144,26 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
     $paymentParams['status_id'] = $params['status_id'] ?? NULL;
 
-    $pledge = self::add($params);
-    if (is_a($pledge, 'CRM_Core_Error')) {
-      $pledge->rollback();
-      return $pledge;
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Pledge', $params['id'] ?? NULL, $params);
+
+    $pledge = new CRM_Pledge_DAO_Pledge();
+
+    // if pledge is complete update end date as current date
+    if ($pledge->status_id == 1) {
+      $pledge->end_date = date('Ymd');
     }
+
+    $pledge->copyValues($params);
+
+    // set currency for CRM-1496
+    if (!isset($pledge->currency)) {
+      $pledge->currency = CRM_Core_Config::singleton()->defaultCurrency;
+    }
+
+    $pledge->save();
+
+    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
 
     // handle custom data.
     if (!empty($params['custom']) &&
