@@ -91,7 +91,9 @@ fieldset.crm-inactive-dashlet-fieldset legend {
 #civicrm-dashboard .ui-sortable-placeholder {
   border: 2px dashed grey;
   visibility: visible !important;
-  height: 80px !important;
+  width: 226px;
+  height: 66px !important;
+  vertical-align: bottom;
 }
 
 #civicrm-dashboard .ui-sortable-placeholder * {
