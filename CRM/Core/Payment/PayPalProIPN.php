@@ -482,9 +482,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         unset($ids['contributionPage']);
       }
 
-      if (!$this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID)) {
-        return;
-      }
+      $contribution = &$objects['contribution'];
+      $ids['paymentProcessor'] = $paymentProcessorID;
+      $contribution->loadRelatedObjects($input, $ids);
+      $objects = array_merge($objects, $contribution->_relatedObjects);
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
@@ -640,9 +641,11 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       unset($ids['contributionPage']);
     }
 
-    if (!$this->loadObjects($input, $ids, $objects, TRUE, $paymentProcessorID)) {
-      throw new CRM_Core_Exception('Data did not validate');
-    }
+    $contribution = &$objects['contribution'];
+    $ids['paymentProcessor'] = $paymentProcessorID;
+    $contribution->loadRelatedObjects($input, $ids);
+    $objects = array_merge($objects, $contribution->_relatedObjects);
+
     $this->recur($input, $ids, $objects['contributionRecur'], $objects['contribution'], $isFirst);
   }
 
