@@ -635,6 +635,11 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'text' => $messageTemplate['msg_text'],
       'html' => $messageTemplate['msg_html'],
       'format' => $messageTemplate['pdf_format_id'],
+      // Workflow name is the field in the message templates table that denotes the
+      // workflow the template is used for. This is intended to eventually
+      // replace the non-standard option value/group implementation - see
+      // https://github.com/civicrm/civicrm-core/pull/17227 and the longer
+      // discussion on https://github.com/civicrm/civicrm-core/pull/17180
       'workflow_name' => $workflowName,
       // Note messageTemplateID is the id but when present we also know it was specifically requested.
       'messageTemplateID' => $messageTemplateID,
