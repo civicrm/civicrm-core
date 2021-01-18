@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '7.1.0';
+  const MIN_INSTALL_PHP_VER = '7.2.0';
 
   /**
    * The minimum recommended MySQL/MariaDB version.
