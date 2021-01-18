@@ -58,16 +58,12 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @param array $params
    *   Reference array contains the values submitted by the form.
    *
-   *
-   * @return object
+   * @return CRM_Pledge_DAO_Pledge
    */
-  public static function add(&$params) {
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Pledge', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Pledge', NULL, $params);
-    }
+  public static function add(array $params): CRM_Pledge_DAO_Pledge {
+
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'Pledge', $params['id'] ?? NULL, $params);
 
     $pledge = new CRM_Pledge_DAO_Pledge();
 
@@ -85,12 +81,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
     $result = $pledge->save();
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Pledge', $pledge->id, $pledge);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Pledge', $pledge->id, $pledge);
-    }
+    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
 
     return $result;
   }
@@ -121,25 +112,12 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * Takes an associative array and creates a pledge object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Assoc array of name/value pairs.
    *
-   * @return CRM_Pledge_BAO_Pledge
+   * @return CRM_Pledge_DAO_Pledge
+   * @throws \CRM_Core_Exception
    */
-  public static function create(&$params) {
-    // FIXME: a cludgy hack to fix the dates to MySQL format
-    $dateFields = [
-      'start_date',
-      'create_date',
-      'acknowledge_date',
-      'modified_date',
-      'cancel_date',
-      'end_date',
-    ];
-    foreach ($dateFields as $df) {
-      if (isset($params[$df])) {
-        $params[$df] = CRM_Utils_Date::isoToMysql($params[$df]);
-      }
-    }
+  public static function create($params) {
 
     $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();

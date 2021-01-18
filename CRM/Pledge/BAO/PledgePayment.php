@@ -86,7 +86,7 @@ WHERE     pledge_id = %1
     $transaction = new CRM_Core_Transaction();
     $overdueStatusID = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Overdue');
     $pendingStatusId = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_PledgePayment', 'status_id', 'Pending');
-
+    $currency = $params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
     //calculate the scheduled date for every installment
     $now = date('Ymd') . '000000';
     $statues = $prevScheduledDate = [];
@@ -110,7 +110,7 @@ WHERE     pledge_id = %1
     }
 
     if ($params['installment_amount']) {
-      $params['scheduled_amount'] = $params['installment_amount'];
+      $params['scheduled_amount'] = round($params['installment_amount'], CRM_Utils_Money::getCurrencyPrecision($currency));
     }
     else {
       $params['scheduled_amount'] = round(($params['amount'] / $params['installments']), 2);

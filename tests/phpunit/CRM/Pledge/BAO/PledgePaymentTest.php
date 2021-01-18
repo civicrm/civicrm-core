@@ -422,10 +422,13 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    * More specifically, in the UI this would be equivalent to creating a $100
    * pledge to be paid in 11 installments of $8.33 and one installment of $8.37
    * (to compensate the missing $0.04 from round(100/12)*12.
-   * The API does not allow to do this kind of pledge, because the BAO recalculates
-   * the 'amount' using original_installment_amount * installment.
+   * The API does not allow to do this kind of pledge, because the BAO
+   * recalculates the 'amount' using original_installment_amount * installment.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCreatePledgePaymentForMultipleInstallments2() {
+  public function testCreatePledgePaymentForMultipleInstallments2(): void {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $contact_id = 2;
 
@@ -446,7 +449,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
 
-    $pledge = CRM_Pledge_BAO_Pledge::create($params);
+    $pledge = $this->callAPISuccess('Pledge', 'create', $params);
 
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
@@ -462,7 +465,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // Fetch the first planned pledge payment/installment
     $pledgePayments = civicrm_api3('PledgePayment', 'get', [
-      'pledge_id' => $pledge->id,
+      'pledge_id' => $pledge['id'],
       'sequential' => 1,
     ]);
 
@@ -492,7 +495,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     // Fetch the pledge payments again to see if the amounts and statuses
     // have been updated correctly.
     $pledgePayments = $this->callAPISuccess('pledge_payment', 'get', [
-      'pledge_id' => $pledge->id,
+      'pledge_id' => $pledge['id'],
       'sequential' => 1,
     ]);
 
@@ -511,11 +514,11 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       $this->assertEquals(1, $pp['status_id']);
     }
 
-    $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge->id, 2));
+    $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], 2));
 
     // Cleanup
     civicrm_api3('Pledge', 'delete', [
-      'id' => $pledge->id,
+      'id' => $pledge['id'],
     ]);
   }
 
