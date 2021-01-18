@@ -471,14 +471,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
     // replace tokens in the three elements (in subject as if it was the text body)
     $domain = CRM_Core_BAO_Domain::getDomain();
-    $hookTokens = [];
+
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->subject = $mailContent['subject'];
     $mailing->body_text = $mailContent['text'];
     $mailing->body_html = $mailContent['html'];
     $tokens = $mailing->getTokens();
-    CRM_Utils_Hook::tokens($hookTokens);
-    $categories = array_keys($hookTokens);
 
     $contactID = $params['contactId'] ?? NULL;
 
@@ -540,6 +538,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       );
       $contact = $contactArray[$contactID];
 
+      $hookTokens = [];
+      CRM_Utils_Hook::tokens($hookTokens);
+      $categories = array_keys($hookTokens);
       $mailContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailContent['subject'], $contact, $categories, TRUE);
       $mailContent['text'] = CRM_Utils_Token::replaceHookTokens($mailContent['text'], $contact, $categories, TRUE);
       $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
