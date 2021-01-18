@@ -24,9 +24,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   protected $_mapperKeys;
 
   private $_contactIdIndex;
-  private $_activityTypeIndex;
-  private $_activityLabelIndex;
-  private $_activityDateIndex;
 
   /**
    * Array of successfully imported activity id's
@@ -84,9 +81,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     // FIXME: we should do this in one place together with Form/MapField.php
     $this->_contactIdIndex = -1;
-    $this->_activityTypeIndex = -1;
-    $this->_activityLabelIndex = -1;
-    $this->_activityDateIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
@@ -94,18 +88,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         case 'target_contact_id':
         case 'external_identifier':
           $this->_contactIdIndex = $index;
-          break;
-
-        case 'activity_label':
-          $this->_activityLabelIndex = $index;
-          break;
-
-        case 'activity_type_id':
-          $this->_activityTypeIndex = $index;
-          break;
-
-        case 'activity_date_time':
-          $this->_activityDateIndex = $index;
           break;
       }
       $index++;
@@ -149,29 +131,15 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   public function summary(&$values) {
     $erroneousField = NULL;
     $this->setActiveFieldValues($values, $erroneousField);
-    $index = -1;
 
-    if ($this->_activityTypeIndex > -1 && $this->_activityLabelIndex > -1) {
-      array_unshift($values, ts('Please select either Activity Type ID OR Activity Type Label.'));
-      return CRM_Import_Parser::ERROR;
+    try {
+      $this->validateActivityTypeIDAndLabel($values);
+      if (!$this->getFieldValue($values, 'activity_date_time')) {
+        throw new CRM_Core_Exception(ts('Missing required fields'));
+      }
     }
-    elseif ($this->_activityLabelIndex > -1) {
-      $index = $this->_activityLabelIndex;
-    }
-    elseif ($this->_activityTypeIndex > -1) {
-      $index = $this->_activityTypeIndex;
-    }
-
-    if ($index < 0 or $this->_activityDateIndex < 0) {
-      $errorRequired = TRUE;
-    }
-    else {
-      $errorRequired = !CRM_Utils_Array::value($index, $values) || !CRM_Utils_Array::value($this->_activityDateIndex, $values);
-    }
-
-    if ($errorRequired) {
-      array_unshift($values, ts('Missing required fields'));
-      return CRM_Import_Parser::ERROR;
+    catch (CRM_Core_Exception $e) {
+      return $this->addError($values, [$e->getMessage()]);
     }
 
     $params = &$this->getActiveFieldParams();
@@ -434,6 +402,67 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       }
     }
     return NULL;
+  }
+
+  /**
+   *
+   * Get the value for the given field from the row of values.
+   *
+   * @param array $row
+   * @param string $fieldName
+   *
+   * @return null|string
+   */
+  protected function getFieldValue(array $row, string $fieldName) {
+    if (!is_numeric($this->getFieldIndex($fieldName))) {
+      return NULL;
+    }
+    return $row[$this->getFieldIndex($fieldName)] ?? NULL;
+  }
+
+  /**
+   * Get the index for the given field.
+   *
+   * @param string $fieldName
+   *
+   * @return false|int
+   */
+  protected function getFieldIndex(string $fieldName) {
+    return array_search($fieldName, $this->_mapperKeys, TRUE);
+
+  }
+
+  /**
+   * Add an error to the values.
+   *
+   * @param array $values
+   * @param array $error
+   *
+   * @return int
+   */
+  protected function addError(array &$values, array $error): int {
+    array_unshift($values, implode(';', $error));
+    return CRM_Import_Parser::ERROR;
+  }
+
+  /**
+   * Validate that the activity type id does not conflict with the label.
+   *
+   * @param array $values
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateActivityTypeIDAndLabel(array $values): void {
+    $activityLabel = $this->getFieldValue($values, 'activity_label');
+    $activityTypeID = $this->getFieldValue($values, 'activity_type_id');
+    if ($activityLabel && $activityTypeID
+      && $activityLabel !== CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeID)) {
+      throw new CRM_Core_Exception(ts('Activity type label and Activity type ID are in conflict'));
+    }
+    if (!$activityLabel && !$activityTypeID) {
+      throw new CRM_Core_Exception(ts('Missing required fields: Activity type label or Activity type ID'));
+    }
   }
 
 }
