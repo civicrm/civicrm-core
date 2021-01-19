@@ -206,7 +206,7 @@ function setting_getfields_expectedresult() {
         'default' => '',
         'html_type' => 'radio',
         'add' => '4.7',
-        'title' => 'Enable Embedded Activity Revisions',
+        'title' => 'Enable deprecated Embedded Activity Revisions',
         'is_domain' => 1,
         'is_contact' => 0,
         'description' => 'Enable tracking of activity revisions embedded within the \"civicrm_activity\" table. Alternatively, see \"Administer => System Settings => Misc => Logging\".',

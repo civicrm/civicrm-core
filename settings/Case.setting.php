@@ -91,10 +91,10 @@ return [
     'default' => FALSE,
     'html_type' => 'radio',
     'add' => '4.7',
-    'title' => ts('Enable Embedded Activity Revisions'),
+    'title' => ts('Enable deprecated Embedded Activity Revisions'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('Enable tracking of activity revisions embedded within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".'),
+    'description' => ts('Enable tracking of activity revisions embedded within the "civicrm_activity" table. This should not be enabled on new installs and will be unsupported in the future. You should enable "Administer => System Settings => Misc => Logging" instead.'),
     'help_text' => '',
   ],
   'civicaseShowCaseActivities' => [
