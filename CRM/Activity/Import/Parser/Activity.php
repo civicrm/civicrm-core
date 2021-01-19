@@ -148,6 +148,12 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       && !$this->isValidDate($this->getFieldValue($values, 'activity_date_time'))) {
         throw new CRM_Core_Exception(ts('Invalid Activity Date'));
       }
+
+      if ($this->getFieldValue($values, 'activity_engagement_level')
+        && !CRM_Utils_Rule::positiveInteger($this->getFieldValue($values, 'activity_engagement_level'))) {
+        throw new CRM_Core_Exception(ts('Activity Engagement Index'));
+      }
+
     }
     catch (CRM_Core_Exception $e) {
       return $this->addError($values, [$e->getMessage()]);
@@ -157,13 +163,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     $errorMessage = NULL;
 
-    foreach ($params as $key => $val) {
-      if ($key == 'activity_engagement_level' && $val &&
-        !CRM_Utils_Rule::positiveInteger($val)
-      ) {
-        CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
-      }
-    }
     // Date-Format part ends.
 
     // Checking error in custom data.
