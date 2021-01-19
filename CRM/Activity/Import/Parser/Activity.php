@@ -190,13 +190,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         $params['subject'] = $val;
       }
     }
-    // Date-Format part ends.
-    $formatError = $this->deprecated_activity_formatted_param($params, $params, TRUE);
-
-    if ($formatError) {
-      array_unshift($values, $formatError['error_message']);
-      return CRM_Import_Parser::ERROR;
-    }
 
     if ($this->_contactIdIndex < 0) {
 
@@ -286,42 +279,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     $this->_newActivity[] = $newActivity['id'];
     return CRM_Import_Parser::VALID;
-  }
-
-  /**
-   * take the input parameter list as specified in the data model and
-   * convert it into the same format that we use in QF and BAO object
-   *
-   * @param array $params
-   *   Associative array of property name/value.
-   *                             pairs to insert in new contact.
-   * @param array $values
-   *   The reformatted properties that we can use internally.
-   *
-   * @param array|bool $create Is the formatted Values array going to
-   *                             be used for CRM_Activity_BAO_Activity::create()
-   *
-   * @return array|CRM_Error
-   * @throws \CRM_Core_Exception
-   */
-  protected function deprecated_activity_formatted_param(&$params, &$values, $create = FALSE) {
-    // copy all the activity fields as is
-    $fields = CRM_Activity_DAO_Activity::fields();
-    _civicrm_api3_store_values($fields, $params, $values);
-
-    foreach ($params as $key => $value) {
-      // ignore empty values or empty arrays etc
-      if (CRM_Utils_System::isNull($value)) {
-        continue;
-      }
-
-      if ($key == 'target_contact_id') {
-        if (!$this->isValidContactID($value)) {
-          return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = " . CRM_Utils_Type::escape($value, 'String'));
-        }
-      }
-    }
-    return NULL;
   }
 
   /**
@@ -455,6 +412,11 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     if ($this->getFieldValue($values, 'activity_engagement_level')
       && !CRM_Utils_Rule::positiveInteger($this->getFieldValue($values, 'activity_engagement_level'))) {
       throw new CRM_Core_Exception(ts('Activity Engagement Index'));
+    }
+
+    $targetContactID = $this->getFieldValue($values, 'target_contact_id');
+    if ($targetContactID && !$this->isValidContactID($targetContactID)) {
+      throw new CRM_Core_Exception("Invalid Contact ID: There is no contact record with contact_id = " . CRM_Utils_Type::escape($targetContactID, 'String'));
     }
     $this->validateCustomFields($values);
   }
