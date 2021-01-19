@@ -129,8 +129,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    *   the result of this processing
    */
   public function summary(&$values) {
-    $erroneousField = NULL;
-    $this->setActiveFieldValues($values, $erroneousField);
+    $this->setActiveFieldValues($values);
 
     try {
       $this->validateActivityTypeIDAndLabel($values);
@@ -142,7 +141,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       return $this->addError($values, [$e->getMessage()]);
     }
 
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getActiveFieldParams();
 
     $errorMessage = NULL;
 
@@ -153,7 +152,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $params['source_contact_id'] = $session->get('userID');
     }
     foreach ($params as $key => $val) {
-      if ($key == 'activity_date_time') {
+      if ($key === 'activity_date_time') {
         if ($val) {
           $dateValue = CRM_Utils_Date::formatDate($val, $dateType);
           if ($dateValue) {
@@ -197,6 +196,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    *
    * @return bool
    *   the result of this processing
+   * @throws \CRM_Core_Exception
    */
   public function import($onDuplicate, &$values) {
     // First make sure this is a valid line
@@ -205,7 +205,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     if ($response != CRM_Import_Parser::VALID) {
       return $response;
     }
-    $params = &$this->getActiveFieldParams();
+    $params = $this->getActiveFieldParams();
     $activityLabel = array_search('activity_label', $this->_mapperKeys);
     if ($activityLabel) {
       $params = array_merge($params, ['activity_label' => $values[$activityLabel]]);
@@ -221,7 +221,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        if ($key == 'activity_date_time' && $val) {
+        if ($key === 'activity_date_time' && $val) {
           $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
         }
         elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Date') {
@@ -231,10 +231,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
           $params[$key] = CRM_Utils_String::strtoboolstr($val);
         }
       }
-      elseif ($key == 'activity_date_time') {
+      elseif ($key === 'activity_date_time') {
         $params[$key] = CRM_Utils_Date::formatDate($val, $dateType);
       }
-      elseif ($key == 'activity_subject') {
+      elseif ($key === 'activity_subject') {
         $params['subject'] = $val;
       }
     }

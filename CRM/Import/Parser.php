@@ -265,7 +265,7 @@ abstract class CRM_Import_Parser {
    *
    * @return int
    */
-  public function setActiveFieldValues($elements, &$erroneousField) {
+  public function setActiveFieldValues($elements, &$erroneousField = NULL) {
     $maxCount = count($elements) < $this->_activeFieldCount ? count($elements) : $this->_activeFieldCount;
     for ($i = 0; $i < $maxCount; $i++) {
       $this->_activeFields[$i]->setValue($elements[$i]);
