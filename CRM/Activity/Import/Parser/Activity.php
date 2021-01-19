@@ -129,8 +129,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    *   the result of this processing
    */
   public function summary(&$values) {
-    $this->setActiveFieldValues($values);
-
     try {
       // Check required fields if this is not an update.
       if (!$this->getFieldValue($values, 'activity_id')) {
@@ -153,28 +151,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
         && !CRM_Utils_Rule::positiveInteger($this->getFieldValue($values, 'activity_engagement_level'))) {
         throw new CRM_Core_Exception(ts('Activity Engagement Index'));
       }
-
+      $this->validateCustomFields($values);
     }
     catch (CRM_Core_Exception $e) {
       return $this->addError($values, [$e->getMessage()]);
-    }
-
-    $params = $this->getActiveFieldParams();
-
-    $errorMessage = NULL;
-
-    // Date-Format part ends.
-
-    // Checking error in custom data.
-    $params['contact_type'] = $this->_contactType ?? 'Activity';
-
-    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
-
-    if ($errorMessage) {
-      $tempMsg = "Invalid value for field(s) : $errorMessage";
-      array_unshift($values, $tempMsg);
-      $errorMessage = NULL;
-      return CRM_Import_Parser::ERROR;
     }
 
     return CRM_Import_Parser::VALID;
@@ -433,6 +413,25 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   protected function isValidDate(string $value): bool {
     return (bool) CRM_Utils_Date::formatDate($value, CRM_Core_Session::singleton()->get('dateTypes'));
+  }
+
+  /**
+   * Validate custom fields.
+   *
+   * @param array $values
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateCustomFields($values):void {
+    $this->setActiveFieldValues($values);
+    $params = $this->getActiveFieldParams();
+    $errorMessage = NULL;
+    // Checking error in custom data.
+    $params['contact_type'] = 'Activity';
+    CRM_Contact_Import_Parser_Contact::isErrorInCustomData($params, $errorMessage);
+    if ($errorMessage) {
+      throw new CRM_Core_Exception('Invalid value for field(s) : ' . $errorMessage);
+    }
   }
 
 }
