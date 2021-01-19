@@ -153,11 +153,13 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   public function import($onDuplicate, &$values) {
     // First make sure this is a valid line
-    $response = $this->summary($values);
-
-    if ($response != CRM_Import_Parser::VALID) {
-      return $response;
+    try {
+      $this->validateValues($values);
     }
+    catch (CRM_Core_Exception $e) {
+      return $this->addError($values, [$e->getMessage()]);
+    }
+
     $params = $this->getActiveFieldParams();
     $activityLabel = array_search('activity_label', $this->_mapperKeys);
     if ($activityLabel) {
