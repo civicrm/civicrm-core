@@ -302,6 +302,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    *                             be used for CRM_Activity_BAO_Activity::create()
    *
    * @return array|CRM_Error
+   * @throws \CRM_Core_Exception
    */
   protected function deprecated_activity_formatted_param(&$params, &$values, $create = FALSE) {
     // copy all the activity fields as is
@@ -315,12 +316,8 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       }
 
       if ($key == 'target_contact_id') {
-        if (!CRM_Utils_Rule::integer($value)) {
-          return civicrm_api3_create_error("contact_id not valid: $value");
-        }
-        $contactID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value");
-        if (!$contactID) {
-          return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = $value.");
+        if (!$this->isValidContactID($value)) {
+          return civicrm_api3_create_error("Invalid Contact ID: There is no contact record with contact_id = " . CRM_Utils_Type::escape($value, 'String'));
         }
       }
     }
@@ -394,6 +391,23 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   protected function isValidDate(string $value): bool {
     return (bool) CRM_Utils_Date::formatDate($value, CRM_Core_Session::singleton()->get('dateTypes'));
+  }
+
+  /**
+   * Is the supplied field a valid contact id.
+   *
+   * @param string|int $value
+   *
+   * @return bool
+   */
+  protected function isValidContactID($value): bool {
+    if (!CRM_Utils_Rule::integer($value)) {
+      return FALSE;
+    }
+    if (!CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = " . (int) $value)) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
