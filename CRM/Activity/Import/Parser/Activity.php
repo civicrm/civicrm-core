@@ -130,28 +130,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
    */
   public function summary(&$values) {
     try {
-      // Check required fields if this is not an update.
-      if (!$this->getFieldValue($values, 'activity_id')) {
-        if (!$this->getFieldValue($values, 'activity_label')
-        && !$this->getFieldValue($values, 'activity_type_id')) {
-          throw new CRM_Core_Exception(ts('Missing required fields: Activity type label or Activity type ID'));
-        }
-        if (!$this->getFieldValue($values, 'activity_date_time')) {
-          throw new CRM_Core_Exception(ts('Missing required fields'));
-        }
-      }
-
-      $this->validateActivityTypeIDAndLabel($values);
-      if ($this->getFieldValue($values, 'activity_date_time')
-      && !$this->isValidDate($this->getFieldValue($values, 'activity_date_time'))) {
-        throw new CRM_Core_Exception(ts('Invalid Activity Date'));
-      }
-
-      if ($this->getFieldValue($values, 'activity_engagement_level')
-        && !CRM_Utils_Rule::positiveInteger($this->getFieldValue($values, 'activity_engagement_level'))) {
-        throw new CRM_Core_Exception(ts('Activity Engagement Index'));
-      }
-      $this->validateCustomFields($values);
+      $this->validateValues($values);
     }
     catch (CRM_Core_Exception $e) {
       return $this->addError($values, [$e->getMessage()]);
@@ -432,6 +411,36 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     if ($errorMessage) {
       throw new CRM_Core_Exception('Invalid value for field(s) : ' . $errorMessage);
     }
+  }
+
+  /**
+   * @param array $values
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateValues(array $values): void {
+    // Check required fields if this is not an update.
+    if (!$this->getFieldValue($values, 'activity_id')) {
+      if (!$this->getFieldValue($values, 'activity_label')
+        && !$this->getFieldValue($values, 'activity_type_id')) {
+        throw new CRM_Core_Exception(ts('Missing required fields: Activity type label or Activity type ID'));
+      }
+      if (!$this->getFieldValue($values, 'activity_date_time')) {
+        throw new CRM_Core_Exception(ts('Missing required fields'));
+      }
+    }
+
+    $this->validateActivityTypeIDAndLabel($values);
+    if ($this->getFieldValue($values, 'activity_date_time')
+      && !$this->isValidDate($this->getFieldValue($values, 'activity_date_time'))) {
+      throw new CRM_Core_Exception(ts('Invalid Activity Date'));
+    }
+
+    if ($this->getFieldValue($values, 'activity_engagement_level')
+      && !CRM_Utils_Rule::positiveInteger($this->getFieldValue($values, 'activity_engagement_level'))) {
+      throw new CRM_Core_Exception(ts('Activity Engagement Index'));
+    }
+    $this->validateCustomFields($values);
   }
 
 }
