@@ -163,9 +163,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     // For date-Formats.
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
-    if (!isset($params['source_contact_id'])) {
-      $params['source_contact_id'] = $session->get('userID');
-    }
 
     $customFields = CRM_Core_BAO_CustomField::getFields('Activity');
 
