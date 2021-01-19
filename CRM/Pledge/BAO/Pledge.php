@@ -118,8 +118,16 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params): CRM_Pledge_DAO_Pledge {
+    $action = empty($params['id']) ? 'create' : 'edit';
+    if ($action === 'create') {
+      $defaults = [
+        'currency' => CRM_Core_Config::singleton()->defaultCurrency,
+        'installments' => (int) self::fields()['installments']['default'],
+        'scheduled_date' => $params['start_date'] ?? date('Ymd'),
+      ];
+      $params = array_merge($defaults, $params);
+    }
 
-    $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
 
     $paymentParams = [];
@@ -144,9 +152,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
     $paymentParams['status_id'] = $params['status_id'] ?? NULL;
 
-    $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Pledge', $params['id'] ?? NULL, $params);
-
+    CRM_Utils_Hook::pre($action, 'Pledge', $params['id'] ?? NULL, $params);
     $pledge = new CRM_Pledge_DAO_Pledge();
 
     // if pledge is complete update end date as current date
@@ -155,15 +161,8 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     $pledge->copyValues($params);
-
-    // set currency for CRM-1496
-    if (!isset($pledge->currency)) {
-      $pledge->currency = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-
     $pledge->save();
-
-    CRM_Utils_Hook::post($hook, 'Pledge', $pledge->id, $pledge);
+    CRM_Utils_Hook::post($action, 'Pledge', $pledge->id, $pledge);
 
     // handle custom data.
     if (!empty($params['custom']) &&
@@ -172,11 +171,11 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_pledge', $pledge->id);
     }
 
-    // skip payment stuff inedit mode
-    if (!isset($params['id']) || $isRecalculatePledgePayment) {
+    // skip payment stuff in edit mode
+    if (empty($params['id']) || self::isPaymentsRequireRecalculation($params)) {
 
       // if pledge is pending delete all payments and recreate.
-      if ($isRecalculatePledgePayment) {
+      if (!empty(empty($params['id']))) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
       }
 

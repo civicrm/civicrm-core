@@ -127,7 +127,13 @@ trait Api3TestTrait {
         'version' => $this->_apiversion,
       ];
     }
-    $result = $this->civicrm_api($entity, $action, $params);
+    try {
+      $result = $this->civicrm_api($entity, $action, $params);
+    }
+    catch (\API_Exception $e) {
+      // api v4 call failed and threw an exception.
+      return [];
+    }
     $this->assertAPIFailure($result, "We expected a failure for $entity $action but got a success", $expectedErrorMessage);
     return $result;
   }
@@ -439,7 +445,7 @@ trait Api3TestTrait {
         }
         if ($options['sort']) {
           foreach (explode(',', $options['sort']) as $sort) {
-            list($sortField, $sortDir) = array_pad(explode(' ', trim($sort)), 2, 'ASC');
+            [$sortField, $sortDir] = array_pad(explode(' ', trim($sort)), 2, 'ASC');
             $v4Params['orderBy'][$sortField] = $sortDir;
           }
         }
