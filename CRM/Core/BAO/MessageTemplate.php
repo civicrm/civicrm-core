@@ -433,9 +433,16 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $mailing->body_html = $mailContent['html'];
     $tokens = $mailing->getTokens();
 
-    $contactID = $params['contactId'] ?? NULL;
+    // When using Smarty we need to pass the $escapeSmarty parameter.
+    $escapeSmarty = !$params['disableSmarty'];
 
+    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
+    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
+
+    $contactID = $params['contactId'] ?? NULL;
     if ($contactID) {
+
       $contactParams = ['contact_id' => $contactID];
       $returnProperties = [];
 
@@ -469,16 +476,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         'CRM_Core_BAO_MessageTemplate'
       );
       $contact = $contact[$contactID];
-    }
-
-    // When using Smarty we need to pass the $escapeSmarty parameter.
-    $escapeSmarty = !$params['disableSmarty'];
-
-    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
-    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
-    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
-
-    if ($contactID) {
       $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['subject'], FALSE, $escapeSmarty);
       $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, $escapeSmarty);
       $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, $escapeSmarty);
