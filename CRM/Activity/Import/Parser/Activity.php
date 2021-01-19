@@ -159,12 +159,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     catch (CRM_Core_Exception $e) {
       return $this->addError($values, [$e->getMessage()]);
     }
-
-    $params = $this->getActiveFieldParams();
-    $activityLabel = array_search('activity_label', $this->_mapperKeys);
-    if ($activityLabel) {
-      $params = array_merge($params, ['activity_label' => $values[$activityLabel]]);
-    }
+    $params = $this->getApiReadyParams($values);
     // For date-Formats.
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
@@ -419,6 +414,26 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       throw new CRM_Core_Exception("Invalid Contact ID: There is no contact record with contact_id = " . CRM_Utils_Type::escape($targetContactID, 'String'));
     }
     $this->validateCustomFields($values);
+  }
+
+  /**
+   * Get array of parameters formatted for the api from the submitted values.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  protected function getApiReadyParams(array $values): array {
+    $this->setActiveFieldValues($values);
+    $params = $this->getActiveFieldParams();
+    if ($this->getFieldValue($values, 'activity_label')) {
+      $params['activity_type_id'] = array_search(
+         $this->getFieldValue($values, 'activity_label'),
+         CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'create'),
+        TRUE
+      );
+    }
+    return $params;
   }
 
 }
