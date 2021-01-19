@@ -157,11 +157,6 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     $errorMessage = NULL;
 
-    // For date-Formats
-    $session = CRM_Core_Session::singleton();
-    if (!isset($params['source_contact_id'])) {
-      $params['source_contact_id'] = $session->get('userID');
-    }
     foreach ($params as $key => $val) {
       if ($key == 'activity_engagement_level' && $val &&
         !CRM_Utils_Rule::positiveInteger($val)
