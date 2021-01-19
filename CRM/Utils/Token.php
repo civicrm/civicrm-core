@@ -224,9 +224,9 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &replaceDomainTokens(
+  public static function replaceDomainTokens(
     $str,
-    &$domain,
+    $domain,
     $html = FALSE,
     $knownTokens = NULL,
     $escapeSmarty = FALSE
@@ -240,7 +240,7 @@ class CRM_Utils_Token {
 
     $str = preg_replace_callback(
       self::tokenRegex($key),
-      function ($matches) use (&$domain, $html, $escapeSmarty) {
+      function ($matches) use ($domain, $html, $escapeSmarty) {
         return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
       },
       $str
@@ -256,7 +256,7 @@ class CRM_Utils_Token {
    *
    * @return mixed|null|string
    */
-  public static function getDomainTokenReplacement($token, &$domain, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE) {
     // check if the token we were passed is valid
     // we have to do this because this function is
     // called only when we find a token in the string
@@ -644,7 +644,7 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &replaceContactTokens(
+  public static function replaceContactTokens(
     $str,
     &$contact,
     $html = FALSE,
