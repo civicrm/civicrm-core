@@ -52,6 +52,7 @@ function afform_civicrm_config(&$config) {
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
   Civi::dispatcher()->addListener('hook_civicrm_angularModules', '_afform_civicrm_angularModules_autoReq', -1000);
+  Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
 }
 
 /**
@@ -339,96 +340,6 @@ function _afform_reverse_deps_find($formName, $html, $revMap) {
   $elems = array_intersect_key($revMap['el'], $symbols->elements);
   $attrs = array_intersect_key($revMap['attr'], $symbols->attributes);
   return array_values(array_unique(array_merge($elems, $attrs)));
-}
-
-/**
- * @param \Civi\Angular\Manager $angular
- * @see CRM_Utils_Hook::alterAngular()
- */
-function afform_civicrm_alterAngular($angular) {
-  $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
-    ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-      try {
-        $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
-        $meta = \Civi\Api4\Afform::get()->addWhere('name', '=', $module['_afform'])->setSelect(['join', 'block'])->setCheckPermissions(FALSE)->execute()->first();
-      }
-      catch (Exception $e) {
-      }
-
-      $blockEntity = $meta['join'] ?? $meta['block'] ?? NULL;
-      if (!$blockEntity) {
-        $entities = _afform_getMetadata($doc);
-      }
-
-      foreach (pq('af-field', $doc) as $afField) {
-        /** @var DOMElement $afField */
-        $entityName = pq($afField)->parents('[af-fieldset]')->attr('af-fieldset');
-        $joinName = pq($afField)->parents('[af-join]')->attr('af-join');
-        if (!$blockEntity && !preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
-          throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
-        }
-        $entityType = $blockEntity ?? $entities[$entityName]['type'];
-        _af_fill_field_metadata($joinName ? $joinName : $entityType, $afField);
-      }
-    });
-  $angular->add($fieldMetadata);
-}
-
-/**
- * Merge field definition metadata into an afform field's definition
- *
- * @param $entityType
- * @param DOMElement $afField
- * @throws API_Exception
- */
-function _af_fill_field_metadata($entityType, DOMElement $afField) {
-  $params = [
-    'action' => 'create',
-    'where' => [['name', '=', $afField->getAttribute('name')]],
-    'select' => ['label', 'input_type', 'input_attrs', 'options'],
-    'loadOptions' => ['id', 'label'],
-  ];
-  if (in_array($entityType, CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-    $params['values'] = ['contact_type' => $entityType];
-    $entityType = 'Contact';
-  }
-  // Merge field definition data with whatever's already in the markup.
-  // If the admin has chosen to include this field on the form, then it's OK for us to get metadata about the field - regardless of user's other permissions.
-  $getFields = civicrm_api4($entityType, 'getFields', $params + ['checkPermissions' => FALSE]);
-  $deep = ['input_attrs'];
-  foreach ($getFields as $fieldInfo) {
-    $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
-    if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
-      // If it's not an object, don't mess with it.
-      continue;
-    }
-    // Default placeholder for select inputs
-    if ($fieldInfo['input_type'] === 'Select') {
-      $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => ts('Select')];
-    }
-
-    $fieldDefn = $existingFieldDefn ? CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-    foreach ($fieldInfo as $name => $prop) {
-      // Merge array props 1 level deep
-      if (in_array($name, $deep) && !empty($fieldDefn[$name])) {
-        $fieldDefn[$name] = CRM_Utils_JS::writeObject(CRM_Utils_JS::getRawProps($fieldDefn[$name]) + array_map(['CRM_Utils_JS', 'encode'], $prop));
-      }
-      elseif (!isset($fieldDefn[$name])) {
-        $fieldDefn[$name] = CRM_Utils_JS::encode($prop);
-      }
-    }
-    pq($afField)->attr('defn', htmlspecialchars(CRM_Utils_JS::writeObject($fieldDefn)));
-  }
-}
-
-function _afform_getMetadata(phpQueryObject $doc) {
-  $entities = [];
-  foreach ($doc->find('af-entity') as $afmModelProp) {
-    $entities[$afmModelProp->getAttribute('name')] = [
-      'type' => $afmModelProp->getAttribute('type'),
-    ];
-  }
-  return $entities;
 }
 
 /**

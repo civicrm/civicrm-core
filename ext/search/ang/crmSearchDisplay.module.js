@@ -74,8 +74,8 @@
         return columns;
       }
 
-      function prepareParams(apiParams, filters, page) {
-        var params = _.cloneDeep(apiParams);
+      function prepareParams(ctrl) {
+        var params = _.cloneDeep(ctrl.apiParams);
         if (_.isEmpty(params.where)) {
           params.where = [];
         }
@@ -87,13 +87,20 @@
             params.select.push(idField);
           }
         });
-        _.each(filters, function(value, key) {
+        function addFilter(value, key) {
           if (value) {
             params.where.push([key, 'CONTAINS', value]);
           }
-        });
-        if (page) {
-          params.offset = (page - 1) * apiParams.limit;
+        }
+        // Add filters explicitly passed into controller
+        _.each(ctrl.filters, addFilter);
+        // Add filters when nested in an afform fieldset
+        if (ctrl.afFieldset) {
+          _.each(ctrl.afFieldset.getFieldData(), addFilter);
+        }
+
+        if (ctrl.settings && ctrl.settings.pager && ctrl.page) {
+          params.offset = (ctrl.page - 1) * params.limit;
           params.select.push('row_count');
         }
         return params;
