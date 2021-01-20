@@ -396,16 +396,18 @@
           ctrl.page = 1;
           ctrl.rowCount = false;
         }
-        if (ctrl.rowCount === false) {
-          params.select.push('row_count');
-        }
         params.offset = ctrl.limit * (ctrl.page - 1);
         crmApi4(ctrl.savedSearch.api_entity, 'get', params).then(function(success) {
           if (ctrl.stale) {
             ctrl.results = {};
-          }
-          if (ctrl.rowCount === false) {
-            ctrl.rowCount = success.count;
+            // Get row count for pager
+            // Select is only needed needed by HAVING
+            params.select = params.having && params.having.length ? params.select : [];
+            params.select.push('row_count');
+            delete params.debug;
+            crmApi4(ctrl.savedSearch.api_entity, 'get', params).then(function(result) {
+              ctrl.rowCount = result.count;
+            });
           }
           ctrl.debug = success.debug;
           // populate this page & the next
@@ -537,7 +539,9 @@
         // If more than one page of results, use ajax to fetch all ids
         $scope.loadingAllRows = true;
         var params = _.cloneDeep(ctrl.savedSearch.api_params);
-        params.select = ['id'];
+        // Select is only needed needed by HAVING
+        params.select = params.having && params.having.length ? params.select : [];
+        params.select.push('id');
         crmApi4(ctrl.savedSearch.api_entity, 'get', params, ['id']).then(function(ids) {
           $scope.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);

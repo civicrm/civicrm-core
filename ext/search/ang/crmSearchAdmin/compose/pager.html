@@ -1,7 +1,7 @@
 <div class="crm-flex-box">
   <div>
     <div class="form-inline">
-      <label ng-if="loading && $ctrl.rowCount === false"><i class="crm-i fa-spin fa-spinner"></i></label>
+      <label ng-if="$ctrl.rowCount === false"><i class="crm-i fa-spin fa-spinner"></i></label>
       <label ng-if="$ctrl.rowCount === 1">
         {{ $ctrl.selectedRows.length ? ts('%1 selected of 1 result', {1: $ctrl.selectedRows.length}) : ts('1 result') }}
       </label>

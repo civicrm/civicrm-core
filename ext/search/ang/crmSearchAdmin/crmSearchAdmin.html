@@ -37,7 +37,7 @@
           <div ng-include="'~/crmSearchAdmin/compose/controls.html'"></div>
           <div ng-include="'~/crmSearchAdmin/compose/debug.html'" ng-if="$ctrl.debug"></div>
           <div ng-include="'~/crmSearchAdmin/compose/results.html'" class="crm-search-results"></div>
-          <div ng-include="'~/crmSearchAdmin/compose/pager.html'"></div>
+          <div ng-include="'~/crmSearchAdmin/compose/pager.html'" ng-if="$ctrl.results"></div>
         </div>
         <div ng-switch-when="group">
           <fieldset ng-include="'~/crmSearchAdmin/group.html'"></fieldset>
