@@ -2,9 +2,19 @@
   <form ng-controller="crmSearchActionDelete">
     <p><strong>{{:: ts('Are you sure you want to delete %1 %2?', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <hr />
-    <div class="buttons pull-right">
-      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger">{{:: ts('Cancel') }}</button>
-      <button ng-click="$ctrl.delete()" class="btn btn-primary">{{:: ts('Delete %1', {1: $ctrl.entityTitle}) }}</button>
+    <div ng-if="$ctrl.run" class="crm-search-action-progress">
+      <h5>{{:: ts('Deleting %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
+      <crm-search-batch-runner entity="model.entity" action="Delete" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
     </div>
-  </form>
+    <hr />
+    <div class="buttons text-right">
+      <button type="button" ng-click="$ctrl.cancel()" class="btn btn-danger" ng-hide="$ctrl.run">
+        <i class="crm-i fa-times"></i>
+        {{:: ts('Cancel') }}
+      </button>
+      <button ng-click="$ctrl.delete()" class="btn btn-primary" ng-disabled="$ctrl.run">
+        <i class="crm-i fa-{{ $ctrl.run ? 'spin fa-spinner' : 'trash' }}"></i>
+        {{:: ts('Delete %1', {1: $ctrl.entityTitle}) }}
+      </button>
+    </div>
 </div>

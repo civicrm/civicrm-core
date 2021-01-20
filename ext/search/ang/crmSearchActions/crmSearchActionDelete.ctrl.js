@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').controller('crmSearchActionDelete', function($scope, crmApi4, dialogService) {
+  angular.module('crmSearchActions').controller('crmSearchActionDelete', function($scope, dialogService) {
     var ts = $scope.ts = CRM.ts(),
       model = $scope.model,
       ctrl = $scope.$ctrl = this;
@@ -13,11 +13,18 @@
     };
 
     this.delete = function() {
-      crmApi4(model.entity, 'Delete', {
-        where: [['id', 'IN', model.ids]],
-      }).then(function() {
-        dialogService.close('crmSearchAction');
-      });
+      $('.ui-dialog-titlebar button').hide();
+      ctrl.run = {};
+    };
+
+    this.onSuccess = function() {
+      CRM.alert(ts('Successfully deleted %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Deleted'), 'success');
+      dialogService.close('crmSearchAction');
+    };
+
+    this.onError = function() {
+      CRM.alert(ts('An error occurred while attempting to delete %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
+      dialogService.close('crmSearchAction');
     };
 
   });

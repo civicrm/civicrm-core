@@ -7,7 +7,7 @@ return [
     'ang/crmSearchAdmin/*/*.js',
   ],
   'css' => [
-    'css/*.css',
+    'css/crmSearchAdmin.css',
   ],
   'partials' => [
     'ang/crmSearchAdmin',
