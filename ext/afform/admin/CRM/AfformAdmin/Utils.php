@@ -4,15 +4,30 @@ use CRM_AfformAdmin_ExtensionUtil as E;
 class CRM_AfformAdmin_Utils {
 
   /**
+   * @return array
+   */
+  public static function getAdminSettings() {
+    return [
+      'afform_type' => \Civi\Api4\OptionValue::get(FALSE)
+        ->addSelect('name', 'label', 'icon')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('option_group_id:name', '=', 'afform_type')
+        ->addOrderBy('weight', 'ASC')
+        ->execute(),
+    ];
+  }
+
+  /**
    * Loads metadata for the gui editor.
    *
    * FIXME: This is a prototype and should get broken out into separate callbacks with hooks, events, etc.
+   * @return array
    */
-  public static function getAngularSettings() {
+  public static function getGuiSettings() {
     $getFieldParams = [
       'checkPermissions' => FALSE,
       'includeCustom' => TRUE,
-      'loadOptions' => TRUE,
+      'loadOptions' => ['id', 'label'],
       'action' => 'create',
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
       'where' => [['input_type', 'IS NOT NULL']],
@@ -134,19 +149,6 @@ class CRM_AfformAdmin_Utils {
         ],
       ],
     ];
-
-    // Reformat options
-    // TODO: Teach the api to return options in this format
-    foreach ($data['entities'] as $entityName => $entity) {
-      foreach ($entity['fields'] as $name => $field) {
-        if (!empty($field['options'])) {
-          $data['entities'][$entityName]['fields'][$name]['options'] = CRM_Utils_Array::makeNonAssociative($field['options'], 'key', 'label');
-        }
-        else {
-          unset($data['entities'][$entityName]['fields'][$name]['options']);
-        }
-      }
-    }
 
     $data['styles'] = [
       'default' => E::ts('Default'),

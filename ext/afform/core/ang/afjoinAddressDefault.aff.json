@@ -1,5 +1,6 @@
 {
   "title": "Address Block (default)",
+  "type": "block",
   "block": "Contact",
   "join": "Address",
   "repeat": true

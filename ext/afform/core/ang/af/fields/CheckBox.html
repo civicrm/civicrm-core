@@ -1,7 +1,7 @@
-<ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="defn.options">
-  <li ng-repeat="opt in defn.options track by opt.key" >
-    <input type="checkbox" checklist-model="dataProvider.getFieldData()[fieldName]" id="{{ fieldId + opt.key }}" checklist-value="opt.key" />
-    <label for="{{ fieldId + opt.key }}">{{ opt.label }}</label>
+<ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="$ctrl.defn.options">
+  <li ng-repeat="opt in $ctrl.defn.options track by opt.id" >
+    <input type="checkbox" checklist-model="dataProvider.getFieldData()[$ctrl.fieldName]" id="{{ fieldId + opt.id }}" checklist-value="opt.id" />
+    <label for="{{ fieldId + opt.id }}">{{ opt.label }}</label>
   </li>
 </ul>
-<input type="checkbox" ng-if="!defn.options" id="{{ fieldId }}" ng-model="dataProvider.getFieldData()[fieldName]" />
+<input type="checkbox" ng-if="!$ctrl.defn.options" id="{{ fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" />

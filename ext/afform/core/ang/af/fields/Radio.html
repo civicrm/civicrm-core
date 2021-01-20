@@ -1,4 +1,4 @@
-<label ng-repeat="opt in getOptions() track by opt.key" >
-  <input class="crm-form-radio" type="radio" ng-model="dataProvider.getFieldData()[fieldName]" ng-value="opt.key" />
+<label ng-repeat="opt in getOptions() track by opt.id" >
+  <input class="crm-form-radio" type="radio" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" ng-value="opt.id" />
   {{ opt.label }}
 </label>

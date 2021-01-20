@@ -1,5 +1,6 @@
 {
   "title": "Phone (default)",
+  "type": "block",
   "block": "Contact",
   "join": "Phone",
   "repeat": true

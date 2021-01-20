@@ -54,6 +54,7 @@
         }
       };
     })
+    // @internal directive used within the afRepeat directive, invoked once per iteration
     .directive('afRepeatItem', function() {
       return {
         restrict: 'A',

@@ -8,7 +8,7 @@
     bindings: {
       node: '='
     },
-    controller: function($scope, afAdmin) {
+    controller: function($scope, afGui) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
@@ -30,11 +30,11 @@
           return border[idx];
         }
         border[idx] = val;
-        afAdmin.setStyle(node, 'border', val ? border.join(' ') : null);
+        afGui.setStyle(node, 'border', val ? border.join(' ') : null);
       }
 
       function getBorder(node) {
-        var border = _.map((afAdmin.getStyles(node).border || '').split(' '), _.trim);
+        var border = _.map((afGui.getStyles(node).border || '').split(' '), _.trim);
         return border.length > 2 ? border : null;
       }
     }

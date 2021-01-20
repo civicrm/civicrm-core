@@ -126,6 +126,9 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'name',
         ],
         [
+          'name' => 'type',
+        ],
+        [
           'name' => 'requires',
         ],
         [

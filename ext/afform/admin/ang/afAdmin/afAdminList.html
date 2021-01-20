@@ -1,0 +1,59 @@
+<div id="bootstrap-theme" class="afadmin-list">
+  <h1 crm-page-title>{{:: ts('Configurable Forms') }}</h1>
+
+  <div class="form-inline text-right">
+    <a class="btn btn-primary" href="#/create/form">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Form') }}
+    </a>
+  </div>
+
+  <ul class="nav nav-tabs">
+    <li role="presentation" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
+      <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{ tab.icon }}"></i> {{:: tab.label }}</a>
+    </li>
+  </ul>
+
+  <div class="form-inline">
+    <input class="form-control" type="search" ng-model="$ctrl.search" placeholder="{{:: ts('Filter') }}">
+  </div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>{{:: ts('Title') }}</th>
+      <th>{{:: ts('Name') }}</th>
+      <th>{{:: ts('Server Route') }}</th>
+      <th>{{:: ts('Frontend?') }}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="afform in $ctrl.afforms[$ctrl.tab] | filter:$ctrl.search">
+      <td>{{afform.title}}</td>
+      <td>
+        <code>{{afform.name}}</code>
+      </td>
+      <td>
+        <a ng-if="afform.server_route" ng-href="{{ crmUrl(afform.server_route) }}" target="_blank">
+          <code>{{afform.server_route}}</code>
+        </a>
+      </td>
+      <td>{{afform.is_public ? ts('Frontend') : ts('Backend')}}</td>
+      <td>
+        <a href="#/edit/{{ afform.name }}" class="btn btn-xs btn-primary">{{ ts('Edit') }}</a>
+        <a href ng-if="afform.has_local" class="btn btn-xs btn-danger" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
+          {{ afform.has_base ? ts('Revert') : ts('Delete') }}
+        </a>
+      </td>
+    </tr>
+    <tr ng-if="!$ctrl.afforms[$ctrl.tab] || $ctrl.afforms[$ctrl.tab].length === 0">
+      <td colspan="9">
+        <p class="messages status no-popup text-center">
+          {{:: ts('None Found')}}
+        </p>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>

@@ -9,6 +9,7 @@ require_once 'search.civix.php';
  */
 function search_civicrm_config(&$config) {
   _search_civix_civicrm_config($config);
+  Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Search\AfformSearchMetadataInjector', 'preprocess'], 1000);
 }
 
 /**
@@ -140,39 +141,4 @@ function search_civicrm_pre($op, $entity, $id, &$params) {
       $params['name'] = \CRM_Utils_String::munge($params['label']);
     }
   }
-}
-
-/**
- * Injects settings data to search displays embedded in afforms
- *
- * @param \Civi\Angular\Manager $angular
- * @see CRM_Utils_Hook::alterAngular()
- */
-function search_civicrm_alterAngular($angular) {
-  $changeSet = \Civi\Angular\ChangeSet::create('searchSettings')
-    ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-      $displayTypes = array_column(\Civi\Search\Display::getDisplayTypes(['name']), 'name');
-
-      if ($displayTypes) {
-        $componentNames = 'crm-search-display-' . implode(', crm-search-display-', $displayTypes);
-        foreach (pq($componentNames, $doc) as $component) {
-          $searchName = pq($component)->attr('search-name');
-          $displayName = pq($component)->attr('display-name');
-          if ($searchName && $displayName) {
-            $display = \Civi\Api4\SearchDisplay::get(FALSE)
-              ->addWhere('name', '=', $displayName)
-              ->addWhere('saved_search.name', '=', $searchName)
-              ->addSelect('settings', 'saved_search.api_entity', 'saved_search.api_params')
-              ->execute()->first();
-            if ($display) {
-              pq($component)->attr('settings', CRM_Utils_JS::encode($display['settings'] ?? []));
-              pq($component)->attr('api-entity', CRM_Utils_JS::encode($display['saved_search.api_entity']));
-              pq($component)->attr('api-params', CRM_Utils_JS::encode($display['saved_search.api_params']));
-            }
-          }
-        }
-      }
-    });
-  $angular->add($changeSet);
-
 }

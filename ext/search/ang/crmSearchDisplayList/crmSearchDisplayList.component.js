@@ -8,6 +8,9 @@
       settings: '<',
       filters: '<'
     },
+    require: {
+      afFieldset: '?^^afFieldset'
+    },
     templateUrl: '~/crmSearchDisplayList/crmSearchDisplayList.html',
     controller: function($scope, crmApi4, searchDisplayUtils) {
       var ts = $scope.ts = CRM.ts(),
@@ -19,18 +22,20 @@
         this.apiParams.limit = parseInt(this.settings.limit || 0, 10);
         this.columns = searchDisplayUtils.prepareColumns(this.settings.columns, this.apiParams);
         $scope.displayUtils = searchDisplayUtils;
+        if (this.afFieldset) {
+          $scope.$watch(this.afFieldset.getFieldData, this.getResults, true);
+        }
+        $scope.$watch('$ctrl.filters', ctrl.getResults, true);
       };
 
-      this.getResults = function() {
-        var params = searchDisplayUtils.prepareParams(ctrl.apiParams, ctrl.filters, ctrl.settings.pager ? ctrl.page : null);
+      this.getResults = _.debounce(function() {
+        var params = searchDisplayUtils.prepareParams(ctrl);
 
         crmApi4(ctrl.apiEntity, 'get', params).then(function(results) {
           ctrl.results = results;
           ctrl.rowCount = results.count;
         });
-      };
-
-      $scope.$watch('$ctrl.filters', ctrl.getResults, true);
+      }, 100);
 
       $scope.formatResult = function(row, col) {
         var value = row[col.key],

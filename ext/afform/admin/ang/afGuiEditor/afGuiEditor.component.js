@@ -5,19 +5,21 @@
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/afGuiEditor.html',
     bindings: {
+      type: '<',
       name: '<'
     },
     controllerAs: 'editor',
-    controller: function($scope, crmApi4, afAdmin, $parse, $timeout, $location) {
+    controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('afform');
       $scope.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
-      this.meta = afAdmin.meta;
+      this.meta = afGui.meta;
       var editor = this;
       var newForm = {
         title: '',
         permission: 'access CiviCRM',
+        type: 'form',
         layout: [{
           '#tag': 'af-form',
           ctrl: 'afform',
@@ -27,7 +29,7 @@
 
       this.$onInit = function() {
         // Fetch the current form plus all blocks
-        afAdmin.initialize(editor.name)
+        afGui.initialize(editor.name)
           .then(initializeForm);
       };
 
@@ -36,22 +38,22 @@
         $scope.afform = _.findWhere(afforms, {name: editor.name});
         if (!$scope.afform) {
           $scope.afform = _.cloneDeep(newForm);
-          if (editor.name != '0') {
+          if (editor.name) {
             alert('Error: unknown form "' + editor.name + '"');
           }
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = afAdmin.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-        $scope.entities = afAdmin.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+        editor.layout = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
+        $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
 
-        if (editor.name == '0') {
+        if (!editor.name) {
           editor.addEntity('Individual');
-          editor.layout['#children'].push(afAdmin.meta.elements.submit.element);
+          editor.layout['#children'].push(afGui.meta.elements.submit.element);
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
-        $scope.changesSaved = editor.name == '0' ? false : 1;
+        $scope.changesSaved = !editor.name ? false : 1;
         $scope.$watch('afform', function () {
           $scope.changesSaved = $scope.changesSaved === 1;
         }, true);
@@ -69,7 +71,7 @@
       };
 
       this.addEntity = function(type) {
-        var meta = afAdmin.meta.entities[type],
+        var meta = afGui.meta.entities[type],
           num = 1;
         // Give this new entity a unique name
         while (!!$scope.entities[type + num]) {
@@ -85,7 +87,7 @@
         var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
         editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
         // Create a new af-fieldset container for the entity
-        var fieldset = _.cloneDeep(afAdmin.meta.elements.fieldset.element);
+        var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
         fieldset['af-fieldset'] = type + num;
         fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
         // Add default contact name block
@@ -104,8 +106,8 @@
 
       this.removeEntity = function(entityName) {
         delete $scope.entities[entityName];
-        afAdmin.removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
-        afAdmin.removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
+        afGui.removeRecursive(editor.layout['#children'], {'#tag': 'af-entity', name: entityName});
+        afGui.removeRecursive(editor.layout['#children'], {'af-fieldset': entityName});
         this.selectEntity(null);
       };
 
@@ -154,8 +156,7 @@
           .then(function (data) {
             $scope.saving = false;
             $scope.afform.name = data[0].name;
-            // FIXME: This causes an unnecessary reload when saving a new form
-            $location.search('name', data[0].name);
+            $location.url('/edit/' + data[0].name);
           });
       };
 

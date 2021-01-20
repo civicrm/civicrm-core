@@ -12,18 +12,18 @@
       editor: '^^afGuiEditor',
       container: '^^afGuiContainer'
     },
-    controller: function($scope, afAdmin) {
+    controller: function($scope, afGui) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
 
       $scope.editingOptions = false;
       var yesNo = [
-        {key: '1', label: ts('Yes')},
-        {key: '0', label: ts('No')}
+        {id: '1', label: ts('Yes')},
+        {id: '0', label: ts('No')}
       ];
 
       this.$onInit = function() {
-        $scope.meta = afAdmin.meta;
+        $scope.meta = afGui.meta;
       };
 
       $scope.getEntity = function() {
@@ -31,7 +31,7 @@
       };
 
       $scope.getDefn = this.getDefn = function() {
-        return ctrl.editor ? afAdmin.getField(ctrl.container.getFieldEntityType(), ctrl.node.name) : {};
+        return ctrl.editor ? afGui.getField(ctrl.container.getFieldEntityType(), ctrl.node.name) : {};
       };
 
       $scope.hasOptions = function() {
