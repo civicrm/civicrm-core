@@ -15,11 +15,8 @@ class HtmlClickTracker implements ClickTrackerInterface {
   public function filterContent($msg, $mailing_id, $queue_id) {
     return self::replaceHrefUrls($msg,
       function ($url) use ($mailing_id, $queue_id) {
-        if (strpos($url, '{') !== FALSE) {
-          return $url;
-        }
         $data = \CRM_Mailing_BAO_TrackableURL::getTrackerURL(
-          $url, $mailing_id, $queue_id);
+          html_entity_decode($url), $mailing_id, $queue_id);
         $data = htmlentities($data, ENT_NOQUOTES);
         return $data;
       }

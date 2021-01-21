@@ -15,9 +15,6 @@ class TextClickTracker implements ClickTrackerInterface {
   public function filterContent($msg, $mailing_id, $queue_id) {
     return self::replaceTextUrls($msg,
       function ($url) use ($mailing_id, $queue_id) {
-        if (strpos($url, '{') !== FALSE) {
-          return $url;
-        }
         return \CRM_Mailing_BAO_TrackableURL::getTrackerURL($url, $mailing_id,
           $queue_id);
       }
