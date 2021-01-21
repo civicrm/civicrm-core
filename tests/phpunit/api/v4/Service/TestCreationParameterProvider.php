@@ -107,7 +107,7 @@ class TestCreationParameterProvider {
    */
   private function getOption(FieldSpec $field) {
     $options = array_column($field->getOptions(), 'label', 'id');
-    return array_rand($options);
+    return key($options);
   }
 
   /**
