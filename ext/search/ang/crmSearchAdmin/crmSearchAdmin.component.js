@@ -255,15 +255,6 @@
         });
       };
 
-      $scope.changeJoin = function(idx) {
-        if (ctrl.savedSearch.api_params.join[idx][0]) {
-          ctrl.savedSearch.api_params.join[idx].length = 2;
-          loadFieldOptions();
-        } else {
-          ctrl.clearParam('join', idx);
-        }
-      };
-
       $scope.changeGroupBy = function(idx) {
         if (!ctrl.savedSearch.api_params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
