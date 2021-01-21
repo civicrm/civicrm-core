@@ -188,15 +188,20 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if ($entity === 'LineItem') {
-    $types = [];
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-    if ($types) {
-      $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
-    }
-    else {
-      $clauses['financial_type_id'] = '= 0';
-    }
+
+  switch ($entity) {
+    case 'LineItem':
+    case 'MembershipType':
+      $types = [];
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+      if ($types) {
+        $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
+      }
+      else {
+        $clauses['financial_type_id'] = '= 0';
+      }
+      break;
+
   }
 
 }
