@@ -376,6 +376,51 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that logging records changes in upper/lower-case and accents.
+   * e.g. changing e to E or e to é
+   * @dataProvider loggingSensitivityProvider
+   *
+   * @param array $input
+   */
+  public function testLoggingSensitivity(array $input) {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    // create a contact with all lower case/no accents
+    $contact_id = $this->individualCreate(['first_name' => 'pierre']);
+
+    $query_params = [
+      1 => [$contact_id, 'Integer'],
+      2 => [$input['first_name'], 'String'],
+    ];
+
+    // Clear out anything that api did twice during initial creation so that
+    // spurious update records don't give false results.
+    CRM_Core_DAO::executeQuery("DELETE FROM log_civicrm_contact WHERE id = %1 AND log_action = 'update'", $query_params);
+
+    // Change the first name
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET first_name = %2 WHERE id = %1", $query_params);
+    // check the log
+    $dao = CRM_Core_DAO::executeQuery("SELECT first_name FROM log_civicrm_contact WHERE id = %1 AND log_action = 'update'", $query_params);
+    $first_name = NULL;
+    if ($dao->fetch()) {
+      $first_name = $dao->first_name;
+    }
+    $this->assertSame($input['first_name'], $first_name);
+  }
+
+  /**
+   * Dataprovider for testLoggingSensitivity
+   * @return array
+   */
+  public function loggingSensitivityProvider():array {
+    return [
+      'upper' => [['first_name' => 'Pierre']],
+      'accent' => [['first_name' => 'pièrre']],
+    ];
+  }
+
+  /**
    * Test creating a table with SchemaHandler::createTable when logging
    * is enabled.
    */
