@@ -467,6 +467,17 @@ function afform_civicrm_permissionList(&$permissions) {
 }
 
 /**
+ * Implements hook_civicrm_alterApiRoutePermissions().
+ *
+ * @see CRM_Utils_Hook::alterApiRoutePermissions
+ */
+function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
+  if ($entity == 'Afform' && $action == 'submit') {
+    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+  }
+}
+
+/**
  * Clear any local/in-memory caches based on afform data.
  */
 function _afform_clear() {

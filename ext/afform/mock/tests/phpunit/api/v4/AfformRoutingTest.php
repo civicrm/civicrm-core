@@ -96,4 +96,58 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $this->assertRegExp(';afform":\{"open":"' . preg_quote($directive, ';') . '"\};', $contents);
   }
 
+  public function testPublicSubmissionAllowed() {
+    $contact = Civi\Api4\Contact::create(FALSE)
+      ->setValues([
+        'first_name' => 'test',
+        'last_name' => 'contact',
+        'contact_type' => 'Individual',
+      ])
+      ->execute()
+      ->first();
+
+    $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
+    $url = function ($path, $query = NULL) {
+      return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
+    };
+
+    $defaults = [
+      'title' => 'My form',
+      'name' => $this->formName,
+      'layout' => '
+<af-form ctrl="modelListCtrl">
+  <af-entity type="Contact" data="{contact_type: \'Individual\'}" name="me" label="Myself" url-autofill="1" autofill="user" />
+  <fieldset af-fieldset="me">
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+  </fieldset>
+</af-form>',
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ];
+    Civi\Api4\Afform::create()
+      ->setCheckPermissions(FALSE)
+      ->setLayoutFormat('html')
+      ->setValues($defaults)
+      ->execute();
+
+    $prefill = Civi\Api4\Afform::prefill()
+      ->setName($this->formName)
+      ->setArgs([])
+      ->execute()
+      ->indexBy('name');
+
+    $me = [0 => ['fields' => []]];
+    $me[0]['fields']['id'] = $contact['id'];
+    $me[0]['fields']['first_name'] = 'Firsty';
+    $me[0]['fields']['last_name'] = 'Lasty';
+
+    $query = [
+      'params' => json_encode(['name' => $this->formName, 'args' => [], 'values' => ['me' => $me]]),
+    ];
+    $response = $http->post($url('civicrm/ajax/api4/Afform/submit', $query), ['headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
+    $contact = Civi\Api4\Contact::get()->setCheckPermissions(FALSE)->addWhere('id', '=', $contact['id'])->execute()->first();
+    $this->assertEquals('Firsty', $contact['first_name']);
+    $this->assertEquals('Lasty', $contact['last_name']);
+  }
+
 }

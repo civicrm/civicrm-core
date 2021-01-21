@@ -167,6 +167,11 @@ class CRM_AfformAdmin_Utils {
         'description' => $perm[1] ?? NULL,
       ];
     }
+    $data['permissions'][] = [
+      'id' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'text' => E::ts('Allow Anonymous users to submit this form'),
+      'description' => E::ts('Allow Anonymous users to submit this form'),
+    ];
 
     return $data;
   }

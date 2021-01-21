@@ -32,13 +32,22 @@ class AfformSubmitEvent extends Event {
   public $entityValues;
 
   /**
+   * @var bool
+   *   should we check permissions as we submit the form or not
+   *
+   */
+  public $checkPermissions;
+
+  /**
    * AfformSubmitEvent constructor.
    * @param $entityDefns
    * @param array $entityValues
+   * @param bool $checkPermissions
    */
-  public function __construct($entityDefns, array $entityValues) {
+  public function __construct($entityDefns, array $entityValues, $checkPermissions) {
     $this->entityDefns = $entityDefns;
     $this->entityValues = $entityValues;
+    $this->checkPermissions = $checkPermissions;
   }
 
   /**
