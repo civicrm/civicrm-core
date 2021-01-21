@@ -245,6 +245,9 @@
             _.each(_.cloneDeep(join.conditions), function(condition) {
               params.push(condition);
             });
+            _.each(_.cloneDeep(join.defaults), function(condition) {
+              params.push(condition);
+            });
             ctrl.savedSearch.api_params.join.push(params);
             loadFieldOptions();
           }

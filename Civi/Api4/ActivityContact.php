@@ -20,11 +20,12 @@
 namespace Civi\Api4;
 
 /**
- * ActivityContact Entity.
+ * ActivityContact BridgeEntity.
  *
- * This entity adds a record which relate a contact to activity.
+ * This connects a contact to an activity.
  *
- * Creating a new ActivityContact requires at minimum a contact_id and activity_id.
+ * The record_type_id field determines the contact's role in the activity (source, target, or assignee).
+ * @ui_join_filters record_type_id
  *
  * @see \Civi\Api4\Activity
  * @package Civi\Api4

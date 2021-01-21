@@ -116,17 +116,21 @@
         // Add the numbered suffix to the join conditions
         // If this is a deep join, also add the base entity prefix
         var prefix = alias.replace(new RegExp('_?' + join.alias + '_?\\d?\\d?$'), '');
-        _.each(result.conditions, function(condition) {
+        function replaceRefs(condition) {
           if (_.isArray(condition)) {
             _.each(condition, function(ref, side) {
-              if (side !== 1 && _.includes(ref, '.')) {
-                condition[side] = ref.replace(join.alias + '.', alias + '.');
-              } else if (side !== 1 && prefix.length && !_.includes(ref, '"') && !_.includes(ref, "'")) {
-                condition[side] = prefix + '.' + ref;
+              if (side !== 1 && typeof ref === 'string') {
+                if (_.includes(ref, '.')) {
+                  condition[side] = ref.replace(join.alias + '.', alias + '.');
+                } else if (prefix.length && !_.includes(ref, '"') && !_.includes(ref, "'")) {
+                  condition[side] = prefix + '.' + ref;
+                }
               }
             });
           }
-        });
+        }
+        _.each(result.conditions, replaceRefs);
+        _.each(result.defaults, replaceRefs);
         return result;
       }
       function getFieldAndJoin(fieldName, entityName) {
