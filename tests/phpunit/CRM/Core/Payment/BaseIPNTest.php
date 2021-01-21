@@ -101,43 +101,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
-  public function testLoadMembershipObjects() {
-    $this->_setUpMembershipObjects();
-    $this->_setUpRecurringContribution();
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertNotEmpty($this->objects['membership']);
-    $this->assertArrayHasKey($this->_membershipId . '_' . $this->_membershipTypeID, $this->objects['membership']);
-    $this->assertTrue(is_a($this->objects['membership'][$this->_membershipId . '_' . $this->_membershipTypeID], 'CRM_Member_BAO_Membership'));
-    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertNotEmpty($this->objects['contributionRecur']);
-    $this->assertNotEmpty($this->objects['paymentProcessor']);
-  }
-
-  /**
-   * Test the LoadObjects function with recurring membership data.
-   */
-  public function testLoadMembershipObjectsNoLeakage() {
-    $this->_setUpMembershipObjects();
-    $this->_setUpRecurringContribution();
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertEquals('Anthony', $this->objects['contact']->first_name);
-
-    $this->ids['contact'] = $this->_contactId = $this->individualCreate([
-      'first_name' => 'Donald',
-      'last_name' => 'Duck',
-      'email' => 'the-don@duckville.com',
-    ]);
-    $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
-    $this->_contributionId = $contribution['id'];
-    $this->_setUpMembershipObjects();
-    $this->input['invoiceID'] = 'abc';
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertEquals('Donald', $this->objects['contact']->first_name);
-  }
-
-  /**
-   * Test the LoadObjects function with recurring membership data.
-   */
   public function testLoadMembershipObjectsLoadAll() {
     $this->_setUpMembershipObjects();
     $this->_setUpRecurringContribution();
@@ -189,8 +152,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate(['name' => 'Fowl']);
     $this->_setUpMembershipObjects();
     $this->input['invoiceID'] = 'abc';
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertEquals('Donald', $this->objects['contact']->first_name);
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
@@ -212,30 +173,13 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that loadObjects works with participant values.
-   */
-  public function testLoadParticipantObjects() {
-    $this->_setUpParticipantObjects();
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertNotEmpty($this->objects['participant']);
-    $this->assertTrue(is_a($this->objects['participant'], 'CRM_Event_BAO_Participant'));
-    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertNotEmpty($this->objects['event']);
-    $this->assertTrue(is_a($this->objects['event'], 'CRM_Event_BAO_Event'));
-    $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
-    $this->assertNotEmpty($this->objects['event']->id);
-  }
-
-  /**
    * Test the LoadObjects function with a participant.
    */
   public function testComposeMailParticipant() {
     $this->_setUpParticipantObjects();
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $values = [];
-    $this->assertNotEmpty($this->objects['event']);
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
+    $contribution->loadRelatedObjects($this->input, $this->ids);
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertContains('registration has been received and your status has been updated to Attended.', $msg['body']);
     $this->assertContains('Annual CiviCRM meet', $msg['html']);
@@ -292,43 +236,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that loadObjects works with participant values.
-   */
-  public function testLoadPledgeObjects() {
-    $this->_setUpPledgeObjects();
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
-    $this->assertNotEmpty($this->objects['pledge_payment'][0]);
-    $this->assertTrue(is_a($this->objects['financialType'], 'CRM_Financial_BAO_FinancialType'));
-    $this->assertTrue(is_a($this->objects['contribution'], 'CRM_Contribute_BAO_Contribution'));
-    $this->assertTrue(is_a($this->objects['pledge_payment'][0], 'CRM_Pledge_BAO_PledgePayment'));
-    $this->assertNotEmpty($this->objects['pledge_payment'][0]->id);
-    $this->assertEquals($this->_financialTypeId, $this->objects['financialType']->id);
-    $this->assertEquals($this->_processorId, $this->objects['paymentProcessor']['id']);
-    $this->assertEquals($this->_contributionId, $this->objects['contribution']->id);
-    $this->assertEquals($this->_contactId, $this->objects['contact']->id);
-    $this->assertEquals($this->_pledgeId, $this->objects['pledge_payment'][0]->pledge_id);
-  }
-
-  /**
-   * Test that loadObjects works with participant values.
-   */
-  public function testLoadPledgeObjectsInvalidPledgeID() {
-    $this->_setUpPledgeObjects();
-    $this->ids['pledge_payment'][0] = 0;
-
-    $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL);
-    $this->assertArrayNotHasKey('pledge_payment', $this->objects);
-
-    $this->ids['pledge_payment'][0] = 999;
-    try {
-      $this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, $this->_processorId);
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertEquals('Could not find pledge payment record: 999', $e->getMessage());
-    }
-  }
-
-  /**
    * Test the LoadObjects function with a pledge.
    */
   public function testSendMailPledge() {
@@ -337,27 +244,6 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertContains('Contribution Information', $msg['html']);
-  }
-
-  /**
-   * Test that an error is returned if required set & no contribution page.
-   */
-  public function testRequiredWithoutProcessorID() {
-    $this->_setUpPledgeObjects();
-    // error is only returned if $required set to True
-    $result = $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, NULL);
-    $this->assertEquals(TRUE, $result);
-  }
-
-  /**
-   * Test that if part of $input the payment processor loads OK.
-   *
-   * It's preferable to pass it in as it cannot be correctly calculated.
-   */
-  public function testPaymentProcessorLoadsAsParam() {
-    $this->_setUpContributionObjects();
-    $this->input = array_merge($this->input, ['payment_processor_id' => $this->_processorId]);
-    $this->assertTrue($this->IPN->loadObjects($this->input, $this->ids, $this->objects, TRUE, NULL));
   }
 
   public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
