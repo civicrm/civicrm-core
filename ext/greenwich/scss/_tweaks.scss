@@ -1,3 +1,9 @@
+/* Fix some cms themes which add margin to lists */
+ul, ol {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 /* Supports adding form-control class to the checkbox-inline class to achieve an outer border around the checkbox&label */
 .form-control.checkbox-inline > label {
   margin-left: 9px;
