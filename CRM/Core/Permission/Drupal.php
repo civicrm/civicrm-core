@@ -108,7 +108,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
     $modules = system_get_info('module');
     foreach ($modules as $moduleName => $module) {
       $prefix = isset($module['name']) ? ($module['name'] . ': ') : '';
-      foreach (module_invoke($moduleName, 'permission') as $permName => $perm) {
+      foreach (module_invoke($moduleName, 'permission') ?? [] as $permName => $perm) {
         if (isset($allCorePerms[$permName])) {
           continue;
         }
