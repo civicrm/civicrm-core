@@ -9,4 +9,7 @@ return [
     },
     'url-autofill': '1'
   }",
+  'boilerplate' => [
+    ['#tag' => 'afblock-name-organization'],
+  ],
 ];

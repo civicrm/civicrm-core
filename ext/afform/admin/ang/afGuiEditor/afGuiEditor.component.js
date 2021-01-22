@@ -90,10 +90,10 @@
         var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
         fieldset['af-fieldset'] = type + num;
         fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
-        // Add default contact name block
-        if (meta.entity === 'Contact') {
-          fieldset['#children'].push({'#tag': 'afblock-name-' + type.toLowerCase()});
-        }
+        // Add boilerplate contents
+        _.each(meta.boilerplate, function(tag) {
+          fieldset['#children'].push(tag);
+        });
         // Attempt to place the new af-fieldset after the last one on the form
         pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
         if (pos) {

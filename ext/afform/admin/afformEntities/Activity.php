@@ -3,4 +3,7 @@ return [
   'entity' => 'Activity',
   'label' => ts('Activity'),
   'defaults' => "{'url-autofill': '1'}",
+  'boilerplate' => [
+    ['#tag' => 'af-field', 'name' => 'subject'],
+  ],
 ];
