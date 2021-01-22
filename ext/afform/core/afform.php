@@ -420,11 +420,16 @@ function afform_civicrm_alterMenu(&$items) {
  * Implements hook_civicrm_permission_check().
  *
  * This extends the list of permissions available in `CRM_Core_Permission:check()`
- * by introducing virtual-permissions named `@afform:myForm`. The evaluation
- * of these virtual-permissions is dependent on the settings for `myForm`.
+ * by introducing synthetic permissions named `@afform:myForm`. The evaluation
+ * of these synthetic permissions is dependent on the settings for `myForm`.
  * `myForm` may be exposed/integrated through multiple subsystems (routing,
- * nav-menu, API, etc), and the use of virtual-permissions makes easy to enforce
+ * nav-menu, API, etc), and the use of virtual-permissions makes it easy to enforce
  * consistent permissions across any relevant subsystems.
+ *
+ * These synthetic permissions are only used to assess preliminary access for
+ * opening/navigating-to the form. The form may have additional permissions
+ * checks (e.g. AfformAuthorizeEvent) to see if particular entity-IDs or actions
+ * are permitted.
  *
  * @see CRM_Utils_Hook::permission_check()
  */
@@ -434,6 +439,7 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
     return;
   }
 
+  // Are you loosely allowed to navigate-to/request a form?
   if (preg_match('/^@afform:(.*)/', $permission, $m)) {
     $name = $m[1];
 
@@ -445,6 +451,24 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
       ->first();
     if ($afform) {
       $granted = CRM_Core_Permission::check($afform['permission'], $contactId);
+    }
+  }
+  // For a form based on generic permissions, are you loosely allowed to navigate-to/request it?
+  elseif (preg_match('/^@afformGeneric:(.*)/', $permission, $m)) {
+    $type = $m[1];
+    switch ($type) {
+      case 'public':
+        // When it comes to enabling dashlets/routes/etc, a 'public' form always works.
+        $granted = TRUE;
+        return;
+
+      case 'backend':
+        // When it comes to enabling dashlets/routes/etc, a 'backend' form is like an API.
+        $granted = CRM_Core_Permission::check([['access AJAX API', 'access CiviCRM']], $contactId);
+        return;
+
+      default:
+        throw new \API_Exception("Unrecognized generic permission: " . $permission);
     }
   }
 }
