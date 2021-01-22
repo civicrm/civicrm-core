@@ -455,6 +455,8 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
  * @see CRM_Utils_Hook::permissionList()
  */
 function afform_civicrm_permissionList(&$permissions) {
+  // A route or dashlet might have 'permissions=@afform:<form_name>' to indicate
+  // that it inherits the currently-configured permissions from that form.
   $scanner = Civi::service('afform_scanner');
   foreach ($scanner->getMetas() as $name => $meta) {
     $permissions['@afform:' . $name] = [
@@ -464,6 +466,29 @@ function afform_civicrm_permissionList(&$permissions) {
       ]),
     ];
   }
+
+  // A specific afform might have 'permission=@afformGeneric:public' or
+  // 'permission=@afformGeneric:backend' to indicate that
+
+  $permissions['@afformGeneric:public'] = [
+    'group' => 'afformGeneric',
+    'title' => ts('Generic: Allow public submissions'),
+    'description' => ts('Anyone may submit new data to this form. Updates for existing records are not allowed.'),
+  ];
+
+  // A specific form might have 'permission=@afformGeneric:backend' to
+  // indicate that this is a basic backend form. There is no specific permission
+  // associated with the form - instead, it relies on the acces-control for
+  // underlying APIs.
+  $permissions['@afformGeneric:backend'] = [
+    'group' => 'afformGeneric',
+    'title' => ts('Generic: Inherit standard permissions'),
+    'description' => ts('Only allow access if the user has permission to the data in the standard UI/API.'),
+  ];
+
+  // Possible additions:
+  //  - @afformGeneric:self service - Some kind of self-service permission, wherein you
+  //    may submit a form if it updates your own Contact record.
 }
 
 /**

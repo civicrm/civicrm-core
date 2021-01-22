@@ -159,19 +159,19 @@ class CRM_AfformAdmin_Utils {
       'danger' => E::ts('Danger'),
     ];
 
-    $data['permissions'] = [];
-    foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $name => $perm) {
+    $perms = Civi\Api4\Permission::get()
+      ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
+      ->addWhere('is_active', '=', 1)
+      ->addOrderBy('group')
+      ->addOrderBy('name')
+      ->execute();
+    foreach ($perms as $perm) {
       $data['permissions'][] = [
-        'id' => $name,
-        'text' => $perm[0],
-        'description' => $perm[1] ?? NULL,
+        'id' => $perm['name'],
+        'text' => $perm['title'],
+        'description' => $perm['description'] ?? NULL,
       ];
     }
-    $data['permissions'][] = [
-      'id' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
-      'text' => E::ts('Allow Anonymous users to submit this form'),
-      'description' => E::ts('Allow Anonymous users to submit this form'),
-    ];
 
     return $data;
   }
