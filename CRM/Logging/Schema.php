@@ -720,8 +720,8 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         if (empty($colSpecs['EXTRA']) || (!empty($colSpecs['EXTRA']) && $colSpecs['EXTRA'] !== 'auto_increment')) {
           // ignore 'id' column for any spec changes, to avoid any auto-increment mysql errors
           if ($civiTableSpecs[$col]['DATA_TYPE'] != CRM_Utils_Array::value('DATA_TYPE', $logTableSpecs[$col])
-          // We won't alter the log if the length is decreased in case some of the existing data won't fit.
-          || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
+            // We won't alter the log if the length is decreased in case some of the existing data won't fit.
+            || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
           ) {
             // if data-type is different, surely consider the column
             $diff['MODIFY'][] = $col;
