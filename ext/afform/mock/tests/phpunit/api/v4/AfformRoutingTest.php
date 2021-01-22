@@ -96,11 +96,38 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $this->assertRegExp(';afform":\{"open":"' . preg_quote($directive, ';') . '"\};', $contents);
   }
 
-  public function testPublicSubmissionAllowed() {
+  public function testPublicCreateAllowed() {
+    $initialMaxId = CRM_Core_DAO::singleValueQuery('SELECT max(id) FROM civicrm_contact');
+    $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
+    $url = function ($path, $query = NULL) {
+      return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
+    };
+
+    $this->createPublicForm();
+
+    $r = md5(random_bytes(16));
+
+    $me = [0 => ['fields' => []]];
+    $me[0]['fields']['first_name'] = 'Firsty' . $r;
+    $me[0]['fields']['last_name'] = 'Lasty' . $r;
+
+    $query = [
+      'params' => json_encode(['name' => $this->formName, 'args' => [], 'values' => ['me' => $me]]),
+    ];
+
+    $response = $http->post($url('civicrm/ajax/api4/Afform/submit', $query), ['headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
+    $this->assertEquals(200, $response->getStatusCode());
+    $contact = Civi\Api4\Contact::get(FALSE)->addWhere('first_name', '=', 'Firsty' . $r)->execute()->first();
+    $this->assertEquals('Firsty' . $r, $contact['first_name']);
+    $this->assertEquals('Lasty' . $r, $contact['last_name']);
+    $this->assertTrue($contact['id'] > $initialMaxId);
+  }
+
+  public function testPublicEditDisallowed() {
     $contact = Civi\Api4\Contact::create(FALSE)
       ->setValues([
-        'first_name' => 'test',
-        'last_name' => 'contact',
+        'first_name' => 'FirstBegin',
+        'last_name' => 'LastBegin',
         'contact_type' => 'Individual',
       ])
       ->execute()
@@ -111,6 +138,32 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
     };
 
+    $this->createPublicForm();
+
+    $r = md5(random_bytes(16));
+
+    $me = [0 => ['fields' => []]];
+    $me[0]['fields']['id'] = $contact['id'];
+    $me[0]['fields']['first_name'] = 'Firsty' . $r;
+    $me[0]['fields']['last_name'] = 'Lasty' . $r;
+
+    $query = [
+      'params' => json_encode(['name' => $this->formName, 'args' => [], 'values' => ['me' => $me]]),
+    ];
+
+    $response = $http->post($url('civicrm/ajax/api4/Afform/submit', $query), ['headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
+
+    // FIXME: The current behavior is {status=500,body='[]'} ... but status=403 probably makes more sense.
+    $this->assertEquals(500, $response->getStatusCode());
+    $get = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->execute()->first();
+    // Contact hasn't changed
+    $this->assertEquals('FirstBegin', $get['first_name']);
+    $this->assertEquals('LastBegin', $get['last_name']);
+    // No other contacts were created or edited with the requested value.
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
+  }
+
+  private function createPublicForm():void {
     $defaults = [
       'title' => 'My form',
       'name' => $this->formName,
@@ -129,25 +182,6 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->setLayoutFormat('html')
       ->setValues($defaults)
       ->execute();
-
-    $prefill = Civi\Api4\Afform::prefill()
-      ->setName($this->formName)
-      ->setArgs([])
-      ->execute()
-      ->indexBy('name');
-
-    $me = [0 => ['fields' => []]];
-    $me[0]['fields']['id'] = $contact['id'];
-    $me[0]['fields']['first_name'] = 'Firsty';
-    $me[0]['fields']['last_name'] = 'Lasty';
-
-    $query = [
-      'params' => json_encode(['name' => $this->formName, 'args' => [], 'values' => ['me' => $me]]),
-    ];
-    $response = $http->post($url('civicrm/ajax/api4/Afform/submit', $query), ['headers' => ['X-Requested-With' => 'XMLHttpRequest']]);
-    $contact = Civi\Api4\Contact::get()->setCheckPermissions(FALSE)->addWhere('id', '=', $contact['id'])->execute()->first();
-    $this->assertEquals('Firsty', $contact['first_name']);
-    $this->assertEquals('Lasty', $contact['last_name']);
   }
 
 }
