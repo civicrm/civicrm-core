@@ -32,7 +32,7 @@ class Submit extends AbstractProcessor {
         }
       }
     }
-    $event = new AfformSubmitEvent($this->_afform, $this, $this->_formDataModel->getEntities(), $entityValues);
+    $event = new AfformSubmitEvent($this->_afform, $this, $this->_formDataModel->getEntities(), $entityValues, $this->_authorization);
     \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     foreach ($event->entityValues as $entityType => $entities) {
       if (!empty($entities)) {
@@ -50,8 +50,7 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processContacts(AfformSubmitEvent $event) {
-    $checkPermissions = (!empty($event->afform['permission']) && $event->afform['permission'] === \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) ? FALSE : TRUE;
-
+    $checkPermissions = $event->authorization->getCheckNestedPermission();
     foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contacts) {
       foreach ($contacts as $contact) {
         $saved = civicrm_api4('Contact', 'save', ['records' => [$contact['fields']], 'checkPermissions' => $checkPermissions])->first();
@@ -67,8 +66,7 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processGenericEntity(AfformSubmitEvent $event) {
-    $checkPermissions = (!empty($event->afform['permission']) && $event->afform['permission'] === \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) ? FALSE : TRUE;
-
+    $checkPermissions = $event->authorization->getCheckNestedPermission();
     foreach ($event->entityValues as $entityType => $entities) {
       // Each record is an array of one or more items (can be > 1 if af-repeat is used)
       foreach ($entities as $entityName => $records) {

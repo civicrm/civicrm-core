@@ -49,6 +49,8 @@ function afform_civicrm_config(&$config) {
   }
   Civi::$statics[__FUNCTION__] = 1;
 
+  Civi::dispatcher()->addListener('civi.afform.authorize', ['\Civi\Afform\DefaultAuthorization', 'checkParentAuth'], 1000);
+  Civi::dispatcher()->addListener('civi.afform.authorize', ['\Civi\Afform\DefaultAuthorization', 'onAuthorize'], -1000);
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
   Civi::dispatcher()->addListener('hook_civicrm_angularModules', '_afform_civicrm_angularModules_autoReq', -1000);
@@ -451,6 +453,10 @@ function afform_civicrm_permission_check($permission, &$granted, $contactId) {
       ->first();
     if ($afform) {
       $granted = CRM_Core_Permission::check($afform['permission'], $contactId);
+      // If the `$afform` record starts to develop more complex permissioning options,
+      // then one might fire `AfformAuthorizeEvent($afform)` instead of calling
+      // `Permission::check($afform['permission'])`. However, in current form, this
+      // probably saves some resources and it handles `$contactId` correctly.
     }
   }
   // For a form based on generic permissions, are you loosely allowed to navigate-to/request it?

@@ -27,6 +27,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_afform;
 
   /**
+   * @var \Civi\Afform\Event\AfformAuthorizeEvent
+   */
+  protected $_authorization;
+
+  /**
    * @var \Civi\Afform\FormDataModel
    *   List of entities declared by this form.
    */
@@ -39,13 +44,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist
     $this->_afform = (array) civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $this->name]]], 0);
-    if ($this->getCheckPermissions()) {
-      if (!\CRM_Core_Permission::check("@afform:" . $this->_afform['name'])) {
-        throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: Cannot process form " . $this->_afform['name']);
-      }
-    }
-
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
+    $this->_authorization = $this->checkPermissions();
     $this->validateArgs();
     $result->exchangeArray($this->processForm());
   }
@@ -62,6 +62,22 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $this->args[$arg] = $val;
       }
     }
+  }
+
+  /**
+   * Assert that the current form submission is authorized.
+   *
+   * @return \Civi\Afform\Event\AfformAuthorizeEvent
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function checkPermissions() {
+    // Perhaps we should also pass-through the FormDataModel?
+    $event = new \Civi\Afform\Event\AfformAuthorizeEvent($this->_afform, $this);
+    \Civi::dispatcher()->dispatch('civi.afform.authorize', $event);
+    if (!$event->isAuthorized()) {
+      throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: Cannot process form " . $this->_afform['name']);
+    }
+    return $event;
   }
 
   /**

@@ -43,11 +43,13 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
    * @param $entityDefns
    * @param array $entityValues
+   * @param \Civi\Afform\Event\AfformAuthorizeEvent $authorization
    */
-  public function __construct(array $afform, Submit $apiRequest, $entityDefns, array $entityValues) {
+  public function __construct(array $afform, Submit $apiRequest, $entityDefns, array $entityValues, AfformAuthorizeEvent $authorization) {
     parent::__construct($afform, $apiRequest);
     $this->entityDefns = $entityDefns;
     $this->entityValues = $entityValues;
+    $this->authorization = $authorization;
   }
 
   /**
