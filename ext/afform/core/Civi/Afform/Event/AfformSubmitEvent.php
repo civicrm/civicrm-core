@@ -1,7 +1,7 @@
 <?php
 namespace Civi\Afform\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Api4\Action\Afform\Submit;
 
 /**
  * Class AfformSubmitEvent
@@ -15,7 +15,7 @@ use Symfony\Component\EventDispatcher\Event;
  * methods. For the moment, this is only expected to be used internally,
  * so KISS.
  */
-class AfformSubmitEvent extends Event {
+class AfformSubmitEvent extends AfformBaseEvent {
 
   /**
    * @var array
@@ -32,22 +32,22 @@ class AfformSubmitEvent extends Event {
   public $entityValues;
 
   /**
-   * @var bool
-   *   should we check permissions as we submit the form or not
-   *
+   * @var AfformAuthorizeEvent
    */
-  public $checkPermissions;
+  public $authorization;
 
   /**
    * AfformSubmitEvent constructor.
+   *
+   * @param array $afform
+   * @param \Civi\Api4\Action\Afform\Submit $apiRequest
    * @param $entityDefns
    * @param array $entityValues
-   * @param bool $checkPermissions
    */
-  public function __construct($entityDefns, array $entityValues, $checkPermissions) {
+  public function __construct(array $afform, Submit $apiRequest, $entityDefns, array $entityValues) {
+    parent::__construct($afform, $apiRequest);
     $this->entityDefns = $entityDefns;
     $this->entityValues = $entityValues;
-    $this->checkPermissions = $checkPermissions;
   }
 
   /**

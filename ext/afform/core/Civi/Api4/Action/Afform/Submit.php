@@ -32,9 +32,7 @@ class Submit extends AbstractProcessor {
         }
       }
     }
-    // If Admin has set the permission so that anonymous users can submit the form turn off check permission when saving content.
-    $checkPermissions = (!empty($this->_afform['permission']) && $this->_afform['permission'] === \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) ? FALSE : TRUE;
-    $event = new AfformSubmitEvent($this->_formDataModel->getEntities(), $entityValues, $checkPermissions);
+    $event = new AfformSubmitEvent($this->_afform, $this, $this->_formDataModel->getEntities(), $entityValues);
     \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     foreach ($event->entityValues as $entityType => $entities) {
       if (!empty($entities)) {
@@ -52,7 +50,8 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processContacts(AfformSubmitEvent $event) {
-    $checkPermissions = $event->checkPermissions ?? TRUE;
+    $checkPermissions = (!empty($event->afform['permission']) && $event->afform['permission'] === \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) ? FALSE : TRUE;
+
     foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contacts) {
       foreach ($contacts as $contact) {
         $saved = civicrm_api4('Contact', 'save', ['records' => [$contact['fields']], 'checkPermissions' => $checkPermissions])->first();
@@ -68,7 +67,8 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processGenericEntity(AfformSubmitEvent $event) {
-    $checkPermissions = $event->checkPermissions ?? TRUE;
+    $checkPermissions = (!empty($event->afform['permission']) && $event->afform['permission'] === \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) ? FALSE : TRUE;
+
     foreach ($event->entityValues as $entityType => $entities) {
       // Each record is an array of one or more items (can be > 1 if af-repeat is used)
       foreach ($entities as $entityName => $records) {
