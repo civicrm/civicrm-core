@@ -1,0 +1,301 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
+
+namespace Civi\Crypto;
+
+use Civi\Crypto\Exception\CryptoException;
+
+/**
+ * The CryptoRegistry tracks a list of available keys and cipher suites:
+ *
+ * - A registered cipher suite is an instance of CipherSuiteInterface that
+ *   provides a list of encryption options ("aes-cbc", "aes-ctr", etc) and
+ *   an implementation for them.
+ * - A registered key is an array that indicates a set of cryptographic options:
+ *     - key: string, binary representation of the key
+ *     - suite: string, e.g. "aes-cbc" or "aes-cbc-hs"
+ *     - id: string, unique (non-sensitive) ID. Usually a fingerprint.
+ *     - tags: string[], list of symbolic names/use-cases that may call upon this key
+ *     - weight: int, when choosing a key for encryption, two similar keys will be
+ *       be differentiated by weight. (Low values chosen before high values.)
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ */
+class CryptoRegistry {
+
+  const LAST_WEIGHT = 32768;
+
+  const DEFAULT_SUITE = 'aes-cbc';
+
+  const DEFAULT_KDF = 'hkdf-sha256';
+
+  /**
+   * List of available keys.
+   *
+   * @var array[]
+   */
+  protected $keys = [];
+
+  /**
+   * List of key-derivation functions. Used when loading keys.
+   *
+   * @var array
+   */
+  protected $kdfs = [];
+
+  protected $cipherSuites = [];
+
+  /**
+   * Initialize a default instance of the registry.
+   *
+   * @return \Civi\Crypto\CryptoRegistry
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public static function createDefaultRegistry() {
+    $registry = new static();
+    $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
+
+    $registry->addPlainText(['tags' => ['CRED']]);
+    if (defined('CIVICRM_CRED_KEYS') && CIVICRM_CRED_KEYS !== '') {
+      foreach (explode(' ', CIVICRM_CRED_KEYS) as $n => $keyExpr) {
+        $key = ['tags' => ['CRED'], 'weight' => $n];
+        if ($keyExpr === 'plain') {
+          $registry->addPlainText($key);
+        }
+        else {
+          $registry->addSymmetricKey($registry->parseKey($keyExpr) + $key);
+        }
+      }
+    }
+
+    //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
+    //  $crypto->addSymmetricKey([
+    //    'key' => base64_decode($_COOKIE['CIVICRM_FORM_KEY']),
+    //    'suite' => 'aes-cbc',
+    //    'tag' => ['FORM'],
+    //  ]);
+    //  // else: somewhere in CRM_Core_Form, we may need to initialize CIVICRM_FORM_KEY
+    //}
+
+    // Allow plugins to add/replace any keys and ciphers.
+    \CRM_Utils_Hook::crypto($registry);
+    return $registry;
+  }
+
+  public function __construct() {
+    $this->cipherSuites['plain'] = TRUE;
+    $this->keys['plain'] = [
+      'key' => '',
+      'suite' => 'plain',
+      'tags' => [],
+      'id' => 'plain',
+      'weight' => self::LAST_WEIGHT,
+    ];
+
+    // Base64 - Useful for precise control. Relatively quick decode. Please bring your own entropy.
+    $this->kdfs['b64'] = 'base64_decode';
+
+    // HKDF - Forgiving about diverse inputs. Relatively quick decode. Please bring your own entropy.
+    $this->kdfs['hkdf-sha256'] = function($v) {
+      // NOTE: 256-bit output by default. Useful for pairing with AES-256.
+      return hash_hkdf('sha256', $v);
+    };
+
+    // Possible future options: Read from PEM file. Run PBKDF2 on a passphrase.
+  }
+
+  /**
+   * @param string|array $options
+   *   Additional options:
+   *     - key: string, a representation of the key as binary
+   *     - suite: string, ex: 'aes-cbc'
+   *     - tags: string[]
+   *     - weight: int, default 0
+   *     - id: string, a unique identifier for this key. (default: fingerprint the key+suite)
+   *
+   * @return array
+   *   The full key record. (Same format as $options)
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function addSymmetricKey($options) {
+    $defaults = [
+      'suite' => self::DEFAULT_SUITE,
+      'weight' => 0,
+    ];
+    $options = array_merge($defaults, $options);
+
+    if (!isset($options['key'])) {
+      throw new CryptoException("Missing crypto key");
+    }
+
+    if (!isset($options['id'])) {
+      $options['id'] = \CRM_Utils_String::base64UrlEncode(sha1($options['suite'] . chr(0) . $options['key'], TRUE));
+    }
+    // Manual key IDs should be validated.
+    elseif (!$this->isValidKeyId($options['id'])) {
+      throw new CryptoException("Malformed key ID");
+    }
+
+    $this->keys[$options['id']] = $options;
+    return $options;
+  }
+
+  /**
+   * Determine if a key ID is well-formed.
+   *
+   * @param string $id
+   * @return bool
+   */
+  public function isValidKeyId($id) {
+    if (strpos($id, "\n") !== FALSE) {
+      return FALSE;
+    }
+    return (bool) preg_match(';^[a-zA-Z0-9_\-\.:,=+/\;\\\\]+$;s', $id);
+  }
+
+  /**
+   * Enable plain-text encoding.
+   *
+   * @param array $options
+   *   Array with options:
+   *   - tags: string[]
+   * @return array
+   */
+  public function addPlainText($options) {
+    static $n = 0;
+    $defaults = [
+      'suite' => 'plain',
+      'weight' => self::LAST_WEIGHT,
+    ];
+    $options = array_merge($defaults, $options);
+    $options['id'] = 'plain' . ($n++);
+    $this->keys[$options['id']] = $options;
+    return $options;
+  }
+
+  /**
+   * @param CipherSuiteInterface $cipherSuite
+   *   The encryption/decryption callback/handler
+   * @param string[]|NULL $names
+   *   Symbolic names. Ex: 'aes-cbc'
+   *   If NULL, probe $cipherSuite->getNames()
+   */
+  public function addCipherSuite(CipherSuiteInterface $cipherSuite, $names = NULL) {
+    $names = $names ?: $cipherSuite->getSuites();
+    foreach ($names as $name) {
+      $this->cipherSuites[$name] = $cipherSuite;
+    }
+  }
+
+  public function getKeys() {
+    return $this->keys;
+  }
+
+  /**
+   * Locate a key in the list of available keys.
+   *
+   * @param string|string[] $keyIds
+   *   List of IDs or tags. The first match in the list is returned.
+   *   If multiple keys match the same tag, then the one with lowest 'weight' is returned.
+   * @return array
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function findKey($keyIds) {
+    $keyIds = (array) $keyIds;
+    foreach ($keyIds as $keyIdOrTag) {
+      if (isset($this->keys[$keyIdOrTag])) {
+        return $this->keys[$keyIdOrTag];
+      }
+
+      $matchKeyId = NULL;
+      $matchWeight = self::LAST_WEIGHT;
+      foreach ($this->keys as $key) {
+        if (in_array($keyIdOrTag, $key['tags']) && $key['weight'] <= $matchWeight) {
+          $matchKeyId = $key['id'];
+          $matchWeight = $key['weight'];
+        }
+      }
+      if ($matchKeyId !== NULL) {
+        return $this->keys[$matchKeyId];
+      }
+    }
+
+    throw new CryptoException("Failed to find key by ID or tag (" . implode(' ', $keyIds) . ")");
+  }
+
+  /**
+   * Find all the keys that apply to a tag.
+   *
+   * @param string $keyTag
+   *
+   * @return array
+   *   List of keys, indexed by id, ordered by weight.
+   */
+  public function findKeysByTag($keyTag) {
+    $keys = array_filter($this->keys, function ($key) use ($keyTag) {
+      return in_array($keyTag, $key['tags'] ?? []);
+    });
+    uasort($keys, function($a, $b) {
+      return ($a['weight'] ?? 0) - ($b['weight'] ?? 0);
+    });
+    return $keys;
+  }
+
+  /**
+   * @param string $name
+   * @return \Civi\Crypto\CipherSuiteInterface
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  public function findSuite($name) {
+    if (isset($this->cipherSuites[$name])) {
+      return $this->cipherSuites[$name];
+    }
+    else {
+      throw new CryptoException('Unknown cipher suite ' . $name);
+    }
+  }
+
+  /**
+   * @param string $keyExpr
+   *   String in the form "<suite>:<key-encoding>:<key-value>".
+   *
+   *   'aes-cbc:b64:cGxlYXNlIHVzZSAzMiBieXRlcyBmb3IgYWVzLTI1NiE='
+   *   'aes-cbc:hkdf-sha256:ABCD1234ABCD1234ABCD1234ABCD1234'
+   *   '::ABCD1234ABCD1234ABCD1234ABCD1234'
+   *
+   * @return array
+   *   Properties:
+   *    - key: string, binary representation
+   *    - suite: string, ex: 'aes-cbc'
+   * @throws CryptoException
+   */
+  public function parseKey($keyExpr) {
+    list($suite, $keyFunc, $keyVal) = explode(':', $keyExpr);
+    if ($suite === '') {
+      $suite = self::DEFAULT_SUITE;
+    }
+    if ($keyFunc === '') {
+      $keyFunc = self::DEFAULT_KDF;
+    }
+    if (isset($this->kdfs[$keyFunc])) {
+      return [
+        'suite' => $suite,
+        'key' => call_user_func($this->kdfs[$keyFunc], $keyVal),
+      ];
+    }
+    else {
+      throw new CryptoException("Crypto key has unrecognized type");
+    }
+  }
+
+}

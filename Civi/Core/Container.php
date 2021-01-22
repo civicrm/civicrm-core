@@ -218,6 +218,12 @@ class Container {
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer')->setPublic(TRUE);
 
+    $container->setDefinition('crypto.registry', new Definition('Civi\Crypto\CryptoService'))
+      ->setFactory('Civi\Crypto\CryptoRegistry::createDefaultRegistry')->setPublic(TRUE);
+
+    $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
+      ->setPublic(TRUE);
+
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }

@@ -222,6 +222,31 @@ class CRM_Utils_String {
   }
 
   /**
+   * Encode string using URL-safe Base64.
+   *
+   * @param string $v
+   *
+   * @return string
+   * @see https://tools.ietf.org/html/rfc4648#section-5
+   */
+  public static function base64UrlEncode($v) {
+    return rtrim(str_replace(['+', '/'], ['-', '_'], base64_encode($v)), '=');
+  }
+
+  /**
+   * Decode string using URL-safe Base64.
+   *
+   * @param string $v
+   *
+   * @return false|string
+   * @see https://tools.ietf.org/html/rfc4648#section-5
+   */
+  public static function base64UrlDecode($v) {
+    // PHP base64_decode() is already forgiving about padding ("=").
+    return base64_decode(str_replace(['-', '_'], ['+', '/'], $v));
+  }
+
+  /**
    * Determine the string replacements for redaction.
    * on the basis of the regular expressions
    *

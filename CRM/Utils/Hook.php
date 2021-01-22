@@ -1760,6 +1760,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Register cryptographic resources, such as keys and cipher-suites.
+   *
+   * Ex: $crypto->addSymmetricKey([
+   *   'key' => hash_hkdf('sha256', 'abcd1234'),
+   *   'suite' => 'aes-cbc-hs',
+   * ]);
+   *
+   * @param \Civi\Crypto\CryptoRegistry $crypto
+   *
+   * @return mixed
+   */
+  public static function crypto($crypto) {
+    return self::singleton()->invoke(['crypto'], $crypto, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject,
+      'civicrm_crypto'
+    );
+  }
+
+  /**
    * This hook collects the trigger definition from all components.
    *
    * @param $info
@@ -2035,6 +2055,47 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(['permission', 'granted', 'contactId'], $permission, $granted, $contactId,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission_check'
+    );
+  }
+
+  /**
+   * Rotate the cryptographic key used in the database.
+   *
+   * The purpose of this hook is to visit any encrypted values in the database
+   * and re-encrypt the content.
+   *
+   * For values encoded via `CryptoToken`, you can use `CryptoToken::rekey($oldToken, $tag)`
+   *
+   * @param string $tag
+   *   The type of crypto-key that is currently being rotated.
+   *   The hook-implementer should use this to decide which (if any) fields to visit.
+   *   Ex: 'CRED'
+   * @param \Psr\Log\LoggerInterface $log
+   *   List of messages about re-keyed values.
+   *
+   * @code
+   * function example_civicrm_rekey($tag, &$log) {
+   *   if ($tag !== 'CRED') return;
+   *
+   *   $cryptoToken = Civi::service('crypto.token');
+   *   $rows = sql('SELECT id, secret_column FROM some_table');
+   *   foreach ($rows as $row) {
+   *     $new = $cryptoToken->rekey($row['secret_column']);
+   *     if ($new !== NULL) {
+   *       sql('UPDATE some_table SET secret_column = %1 WHERE id = %2',
+   *         $new, $row['id']);
+   *     }
+   *   }
+   * }
+   * @endCode
+   *
+   * @return null
+   *   The return value is ignored
+   */
+  public static function cryptoRotateKey($tag, $log) {
+    return self::singleton()->invoke(['tag', 'log'], $tag, $log, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_cryptoRotateKey'
     );
   }
 
