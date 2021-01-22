@@ -61,7 +61,7 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'icon', 'paths', 'dao', 'bridge')
+      ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters')
       ->addWhere('searchable', '=', TRUE)
       ->addOrderBy('title_plural')
       ->setChain([
@@ -142,6 +142,7 @@ class Admin {
           ) {
             continue;
           }
+          // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
           foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
             if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
               continue;
@@ -158,6 +159,7 @@ class Admin {
                 'description' => $dynamicCol ? '' : $keyField['label'],
                 'entity' => $targetEntityName,
                 'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $targetTable, $dynamicCol),
+                'defaults' => self::getJoinDefaults($alias, $targetEntity),
                 'alias' => $alias,
                 'multi' => FALSE,
               ];
@@ -168,6 +170,7 @@ class Admin {
                 'description' => $dynamicCol ? '' : $keyField['label'],
                 'entity' => $entity['name'],
                 'conditions' => self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $targetTable, $dynamicCol ? $alias . '.' . $dynamicCol : NULL),
+                'defaults' => self::getJoinDefaults($alias, $entity),
                 'alias' => $alias,
                 'multi' => TRUE,
               ];
@@ -192,6 +195,7 @@ class Admin {
                   [$bridge],
                   self::getJoinConditions('id', $alias . '.' . $baseKey, NULL, NULL)
                 ),
+                'defaults' => self::getJoinDefaults($alias, $targetEntity, $entity),
                 'bridge' => $bridge,
                 'alias' => $alias,
                 'multi' => TRUE,
@@ -206,6 +210,7 @@ class Admin {
                     [$bridge],
                     self::getJoinConditions($reference->getTargetKey(), $alias . '.' . $keyField['name'], $targetTable, $dynamicCol ? $alias . '.' . $dynamicCol : NULL)
                   ),
+                  'defaults' => self::getJoinDefaults($alias, $baseEntity, $entity),
                   'bridge' => $bridge,
                   'alias' => $alias,
                   'multi' => TRUE,
@@ -242,6 +247,31 @@ class Admin {
         '=',
         "'$targetTable'",
       ];
+    }
+    return $conditions;
+  }
+
+  /**
+   * @param $alias
+   * @param array ...$entities
+   * @return array
+   */
+  private static function getJoinDefaults($alias, ...$entities):array {
+    $conditions = [];
+    foreach ($entities as $entity) {
+      foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
+        $field = civicrm_api4($entity['name'], 'getFields', [
+          'select' => ['options'],
+          'where' => [['name', '=', $fieldName]],
+          'loadOptions' => ['name'],
+        ])->first();
+        $value = isset($field['options'][0]) ? json_encode($field['options'][0]['name']) : '';
+        $conditions[] = [
+          $alias . '.' . $fieldName . ($value ? ':name' : ''),
+          '=',
+          $value,
+        ];
+      }
     }
     return $conditions;
   }

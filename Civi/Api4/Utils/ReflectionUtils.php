@@ -88,9 +88,9 @@ class ReflectionUtils {
         elseif ($key == 'return') {
           $info['return'] = explode('|', $words[0]);
         }
-        elseif ($key == 'options') {
+        elseif ($key == 'options' || $key == 'ui_join_filters') {
           $val = str_replace(', ', ',', implode(' ', $words));
-          $info['options'] = explode(',', $val);
+          $info[$key] = explode(',', $val);
         }
         elseif ($key == 'throws' || $key == 'see') {
           $info[$key][] = implode(' ', $words);

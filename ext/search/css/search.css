@@ -69,9 +69,6 @@
   right: 0;
   top: 0;
 }
-#bootstrap-theme.crm-search crm-search-clause > .btn-group .btn {
-  border: 0 none;
-}
 
 #bootstrap-theme.crm-search fieldset div.api4-input {
   margin-bottom: 10px;

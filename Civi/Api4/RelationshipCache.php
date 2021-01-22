@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Relationship
  * @bridge near_contact_id far_contact_id
+ * @ui_join_filters near_relation
  * @package Civi\Api4
  */
 class RelationshipCache extends Generic\AbstractEntity {

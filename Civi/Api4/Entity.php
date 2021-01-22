@@ -103,6 +103,11 @@ class Entity extends Generic\AbstractEntity {
           'data_type' => 'Array',
           'description' => 'Connecting fields for EntityBridge types',
         ],
+        [
+          'name' => 'ui_join_filters',
+          'data_type' => 'Array',
+          'description' => 'When joining entities in the UI, which fields should be presented by default in the ON clause',
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }

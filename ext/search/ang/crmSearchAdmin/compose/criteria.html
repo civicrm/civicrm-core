@@ -4,8 +4,11 @@
       <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join">
         <div class="form-inline">
           <label for="crm-search-join-{{ $index }}">{{:: ts('With') }}</label>
-          <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" ng-change="changeJoin($index)" />
+          <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" disabled >
           <select class="form-control" ng-model="join[1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+          <button class="btn btn-xs btn-danger-outline" ng-click="$ctrl.clearParam('join', $index)" title="{{:: ts('Remove join') }}">
+            <i class="crm-i fa-trash" aria-hidden="true"></i>
+          </button>
         </div>
         <fieldset class="api4-clause-fieldset">
           <crm-search-clause clauses="join" format="json" skip="2 + getJoin(join[0]).conditions.length" op="AND" label="{{ ts('If') }}" fields="fieldsForWhere" ></crm-search-clause>
