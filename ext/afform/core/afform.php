@@ -51,7 +51,7 @@ function afform_civicrm_config(&$config) {
 
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
   Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
-  Civi::dispatcher()->addListener('hook_civicrm_angularModules', '_afform_civicrm_angularModules_autoReq', -1000);
+  Civi::dispatcher()->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
   Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
 }
 
@@ -227,119 +227,6 @@ function _afform_get_partials($moduleName, $module) {
   return [
     "~/$moduleName/$moduleName.aff.html" => $afform['layout'],
   ];
-}
-
-/**
- * Scan the list of Angular modules and inject automatic-requirements.
- *
- * TLDR: if an afform uses element "<other-el/>", and if another module defines
- * `$angularModules['otherMod']['exports']['el'][0] === 'other-el'`, then
- * the 'otherMod' is automatically required.
- *
- * @param \Civi\Core\Event\GenericHookEvent $e
- * @see CRM_Utils_Hook::angularModules()
- */
-function _afform_civicrm_angularModules_autoReq($e) {
-  /** @var CRM_Afform_AfformScanner $scanner */
-  $scanner = Civi::service('afform_scanner');
-  $moduleEnvId = md5(\CRM_Core_Config_Runtime::getId() . implode(',', array_keys($e->angularModules)));
-  $depCache = CRM_Utils_Cache::create([
-    'name' => 'afdep_' . substr($moduleEnvId, 0, 32 - 6),
-    'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
-    'withArray' => 'fast',
-    'prefetch' => TRUE,
-  ]);
-  $depCacheTtl = 2 * 60 * 60;
-
-  $revMap = _afform_reverse_deps($e->angularModules);
-
-  $formNames = array_keys($scanner->findFilePaths());
-  foreach ($formNames as $formName) {
-    $angModule = _afform_angular_module_name($formName, 'camel');
-    $cacheLine = $depCache->get($formName, NULL);
-
-    $jFile = $scanner->findFilePath($formName, 'aff.json');
-    $hFile = $scanner->findFilePath($formName, 'aff.html');
-
-    $jStat = stat($jFile);
-    $hStat = stat($hFile);
-
-    if ($cacheLine === NULL) {
-      $needsUpdate = TRUE;
-    }
-    elseif ($jStat !== FALSE && $jStat['size'] !== $cacheLine['js']) {
-      $needsUpdate = TRUE;
-    }
-    elseif ($jStat !== FALSE && $jStat['mtime'] > $cacheLine['jm']) {
-      $needsUpdate = TRUE;
-    }
-    elseif ($hStat !== FALSE && $hStat['size'] !== $cacheLine['hs']) {
-      $needsUpdate = TRUE;
-    }
-    elseif ($hStat !== FALSE && $hStat['mtime'] > $cacheLine['hm']) {
-      $needsUpdate = TRUE;
-    }
-    else {
-      $needsUpdate = FALSE;
-    }
-
-    if ($needsUpdate) {
-      $cacheLine = [
-        'js' => $jStat['size'] ?? NULL,
-        'jm' => $jStat['mtime'] ?? NULL,
-        'hs' => $hStat['size'] ?? NULL,
-        'hm' => $hStat['mtime'] ?? NULL,
-        'r' => array_values(array_unique(array_merge(
-          [CRM_Afform_AfformScanner::DEFAULT_REQUIRES],
-          $e->angularModules[$angModule]['requires'] ?? [],
-          _afform_reverse_deps_find($formName, file_get_contents($hFile), $revMap)
-        ))),
-      ];
-      // print_r(['cache update:' . $formName => $cacheLine]);
-      $depCache->set($formName, $cacheLine, $depCacheTtl);
-    }
-
-    $e->angularModules[$angModule]['requires'] = $cacheLine['r'];
-  }
-}
-
-/**
- * @param $angularModules
- * @return array
- *   'attr': array(string $attrName => string $angModuleName)
- *   'el': array(string $elementName => string $angModuleName)
- */
-function _afform_reverse_deps($angularModules) {
-  $revMap = ['attr' => [], 'el' => []];
-  foreach (array_keys($angularModules) as $module) {
-    if (!isset($angularModules[$module]['exports'])) {
-      continue;
-    }
-    foreach ($angularModules[$module]['exports'] as $symbolName => $symbolTypes) {
-      if (strpos($symbolTypes, 'A') !== FALSE) {
-        $revMap['attr'][$symbolName] = $module;
-      }
-      if (strpos($symbolTypes, 'E') !== FALSE) {
-        $revMap['el'][$symbolName] = $module;
-      }
-    }
-  }
-  return $revMap;
-}
-
-/**
- * @param string $formName
- * @param string $html
- * @param array $revMap
- *   The reverse-dependencies map from _afform_reverse_deps().
- * @return array
- * @see _afform_reverse_deps()
- */
-function _afform_reverse_deps_find($formName, $html, $revMap) {
-  $symbols = \Civi\Afform\Symbols::scan($html);
-  $elems = array_intersect_key($revMap['el'], $symbols->elements);
-  $attrs = array_intersect_key($revMap['attr'], $symbols->attributes);
-  return array_values(array_unique(array_merge($elems, $attrs)));
 }
 
 /**
