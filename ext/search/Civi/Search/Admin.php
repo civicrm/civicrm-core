@@ -27,7 +27,7 @@ class Admin {
       'joins' => self::getJoins(array_column($schema, NULL, 'name')),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
-      'displayTypes' => Display::getDisplayTypes(['name', 'label', 'description', 'icon']),
+      'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
     ];
   }
 

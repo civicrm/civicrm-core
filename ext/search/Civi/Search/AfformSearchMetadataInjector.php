@@ -26,11 +26,10 @@ class AfformSearchMetadataInjector {
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('searchSettings')
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
-        $displayTypes = array_column(\Civi\Search\Display::getDisplayTypes(['name']), 'name');
+        $displayTags = array_column(\Civi\Search\Display::getDisplayTypes(['name']), 'name');
 
-        if ($displayTypes) {
-          $displayTypeTags = 'crm-search-display-' . implode(', crm-search-display-', $displayTypes);
-          foreach (pq($displayTypeTags, $doc) as $component) {
+        if ($displayTags) {
+          foreach (pq(implode(',', $displayTags), $doc) as $component) {
             $searchName = pq($component)->attr('search-name');
             $displayName = pq($component)->attr('display-name');
             if ($searchName && $displayName) {

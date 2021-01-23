@@ -15,8 +15,8 @@ return [
     'entity' => 'OptionValue',
     'params' => [
       'option_group_id' => 'search_display_type',
-      'name' => 'table',
       'value' => 'table',
+      'name' => 'crm-search-display-table',
       'label' => 'Table',
       'icon' => 'fa-table',
     ],
@@ -26,8 +26,8 @@ return [
     'entity' => 'OptionValue',
     'params' => [
       'option_group_id' => 'search_display_type',
-      'name' => 'list',
       'value' => 'list',
+      'name' => 'crm-search-display-list',
       'label' => 'List',
       'icon' => 'fa-list',
     ],
