@@ -45,5 +45,15 @@
       "financial_type_id:name": "Donation",
       "contact_id": "@ref test_contact_1.id"
     }
+  ],
+  "Pledge" : [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "original_installment_amount" : 10,
+      "amount" : 10,
+      "start_date" :  "now",
+      "create_date" :  "now",
+      "status_id:name" : "Pending"
+    }
   ]
 }
