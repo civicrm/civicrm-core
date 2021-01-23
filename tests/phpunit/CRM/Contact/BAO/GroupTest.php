@@ -146,6 +146,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     $group3 = CRM_Contact_BAO_Group::create($params);
 
+    unset(Civi::$statics['CRM_Core_Permission_Base']);
     // Check with no group type restriction
     $nestedGroup = CRM_Core_PseudoConstant::nestedGroup();
     $this->assertEquals([
