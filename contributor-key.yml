@@ -39,6 +39,10 @@
   name        : Pengyi Zhang
   organization: Agileware
 
+- github      : ahed-compucorp
+  name        : Ahed
+  organization: CompuCorp
+
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
   organization: MongoDB
@@ -749,6 +753,9 @@
   name        : Jason Gillman Jr.
   organization: Liquid Web, Inc.
 
+- github      : jgrygierek
+  name        : Jarek
+
 - github      : jitendrapurohit
   name        : Jitendra Purohit
   organization: Fuzion
@@ -962,6 +969,8 @@
   name        : Lisa Taliano
   organization: National Urban League
 
+- github      : lucky091588
+
 - github      : lyyana
   name        : Yuliyana Liyana
   organization: Oxfam Germany
@@ -1019,6 +1028,8 @@
 - github      : maxtsero
   name        : Max Tsero
   organization: Atomic Development
+
+- github      : maynardsmith
 
 - github      : mc0e
   name        : Andrew McNaughton
@@ -1169,6 +1180,9 @@
   name        : Niels Heinemann
   organization: Kompetenzzentrum Technik-Diversity-Chancengleichheit
   jira        : nielo
+
+- github      : nishant-bhorodia
+  name        : Nishant Bhorodia
 
 - github      : highfalutin
   name        : Noah Miller
