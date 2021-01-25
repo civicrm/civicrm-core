@@ -89,8 +89,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     // make sure the invoice is valid and matches what we have in the contribution record
     if ($recur->invoice_id != $input['invoice']) {
       Civi::log()->debug('PayPalIPN: Invoice values dont match between database and IPN request (RecurID: ' . $recur->id . ').');
-      echo "Failure: Invoice values dont match between database and IPN request<p>";
-      return;
+      throw new CRM_Core_Exception("Failure: Invoice values dont match between database and IPN request");
     }
 
     $now = date('YmdHis');
@@ -153,16 +152,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $recur->save();
 
-    if ($this->getFirstOrLastInSeriesStatus()) {
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify($this->getFirstOrLastInSeriesStatus(),
-        $ids['contact'],
-        $ids['contributionPage'],
-        $recur,
-        !empty($ids['membership'])
-      );
-    }
-
     if ($txnType !== 'subscr_payment') {
       return;
     }
@@ -193,7 +182,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $this->single($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => $ids['participant'] ?? NULL,
       'contributionRecur' => $recur->id,
     ], $contribution, TRUE);
@@ -358,6 +346,15 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           $first = FALSE;
         }
         $this->recur($input, $ids, $contributionRecur, $contribution, $first);
+        if ($this->getFirstOrLastInSeriesStatus()) {
+          //send recurring Notification email for user
+          CRM_Contribute_BAO_ContributionPage::recurringNotify($this->getFirstOrLastInSeriesStatus(),
+            $ids['contact'],
+            $ids['contributionPage'],
+            $contributionRecur,
+            !empty($ids['membership'])
+          );
+        }
         return;
       }
 
@@ -387,7 +384,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
       $this->single($input, [
-        'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => $ids['participant'] ?? NULL,
         'contributionRecur' => $contributionRecurID,
       ], $contribution);

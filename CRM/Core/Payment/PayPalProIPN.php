@@ -274,7 +274,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     $contribution->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
     $this->single($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => $ids['participant'] ?? NULL,
       'contributionRecur' => $recur->id ?? NULL,
     ], $contribution, TRUE, $first);
@@ -493,7 +492,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       }
 
       $this->single($input, [
-        'related_contact' => $ids['related_contact'] ?? NULL,
         'participant' => $ids['participant'] ?? NULL,
         'contributionRecur' => $ids['contributionRecur'] ?? NULL,
       ], $contribution, FALSE, FALSE);
