@@ -1,4 +1,4 @@
-<div class="af-gui-columns crm-flex-box">
+<div class="af-gui-columns crm-flex-box" ng-if="!$ctrl.entity.loading">
   <fieldset class="af-gui-entity-values">
     <legend>{{:: ts('Values:') }}</legend>
     <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in $ctrl.entity.data">
@@ -54,7 +54,7 @@
   <i class="crm-i fa-trash"></i>
 </a>
 
-<fieldset>
+<fieldset ng-if="!$ctrl.entity.loading">
   <legend>{{:: ts('Options') }}</legend>
   <div ng-include="'~/afGuiEditor/entityConfig/' + $ctrl.entity.type + '.html'"></div>
 </fieldset>

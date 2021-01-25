@@ -17,13 +17,30 @@
           }
         }
       });
-      $routeProvider.when('/create/:type', {
+      $routeProvider.when('/create/:type/:entity', {
         controller: 'afAdminGui',
-        template: '<af-gui-editor type="$ctrl.type"></af-gui-editor>',
+        template: '<af-gui-editor mode="create" data="$ctrl.data" entity="$ctrl.entity"></af-gui-editor>',
+        resolve: {
+          // Load data for gui editor
+          data: function($route, crmApi4) {
+            return crmApi4('Afform', 'loadAdminData', {
+              definition: {type: $route.current.params.type},
+              entity: $route.current.params.entity
+            }, 0);
+          }
+        }
       });
       $routeProvider.when('/edit/:name', {
         controller: 'afAdminGui',
-        template: '<af-gui-editor name="$ctrl.name"></af-gui-editor>',
+        template: '<af-gui-editor mode="edit" data="$ctrl.data"></af-gui-editor>',
+        resolve: {
+          // Load data for gui editor
+          data: function($route, crmApi4) {
+            return crmApi4('Afform', 'loadAdminData', {
+              definition: {name: $route.current.params.name}
+            }, 0);
+          }
+        }
       });
     });
 

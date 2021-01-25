@@ -17,6 +17,18 @@
 
       this.$onInit = function() {
         if ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join) {
+          var blockNode = getBlockNode(),
+            blockTag = blockNode ? blockNode['#tag'] : null;
+          if (blockTag && (blockTag in afGui.meta.blocks) && !afGui.meta.blocks[blockTag].layout) {
+            ctrl.loading = true;
+            crmApi4('Afform', 'loadAdminData', {
+              definition: {name: afGui.meta.blocks[blockTag].name}
+            }, 0).then(function(data) {
+              afGui.addMeta(data);
+              initializeBlockContainer();
+              ctrl.loading = false;
+            });
+          }
           initializeBlockContainer();
         }
       };

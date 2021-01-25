@@ -7,7 +7,8 @@
       </li>
       <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntityName === entity.name}">
         <a href ng-click="editor.selectEntity(entity.name)">
-          <span af-gui-editable ng-model="entity.label">{{ entity.label }}</span>
+          <span ng-if="!entity.loading" af-gui-editable ng-model="entity.label">{{ entity.label }}</span>
+          <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>
         </a>
       </li>
       <li role="presentation" class="dropdown">
@@ -16,7 +17,10 @@
         </a>
         <ul class="dropdown-menu">
           <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
-            <a href ng-click="addEntity(entityName)">{{ entity.label }}</a>
+            <a href ng-click="editor.addEntity(entityName, true)">
+              <i class="crm-i {{:: entity.icon }}"></i>
+              {{:: entity.label }}
+            </a>
           </li>
         </ul>
       </li>

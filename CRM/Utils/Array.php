@@ -81,6 +81,41 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Recursively searches through a given array for all matches
+   *
+   * @param $collection
+   * @param $predicate
+   * @return array
+   */
+  public static function findAll($collection, $predicate) {
+    $results = [];
+    $search = function($collection) use (&$search, &$results, $predicate) {
+      if (is_array($collection)) {
+        if (is_callable($predicate)) {
+          if ($predicate($collection)) {
+            $results[] = $collection;
+          }
+        }
+        elseif (is_array($predicate)) {
+          if (count(array_intersect_assoc($collection, $predicate)) === count($predicate)) {
+            $results[] = $collection;
+          }
+        }
+        else {
+          if (array_key_exists($predicate, $collection)) {
+            $results[] = $collection;
+          }
+        }
+        foreach ($collection as $item) {
+          $search($item);
+        }
+      }
+    };
+    $search($collection);
+    return $results;
+  }
+
+  /**
    * Wraps and slightly changes the behavior of PHP's array_search().
    *
    * This function reproduces the behavior of array_search() from PHP prior to

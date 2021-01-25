@@ -1,7 +1,10 @@
 <?php
+
+namespace Civi\AfformAdmin;
+
 use CRM_AfformAdmin_ExtensionUtil as E;
 
-class CRM_AfformAdmin_Utils {
+class AfformAdminMeta {
 
   /**
    * @return array
@@ -18,13 +21,51 @@ class CRM_AfformAdmin_Utils {
   }
 
   /**
-   * Loads metadata for the gui editor.
-   *
-   * FIXME: This is a prototype and should get broken out into separate callbacks with hooks, events, etc.
+   * @param $entityName
+   * @return array|void
+   */
+  public static function getAfformEntity($entityName) {
+    // Optimization: look here before scanning every other extension
+    global $civicrm_root;
+    $fileName = \CRM_Utils_File::addTrailingSlash($civicrm_root) . "ext/afform/admin/afformEntities/$entityName.php";
+    if (is_file($fileName)) {
+      return include $fileName;
+    }
+    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
+      $fileName = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . "afformEntities/$entityName.php";
+      if (is_file($fileName)) {
+        return include $fileName;
+      }
+    }
+  }
+
+  /**
+   * @param $entityName
    * @return array
    */
-  public static function getGuiSettings() {
-    $getFieldParams = [
+  public static function getApiEntity($entityName) {
+    if (in_array($entityName, ['Individual', 'Household', 'Organization'])) {
+      $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
+      return [
+        'entity' => 'Contact',
+        'label' => $contactTypes[$entityName]['label'],
+      ];
+    }
+    $info = ("\Civi\Api4\\{$entityName}")::getInfo();
+    return [
+      'entity' => $entityName,
+      'label' => $info['title'],
+      'icon' => $info['icon'],
+    ];
+  }
+
+  /**
+   * @param $entityName
+   * @param array $params
+   * @return array
+   */
+  public static function getFields($entityName, $params = []) {
+    $params += [
       'checkPermissions' => FALSE,
       'includeCustom' => TRUE,
       'loadOptions' => ['id', 'label'],
@@ -32,61 +73,62 @@ class CRM_AfformAdmin_Utils {
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type'],
       'where' => [['input_type', 'IS NOT NULL']],
     ];
+    if (in_array($entityName, ['Individual', 'Household', 'Organization'])) {
+      $params['values']['contact_type'] = $entityName;
+      $entityName = 'Contact';
+    }
+    if ($entityName === 'Address') {
+      // The stateProvince option list is waaay too long unless country limits are set
+      if (!\Civi::settings()->get('provinceLimit')) {
+        // If no province limit, restrict it to the default country, or if there's no default, pick one to avoid breaking the UI
+        $params['values']['country_id'] = \Civi::settings()->get('defaultContactCountry') ?: 1228;
+      }
+      $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
+    }
+    return (array) civicrm_api4($entityName, 'getFields', $params, 'name');
+  }
 
+  /**
+   * Loads metadata for the gui editor.
+   *
+   * @return array
+   */
+  public static function getGuiSettings() {
     $data = [
       'entities' => [
-        'Contact' => [
-          'entity' => 'Contact',
-          'label' => E::ts('Contact'),
-          'fields' => (array) civicrm_api4('Contact', 'getFields', $getFieldParams, 'name'),
-        ],
+        'Contact' => self::getApiEntity('Contact'),
       ],
-      'blocks' => [],
     ];
 
-    $contactTypes = CRM_Contact_BAO_ContactType::basicTypeInfo();
+    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
 
     // Scan all extensions for entities & input types
-    foreach (CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $dir = CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
+    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
       if (is_dir($dir)) {
         // Scan for entities
         foreach (glob($dir . 'afformEntities/*.php') as $file) {
           $entity = include $file;
-          // Skip disabled contact types
-          if (!empty($entity['contact_type']) && !isset($contactTypes[$entity['contact_type']])) {
-            continue;
-          }
+          $afformEntity = basename($file, '.php');
+          // Contact pseudo-entities (Individual, Organization, Household) get special treatment,
+          // notably their fields are pre-loaded since they are both commonly-used and nonstandard
           if (!empty($entity['contact_type'])) {
+            // Skip disabled contact types
+            if (!isset($contactTypes[$entity['contact_type']])) {
+              continue;
+            }
             $entity['label'] = $contactTypes[$entity['contact_type']]['label'];
           }
-          // For Contact pseudo-entities (Individual, Organization, Household)
-          $values = array_intersect_key($entity, ['contact_type' => NULL]);
-          $afformEntity = $entity['contact_type'] ?? $entity['entity'];
-          $entity['fields'] = (array) civicrm_api4($entity['entity'], 'getFields', $getFieldParams + ['values' => $values], 'name');
+          elseif (empty($entity['label']) || empty($entity['icon'])) {
+            $entity += self::getApiEntity($entity['entity']);
+          }
           $data['entities'][$afformEntity] = $entity;
         }
         // Scan for input types
         foreach (glob($dir . 'ang/afGuiEditor/inputType/*.html') as $file) {
-          $matches = [];
-          preg_match('/([-a-z_A-Z0-9]*).html/', $file, $matches);
-          $data['inputType'][$matches[1]] = $matches[1];
+          $name = basename($file, '.html');
+          $data['inputType'][$name] = $name;
         }
-      }
-    }
-
-    // Load fields from afform blocks with joins
-    $blockData = \Civi\Api4\Afform::get()
-      ->setCheckPermissions(FALSE)
-      ->addWhere('join', 'IS NOT NULL')
-      ->setSelect(['join'])
-      ->execute();
-    foreach ($blockData as $block) {
-      if (!isset($data['entities'][$block['join']]['fields'])) {
-        $data['entities'][$block['join']]['entity'] = $block['join'];
-        // Normally you shouldn't pass variables to ts() but very common strings like "Email" should already exist
-        $data['entities'][$block['join']]['label'] = E::ts($block['join']);
-        $data['entities'][$block['join']]['fields'] = (array) civicrm_api4($block['join'], 'getFields', $getFieldParams, 'name');
       }
     }
 
@@ -160,7 +202,7 @@ class CRM_AfformAdmin_Utils {
     ];
 
     $data['permissions'] = [];
-    foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $name => $perm) {
+    foreach (\CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $name => $perm) {
       $data['permissions'][] = [
         'id' => $name,
         'text' => $perm[0],

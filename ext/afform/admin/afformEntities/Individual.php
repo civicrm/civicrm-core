@@ -9,6 +9,7 @@ return [
     },
     'url-autofill': '1'
   }",
+  'icon' => 'fa-user',
   'boilerplate' => [
     ['#tag' => 'afblock-name-individual'],
   ],

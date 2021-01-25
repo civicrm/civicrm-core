@@ -1,5 +1,6 @@
 (function(angular, $, _) {
   "use strict";
+
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
 
     .service('afGui', function(crmApi4, $parse, $q) {
@@ -65,23 +66,51 @@
       }
 
       return {
-        // Initialize/refresh data about the current afform + available blocks
-        initialize: function(afName) {
-          var promise = crmApi4('Afform', 'get', {
-            layoutFormat: 'shallow',
-            formatWhitespace: true,
-            where: [afName ? ["OR", [["name", "=", afName], ["block", "IS NOT NULL"]]] : ["block", "IS NOT NULL"]]
+        // Called when loading a new afform for editing - clears out stale metadata
+        resetMeta: function() {
+          _.each(CRM.afGuiEditor.entities, function(entity) {
+            delete entity.fields;
           });
-          promise.then(function(afforms) {
-            CRM.afGuiEditor.blocks = {};
-            _.each(afforms, function(form) {
-              evaluate(form.layout);
-              if (form.block) {
-                CRM.afGuiEditor.blocks[form.directive_name] = form;
+          CRM.afGuiEditor.blocks = {};
+        },
+
+        // Takes the results from api.Afform.loadAdminData and processes the metadata
+        // Note this runs once when loading a new afform for editing (just after this.resetMeta is called)
+        // and it also runs when adding new entities or joins to the form.
+        addMeta: function(data) {
+          evaluate(data.definition.layout);
+          if (data.definition.type === 'block') {
+            CRM.afGuiEditor.blocks[data.definition.directive_name] = data.definition;
+          }
+          // Add new or updated blocks
+          _.each(data.blocks, function(block) {
+            // Avoid overwriting complete block record with an incomplete one
+            if (!CRM.afGuiEditor.blocks[block.directive_name] || block.layout) {
+              if (block.layout) {
+                evaluate(block.layout);
               }
-            });
+              CRM.afGuiEditor.blocks[block.directive_name] = block;
+            }
           });
-          return promise;
+          _.each(data.entities, function(entity, entityName) {
+            if (!CRM.afGuiEditor.entities[entityName]) {
+              CRM.afGuiEditor.entities[entityName] = entity;
+            }
+          });
+          _.each(data.fields, function(fields, entityName) {
+            if (CRM.afGuiEditor.entities[entityName]) {
+              CRM.afGuiEditor.entities[entityName].fields = fields;
+            }
+          });
+          // Optimization - since contact fields are a combination of these three,
+          // the server doesn't send contact fields if sending contact-type fields
+          if ('Individual' in data.fields || 'Household' in data.fields || 'Organization' in data.fields) {
+            CRM.afGuiEditor.entities.Contact.fields = _.assign({},
+              (CRM.afGuiEditor.entities.Individual || {}).fields,
+              (CRM.afGuiEditor.entities.Household || {}).fields,
+              (CRM.afGuiEditor.entities.Organization || {}).fields
+            );
+          }
         },
 
         meta: CRM.afGuiEditor,
