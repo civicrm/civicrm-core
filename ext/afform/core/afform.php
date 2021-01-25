@@ -198,7 +198,7 @@ function afform_civicrm_angularModules(&$angularModules) {
       'partialsCallback' => '_afform_get_partials',
       '_afform' => $afform['name'],
       'exports' => [
-        $afform['directive_name'] => 'AE',
+        $afform['directive_name'] => 'E',
       ],
     ];
   }

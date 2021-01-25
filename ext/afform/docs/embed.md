@@ -8,13 +8,13 @@ sub-forms*.
 How does this work?  Every `afform` is an *AngularJS directive*.  For example, `hello-world` can be embedded with:
 
 ```html
-<div hello-world=""></div>
+<hello-world></hello-world>
 ```
 
 Moreover, you can pass options to `helloWorld`:
 
 ```html
-<div hello-world="{phaseOfMoon: 'waxing'}"></div>
+<hello-world options="{phaseOfMoon: 'waxing'}"></hello-world>
 ```
 
 Now, in `ang/helloWorld.aff.html`, you can use `options.phaseOfMoon`:
@@ -38,13 +38,13 @@ Next, we should create an overall `ang/myContact.aff.html` which uses these buil
 ```html
 <div ng-form="contactForm">
   <div crm-ui-accordion="{title: ts('Name')}">
-    <div my-contact-name="{cid: routeParams.cid}"></div>
+    <my-contact-name options="{cid: routeParams.cid}"></my-contact-name>
   </div>
   <div crm-ui-accordion="{title: ts('Street Addresses')}">
-    <div my-contact-addresses="{cid: routeParams.cid}"></div>
+    <my-contact-addresses options="{cid: routeParams.cid}"></my-contact-addresses>
   </div>
   <div crm-ui-accordion="{title: ts('Emails')}">
-    <div my-contact-emails="{cid: routeParams.cid}"></div>
+    <my-contact-emails options="{cid: routeParams.cid}"></my-contact-emails>
   </div>
 </div>
 ```
@@ -53,11 +53,11 @@ And we should create a `ang/myContact.aff.json` looking like
 
 ```json
 {
-  "server_route": "civicrm/contact", 
+  "server_route": "civicrm/contact",
   "requires" : ["myContactName", "myContactEmails", "myContactAddresses"]
 }
 ```
-> *(FIXME: In the parent form's `*.aff.json`, we need to manually add `myContactName`, `myContactAddresses`, `myContactEmails` to the `requires` list. We should autodetect these instead.)*
+> *Note: The parent afform will automatically require the `myContactName`, `myContactAddresses`, `myContactEmails` directives. You do not need to manually include them.*
 
 We've created new files, so we'll need to flush the file-index
 

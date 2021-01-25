@@ -5,9 +5,9 @@
   // Use `afCoreDirective(string name)` to generate an AngularJS directive.
   angular.module('afCore').service('afCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert) {
     return function(camelName, meta, d) {
-      d.restrict = 'AE';
+      d.restrict = 'E';
       d.scope = {};
-      d.scope.options = '=' + camelName;
+      d.scope.options = '<';
       d.link = {
         pre: function($scope, $el, $attr) {
           $scope.ts = CRM.ts(camelName);
