@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
 <CaseType>
-  <name>Adult Day Care Referral</name>
+  <name>adult_day_care_referral</name>
   <ActivityTypes>
     <ActivityType>
       <name>Open Case</name>
