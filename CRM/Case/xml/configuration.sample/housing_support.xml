@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 
 <CaseType>
-  <name>Housing Support</name>
+  <name>housing_support</name>
   <ActivityTypes>
     <ActivityType>
       <name>Open Case</name>
