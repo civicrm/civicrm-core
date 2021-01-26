@@ -310,11 +310,12 @@ class CRM_Extension_Manager {
 
     $this->statuses = NULL;
     $this->mapper->refresh();
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
+    if (!CRM_Core_Config::isUpgradeMode()) {
+      CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
 
-    $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferences();
-
+      $schema = new CRM_Logging_Schema();
+      $schema->fixSchemaDifferences();
+    }
     foreach ($keys as $key) {
       // throws Exception
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
