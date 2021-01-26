@@ -52,21 +52,20 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFive extends CRM_Upgrade_Incremental
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_35_alpha1(string $rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+    $this->addTask('dev/core/#2329 - Add is_active to Country', 'addColumn',
+      'civicrm_country', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this Country active?'");
+    $this->addTask('dev/core/#2329 - Add is_active to StateProvince', 'addColumn',
+      'civicrm_state_province', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this StateProvince active?'");
+    $this->addTask('dev/core/#2329 - Add is_active to County', 'addColumn',
+      'civicrm_county', 'is_active', "tinyint DEFAULT 1 COMMENT 'Is this County active?'");
+  }
 
 }
