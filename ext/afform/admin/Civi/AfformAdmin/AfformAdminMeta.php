@@ -51,7 +51,10 @@ class AfformAdminMeta {
         'label' => $contactTypes[$entityName]['label'],
       ];
     }
-    $info = ("\Civi\Api4\\{$entityName}")::getInfo();
+    $info = \Civi\Api4\Entity::get(FALSE)
+      ->addWhere('name', '=', $entityName)
+      ->addSelect('title', 'icon')
+      ->execute()->first();
     return [
       'entity' => $entityName,
       'label' => $info['title'],
