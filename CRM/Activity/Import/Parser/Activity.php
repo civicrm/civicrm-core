@@ -132,9 +132,21 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     $this->setActiveFieldValues($values);
 
     try {
+      // Check required fields if this is not an update.
+      if (!$this->getFieldValue($values, 'activity_id')) {
+        if (!$this->getFieldValue($values, 'activity_label')
+        && !$this->getFieldValue($values, 'activity_type_id')) {
+          throw new CRM_Core_Exception(ts('Missing required fields: Activity type label or Activity type ID'));
+        }
+        if (!$this->getFieldValue($values, 'activity_date_time')) {
+          throw new CRM_Core_Exception(ts('Missing required fields'));
+        }
+      }
+
       $this->validateActivityTypeIDAndLabel($values);
-      if (!$this->getFieldValue($values, 'activity_date_time')) {
-        throw new CRM_Core_Exception(ts('Missing required fields'));
+      if ($this->getFieldValue($values, 'activity_date_time')
+      && !$this->isValidDate($this->getFieldValue($values, 'activity_date_time'))) {
+        throw new CRM_Core_Exception(ts('Invalid Activity Date'));
       }
     }
     catch (CRM_Core_Exception $e) {
@@ -147,23 +159,11 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     // For date-Formats
     $session = CRM_Core_Session::singleton();
-    $dateType = $session->get('dateTypes');
     if (!isset($params['source_contact_id'])) {
       $params['source_contact_id'] = $session->get('userID');
     }
     foreach ($params as $key => $val) {
-      if ($key === 'activity_date_time') {
-        if ($val) {
-          $dateValue = CRM_Utils_Date::formatDate($val, $dateType);
-          if ($dateValue) {
-            $params[$key] = $dateValue;
-          }
-          else {
-            CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity date', $errorMessage);
-          }
-        }
-      }
-      elseif ($key == 'activity_engagement_level' && $val &&
+      if ($key == 'activity_engagement_level' && $val &&
         !CRM_Utils_Rule::positiveInteger($val)
       ) {
         CRM_Contact_Import_Parser_Contact::addToErrorMsg('Activity Engagement Index', $errorMessage);
@@ -457,9 +457,17 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       && $activityLabel !== CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeID)) {
       throw new CRM_Core_Exception(ts('Activity type label and Activity type ID are in conflict'));
     }
-    if (!$activityLabel && !$activityTypeID) {
-      throw new CRM_Core_Exception(ts('Missing required fields: Activity type label or Activity type ID'));
-    }
+  }
+
+  /**
+   * Is the supplied date field valid based on selected date format.
+   *
+   * @param string $value
+   *
+   * @return bool
+   */
+  protected function isValidDate(string $value): bool {
+    return (bool) CRM_Utils_Date::formatDate($value, CRM_Core_Session::singleton()->get('dateTypes'));
   }
 
 }
