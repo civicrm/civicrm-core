@@ -19,7 +19,7 @@
       {foreach from=$list item=rows key=report}
         <div class="crm-accordion-wrapper crm-accordion_{$report}-accordion ">
           <div class="crm-accordion-header">
-            {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}Contact{/if} Report Templates
+            {if $report}{if $report EQ 'Contribute'}{ts}Contribution{/ts}{else}{$report}{/if}{else}{ts}Contact{/ts}{/if} Report Templates
           </div><!-- /.crm-accordion-header -->
           <div class="crm-accordion-body">
             <div id="{$report}" class="boxBlock">
