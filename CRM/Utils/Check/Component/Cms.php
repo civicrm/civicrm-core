@@ -41,10 +41,9 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
       case 0:
         $messageText = [
           ts(
-            'CiviCRM relies upon a <a href="%1%2">base page in WordPress</a>, but it is not published.',
+            'CiviCRM relies upon a <a href="%1">base page in WordPress</a>, but it is not published.',
             [
-              1 => $config->userFrameworkBaseURL,
-              2 => $config->wpBasePage,
+              1 => $config->userFrameworkBaseURL . $config->wpBasePage,
             ]
           ),
         ];
@@ -65,10 +64,9 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
         );
         $messageText = [
           ts(
-            'CiviCRM relies upon a base page in WordPress at %1%2, but it is missing.',
+            'CiviCRM relies upon a base page in WordPress at %1, but it is missing.',
             [
-              1 => $config->userFrameworkBaseURL,
-              2 => $config->wpBasePage,
+              1 => $config->userFrameworkBaseURL . $config->wpBasePage,
             ]
           ),
         ];
@@ -93,10 +91,9 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
             if ($exists >= 0) {
               // One of the possible defaults is here, published or not.
               $messageText[] = ts(
-                'The default is %1%2, which <a href="%1%2">does exist on this site</a>.',
+                'The default is %1, which <a href="%1">does exist on this site</a>.',
                 [
-                  1 => $config->userFrameworkBaseURL,
-                  2 => $slug,
+                  1 => $config->userFrameworkBaseURL . $slug,
                 ]
               );
               if ($exists == 0) {
@@ -111,10 +108,9 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
             // We went through the default(s) and couldn't find one.  Defer to
             // the one modified by the filter.
             $messageText[] = ts(
-              'The default is %1%2, but that does not exist on this site either.',
+              'The default is %1, but that does not exist on this site either.',
               [
-                1 => $config->userFrameworkBaseURL,
-                2 => $altSlugs[0],
+                1 => $config->userFrameworkBaseURL . $altSlugs[0],
               ]
             );
           }
