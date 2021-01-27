@@ -350,6 +350,11 @@ function _civicrm_api3_payment_get_spec(&$params) {
       'description' => ts('Transaction id supplied by external processor. This may not be unique.'),
       'type' => CRM_Utils_Type::T_STRING,
     ],
+    'order_reference' => [
+      'title' => ts('Order Reference'),
+      'description' => ts('Payment Processor external order reference'),
+      'type' => CRM_Utils_Type::T_STRING,
+    ],
     'trxn_date' => [
       'title' => ts('Payment Date'),
       'type' => CRM_Utils_Type::T_TIMESTAMP,
