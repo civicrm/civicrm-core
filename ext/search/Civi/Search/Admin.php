@@ -120,7 +120,34 @@ class Admin {
   public static function getJoins(array $allowedEntities) {
     $joins = [];
     foreach ($allowedEntities as $entity) {
-      if (!empty($entity['dao'])) {
+      // Multi-record custom field groups (to-date only the contact entity supports these)
+      if (in_array('CustomValue', $entity['type'])) {
+        $targetEntity = $allowedEntities['Contact'];
+        // Join from Custom group to Contact (n-1)
+        $alias = $entity['name'] . '_Contact_entity_id';
+        $joins[$entity['name']][] = [
+          'label' => $entity['title'] . ' ' . $targetEntity['title'],
+          'description' => '',
+          'entity' => 'Contact',
+          'conditions' => self::getJoinConditions('entity_id', $alias . '.id'),
+          'defaults' => self::getJoinDefaults($alias, $targetEntity),
+          'alias' => $alias,
+          'multi' => FALSE,
+        ];
+        // Join from Contact to Custom group (n-n)
+        $alias = 'Contact_' . $entity['name'] . '_entity_id';
+        $joins['Contact'][] = [
+          'label' => $entity['title_plural'],
+          'description' => '',
+          'entity' => $entity['name'],
+          'conditions' => self::getJoinConditions('id', $alias . '.entity_id'),
+          'defaults' => self::getJoinDefaults($alias, $entity),
+          'alias' => $alias,
+          'multi' => TRUE,
+        ];
+      }
+      // Non-custom DAO entities
+      elseif (!empty($entity['dao'])) {
         /* @var \CRM_Core_DAO $daoClass */
         $daoClass = $entity['dao'];
         $references = $daoClass::getReferenceColumns();
@@ -142,14 +169,14 @@ class Admin {
           ) {
             continue;
           }
+          // Dynamic references use a column like "entity_table" (for normal joins this value will be null)
+          $dynamicCol = $reference->getTypeColumn();
           // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
           foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
             if (!isset($allowedEntities[$targetEntityName]) || $targetEntityName === $entity['name']) {
               continue;
             }
             $targetEntity = $allowedEntities[$targetEntityName];
-            // Dynamic references use a column like "entity_table"
-            $dynamicCol = $reference->getTypeColumn();
             // Non-bridge joins directly between 2 entities
             if (!$bridge) {
               // Add the straight 1-1 join
@@ -233,7 +260,7 @@ class Admin {
    * @param string|null $dynamicCol
    * @return array[]
    */
-  private static function getJoinConditions($nearCol, $farCol, $targetTable, $dynamicCol) {
+  private static function getJoinConditions($nearCol, $farCol, $targetTable = NULL, $dynamicCol = NULL) {
     $conditions = [
       [
         $nearCol,
