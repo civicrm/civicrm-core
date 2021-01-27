@@ -541,9 +541,6 @@ AND    u.status = 1
     require_once "$cmsPath/core/includes/config.inc";
     backdrop_bootstrap(BACKDROP_BOOTSTRAP_FULL);
 
-    // Explicitly setting error reporting, since we cannot handle Backdrop
-    // related notices.
-    error_reporting(1);
     if (!function_exists('module_exists') || !module_exists('civicrm')) {
       if ($throwError) {
         echo '<br />Sorry, could not load Backdrop bootstrap.';
