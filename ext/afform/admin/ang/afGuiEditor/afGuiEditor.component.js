@@ -31,6 +31,10 @@
         if (!$scope.afform) {
           alert('Error: unknown form');
         }
+        if (editor.mode === 'clone') {
+          delete $scope.afform.name;
+          $scope.afform.title += ' ' + ts('(copy)');
+        }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
         editor.layout = {'#children': []};

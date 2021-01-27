@@ -42,6 +42,18 @@
           }
         }
       });
+      $routeProvider.when('/clone/:name', {
+        controller: 'afAdminGui',
+        template: '<af-gui-editor mode="clone" data="$ctrl.data"></af-gui-editor>',
+        resolve: {
+          // Load data for gui editor
+          data: function($route, crmApi4) {
+            return crmApi4('Afform', 'loadAdminData', {
+              definition: {name: $route.current.params.name}
+            }, 0);
+          }
+        }
+      });
     });
 
 })(angular, CRM.$, CRM._);
