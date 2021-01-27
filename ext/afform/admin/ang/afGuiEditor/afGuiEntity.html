@@ -50,11 +50,11 @@
   </fieldset>
 </div>
 
-<a href ng-click="$ctrl.editor.removeEntity($ctrl.entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
+<a ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig" href ng-click="$ctrl.editor.removeEntity($ctrl.entity.name)" class="btn btn-sm btn-danger-outline af-gui-remove-entity" title="{{ ts('Remove %1', {1: getMeta().label}) }}">
   <i class="crm-i fa-trash"></i>
 </a>
 
-<fieldset ng-if="!$ctrl.entity.loading">
+<fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">
   <legend>{{:: ts('Options') }}</legend>
   <div ng-include="'~/afGuiEditor/entityConfig/' + $ctrl.entity.type + '.html'"></div>
 </fieldset>

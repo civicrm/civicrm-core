@@ -81,15 +81,15 @@
   font-size: 12px;
 }
 
-#afGuiEditor input[type=search]::placeholder {
+#bootstrap-theme input[type=search]::placeholder {
   font-family: FontAwesome;
   text-align: right;
 }
-#afGuiEditor input[type=search]:-ms-input-placeholder {
+#bootstrap-theme input[type=search]:-ms-input-placeholder {
   font-family: FontAwesome;
   text-align: right;
 }
-#afGuiEditor input[type=search]::-ms-input-placeholder {
+#bootstrap-theme input[type=search]::-ms-input-placeholder {
   font-family: FontAwesome;
   text-align: right;
 }

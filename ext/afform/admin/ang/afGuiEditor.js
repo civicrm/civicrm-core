@@ -115,8 +115,12 @@
 
         meta: CRM.afGuiEditor,
 
-        getField: function(entityType, fieldName) {
-          return CRM.afGuiEditor.entities[entityType].fields[fieldName];
+        getEntity: function(entityName) {
+          return CRM.afGuiEditor.entities[entityName];
+        },
+
+        getField: function(entityName, fieldName) {
+          return CRM.afGuiEditor.entities[entityName].fields[fieldName];
         },
 
         // Recursively searches a collection and its children using _.filter

@@ -25,7 +25,7 @@
 
   </div>
   <div id="afGuiEditor-canvas-body" class="panel-body" ng-if="canvasTab === 'layout'">
-    <af-gui-container ng-if="editor.layout" node="editor.layout" entity-name="" ></af-gui-container>
+    <af-gui-container ng-if="editor.layout" node="editor.layout" entity-name="editor.blockEntity" data-entity="{{ editor.blockEntity }}" ></af-gui-container>
   </div>
   <div class="panel-body" ng-if="canvasTab === 'markup'">
     <p class="help-block">{{:: ts('This is a read-only preview of the auto-generated markup.') }}</p>

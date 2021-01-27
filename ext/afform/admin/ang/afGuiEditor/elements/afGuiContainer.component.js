@@ -16,7 +16,7 @@
         ctrl = this;
 
       this.$onInit = function() {
-        if ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join) {
+        if (ctrl.node['#tag'] && ((ctrl.node['#tag'] in afGui.meta.blocks) || ctrl.join)) {
           var blockNode = getBlockNode(),
             blockTag = blockNode ? blockNode['#tag'] : null;
           if (blockTag && (blockTag in afGui.meta.blocks) && !afGui.meta.blocks[blockTag].layout) {
@@ -234,7 +234,7 @@
       this.node = ctrl.node;
 
       this.getNodeType = function(node) {
-        if (!node) {
+        if (!node || !node['#tag']) {
           return null;
         }
         if (node['#tag'] === 'af-field') {

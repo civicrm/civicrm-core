@@ -1,21 +1,36 @@
 <div id="bootstrap-theme" class="afadmin-list">
   <h1 crm-page-title>{{:: ts('Configurable Forms') }}</h1>
 
-  <div class="form-inline text-right">
-    <a class="btn btn-primary" href="#/create/form">
-      <i class="crm-i fa-plus"></i>
-      {{:: ts('New Form') }}
-    </a>
-  </div>
-
   <ul class="nav nav-tabs">
     <li role="presentation" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
-      <a href ng-click="$ctrl.tab = tab.name"><i class="crm-i {{ tab.icon }}"></i> {{:: tab.label }}</a>
+      <a href ng-click="$ctrl.tab = tab.name; $ctrl.searchAfformList = ''"><i class="crm-i {{ tab.icon }}"></i> {{:: tab.label }}</a>
     </li>
   </ul>
 
   <div class="form-inline">
-    <input class="form-control" type="search" ng-model="$ctrl.search" placeholder="{{:: ts('Filter') }}">
+    <label for="afform-list-filter">{{:: ts('Filter:') }}</label>
+    <input class="form-control" type="search" id="afform-list-filter" ng-model="$ctrl.searchAfformList" placeholder="&#xf002">
+    <div class="btn-group pull-right" ng-if="tabs[$ctrl.tab].options">
+      <a ng-if="tabs[$ctrl.tab].default" href="{{ tabs[$ctrl.tab].default }}" class="btn btn-primary">
+        {{ ts('New %1', {1: tabs[$ctrl.tab].label }) }}
+      </a>
+      <button ng-click="$ctrl.createLinks()" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <span ng-class="{'sr-only': tabs[$ctrl.tab].default}">{{ ts('New %1', {1: tabs[$ctrl.tab].label }) }}</span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <input ng-if="tabs[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="$ctrl.searchCreateLinks">
+          <a href ng-if="!tabs[$ctrl.tab].options.length"><i class="crm-i fa-spinner fa-spin"></i></a>
+        </li>
+        <li ng-repeat="link in tabs[$ctrl.tab].options | filter:$ctrl.searchCreateLinks">
+          <a href="{{ link.url }}">
+            <i class="crm-i {{ link.icon }}"></i>
+            {{ link.label }}
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 
   <table>
@@ -29,7 +44,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="afform in $ctrl.afforms[$ctrl.tab] | filter:$ctrl.search">
+    <tr ng-repeat="afform in $ctrl.afforms[$ctrl.tab] | filter:$ctrl.searchAfformList">
       <td>{{afform.title}}</td>
       <td>
         <code>{{afform.name}}</code>
@@ -41,7 +56,7 @@
       </td>
       <td>{{afform.is_public ? ts('Frontend') : ts('Backend')}}</td>
       <td>
-        <a href="#/edit/{{ afform.name }}" class="btn btn-xs btn-primary">{{ ts('Edit') }}</a>
+        <a ng-if="afform.type !== 'system'" href="#/edit/{{ afform.name }}" class="btn btn-xs btn-primary">{{ ts('Edit') }}</a>
         <a href ng-if="afform.has_local" class="btn btn-xs btn-danger" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>

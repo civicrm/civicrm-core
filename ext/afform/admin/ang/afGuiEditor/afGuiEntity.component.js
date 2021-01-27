@@ -110,6 +110,9 @@
           if (!search || _.contains(name, search) || _.contains(element.title.toLowerCase(), search)) {
             var node = _.cloneDeep(element.element);
             if (name === 'fieldset') {
+              if (!ctrl.editor.allowEntityConfig) {
+                return;
+              }
               node['af-fieldset'] = ctrl.entity.name;
             }
             $scope.elementList.push(node);

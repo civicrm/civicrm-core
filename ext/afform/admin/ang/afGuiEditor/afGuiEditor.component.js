@@ -33,12 +33,28 @@
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-        $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+        editor.layout = {'#children': []};
+        $scope.entities = {};
 
-        if (editor.mode === 'create') {
-          editor.addEntity(editor.entity);
-          editor.layout['#children'].push(afGui.meta.elements.submit.element);
+        if ($scope.afform.type === 'form') {
+          editor.allowEntityConfig = true;
+          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0]['#children'];
+          $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+
+          if (editor.mode === 'create') {
+            editor.addEntity(editor.entity);
+            editor.layout['#children'].push(afGui.meta.elements.submit.element);
+          }
+        }
+
+        else if ($scope.afform.type === 'block') {
+          editor.layout['#children'] = $scope.afform.layout;
+          editor.blockEntity = $scope.afform.join || $scope.afform.block;
+          $scope.entities[editor.blockEntity] = {
+            type: editor.blockEntity,
+            name: editor.blockEntity,
+            label: afGui.getEntity(editor.blockEntity).label
+          };
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
