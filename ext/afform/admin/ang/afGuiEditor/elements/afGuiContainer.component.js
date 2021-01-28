@@ -240,7 +240,7 @@
         if (node['#tag'] === 'af-field') {
           return 'field';
         }
-        if (node['af-fieldset']) {
+        if ('af-fieldset' in node) {
           return 'fieldset';
         }
         if (node['af-join']) {
@@ -248,6 +248,9 @@
         }
         if (node['#tag'] && node['#tag'] in afGui.meta.blocks) {
           return 'container';
+        }
+        if (node['#tag'] && (node['#tag'].slice(0, 19) === 'crm-search-display-')) {
+          return 'searchDisplay';
         }
         var classes = afGui.splitClass(node['class']),
           types = ['af-container', 'af-text', 'af-button', 'af-markup'],
@@ -260,7 +263,7 @@
       };
 
       this.getEntityName = function() {
-        return ctrl.entityName.split('-join-')[0];
+        return ctrl.entityName ? ctrl.entityName.split('-join-')[0] : null;
       };
 
       // Returns the primary entity type for this container e.g. "Contact"
@@ -269,9 +272,33 @@
       };
 
       // Returns the entity type for fields within this conainer (join entity type if this is a join, else the primary entity type)
-      this.getFieldEntityType = function() {
-        var joinType = ctrl.entityName.split('-join-');
-        return joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
+      this.getFieldEntityType = function(fieldName) {
+        // If entityName is declared for this fieldset, return entity-type or join-type
+        if (ctrl.entityName) {
+          var joinType = ctrl.entityName.split('-join-');
+          return joinType[1] || (ctrl.editor && ctrl.editor.getEntity(joinType[0]).type);
+        }
+        // If entityName is not declared, this field belongs to a search
+        var entityType,
+          prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
+        _.each(afGui.meta.searchDisplays, function(searchDisplay) {
+          if (prefix) {
+            _.each(searchDisplay['saved_search.api_params'].join, function(join) {
+              var joinInfo = join[0].split(' AS ');
+              if (prefix === joinInfo[1]) {
+                entityType = joinInfo[0];
+                return false;
+              }
+            });
+          }
+          if (!entityType && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
+            entityType = searchDisplay['saved_search.api_entity'];
+          }
+          if (entityType) {
+            return false;
+          }
+        });
+        return entityType;
       };
 
     }

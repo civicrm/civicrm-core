@@ -63,6 +63,21 @@
         });
         $scope.tabs.block.options = _.sortBy(links, 'Label');
       }
+
+      if (ctrl.tab === 'search') {
+        crmApi4('SearchDisplay', 'get', {
+          select: ['name', 'label', 'type:icon', 'saved_search.name', 'saved_search.label']
+        }).then(function(searchDisplays) {
+          _.each(searchDisplays, function(searchDisplay) {
+            links.push({
+              url: '#create/search/' + searchDisplay['saved_search.name'] + '.' + searchDisplay.name,
+              label: searchDisplay['saved_search.label'] + ': ' + searchDisplay.label,
+              icon: searchDisplay['type:icon']
+            });
+          });
+          $scope.tabs.search.options = _.sortBy(links, 'Label');
+        });
+      }
     };
 
     this.revert = function(afform) {

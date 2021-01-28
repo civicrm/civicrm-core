@@ -26,24 +26,32 @@
         $scope.meta = afGui.meta;
       };
 
-      $scope.getEntity = function() {
-        return ctrl.editor ? ctrl.editor.getEntity(ctrl.container.getEntityName()) : {};
+      // $scope.getEntity = function() {
+      //   return ctrl.editor ? ctrl.editor.getEntity(ctrl.container.getEntityName()) : {};
+      // };
+
+      // Returns the original field definition from metadata
+      this.getDefn = function() {
+        return ctrl.editor ? afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name) : {};
       };
 
-      $scope.getDefn = this.getDefn = function() {
-        return ctrl.editor ? afGui.getField(ctrl.container.getFieldEntityType(), ctrl.node.name) : {};
+      $scope.getOriginalLabel = function() {
+        if (ctrl.container.getEntityName()) {
+          return ctrl.editor.getEntity(ctrl.container.getEntityName()).label + ': ' + ctrl.getDefn().label;
+        }
+        return afGui.getEntity(ctrl.container.getFieldEntityType(ctrl.node.name)).label + ': ' + ctrl.getDefn().label;
       };
 
       $scope.hasOptions = function() {
         var inputType = $scope.getProp('input_type');
-        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !$scope.getDefn().options);
+        return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !ctrl.getDefn().options);
       };
 
       $scope.getOptions = this.getOptions = function() {
         if (ctrl.node.defn && ctrl.node.defn.options) {
           return ctrl.node.defn.options;
         }
-        return $scope.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
+        return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
       };
 
       $scope.resetOptions = function() {
@@ -56,7 +64,7 @@
       };
 
       $scope.inputTypeCanBe = function(type) {
-        var defn = $scope.getDefn();
+        var defn = ctrl.getDefn();
         switch (type) {
           case 'CheckBox':
           case 'Radio':
@@ -78,7 +86,7 @@
         if (typeof localDefn[item] !== 'undefined') {
           return localDefn[item];
         }
-        return drillDown($scope.getDefn(), path)[item];
+        return drillDown(ctrl.getDefn(), path)[item];
       };
 
       // Checks for a value in either the local field defn or the base defn
@@ -102,7 +110,7 @@
       };
 
       $scope.toggleHelp = function(position) {
-        getSet('help_' + position, $scope.propIsset('help_' + position) ? null : ($scope.getDefn()['help_' + position] || ts('Enter text')));
+        getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
         return false;
       };
 
@@ -117,7 +125,7 @@
           var path = propName.split('.'),
             item = path.pop(),
             localDefn = drillDown(ctrl.node, ['defn'].concat(path)),
-            fieldDefn = drillDown($scope.getDefn(), path);
+            fieldDefn = drillDown(ctrl.getDefn(), path);
           // Set the value if different than the field defn, otherwise unset it
           if (typeof val !== 'undefined' && (val !== fieldDefn[item] && !(!val && !fieldDefn[item]))) {
             localDefn[item] = val;

@@ -28,6 +28,14 @@ class Admin {
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
+      'afformEnabled' => (bool) \CRM_Utils_Array::findAll(
+        \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),
+        ['fullName' => 'org.civicrm.afform']
+      ),
+      'afformAdminEnabled' => (bool) \CRM_Utils_Array::findAll(
+        \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),
+        ['fullName' => 'org.civicrm.afform_admin']
+      ),
     ];
   }
 

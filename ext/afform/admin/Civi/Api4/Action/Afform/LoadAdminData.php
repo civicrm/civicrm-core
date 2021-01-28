@@ -56,6 +56,20 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
             'layout' => [],
           ];
           break;
+
+        case 'search':
+          $info['definition'] = $this->definition + [
+            'title' => '',
+            'permission' => 'access CiviCRM',
+            'layout' => [
+              [
+                '#tag' => 'div',
+                'af-fieldset' => '',
+                '#children' => [],
+              ],
+            ],
+          ];
+          break;
       }
     }
 
@@ -133,9 +147,39 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       $entities[] = $info['definition']['join'] ?? $info['definition']['block'];
     }
 
+    if ($info['definition']['type'] === 'search') {
+      $getFieldsMode = 'search';
+      $displayTags = [];
+      if ($newForm) {
+        [$searchName, $displayName] = array_pad(explode('.', $this->entity ?? ''), 2, '');
+        $displayTags[] = ['search-name' => $searchName, 'display-name' => $displayName];
+      }
+      else {
+        foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
+          $displayTags = array_merge($displayTags, \CRM_Utils_Array::findAll($info['definition']['layout'], ['#tag' => $displayType['name']]));
+        }
+      }
+      foreach ($displayTags as $displayTag) {
+        $display = \Civi\Api4\SearchDisplay::get(FALSE)
+          ->addWhere('name', '=', $displayTag['display-name'])
+          ->addWhere('saved_search.name', '=', $displayTag['search-name'])
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search.name', 'saved_search.api_entity', 'saved_search.api_params')
+          ->execute()->first();
+        $info['search_displays'][] = $display;
+        if ($newForm) {
+          $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
+        }
+        $entities[] = $display['saved_search.api_entity'];
+        foreach ($display['saved_search.api_params']['join'] ?? [] as $join) {
+          $entities[] = explode(' AS ', $join[0])[0];
+        }
+      }
+      $entities = array_unique($entities);
+    }
+
     // Optimization - since contact fields are a combination of these three,
     // we'll combine them client-side rather than sending them via ajax.
-    if (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+    elseif (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
       $entities = array_diff($entities, ['Contact']);
     }
 
@@ -167,6 +211,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       ],
       [
         'name' => 'fields',
+        'data_type' => 'Array',
+      ],
+      [
+        'name' => 'search_displays',
         'data_type' => 'Array',
       ],
     ];

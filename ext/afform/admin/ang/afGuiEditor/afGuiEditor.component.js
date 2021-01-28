@@ -51,7 +51,7 @@
           }
         }
 
-        else if ($scope.afform.type === 'block') {
+        if ($scope.afform.type === 'block') {
           editor.layout['#children'] = $scope.afform.layout;
           editor.blockEntity = $scope.afform.join || $scope.afform.block;
           $scope.entities[editor.blockEntity] = {
@@ -59,6 +59,11 @@
             name: editor.blockEntity,
             label: afGui.getEntity(editor.blockEntity).label
           };
+        }
+
+        if ($scope.afform.type === 'search') {
+          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'af-fieldset': ''})[0]['#children'];
+
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model

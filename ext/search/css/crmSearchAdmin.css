@@ -152,3 +152,16 @@
   right: 0;
   top: 0;
 }
+
+#bootstrap-theme input[type=search]::placeholder {
+  font-family: FontAwesome;
+  text-align: right;
+}
+#bootstrap-theme input[type=search]:-ms-input-placeholder {
+  font-family: FontAwesome;
+  text-align: right;
+}
+#bootstrap-theme input[type=search]::-ms-input-placeholder {
+  font-family: FontAwesome;
+  text-align: right;
+}

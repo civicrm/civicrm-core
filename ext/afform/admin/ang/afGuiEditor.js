@@ -72,6 +72,7 @@
             delete entity.fields;
           });
           CRM.afGuiEditor.blocks = {};
+          CRM.afGuiEditor.searchDisplays = {};
         },
 
         // Takes the results from api.Afform.loadAdminData and processes the metadata
@@ -111,6 +112,9 @@
               (CRM.afGuiEditor.entities.Organization || {}).fields
             );
           }
+          _.each(data.search_displays, function(display) {
+            CRM.afGuiEditor.searchDisplays[display['saved_search.name'] + '.' + display.name] = display;
+          });
         },
 
         meta: CRM.afGuiEditor,
@@ -120,7 +124,8 @@
         },
 
         getField: function(entityName, fieldName) {
-          return CRM.afGuiEditor.entities[entityName].fields[fieldName];
+          var fields = CRM.afGuiEditor.entities[entityName].fields;
+          return fields[fieldName] || fields[fieldName.substr(fieldName.indexOf('.') + 1)];
         },
 
         // Recursively searches a collection and its children using _.filter

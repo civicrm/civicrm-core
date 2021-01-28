@@ -120,6 +120,11 @@
   background-color: #b3b3b3;
 }
 
+#afGuiEditor .af-gui-bar > .form-inline > span {
+  color: #696969;
+  font-style: italic;
+}
+
 #afGuiEditor .af-gui-element {
   position: relative;
   padding: 0 3px 3px;
@@ -138,6 +143,13 @@
 #afGuiEditor af-gui-field,
 #afGuiEditor af-gui-edit-options {
   display: block;
+}
+
+#afGuiEditor .af-gui-search-display {
+  border: 1px dotted gray;
+  color: gray;
+  padding: 3em;
+  background-color: #f9f9f9;
 }
 
 #afGuiEditor .af-gui-container-type-fieldset {
