@@ -271,7 +271,7 @@
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>
           <caption>{ts}Code{/ts}</caption>
-          <tr><td>Rest</td><td><pre id="api-rest"></pre></td></tr>
+          <tr><td>Rest</td><td><div id="api-rest"></div></td></tr>
           <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
           <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
           <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
@@ -282,6 +282,7 @@
           {if $config->userSystem->is_wordpress}
             <tr><td><a href="http://wp-cli.org/" target="_blank">wp-cli</a></td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
           {/if}
+          <tr><td><a href="https://curl.se/">curl</a></td><td><pre id="api-curl"></pre></td></tr>
         </table>
       </div>
       <div class="crm-submit-buttons">
@@ -347,6 +348,15 @@
 </div>
 </div>
 {strip}
+<script type="text/template" id="api-rest-tpl">
+  <pre><%- method %> <%- url %></pre>
+  <ul>{literal}
+    <% _.forEach(query, function(value, field){ %>
+      <li><b><%- field %></b>: <pre style="display: inline-block"><%- value %></pre></li>
+    <% }); %>
+  {/literal}</ul>
+</script>
+
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
     <td>
