@@ -102,6 +102,9 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'title' => $customEntity['title'],
         'title_plural' => $customEntity['title'],
         'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
+        'searchable' => TRUE,
+        'type' => ['CustomValue'],
+        'paths' => [],
         'see' => [
           'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
           '\\Civi\\Api4\\CustomGroup',
