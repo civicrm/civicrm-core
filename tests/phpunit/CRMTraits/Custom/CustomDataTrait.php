@@ -92,10 +92,9 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL, $fieldParams = []) {
-    $supported = ['text', 'select', 'date', 'int', 'contact_reference', 'radio', 'multi_country'];
+  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL, $fieldParams = []): void {
+    $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
     if (!in_array($customFieldType, $supported, TRUE)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -111,6 +110,10 @@ trait CRMTraits_Custom_CustomDataTrait {
 
       case 'select':
         $reference = $this->createSelectCustomField($fieldParams)['id'];
+        return;
+
+      case 'checkbox':
+        $reference = $this->createStringCheckboxCustomField($fieldParams)['id'];
         return;
 
       case 'int':
@@ -154,6 +157,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $ids['state'] = (int) $this->createStateCustomField(['custom_group_id' => $customGroupID])['id'];
     $ids['multi_state'] = (int) $this->createMultiStateCustomField(['custom_group_id' => $customGroupID])['id'];
     $ids['boolean'] = (int) $this->createBooleanCustomField(['custom_group_id' => $customGroupID])['id'];
+    $ids['checkbox'] = (int) $this->createStringCheckboxCustomField(['custom_group_id' => $customGroupID])['id'];
     return $ids;
   }
 
@@ -204,6 +208,34 @@ trait CRMTraits_Custom_CustomDataTrait {
    */
   protected function getCustomFieldID($key) {
     return $this->ids['CustomField'][$key];
+  }
+
+  /**
+   * Get the option group id of the created field.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getOptionGroupID(string $key): string {
+    return (string) $this->callAPISuccessGetValue('CustomField', [
+      'id' => $this->getCustomFieldID($key),
+      'return' => 'option_group_id',
+    ]);
+  }
+
+  /**
+   * Get the option group id of the created field.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getOptionGroupName(string $key): string {
+    return (string) $this->callAPISuccessGetValue('CustomField', [
+      'id' => $this->getCustomFieldID($key),
+      'return' => 'option_group_id.name',
+    ]);
   }
 
   /**
@@ -381,6 +413,18 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
+  protected function createStringCheckboxCustomField(array $params): array {
+    $params = array_merge($this->getFieldsValuesByType('String', 'CheckBox'), $params);
+    return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
+  }
+
+  /**
+   * Create a custom field of  type radio with integer values.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
   protected function createIntegerRadioCustomField($params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
@@ -480,28 +524,34 @@ trait CRMTraits_Custom_CustomDataTrait {
           ],
         ],
         'CheckBox' => [
-          'label' => 'Pick Color',
+          'label' => 'Pick Shade',
           'html_type' => 'CheckBox',
           'data_type' => 'String',
           'text_length' => '',
           'default_value' => '',
           'option_values' => [
             [
-              'label' => 'Red',
-              'value' => 'R',
+              'label' => 'Lilac',
+              'value' => 'L',
               'weight' => 1,
               'is_active' => 1,
             ],
             [
-              'label' => 'Yellow',
-              'value' => 'Y',
+              'label' => 'Purple',
+              'value' => 'P',
               'weight' => 2,
               'is_active' => 1,
             ],
             [
-              'label' => 'Green',
-              'value' => 'G',
+              'label' => 'Mauve',
+              'value' => 'M',
               'weight' => 3,
+              'is_active' => 1,
+            ],
+            [
+              'label' => 'Violet',
+              'value' => 'V',
+              'weight' => 4,
               'is_active' => 1,
             ],
           ],

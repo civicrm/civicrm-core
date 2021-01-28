@@ -52,9 +52,9 @@ class CRM_Core_Session {
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
+   * @var \CRM_Core_Session
    */
-  static private $_singleton = NULL;
+  static private $_singleton;
 
   /**
    * Constructor.
