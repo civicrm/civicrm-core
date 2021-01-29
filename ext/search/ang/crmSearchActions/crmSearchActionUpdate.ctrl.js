@@ -29,7 +29,16 @@
       // Debounce the onchange event using timeout
       $timeout(function() {
         if (ctrl.add) {
-          ctrl.values.push([ctrl.add, '']);
+          var field = ctrl.getField(ctrl.add),
+            value = '';
+          if (field.serialize) {
+            value = [];
+          } else if (field.data_type === 'Boolean') {
+            value = true;
+          } else if (field.options && field.options.length) {
+            value = field.options[0].id;
+          }
+          ctrl.values.push([ctrl.add, value]);
         }
         ctrl.add = null;
       });
@@ -61,12 +70,20 @@
     };
 
     this.save = function() {
-      crmApi4(model.entity, 'Update', {
-        where: [['id', 'IN', model.ids]],
+      $('.ui-dialog-titlebar button').hide();
+      ctrl.run = {
         values: _.zipObject(ctrl.values)
-      }).then(function() {
-        dialogService.close('crmSearchAction');
-      });
+      };
+    };
+
+    this.onSuccess = function() {
+      CRM.alert(ts('Successfully updated %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+      dialogService.close('crmSearchAction');
+    };
+
+    this.onError = function() {
+      CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
+      dialogService.close('crmSearchAction');
     };
 
   });
