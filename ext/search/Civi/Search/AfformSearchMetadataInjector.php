@@ -39,15 +39,15 @@ class AfformSearchMetadataInjector {
                 ->addSelect('settings', 'saved_search.api_entity', 'saved_search.api_params')
                 ->execute()->first();
               if ($display) {
-                pq($component)->attr('settings', \CRM_Utils_JS::encode($display['settings'] ?? []));
-                pq($component)->attr('api-entity', \CRM_Utils_JS::encode($display['saved_search.api_entity']));
-                pq($component)->attr('api-params', \CRM_Utils_JS::encode($display['saved_search.api_params']));
+                pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? [])));
+                pq($component)->attr('api-entity', htmlspecialchars(\CRM_Utils_JS::encode($display['saved_search.api_entity'])));
+                pq($component)->attr('api-params', htmlspecialchars(\CRM_Utils_JS::encode($display['saved_search.api_params'])));
 
                 // Add entity names to the fieldset so that afform can populate field metadata
                 $fieldset = pq($component)->parents('[af-fieldset]');
                 if ($fieldset->length) {
                   $entityList = array_merge([$display['saved_search.api_entity']], array_column($display['saved_search.api_params']['join'] ?? [], 0));
-                  $fieldset->attr('api-entities', \CRM_Utils_JS::encode($entityList));
+                  $fieldset->attr('api-entities', htmlspecialchars(\CRM_Utils_JS::encode($entityList)));
                 }
               }
             }
