@@ -203,6 +203,19 @@
     text-align: right;
     font-style: italic;
   }
+  .crm-container .api-rest-params pre {
+    display: inline-block;
+  }
+  .crm-container .api-rest-params tr td:first-child {
+    text-align: right;
+  }
+  .crm-container .api-rest-params tr td:first-child + td {
+    text-align: center;
+    width: 1em;
+  }
+  .crm-container .api-rest-params tr td:first-child + td + td {
+    text-align: left;
+  }
   {/literal}
 </style>
 
@@ -349,12 +362,16 @@
 </div>
 {strip}
 <script type="text/template" id="api-rest-tpl">
-  <pre><%- method %> <%- url %></pre>
-  <ul>{literal}
+  <pre class="api-rest-url"><%- method %> <%- url %></pre>
+  <table class="api-rest-params"><tbody>{literal}
     <% _.forEach(query, function(value, field){ %>
-      <li><b><%- field %></b>: <pre style="display: inline-block"><%- value %></pre></li>
+    <tr>
+      <td><pre><%- field %></pre></td>
+      <td>=</td>
+      <td><pre><%- value %></pre></td>
+    </tr>
     <% }); %>
-  {/literal}</ul>
+  {/literal}</table>
 </script>
 
 <script type="text/template" id="api-param-tpl">
