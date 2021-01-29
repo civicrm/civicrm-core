@@ -75,7 +75,7 @@
 
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
-        crmApi4('Afform', 'convert', {layout: [editor.layout], from: 'deep', to: 'html', formatWhitespace: true})
+        crmApi4('Afform', 'convert', {layout: $scope.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
           .then(function(r){
             $scope.layoutHtml = r[0].layout || '(Error)';
           })
