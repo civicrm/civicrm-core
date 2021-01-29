@@ -2,10 +2,10 @@
 
 <div id="bootstrap-theme">
   <div ng-if="!routeParams.provider">
-    <div oauth-provider-list></div>
+    <oauth-provider-list></oauth-provider-list>
   </div>
 
   <div ng-if="routeParams.provider">
-    <div oauth-provider-detail="{provider: theProviders[routeParams.provider]}"></div>
+    <oauth-provider-detail options="{provider: theProviders[routeParams.provider]}"></oauth-provider-detail>
   </div>
 </div>
