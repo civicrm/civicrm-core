@@ -9,3 +9,9 @@ INSERT IGNORE INTO `civicrm_state_province` (`id`, `country_id`, `abbreviation`,
 DELETE FROM civicrm_mapping_field
 WHERE name NOT IN ( SELECT concat('custom_', id) FROM civicrm_custom_field)
 AND name LIKE 'custom_%';
+
+-- Ensure action_schedule has dynamic row format to prevent
+-- https://lab.civicrm.org/dev/core/-/issues/2335
+-- should be the case on new installs
+-- this runs before the php column adds (good).
+ALTER TABLE `civicrm_action_schedule` ROW_FORMAT=DYNAMIC;
