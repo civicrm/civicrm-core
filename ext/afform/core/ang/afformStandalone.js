@@ -7,7 +7,7 @@
       $routeProvider.when('/', {
         controller: 'AfformStandalonePageCtrl',
         template: function() {
-          return '<div id="bootstrap-theme" ' + CRM.afform.open + '="{}"></div>';
+          return '<div id="bootstrap-theme"><' + CRM.afform.open + '></' + CRM.afform.open + '></div>';
         }
       });
     })

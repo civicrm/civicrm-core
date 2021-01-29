@@ -18,7 +18,7 @@
       <div ng-form="editClientForm">
         <h4>{{ts('Tokens')}}</h4>
 
-        <div oauth-client-tokens="{clientId: resultClient.id}"></div>
+        <oauth-client-tokens options="{clientId: resultClient.id}"></oauth-client-tokens>
 
         <div class="btn-group" oauth-util-grant-ctrl="granter">
           <a class="btn btn-primary" ng-click="granter.authCode(resultClient.id)">{{ts('Add (Auth Code)')}}</a>
@@ -26,7 +26,7 @@
 
         <h4>{{ts('Properties')}}</h4>
 
-        <div oauth-client-editor="{client: resultClient}"></div>
+        <oauth-client-editor options="{client: resultClient}"></oauth-client-editor>
         <div class="btn-group">
           <a class="btn btn-primary"
              af-api4-action="['OAuthClient', 'update', {where: [['id', '=', resultClient.id]], values:resultClient}]">{{ts('Save')}}</a>
@@ -40,9 +40,9 @@
     </div>
 
     <div class="panel-body" ng-if="selected.tab === 'new'" ng-form="newClientForm" ng-init="theNew = {provider: options.provider.name}">
-      <div oauth-client-create-help="{provider: options.provider}"></div>
+      <oauth-client-create-help options="{provider: options.provider}"></oauth-client-create-help>
       <div crm-ui-debug="theNew"></div>
-      <div oauth-client-creator="{client: theNew}"></div>
+      <oauth-client-creator options="{client: theNew}"></oauth-client-creator>
       <div class="btn-group">
         <a class="btn btn-primary"
            af-api4-action="['OAuthClient', 'create', {values:theNew}]"

@@ -258,7 +258,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     Civi\Api4\Afform::update()
       ->addWhere('name', '=', $formName)
       ->setLayoutFormat('html')
-      ->setValues(['layout' => '<div>The bare file says "<span mock-bare-file/>"</div>'])
+      ->setValues(['layout' => '<div>The bare file says "<mock-bare-file/>"</div>'])
       ->execute();
     $angModule = Civi::service('angular')->getModule($formName);
     $this->assertEquals(['afCore', 'mockBespoke', 'mockBareFile'], $angModule['requires']);

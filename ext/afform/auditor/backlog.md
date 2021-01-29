@@ -19,3 +19,4 @@ validator to catch. Loosely/informally:
 * Accept a restricted subset of BootstrapCSS
 * Accept a restricted subset of Angular HTML
 * Accept directives created via Afform
+* Circa 5.35, afforms became strictly (e)lement mode and dropped (a)ttribute mode (#19438)
