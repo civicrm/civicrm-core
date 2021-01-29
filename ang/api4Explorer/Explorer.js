@@ -702,7 +702,7 @@
       }
       _.each($scope.code, function(vals) {
         _.each(vals, function(style) {
-          style.code = code[style.name] ? prettyPrintOne(code[style.name]) : '';
+          style.code = code[style.name] ? prettyPrintOne(_.escape(code[style.name])) : '';
         });
       });
     }
