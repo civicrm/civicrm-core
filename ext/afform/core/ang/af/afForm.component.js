@@ -9,10 +9,10 @@
         data = {},
         ctrl = this;
 
-      // This component has no template. It makes its controller available within it by adding it to the parent scope.
-      $scope.$parent[this.ctrl] = this;
-
       this.$onInit = function() {
+        // This component has no template. It makes its controller available within it by adding it to the parent scope.
+        $scope.$parent[this.ctrl] = this;
+
         $timeout(ctrl.loadData);
       };
 
