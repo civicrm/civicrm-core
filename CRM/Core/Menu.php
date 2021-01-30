@@ -265,14 +265,19 @@ class CRM_Core_Menu {
    */
   public static function build(&$menu) {
     foreach ($menu as $path => $menuItems) {
-      self::buildBreadcrumb($menu, $path);
-      self::fillMenuValues($menu, $path);
-      self::fillComponentIds($menu, $path);
-      self::buildReturnUrl($menu, $path);
+      try {
+        self::buildBreadcrumb($menu, $path);
+        self::fillMenuValues($menu, $path);
+        self::fillComponentIds($menu, $path);
+        self::buildReturnUrl($menu, $path);
 
-      // add add page_type if not present
-      if (!isset($menu[$path]['page_type'])) {
-        $menu[$path]['page_type'] = 0;
+        // add add page_type if not present
+        if (!isset($menu[$path]['page_type'])) {
+          $menu[$path]['page_type'] = 0;
+        }
+      }
+      catch (CRM_Core_Exception $e) {
+        Civi::log()->error('Menu path skipped:' . $e->getMessage());
       }
     }
 
@@ -465,7 +470,7 @@ class CRM_Core_Menu {
    */
   public static function buildReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
-      list($menu[$path]['return_url'], $menu[$path]['return_url_args']) = self::getReturnUrl($menu, $path);
+      [$menu[$path]['return_url'], $menu[$path]['return_url_args']] = self::getReturnUrl($menu, $path);
     }
   }
 
