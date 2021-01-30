@@ -81,15 +81,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     ];
     $result = civicrm_api3('payment_processor', 'create', $api_params);
 
-    // Create a Campaign for testing.
-    $campaign_name = md5(microtime());
-    $api_params = [
-      'title' => $campaign_name,
-      'is_active' => TRUE,
-      'status_id' => 2,
-    ];
-    $result = civicrm_api3('campaign', 'create', $api_params);
-
     // Create a membership type for testing.
     $membership_type = md5(microtime());
     $api_params = [
@@ -243,10 +234,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'medium_id',
           'sample' => 'Phone',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Campaign_DAO_Campaign' => [
         [
@@ -262,20 +249,12 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       ],
       'CRM_Campaign_DAO_Survey' => [
         [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
-        [
           'fieldName' => 'activity_type_id',
           'sample' => 'Phone Call',
           'max' => 100,
         ],
       ],
       'CRM_Campaign_DAO_CampaignGroup' => [
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
         [
           'fieldName' => 'group_type',
           'sample' => 'Include',
@@ -499,10 +478,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'payment_instrument_id',
           'sample' => 'Check',
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Pledge_DAO_PledgePayment' => [
         [
@@ -524,10 +499,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         [
           'fieldName' => 'frequency_unit',
           'sample' => 'month',
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_PCP_DAO_PCP' => [
@@ -778,10 +749,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Event_DAO_Event' => [
         [
@@ -809,10 +776,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Core_DAO_Menu' => [
         [
@@ -832,10 +795,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         [
           'fieldName' => 'status_id',
           'sample' => 'New',
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_Member_DAO_MembershipStatus' => [
@@ -890,10 +849,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         [
           'fieldName' => 'visibility',
           'sample' => 'Public Pages',
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_Mailing_DAO_MailingComponent' => [
@@ -967,10 +922,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'contribution_page_id',
           'sample' => $contribution_page,
         ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
-        ],
       ],
       'CRM_Contribute_DAO_PremiumsProduct' => [
         [
@@ -991,10 +942,6 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'fieldName' => 'currency',
           'sample' => ['USD' => 'US Dollar'],
           'max' => 200,
-        ],
-        [
-          'fieldName' => 'campaign_id',
-          'sample' => $campaign_name,
         ],
       ],
       'CRM_Case_DAO_Case' => [

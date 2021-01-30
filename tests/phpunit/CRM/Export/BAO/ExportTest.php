@@ -574,7 +574,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportPseudoFieldCampaign() {
     $this->setUpContributionExportData();
     $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign and kinda long too']);
-    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => 'Big_campaign_and_kinda_long_too', 'id' => $this->contributionIDs[0]]);
+    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => $campaign['id'], 'id' => $this->contributionIDs[0]]);
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'gender_id'],
       ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_title'],
