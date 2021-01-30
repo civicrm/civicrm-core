@@ -771,11 +771,6 @@
     <type>int unsigned</type>
     <title>Campaign</title>
     <comment>The campaign for which this event has been created.</comment>
-    <pseudoconstant>
-      <table>civicrm_campaign</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>title</labelColumn>
-    </pseudoconstant>
     <add>3.4</add>
     <html>
        <type>EntityRef</type>

@@ -269,11 +269,6 @@
     <title>Campaign</title>
     <import>true</import>
     <comment>The campaign for which this membership is attached.</comment>
-    <pseudoconstant>
-      <table>civicrm_campaign</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>title</labelColumn>
-    </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
