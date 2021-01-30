@@ -19,6 +19,7 @@
     chainTpl = _.template($('#api-chain-tpl').html()),
     docCodeTpl = _.template($('#doc-code-tpl').html()),
     joinTpl = _.template($('#join-tpl').html()),
+    restTpl = _.template($('#api-rest-tpl').html()),
 
     // The following apis do not use Api3SelectQuery so do not support advanced features like joins or OR
     NO_JOINS = ['Contact', 'Contribution', 'Pledge', 'Participant'],
@@ -699,6 +700,11 @@
    * Render the api request in various formats
    */
   function formatQuery() {
+    var http = {
+      url: CRM.config.resourceBase + "extern/rest.php",
+      method:  action.startsWith('get') ? 'GET' : 'POST',
+      query: {entity: entity, action: action, json: JSON.stringify(params), api_key: 'FIXME_USER_KEY', key: 'FIXME_SITE_KEY'}
+    };
     var i = 0, q = {
       smarty: "{crmAPI var='result' entity='" + entity + "' action='" + action + "'" + (params.sequential ? '' : ' sequential=0'),
       php: "$result = civicrm_api3('" + entity + "', '" + action + "'",
@@ -706,7 +712,9 @@
       cv: "cv api " + entity + '.' + action + ' ',
       drush: "drush cvapi " + entity + '.' + action + ' ',
       wpcli: "wp cv api " + entity + '.' + action + ' ',
-      rest: CRM.config.resourceBase + "extern/rest.php?entity=" + entity + "&action=" + action + "&api_key=userkey&key=sitekey&json=" + JSON.stringify(params)
+      curl: http.method === 'GET' ?
+        "curl '" + http.url + "?" + $.param(http.query) + "'"
+        : "curl -X " + http.method + " -d '" + $.param(http.query) +"' \\\n  '" + http.url + "'"
     };
     smartyPhp = [];
     $.each(params, function(key, value) {
@@ -743,6 +751,7 @@
     } else if (smartyPhp.length) {
       q.smarty = "{php}\n  " + smartyPhp.join("\n  ") + "\n{/php}\n" + q.smarty;
     }
+    $('#api-rest').html(restTpl(http));
     $.each(q, function(type, val) {
       $('#api-' + type).text(val);
     });

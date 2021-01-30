@@ -203,6 +203,19 @@
     text-align: right;
     font-style: italic;
   }
+  .crm-container .api-rest-params pre {
+    display: inline-block;
+  }
+  .crm-container .api-rest-params tr td:first-child {
+    text-align: right;
+  }
+  .crm-container .api-rest-params tr td:first-child + td {
+    text-align: center;
+    width: 1em;
+  }
+  .crm-container .api-rest-params tr td:first-child + td + td {
+    text-align: left;
+  }
   {/literal}
 </style>
 
@@ -271,7 +284,7 @@
       <div id="api-generated-wraper">
         <table id="api-generated" border=1>
           <caption>{ts}Code{/ts}</caption>
-          <tr><td>Rest</td><td><pre id="api-rest"></pre></td></tr>
+          <tr><td>Rest</td><td><div id="api-rest"></div></td></tr>
           <tr><td>Smarty</td><td><pre class="linenums" id="api-smarty" title='smarty syntax (for get actions)'></pre></td></tr>
           <tr><td>Php</td><td><pre class="linenums" id="api-php" title='php syntax'></pre></td></tr>
           <tr><td>Javascript</td><td><pre class="linenums" id="api-json" title='javascript syntax'></pre></td></tr>
@@ -282,6 +295,7 @@
           {if $config->userSystem->is_wordpress}
             <tr><td><a href="http://wp-cli.org/" target="_blank">wp-cli</a></td><td><pre id="api-wpcli" title='wp-cli syntax'></pre></td></tr>
           {/if}
+          <tr><td><a href="https://curl.se/">curl</a></td><td><pre id="api-curl"></pre></td></tr>
         </table>
       </div>
       <div class="crm-submit-buttons">
@@ -347,6 +361,19 @@
 </div>
 </div>
 {strip}
+<script type="text/template" id="api-rest-tpl">
+  <pre class="api-rest-url"><%- method %> <%- url %></pre>
+  <table class="api-rest-params"><tbody>{literal}
+    <% _.forEach(query, function(value, field){ %>
+    <tr>
+      <td><pre><%- field %></pre></td>
+      <td>=</td>
+      <td><pre><%- value %></pre></td>
+    </tr>
+    <% }); %>
+  {/literal}</table>
+</script>
+
 <script type="text/template" id="api-param-tpl">
   <tr class="api-param-row">
     <td>
