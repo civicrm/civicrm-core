@@ -1233,9 +1233,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           $memType = $membershipTypeValues[$value];
           if ($selectedMembershipTypeID != NULL) {
             if ($memType['id'] == $selectedMembershipTypeID) {
-              $this->assign('minimum_fee',
-                CRM_Utils_Array::value('minimum_fee', $memType)
-              );
+              $this->assign('minimum_fee', $memType['minimum_fee'] ?? NULL);
               $this->assign('membership_name', $memType['name']);
               if (!$thankPage && $cid) {
                 $membership = new CRM_Member_DAO_Membership();
