@@ -361,7 +361,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
         $this->_separateMembershipPayment = $this->buildMembershipBlock(
           $this->_membershipContactID,
-          TRUE, NULL, FALSE,
+          NULL,
           $isTest
         );
       }
@@ -511,13 +511,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @param int $cid
    *   Contact checked for having a current membership for a particular membership.
-   * @param bool $isContributionMainPage
-   *   Is this the main page? If so add form input fields.
-   *   (or better yet don't have this functionality in a function shared with forms that don't share it).
    * @param int|array $selectedMembershipTypeID
    *   Selected membership id.
-   * @param bool $thankPage
-   *   Thank you page.
    * @param null $isTest
    *
    * @return bool
@@ -526,14 +521,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function buildMembershipBlock(
-    $cid,
-    $isContributionMainPage = FALSE,
-    $selectedMembershipTypeID = NULL,
-    $thankPage = FALSE,
-    $isTest = NULL
-  ) {
-
+  private function buildMembershipBlock($cid, $selectedMembershipTypeID = NULL, $isTest = NULL) {
     $separateMembershipPayment = FALSE;
     if ($this->_membershipBlock) {
       $this->_currentMemberships = [];
@@ -596,7 +584,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             if ($memType['id'] == $selectedMembershipTypeID) {
               $this->assign('minimum_fee', $memType['minimum_fee'] ?? NULL);
               $this->assign('membership_name', $memType['name']);
-              if (!$thankPage && $cid) {
+              if ($cid) {
                 $membership = new CRM_Member_DAO_Membership();
                 $membership->contact_id = $cid;
                 $membership->membership_type_id = $memType['id'];
@@ -667,7 +655,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
 
       $this->assign('membershipBlock', $this->_membershipBlock);
-      $this->assign('showRadio', $isContributionMainPage);
+      $this->assign('showRadio', TRUE);
       $this->assign('membershipTypes', $membershipTypes);
       $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
@@ -686,39 +674,37 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         $this->assign('autoRenewOption', $autoRenewOption);
       }
 
-      if ($isContributionMainPage) {
-        if (!$membershipPriceset) {
-          if (!$this->_membershipBlock['is_required']) {
-            $this->assign('showRadioNoThanks', TRUE);
-            $radio['no_thanks'] = NULL;
-            $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
+      if (!$membershipPriceset) {
+        if (!$this->_membershipBlock['is_required']) {
+          $this->assign('showRadioNoThanks', TRUE);
+          $radio['no_thanks'] = NULL;
+          $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
+        }
+        elseif ($this->_membershipBlock['is_required'] && count($radio) == 1) {
+          $temp = array_keys($radio);
+          $this->add('hidden', 'selectMembership', $temp[0], ['id' => 'selectMembership']);
+          $this->assign('singleMembership', TRUE);
+          $this->assign('showRadio', FALSE);
+        }
+        else {
+          foreach ($radioOptAttrs as $opt => $attrs) {
+            $attrs['class'] = ' required';
           }
-          elseif ($this->_membershipBlock['is_required'] && count($radio) == 1) {
-            $temp = array_keys($radio);
-            $this->add('hidden', 'selectMembership', $temp[0], ['id' => 'selectMembership']);
-            $this->assign('singleMembership', TRUE);
-            $this->assign('showRadio', FALSE);
-          }
-          else {
-            foreach ($radioOptAttrs as $opt => $attrs) {
-              $attrs['class'] = ' required';
-            }
-            $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
-          }
-
-          $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
+          $this->addRadio('selectMembership', NULL, $radio, [], NULL, FALSE, $radioOptAttrs);
         }
 
-        if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
-          if ($autoRenewOption == 2) {
-            $this->addElement('hidden', 'auto_renew', ts('Please renew my membership automatically.'));
-          }
-          else {
-            $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
-          }
-        }
-
+        $this->addRule('selectMembership', ts('Please select one of the memberships.'), 'required');
       }
+
+      if ((!$this->_values['is_pay_later'] || is_array($this->_paymentProcessors)) && ($allowAutoRenewMembership || $autoRenewOption)) {
+        if ($autoRenewOption == 2) {
+          $this->addElement('hidden', 'auto_renew', ts('Please renew my membership automatically.'));
+        }
+        else {
+          $this->addElement('checkbox', 'auto_renew', ts('Please renew my membership automatically.'));
+        }
+      }
+
     }
 
     return $separateMembershipPayment;
