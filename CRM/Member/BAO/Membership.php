@@ -1575,11 +1575,15 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * @return null|string
    */
   public static function getContactMembershipCount($contactID, $activeOnly = FALSE) {
-    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    $membershipTypes = \Civi\Api4\MembershipType::get(TRUE)
+      ->execute()
+      ->indexBy('id')
+      ->column('name');
     $addWhere = " AND membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
       $addWhere = " AND membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
     }
+
     $select = "SELECT count(*) FROM civicrm_membership ";
     $where = "WHERE civicrm_membership.contact_id = {$contactID} AND civicrm_membership.is_test = 0 ";
 

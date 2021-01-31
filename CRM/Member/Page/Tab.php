@@ -32,7 +32,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public function browse() {
     $links = self::links('all', $this->_isPaymentProcessor, $this->_accessContribution);
-    CRM_Financial_BAO_FinancialType::getAvailableMembershipTypes($membershipTypes);
+    $membershipTypes = \Civi\Api4\MembershipType::get(TRUE)
+      ->execute()
+      ->indexBy('id')
+      ->column('name');
     $addWhere = "membership_type_id IN (0)";
     if (!empty($membershipTypes)) {
       $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
