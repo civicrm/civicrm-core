@@ -15,11 +15,14 @@ use Civi\Api4\PriceField;
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
+ *
  * Order class.
  *
  * This class is intended to become the object to manage orders, including via Order.api.
  *
  * As of writing it is in the process of having appropriate functions built up.
+ * It should **NOT** be accessed directly outside of tested core methods as it
+ * may change.
  */
 class CRM_Financial_BAO_Order {
 
@@ -76,6 +79,60 @@ class CRM_Financial_BAO_Order {
   protected $priceFieldMetadata = [];
 
   /**
+   * Get form object.
+   *
+   * @return \CRM_Core_Form|NULL
+   */
+  public function getForm(): ?CRM_Core_Form {
+    return $this->form;
+  }
+
+  /**
+   * Set form object.
+   *
+   * @param \CRM_Core_Form|NULL $form
+   */
+  public function setForm(?CRM_Core_Form $form): void {
+    $this->form = $form;
+  }
+
+  /**
+   * The serialize & unserialize functions are to prevent the form being serialized & stored.
+   *
+   * The form could be potentially large & circular.
+   *
+   * We simply serialize the values needed to re-serialize the form.
+   *
+   * @return array
+   */
+  public function _serialize(): array {
+    return [
+      'OverrideTotalAmount' => $this->getOverrideTotalAmount(),
+      'OverrideFinancialType' => $this->getOverrideFinancialTypeID(),
+      'PriceSelection' => $this->getPriceSelection(),
+    ];
+  }
+
+  /**
+   * Re-instantiate the the class with non-calculated variables.
+   *
+   * @param array $data
+   */
+  public function _unserialize(array $data): void {
+    foreach ($data as $key => $value) {
+      $fn = 'set' . $key;
+      $this->$fn($value);
+    }
+  }
+
+  /**
+   * Form object - if present the buildAmount hook will be called.
+   *
+   * @var \CRM_Member_Form_Membership|\CRM_Member_Form_MembershipRenewal
+   */
+  protected $form;
+
+  /**
    * Get Set override for total amount of the order.
    *
    * @return float|false
@@ -92,7 +149,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param float $overrideTotalAmount
    */
-  public function setOverrideTotalAmount(float $overrideTotalAmount) {
+  public function setOverrideTotalAmount(float $overrideTotalAmount): void {
     $this->overrideTotalAmount = $overrideTotalAmount;
   }
 
@@ -189,6 +246,9 @@ class CRM_Financial_BAO_Order {
   public function getPriceFieldsMetadata(): array {
     if (empty($this->priceFieldMetadata)) {
       $this->priceFieldMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID())['fields'];
+      if ($this->getForm()) {
+        CRM_Utils_Hook::buildAmount($this->form->getFormContext(), $this->form, $this->priceFieldMetadata);
+      }
     }
     return $this->priceFieldMetadata;
   }
