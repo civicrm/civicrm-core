@@ -268,7 +268,7 @@ class TokenRow {
               }
               elseif (\CRM_Utils_Array::value('data_type', \CRM_Utils_Array::value($field, $entityFields['values'])) == 'Memo') {
                 // Memo fields aka custom fields of type Note are html.
-                $htmlTokens[$entity][$field] = CRM_Utils_String::purifyHTML($value);
+                $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
                 $htmlTokens[$entity][$field] = htmlentities($value);
