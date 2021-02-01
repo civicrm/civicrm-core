@@ -30,7 +30,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (empty($formValues)) {
       $formValues = $form->controller->exportValues($form->getName());
     }
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = self::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = [];
     if (!empty($formValues['email_options'])) {
@@ -82,7 +82,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       //@todo - comment on what is stored there
       $contributionIDs = $form->getVar('_contributionContactIds');
     }
-    list($contributions, $contacts) = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
+    [$contributions, $contacts] = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
@@ -135,7 +135,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($html)) {
       $type = $formValues['document_type'];
 
-      if ($type == 'pdf') {
+      if ($type === 'pdf') {
         CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
       }
       else {
@@ -265,7 +265,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments
-        list($contactID) = explode('-', $item);
+        [$contactID] = explode('-', $item);
         $contactID = (int) $contactID;
       }
       else {
