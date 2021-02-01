@@ -108,17 +108,13 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $hasHeaders = !empty($this->_columnHeaders);
     $headerPatterns = $this->get('headerPatterns');
     $dataPatterns = $this->get('dataPatterns');
-    $hasLocationTypes = $this->get('fieldTypes');
 
     // Initialize all field usages to false.
 
     foreach ($mapperKeys as $key) {
       $this->_fieldUsed[$key] = FALSE;
     }
-    $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $sel1 = $this->_mapperFields;
-
-    $sel2[''] = NULL;
 
     $js = "<script type='text/javascript'>\n";
     $formName = 'document.forms.' . $this->_name;
@@ -135,19 +131,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
             $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
 
-            if (!isset($locationId) || !$locationId) {
-              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-            }
-
-            if (!isset($phoneType) || !$phoneType) {
-              $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-            }
-
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
             $defaults["mapper[$i]"] = [
               $mappingHeader[0],
-              (isset($locationId)) ? $locationId : "",
-              (isset($phoneType)) ? $phoneType : "",
+              '',
+              '',
             ];
             $jsSet = TRUE;
           }
@@ -190,9 +178,9 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       $sel->setOptions([
         $sel1,
-        $sel2,
-        (isset($sel3)) ? $sel3 : "",
-        (isset($sel4)) ? $sel4 : "",
+        ['' => NULL],
+        '',
+        '',
       ]);
     }
     $js .= "</script>\n";
@@ -205,12 +193,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     if ($warning != 0 && $this->get('savedMapping')) {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
+      CRM_Core_Session::singleton()->setStatus(ts('The data columns in this import file appear to be different from the saved mapping. Please verify that you have selected the correct saved mapping before continuing.'));
     }
     else {
-      $session = CRM_Core_Session::singleton();
-      $session->setStatus(NULL);
+      CRM_Core_Session::singleton()->setStatus(NULL);
     }
 
     $this->setDefaults($defaults);
