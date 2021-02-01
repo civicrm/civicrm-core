@@ -74,6 +74,9 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $prefix = "";
       if ($config->dsn != $config->userFrameworkDSN) {
         $prefix = "`{$dsnArray['database']}`.";
+        if ($config->userFramework === 'Backdrop') {
+          $prefix = "{$dsnArray['database']}.";
+        }
       }
       foreach ($tableNames as $tableName) {
         $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
