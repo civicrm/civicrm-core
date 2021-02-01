@@ -5,7 +5,7 @@
       total-items="$ctrl.rowCount"
       ng-model="$ctrl.page"
       ng-change="$ctrl.getResults()"
-      items-per-page="$ctrl.limit"
+      items-per-page="$ctrl.apiParams.limit"
       max-size="6"
       force-ellipses="true"
       previous-text="&lsaquo;"
