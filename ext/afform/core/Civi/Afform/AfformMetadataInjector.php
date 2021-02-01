@@ -60,7 +60,8 @@ class AfformMetadataInjector {
           else {
             $entityName = pq($fieldset)->attr('af-fieldset');
             if (!preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
-              throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
+              \Civi::log()->error("Afform error: cannot process $path: malformed entity name ($entityName)");
+              return;
             }
             $entityType = $entities[$entityName]['type'];
           }
