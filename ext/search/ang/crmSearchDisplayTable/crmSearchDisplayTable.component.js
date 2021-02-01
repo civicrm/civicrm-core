@@ -82,14 +82,16 @@
         }
         // Select all
         ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results[1].length < ctrl.apiParams.limit) {
-          ctrl.selectedRows = _.pluck(ctrl.results[1], 'id');
+        if (ctrl.page === 1 && ctrl.results.length < ctrl.apiParams.limit) {
+          ctrl.selectedRows = _.pluck(ctrl.results, 'id');
           return;
         }
         // If more than one page of results, use ajax to fetch all ids
         $scope.loadingAllRows = true;
         var params = _.cloneDeep(ctrl.apiParams);
-        params.select = ['id'];
+        delete params.limit;
+        // Select only ids unless HAVING clause is present
+        params.select = params.having && params.having.length? params.select : ['id'];
         crmApi4(ctrl.apiEntity, 'get', params, ['id']).then(function(ids) {
           $scope.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);

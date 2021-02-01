@@ -395,13 +395,18 @@
           if (ctrl.stale) {
             ctrl.results = {};
             // Get row count for pager
-            // Select is only needed needed by HAVING
-            params.select = params.having && params.having.length ? params.select : [];
-            params.select.push('row_count');
-            delete params.debug;
-            crmApi4(ctrl.savedSearch.api_entity, 'get', params).then(function(result) {
-              ctrl.rowCount = result.count;
-            });
+            if (success.length < params.limit) {
+              ctrl.rowCount = success.count;
+            } else {
+              var countParams = _.cloneDeep(params);
+              // Select is only needed needed by HAVING
+              countParams.select = countParams.having && countParams.having.length ? countParams.select : [];
+              countParams.select.push('row_count');
+              delete countParams.debug;
+              crmApi4(ctrl.savedSearch.api_entity, 'get', countParams).then(function(result) {
+                ctrl.rowCount = result.count;
+              });
+            }
           }
           ctrl.debug = success.debug;
           // populate this page & the next
@@ -576,7 +581,7 @@
 
       $scope.formatResult = function(row, col) {
         var info = searchMeta.parseExpr(col),
-          value = row[info.alias];
+          value = row[info.alias + info.suffix];
         if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }

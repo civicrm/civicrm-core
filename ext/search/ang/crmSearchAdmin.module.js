@@ -188,7 +188,7 @@
           info.suffix = !split[1] ? '' : ':' + split[1];
           info.field = fieldAndJoin.field;
           info.join = fieldAndJoin.join;
-          info.alias = splitAs[1] || (info.fn ? info.fn.name + ':' + info.path + info.suffix : split[0]);
+          info.alias = splitAs[1] || (info.fn ? info.fn.name + ':' + info.path : split[0]);
         }
         return info;
       }
