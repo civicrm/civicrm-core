@@ -1106,7 +1106,7 @@ class CRM_Utils_Token {
 
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        [$type, $name] = preg_split('/\./', $token, 2);
         if ($name && $type) {
           if (!isset($tokens[$type])) {
             $tokens[$type] = [];
@@ -1135,7 +1135,7 @@ class CRM_Utils_Token {
     );
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        [$type, $name] = preg_split('/\./', $token, 2);
         if ($name) {
           $returnProperties["{$name}"] = 1;
         }
@@ -1407,7 +1407,7 @@ class CRM_Utils_Token {
         );
         // Prepare variables for calling replaceHookTokens
         $categories = array_keys($greetingTokens);
-        list($contact) = $greetingDetails;
+        [$contact] = $greetingDetails;
         // Replace tokens defined in Hooks.
         $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
       }
@@ -1532,7 +1532,7 @@ class CRM_Utils_Token {
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
 
-    list($objectName, $objectValue) = explode('-', $token, 2);
+    [$objectName, $objectValue] = explode('-', $token, 2);
 
     switch ($objectName) {
       case 'permission':
@@ -1792,6 +1792,7 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return mixed|string
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionTokenReplacement($token, &$contribution, $html = FALSE, $escapeSmarty = FALSE) {
     self::_buildContributionTokens();

@@ -1161,7 +1161,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @throws \Exception
    */
-  public function testReSubmitSaleTax($thousandSeparator) {
+  public function testReSubmitSaleTax($thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType($this->_financialTypeId);
@@ -1205,7 +1205,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $mut->checkMailLog($strings);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 3);
     $items = $this->callAPISuccess('FinancialItem', 'get', ['sequential' => 1])['values'];
-    $this->assertEquals(2, count($items));
+    $this->assertCount(2, $items);
     $this->assertEquals('Contribution Amount', $items[0]['description']);
     $this->assertEquals('Sales Tax', $items[1]['description']);
 
