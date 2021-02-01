@@ -208,6 +208,14 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $paymentInstrumentID;
 
   /**
+   * The contribution ID - is an option in the URL if you are making a payment against an existing contribution (an
+   * "invoice payment").
+   *
+   * @var int
+   */
+  public $_ccid;
+
+  /**
    * Is the price set quick config.
    * @return bool
    */
