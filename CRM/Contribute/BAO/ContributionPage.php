@@ -436,15 +436,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $sendTemplateParams['cc'] = $values['cc_receipt'] ?? NULL;
         $sendTemplateParams['bcc'] = $values['bcc_receipt'] ?? NULL;
         //send email with pdf invoice
-        $template = CRM_Core_Smarty::singleton();
-        $taxAmt = $template->get_template_vars('dataArray');
-        $isEmailPDF = Civi::settings()->get('invoice_is_email_pdf');
-        $invoicing = Civi::settings()->get('invoicing');
-        if ($invoicing && !empty($isEmailPDF)) {
+        if (Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf')) {
           $sendTemplateParams['isEmailPdf'] = TRUE;
           $sendTemplateParams['contributionId'] = $values['contribution_id'];
         }
-        list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        list($sent, $subject, $message) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
 
       // send duplicate alert, if dupe match found during on-behalf-of processing.
