@@ -51,6 +51,60 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test thank you send with grouping.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testGroupedThankYous(): void {
+    $this->ids['Contact'][0] = $this->individualCreate();
+    $this->createLoggedInUser();
+    $contribution1ID = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->ids['Contact'][0],
+      'total_amount' => '60',
+      'financial_type_id' => 'Donation',
+      'currency' => 'USD',
+      'receive_date' => '2021-01-01 13:21',
+    ])['id'];
+    $contribution2ID = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->ids['Contact'][0],
+      'total_amount' => '70',
+      'financial_type_id' => 'Donation',
+      'receive_date' => '2021-02-01 2:21',
+      'currency' => 'USD',
+    ])['id'];
+    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', [
+      'campaign_id' => '',
+      'subject' => '',
+      'format_id' => '',
+      'paper_size' => 'letter',
+      'orientation' => 'portrait',
+      'metric' => 'in',
+      'margin_left' => '0.75',
+      'margin_right' => '0.75',
+      'margin_top' => '0.75',
+      'margin_bottom' => '0.75',
+      'document_type' => 'pdf',
+      'html_message' => '{contribution.currency} * {contribution.total_amount} * {contribution.receive_date}',
+      'template' => '',
+      'saveTemplateName' => '',
+      'from_email_address' => '185',
+      'thankyou_update' => '1',
+      'group_by' => 'contact_id',
+      'group_by_separator' => 'comma',
+      'email_options' => '',
+    ]);
+    $this->setSearchSelection([$contribution1ID, $contribution2ID], $form);
+    $form->preProcess();
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertContains('USD, USD * $ 60.00, $ 70.00 * January 1st, 2021  1:21 PM, February 1st, 2021  2:21 AM', $e->errorData['html']);
+    }
+  }
+
+  /**
    * Test the buildContributionArray function.
    *
    * @throws \CRM_Core_Exception
@@ -441,6 +495,19 @@ value=$contact_aggregate+$contribution.total_amount}
       ],
 
     ];
+  }
+
+  /**
+   * @param array $entities
+   * @param \CRM_Core_Form $form
+   */
+  protected function setSearchSelection(array $entities, CRM_Core_Form $form): void {
+    $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = [
+      'radio_ts' => 'ts_sel',
+    ];
+    foreach ($entities as $entityID) {
+      $_SESSION['_' . $form->controller->_name . '_container']['values']['Search']['mark_x_' . $entityID] = TRUE;
+    }
   }
 
 }
