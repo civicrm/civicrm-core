@@ -179,8 +179,11 @@
       };
 
       $scope.save = function() {
+        var afform = JSON.parse(angular.toJson($scope.afform));
+        // This might be set to undefined by validation
+        afform.server_route = afform.server_route || '';
         $scope.saving = $scope.changesSaved = true;
-        crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson($scope.afform))]})
+        crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {
             $scope.saving = false;
             $scope.afform.name = data[0].name;

@@ -29,7 +29,7 @@ class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
           'permission' => 'administer CiviCRM',
           'url' => 'civicrm/admin/afform',
           'is_active' => 1,
-          'icon' => 'crm-i fa-list-alt'
+          'icon' => 'crm-i fa-list-alt',
         ]);
       }
     }
@@ -55,15 +55,15 @@ class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
    * @return TRUE on success
    * @throws Exception
    */
-   public function upgrade_0001() {
-     $this->ctx->log->info('Applying update 0001');
-     \Civi\Api4\Navigation::update(FALSE)
-       ->addValue('icon', 'crm-i fa-list-alt')
-       ->addValue('label', E::ts('Form Builder'))
-       ->addValue('name', 'afform_admin')
-       ->addWhere('name', '=', 'afform_gui')
-       ->execute();
-     return TRUE;
-   }
+  public function upgrade_0001() {
+    $this->ctx->log->info('Applying update 0001');
+    \Civi\Api4\Navigation::update(FALSE)
+      ->addValue('icon', 'crm-i fa-list-alt')
+      ->addValue('label', E::ts('Form Builder'))
+      ->addValue('name', 'afform_admin')
+      ->addWhere('name', '=', 'afform_gui')
+      ->execute();
+    return TRUE;
+  }
 
 }
