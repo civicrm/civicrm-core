@@ -16,3 +16,7 @@ label input[type=checkbox]:not(:checked) + * {
 .select2-choices {
   margin-bottom: 0;
 }
+/* Fix for https://github.com/twbs/bootstrap/issues/5624 */
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+}
