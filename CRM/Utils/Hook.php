@@ -2785,4 +2785,21 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * Alter APIv4 route permissions based on the Entity and Action
+   *
+   * @param array|string $permissions
+   * @param string $entity
+   * @param string $action
+   *
+   * @return mixed
+   */
+  public static function alterApiRoutePermissions(&$permissions, $entity, $action) {
+    return self::singleton()->invoke(
+      ['permissions', 'entity', 'action'],
+      $permissions, $entity, $action, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, 'civicrm_alterApiRoutePermissions'
+    );
+  }
+
 }

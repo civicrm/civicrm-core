@@ -387,3 +387,14 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
       throw new \Exception("Unrecognized format");
   }
 }
+
+/**
+ * Implements hook_civicrm_alterApiRoutePermissions().
+ *
+ * @see CRM_Utils_Hook::alterApiRoutePermissions
+ */
+function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
+  if ($entity == 'Afform' && $action == 'submit') {
+    $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+  }
+}
