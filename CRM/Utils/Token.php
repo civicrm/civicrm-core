@@ -1706,28 +1706,20 @@ class CRM_Utils_Token {
    *
    * @param string $separator
    * @param string $str
-   * @param array $contribution
-   * @param bool|string $html
-   * @param string $knownTokens
-   * @param bool|string $escapeSmarty
+   * @param array $contributions
+   * @param array $knownTokens
    *
    * @return string
    */
-  public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    if (empty($knownTokens['contribution'])) {
-      return $str;
-    }
-
-    if (in_array('receive_date', $knownTokens['contribution'])) {
-      $formattedDates = [];
-      $dates = explode($separator, $contribution['receive_date']);
-      foreach ($dates as $date) {
-        $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, ['j', 'm', 'Y']);
+  public static function replaceMultipleContributionTokens(string $separator, string $str, array $contributions, array $knownTokens): string {
+    foreach ($knownTokens['contribution'] ?? [] as $token) {
+      $resolvedTokens = [];
+      foreach ($contributions as $contribution) {
+        $resolvedTokens[] = self::replaceContributionTokens('{contribution.' . $token . '}', $contribution, FALSE, $knownTokens);
       }
-      $str = str_replace("{contribution.receive_date}", implode($separator, $formattedDates), $str);
-      unset($knownTokens['contribution']['receive_date']);
+      $str = self::token_replace('contribution', $token, implode($separator, $resolvedTokens), $str);
     }
-    return self::replaceContributionTokens($str, $contribution, $html, $knownTokens, $escapeSmarty);
+    return $str;
   }
 
   /**
