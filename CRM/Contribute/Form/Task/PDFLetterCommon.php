@@ -30,7 +30,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (empty($formValues)) {
       $formValues = $form->controller->exportValues($form->getName());
     }
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = self::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = [];
     if (!empty($formValues['email_options'])) {
@@ -82,7 +82,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
       //@todo - comment on what is stored there
       $contributionIDs = $form->getVar('_contributionContactIds');
     }
-    list($contributions, $contacts) = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
+    [$contributions, $contacts] = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
@@ -135,7 +135,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     if (!empty($html)) {
       $type = $formValues['document_type'];
 
-      if ($type == 'pdf') {
+      if ($type === 'pdf') {
         CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
       }
       else {
@@ -216,15 +216,18 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *   Does this letter represent more than one contribution.
    * @param string $separator
    *   What is the preferred letter separator.
+   * @param array $contributions
+   *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  private static function resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator) {
+  private static function resolveTokens(string $html_message, $contact, $contribution, $messageToken, $grouped, $separator, $contributions): string {
     $categories = self::getTokenCategories();
     $domain = CRM_Core_BAO_Domain::getDomain();
     $tokenHtml = CRM_Utils_Token::replaceDomainTokens($html_message, $domain, TRUE, $messageToken);
     $tokenHtml = CRM_Utils_Token::replaceContactTokens($tokenHtml, $contact, TRUE, $messageToken);
     if ($grouped) {
-      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contribution, TRUE, $messageToken);
+      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $tokenHtml, $contributions, $messageToken);
     }
     else {
       // no change to normal behaviour to avoid risk of breakage
@@ -265,7 +268,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
 
       if ($isIncludeSoftCredits) {
         //@todo find out why this happens & add comments
-        list($contactID) = explode('-', $item);
+        [$contactID] = explode('-', $item);
         $contactID = (int) $contactID;
       }
       else {
@@ -340,7 +343,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
     CRM_Core_Smarty::singleton()->assign('contact_aggregate', $contact['contact_aggregate']);
     CRM_Core_Smarty::singleton()
-      ->assign('contributions', array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]));
+      ->assign('contributions', $contributions);
     CRM_Core_Smarty::singleton()->assign('contribution_aggregate', $contact['aggregates'][$groupBy][$groupByID]);
 
   }
@@ -417,12 +420,14 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    * @param int $groupByID
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   protected static function generateHtml(&$contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
     static $validated = FALSE;
     $html = NULL;
 
-    self::assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID);
+    $groupedContributions = array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]);
+    self::assignCombinedContributionValues($contact, $groupedContributions, $groupBy, $groupByID);
 
     if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
       if (!$validated && in_array($realSeparator, $tableSeparators) && !self::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
@@ -430,7 +435,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
       }
       $validated = TRUE;
-      $html = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator));
+      $html = str_replace($separator, $realSeparator, self::resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator, $groupedContributions));
     }
 
     return $html;

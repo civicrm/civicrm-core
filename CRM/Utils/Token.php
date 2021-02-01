@@ -1106,7 +1106,7 @@ class CRM_Utils_Token {
 
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        [$type, $name] = preg_split('/\./', $token, 2);
         if ($name && $type) {
           if (!isset($tokens[$type])) {
             $tokens[$type] = [];
@@ -1135,7 +1135,7 @@ class CRM_Utils_Token {
     );
     if ($matches[1]) {
       foreach ($matches[1] as $token) {
-        list($type, $name) = preg_split('/\./', $token, 2);
+        [$type, $name] = preg_split('/\./', $token, 2);
         if ($name) {
           $returnProperties["{$name}"] = 1;
         }
@@ -1407,7 +1407,7 @@ class CRM_Utils_Token {
         );
         // Prepare variables for calling replaceHookTokens
         $categories = array_keys($greetingTokens);
-        list($contact) = $greetingDetails;
+        [$contact] = $greetingDetails;
         // Replace tokens defined in Hooks.
         $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
       }
@@ -1532,7 +1532,7 @@ class CRM_Utils_Token {
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
 
-    list($objectName, $objectValue) = explode('-', $token, 2);
+    [$objectName, $objectValue] = explode('-', $token, 2);
 
     switch ($objectName) {
       case 'permission':
@@ -1706,28 +1706,20 @@ class CRM_Utils_Token {
    *
    * @param string $separator
    * @param string $str
-   * @param array $contribution
-   * @param bool|string $html
-   * @param string $knownTokens
-   * @param bool|string $escapeSmarty
+   * @param array $contributions
+   * @param array $knownTokens
    *
    * @return string
    */
-  public static function replaceMultipleContributionTokens($separator, $str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    if (empty($knownTokens['contribution'])) {
-      return $str;
-    }
-
-    if (in_array('receive_date', $knownTokens['contribution'])) {
-      $formattedDates = [];
-      $dates = explode($separator, $contribution['receive_date']);
-      foreach ($dates as $date) {
-        $formattedDates[] = CRM_Utils_Date::customFormat($date, NULL, ['j', 'm', 'Y']);
+  public static function replaceMultipleContributionTokens(string $separator, string $str, array $contributions, array $knownTokens): string {
+    foreach ($knownTokens['contribution'] ?? [] as $token) {
+      $resolvedTokens = [];
+      foreach ($contributions as $contribution) {
+        $resolvedTokens[] = self::replaceContributionTokens('{contribution.' . $token . '}', $contribution, FALSE, $knownTokens);
       }
-      $str = str_replace("{contribution.receive_date}", implode($separator, $formattedDates), $str);
-      unset($knownTokens['contribution']['receive_date']);
+      $str = self::token_replace('contribution', $token, implode($separator, $resolvedTokens), $str);
     }
-    return self::replaceContributionTokens($str, $contribution, $html, $knownTokens, $escapeSmarty);
+    return $str;
   }
 
   /**
@@ -1792,6 +1784,7 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return mixed|string
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionTokenReplacement($token, &$contribution, $html = FALSE, $escapeSmarty = FALSE) {
     self::_buildContributionTokens();
