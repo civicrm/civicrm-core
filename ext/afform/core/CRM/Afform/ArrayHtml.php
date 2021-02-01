@@ -105,7 +105,7 @@ class CRM_Afform_ArrayHtml {
 
     $buf = $indent . '<' . $tag;
     foreach ($array as $attrName => $attrValue) {
-      if ($attrName{0} === '#') {
+      if ($attrName[0] === '#') {
         continue;
       }
       if (!preg_match('/^[a-zA-Z0-9\-]+$/', $attrName)) {
