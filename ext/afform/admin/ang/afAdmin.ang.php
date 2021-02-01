@@ -9,7 +9,7 @@ return [
   'css' => [],
   'partials' => ['ang/afAdmin'],
   'requires' => ['api4', 'afGuiEditor', 'crmRouteBinder'],
-  'settingsFactory' => ['CRM_AfformAdmin_Utils', 'getAdminSettings'],
+  'settingsFactory' => ['Civi\AfformAdmin\AfformAdminMeta', 'getAdminSettings'],
   'basePages' => ['civicrm/admin/afform'],
   'bundles' => ['bootstrap3'],
 ];

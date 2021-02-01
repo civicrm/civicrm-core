@@ -8,11 +8,20 @@
     $scope.crmUrl = CRM.url;
 
     this.tabs = CRM.afAdmin.afform_type;
+    $scope.tabs = _.indexBy(ctrl.tabs, 'name');
+    _.each(['form', 'block', 'search'], function(type) {
+      if ($scope.tabs[type]) {
+        $scope.tabs[type].options = [];
+        if (type === 'form') {
+          $scope.tabs.form.default = '#create/form/Individual';
+        }
+      }
+    });
 
     this.afforms = _.transform(afforms, function(afforms, afform) {
-      var type = afform.type || 'system';
-      afforms[type] = afforms[type] || [];
-      afforms[type].push(afform);
+      afform.type = afform.type || 'system';
+      afforms[afform.type] = afforms[afform.type] || [];
+      afforms[afform.type].push(afform);
     }, {});
 
     $scope.$bindToRoute({
@@ -21,6 +30,55 @@
       format: 'raw',
       default: ctrl.tabs[0].name
     });
+
+    this.createLinks = function() {
+      ctrl.searchCreateLinks = '';
+      if ($scope.tabs[ctrl.tab].options.length) {
+        return;
+      }
+      var links = [];
+
+      if (ctrl.tab === 'form') {
+        _.each(CRM.afGuiEditor.entities, function(entity, name) {
+          if (entity.defaults) {
+            links.push({
+              url: '#create/form/' + name,
+              label: entity.label,
+              icon: entity.icon
+            });
+          }
+        });
+        $scope.tabs.form.options = _.sortBy(links, 'Label');
+      }
+
+      if (ctrl.tab === 'block') {
+        _.each(CRM.afGuiEditor.entities, function(entity, name) {
+          if (entity.defaults) {
+            links.push({
+              url: '#create/block/' + name,
+              label: entity.label,
+              icon: entity.icon
+            });
+          }
+        });
+        $scope.tabs.block.options = _.sortBy(links, 'Label');
+      }
+
+      if (ctrl.tab === 'search') {
+        crmApi4('SearchDisplay', 'get', {
+          select: ['name', 'label', 'type:icon', 'saved_search.name', 'saved_search.label']
+        }).then(function(searchDisplays) {
+          _.each(searchDisplays, function(searchDisplay) {
+            links.push({
+              url: '#create/search/' + searchDisplay['saved_search.name'] + '.' + searchDisplay.name,
+              label: searchDisplay['saved_search.label'] + ': ' + searchDisplay.label,
+              icon: searchDisplay['type:icon']
+            });
+          });
+          $scope.tabs.search.options = _.sortBy(links, 'Label');
+        });
+      }
+    };
 
     this.revert = function(afform) {
       var index = _.findIndex(ctrl.afforms[ctrl.tab], {name: afform.name});

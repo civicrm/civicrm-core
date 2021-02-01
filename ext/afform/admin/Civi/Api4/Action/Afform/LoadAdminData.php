@@ -1,0 +1,238 @@
+<?php
+
+namespace Civi\Api4\Action\Afform;
+
+use Civi\AfformAdmin\AfformAdminMeta;
+use Civi\Api4\Afform;
+
+/**
+ * This action is used by the Afform Admin extension to load metadata for the Admin GUI.
+ *
+ * @package Civi\Api4\Action\Afform
+ */
+class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
+
+  /**
+   * Any properties already known about the afform
+   * @var array
+   */
+  protected $definition;
+
+  /**
+   * Entity type when creating a new form
+   * @var string
+   */
+  protected $entity;
+
+  public function _run(\Civi\Api4\Generic\Result $result) {
+    $info = ['fields' => [], 'blocks' => []];
+    $entities = [];
+    $newForm = empty($this->definition['name']);
+
+    if (!$newForm) {
+      // Load existing afform if name provided
+      $info['definition'] = $this->loadForm($this->definition['name']);
+    }
+    else {
+      // Create new blank afform
+      switch ($this->definition['type']) {
+        case 'form':
+          $info['definition'] = $this->definition + [
+            'title' => '',
+            'permission' => 'access CiviCRM',
+            'layout' => [
+              [
+                '#tag' => 'af-form',
+                'ctrl' => 'afform',
+                '#children' => [],
+              ],
+            ],
+          ];
+          break;
+
+        case 'block':
+          $info['definition'] = $this->definition + [
+            'title' => '',
+            'layout' => [],
+          ];
+          break;
+
+        case 'search':
+          $info['definition'] = $this->definition + [
+            'title' => '',
+            'permission' => 'access CiviCRM',
+            'layout' => [
+              [
+                '#tag' => 'div',
+                'af-fieldset' => '',
+                '#children' => [],
+              ],
+            ],
+          ];
+          break;
+      }
+    }
+
+    $getFieldsMode = 'create';
+
+    // Generate list of possibly embedded afform tags to search for
+    $allAfforms = \Civi::service('afform_scanner')->findFilePaths();
+    foreach ($allAfforms as $name => $path) {
+      $allAfforms[$name] = _afform_angular_module_name($name, 'dash');
+    }
+    // Find all entities by recursing into embedded afforms
+    $scanBlocks = function($layout) use (&$scanBlocks, &$info, &$entities, $allAfforms) {
+      // Find declared af-entity tags
+      foreach (\CRM_Utils_Array::findAll($layout, ['#tag' => 'af-entity']) as $afEntity) {
+        // Convert "Contact" to "Individual", "Organization" or "Household"
+        if ($afEntity['type'] === 'Contact' && !empty($afEntity['data'])) {
+          $data = \CRM_Utils_JS::decode($afEntity['data']);
+          $entities[] = $data['contact_type'] ?? $afEntity['type'];
+        }
+        else {
+          $entities[] = $afEntity['type'];
+        }
+      }
+      $joins = array_column(\CRM_Utils_Array::findAll($layout, 'af-join'), 'af-join');
+      $entities = array_unique(array_merge($entities, $joins));
+      $blockTags = array_unique(array_column(\CRM_Utils_Array::findAll($layout, function($el) use ($allAfforms) {
+        return in_array($el['#tag'], $allAfforms);
+      }), '#tag'));
+      foreach ($blockTags as $blockTag) {
+        if (!isset($info['blocks'][$blockTag])) {
+          // Load full contents of block used on the form, then recurse into it
+          $embeddedForm = Afform::get($this->checkPermissions)
+            ->setFormatWhitespace(TRUE)
+            ->setLayoutFormat('shallow')
+            ->addWhere('directive_name', '=', $blockTag)
+            ->execute()->first();
+          if ($embeddedForm['type'] === 'block') {
+            $info['blocks'][$blockTag] = $embeddedForm;
+          }
+          if (!empty($embeddedForm['join'])) {
+            $entities = array_unique(array_merge($entities, [$embeddedForm['join']]));
+          }
+          $scanBlocks($embeddedForm['layout']);
+        }
+      }
+    };
+
+    if ($info['definition']['type'] === 'form') {
+      if ($newForm) {
+        $entities[] = $this->entity;
+        $defaultEntity = AfformAdminMeta::getAfformEntity($this->entity);
+        if (!empty($defaultEntity['boilerplate'])) {
+          $scanBlocks($defaultEntity['boilerplate']);
+        }
+      }
+      else {
+        $scanBlocks($info['definition']['layout']);
+      }
+
+      if (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+        $entities[] = 'Contact';
+      }
+
+      // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
+      $blockInfo = Afform::get($this->checkPermissions)
+        ->addSelect('name', 'title', 'block', 'join', 'directive_name')
+        ->addWhere('type', '=', 'block')
+        ->addWhere('block', 'IN', $entities)
+        ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
+        ->execute();
+      $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
+    }
+
+    if ($info['definition']['type'] === 'block') {
+      $entities[] = $info['definition']['join'] ?? $info['definition']['block'];
+    }
+
+    if ($info['definition']['type'] === 'search') {
+      $getFieldsMode = 'search';
+      $displayTags = [];
+      if ($newForm) {
+        [$searchName, $displayName] = array_pad(explode('.', $this->entity ?? ''), 2, '');
+        $displayTags[] = ['search-name' => $searchName, 'display-name' => $displayName];
+      }
+      else {
+        foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
+          $displayTags = array_merge($displayTags, \CRM_Utils_Array::findAll($info['definition']['layout'], ['#tag' => $displayType['name']]));
+        }
+      }
+      foreach ($displayTags as $displayTag) {
+        $display = \Civi\Api4\SearchDisplay::get(FALSE)
+          ->addWhere('name', '=', $displayTag['display-name'])
+          ->addWhere('saved_search.name', '=', $displayTag['search-name'])
+          ->addSelect('*', 'type:name', 'type:icon', 'saved_search.name', 'saved_search.api_entity', 'saved_search.api_params')
+          ->execute()->first();
+        $info['search_displays'][] = $display;
+        if ($newForm) {
+          $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
+        }
+        $entities[] = $display['saved_search.api_entity'];
+        foreach ($display['saved_search.api_params']['join'] ?? [] as $join) {
+          $entities[] = explode(' AS ', $join[0])[0];
+        }
+      }
+      $entities = array_unique($entities);
+    }
+
+    // Optimization - since contact fields are a combination of these three,
+    // we'll combine them client-side rather than sending them via ajax.
+    elseif (array_intersect($entities, ['Individual', 'Household', 'Organization'])) {
+      $entities = array_diff($entities, ['Contact']);
+    }
+
+    foreach ($entities as $entity) {
+      $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
+      $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
+    }
+
+    $result[] = $info;
+  }
+
+  private function loadForm($name) {
+    return Afform::get($this->checkPermissions)
+      ->setFormatWhitespace(TRUE)
+      ->setLayoutFormat('shallow')
+      ->addWhere('name', '=', $name)
+      ->execute()->first();
+  }
+
+  public function fields() {
+    return [
+      [
+        'name' => 'definition',
+        'data_type' => 'Array',
+      ],
+      [
+        'name' => 'blocks',
+        'data_type' => 'Array',
+      ],
+      [
+        'name' => 'fields',
+        'data_type' => 'Array',
+      ],
+      [
+        'name' => 'search_displays',
+        'data_type' => 'Array',
+      ],
+    ];
+  }
+
+  /**
+   * @return array
+   */
+  public function getDefinition():array {
+    return $this->definition;
+  }
+
+  /**
+   * @param array $definition
+   */
+  public function setDefinition(array $definition) {
+    $this->definition = $definition;
+    return $this;
+  }
+
+}

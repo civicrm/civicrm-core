@@ -1,6 +1,8 @@
 <div id="bootstrap-theme" class="crm-search">
   <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
   <div class="form-inline">
+    <label for="search-list-filter">{{:: ts('Filter:') }}</label>
+    <input class="form-control" type="search" id="search-list-filter" ng-model="$ctrl.searchFilter" placeholder="&#xf002">
     <a class="btn btn-primary pull-right" href="#/create/Contact/">
       <i class="crm-i fa-plus"></i>
       {{:: ts('New Search') }}
@@ -14,11 +16,12 @@
         <th>{{:: ts('For') }}</th>
         <th>{{:: ts('Displays') }}</th>
         <th>{{:: ts('Smart Group') }}</th>
+        <th ng-if="$ctrl.afformEnabled">{{:: ts('Forms') }}</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="search in $ctrl.savedSearches">
+      <tr ng-repeat="search in $ctrl.savedSearches | filter:$ctrl.searchFilter">
         <td>{{ search.id }}</td>
         <td>{{ search.label }}</td>
         <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
@@ -32,12 +35,41 @@
             </button>
             <ul class="dropdown-menu" ng-if=":: search.display_name.length">
               <li ng-repeat="display_name in search.display_name">
-                <a href="{{:: $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}"><i class="fa {{:: search.display_icon[$index] }}"></i> {{:: search.display_label[$index] }}</a>
+                <a href="{{:: $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}" target="_blank">
+                  <i class="fa {{:: search.display_icon[$index] }}"></i>
+                  {{:: search.display_label[$index] }}
+                </a>
               </li>
             </ul>
           </div>
         </td>
         <td>{{ search.groups.join(', ') }}</td>
+        <td ng-if="$ctrl.afformEnabled">
+          <div class="btn-group">
+            <button type="button" ng-click="$ctrl.loadAfforms()" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{:: ts('Forms') }} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li ng-repeat="display_name in search.display_name" ng-if="::$ctrl.afformAdminEnabled">
+                <a href="{{:: $ctrl.newFormPath + '#/create/search/' + search.name + '.' + display_name }}">
+                  <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: search.display_label[$index]}) }}
+                </a>
+              </li>
+              <li class="divider" role="separator" ng-if="::$ctrl.afformAdminEnabled"></li>
+              <li ng-if="!$ctrl.afforms || !$ctrl.afforms[search.name]" class="disabled">
+                <a href>
+                  <i ng-if="!$ctrl.afforms" class="crm-i fa-spinner fa-spin"></i>
+                  <em ng-if="$ctrl.afforms && !$ctrl.afforms[search.name]">{{:: ts('None Found') }}</em>
+                </a>
+              </li>
+              <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[search.name]" ng-class="{disabled: !afform.url}">
+                <a href="{{:: afform.url }}" target="_blank">
+                  {{:: afform.title }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </td>
         <td class="text-right">
           <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}">{{:: ts('Edit') }}</a>
           <a class="btn btn-xs btn-default" href="#/create/{{:: search.api_entity + '?params=' + $ctrl.encode(search.api_params) }}">{{:: ts('Clone') }}</a>

@@ -35,7 +35,7 @@
     </li>
     <li class="dropdown-header">{{ ts('Display:') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
-      <a href ng-click="$ctrl.addDisplay(type.name)">
+      <a href ng-click="$ctrl.addDisplay(type.id)">
         <i class="crm-i {{:: type.icon }}"></i>
         {{:: type.label }}
       </a>

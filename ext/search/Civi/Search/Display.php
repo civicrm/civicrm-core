@@ -20,20 +20,22 @@ class Display {
   /**
    * @return array
    */
-  public static function getPageSettings():array {
-    return [
-      'displayTypes' => self::getDisplayTypes(['name']),
-    ];
+  public static function getPartials($moduleName, $module) {
+    $partials = [];
+    foreach (self::getDisplayTypes(['id', 'name']) as $type) {
+      $partials["~/$moduleName/displayType/{$type['id']}.html"] =
+        '<' . $type['name'] . ' api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" settings="$ctrl.display.settings"></' . $type['name'] . '>';
+    }
+    return $partials;
   }
 
   /**
-   * @param array $props
    * @return array
    */
   public static function getDisplayTypes(array $props):array {
     try {
       return \Civi\Api4\SearchDisplay::getFields(FALSE)
-        ->setLoadOptions($props)
+        ->setLoadOptions(array_diff($props, ['tag']))
         ->addWhere('name', '=', 'type')
         ->execute()
         ->first()['options'];

@@ -5,8 +5,9 @@
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/afGuiEditor.html',
     bindings: {
-      type: '<',
-      name: '<'
+      data: '<',
+      entity: '<',
+      mode: '@'
     },
     controllerAs: 'editor',
     controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
@@ -16,44 +17,57 @@
       $scope.selectedEntityName = null;
       this.meta = afGui.meta;
       var editor = this;
-      var newForm = {
-        title: '',
-        permission: 'access CiviCRM',
-        type: 'form',
-        layout: [{
-          '#tag': 'af-form',
-          ctrl: 'afform',
-          '#children': []
-        }]
-      };
 
       this.$onInit = function() {
-        // Fetch the current form plus all blocks
-        afGui.initialize(editor.name)
-          .then(initializeForm);
+        // Load the current form plus blocks & fields
+        afGui.resetMeta();
+        afGui.addMeta(this.data);
+        initializeForm();
       };
 
       // Initialize the current form
-      function initializeForm(afforms) {
-        $scope.afform = _.findWhere(afforms, {name: editor.name});
+      function initializeForm() {
+        $scope.afform = editor.data.definition;
         if (!$scope.afform) {
-          $scope.afform = _.cloneDeep(newForm);
-          if (editor.name) {
-            alert('Error: unknown form "' + editor.name + '"');
-          }
+          alert('Error: unknown form');
+        }
+        if (editor.mode === 'clone') {
+          delete $scope.afform.name;
+          $scope.afform.title += ' ' + ts('(copy)');
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
-        editor.layout = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0];
-        $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+        editor.layout = {'#children': []};
+        $scope.entities = {};
 
-        if (!editor.name) {
-          editor.addEntity('Individual');
-          editor.layout['#children'].push(afGui.meta.elements.submit.element);
+        if ($scope.afform.type === 'form') {
+          editor.allowEntityConfig = true;
+          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0]['#children'];
+          $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+
+          if (editor.mode === 'create') {
+            editor.addEntity(editor.entity);
+            editor.layout['#children'].push(afGui.meta.elements.submit.element);
+          }
+        }
+
+        if ($scope.afform.type === 'block') {
+          editor.layout['#children'] = $scope.afform.layout;
+          editor.blockEntity = $scope.afform.join || $scope.afform.block;
+          $scope.entities[editor.blockEntity] = {
+            type: editor.blockEntity,
+            name: editor.blockEntity,
+            label: afGui.getEntity(editor.blockEntity).label
+          };
+        }
+
+        if ($scope.afform.type === 'search') {
+          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'af-fieldset': ''})[0]['#children'];
+
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
-        $scope.changesSaved = !editor.name ? false : 1;
+        $scope.changesSaved = editor.mode === 'edit' ? 1 : false;
         $scope.$watch('afform', function () {
           $scope.changesSaved = $scope.changesSaved === 1;
         }, true);
@@ -61,7 +75,7 @@
 
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
-        crmApi4('Afform', 'convert', {layout: [editor.layout], from: 'deep', to: 'html', formatWhitespace: true})
+        crmApi4('Afform', 'convert', {layout: $scope.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
           .then(function(r){
             $scope.layoutHtml = r[0].layout || '(Error)';
           })
@@ -70,7 +84,7 @@
           });
       };
 
-      this.addEntity = function(type) {
+      this.addEntity = function(type, selectTab) {
         var meta = afGui.meta.entities[type],
           num = 1;
         // Give this new entity a unique name
@@ -81,27 +95,46 @@
           '#tag': 'af-entity',
           type: meta.entity,
           name: type + num,
-          label: meta.label + ' ' + num
+          label: meta.label + ' ' + num,
+          loading: true,
         });
-        // Add this af-entity tag after the last existing one
-        var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
-        editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
-        // Create a new af-fieldset container for the entity
-        var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
-        fieldset['af-fieldset'] = type + num;
-        fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
-        // Add default contact name block
-        if (meta.entity === 'Contact') {
-          fieldset['#children'].push({'#tag': 'afblock-name-' + type.toLowerCase()});
+
+        function addToCanvas() {
+          // Add this af-entity tag after the last existing one
+          var pos = 1 + _.findLastIndex(editor.layout['#children'], {'#tag': 'af-entity'});
+          editor.layout['#children'].splice(pos, 0, $scope.entities[type + num]);
+          // Create a new af-fieldset container for the entity
+          var fieldset = _.cloneDeep(afGui.meta.elements.fieldset.element);
+          fieldset['af-fieldset'] = type + num;
+          fieldset['#children'][0]['#children'][0]['#text'] = meta.label + ' ' + num;
+          // Add boilerplate contents
+          _.each(meta.boilerplate, function (tag) {
+            fieldset['#children'].push(tag);
+          });
+          // Attempt to place the new af-fieldset after the last one on the form
+          pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
+          if (pos) {
+            editor.layout['#children'].splice(pos, 0, fieldset);
+          } else {
+            editor.layout['#children'].push(fieldset);
+          }
+          delete $scope.entities[type + num].loading;
+          if (selectTab) {
+            editor.selectEntity(type + num);
+          }
         }
-        // Attempt to place the new af-fieldset after the last one on the form
-        pos = 1 + _.findLastIndex(editor.layout['#children'], 'af-fieldset');
-        if (pos) {
-          editor.layout['#children'].splice(pos, 0, fieldset);
+
+        if (meta.fields) {
+          addToCanvas();
         } else {
-          editor.layout['#children'].push(fieldset);
+          crmApi4('Afform', 'loadAdminData', {
+            definition: {type: 'form'},
+            entity: type
+          }, 0).then(function(data) {
+            afGui.addMeta(data);
+            addToCanvas();
+          });
         }
-        return type + num;
       };
 
       this.removeEntity = function(entityName) {
@@ -145,18 +178,15 @@
         }
       };
 
-      $scope.addEntity = function(entityType) {
-        var entityName = editor.addEntity(entityType);
-        editor.selectEntity(entityName);
-      };
-
       $scope.save = function() {
         $scope.saving = $scope.changesSaved = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [JSON.parse(angular.toJson($scope.afform))]})
           .then(function (data) {
             $scope.saving = false;
             $scope.afform.name = data[0].name;
-            $location.url('/edit/' + data[0].name);
+            if (editor.mode !== 'edit') {
+              $location.url('/edit/' + data[0].name);
+            }
           });
       };
 
