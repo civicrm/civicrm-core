@@ -1567,6 +1567,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['is_pay_later'] = 1;
       }
       elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+        // @todo - if the contribution is new then it should be Pending status & then we use
+        // Payment.create to update to Completed.
         $params['is_pay_later'] = 0;
       }
 
@@ -1597,6 +1599,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // process associated membership / participant, CRM-4395
       if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
+        // @todo use Payment.create to do this, remove transitioncomponents function
+        // if contribution is being created with a completed status it should be
+        // created pending & then Payment.create adds the payment
         CRM_Contribute_BAO_Contribution::transitionComponents([
           'contribution_id' => $contribution->id,
           'contribution_status_id' => $contribution->contribution_status_id,
