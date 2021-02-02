@@ -372,13 +372,17 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $tplParams['contributionTypeName'] = $tplParams['financialTypeName'];
       }
 
-      if ($contributionPageId = CRM_Utils_Array::value('id', $values)) {
-        $tplParams['contributionPageId'] = $contributionPageId;
+      if (isset($values['id'])) {
+        $tplParams['contributionPageId'] = $values['id'];
       }
 
       // address required during receipt processing (pdf and email receipt)
-      if ($displayAddress = CRM_Utils_Array::value('address', $values)) {
-        $tplParams['address'] = $displayAddress;
+      if (isset($values['address'])) {
+        $tplParams['address'] = $values['address'];
+      }
+
+      if (isset($values['membership_id'])) {
+        $tplParams['membershipID'] = $values['membership_id'];
       }
 
       // CRM-6976
