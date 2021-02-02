@@ -425,99 +425,23 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $params['subject'];
     }
 
-    // replace tokens in the three elements (in subject as if it was the text body)
-    $domain = CRM_Core_BAO_Domain::getDomain();
-
-    $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailing->subject = $mailContent['subject'];
-    $mailing->body_text = $mailContent['text'];
-    $mailing->body_html = $mailContent['html'];
-    $tokens = $mailing->getTokens();
+    $tokens = self::getTokensToResolve($mailContent);
 
     // When using Smarty we need to pass the $escapeSmarty parameter.
     $escapeSmarty = !$params['disableSmarty'];
 
-    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
-    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
-    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
+    $mailContent = self::resolveDomainTokens($mailContent, $tokens, $escapeSmarty);
 
     $contactID = $params['contactId'] ?? NULL;
     if ($contactID) {
-
-      $contactParams = ['contact_id' => $contactID];
-      $returnProperties = [];
-
-      if (isset($tokens['subject']['contact'])) {
-        foreach ($tokens['subject']['contact'] as $name) {
-          $returnProperties[$name] = 1;
-        }
-      }
-
-      if (isset($tokens['text']['contact'])) {
-        foreach ($tokens['text']['contact'] as $name) {
-          $returnProperties[$name] = 1;
-        }
-      }
-
-      if (isset($tokens['html']['contact'])) {
-        foreach ($tokens['html']['contact'] as $name) {
-          $returnProperties[$name] = 1;
-        }
-      }
-
-      // @todo CRM-17253 don't resolve contact details if there are no tokens
-      // effectively comment out this next (performance-expensive) line
-      // but unfortunately testing is a bit think on the ground to that needs to
-      // be added.
-      [$contact] = CRM_Utils_Token::getTokenDetails($contactParams,
-        $returnProperties,
-        FALSE, FALSE, NULL,
-        CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding valueName here
-        'CRM_Core_BAO_MessageTemplate'
-      );
-      $contact = $contact[$contactID];
-      $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['subject'], FALSE, $escapeSmarty);
-      $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, $escapeSmarty);
-      $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, $escapeSmarty);
-
-      $contactArray = [$contactID => $contact];
-      CRM_Utils_Hook::tokenValues($contactArray,
-        [$contactID],
-        NULL,
-        CRM_Utils_Token::flattenTokens($tokens),
-        // we should consider adding valueName here
-        'CRM_Core_BAO_MessageTemplate'
-      );
-      $contact = $contactArray[$contactID];
-
-      $hookTokens = [];
-      CRM_Utils_Hook::tokens($hookTokens);
-      $categories = array_keys($hookTokens);
-      $mailContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailContent['subject'], $contact, $categories, TRUE);
-      $mailContent['text'] = CRM_Utils_Token::replaceHookTokens($mailContent['text'], $contact, $categories, TRUE);
-      $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
+      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, $escapeSmarty);
     }
 
     // Normally Smarty is run, but it can be disabled using the disableSmarty
     // parameter, which may be useful for non-core uses of MessageTemplate.send
     // In particular it helps with the mosaicomsgtpl extension.
     if (!$params['disableSmarty']) {
-      // strip whitespace from ends and turn into a single line
-      $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
-
-      // parse the three elements with Smarty
-      $smarty = CRM_Core_Smarty::singleton();
-      foreach ($params['tplParams'] as $name => $value) {
-        $smarty->assign($name, $value);
-      }
-      foreach ([
-        'subject',
-        'text',
-        'html',
-      ] as $elem) {
-        $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
-      }
+      $mailContent = self::parseThroughSmarty($mailContent, $params['tplParams']);
     }
     else {
       // Since we're not relying on Smarty for this function, we DIY.
@@ -662,6 +586,123 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['html'] = preg_replace('/<body(.*)$/im', "<body\\1\n{$testText['msg_html']}", $mailContent['html']);
     }
 
+    return $mailContent;
+  }
+
+  /**
+   * Get an array of the tokens ito be resolved in the template.
+   *
+   * @param array $html
+   *
+   * @return array
+   */
+  protected static function getTokensToResolve(array $html): array {
+    $mailing = new CRM_Mailing_BAO_Mailing();
+    $mailing->subject = $html['subject'];
+    $mailing->body_text = $html['text'];
+    $mailing->body_html = $html['html'];
+    return $mailing->getTokens();
+  }
+
+  /**
+   * @param array $mailContent
+   * @param array $tokens
+   * @param bool $escapeSmarty
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function resolveDomainTokens(array $mailContent, array $tokens, bool $escapeSmarty): array {
+    $domain = CRM_Core_BAO_Domain::getDomain();
+    $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
+    $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens, $escapeSmarty);
+    return $mailContent;
+  }
+
+  /**
+   * @param $contactID
+   * @param array|null $tokens
+   * @param array $mailContent
+   * @param bool $escapeSmarty
+   *
+   * @return array
+   */
+  protected static function resolveContactTokens($contactID, ?array $tokens, array $mailContent, bool $escapeSmarty): array {
+    $contactParams = ['contact_id' => $contactID];
+    $returnProperties = [];
+
+    if (isset($tokens['subject']['contact'])) {
+      foreach ($tokens['subject']['contact'] as $name) {
+        $returnProperties[$name] = 1;
+      }
+    }
+
+    if (isset($tokens['text']['contact'])) {
+      foreach ($tokens['text']['contact'] as $name) {
+        $returnProperties[$name] = 1;
+      }
+    }
+
+    if (isset($tokens['html']['contact'])) {
+      foreach ($tokens['html']['contact'] as $name) {
+        $returnProperties[$name] = 1;
+      }
+    }
+
+    // @todo CRM-17253 don't resolve contact details if there are no tokens
+    // effectively comment out this next (performance-expensive) line
+    // but unfortunately testing is a bit think on the ground to that needs to
+    // be added.
+    [$contact] = CRM_Utils_Token::getTokenDetails($contactParams,
+      $returnProperties,
+      FALSE, FALSE, NULL,
+      CRM_Utils_Token::flattenTokens($tokens),
+      // we should consider adding valueName here
+      'CRM_Core_BAO_MessageTemplate'
+    );
+    $contact = $contact[$contactID];
+    $mailContent['subject'] = CRM_Utils_Token::replaceContactTokens($mailContent['subject'], $contact, FALSE, $tokens['subject'], FALSE, $escapeSmarty);
+    $mailContent['text'] = CRM_Utils_Token::replaceContactTokens($mailContent['text'], $contact, FALSE, $tokens['text'], FALSE, $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceContactTokens($mailContent['html'], $contact, FALSE, $tokens['html'], FALSE, $escapeSmarty);
+
+    $contactArray = [$contactID => $contact];
+    CRM_Utils_Hook::tokenValues($contactArray,
+      [$contactID],
+      NULL,
+      CRM_Utils_Token::flattenTokens($tokens),
+      // we should consider adding valueName here
+      'CRM_Core_BAO_MessageTemplate'
+    );
+    $contact = $contactArray[$contactID];
+
+    $hookTokens = [];
+    CRM_Utils_Hook::tokens($hookTokens);
+    $categories = array_keys($hookTokens);
+    $mailContent['subject'] = CRM_Utils_Token::replaceHookTokens($mailContent['subject'], $contact, $categories, TRUE);
+    $mailContent['text'] = CRM_Utils_Token::replaceHookTokens($mailContent['text'], $contact, $categories, TRUE);
+    $mailContent['html'] = CRM_Utils_Token::replaceHookTokens($mailContent['html'], $contact, $categories, TRUE);
+    return $mailContent;
+  }
+
+  /**
+   * @param array $mailContent
+   * @param $tplParams
+   *
+   * @return array
+   */
+  protected static function parseThroughSmarty(array $mailContent, $tplParams): array {
+    // strip whitespace from ends and turn into a single line
+    $mailContent['subject'] = "{strip}{$mailContent['subject']}{/strip}";
+
+    // parse the three elements with Smarty
+    $smarty = CRM_Core_Smarty::singleton();
+    foreach ($tplParams as $name => $value) {
+      $smarty->assign($name, $value);
+    }
+    foreach (['subject', 'text', 'html'] as $elem) {
+      $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
+    }
     return $mailContent;
   }
 
