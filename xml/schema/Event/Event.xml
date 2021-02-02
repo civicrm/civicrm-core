@@ -7,6 +7,7 @@
   <add>1.7</add>
   <log>true</log>
   <icon>fa-calendar</icon>
+  <labelField>title</labelField>
   <component>CiviEvent</component>
   <paths>
     <add>civicrm/event/add?reset=1</add>

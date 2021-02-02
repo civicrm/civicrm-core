@@ -8,6 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-phone</icon>
+  <labelField>phone</labelField>
   <field>
     <name>id</name>
     <title>Phone ID</title>

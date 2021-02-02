@@ -6,6 +6,7 @@
   <comment>Campaign Details.</comment>
   <add>3.3</add>
   <icon>fa-bullhorn</icon>
+  <labelField>title</labelField>
   <component>CiviCampaign</component>
   <paths>
     <add>civicrm/campaign/add?reset=1</add>

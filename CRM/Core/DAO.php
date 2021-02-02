@@ -53,6 +53,13 @@ class CRM_Core_DAO extends DB_DataObject {
   public static $_icon = NULL;
 
   /**
+   * Field to show when displaying a record.
+   *
+   * @var string
+   */
+  public static $_labelField = NULL;
+
+  /**
    * @var array
    * @deprecated
    */

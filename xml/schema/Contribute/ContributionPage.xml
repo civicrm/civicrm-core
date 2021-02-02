@@ -8,6 +8,7 @@
   <add>1.3</add>
   <log>true</log>
   <component>CiviContribute</component>
+  <labelField>title</labelField>
   <field>
     <name>id</name>
     <title>Contribution Page ID</title>

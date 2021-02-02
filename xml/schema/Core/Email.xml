@@ -8,6 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-envelope-o</icon>
+  <labelField>email</labelField>
   <field>
     <name>id</name>
     <title>Email ID</title>

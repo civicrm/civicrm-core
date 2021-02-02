@@ -8,6 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-tag</icon>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>Tag ID</title>

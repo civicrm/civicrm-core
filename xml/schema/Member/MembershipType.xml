@@ -8,6 +8,7 @@
   <add>1.5</add>
   <log>true</log>
   <component>CiviMember</component>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>Membership Type ID</title>

@@ -8,6 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-users</icon>
+  <labelField>title</labelField>
   <paths>
     <add>civicrm/group/add?reset=1</add>
   </paths>

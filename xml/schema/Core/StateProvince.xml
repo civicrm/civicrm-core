@@ -7,6 +7,7 @@
   <add>1.1</add>
   <title>State/Province</title>
   <titlePlural>States/Provinces</titlePlural>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>State ID</title>

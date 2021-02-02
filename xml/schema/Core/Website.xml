@@ -7,6 +7,7 @@
   <comment>Website information for a specific location.</comment>
   <add>3.2</add>
   <icon>fa-desktop</icon>
+  <labelField>url</labelField>
   <field>
     <name>id</name>
     <type>int unsigned</type>
