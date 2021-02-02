@@ -257,30 +257,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   }
 
   /**
-   * Test cancel order api when a pledge is linked.
-   *
-   * The pledge status should be updated. I believe the contribution should also be unlinked but
-   * the goal at this point is no change.
-   *
-   * @throws CRM_Core_Exception
-   * @throws API_Exception
-   */
-  public function testCancelOrderWithPledge(): void {
-    $this->createContact();
-    $pledgeID = (int) $this->callAPISuccess('Pledge', 'create', ['contact_id' => $this->ids['contact'][0], 'amount' => 4, 'installments' => 2, 'frequency_unit' => 'month', 'original_installment_amount' => 2, 'create_date' => 'now', 'financial_type_id' => 'Donation', 'start_date' => '+5 days'])['id'];
-    $orderID = (int) $this->callAPISuccess('Order', 'create', ['contact_id' => $this->ids['contact'][0], 'total_amount' => 2, 'financial_type_id' => 'Donation', 'api.Payment.create' => ['total_amount' => 2]])['id'];
-    $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
-    $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
-    $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertEquals(2, $beforePledge['pledge_total_paid']);
-    $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
-
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
-    $afterPledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertEquals('', $afterPledge['pledge_total_paid']);
-  }
-
-  /**
    * Test cancelling a contribution with a membership on the contribution edit
    * form.
    *
