@@ -135,7 +135,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
 
       // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
       $blockInfo = Afform::get($this->checkPermissions)
-        ->addSelect('name', 'title', 'block', 'join', 'directive_name')
+        ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')
         ->addWhere('type', '=', 'block')
         ->addWhere('block', 'IN', $entities)
         ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
