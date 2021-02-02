@@ -1003,8 +1003,7 @@ DESC limit 1");
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function submit() {
-    $isTest = ($this->_mode === 'test') ? 1 : 0;
+  public function submit(): void {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $endDate = NULL;
@@ -1292,7 +1291,7 @@ DESC limit 1");
           [
             'contact_id' => $this->_contributorContactID,
             'line_item' => $lineItem,
-            'is_test' => $isTest,
+            'is_test' => $this->isTest(),
             'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $paymentInstrumentID,
@@ -1363,7 +1362,7 @@ DESC limit 1");
       );
       $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
-      $params['is_test'] = ($this->_mode === 'live') ? 0 : 1;
+      $params['is_test'] = $this->isTest();
       if (!empty($formValues['send_receipt'])) {
         $params['receipt_date'] = $now;
       }
@@ -1938,7 +1937,6 @@ DESC limit 1");
    * @return int
    */
   protected function legacyProcessRecurringContribution(array $params, $contactID): int {
-    $form = $this;
 
     $recurParams = ['contact_id' => $contactID];
     $recurParams['amount'] = $params['amount'] ?? NULL;
@@ -1950,12 +1948,7 @@ DESC limit 1");
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
-    $recurParams['is_test'] = 0;
-    if (($form->_action & CRM_Core_Action::PREVIEW) ||
-      (isset($form->_mode) && ($form->_mode == 'test'))
-    ) {
-      $recurParams['is_test'] = 1;
-    }
+    $recurParams['is_test'] = $this->isTest();
 
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::date('YmdHis');
     if (!empty($params['receive_date'])) {
@@ -1969,9 +1962,18 @@ DESC limit 1");
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
 
-    $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
+    $campaignId = $params['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL;
     $recurParams['campaign_id'] = $campaignId;
     return CRM_Contribute_BAO_ContributionRecur::add($recurParams)->id;
+  }
+
+  /**
+   * Is the form being submitted in test mode.
+   *
+   * @return bool
+   */
+  protected function isTest(): int {
+    return ($this->_mode === 'test') ? TRUE : FALSE;
   }
 
 }
