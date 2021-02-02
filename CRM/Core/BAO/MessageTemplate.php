@@ -221,6 +221,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @throws \CRM_Core_Exception
    */
   public static function sendReminder($contactId, $email, $messageTemplateID, $from) {
+    CRM_Core_Error::deprecatedWarning('CRM_Core_BAO_MessageTemplate::sendReminder is deprecated and will be removed in a future version of CiviCRM');
 
     $messageTemplates = new CRM_Core_DAO_MessageTemplate();
     $messageTemplates->id = $messageTemplateID;
