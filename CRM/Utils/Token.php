@@ -169,7 +169,7 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
+  public static function token_replace($type, $var, $value, &$str, $escapeSmarty = FALSE) {
     $token = preg_quote('{' . "$type.$var") . '(\|([^\}]+?))?' . preg_quote('}');
     if (!$value) {
       $value = '$3';
