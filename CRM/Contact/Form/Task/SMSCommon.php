@@ -174,6 +174,7 @@ class CRM_Contact_Form_Task_SMSCommon {
       $form->_allContactDetails = $form->_contactDetails;
 
       foreach ($form->_contactIds as $key => $contactId) {
+        $mobilePhone = NULL;
         $value = $form->_contactDetails[$contactId];
 
         //to check if the phone type is "Mobile"
