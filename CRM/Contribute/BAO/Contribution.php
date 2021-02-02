@@ -2795,7 +2795,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws Exception
    */
   public function composeMessageArray(&$input, &$ids, &$values, $returnMessageText = TRUE) {
-    $this->loadRelatedObjects($input, $ids);
+    $this->loadRelatedObjects($input, $ids, TRUE);
 
     if (empty($this->_component)) {
       $this->_component = $input['component'] ?? NULL;
@@ -4345,7 +4345,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!$contribution->find(TRUE)) {
       throw new CRM_Core_Exception('Contribution does not exist');
     }
-    $contribution->loadRelatedObjects($input, $ids, TRUE);
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
       list($values['receipt_from_name'], $values['receipt_from_email']) = self::generateFromEmailAndName($input, $contribution);
