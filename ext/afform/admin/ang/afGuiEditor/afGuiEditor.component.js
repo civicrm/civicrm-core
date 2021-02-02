@@ -33,6 +33,8 @@
         }
         if (editor.mode === 'clone') {
           delete $scope.afform.name;
+          delete $scope.afform.server_route;
+          $scope.afform.is_dashlet = false;
           $scope.afform.title += ' ' + ts('(copy)');
         }
         $scope.canvasTab = 'layout';
