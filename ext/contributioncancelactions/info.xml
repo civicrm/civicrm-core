@@ -2,7 +2,7 @@
 <extension key="contributioncancelactions" type="module">
   <file>contributioncancelactions</file>
   <name>Contribution cancel actions</name>
-  <description>This extension cancels memberships, participation records, and pledge payments when the related contribution is cancelled.</description>
+  <description>This extension cancels memberships, participation records when the related contribution is cancelled.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>
@@ -20,10 +20,7 @@
   <compatibility>
     <ver>5.32</ver>
   </compatibility>
-  <tags>
-    <tag>mgmt:hidden</tag>
-  </tags>
-  <comments>This code has been moved from core to a separate extension in 5.32</comments>
+  <comments>This code has been moved from core to a separate extension in 5.32. Note that if you disable it failed or cancelled contributions will not cause related memberships and participant records to be updated</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
