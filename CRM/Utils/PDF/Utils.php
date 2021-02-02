@@ -193,7 +193,9 @@ class CRM_Utils_PDF_Utils {
     }
     // CRM-19183 remove .pdf extension from filename
     $fileName = basename($fileName, ".pdf");
-    if (CIVICRM_UF === 'UnitTests') {
+    if (CIVICRM_UF === 'UnitTests' && headers_sent()) {
+      // Streaming content will 'die' in unit tests unless ob_start()
+      // has been called.
       throw new CRM_Core_Exception_PrematureExitException('_html2pdf_dompdf called', [
         'html' => $html,
         'fileName' => $fileName,
