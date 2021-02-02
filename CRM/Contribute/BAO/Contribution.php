@@ -2105,6 +2105,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contribution->find();
 
     $contribution->loadRelatedObjects($input, $ids);
+    $ids = $contribution->loadRelatedMembershipObjects($ids);
 
     $memberships = $contribution->_relatedObjects['membership'] ?? [];
     $participant = $contribution->_relatedObjects['participant'] ?? [];
@@ -2897,23 +2898,24 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($this->is_test) {
         $isTest = TRUE;
       }
-      if (!empty($this->_relatedObjects['membership'])) {
-        foreach ($this->_relatedObjects['membership'] as $membership) {
-          if ($membership->id) {
-            $values['membership_id'] = $membership->id;
+      if (!empty($ids['membership'])) {
+        $memberships = civicrm_api3('Membership', 'get', ['id' => ['IN' => $ids['membership']]])['values'];
+        foreach ($memberships as $membership) {
+          if ($membership['id']) {
+            $values['membership_id'] = $membership['id'];
             $values['isMembership'] = TRUE;
             $values['membership_assign'] = TRUE;
 
             // need to set the membership values here
             $template->assign('membership_name',
-              CRM_Member_PseudoConstant::membershipType($membership->membership_type_id)
+              CRM_Member_PseudoConstant::membershipType($membership['membership_type_id'])
             );
-            $template->assign('mem_start_date', $membership->start_date);
-            $template->assign('mem_join_date', $membership->join_date);
-            $template->assign('mem_end_date', $membership->end_date);
-            $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
+            $template->assign('mem_start_date', $membership['start_date']);
+            $template->assign('mem_join_date', $membership['join_date']);
+            $template->assign('mem_end_date', $membership['end_date']);
+            $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership['status_id'], NULL, 'label');
             $template->assign('mem_status', $membership_status);
-            if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
+            if ($membership_status == 'Pending' && $membership['is_pay_later'] == 1) {
               $values['is_pay_later'] = 1;
             }
             // Pass amount to floatval as string '0.00' is considered a
@@ -2923,9 +2925,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             }
 
             if (!empty($this->contribution_recur_id) && $paymentObject) {
-              $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'cancel');
+              $url = $paymentObject->subscriptionURL($membership['id'], 'membership', 'cancel');
               $template->assign('cancelSubscriptionUrl', $url);
-              $url = $paymentObject->subscriptionURL($membership->id, 'membership', 'billing');
+              $url = $paymentObject->subscriptionURL($membership['id'], 'membership', 'billing');
               $template->assign('updateSubscriptionBillingUrl', $url);
               $url = $paymentObject->subscriptionURL($entityID, $entity, 'update');
               $template->assign('updateSubscriptionUrl', $url);
@@ -3003,7 +3005,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
       // set lineItem for contribution
       if ($this->id) {
-        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->id);
+        $lineItems = \Civi\Api4\LineItem::get(FALSE)
+          ->addWhere('contribution_id', '=', $this->id)
+          ->execute();
         if (!empty($lineItems)) {
           $firstLineItem = reset($lineItems);
           $priceSet = [];
