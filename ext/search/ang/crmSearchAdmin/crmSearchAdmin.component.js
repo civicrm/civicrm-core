@@ -659,7 +659,8 @@
 
       $scope.fieldsForHaving = function() {
         return {results: _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-          fields.push({id: name, text: ctrl.getFieldLabel(name)});
+          var info = searchMeta.parseExpr(name);
+          fields.push({id: info.alias + info.suffix, text: ctrl.getFieldLabel(name)});
         })};
       };
 
