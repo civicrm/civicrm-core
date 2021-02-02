@@ -10,7 +10,7 @@
  */
 
 use Civi\Api4\Activity;
-use Civi\Api4\ContributionPage;
+use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\PledgePayment;
@@ -1258,14 +1258,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * Should an email receipt be sent for this contribution on completion.
    *
    * @param array $input
-   * @param int $contributionPageID
+   * @param int $contributionID
    * @param int $recurringContributionID
    *
    * @return bool
    * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected static function isEmailReceipt(array $input, $contributionPageID, $recurringContributionID): bool {
+  protected static function isEmailReceipt(array $input, int $contributionID, $recurringContributionID): bool {
     if (isset($input['is_email_receipt'])) {
       return (bool) $input['is_email_receipt'];
     }
@@ -1278,8 +1277,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // https://lab.civicrm.org/dev/core/issues/1245
       return (bool) ContributionRecur::get(FALSE)->addWhere('id', '=', $recurringContributionID)->addSelect('is_email_receipt')->execute()->first()['is_email_receipt'];
     }
-    if ($contributionPageID) {
-      return (bool) ContributionPage::get(FALSE)->addWhere('id', '=', $contributionPageID)->addSelect('is_email_receipt')->execute()->first()['is_email_receipt'];
+    $contributionPage = Contribution::get(FALSE)
+      ->addSelect('contribution_page.is_email_receipt')
+      ->addWhere('contribution_page_id', 'IS NOT NULL')
+      ->addWhere('id', '=', $contributionID)
+      ->execute()->first();
+
+    if (!empty($contributionPage)) {
+      return (bool) $contributionPage['contribution_page.is_email_receipt'];
     }
     // This would be the case for backoffice (where is_email_receipt is not passed in) or events, where Event::sendMail will filter
     // again anyway.
@@ -4307,7 +4312,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);
 
-    if (self::isEmailReceipt($input, $contribution->contribution_page_id, $recurringContributionID)) {
+    if (self::isEmailReceipt($input, $contributionID, $recurringContributionID)) {
       civicrm_api3('Contribution', 'sendconfirmation', [
         'id' => $contributionID,
         'payment_processor_id' => $paymentProcessorId,
