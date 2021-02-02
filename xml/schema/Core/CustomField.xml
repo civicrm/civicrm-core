@@ -7,6 +7,7 @@
   <comment>Stores info about an extended (custom) property (data and form field info).</comment>
   <add>1.1</add>
   <log>true</log>
+  <labelField>label</labelField>
   <field>
     <name>id</name>
     <type>int unsigned</type>

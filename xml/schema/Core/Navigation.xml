@@ -6,6 +6,7 @@
   <name>civicrm_navigation</name>
   <comment>Table to store navigation.</comment>
   <add>3.0</add>
+  <labelField>label</labelField>
   <field>
     <name>id</name>
     <title>Navigation ID</title>

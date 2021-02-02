@@ -5,6 +5,7 @@
   <class>County</class>
   <name>civicrm_county</name>
   <add>1.1</add>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>County ID</title>

@@ -10,6 +10,7 @@
   <title>Instant Messaging</title>
   <titlePlural>Instant Messaging</titlePlural>
   <icon>fa-comments-o</icon>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>Instant Messenger ID</title>

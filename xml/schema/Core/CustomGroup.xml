@@ -8,6 +8,7 @@
   </comment>
   <add>1.1</add>
   <log>true</log>
+  <labelField>title</labelField>
   <field>
     <name>id</name>
     <type>int unsigned</type>

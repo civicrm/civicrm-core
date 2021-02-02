@@ -8,6 +8,7 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-address-book-o</icon>
+  <labelField>display_name</labelField>
   <paths>
     <add>civicrm/contact/add?reset=1&amp;ct=[contact_type]</add>
     <view>civicrm/contact/view?reset=1&amp;cid=[id]</view>

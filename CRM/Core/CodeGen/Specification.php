@@ -215,6 +215,7 @@ class CRM_Core_CodeGen_Specification {
       'title' => $tableXML->title ?? $titleFromClass,
       'titlePlural' => $tableXML->titlePlural ?? CRM_Utils_String::pluralize($tableXML->title ?? $titleFromClass),
       'icon' => $tableXML->icon ?? NULL,
+      'labelField' => $tableXML->labelField ?? NULL,
       'add' => $tableXML->add ?? NULL,
       'component' => $tableXML->component ?? NULL,
       'paths' => (array) ($tableXML->paths ?? []),

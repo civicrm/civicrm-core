@@ -5,6 +5,7 @@
   <class>Country</class>
   <name>civicrm_country</name>
   <add>1.1</add>
+  <labelField>name</labelField>
   <field>
     <name>id</name>
     <title>Country ID</title>

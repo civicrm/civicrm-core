@@ -6,6 +6,7 @@
   <comment>Campaign Survey Details.</comment>
   <add>3.2</add>
   <icon>fa-clipboard</icon>
+  <labelField>title</labelField>
   <component>CiviCampaign</component>
   <field>
     <name>id</name>
