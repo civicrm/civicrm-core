@@ -10,13 +10,24 @@ class AfformAdminMeta {
    * @return array
    */
   public static function getAdminSettings() {
+    $afformTypes = (array) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('name', 'label', 'icon')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('option_group_id:name', '=', 'afform_type')
+      ->addOrderBy('weight', 'ASC')
+      ->execute();
+    // Pluralize tabs (too bad option groups only store a single label)
+    $plurals = [
+      'form' => ts('Custom Forms'),
+      'search' => ts('Search Displays'),
+      'block' => ts('Field Blocks'),
+      'system' => ts('System Forms'),
+    ];
+    foreach ($afformTypes as $index => $type) {
+      $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);
+    }
     return [
-      'afform_type' => \Civi\Api4\OptionValue::get(FALSE)
-        ->addSelect('name', 'label', 'icon')
-        ->addWhere('is_active', '=', TRUE)
-        ->addWhere('option_group_id:name', '=', 'afform_type')
-        ->addOrderBy('weight', 'ASC')
-        ->execute(),
+      'afform_type' => $afformTypes,
     ];
   }
 
