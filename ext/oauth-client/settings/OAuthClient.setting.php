@@ -3,7 +3,7 @@ return [
   'oauthClientRedirectUrl' => [
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
-    'name' => 'fatalErrorHandler',
+    'name' => 'oauthClientRedirectUrl',
     'type' => 'String',
     'quick_form_type' => 'Element',
     'html_type' => 'text',
