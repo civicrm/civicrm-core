@@ -158,6 +158,10 @@
         return $scope.selectedEntityName;
       };
 
+      this.getAfform = function() {
+        return $scope.afform;
+      };
+
       // Validates that a drag-n-drop action is allowed
       this.onDrop = function(event, ui) {
         var sort = ui.item.sortable;
