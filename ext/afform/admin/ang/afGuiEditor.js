@@ -77,10 +77,10 @@
 
         // Takes the results from api.Afform.loadAdminData and processes the metadata
         // Note this runs once when loading a new afform for editing (just after this.resetMeta is called)
-        // and it also runs when adding new entities or joins to the form.
+        // and it also runs when adding new entities or blocks to the form.
         addMeta: function(data) {
           evaluate(data.definition.layout);
-          if (data.definition.type === 'block') {
+          if (data.definition.type === 'block' && data.definition.name) {
             CRM.afGuiEditor.blocks[data.definition.directive_name] = data.definition;
           }
           // Add new or updated blocks

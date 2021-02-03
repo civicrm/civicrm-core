@@ -53,6 +53,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         case 'block':
           $info['definition'] = $this->definition + [
             'title' => '',
+            'block' => $this->entity,
             'layout' => [],
           ];
           break;
@@ -134,17 +135,13 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       }
 
       // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
-      $blockInfo = Afform::get($this->checkPermissions)
-        ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')
-        ->addWhere('type', '=', 'block')
-        ->addWhere('block', 'IN', $entities)
-        ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
-        ->execute();
-      $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
+      $this->loadAvailableBlocks($entities, $info);
     }
 
     if ($info['definition']['type'] === 'block') {
       $entities[] = $info['definition']['join'] ?? $info['definition']['block'];
+      $scanBlocks($info['definition']['layout']);
+      $this->loadAvailableBlocks($entities, $info);
     }
 
     if ($info['definition']['type'] === 'search') {
@@ -197,6 +194,25 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       ->setLayoutFormat('shallow')
       ->addWhere('name', '=', $name)
       ->execute()->first();
+  }
+
+  /**
+   * Get basic info about blocks relevant to these entities.
+   *
+   * @param $entities
+   * @param $info
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function loadAvailableBlocks($entities, &$info) {
+    // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
+    $blockInfo = Afform::get($this->checkPermissions)
+      ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')
+      ->addWhere('type', '=', 'block')
+      ->addWhere('block', 'IN', $entities)
+      ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
+      ->execute();
+    $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
   }
 
   public function fields() {

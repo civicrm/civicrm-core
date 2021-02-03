@@ -19,7 +19,7 @@
       $scope.elementTitles = [];
 
       function getEntityType() {
-        return ctrl.entity.type === 'Contact' ? ctrl.entity.data.contact_type : ctrl.entity.type;
+        return (ctrl.entity.type === 'Contact' && ctrl.entity.data) ? ctrl.entity.data.contact_type || 'Contact' : ctrl.entity.type;
       }
 
       $scope.getMeta = function() {
