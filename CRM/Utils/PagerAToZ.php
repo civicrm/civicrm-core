@@ -156,7 +156,7 @@ class CRM_Utils_PagerAToZ {
           'force' => 1,
           'qfKey' => $qfKey,
         ];
-        if ($query->_context === 'amtg') {
+        if (($query->_context ?? '') === 'amtg') {
           // See https://lab.civicrm.org/dev/core/-/issues/2333
           // Seems to be needed in add to group flow.
           $urlParams['_qf_Basic_display'] = 1;
