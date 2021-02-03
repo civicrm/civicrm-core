@@ -44,10 +44,11 @@
           </div>
         </td>
         <td>{{ search.groups.join(', ') }}</td>
-        <td ng-if="$ctrl.afformEnabled">
+        <td ng-if="::$ctrl.afformEnabled">
           <div class="btn-group">
             <button type="button" ng-click="$ctrl.loadAfforms()" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {{:: ts('Forms') }} <span class="caret"></span>
+              {{ $ctrl.afforms ? ($ctrl.afforms[search.name] && $ctrl.afforms[search.name].length === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.afforms[search.name] ? $ctrl.afforms[search.name].length : 0})) : ts('Forms...') }}
+              <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
               <li ng-repeat="display_name in search.display_name" ng-if="::$ctrl.afformAdminEnabled">
@@ -62,8 +63,9 @@
                   <em ng-if="$ctrl.afforms && !$ctrl.afforms[search.name]">{{:: ts('None Found') }}</em>
                 </a>
               </li>
-              <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[search.name]" ng-class="{disabled: !afform.url}">
+              <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[search.name]" ng-class="{disabled: !afform.url}" title="{{:: afform.url ? ts('Open form in new tab') : ts('This form does not have a page') }}">
                 <a href="{{:: afform.url }}" target="_blank">
+                  <i class="crm-i {{:: afform.url ? 'fa-external-link' : 'fa-list-alt' }}"></i>
                   {{:: afform.title }}
                 </a>
               </li>
