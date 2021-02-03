@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\Relationship;
 use api\v4\UnitTestCase;
 
@@ -141,6 +142,59 @@ class DateTest extends UnitTestCase {
     $this->assertContains($act[3], $result);
     $this->assertNotContains($act[0], $result);
     $this->assertNotContains($act[6], $result);
+  }
+
+  public function testJoinOnRelativeDate() {
+    $c1 = Contact::create(FALSE)
+      ->addValue('first_name', 'Contributor')
+      ->addValue('last_name', 'One')
+      ->execute()
+      ->first()['id'];
+
+    // Contribution from last year
+    Contribution::create(FALSE)
+      ->addValue('contact_id', $c1)
+      ->addValue('receive_date', (date('Y') - 1) . '-06-01')
+      ->addValue('financial_type_id', 1)
+      ->addValue('total_amount', 12)
+      ->execute();
+
+    // Contribution from this year
+    Contribution::create(FALSE)
+      ->addValue('contact_id', $c1)
+      ->addValue('receive_date', date('Y') . '-06-01')
+      ->addValue('financial_type_id', 1)
+      ->addValue('total_amount', 6)
+      ->execute();
+
+    // Contribution from 2 years ago
+    Contribution::create(FALSE)
+      ->addValue('contact_id', $c1)
+      ->addValue('receive_date', (date('Y') - 2) . '-06-01')
+      ->addValue('financial_type_id', 1)
+      ->addValue('total_amount', 24)
+      ->execute();
+
+    // Find contribution from last year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '=', '"previous.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(1, $contact);
+    $this->assertEquals(12, $contact[0]['contribution.total_amount']);
+
+    // Find contributions not from last year
+    $contact = \Civi\Api4\Contact::get()
+      ->addSelect('id', 'contribution.total_amount')
+      ->setJoin([
+        ['Contribution AS contribution', FALSE, NULL, ['contribution.receive_date', '!=', '"previous.year"']],
+      ])
+      ->addWhere('id', '=', $c1)
+      ->execute();
+    $this->assertCount(2, $contact);
   }
 
 }
