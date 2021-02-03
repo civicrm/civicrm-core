@@ -1897,14 +1897,6 @@ DESC limit 1");
       }
 
       $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-      if (isset($contributionParams['invoice_id'])) {
-        $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
-          'CRM_Contribute_DAO_Contribution',
-          $contributionParams['invoice_id'],
-          'id',
-          'invoice_id'
-        );
-      }
 
       $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
