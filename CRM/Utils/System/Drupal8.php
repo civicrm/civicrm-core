@@ -570,6 +570,17 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * Load the user object.
+   *
+   * @param int $userID
+   *
+   * @return object
+   */
+  public function getUserObject($userID) {
+    return \Drupal\user\Entity\User::load($userID);
+  }
+
+  /**
    * @inheritDoc
    */
   public function getUniqueIdentifierFromUserObject($user) {
