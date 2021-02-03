@@ -412,9 +412,14 @@ class Api4SelectQuery {
       if (is_string($value)) {
         $valExpr = $this->getExpression($value);
         if ($fieldName && $valExpr->getType() === 'SqlString') {
-          FormattingUtil::formatInputValue($valExpr->expr, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
+          $value = $valExpr->getExpr();
+          FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
+          return \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
         }
-        return sprintf('%s %s %s', $fieldAlias, $operator, $valExpr->render($this->apiFieldSpec));
+        else {
+          $value = $valExpr->render($this->apiFieldSpec);
+          return sprintf('%s %s %s', $fieldAlias, $operator, $value);
+        }
       }
       elseif ($fieldName) {
         $field = $this->getField($fieldName);
