@@ -1898,7 +1898,6 @@ DESC limit 1");
 
       $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
 
-      $contributionParams['skipCleanMoney'] = TRUE;
       // @todo this is the wrong place for this - it should be done as close to form submission
       // as possible
       $contributionParams['total_amount'] = $params['amount'];
