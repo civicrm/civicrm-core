@@ -421,7 +421,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitMembershipBlockNotSeparatePaymentWithEmail() {
+  public function testSubmitMembershipBlockNotSeparatePaymentWithEmail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setUpMembershipContributionPage();
     $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
