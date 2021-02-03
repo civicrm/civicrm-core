@@ -40,15 +40,48 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
    * @return array
    */
   protected function getRecords() {
-    $fields = $this->_itemsToGet('name');
+    $fieldsToGet = $this->_itemsToGet('name');
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    // Any fields name with a dot in it is custom
-    if ($fields) {
-      $this->includeCustom = strpos(implode('', $fields), '.') !== FALSE;
+    // Any fields name with a dot in it is either custom or an implicit join
+    if ($fieldsToGet) {
+      $this->includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
     }
     $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->includeCustom, $this->values);
-    return SpecFormatter::specToArray($spec->getFields($fields), $this->loadOptions, $this->values);
+    $fields = SpecFormatter::specToArray($spec->getFields($fieldsToGet), $this->loadOptions, $this->values);
+    foreach ($fieldsToGet ?? [] as $fieldName) {
+      if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
+        $fkField = $this->getFkFieldSpec($fieldName, $fields);
+        if ($fkField) {
+          $fkField['name'] = $fieldName;
+          $fields[] = $fkField;
+        }
+      }
+    }
+    return $fields;
+  }
+
+  /**
+   * @param string $fieldName
+   * @param array $fields
+   * @return array|null
+   * @throws \API_Exception
+   */
+  private function getFkFieldSpec($fieldName, $fields) {
+    $fieldPath = explode('.', $fieldName);
+    // Search for the first segment alone plus the first and second
+    // No field in the schema contains more than one dot in its name.
+    $searchPaths = [$fieldPath[0], $fieldPath[0] . '.' . $fieldPath[1]];
+    $fkFieldName = array_intersect($searchPaths, array_keys($fields))[0] ?? NULL;
+    if ($fkFieldName && !empty($fields[$fkFieldName]['fk_entity'])) {
+      $newFieldName = substr($fieldName, 1 + strlen($fkFieldName));
+      return civicrm_api4($fields[$fkFieldName]['fk_entity'], 'getFields', [
+        'checkPermissions' => $this->checkPermissions,
+        'where' => [['name', '=', $newFieldName]],
+        'loadOptions' => $this->loadOptions,
+        'action' => $this->action,
+      ])->first();
+    }
   }
 
   public function fields() {

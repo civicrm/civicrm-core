@@ -64,4 +64,18 @@ class GetExtraFieldsTest extends UnitTestCase {
     $this->assertContains('Alberta', $caOptions['options']);
   }
 
+  public function testGetFkFields() {
+    $fields = \Civi\Api4\Participant::getFields()
+      ->setLoadOptions(TRUE)
+      ->addWhere('name', 'IN', ['event_id', 'event_id.created_id', 'contact_id.gender_id', 'event_id.created_id.sort_name'])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertCount(4, $fields);
+    $this->assertEquals('Participant', $fields['event_id']['entity']);
+    $this->assertEquals('Event', $fields['event_id.created_id']['entity']);
+    $this->assertEquals('Contact', $fields['event_id.created_id.sort_name']['entity']);
+    $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
+  }
+
 }
