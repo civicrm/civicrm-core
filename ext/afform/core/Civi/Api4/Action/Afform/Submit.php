@@ -25,9 +25,9 @@ class Submit extends AbstractProcessor {
       foreach ($this->values[$entityName] ?? [] as $values) {
         $entityValues[$entity['type']][$entityName][] = $values + ['fields' => []];
         // Predetermined values override submitted values
-        if (!empty($entity['af-values'])) {
+        if (!empty($entity['data'])) {
           foreach ($entityValues[$entity['type']][$entityName] as $index => $vals) {
-            $entityValues[$entity['type']][$entityName][$index]['fields'] = $entity['af-values'] + $vals['fields'];
+            $entityValues[$entity['type']][$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
           }
         }
       }

@@ -170,7 +170,7 @@
           return;
         }
         var splitAs = expr.split(' AS '),
-          info = {fn: null, modifier: ''},
+          info = {fn: null, modifier: '', field: {}},
           fieldName = splitAs[0],
           bracketPos = splitAs[0].indexOf('(');
         if (bracketPos >= 0) {

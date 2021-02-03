@@ -16,7 +16,7 @@ class CRM_AfformAdmin_Page_Base extends CRM_Core_Page {
 
   public function run() {
     $breadCrumb = [
-      'title' => ts('Forms'),
+      'title' => ts('Form Builder'),
       'url' => CRM_Utils_System::url('civicrm/admin/afform', NULL, FALSE, '/'),
     ];
     CRM_Utils_System::appendBreadCrumb([$breadCrumb]);

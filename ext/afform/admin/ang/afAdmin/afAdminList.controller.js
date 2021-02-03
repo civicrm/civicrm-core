@@ -8,12 +8,12 @@
     $scope.crmUrl = CRM.url;
 
     this.tabs = CRM.afAdmin.afform_type;
-    $scope.tabs = _.indexBy(ctrl.tabs, 'name');
+    $scope.types = _.indexBy(ctrl.tabs, 'name');
     _.each(['form', 'block', 'search'], function(type) {
-      if ($scope.tabs[type]) {
-        $scope.tabs[type].options = [];
+      if ($scope.types[type]) {
+        $scope.types[type].options = [];
         if (type === 'form') {
-          $scope.tabs.form.default = '#create/form/Individual';
+          $scope.types.form.default = '#create/form/Individual';
         }
       }
     });
@@ -33,7 +33,7 @@
 
     this.createLinks = function() {
       ctrl.searchCreateLinks = '';
-      if ($scope.tabs[ctrl.tab].options.length) {
+      if ($scope.types[ctrl.tab].options.length) {
         return;
       }
       var links = [];
@@ -48,7 +48,7 @@
             });
           }
         });
-        $scope.tabs.form.options = _.sortBy(links, 'Label');
+        $scope.types.form.options = _.sortBy(links, 'Label');
       }
 
       if (ctrl.tab === 'block') {
@@ -61,7 +61,7 @@
             });
           }
         });
-        $scope.tabs.block.options = _.sortBy(links, 'Label');
+        $scope.types.block.options = _.sortBy(links, 'Label');
       }
 
       if (ctrl.tab === 'search') {
@@ -75,7 +75,7 @@
               icon: searchDisplay['type:icon']
             });
           });
-          $scope.tabs.search.options = _.sortBy(links, 'Label');
+          $scope.types.search.options = _.sortBy(links, 'Label');
         });
       }
     };

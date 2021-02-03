@@ -88,7 +88,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     }
     $customApi = CustomGroup::get()
       ->setCheckPermissions(FALSE)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends'])
+      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'max_multiple'])
       ->addWhere('is_multiple', '=', 1)
       ->addWhere('is_active', '=', 1);
     if ($groupNames) {
@@ -120,7 +120,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'permission' => 'access CiviCRM',
         'join' => 'Custom_' . $custom['name'],
         'block' => $custom['extends'],
-        'repeat' => TRUE,
+        'repeat' => $custom['max_multiple'] ?: TRUE,
         'has_base' => TRUE,
       ];
       if ($getLayout) {
