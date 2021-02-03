@@ -101,13 +101,15 @@ class RequestSpec {
     if (!$fieldNames) {
       return $this->fields;
     }
-    $fields = [];
-    foreach ($this->fields as $field) {
-      if (in_array($field->getName(), $fieldNames)) {
-        $fields[] = $field;
+    // Return all exact matches plus partial matches (to support retrieving fk fields)
+    return array_filter($this->fields, function($field) use($fieldNames) {
+      foreach ($fieldNames as $fieldName) {
+        if (strpos($fieldName, $field->getName()) === 0) {
+          return TRUE;
+        }
       }
-    }
-    return $fields;
+      return FALSE;
+    });
   }
 
   /**
