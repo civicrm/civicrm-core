@@ -1215,7 +1215,7 @@ DESC limit 1");
         $this->assign('is_pay_later', 1);
       }
 
-      if (!empty($formValues['send_receipt'])) {
+      if ($this->getSubmittedValue('send_receipt')) {
         $params['receipt_date'] = $formValues['receive_date'] ?? NULL;
       }
 
@@ -1273,7 +1273,7 @@ DESC limit 1");
           $softParams['soft_credit_type_id'] = $formValues['soft_credit_type_id'];
         }
       }
-      if (!empty($formValues['send_receipt'])) {
+      if ($this->getSubmittedValue('send_receipt')) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
 
@@ -1344,8 +1344,6 @@ DESC limit 1");
       if ($paymentStatus !== 'Completed') {
         $params['status_id'] = $pendingMembershipStatusId;
         $params['skipStatusCal'] = TRUE;
-        // unset send-receipt option, since receipt will be sent when ipn is received.
-        unset($formValues['send_receipt'], $formValues['send_receipt']);
         //as membership is pending set dates to null.
         foreach ($this->_memTypeSelected as $memType) {
           $membershipTypeValues[$memType]['joinDate'] = NULL;
@@ -1363,11 +1361,11 @@ DESC limit 1");
       $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
       $params['is_test'] = $this->isTest();
-      if (!empty($formValues['send_receipt'])) {
+      $params['receipt_date'] = NULL;
+      if ($this->getSubmittedValue('send_receipt') && $paymentStatus === 'Completed') {
+        // @todo this should be updated by the send function once sent rather than
+        // set here.
         $params['receipt_date'] = $now;
-      }
-      else {
-        $params['receipt_date'] = NULL;
       }
 
       $this->set('params', $formValues);
@@ -1513,7 +1511,7 @@ DESC limit 1");
     }
 
     $receiptSent = FALSE;
-    if (!empty($formValues['send_receipt']) && $receiptSend) {
+    if ($this->getSubmittedValue('send_receipt') && $receiptSend) {
       $formValues['contact_id'] = $this->_contactID;
       $formValues['contribution_id'] = $contributionId;
       // We really don't need a distinct receipt_text_signup vs receipt_text_renewal as they are
@@ -1851,27 +1849,17 @@ DESC limit 1");
     $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
 
-    $isEmailReceipt = !empty($form->_values['is_email_receipt']);
-
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $contributionParams['financial_type_id'];
 
-    //@todo - this is being set from the form to resolve CRM-10188 - an
-    // eNotice caused by it not being set @ the front end
-    // however, we then get it being over-written with null for backend contributions
-    // a better fix would be to set the values in the respective forms rather than require
-    // a function being shared by two forms to deal with their respective values
-    // moving it to the BAO & not taking the $form as a param would make sense here.
-    if (!isset($params['is_email_receipt']) && $isEmailReceipt) {
-      $params['is_email_receipt'] = $isEmailReceipt;
-    }
+    $params['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     $params['is_recur'] = TRUE;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
     $now = CRM_Utils_Time::date('YmdHis');
     $receiptDate = $params['receipt_date'] ?? NULL;
-    if ($isEmailReceipt) {
+    if ($params['is_email_receipt']) {
       $receiptDate = $now;
     }
 
@@ -1886,7 +1874,7 @@ DESC limit 1");
         'skipLineItem' => $params['skipLineItem'] ?? 0,
       ], $contributionParams);
 
-      if (!empty($params["is_email_receipt"])) {
+      if ($this->getSubmittedValue('send_receipt')) {
         $contributionParams += [
           'receipt_date' => $receiptDate,
         ];
@@ -1948,7 +1936,7 @@ DESC limit 1");
     $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
-    $recurParams['is_email_receipt'] = (bool) ($params['is_email_receipt'] ?? FALSE);
+    $recurParams['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
