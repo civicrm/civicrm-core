@@ -84,7 +84,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $statusMap = [
         \Civi\API\Exception\UnauthorizedException::class => 403,
       ];
-      http_response_code($statusMap[get_class($e) ?? 500]);
+      http_response_code($statusMap[get_class($e)] ?? 500);
       $response = [];
       if (CRM_Core_Permission::check('view debug output')) {
         $response['error_code'] = $e->getCode();
