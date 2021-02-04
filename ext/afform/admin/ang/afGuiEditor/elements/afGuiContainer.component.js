@@ -227,7 +227,7 @@
           model.block = afGui.meta.blocks[$scope.block.original].block;
         }
         else {
-          model.block = ctrl.getFieldEntityType('id') || '*';
+          model.block = ctrl.getFieldEntityType();
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
           .then(function(block) {
@@ -297,14 +297,14 @@
               }
             });
           }
-          if (!entityType && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
+          if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
             entityType = searchDisplay['saved_search.api_entity'];
           }
           if (entityType) {
             return false;
           }
         });
-        return entityType;
+        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search.api_entity')[0];
       };
 
     }
