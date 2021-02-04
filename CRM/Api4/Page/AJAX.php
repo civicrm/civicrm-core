@@ -81,7 +81,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       }
     }
     catch (Exception $e) {
-      http_response_code(500);
+      $statusMap = [
+        \Civi\API\Exception\UnauthorizedException::class => 403,
+      ];
+      http_response_code($statusMap[get_class($e) ?? 500]);
       $response = [];
       if (CRM_Core_Permission::check('view debug output')) {
         $response['error_code'] = $e->getCode();
@@ -100,6 +103,17 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
             $response['debug']['backtrace'] = $e->getTraceAsString();
           }
         }
+      }
+      else {
+        $error_id = rtrim(chunk_split(CRM_Utils_String::createRandom(12, CRM_Utils_String::ALPHANUMERIC), 4, '-'), '-');
+        $response['error_code'] = '1';
+        $response['error_message']  = ts('Sorry an error occurred and your request was not completed. (Error ID: %1)', [
+          1 => $error_id,
+        ]);
+        \Civi::log()->debug('AJAX Error ({error_id}): failed with exception', [
+          'error_id' => $error_id,
+          'exception' => $e,
+        ]);
       }
     }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
