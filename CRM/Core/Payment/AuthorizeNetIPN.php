@@ -62,7 +62,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // Check if the contribution exists
       // make sure contribution exists and is valid
       $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $ids['contribution'];
+      $contribution->id = $contributionID = $ids['contribution'];
       if (!$contribution->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
@@ -92,7 +92,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
           $contributionRecur->contact_id,
           $ids['contributionPage'],
           $contributionRecur,
-          (bool) $this->getMembershipID($contribution->id, $contributionRecur->id)
+          (bool) $this->getMembershipID($contributionID, $contributionRecur->id)
         );
       }
 
