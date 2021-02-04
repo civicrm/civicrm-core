@@ -13,6 +13,8 @@
       var ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];
+      $scope.blockList = [];
+      $scope.blockTitles = [];
       $scope.elementList = [];
       $scope.elementTitles = [];
 
@@ -21,7 +23,20 @@
       function buildPaletteLists() {
         var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildFieldList(search);
+        buildBlockList(search);
         buildElementList(search);
+      }
+
+      function buildBlockList(search) {
+        $scope.blockList.length = 0;
+        $scope.blockTitles.length = 0;
+        _.each(afGui.meta.blocks, function(block, directive) {
+          if (!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) {
+            var item = {"#tag": directive};
+            $scope.blockList.push(item);
+            $scope.blockTitles.push(block.title);
+          }
+        });
       }
 
       function buildFieldList(search) {

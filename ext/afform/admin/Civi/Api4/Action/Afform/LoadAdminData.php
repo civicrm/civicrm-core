@@ -15,6 +15,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Any properties already known about the afform
    * @var array
+   * @required
    */
   protected $definition;
 
@@ -24,8 +25,14 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $entity;
 
+  /**
+   * A list of entities whose blocks & fields are not needed
+   * @var array
+   */
+  protected $skipEntities = [];
+
   public function _run(\Civi\Api4\Generic\Result $result) {
-    $info = ['fields' => [], 'blocks' => []];
+    $info = ['entities' => [], 'fields' => [], 'blocks' => []];
     $entities = [];
     $newForm = empty($this->definition['name']);
 
@@ -81,7 +88,11 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     foreach ($allAfforms as $name => $path) {
       $allAfforms[$name] = _afform_angular_module_name($name, 'dash');
     }
-    // Find all entities by recursing into embedded afforms
+
+    /**
+     * Find all entities by recursing into embedded afforms
+     * @param array $layout
+     */
     $scanBlocks = function($layout) use (&$scanBlocks, &$info, &$entities, $allAfforms) {
       // Find declared af-entity tags
       foreach (\CRM_Utils_Array::findAll($layout, ['#tag' => 'af-entity']) as $afEntity) {
@@ -171,7 +182,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
           $entities[] = explode(' AS ', $join[0])[0];
         }
       }
-      $entities = array_unique($entities);
+      if (!$newForm) {
+        $scanBlocks($info['definition']['layout']);
+      }
+      $this->loadAvailableBlocks($entities, $info, [['join', 'IS NULL']]);
     }
 
     // Optimization - since contact fields are a combination of these three,
@@ -180,10 +194,11 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       $entities = array_diff($entities, ['Contact']);
     }
 
-    foreach ($entities as $entity) {
+    foreach (array_diff($entities, $this->skipEntities) as $entity) {
       $info['entities'][$entity] = AfformAdminMeta::getApiEntity($entity);
       $info['fields'][$entity] = AfformAdminMeta::getFields($entity, ['action' => $getFieldsMode]);
     }
+    $info['blocks'] = array_values($info['blocks']);
 
     $result[] = $info;
   }
@@ -199,20 +214,24 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Get basic info about blocks relevant to these entities.
    *
-   * @param $entities
-   * @param $info
+   * @param array $entities
+   * @param array $info
+   * @param array $where
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function loadAvailableBlocks($entities, &$info) {
-    // The full contents of blocks used on the form have been loaded. Get basic info about others relevant to these entities.
-    $blockInfo = Afform::get($this->checkPermissions)
-      ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')
-      ->addWhere('type', '=', 'block')
-      ->addWhere('block', 'IN', $entities)
-      ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
-      ->execute();
-    $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
+  private function loadAvailableBlocks($entities, &$info, $where = []) {
+    $entities = array_diff($entities, $this->skipEntities);
+    if ($entities) {
+      $blockInfo = Afform::get($this->checkPermissions)
+        ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')
+        ->setWhere($where)
+        ->addWhere('type', '=', 'block')
+        ->addWhere('block', 'IN', $entities)
+        ->addWhere('directive_name', 'NOT IN', array_keys($info['blocks']))
+        ->execute();
+      $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
+    }
   }
 
   public function fields() {
