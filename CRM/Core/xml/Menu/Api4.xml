@@ -3,7 +3,7 @@
   <item>
     <path>civicrm/ajax/api4</path>
     <page_callback>CRM_Api4_Page_AJAX</page_callback>
-    <access_arguments>access CiviCRM;access AJAX API</access_arguments>
+    <access_callback>CRM_Api4_Permission::check</access_callback>
   </item>
   <item>
     <path>civicrm/api4</path>

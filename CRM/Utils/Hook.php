@@ -2785,4 +2785,37 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * Alter APIv4 route permissions based on the Entity and Action
+   *
+   * This is an experimental hook intended to *relax* the requirement
+   * for "access AJAX API" when calling public-oriented APIs.
+   *
+   * Historically, when APIv2/v3 were first exposed to an HTTP interface, using
+   * the HTTP interface required an extra permission "access AJAX API". This is a
+   * broad hedge against security flaws within those API's. In the current APIv4
+   * era, security concerns are often baked into each API, so there is a debate about
+   * whether "access AJAX API" serves a purpose or just makes
+   * administration/development more complicated. (So far, there's more support
+   * for the latter.)
+   *
+   * This hook might foreseeably be abandoned either...
+   *
+   * - if it is found that "access AJAX API" guard is not needed for APIv4.
+   * - if the policy is moved into metadata.
+   *
+   * @param array|string $permissions
+   * @param string $entity
+   * @param string $action
+   *
+   * @return mixed
+   */
+  public static function alterApiRoutePermissions(&$permissions, $entity, $action) {
+    return self::singleton()->invoke(
+      ['permissions', 'entity', 'action'],
+      $permissions, $entity, $action, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, 'civicrm_alterApiRoutePermissions'
+    );
+  }
+
 }
