@@ -425,29 +425,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $params['subject'];
     }
 
-    $tokens = self::getTokensToResolve($mailContent);
-
-    // When using Smarty we need to pass the $escapeSmarty parameter.
-    $escapeSmarty = !$params['disableSmarty'];
-
-    $mailContent = self::resolveDomainTokens($mailContent, $tokens, $escapeSmarty);
-
-    $contactID = $params['contactId'] ?? NULL;
-    if ($contactID) {
-      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, $escapeSmarty);
-    }
-
-    // Normally Smarty is run, but it can be disabled using the disableSmarty
-    // parameter, which may be useful for non-core uses of MessageTemplate.send
-    // In particular it helps with the mosaicomsgtpl extension.
-    if (!$params['disableSmarty']) {
-      $mailContent = self::parseThroughSmarty($mailContent, $params['tplParams']);
-    }
-    else {
-      // Since we're not relying on Smarty for this function, we DIY.
-      // strip whitespace from ends and turn into a single line
-      $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
-    }
+    $mailContent = self::renderMessageTemplate($mailContent, $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams']);
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
@@ -702,6 +680,43 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
     foreach (['subject', 'text', 'html'] as $elem) {
       $mailContent[$elem] = $smarty->fetch("string:{$mailContent[$elem]}");
+    }
+    return $mailContent;
+  }
+
+  /**
+   * Render the message template, resolving tokens and smarty tokens.
+   *
+   * @param array $mailContent
+   * @param bool $disableSmarty
+   * @param int $contactID
+   * @param array $smartyAssigns
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function renderMessageTemplate(array $mailContent, $disableSmarty, $contactID, $smartyAssigns): array {
+    $tokens = self::getTokensToResolve($mailContent);
+
+    // When using Smarty we need to pass the $escapeSmarty parameter.
+    $escapeSmarty = !$disableSmarty;
+
+    $mailContent = self::resolveDomainTokens($mailContent, $tokens, $escapeSmarty);
+
+    if ($contactID) {
+      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, $escapeSmarty);
+    }
+
+    // Normally Smarty is run, but it can be disabled using the disableSmarty
+    // parameter, which may be useful for non-core uses of MessageTemplate.send
+    // In particular it helps with the mosaicomsgtpl extension.
+    if (!$disableSmarty) {
+      $mailContent = self::parseThroughSmarty($mailContent, $smartyAssigns);
+    }
+    else {
+      // Since we're not relying on Smarty for this function, we DIY.
+      // strip whitespace from ends and turn into a single line
+      $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
     }
     return $mailContent;
   }
