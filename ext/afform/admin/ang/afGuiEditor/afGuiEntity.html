@@ -20,19 +20,19 @@
       <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{:: ts('Search fields') }}" />
     </legend>
     <div class="af-gui-entity-palette-select-list">
-      <div ng-if="blockList.length">
-        <label>{{:: ts('Blocks') }}</label>
-        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + $ctrl.entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="blockList">
-          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
-            {{ blockTitles[$index] }}
-          </div>
-        </div>
-      </div>
       <div ng-if="elementList.length">
         <label>{{:: ts('Elements') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="elementList">
           <div ng-repeat="element in elementList" >
             {{ elementTitles[$index] }}
+          </div>
+        </div>
+      </div>
+      <div ng-if="blockList.length">
+        <label>{{:: ts('Blocks') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + $ctrl.entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="blockList">
+          <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
+            {{ blockTitles[$index] }}
           </div>
         </div>
       </div>
