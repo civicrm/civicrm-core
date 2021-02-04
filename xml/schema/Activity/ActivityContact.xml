@@ -13,6 +13,9 @@
     <title>Activity Contact ID</title>
     <required>true</required>
     <comment>Activity contact id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.4</add>
   </field>
   <primaryKey>

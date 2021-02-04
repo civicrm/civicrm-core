@@ -23,6 +23,9 @@
     <headerPattern>/internal|contact?|id$/i</headerPattern>
     <required>true</required>
     <comment>Unique Contact ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

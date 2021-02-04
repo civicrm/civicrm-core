@@ -13,6 +13,9 @@
     <title>Group Contact ID</title>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

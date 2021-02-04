@@ -12,6 +12,9 @@
     <title>Status Preference ID</title>
     <required>true</required>
     <comment>Unique Status Preference ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.7</add>
   </field>
   <primaryKey>

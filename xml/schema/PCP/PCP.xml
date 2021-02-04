@@ -15,6 +15,9 @@
     <title>Personal Campaign Page ID</title>
     <comment>Personal Campaign Page ID</comment>
     <add>2.2</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

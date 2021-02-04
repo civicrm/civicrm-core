@@ -13,6 +13,9 @@
     <title>File ID</title>
     <required>true</required>
     <comment>Unique ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.5</add>
   </field>
   <primaryKey>

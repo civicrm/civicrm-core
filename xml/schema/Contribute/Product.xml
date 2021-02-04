@@ -14,6 +14,9 @@
     <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>

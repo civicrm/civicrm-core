@@ -13,10 +13,10 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Set</comment>
-    <add>1.8</add>
     <html>
-      <type>Select</type>
+      <type>Number</type>
     </html>
+    <add>1.8</add>
   </field>
   <primaryKey>
     <name>id</name>

@@ -14,6 +14,9 @@
     <title>Website ID</title>
     <required>true</required>
     <comment>Unique Website ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.2</add>
   </field>
   <primaryKey>

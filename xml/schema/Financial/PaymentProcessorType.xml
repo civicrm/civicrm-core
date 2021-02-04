@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Payment Processor Type ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>

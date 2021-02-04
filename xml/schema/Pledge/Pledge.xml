@@ -15,6 +15,9 @@
     <required>true</required>
     <comment>Pledge ID</comment>
     <import>true</import>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.1</add>
   </field>
   <primaryKey>

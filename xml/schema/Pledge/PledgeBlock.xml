@@ -13,6 +13,9 @@
     <required>true</required>
     <comment>Pledge ID</comment>
     <add>2.1</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

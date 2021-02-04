@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Option Group ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.5</add>
   </field>
   <primaryKey>

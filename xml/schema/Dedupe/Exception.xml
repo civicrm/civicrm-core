@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique dedupe exception id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>

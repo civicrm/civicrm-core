@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Event In Cart Id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>

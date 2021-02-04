@@ -11,6 +11,9 @@
     <title>Setting ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>

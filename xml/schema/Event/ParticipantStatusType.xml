@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>unique participant status type id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.0</add>
   </field>
   <primaryKey>

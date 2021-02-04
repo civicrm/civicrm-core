@@ -12,6 +12,9 @@
     <title>Financial Transaction ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>

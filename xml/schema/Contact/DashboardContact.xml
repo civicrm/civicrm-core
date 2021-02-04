@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <title>Dashboard Contact ID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.1</add>
   </field>
   <primaryKey>

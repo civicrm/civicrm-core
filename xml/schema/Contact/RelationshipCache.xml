@@ -15,6 +15,9 @@
     <title>Relationship Cache ID</title>
     <required>true</required>
     <comment>Relationship Cache ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>5.29</add>
   </field>
   <primaryKey>

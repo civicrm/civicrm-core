@@ -12,6 +12,9 @@
     <title>Mapping Field ID</title>
     <required>true</required>
     <comment>Mapping Field ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.2</add>
   </field>
   <primaryKey>

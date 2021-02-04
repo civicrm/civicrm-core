@@ -15,6 +15,9 @@
     <length>10</length>
     <required>true</required>
     <comment></comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.3</add>
   </field>
   <primaryKey>

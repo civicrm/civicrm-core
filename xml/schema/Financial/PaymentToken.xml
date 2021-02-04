@@ -15,6 +15,9 @@
     <required>true</required>
     <comment>Payment Token ID</comment>
     <add>4.6</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

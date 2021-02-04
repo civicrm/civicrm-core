@@ -16,6 +16,9 @@
     <length>10</length>
     <required>true</required>
     <comment>ID of original financial_type so you can search this table by the financial_type.id and then select the relevant version based on the timestamp</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>

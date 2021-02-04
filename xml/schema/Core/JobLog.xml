@@ -13,6 +13,9 @@
     <required>true</required>
     <title>Job Log ID</title>
     <comment>Job log entry Id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>

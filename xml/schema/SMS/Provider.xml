@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>SMS Provider ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.2</add>
   </field>
   <primaryKey>

@@ -10,6 +10,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.2</add>
   </field>
   <primaryKey>

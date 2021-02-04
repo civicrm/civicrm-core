@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Persistent Record Id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.2</add>
   </field>
   <primaryKey>

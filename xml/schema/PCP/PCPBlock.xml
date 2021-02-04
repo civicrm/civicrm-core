@@ -15,6 +15,9 @@
     <required>true</required>
     <comment>PCP block Id</comment>
     <add>2.2</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

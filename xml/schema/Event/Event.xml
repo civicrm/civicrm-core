@@ -19,6 +19,9 @@
     <title>Event ID</title>
     <required>true</required>
     <comment>Event</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.7</add>
   </field>
   <primaryKey>

@@ -25,6 +25,9 @@
     <headerPattern>/^(m(embership\s)?id)$/i</headerPattern>
     <comment>Membership Id</comment>
     <add>1.5</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>

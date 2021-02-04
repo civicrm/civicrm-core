@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Word replacement ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.4</add>
   </field>
   <primaryKey>

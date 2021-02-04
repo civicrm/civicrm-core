@@ -22,6 +22,9 @@
     <required>true</required>
     <comment>Unique Grant id</comment>
     <import>true</import>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>

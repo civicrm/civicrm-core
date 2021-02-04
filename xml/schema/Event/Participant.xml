@@ -17,6 +17,9 @@
     <comment>Participant Id</comment>
     <import>true</import>
     <headerPattern>/(^(participant(.)?)?id$)/i</headerPattern>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.7</add>
   </field>
   <primaryKey>

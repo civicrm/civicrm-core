@@ -12,6 +12,9 @@
       <type>int unsigned</type>
       <length>10</length>
       <required>true</required>
+      <html>
+        <type>Number</type>
+      </html>
       <add>4.6</add>
   </field>
   <primaryKey>

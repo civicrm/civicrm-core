@@ -12,6 +12,9 @@
     <title>Saved Search ID</title>
     <required>true</required>
     <comment>Saved Search ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

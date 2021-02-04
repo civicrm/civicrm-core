@@ -20,6 +20,9 @@
     <required>true</required>
     <comment>Unique Campaign ID.</comment>
     <import>true</import>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>

@@ -20,6 +20,9 @@
     <import>true</import>
     <title>Soft Credit ID</title>
     <comment>Soft Credit ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.2</add>
   </field>
   <primaryKey>

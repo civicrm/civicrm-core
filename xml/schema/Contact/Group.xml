@@ -18,6 +18,9 @@
     <title>Group ID</title>
     <required>true</required>
     <comment>Group ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

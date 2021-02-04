@@ -14,6 +14,9 @@
     <title>Relationship ID</title>
     <required>true</required>
     <comment>Relationship ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

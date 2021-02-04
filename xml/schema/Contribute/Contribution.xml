@@ -23,7 +23,7 @@
     <title>Contribution ID</title>
     <comment>Contribution ID</comment>
     <html>
-      <type>Text</type>
+      <type>Number</type>
     </html>
     <add>1.3</add>
   </field>

@@ -14,6 +14,9 @@
     <title>Custom Field ID</title>
     <required>true</required>
     <comment>Unique Custom Field ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

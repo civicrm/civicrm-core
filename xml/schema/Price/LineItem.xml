@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Line Item</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.7</add>
   </field>
   <primaryKey>
