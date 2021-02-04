@@ -4279,6 +4279,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
     $contributionID = (int) $contribution->id;
+    unset($contribution);
 
     if ($input['component'] == 'contribute') {
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
@@ -4302,8 +4303,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if (!$contributionResult) {
       $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
     }
-
-    $contribution->contribution_status_id = $contributionParams['contribution_status_id'];
 
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
