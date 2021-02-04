@@ -150,7 +150,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if ($info['definition']['type'] === 'block') {
-      $entities[] = $info['definition']['join'] ?? $info['definition']['block'];
+      $blockEntity = $info['definition']['join'] ?? $info['definition']['block'];
+      if ($blockEntity !== '*') {
+        $entities[] = $blockEntity;
+      }
       $scanBlocks($info['definition']['layout']);
       $this->loadAvailableBlocks($entities, $info);
     }
@@ -222,6 +225,9 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
    */
   private function loadAvailableBlocks($entities, &$info, $where = []) {
     $entities = array_diff($entities, $this->skipEntities);
+    if (!$this->skipEntities) {
+      $entities[] = '*';
+    }
     if ($entities) {
       $blockInfo = Afform::get($this->checkPermissions)
         ->addSelect('name', 'title', 'block', 'join', 'directive_name', 'repeat')

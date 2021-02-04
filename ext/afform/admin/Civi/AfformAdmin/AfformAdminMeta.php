@@ -110,6 +110,11 @@ class AfformAdminMeta {
   public static function getGuiSettings() {
     $data = [
       'entities' => [
+        '*' => [
+          'label' => E::ts('Content Block'),
+          'icon' => 'fa-pencil-square-o',
+          'fields' => [],
+        ],
         'Contact' => self::getApiEntity('Contact'),
       ],
     ];

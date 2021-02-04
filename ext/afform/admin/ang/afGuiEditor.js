@@ -68,8 +68,11 @@
       return {
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
-          _.each(CRM.afGuiEditor.entities, function(entity) {
-            delete entity.fields;
+          _.each(CRM.afGuiEditor.entities, function(entity, type) {
+            // Skip the "*" pseudo-entity which should always have an empty list of fields
+            if (entity.fields && type !== '*') {
+              delete entity.fields;
+            }
           });
           CRM.afGuiEditor.blocks = {};
           CRM.afGuiEditor.searchDisplays = {};

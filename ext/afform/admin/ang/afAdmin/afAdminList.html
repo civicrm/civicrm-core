@@ -20,13 +20,13 @@
       </button>
       <ul class="dropdown-menu">
         <li>
-          <input ng-if="types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="$ctrl.searchCreateLinks">
+          <input ng-if="types[$ctrl.tab].options.length" type="search" class="form-control" placeholder="&#xf002" ng-model="searchCreateLinks.label">
           <a href ng-if="!types[$ctrl.tab].options.length"><i class="crm-i fa-spinner fa-spin"></i></a>
         </li>
-        <li ng-repeat="link in types[$ctrl.tab].options | filter:$ctrl.searchCreateLinks">
-          <a href="{{ link.url }}">
-            <i class="crm-i {{ link.icon }}"></i>
-            {{ link.label }}
+        <li ng-repeat="link in types[$ctrl.tab].options | filter:searchCreateLinks" class="{{:: link.class }}">
+          <a ng-if=":: link.url" href="{{:: link.url }}">
+            <i class="crm-i {{:: link.icon }}"></i>
+            {{:: link.label }}
           </a>
         </li>
       </ul>
