@@ -210,6 +210,7 @@
         var model = {
           title: '',
           name: null,
+          type: 'block',
           layout: ctrl.node['#children']
         };
         if (ctrl.join) {
@@ -221,7 +222,7 @@
           model.block = afGui.meta.blocks[$scope.block.original].block;
         }
         else {
-          model.block = ctrl.container.getFieldEntityType() || '*';
+          model.block = ctrl.getFieldEntityType('id') || '*';
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
           .then(function(block) {
