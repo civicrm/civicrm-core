@@ -415,11 +415,6 @@
     <type>int unsigned</type>
     <title>Mailing Campaign</title>
     <comment>The campaign for which this mailing has been initiated.</comment>
-    <pseudoconstant>
-      <table>civicrm_campaign</table>
-      <keyColumn>id</keyColumn>
-      <labelColumn>title</labelColumn>
-    </pseudoconstant>
     <add>3.4</add>
     <html>
       <type>Select</type>
