@@ -20,12 +20,12 @@
 
       $scope.getField = afGui.getField;
 
-      function buildPaletteLists() {
+      this.buildPaletteLists = function() {
         var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildFieldList(search);
         buildBlockList(search);
         buildElementList(search);
-      }
+      };
 
       function buildBlockList(search) {
         $scope.blockList.length = 0;
@@ -89,15 +89,11 @@
         });
       }
 
-      $scope.clearSearch = function() {
-        $scope.controls.fieldSearch = '';
-      };
-
       // This gets called from jquery-ui so we have to manually apply changes to scope
       $scope.buildPaletteLists = function() {
         $timeout(function() {
           $scope.$apply(function() {
-            buildPaletteLists();
+            ctrl.buildPaletteLists();
           });
         });
       };
@@ -105,6 +101,18 @@
       // Checks if a field is on the form or set as a value
       $scope.fieldInUse = function(fieldName) {
         return check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
+      };
+
+      // Checks if fields in a block are already in use on the form.
+      // Note that if a block contains no fields it can be used repeatedly, so this will always return false for those.
+      $scope.blockInUse = function(block) {
+        if (block['af-join']) {
+          return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
+        }
+        var fieldsInBlock = _.pluck(afGui.findRecursive(afGui.meta.blocks[block['#tag']].layout, {'#tag': 'af-field'}), 'name');
+        return check(ctrl.editor.layout['#children'], function(item) {
+          return item['#tag'] === 'af-field' && _.includes(fieldsInBlock, item.name);
+        });
       };
 
       // Check for a matching item for this entity
@@ -135,7 +143,14 @@
         return found.match;
       }
 
-      $scope.$watch('controls.fieldSearch', buildPaletteLists);
+      this.$onInit = function() {
+        // When a new block is saved, update the list
+        this.meta = afGui.meta;
+        $scope.$watchCollection('$ctrl.meta.blocks', function() {
+          $scope.controls.fieldSearch = '';
+          ctrl.buildPaletteLists();
+        });
+      };
     }
   });
 

@@ -17,14 +17,14 @@
   <fieldset class="af-gui-entity-palette">
     <legend class="form-inline">
       {{:: ts('Add:') }}
-      <input ng-model="controls.fieldSearch" class="form-control" type="search" placeholder="&#xf002" title="{{:: ts('Search fields') }}" />
+      <input ng-model="controls.fieldSearch" ng-change="$ctrl.buildPaletteLists()" class="form-control" type="search" placeholder="&#xf002" title="{{:: ts('Search fields') }}" />
     </legend>
     <div class="af-gui-entity-palette-select-list">
       <div ng-if="elementList.length">
         <label>{{:: ts('Elements') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="elementList">
           <div ng-repeat="element in elementList" >
-            {{ elementTitles[$index] }}
+            {{:: elementTitles[$index] }}
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
         <label>{{:: ts('Blocks') }}</label>
         <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + $ctrl.entity.name + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="blockList">
           <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
-            {{ blockTitles[$index] }}
+            {{:: blockTitles[$index] }}
           </div>
         </div>
       </div>
@@ -41,7 +41,7 @@
           <label>{{ fieldGroup.label }}</label>
           <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=' + fieldGroup.entityName + '] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="fieldGroup.fields">
             <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
-              {{ getField(fieldGroup.entityType, field.name).label }}
+              {{:: getField(fieldGroup.entityType, field.name).label }}
             </div>
           </div>
         </div>
@@ -56,5 +56,5 @@
 
 <fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">
   <legend>{{:: ts('Options') }}</legend>
-  <div ng-include="'~/afGuiEditor/entityConfig/' + $ctrl.entity.type + '.html'"></div>
+  <div ng-include="::'~/afGuiEditor/entityConfig/' + $ctrl.entity.type + '.html'"></div>
 </fieldset>

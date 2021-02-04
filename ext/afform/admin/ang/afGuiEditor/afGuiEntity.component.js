@@ -39,12 +39,12 @@
         delete entity.data[fieldName];
       };
 
-      function buildPaletteLists() {
+      this.buildPaletteLists = function() {
         var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
         buildFieldList(search);
         buildBlockList(search);
         buildElementList(search);
-      }
+      };
 
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
@@ -122,15 +122,11 @@
         });
       }
 
-      $scope.clearSearch = function() {
-        $scope.controls.fieldSearch = '';
-      };
-
       // This gets called from jquery-ui so we have to manually apply changes to scope
       $scope.buildPaletteLists = function() {
         $timeout(function() {
           $scope.$apply(function() {
-            buildPaletteLists();
+            ctrl.buildPaletteLists();
           });
         });
       };
@@ -144,6 +140,8 @@
         return check(ctrl.editor.layout['#children'], {'#tag': 'af-field', name: fieldName});
       };
 
+      // Checks if fields in a block are already in use on the form.
+      // Note that if a block contains no fields it can be used repeatedly, so this will always return false for those.
       $scope.blockInUse = function(block) {
         if (block['af-join']) {
           return check(ctrl.editor.layout['#children'], {'af-join': block['af-join']});
@@ -182,17 +180,24 @@
         return found.match;
       }
 
-      $scope.$watch('controls.addValue', function(fieldName) {
-        if (fieldName) {
-          if (!ctrl.entity.data) {
-            ctrl.entity.data = {};
-          }
-          ctrl.entity.data[fieldName] = '';
-          $scope.controls.addValue = '';
-        }
-      });
+      this.$onInit = function() {
+        // When a new block is saved, update the list
+        this.meta = afGui.meta;
+        $scope.$watchCollection('$ctrl.meta.blocks', function() {
+          $scope.controls.fieldSearch = '';
+          ctrl.buildPaletteLists();
+        });
 
-      $scope.$watch('controls.fieldSearch', buildPaletteLists);
+        $scope.$watch('controls.addValue', function(fieldName) {
+          if (fieldName) {
+            if (!ctrl.entity.data) {
+              ctrl.entity.data = {};
+            }
+            ctrl.entity.data[fieldName] = '';
+            $scope.controls.addValue = '';
+          }
+        });
+      };
     }
   });
 
