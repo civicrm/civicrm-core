@@ -185,6 +185,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {
+      throw new \CRM_Core_Exception('here');
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $mailer->send($mailing->replyto_email, $h, $b);
       unset($errorScope);

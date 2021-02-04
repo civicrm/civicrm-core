@@ -169,6 +169,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
     $result = NULL;
     if (is_object($mailer)) {
+      throw new \CRM_Core_Exception('here');
       $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       $result = $mailer->send($recipient, $headers, $body);
       unset($errorScope);

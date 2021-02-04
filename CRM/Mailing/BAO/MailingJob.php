@@ -649,6 +649,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
       // disable error reporting on real mailings (but leave error reporting for tests), CRM-5744
       if ($job_date) {
+        throw new \CRM_Core_Exception('here');
         $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
       }
 
