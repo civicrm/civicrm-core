@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform-mock" type="module">
   <file>afform_mock</file>
-  <name>Afform: Mocks</name>
-  <description>Mock extension used for testing the framework</description>
+  <name>Afform: Mock Form Collection</name>
+  <description>(DEVELOPMENT ONLY) List of example forms used for automated testing</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
@@ -16,6 +16,9 @@
   </urls>
   <releaseDate>2020-01-09</releaseDate>
   <version>0.5</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>5.23</ver>
