@@ -70,7 +70,7 @@
   </field>
   <field>
     <name>domain_id</name>
-    <title>Word Replacement Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -79,7 +79,7 @@
     </pseudoconstant>
     <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
     <html>
-      <label>Word Replacement Domain</label>
+      <label>Domain</label>
     </html>
     <add>1.1</add>
   </field>

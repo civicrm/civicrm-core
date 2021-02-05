@@ -22,12 +22,12 @@
   </primaryKey>
   <field>
     <name>event_queue_id</name>
-    <title>Mailing Event Queue ID</title>
+    <title>Event Queue ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to EventQueue</comment>
     <html>
-      <label>Mailing Event Queue</label>
+      <label>Event Queue</label>
     </html>
   </field>
   <foreignKey>

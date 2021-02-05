@@ -10,7 +10,7 @@
     <title>Timezone ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Timezone Id</comment>
+    <comment>Timezone ID</comment>
     <html>
       <type>Number</type>
     </html>
@@ -56,7 +56,7 @@
     <title>Country ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Country Id</comment>
+    <comment>Country ID</comment>
     <html>
       <label>Country</label>
     </html>

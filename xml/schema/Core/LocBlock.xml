@@ -24,10 +24,10 @@
   </primaryKey>
   <field>
     <name>address_id</name>
-    <title>Location Block Address ID</title>
+    <title>Address ID</title>
     <type>int unsigned</type>
     <html>
-      <label>Location Block Address</label>
+      <label>Address</label>
     </html>
     <add>2.0</add>
   </field>
@@ -40,10 +40,10 @@
   </foreignKey>
   <field>
     <name>email_id</name>
-    <title>Location Block Email ID</title>
+    <title>Email ID</title>
     <type>int unsigned</type>
     <html>
-      <label>Location Block Email</label>
+      <label>Email</label>
     </html>
     <add>2.0</add>
   </field>
@@ -56,10 +56,10 @@
   </foreignKey>
   <field>
     <name>phone_id</name>
-    <title>Location Block Phone ID</title>
+    <title>Phone ID</title>
     <type>int unsigned</type>
     <html>
-      <label>Location Block Phone</label>
+      <label>Phone</label>
     </html>
     <add>2.0</add>
   </field>
@@ -72,10 +72,10 @@
   </foreignKey>
   <field>
     <name>im_id</name>
-    <title>Location Block IM ID</title>
+    <title>IM ID</title>
     <type>int unsigned</type>
     <html>
-      <label>Location Block IM</label>
+      <label>IM</label>
     </html>
     <add>2.0</add>
   </field>
@@ -88,10 +88,10 @@
   </foreignKey>
   <field>
     <name>address_2_id</name>
-    <title>Location Block IM 2 ID</title>
+    <title>IM 2 ID</title>
     <type>int unsigned</type>
     <html>
-      <label>Location Block IM 2</label>
+      <label>IM 2</label>
     </html>
     <add>2.0</add>
   </field>

@@ -26,11 +26,11 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Phone Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>Phone Contact</label>
+      <label>Contact</label>
     </html>
     <add>2.0</add>
   </field>

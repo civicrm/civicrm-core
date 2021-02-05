@@ -31,7 +31,7 @@
   </field>
   <field>
     <name>entity_id</name>
-    <title>Entity Id</title>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to entity table specified in entity_table column.</comment>

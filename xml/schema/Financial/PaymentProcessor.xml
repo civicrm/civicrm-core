@@ -23,7 +23,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Payment Processor Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -33,7 +33,7 @@
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
     <html>
-      <label>Payment Processor Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.0</add>
   </field>
@@ -79,7 +79,7 @@
   </field>
   <field>
     <name>payment_processor_type_id</name>
-    <title>Payment Processor Type ID</title>
+    <title>Type ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
@@ -89,7 +89,7 @@
     <required>true</required>
     <length>10</length>
     <html>
-      <label>Payment Processor Type</label>
+      <label>Type</label>
     </html>
     <add>4.3</add>
   </field>

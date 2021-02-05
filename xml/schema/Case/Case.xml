@@ -114,7 +114,7 @@
     <import>true</import>
     <export>false</export>
     <title>Case Status</title>
-    <comment>Id of case status.</comment>
+    <comment>ID of case status.</comment>
     <pseudoconstant>
       <optionGroupName>case_status</optionGroupName>
     </pseudoconstant>

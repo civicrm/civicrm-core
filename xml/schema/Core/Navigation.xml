@@ -23,7 +23,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Navigation Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -33,7 +33,7 @@
     </pseudoconstant>
     <comment>Which Domain is this navigation item for</comment>
     <html>
-      <label>Navigation Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.0</add>
   </field>
@@ -95,7 +95,7 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Navigation parent ID</title>
+    <title>parent ID</title>
     <type>int unsigned</type>
     <comment>Parent navigation item, used for grouping</comment>
     <pseudoconstant>
@@ -105,7 +105,7 @@
       <labelColumn>label</labelColumn>
     </pseudoconstant>
     <html>
-      <label>Navigation parent</label>
+      <label>parent</label>
     </html>
     <add>3.0</add>
   </field>

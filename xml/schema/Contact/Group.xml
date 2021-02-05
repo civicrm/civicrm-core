@@ -215,10 +215,10 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Group Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <comment>FK to contact table.</comment>
     <html>
-      <label>Group Created By</label>
+      <label>Created By</label>
     </html>
     <add>4.3</add>
   </field>
@@ -232,10 +232,10 @@
   <field>
     <name>modified_id</name>
     <type>int unsigned</type>
-    <title>Group Modified By Contact ID</title>
+    <title>Modified By Contact ID</title>
     <comment>FK to contact table.</comment>
     <html>
-      <label>Group Modified By</label>
+      <label>Modified By</label>
     </html>
     <add>4.5</add>
   </field>

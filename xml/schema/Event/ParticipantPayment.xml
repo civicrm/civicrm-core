@@ -12,7 +12,7 @@
     <title>Payment ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Participant Payment Id</comment>
+    <comment>Participant Payment ID</comment>
     <html>
       <type>Number</type>
     </html>
@@ -27,7 +27,7 @@
     <title>Participant ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Participant Id (FK)</comment>
+    <comment>Participant ID (FK)</comment>
     <html>
       <label>Participant</label>
     </html>

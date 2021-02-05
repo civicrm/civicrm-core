@@ -65,11 +65,11 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Batch Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>Batch Created By</label>
+      <label>Created By</label>
     </html>
     <add>3.3</add>
   </field>
@@ -93,11 +93,11 @@
   </field>
   <field>
     <name>modified_id</name>
-    <title>Batch Modified By Contact ID</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>Batch Modified By</label>
+      <label>Modified By</label>
     </html>
     <add>3.3</add>
   </field>
@@ -117,13 +117,13 @@
   </foreignKey>
   <field>
     <name>saved_search_id</name>
-    <title>Batch Smart Group ID</title>
+    <title>Smart Group ID</title>
     <type>int unsigned</type>
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
     <html>
       <type>EntityRef</type>
-      <label>Batch Smart Group</label>
+      <label>Smart Group</label>
     </html>
   </field>
   <foreignKey>

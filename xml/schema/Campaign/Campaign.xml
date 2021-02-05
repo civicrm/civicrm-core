@@ -201,10 +201,10 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Campaign Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this Campaign.</comment>
     <html>
-      <label>Campaign Created By</label>
+      <label>Created By</label>
     </html>
     <add>3.3</add>
   </field>
@@ -231,10 +231,10 @@
   <field>
     <name>last_modified_id</name>
     <type>int unsigned</type>
-    <title>Campaign Modified By Contact ID</title>
+    <title>Modified By Contact ID</title>
     <comment>FK to civicrm_contact, who recently edited this Campaign.</comment>
     <html>
-      <label>Campaign Modified By</label>
+      <label>Modified By</label>
     </html>
     <add>3.3</add>
   </field>

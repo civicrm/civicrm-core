@@ -104,11 +104,11 @@
   </field>
   <field>
     <name>limit_listings_group_id</name>
-    <title>Profile Search Limit Group ID</title>
+    <title>Search Limit Group ID</title>
     <type>int unsigned</type>
     <comment>Group id, foreign key from civicrm_group</comment>
     <html>
-      <label>Profile Search Limit Group</label>
+      <label>Search Limit Group</label>
     </html>
     <add>1.4</add>
   </field>
@@ -226,11 +226,11 @@
   </index>
   <field>
     <name>created_id</name>
-    <title>Profile Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this UF group</comment>
     <html>
-      <label>Profile Created By</label>
+      <label>Created By</label>
     </html>
     <add>3.0</add>
   </field>

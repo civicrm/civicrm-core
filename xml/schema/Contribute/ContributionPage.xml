@@ -14,7 +14,7 @@
     <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
     <html>
       <type>Number</type>
     </html>
@@ -381,11 +381,11 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Contribution Page Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this contribution page</comment>
     <html>
-      <label>Contribution Page Created By</label>
+      <label>Created By</label>
     </html>
     <add>3.0</add>
   </field>
@@ -426,11 +426,11 @@
   </field>
   <field>
     <name>campaign_id</name>
-    <title>Contribution Page Campaign ID</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>
     <html>
-      <label>Contribution Page Campaign</label>
+      <label>Campaign</label>
     </html>
     <add>3.4</add>
   </field>

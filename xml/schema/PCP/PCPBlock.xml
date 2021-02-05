@@ -13,7 +13,7 @@
     <title>PCP Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>PCP block Id</comment>
+    <comment>PCP block ID</comment>
     <add>2.2</add>
     <html>
       <type>Number</type>

@@ -12,7 +12,7 @@
     <uniqueName>cart_id</uniqueName>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Cart Id</comment>
+    <comment>Cart ID</comment>
     <html>
       <type>Number</type>
     </html>

@@ -10,7 +10,7 @@
     <title>Address Format ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Address Format Id</comment>
+    <comment>Address Format ID</comment>
     <html>
       <type>Number</type>
     </html>

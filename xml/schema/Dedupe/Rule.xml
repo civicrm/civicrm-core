@@ -22,12 +22,12 @@
   </primaryKey>
   <field>
     <name>dedupe_rule_group_id</name>
-    <title>Dedupe Rule Group ID</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The id of the rule group this rule belongs to</comment>
     <html>
-      <label>Dedupe Rule Group</label>
+      <label>Group</label>
     </html>
     <add>1.8</add>
   </field>

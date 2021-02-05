@@ -12,7 +12,7 @@
     <title>Group Membership History ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Internal Id</comment>
+    <comment>Internal ID</comment>
     <html>
       <type>Number</type>
     </html>
@@ -27,7 +27,7 @@
     <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contact Id</comment>
+    <comment>Contact ID</comment>
     <html>
       <label>Contact</label>
     </html>
@@ -44,7 +44,7 @@
     <name>group_id</name>
     <title>Group ID</title>
     <type>int unsigned</type>
-    <comment>Group Id</comment>
+    <comment>Group ID</comment>
     <add>1.1</add>
     <pseudoconstant>
       <table>civicrm_group</table>

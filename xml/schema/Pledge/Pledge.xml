@@ -47,7 +47,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Type ID</title>
+    <title>Financial Type ID</title>
     <uniqueName>pledge_financial_type_id</uniqueName>
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
@@ -59,7 +59,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
-      <label>Type</label>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>
@@ -71,11 +71,11 @@
   <field>
     <name>contribution_page_id</name>
     <uniqueName>pledge_contribution_page_id</uniqueName>
-    <title>Pledge Contribution Page ID</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <comment>The Contribution Page which triggered this contribution</comment>
     <html>
-      <label>Pledge Contribution Page</label>
+      <label>Contribution Page</label>
     </html>
     <add>2.1</add>
   </field>
@@ -294,7 +294,7 @@
   </field>
   <field>
     <name>status_id</name>
-    <title>Pledge Status Id</title>
+    <title>Pledge Status ID</title>
     <uniqueName>pledge_status_id</uniqueName>
     <required>true</required>
     <import>true</import>

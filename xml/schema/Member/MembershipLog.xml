@@ -76,11 +76,11 @@
   </field>
   <field>
     <name>modified_id</name>
-    <title>Membership Log modified By Contact ID</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
     <html>
-      <label>Membership Log modified By</label>
+      <label>Modified By</label>
     </html>
     <add>1.5</add>
   </field>

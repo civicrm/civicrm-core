@@ -12,7 +12,7 @@
     <uniqueName>event_in_cart_id</uniqueName>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Event In Cart Id</comment>
+    <comment>Event In Cart ID</comment>
     <html>
       <type>Number</type>
     </html>

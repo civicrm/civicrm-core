@@ -232,7 +232,7 @@
   </field>
   <field>
     <name>group_id</name>
-    <title>Reminder Group ID</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
     <comment>FK to Group</comment>
     <pseudoconstant>
@@ -242,7 +242,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-      <label>Reminder Group</label>
+      <label>Group</label>
     </html>
     <add>3.4</add>
   </field>
@@ -254,11 +254,11 @@
   </foreignKey>
   <field>
     <name>msg_template_id</name>
-    <title>Reminder Template ID</title>
+    <title>Message Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
     <html>
-      <label>Reminder Template</label>
+      <label>Message Template</label>
     </html>
   </field>
   <foreignKey>
@@ -269,11 +269,11 @@
   </foreignKey>
   <field>
     <name>sms_template_id</name>
-    <title>SMS Reminder Template ID</title>
+    <title>SMS Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
     <html>
-      <label>SMS Reminder Template</label>
+      <label>SMS Template</label>
     </html>
   </field>
   <foreignKey>

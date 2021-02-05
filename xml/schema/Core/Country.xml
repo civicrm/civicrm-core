@@ -11,7 +11,7 @@
     <title>Country ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Country Id</comment>
+    <comment>Country ID</comment>
     <html>
       <type>Number</type>
     </html>

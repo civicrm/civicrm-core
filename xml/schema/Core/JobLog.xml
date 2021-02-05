@@ -12,7 +12,7 @@
     <type>int unsigned</type>
     <required>true</required>
     <title>Job Log ID</title>
-    <comment>Job log entry Id</comment>
+    <comment>Job log entry ID</comment>
     <html>
       <type>Number</type>
     </html>

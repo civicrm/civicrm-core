@@ -14,7 +14,7 @@
     <title>Participant ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Participant Id</comment>
+    <comment>Participant ID</comment>
     <import>true</import>
     <headerPattern>/(^(participant(.)?)?id$)/i</headerPattern>
     <html>
@@ -68,7 +68,7 @@
   <field>
     <name>status_id</name>
     <uniqueName>participant_status_id</uniqueName>
-    <title>Participant Status ID</title>
+    <title>Status ID</title>
     <headerPattern>/(participant.)?(status)$/i</headerPattern>
     <import>true</import>
     <type>int unsigned</type>
@@ -84,7 +84,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-      <label>Participant Status</label>
+      <label>Status</label>
     </html>
   </field>
   <foreignKey>

@@ -13,7 +13,7 @@
     <title>Widget ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
     <html>
       <type>Number</type>
     </html>

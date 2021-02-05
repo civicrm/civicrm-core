@@ -23,12 +23,12 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Cache Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>Foreign Key to Contact</comment>
     <html>
       <type>EntityRef</type>
-      <label>Cache Contact</label>
+      <label>Contact</label>
     </html>
     <add>1.6</add>
   </field>
@@ -47,7 +47,7 @@
   </index>
   <field>
     <name>acl_id</name>
-    <title>Cache ACL ID</title>
+    <title>ACL ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL</comment>
@@ -57,7 +57,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <label>Cache ACL</label>
+      <label>ACL</label>
     </html>
     <add>1.6</add>
   </field>

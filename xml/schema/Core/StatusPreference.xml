@@ -23,7 +23,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Setting Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -33,7 +33,7 @@
     </pseudoconstant>
     <comment>Which Domain is this Status Preference for</comment>
     <html>
-      <label>Setting Domain</label>
+      <label>Domain</label>
     </html>
     <add>4.7</add>
   </field>

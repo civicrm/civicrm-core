@@ -54,7 +54,7 @@
   </field>
   <field>
     <name>domain_id</name>
-    <title>Setting Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -64,7 +64,7 @@
     </pseudoconstant>
     <comment>Which Domain is this menu item for</comment>
     <html>
-      <label>Setting Domain</label>
+      <label>Domain</label>
     </html>
     <add>4.1</add>
   </field>
@@ -77,11 +77,11 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
-    <title>Setting Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID if the setting is localized to a contact</comment>
     <html>
-      <label>Setting Contact</label>
+      <label>Contact</label>
     </html>
     <add>4.1</add>
   </field>
@@ -101,7 +101,7 @@
   </field>
   <field>
     <name>component_id</name>
-    <title>Setting Component ID</title>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this menu item belongs to</comment>
     <add>4.1</add>
@@ -112,7 +112,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-      <label>Setting Component</label>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>
@@ -130,11 +130,11 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Setting Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this setting</comment>
     <html>
-      <label>Setting Created By</label>
+      <label>Created By</label>
     </html>
     <add>4.1</add>
   </field>

@@ -24,7 +24,7 @@
   <field>
     <name>from_financial_account_id</name>
     <type>int unsigned</type>
-    <title>Financial Transaction From Account ID</title>
+    <title>From Account ID</title>
     <comment>FK to financial_account table.</comment>
     <add>4.3</add>
     <pseudoconstant>
@@ -34,7 +34,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-      <label>Financial Transaction From Account</label>
+      <label>From Account</label>
     </html>
   </field>
   <foreignKey>
@@ -45,7 +45,7 @@
   </foreignKey>
   <field>
     <name>to_financial_account_id</name>
-    <title>Financial Transaction To Account ID</title>
+    <title>To Account ID</title>
     <type>int unsigned</type>
     <comment>FK to financial_financial_account table.</comment>
     <add>4.3</add>
@@ -56,7 +56,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-      <label>Financial Transaction To Account</label>
+      <label>To Account</label>
     </html>
   </field>
   <foreignKey>
@@ -157,7 +157,7 @@
   </field>
   <field>
     <name>status_id</name>
-    <title>Financial Transaction Status Id</title>
+    <title>Financial Transaction Status ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <export>true</export>

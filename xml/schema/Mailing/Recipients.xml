@@ -40,12 +40,12 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
-    <title>Mailing Recipient ID</title>
+    <title>Recipient ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact</comment>
     <html>
-      <label>Mailing Recipient</label>
+      <label>Recipient</label>
     </html>
   </field>
   <foreignKey>
@@ -56,12 +56,12 @@
   </foreignKey>
   <field>
     <name>email_id</name>
-    <title>Recipient Email ID</title>
+    <title>Email ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Email</comment>
     <html>
-      <label>Recipient Email</label>
+      <label>Email</label>
     </html>
   </field>
   <foreignKey>
@@ -72,12 +72,12 @@
   </foreignKey>
   <field>
     <name>phone_id</name>
-    <title>Recipient Phone ID</title>
+    <title>Phone ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Phone</comment>
     <html>
-      <label>Recipient Phone</label>
+      <label>Phone</label>
     </html>
   </field>
   <foreignKey>

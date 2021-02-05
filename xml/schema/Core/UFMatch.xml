@@ -24,7 +24,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>UF Match Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Which Domain is this match entry for</comment>
@@ -34,7 +34,7 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <html>
-      <label>UF Match Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.0</add>
   </field>
@@ -67,11 +67,11 @@
   </field>
   <field>
     <name>contact_id</name>
-    <title>CiviCRM Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>CiviCRM Contact</label>
+      <label>Contact</label>
     </html>
     <add>1.1</add>
   </field>

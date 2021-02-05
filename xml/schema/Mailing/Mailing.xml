@@ -27,7 +27,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Mailing Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -36,7 +36,7 @@
     </pseudoconstant>
     <comment>Which site is this mailing for</comment>
     <html>
-      <label>Mailing Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.4</add>
   </field>
@@ -49,7 +49,7 @@
   </foreignKey>
   <field>
     <name>header_id</name>
-    <title>Mailing Header ID</title>
+    <title>Header ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_mailing_component</table>
@@ -59,7 +59,7 @@
     </pseudoconstant>
     <comment>FK to the header component.</comment>
     <html>
-      <label>Mailing Header</label>
+      <label>Header</label>
     </html>
   </field>
   <foreignKey>
@@ -70,7 +70,7 @@
   </foreignKey>
   <field>
     <name>footer_id</name>
-    <title>Mailing Footer ID</title>
+    <title>Footer ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_mailing_component</table>
@@ -80,7 +80,7 @@
     </pseudoconstant>
     <comment>FK to the footer component.</comment>
     <html>
-      <label>Mailing Footer</label>
+      <label>Footer</label>
     </html>
   </field>
   <foreignKey>
@@ -91,11 +91,11 @@
   </foreignKey>
   <field>
     <name>reply_id</name>
-    <title>Mailing Reply ID</title>
+    <title>Reply ID</title>
     <type>int unsigned</type>
     <comment>FK to the auto-responder component.</comment>
     <html>
-      <label>Mailing Reply</label>
+      <label>Reply</label>
     </html>
   </field>
   <foreignKey>
@@ -106,11 +106,11 @@
   </foreignKey>
   <field>
     <name>unsubscribe_id</name>
-    <title>Mailing Unsubscribe ID</title>
+    <title>Unsubscribe ID</title>
     <type>int unsigned</type>
     <comment>FK to the unsubscribe component.</comment>
     <html>
-      <label>Mailing Unsubscribe</label>
+      <label>Unsubscribe</label>
     </html>
   </field>
   <foreignKey>
@@ -126,11 +126,11 @@
   </field>
   <field>
     <name>optout_id</name>
-    <title>Mailing Opt Out ID</title>
+    <title>Opt Out ID</title>
     <type>int unsigned</type>
     <comment>FK to the opt-out component.</comment>
     <html>
-      <label>Mailing Opt Out</label>
+      <label>Opt Out</label>
     </html>
   </field>
   <foreignKey>
@@ -271,11 +271,11 @@
   </field>
   <field>
     <name>msg_template_id</name>
-    <title>Mailing Message Template ID</title>
+    <title>Message Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
     <html>
-      <label>Mailing Message Template</label>
+      <label>Message Template</label>
     </html>
   </field>
   <foreignKey>
@@ -296,11 +296,11 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Mailing Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who first created this mailing</comment>
     <html>
-      <label>Mailing Creator</label>
+      <label>Creator</label>
     </html>
   </field>
   <foreignKey>
@@ -440,12 +440,12 @@
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
-    <title>Mailing Campaign ID</title>
+    <title>Campaign ID</title>
     <comment>The campaign for which this mailing has been initiated.</comment>
     <add>3.4</add>
     <html>
       <type>Select</type>
-      <label>Mailing Campaign</label>
+      <label>Campaign</label>
     </html>
   </field>
   <foreignKey>
@@ -467,12 +467,12 @@
   </field>
   <field>
     <name>sms_provider_id</name>
-    <title>Mailing SMS Provider ID</title>
+    <title>SMS Provider ID</title>
     <type>int unsigned</type>
     <add>4.2</add>
     <html>
       <type>Select</type>
-      <label>Mailing SMS Provider</label>
+      <label>SMS Provider</label>
     </html>
   </field>
   <foreignKey>

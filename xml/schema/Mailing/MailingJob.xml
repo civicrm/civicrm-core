@@ -106,12 +106,12 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Mailing Job Parent ID</title>
+    <title>Parent ID</title>
     <type>int unsigned</type>
     <comment>Parent job id</comment>
     <default>NULL</default>
     <html>
-      <label>Mailing Job Parent</label>
+      <label>Parent</label>
     </html>
     <add>3.3</add>
   </field>

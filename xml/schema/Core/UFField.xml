@@ -159,7 +159,7 @@
     <name>phone_type_id</name>
     <title>Profile Field Phone Type</title>
     <type>int unsigned</type>
-    <comment>Phone Type Id, if required</comment>
+    <comment>Phone Type ID, if required</comment>
     <add>2.2</add>
     <pseudoconstant>
       <optionGroupName>phone_type</optionGroupName>
@@ -169,7 +169,7 @@
     <name>website_type_id</name>
     <title>Profile Field Website Type</title>
     <type>int unsigned</type>
-    <comment>Website Type Id, if required</comment>
+    <comment>Website Type ID, if required</comment>
     <add>4.5</add>
     <pseudoconstant>
       <optionGroupName>website_type</optionGroupName>

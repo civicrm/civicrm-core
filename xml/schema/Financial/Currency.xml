@@ -12,7 +12,7 @@
     <title>Currency ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Currency Id</comment>
+    <comment>Currency ID</comment>
     <html>
       <type>Number</type>
     </html>

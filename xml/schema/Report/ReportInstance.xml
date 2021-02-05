@@ -26,7 +26,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Report Instance Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -36,7 +36,7 @@
     <required>true</required>
     <comment>Which Domain is this instance for</comment>
     <html>
-      <label>Report Instance Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.1</add>
   </field>
@@ -146,10 +146,10 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Report Instance Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <comment>FK to contact table.</comment>
     <html>
-      <label>Report Instance Created By</label>
+      <label>Created By</label>
     </html>
     <add>4.6</add>
   </field>
@@ -163,10 +163,10 @@
   <field>
     <name>owner_id</name>
     <type>int unsigned</type>
-    <title>Report Instance Owned By Contact ID</title>
+    <title>Owned By Contact ID</title>
     <comment>FK to contact table.</comment>
     <html>
-      <label>Report Instance Owned By</label>
+      <label>Owned By</label>
     </html>
     <add>4.6</add>
   </field>

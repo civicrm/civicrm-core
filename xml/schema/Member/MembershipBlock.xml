@@ -13,7 +13,7 @@
     <title>Membership Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Membership Id</comment>
+    <comment>Membership ID</comment>
     <add>1.5</add>
     <html>
       <type>Number</type>
@@ -33,12 +33,12 @@
   </field>
   <field>
     <name>entity_id</name>
-    <title>Membership Block Entity ID</title>
+    <title>Entity ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_contribution_page.id</comment>
     <html>
-      <label>Membership Block Entity</label>
+      <label>Entity</label>
     </html>
     <add>1.5</add>
   </field>
@@ -61,11 +61,11 @@
   </field>
   <field>
     <name>membership_type_default</name>
-    <title>Membership Block Default Type ID</title>
+    <title>Default Type ID</title>
     <type>int unsigned</type>
     <comment>Optional foreign key to membership_type</comment>
     <html>
-      <label>Membership Block Default Type</label>
+      <label>Default Type</label>
     </html>
     <add>1.5</add>
   </field>

@@ -14,7 +14,7 @@
     <title>Membership Status ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Membership Id</comment>
+    <comment>Membership ID</comment>
     <add>1.5</add>
     <html>
       <type>Number</type>

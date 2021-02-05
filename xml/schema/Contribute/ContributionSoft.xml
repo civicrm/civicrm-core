@@ -31,12 +31,12 @@
   </primaryKey>
   <field>
     <name>contribution_id</name>
-    <title>Soft Credit - Contribution ID</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to contribution table.</comment>
     <html>
-      <label>Soft Credit - Contribution</label>
+      <label>Contribution</label>
     </html>
     <add>2.2</add>
   </field>
@@ -50,7 +50,7 @@
   <field>
     <name>contact_id</name>
     <uniqueName>contribution_soft_contact_id</uniqueName>
-    <title>Soft Credit Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <import>true</import>
@@ -58,7 +58,7 @@
     <dataPattern>/^\d+$/</dataPattern>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>Soft Credit Contact</label>
+      <label>Contact</label>
     </html>
     <add>2.2</add>
   </field>
@@ -102,11 +102,11 @@
   <field>
     <name>pcp_id</name>
     <type>int unsigned</type>
-    <title>Soft Contribution PCP ID</title>
+    <title>PCP ID</title>
     <default>NULL</default>
     <comment>FK to civicrm_pcp.id</comment>
     <html>
-      <label>Soft Contribution PCP</label>
+      <label>PCP</label>
     </html>
     <add>2.2</add>
     <pseudoconstant>

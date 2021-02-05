@@ -416,11 +416,11 @@
   <field>
     <name>address_id</name>
     <uniqueName>contribution_address_id</uniqueName>
-    <title>Contribution Address ID</title>
+    <title>Address ID</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_address.id. We insert an address record for each contribution when we have associated billing name and address data.</comment>
     <html>
-      <label>Contribution Address</label>
+      <label>Address</label>
     </html>
     <add>2.2</add>
     <export>true</export>

@@ -22,11 +22,11 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Action Schedule Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
     <html>
-      <label>Action Schedule Contact</label>
+      <label>Contact</label>
     </html>
     <add>3.4</add>
   </field>

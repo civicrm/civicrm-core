@@ -211,7 +211,7 @@
     <required>true</required>
     <import>true</import>
     <export>false</export>
-    <comment>Id of Grant status.</comment>
+    <comment>ID of Grant status.</comment>
     <pseudoconstant>
       <optionGroupName>grant_status</optionGroupName>
     </pseudoconstant>

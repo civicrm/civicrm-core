@@ -44,12 +44,12 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Financial Item Contact ID</title>
+    <title>Contact ID</title>
     <required>true</required>
     <export>true</export>
     <comment>FK to Contact ID of contact the item is from</comment>
     <html>
-      <label>Financial Item Contact</label>
+      <label>Contact</label>
     </html>
     <add>4.3</add>
   </field>

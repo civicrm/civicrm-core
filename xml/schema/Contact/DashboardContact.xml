@@ -41,11 +41,11 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Dashboard Contact ID</title>
+    <title>Contact ID</title>
     <required>true</required>
     <comment>Contact ID</comment>
     <html>
-      <label>Dashboard Contact</label>
+      <label>Contact</label>
     </html>
     <add>3.1</add>
   </field>

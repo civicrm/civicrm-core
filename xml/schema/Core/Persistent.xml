@@ -11,7 +11,7 @@
     <title>Persistent ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Persistent Record Id</comment>
+    <comment>Persistent Record ID</comment>
     <html>
       <type>Number</type>
     </html>

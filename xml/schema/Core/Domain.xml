@@ -69,10 +69,10 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Domain Contact ID</title>
+    <title>Contact ID</title>
     <comment>FK to Contact ID. This is specifically not an FK to avoid circular constraints</comment>
     <html>
-      <label>Domain Contact</label>
+      <label>Contact</label>
     </html>
     <add>4.3</add>
   </field>

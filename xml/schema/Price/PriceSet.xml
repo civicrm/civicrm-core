@@ -24,7 +24,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Price Set Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -35,7 +35,7 @@
     <add>3.1</add>
     <html>
       <type>Text</type>
-      <label>Price Set Domain</label>
+      <label>Domain</label>
     </html>
   </field>
   <foreignKey>

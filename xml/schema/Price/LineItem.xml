@@ -46,11 +46,11 @@
   </dynamicForeignKey>
   <field>
     <name>contribution_id</name>
-    <title>Line Item Contribution ID</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contribution</comment>
     <html>
-      <label>Line Item Contribution</label>
+      <label>Contribution</label>
     </html>
     <add>4.5</add>
   </field>
@@ -62,7 +62,7 @@
   </foreignKey>
   <field>
     <name>price_field_id</name>
-    <title>Line Item Price Field ID</title>
+    <title>Price Field ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_price_field</comment>
     <pseudoconstant>
@@ -73,7 +73,7 @@
     </pseudoconstant>
     <!-- changed to not required in 4.3 in order to change ON DELETE CASCADE FK constraint to SET NULL -->
     <html>
-      <label>Line Item Price Field</label>
+      <label>Price Field</label>
     </html>
     <add>1.7</add>
   </field>
@@ -157,7 +157,7 @@
   </index>
   <field>
     <name>price_field_value_id</name>
-    <title>Line Item Option ID</title>
+    <title>Option ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to civicrm_price_field_value</comment>
@@ -168,7 +168,7 @@
       <labelColumn>label</labelColumn>
     </pseudoconstant>
     <html>
-      <label>Line Item Option</label>
+      <label>Option</label>
     </html>
     <add>3.3</add>
   </field>

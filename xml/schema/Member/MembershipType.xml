@@ -14,7 +14,7 @@
     <title>Membership Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Membership Id</comment>
+    <comment>Membership ID</comment>
     <add>1.5</add>
     <html>
       <type>Number</type>
@@ -26,7 +26,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Membership Type Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -36,7 +36,7 @@
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
     <html>
-      <label>Membership Type Domain</label>
+      <label>Domain</label>
     </html>
     <add>3.0</add>
   </field>
@@ -79,12 +79,12 @@
   </field>
   <field>
     <name>member_of_contact_id</name>
-    <title>Membership Type Organization ID</title>
+    <title>Organization ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Owner organization for this membership type. FK to Contact ID</comment>
     <html>
-      <label>Membership Type Organization</label>
+      <label>Organization</label>
     </html>
     <add>1.5</add>
   </field>
@@ -97,7 +97,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Membership Financial Type ID</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -107,7 +107,7 @@
     </pseudoconstant>
     <comment>If membership is paid by a contribution - what financial type should be used. FK to civicrm_financial_type.id</comment>
     <html>
-      <label>Membership Financial Type</label>
+      <label>Financial Type</label>
     </html>
     <add>4.3</add>
   </field>
