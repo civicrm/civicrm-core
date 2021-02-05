@@ -69,7 +69,7 @@ trait AfformSaveTrait {
       // FIXME: more targetted reconciliation
       \CRM_Core_ManagedEntities::singleton()->reconcile();
     }
-    elseif ($orig['is_dashlet'] && $isChanged('title')) {
+    elseif (array_key_exists('is_dashlet', (array) $orig) && $orig['is_dashlet'] && $isChanged('title')) {
       // FIXME: more targetted reconciliation
       \CRM_Core_ManagedEntities::singleton()->reconcile();
     }
