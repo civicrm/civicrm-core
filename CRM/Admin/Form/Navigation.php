@@ -57,7 +57,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $getPerms = (array) \Civi\Api4\Permission::get(0)
       ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
-      ->setOrderBy(['group' => 'ASC', 'name' => 'ASC'])
+      ->setOrderBy(['title' => 'ASC'])
       ->execute();
     $permissions = [];
     foreach ($getPerms as $perm) {

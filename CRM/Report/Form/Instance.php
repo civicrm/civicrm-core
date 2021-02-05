@@ -105,7 +105,7 @@ class CRM_Report_Form_Instance {
     $getPerms = \Civi\Api4\Permission::get(0)
       ->addWhere('is_active', '=', 1)
       ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
-      ->setOrderBy(['group' => 'ASC', 'name' => 'ASC'])
+      ->setOrderBy(['title' => 'ASC'])
       ->execute();
     $form->addElement('select',
       'permission',
