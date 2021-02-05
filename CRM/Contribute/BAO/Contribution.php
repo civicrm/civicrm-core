@@ -2517,9 +2517,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     }
 
     $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
-    $contribution->id = $createContribution['id'];
-    $contribution->copyCustomFields($templateContribution['id'], $contribution->id);
-    self::handleMembershipIDOverride($contribution->id, $input);
+    $temporaryObject = new CRM_Contribute_BAO_Contribution();
+    $temporaryObject->copyCustomFields($templateContribution['id'], $createContribution['id']);
+    self::handleMembershipIDOverride($createContribution['id'], $input);
     // Add new soft credit against current $contribution.
     CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($contributionParams['contribution_recur_id'], $createContribution['id']);
     return $createContribution;
@@ -4282,8 +4282,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
 
     $contributionResult = self::repeatTransaction($contribution, $input, $contributionParams);
-    $contributionID = (int) $contribution->id;
-    unset($contribution);
+    $contributionID = (int) ($contribution->id ?? $contributionResult['id']);
 
     if ($input['component'] == 'contribute') {
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
