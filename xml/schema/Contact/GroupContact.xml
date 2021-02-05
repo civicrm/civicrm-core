@@ -36,6 +36,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Group</label>
     </html>
   </field>
   <foreignKey>
@@ -51,6 +52,9 @@
     <title>Contact ID</title>
     <required>true</required>
     <comment>FK to civicrm_contact</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -77,8 +81,11 @@
   <field>
     <name>location_id</name>
     <type>int unsigned</type>
-    <title>Group Contact Location</title>
+    <title>Group Contact Location ID</title>
     <comment>Optional location to associate with this membership</comment>
+    <html>
+      <label>Group Contact Location</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -91,8 +98,11 @@
   <field>
     <name>email_id</name>
     <type>int unsigned</type>
-    <title>Group Contact Email</title>
+    <title>Group Contact Email ID</title>
     <comment>Optional email to associate with this membership</comment>
+    <html>
+      <label>Group Contact Email</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>

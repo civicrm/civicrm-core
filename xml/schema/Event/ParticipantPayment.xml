@@ -28,6 +28,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Participant Id (FK)</comment>
+    <html>
+      <label>Participant</label>
+    </html>
     <add>1.7</add>
   </field>
   <foreignKey>
@@ -38,10 +41,13 @@
   </foreignKey>
   <field>
     <name>contribution_id</name>
-    <title>Contribution</title>
+    <title>Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to contribution table.</comment>
+    <html>
+      <label>Contribution</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

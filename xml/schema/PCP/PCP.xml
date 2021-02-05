@@ -33,6 +33,7 @@
     <add>2.2</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
   </field>
   <foreignKey>

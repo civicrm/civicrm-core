@@ -26,7 +26,7 @@
   <field>
     <name>custom_group_id</name>
     <type>int unsigned</type>
-    <title>Custom Group</title>
+    <title>Custom Group ID</title>
     <required>true</required>
     <comment>FK to civicrm_custom_group.</comment>
     <add>1.1</add>
@@ -37,6 +37,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Custom Group</label>
     </html>
   </field>
   <foreignKey>
@@ -266,8 +267,11 @@
   <field>
     <name>option_group_id</name>
     <type>int unsigned</type>
-    <title>Field Option Group</title>
+    <title>Field Option Group ID</title>
     <comment>For elements with options, the option group id that is used</comment>
+    <html>
+      <label>Field Option Group</label>
+    </html>
     <add>1.4</add>
     <pseudoconstant>
       <table>civicrm_option_group</table>

@@ -51,10 +51,13 @@
   </index>
   <field>
     <name>file_id</name>
-    <title>File</title>
+    <title>File ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_file</comment>
+    <html>
+      <label>File</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>

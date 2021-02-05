@@ -21,7 +21,7 @@
   </primaryKey>
   <field>
     <name>bounce_type_id</name>
-    <title>Bounce Type</title>
+    <title>Bounce Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Type of bounce</comment>
@@ -30,6 +30,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Bounce Type</label>
+    </html>
   </field>
   <foreignKey>
     <name>bounce_type_id</name>

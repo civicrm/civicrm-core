@@ -24,7 +24,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Price Set Domain</title>
+    <title>Price Set Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -35,6 +35,7 @@
     <add>3.1</add>
     <html>
       <type>Text</type>
+      <label>Price Set Domain</label>
     </html>
   </field>
   <foreignKey>
@@ -140,7 +141,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Financial Type(for membership price sets only).</comment>
@@ -152,6 +153,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>

@@ -33,6 +33,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>UF Match Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -67,6 +70,9 @@
     <title>CiviCRM Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>CiviCRM Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>

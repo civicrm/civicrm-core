@@ -34,8 +34,9 @@
     <comment>Foreign key to civicrm_contact.id .</comment>
     <add>2.1</add>
     <html>
-       <type>EntityRef</type>
-     </html>
+      <type>EntityRef</type>
+      <label>Contact</label>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -46,7 +47,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Type</title>
+    <title>Type ID</title>
     <uniqueName>pledge_financial_type_id</uniqueName>
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
@@ -58,6 +59,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
+      <label>Type</label>
     </html>
   </field>
   <foreignKey>
@@ -69,9 +71,12 @@
   <field>
     <name>contribution_page_id</name>
     <uniqueName>pledge_contribution_page_id</uniqueName>
-    <title>Pledge Contribution Page</title>
+    <title>Pledge Contribution Page ID</title>
     <type>int unsigned</type>
     <comment>The Contribution Page which triggered this contribution</comment>
+    <html>
+      <label>Pledge Contribution Page</label>
+    </html>
     <add>2.1</add>
   </field>
   <foreignKey>
@@ -325,12 +330,13 @@
     <name>campaign_id</name>
     <uniqueName>pledge_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <import>true</import>
     <comment>The campaign for which this pledge has been initiated.</comment>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Campaign</label>
     </html>
   </field>
   <foreignKey>

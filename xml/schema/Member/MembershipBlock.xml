@@ -37,6 +37,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_contribution_page.id</comment>
+    <html>
+      <label>Membership Block Entity</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -58,9 +61,12 @@
   </field>
   <field>
     <name>membership_type_default</name>
-    <title>Membership Block Default Type</title>
+    <title>Membership Block Default Type ID</title>
     <type>int unsigned</type>
     <comment>Optional foreign key to membership_type</comment>
+    <html>
+      <label>Membership Block Default Type</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>

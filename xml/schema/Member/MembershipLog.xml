@@ -28,6 +28,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Membership table</comment>
+    <html>
+      <label>Membership</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -39,10 +42,13 @@
   </foreignKey>
   <field>
     <name>status_id</name>
-    <title>Membership Status</title>
+    <title>Membership Status ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>New status assigned to membership by this action. FK to Membership Status</comment>
+    <html>
+      <label>Membership Status</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -70,9 +76,12 @@
   </field>
   <field>
     <name>modified_id</name>
-    <title>Membership Log modified By</title>
+    <title>Membership Log modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID of person under whose credentials this data modification was made.</comment>
+    <html>
+      <label>Membership Log modified By</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -95,6 +104,9 @@
     <title>Membership Type ID</title>
     <type>int unsigned</type>
     <comment>FK to Membership Type.</comment>
+    <html>
+      <label>Membership Type</label>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>

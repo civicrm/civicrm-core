@@ -35,6 +35,9 @@
     </pseudoconstant>
     <required>true</required>
     <comment>Which Domain is this instance for</comment>
+    <html>
+      <label>Report Instance Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -143,8 +146,11 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Report Instance Created By</title>
+    <title>Report Instance Created By Contact ID</title>
     <comment>FK to contact table.</comment>
+    <html>
+      <label>Report Instance Created By</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -157,8 +163,11 @@
   <field>
     <name>owner_id</name>
     <type>int unsigned</type>
-    <title>Report Instance Owned By</title>
+    <title>Report Instance Owned By Contact ID</title>
     <comment>FK to contact table.</comment>
+    <html>
+      <label>Report Instance Owned By</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -228,6 +237,9 @@
     <type>int unsigned</type>
     <import>true</import>
     <comment>FK to navigation ID</comment>
+    <html>
+      <label>Navigation</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -243,6 +255,9 @@
     <type>int unsigned</type>
     <import>true</import>
     <comment>FK to instance ID drilldown to</comment>
+    <html>
+      <label>Drilldown Report</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

@@ -29,6 +29,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact ID for the owner of the token</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -44,6 +47,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment></comment>
+    <html>
+      <label>Payment Processor</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -75,6 +81,9 @@
     <title>Created ID</title>
     <type>int unsigned</type>
     <comment>Contact ID of token creator</comment>
+    <html>
+      <label>Created</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>

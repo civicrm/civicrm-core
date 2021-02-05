@@ -43,7 +43,7 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Parent Tag</title>
+    <title>Parent Tag ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Optional parent id for this tag.</comment>
@@ -52,6 +52,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Parent Tag</label>
+    </html>
     <add>1.1</add>
   </field>
   <field>
@@ -105,9 +108,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Tag Created By</title>
+    <title>Tag Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this tag</comment>
+    <html>
+      <label>Tag Created By</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>

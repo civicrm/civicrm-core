@@ -28,6 +28,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contact Id</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -39,7 +42,7 @@
   </foreignKey>
   <field>
     <name>group_id</name>
-    <title>Group</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
     <comment>Group Id</comment>
     <add>1.1</add>
@@ -50,6 +53,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Group</label>
     </html>
   </field>
   <foreignKey>

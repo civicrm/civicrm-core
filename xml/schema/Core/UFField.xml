@@ -36,6 +36,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Profile</label>
     </html>
   </field>
   <foreignKey>
@@ -139,9 +140,12 @@
   </field>
   <field>
     <name>location_type_id</name>
-    <title>Profile Field Location Type</title>
+    <title>Profile Field Location Type ID</title>
     <type>int unsigned</type>
     <comment>Location type of this mapping, if required</comment>
+    <html>
+      <label>Profile Field Location Type</label>
+    </html>
     <add>1.3</add>
   </field>
   <foreignKey>

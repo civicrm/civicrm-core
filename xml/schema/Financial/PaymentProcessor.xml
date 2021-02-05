@@ -23,7 +23,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Payment Processor Domain</title>
+    <title>Payment Processor Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -32,6 +32,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Payment Processor Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -85,6 +88,9 @@
     </pseudoconstant>
     <required>true</required>
     <length>10</length>
+    <html>
+      <label>Payment Processor Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

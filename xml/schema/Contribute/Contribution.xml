@@ -43,6 +43,7 @@
     <comment>FK to Contact ID</comment>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
     <add>1.3</add>
   </field>
@@ -353,6 +354,9 @@
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each contribution made in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
     <export>true</export>
+    <html>
+      <label>Recurring Contribution</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -412,9 +416,12 @@
   <field>
     <name>address_id</name>
     <uniqueName>contribution_address_id</uniqueName>
-    <title>Contribution Address</title>
+    <title>Contribution Address ID</title>
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_address.id. We insert an address record for each contribution when we have associated billing name and address data.</comment>
+    <html>
+      <label>Contribution Address</label>
+    </html>
     <add>2.2</add>
     <export>true</export>
   </field>
@@ -448,12 +455,13 @@
     <name>campaign_id</name>
     <uniqueName>contribution_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <import>true</import>
     <comment>The campaign for which this contribution has been triggered.</comment>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Campaign</label>
     </html>
   </field>
   <field>
@@ -484,8 +492,8 @@
     <comment>Total tax amount of this contribution.</comment>
     <add>4.6</add>
     <html>
-     <type>Text</type>
-   </html>
+      <type>Text</type>
+    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>

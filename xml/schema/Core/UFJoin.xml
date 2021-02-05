@@ -91,6 +91,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Profile</label>
     </html>
   </field>
   <foreignKey>

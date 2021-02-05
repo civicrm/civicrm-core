@@ -22,10 +22,13 @@
   </primaryKey>
   <field>
     <name>mailing_id</name>
-    <title>Mailing</title>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of the mailing this Job will send.</comment>
+    <html>
+      <label>Mailing</label>
+    </html>
   </field>
   <foreignKey>
     <name>mailing_id</name>
@@ -103,10 +106,13 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Mailing Job Parent</title>
+    <title>Mailing Job Parent ID</title>
     <type>int unsigned</type>
     <comment>Parent job id</comment>
     <default>NULL</default>
+    <html>
+      <label>Mailing Job Parent</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

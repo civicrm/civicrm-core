@@ -28,6 +28,9 @@
     <required>true</required>
     <title>Job ID</title>
     <comment>FK to Job</comment>
+    <html>
+      <label>Job</label>
+    </html>
   </field>
   <foreignKey>
     <name>job_id</name>
@@ -41,6 +44,9 @@
     <default>NULL</default>
     <title>Email ID</title>
     <comment>FK to Email</comment>
+    <html>
+      <label>Email</label>
+    </html>
   </field>
   <foreignKey>
     <name>email_id</name>
@@ -54,6 +60,9 @@
     <required>true</required>
     <title>Contact ID</title>
     <comment>FK to Contact</comment>
+    <html>
+      <label>Contact</label>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -80,6 +89,9 @@
     <default>NULL</default>
     <title>Phone ID</title>
     <comment>FK to Phone</comment>
+    <html>
+      <label>Phone</label>
+    </html>
   </field>
   <foreignKey>
     <name>phone_id</name>

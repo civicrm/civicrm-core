@@ -26,7 +26,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Membership Type Domain</title>
+    <title>Membership Type Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -35,6 +35,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Membership Type Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -76,10 +79,13 @@
   </field>
   <field>
     <name>member_of_contact_id</name>
-    <title>Membership Type Organization</title>
+    <title>Membership Type Organization ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Owner organization for this membership type. FK to Contact ID</comment>
+    <html>
+      <label>Membership Type Organization</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>
@@ -91,7 +97,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Membership Financial Type</title>
+    <title>Membership Financial Type ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -100,6 +106,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>If membership is paid by a contribution - what financial type should be used. FK to civicrm_financial_type.id</comment>
+    <html>
+      <label>Membership Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

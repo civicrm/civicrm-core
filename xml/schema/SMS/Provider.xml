@@ -116,7 +116,7 @@
   </field>
   <field>
     <name>domain_id</name>
-    <title>SMS Domain</title>
+    <title>SMS Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -124,6 +124,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this sms provider for</comment>
+    <html>
+      <label>SMS Domain</label>
+    </html>
     <add>4.7</add>
   </field>
   <foreignKey>

@@ -22,7 +22,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -31,6 +31,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this menu item for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -121,7 +124,7 @@
   </field>
   <field>
     <name>component_id</name>
-    <title>Component</title>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this menu item belongs to</comment>
     <add>2.1</add>
@@ -132,6 +135,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>

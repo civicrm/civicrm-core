@@ -29,9 +29,12 @@
   </field>
   <field>
     <name>mailing_id</name>
-    <title>Mailing</title>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <label>Mailing</label>
+    </html>
     <comment>FK to the mailing</comment>
   </field>
   <foreignKey>

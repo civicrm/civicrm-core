@@ -111,9 +111,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>AB Test Created By</title>
+    <title>AB Test Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>AB Test Created By</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>

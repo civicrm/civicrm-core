@@ -34,6 +34,7 @@
   <field>
     <name>group_id</name>
     <type>int unsigned</type>
+    <title>Group ID</title>
     <required>true</required>
     <comment>FK to civicrm group.</comment>
     <add>2.0</add>
@@ -44,6 +45,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Group</label>
     </html>
   </field>
   <foreignKey>
@@ -55,8 +57,12 @@
   <field>
     <name>acl_id</name>
     <type>int unsigned</type>
+    <title>ACL ID</title>
     <required>true</required>
     <comment>FK to civicrm acl.</comment>
+    <html>
+      <label>ACL</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -68,6 +74,7 @@
   <field>
     <name>admin_group_id</name>
     <type>int unsigned</type>
+    <title>Admin Group ID</title>
     <required>true</required>
     <comment>FK to admin civicrm group.</comment>
     <add>2.0</add>
@@ -78,6 +85,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Admin Group</label>
     </html>
   </field>
   <foreignKey>
@@ -89,8 +97,12 @@
   <field>
     <name>admin_acl_id</name>
     <type>int unsigned</type>
+    <title>Admin ACL ID</title>
     <required>true</required>
     <comment>FK to civicrm acl.</comment>
+    <html>
+      <label>Admin ACL</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

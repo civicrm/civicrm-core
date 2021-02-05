@@ -67,7 +67,7 @@
   </field>
   <field>
     <name>parent_id</name>
-    <title>Contact Type Parent</title>
+    <title>Contact Type Parent ID</title>
     <type>int unsigned</type>
     <comment>Optional FK to parent contact type.</comment>
     <pseudoconstant>
@@ -76,6 +76,9 @@
       <labelColumn>label</labelColumn>
       <condition>parent_id IS NULL</condition>
     </pseudoconstant>
+    <html>
+      <label>Contact Type Parent</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

@@ -22,10 +22,13 @@
   </primaryKey>
   <field>
     <name>event_queue_id</name>
-    <title>Event Queue</title>
+    <title>Event Queue ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to EventQueue</comment>
+    <html>
+      <label>Event Queue</label>
+    </html>
   </field>
   <foreignKey>
     <name>event_queue_id</name>
@@ -35,10 +38,13 @@
   </foreignKey>
   <field>
     <name>trackable_url_id</name>
-    <title>Trackable Url</title>
+    <title>Trackable Url ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to TrackableURL</comment>
+    <html>
+      <label>Trackable Url</label>
+    </html>
   </field>
   <foreignKey>
     <name>trackable_url_id</name>

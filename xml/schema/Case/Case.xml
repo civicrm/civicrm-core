@@ -31,11 +31,12 @@
     <type>int unsigned</type>
     <import>true</import>
     <export>false</export>
-    <title>Case Type</title>
+    <title>Case Type ID</title>
     <required>true</required>
     <comment>FK to civicrm_case_type.id</comment>
     <html>
       <type>Select</type>
+      <label>Case Type</label>
     </html>
     <pseudoconstant>
       <table>civicrm_case_type</table>

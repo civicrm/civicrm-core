@@ -21,10 +21,13 @@
   </primaryKey>
   <field>
     <name>job_id</name>
-    <title>Mailing Job</title>
+    <title>Mailing Job ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The ID of the Job .</comment>
+    <html>
+      <label>Mailing Job</label>
+    </html>
   </field>
   <foreignKey>
     <name>job_id</name>

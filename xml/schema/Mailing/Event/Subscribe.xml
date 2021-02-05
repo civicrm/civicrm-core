@@ -22,7 +22,7 @@
   </primaryKey>
   <field>
     <name>group_id</name>
-    <title>Mailing Subscribe Group</title>
+    <title>Mailing Subscribe Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Group</comment>
@@ -33,6 +33,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Mailing Subscribe Group</label>
     </html>
   </field>
   <foreignKey>
@@ -43,10 +44,13 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
-    <title>Mailing Subscribe Contact</title>
+    <title>Mailing Subscribe Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact</comment>
+    <html>
+      <label>Mailing Subscribe Contact</label>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>

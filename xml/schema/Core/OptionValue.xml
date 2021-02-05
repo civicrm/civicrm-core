@@ -12,9 +12,6 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Option ID</comment>
-    <html>
-      <type>Number</type>
-    </html>
     <add>1.5</add>
   </field>
   <primaryKey>
@@ -36,6 +33,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Option Group</label>
     </html>
   </field>
   <foreignKey>
@@ -144,7 +142,7 @@
   </field>
   <field>
     <name>component_id</name>
-    <title>Option Component</title>
+    <title>Option Component ID</title>
     <type>int unsigned</type>
     <comment>Component that this option value belongs/caters to.</comment>
     <add>2.0</add>
@@ -155,6 +153,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Option Component</label>
     </html>
   </field>
   <foreignKey>
@@ -165,7 +164,7 @@
   </foreignKey>
   <field>
     <name>domain_id</name>
-    <title>Option Domain</title>
+    <title>Option Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -173,6 +172,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this option value for</comment>
+    <html>
+      <label>Option Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

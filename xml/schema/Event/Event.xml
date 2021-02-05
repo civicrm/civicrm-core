@@ -310,6 +310,9 @@
     <type>int unsigned</type>
     <title>Location Block ID</title>
     <comment>FK to Location Block ID</comment>
+    <html>
+      <label>Location Block</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -733,6 +736,9 @@
     <type>int unsigned</type>
     <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this event</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -772,12 +778,13 @@
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <comment>The campaign for which this event has been created.</comment>
     <add>3.4</add>
     <html>
        <type>EntityRef</type>
-     </html>
+       <label>Campaign</label>
+    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>
@@ -837,7 +844,7 @@
   <field>
     <name>dedupe_rule_group_id</name>
     <type>int unsigned</type>
-    <title>Dedupe Rule</title>
+    <title>Dedupe Rule ID</title>
     <default>NULL</default>
     <comment>Rule to use when matching registrations for this event</comment>
     <pseudoconstant>
@@ -849,6 +856,7 @@
     <add>4.5</add>
     <html>
       <type>Select</type>
+      <label>Dedupe Rule</label>
     </html>
   </field>
   <foreignKey>
