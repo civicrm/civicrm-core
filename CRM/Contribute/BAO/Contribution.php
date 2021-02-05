@@ -2484,15 +2484,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $input['line_item'] = $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
 
-    if (isset($contributionParams['financial_type_id']) && count($input['line_item']) === 1) {
-      // We permit the financial type to be overridden for single line items.
-      // More comments on this are in getTemplateTransaction.
-      $contribution->financial_type_id = $contributionParams['financial_type_id'];
-    }
-    else {
-      $contributionParams['financial_type_id'] = $templateContribution['financial_type_id'];
-    }
-    foreach (['contact_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id'] as $fieldName) {
+    foreach (['contact_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id'] as $fieldName) {
       if (isset($templateContribution[$fieldName])) {
         $contributionParams[$fieldName] = $templateContribution[$fieldName];
       }
