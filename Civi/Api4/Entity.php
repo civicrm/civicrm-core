@@ -85,7 +85,7 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Class name for dao-based entities',
         ],
         [
-          'name' => 'labelField',
+          'name' => 'label_field',
           'description' => 'Field to show when displaying a record',
         ],
         [
