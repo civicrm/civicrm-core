@@ -164,7 +164,7 @@ class Api4SelectQuery {
       $this->buildHavingClause();
       $this->buildGroupBy();
       $subquery = $this->query->toSQL();
-      $sql = "SELECT count(*) AS `c` FROM ( $subquery ) AS rows";
+      $sql = "SELECT count(*) AS `c` FROM ( $subquery ) AS `rows`";
     }
     $this->debug('sql', $sql);
     return (int) \CRM_Core_DAO::singleValueQuery($sql);
