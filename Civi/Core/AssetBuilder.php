@@ -188,10 +188,15 @@ class AssetBuilder {
       if (!file_exists($this->getCachePath())) {
         mkdir($this->getCachePath());
       }
-
-      $rendered = $this->render($name, $params);
-      file_put_contents($this->getCachePath($fileName), $rendered['content']);
-      return $fileName;
+      try {
+        $rendered = $this->render($name, $params);
+        file_put_contents($this->getCachePath($fileName), $rendered['content']);
+        return $fileName;
+      }
+      catch (UnknownAssetException $e) {
+        // unexpected error, log and continue
+        Civi::log()->error('Unexpected error while rendering a file in the AssetBuilder');
+      }
     }
     return $fileName;
   }
