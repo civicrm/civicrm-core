@@ -143,7 +143,7 @@ abstract class AbstractEntity {
     if ($dao) {
       $info['paths'] = $dao::getEntityPaths();
       $info['icon'] = $dao::$_icon;
-      $info['labelField'] = $dao::$_labelField;
+      $info['label_field'] = $dao::$_labelField;
       $info['dao'] = $dao;
     }
     foreach (ReflectionUtils::getTraits(static::class) as $trait) {
