@@ -86,12 +86,12 @@ class CRM_Core_Permission_List {
     // There are a handful of special permissions defined in CRM/Core/Permission.
     $e->permissions[\CRM_Core_Permission::ALWAYS_DENY_PERMISSION] = [
       'group' => 'const',
-      'title' => ts('Constant: Always deny'),
+      'title' => ts('Generic: Deny all users'),
       'is_synthetic' => TRUE,
     ];
     $e->permissions[\CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION] = [
       'group' => 'const',
-      'title' => ts('Constant: Always allow'),
+      'title' => ts('Generic: Allow all users (including anonymous)'),
       'is_synthetic' => TRUE,
     ];
   }
