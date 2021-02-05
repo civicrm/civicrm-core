@@ -22,7 +22,12 @@
           if (blockTag && (blockTag in afGui.meta.blocks) && !afGui.meta.blocks[blockTag].layout) {
             ctrl.loading = true;
             crmApi4('Afform', 'loadAdminData', {
-              definition: {name: afGui.meta.blocks[blockTag].name}
+              definition: {name: afGui.meta.blocks[blockTag].name},
+              skipEntities: _.transform(afGui.meta.entities, function(result, entity, entityName) {
+                if (entity.fields) {
+                  result.push(entityName);
+                }
+              }, [])
             }, 0).then(function(data) {
               afGui.addMeta(data);
               initializeBlockContainer();
@@ -180,7 +185,7 @@
         };
 
         _.each(afGui.meta.blocks, function(blockInfo, directive) {
-          if (directive === ctrl.node['#tag'] || blockInfo.join === ctrl.getFieldEntityType()) {
+          if (directive === ctrl.node['#tag'] || (blockInfo.join && blockInfo.join === ctrl.getFieldEntityType())) {
             block.options.push({
               id: directive,
               text: blockInfo.title
@@ -222,7 +227,7 @@
           model.block = afGui.meta.blocks[$scope.block.original].block;
         }
         else {
-          model.block = ctrl.getFieldEntityType('id') || '*';
+          model.block = ctrl.getFieldEntityType();
         }
         dialogService.open('saveBlockDialog', '~/afGuiEditor/saveBlock.html', model, options)
           .then(function(block) {
@@ -292,14 +297,14 @@
               }
             });
           }
-          if (!entityType && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
+          if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
             entityType = searchDisplay['saved_search.api_entity'];
           }
           if (entityType) {
             return false;
           }
         });
-        return entityType;
+        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search.api_entity')[0];
       };
 
     }

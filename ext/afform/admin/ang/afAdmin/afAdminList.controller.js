@@ -7,6 +7,8 @@
 
     $scope.crmUrl = CRM.url;
 
+    $scope.searchCreateLinks = {};
+
     this.tabs = CRM.afAdmin.afform_type;
     $scope.types = _.indexBy(ctrl.tabs, 'name');
     _.each(['form', 'block', 'search'], function(type) {
@@ -53,15 +55,18 @@
 
       if (ctrl.tab === 'block') {
         _.each(CRM.afGuiEditor.entities, function(entity, name) {
-          if (entity.defaults) {
+          if (true) { // FIXME: What conditions do we use for block entities?
             links.push({
               url: '#create/block/' + name,
               label: entity.label,
-              icon: entity.icon
+              icon: entity.icon || 'fa-cog'
             });
           }
         });
-        $scope.types.block.options = _.sortBy(links, 'Label');
+        $scope.types.block.options = _.sortBy(links, function(item) {
+          return item.url === '#create/block/*' ? '0' : item.label;
+        });
+        $scope.types.block.options.splice(1, 0, {'class': 'divider', label: ''});
       }
 
       if (ctrl.tab === 'search') {
