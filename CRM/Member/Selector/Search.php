@@ -188,7 +188,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $extraParams .= "&key={$qfKey}";
     }
 
-    if (!self::$_links['view']) {
+    if (empty(self::$_links['view'])) {
       self::$_links['view'] = [
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
