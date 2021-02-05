@@ -534,7 +534,7 @@ class Api4SelectQuery {
       // Which might contain an alias. Split on the keyword "AS"
       list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
       // Ensure alias is a safe string, and supply default if not given
-      $alias = $alias ? \CRM_Utils_String::munge($alias) : strtolower($entity);
+      $alias = $alias ? \CRM_Utils_String::munge($alias, '_', 256) : strtolower($entity);
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
       $side = array_shift($join) ? 'INNER' : 'LEFT';
