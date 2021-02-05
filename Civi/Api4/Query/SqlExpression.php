@@ -73,7 +73,7 @@ abstract class SqlExpression {
   public static function convert(string $expression, $parseAlias = FALSE, $mustBe = [], $cantBe = ['SqlWild']) {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
     $expr = $as ? substr($expression, 0, $as) : $expression;
-    $alias = $as ? \CRM_Utils_String::munge(substr($expression, $as + 4)) : NULL;
+    $alias = $as ? \CRM_Utils_String::munge(substr($expression, $as + 4), '_', 256) : NULL;
     $bracketPos = strpos($expr, '(');
     $firstChar = substr($expr, 0, 1);
     $lastChar = substr($expr, -1);
@@ -153,7 +153,7 @@ abstract class SqlExpression {
    * @return string
    */
   public function getAlias(): string {
-    return $this->alias ?? $this->fields[0] ?? \CRM_Utils_String::munge($this->expr);
+    return $this->alias ?? $this->fields[0] ?? \CRM_Utils_String::munge($this->expr, '_', 256);
   }
 
   /**
