@@ -313,10 +313,20 @@ class CRM_Utils_Token {
   /**
    * Replace all the org-level tokens in $str
    *
-   * @fixme: This function appears to be broken, as it depends on
+   * @fixme: This function appears to be broken, as it depended on
    * nonexistant method: CRM_Core_BAO_CustomValue::getContactValues()
-   * Marking as deprecated until this is fixed
+   * Marking as deprecated until this is clarified.
+   *
    * @deprecated
+   *  - the above hard-breakage was there from 2015 to 2021 and
+   * no error was ever reported on it -does that mean
+   * 1) the code is never hit because the only function that
+   * calls this function is never called or
+   * 2) it was called but never required to resolve any tokens
+   * or more specifically custom field tokens
+   *
+   * The handling for custom fields with the removed token has
+   * now been removed.
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -330,17 +340,16 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    */
-  public static function &replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
     self::$_tokens['org']
       = array_merge(
         array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
         ['address', 'display_name', 'checksum', 'contact_id']
       );
 
-    $cv = NULL;
     foreach (self::$_tokens['org'] as $token) {
       // print "Getting token value for $token<br/><br/>";
-      if ($token == '') {
+      if ($token === '') {
         continue;
       }
 
@@ -354,23 +363,11 @@ class CRM_Utils_Token {
 
       $value = NULL;
 
-      if ($cfID = CRM_Core_BAO_CustomField::getKeyID($token)) {
-        // only generate cv if we need it
-        if ($cv === NULL) {
-          $cv = CRM_Core_BAO_CustomValue::getContactValues($org['contact_id']);
-        }
-        foreach ($cv as $cvFieldID => $value) {
-          if ($cvFieldID == $cfID) {
-            $value = CRM_Core_BAO_CustomField::displayValue($value, $cfID);
-            break;
-          }
-        }
-      }
-      elseif ($token == 'checksum') {
+      if ($token === 'checksum') {
         $cs = CRM_Contact_BAO_Contact_Utils::generateChecksum($org['contact_id']);
         $value = "cs={$cs}";
       }
-      elseif ($token == 'address') {
+      elseif ($token === 'address') {
         // Build the location values array
 
         $loc = [];
