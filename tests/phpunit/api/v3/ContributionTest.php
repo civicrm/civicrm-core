@@ -2338,7 +2338,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionWithCustomData() {
+  public function testRepeatTransactionWithCustomData(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Contribution', 'name' => 'Repeat'], 'text');
     $originalContribution = $this->setUpRepeatTransaction([], 'single', [$this->getCustomFieldName('text') => 'first']);
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -2649,9 +2649,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-16397 test appropriate action if total amount has changed for single line items.
+   * CRM-16397 test appropriate action if total amount has changed for single
+   * line items.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionAlteredAmount() {
+  public function testRepeatTransactionAlteredAmount(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
       'contact_id' => $this->_individualId,
@@ -2674,7 +2677,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => 1234,
       'total_amount' => '400',
       'fee_amount' => 50,
     ]);
@@ -2713,8 +2716,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'entity_id' => $originalContribution['id'] + 1,
     ]));
 
-    unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
-    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
+    unset($expectedLineItem['id'], $expectedLineItem['entity_id'], $lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
   }
 
@@ -2934,8 +2936,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-17718 campaign stored on contribution recur gets priority.
    *
    * This reflects the fact we permit people to update them.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionUpdatedCampaign() {
+  public function testRepeatTransactionUpdatedCampaign(): void {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $campaignID = $this->campaignCreate();
     $campaignID2 = $this->campaignCreate();
@@ -2962,10 +2966,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Completed',
-      'trxn_id' => uniqid(),
+      'trxn_id' => 789,
     ]);
 
-    $this->callAPISuccessGetSingle('contribution', [
+    $this->callAPISuccessGetSingle('Contribution', [
       'total_amount' => 100,
       'campaign_id' => $campaignID,
     ]);
