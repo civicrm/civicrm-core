@@ -590,7 +590,7 @@
           return value;
         }
         // Output user-facing name/label fields as a link, if possible
-        if (info.field && _.includes(['display_name', 'title', 'label', 'subject'], info.field.name) && !info.fn && typeof value === 'string') {
+        if (info.field && info.field.name === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
           var link = getEntityUrl(row, info);
           if (link) {
             return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
