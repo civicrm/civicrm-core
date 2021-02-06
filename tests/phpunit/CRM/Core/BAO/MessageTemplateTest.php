@@ -117,7 +117,6 @@ London, 90210
   /**
    * Test rendering of smarty tokens.
    *
-   * @throws \CRM_Core_Exception
    */
   public function testRenderMessageTemplateIgnoreSmarty(): void {
     $messageContent = CRM_Core_BAO_MessageTemplate::renderMessageTemplate([
@@ -187,7 +186,7 @@ Default Domain Name
     foreach (array_keys($tokenData) as $key) {
       $tokenString .= "{$key}:{contact.{$key}}\n";
     }
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), []);
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
     $tokenProcessor->addMessage('html', $tokenString, 'text/html');
     $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
     $tokenProcessor->evaluate();
@@ -398,7 +397,7 @@ sort_name:Smith, Robert
 display_name:Mr. Robert Smith II
 nick_name:Bob
 image_URL:https://example.com
-preferred_communication_method:
+preferred_communication_method:Phone
 preferred_language:fr_CA
 preferred_mail_format:Both
 hash:xyz
