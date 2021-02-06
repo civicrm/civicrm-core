@@ -241,6 +241,7 @@
           if ($scope.controls.join) {
             ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
             var join = searchMeta.getJoin($scope.controls.join),
+              entity = searchMeta.getEntity(join.entity),
               params = [$scope.controls.join, false];
             _.each(_.cloneDeep(join.conditions), function(condition) {
               params.push(condition);
@@ -249,6 +250,9 @@
               params.push(condition);
             });
             ctrl.savedSearch.api_params.join.push(params);
+            if (entity.label_field) {
+              ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
+            }
             loadFieldOptions();
           }
           $scope.controls.join = '';
