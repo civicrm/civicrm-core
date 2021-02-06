@@ -12,6 +12,9 @@
     <title>Contribution Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>
@@ -30,6 +33,9 @@
     <title>Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <label>Contribution</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -94,7 +100,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -103,6 +109,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Financial Type(for membership price sets only).</comment>
+    <html>
+      <label>Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

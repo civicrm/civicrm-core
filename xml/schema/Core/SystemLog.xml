@@ -11,6 +11,9 @@
     <title>System Log ID</title>
     <required>true</required>
     <comment>Primary key ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.4</add>
   </field>
   <primaryKey>

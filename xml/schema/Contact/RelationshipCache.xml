@@ -15,6 +15,9 @@
     <title>Relationship Cache ID</title>
     <required>true</required>
     <comment>Relationship Cache ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>5.29</add>
   </field>
   <primaryKey>
@@ -25,9 +28,12 @@
   <field>
     <name>relationship_id</name>
     <type>int unsigned</type>
-    <title>Relationship</title>
+    <title>Relationship ID</title>
     <required>true</required>
     <comment>id of the relationship (FK to civicrm_relationship.id)</comment>
+    <html>
+      <label>Relationship</label>
+    </html>
     <add>5.29</add>
   </field>
   <foreignKey>
@@ -41,9 +47,12 @@
   <field>
     <name>relationship_type_id</name>
     <type>int unsigned</type>
-    <title>Relationship Type</title>
+    <title>Relationship Type ID</title>
     <required>true</required>
     <comment>id of the relationship type</comment>
+    <html>
+      <label>Relationship Type</label>
+    </html>
     <add>5.29</add>
   </field>
   <foreignKey>
@@ -76,6 +85,7 @@
     <add>5.29</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact (Near side)</label>
     </html>
   </field>
   <foreignKey>
@@ -110,6 +120,7 @@
     <add>5.29</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact (Far side)</label>
     </html>
   </field>
   <foreignKey>

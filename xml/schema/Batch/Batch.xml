@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Address ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -62,9 +65,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Batch Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -87,9 +93,12 @@
   </field>
   <field>
     <name>modified_id</name>
-    <title>Batch Modified By</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>3.3</add>
   </field>
   <field>
@@ -108,12 +117,13 @@
   </foreignKey>
   <field>
     <name>saved_search_id</name>
-    <title>Batch Smart Group</title>
+    <title>Smart Group ID</title>
     <type>int unsigned</type>
     <comment>FK to Saved Search ID</comment>
     <add>4.1</add>
     <html>
       <type>EntityRef</type>
+      <label>Smart Group</label>
     </html>
   </field>
   <foreignKey>

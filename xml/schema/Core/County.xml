@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>County ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -39,10 +42,14 @@
   </field>
   <field>
     <name>state_province_id</name>
-    <title>State</title>
+    <title>State ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID of State/Province that County belongs</comment>
+    <html>
+      <label>State</label>
+      <label>State</label>
+    </html>
     <add>1.1</add>
     <pseudoconstant>
       <table>civicrm_state_province</table>

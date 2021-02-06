@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique table ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.6</add>
   </field>
   <primaryKey>
@@ -20,11 +23,12 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Cache Contact</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>Foreign Key to Contact</comment>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
     <add>1.6</add>
   </field>
@@ -43,7 +47,7 @@
   </index>
   <field>
     <name>acl_id</name>
-    <title>Cache ACL</title>
+    <title>ACL ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign Key to ACL</comment>
@@ -52,6 +56,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>ACL</label>
+    </html>
     <add>1.6</add>
   </field>
   <foreignKey>

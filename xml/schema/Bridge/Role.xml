@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique table ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -31,6 +34,7 @@
   <field>
     <name>group_id</name>
     <type>int unsigned</type>
+    <title>Group ID</title>
     <required>true</required>
     <comment>FK to civicrm group.</comment>
     <add>2.0</add>
@@ -41,6 +45,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Group</label>
     </html>
   </field>
   <foreignKey>

@@ -18,6 +18,9 @@
     <title>Group ID</title>
     <required>true</required>
     <comment>Group ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -69,6 +72,9 @@
     <type>int unsigned</type>
     <title>Saved Search ID</title>
     <comment>FK to saved search table.</comment>
+    <html>
+      <label>Saved Search</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -209,8 +215,11 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Group Created By</title>
+    <title>Created By Contact ID</title>
     <comment>FK to contact table.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -223,8 +232,11 @@
   <field>
     <name>modified_id</name>
     <type>int unsigned</type>
-    <title>Group Modified By</title>
+    <title>Modified By Contact ID</title>
     <comment>FK to contact table.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>4.5</add>
   </field>
   <foreignKey>

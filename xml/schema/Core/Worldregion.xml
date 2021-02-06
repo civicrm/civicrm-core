@@ -10,7 +10,10 @@
     <title>World Region ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Country Id</comment>
+    <comment>Country ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>

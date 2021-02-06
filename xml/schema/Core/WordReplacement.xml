@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Word replacement ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.4</add>
   </field>
   <primaryKey>
@@ -67,7 +70,7 @@
   </field>
   <field>
     <name>domain_id</name>
-    <title>Word Replacement Domain ID</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -75,6 +78,9 @@
         <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Domain ID. This is for Domain specific word replacement</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>

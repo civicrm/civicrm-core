@@ -14,6 +14,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Survey id.</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -35,10 +38,13 @@
 
   <field>
     <name>campaign_id</name>
-    <title>Survey Campaign ID</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
+    <html>
+      <label>Campaign</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -144,9 +150,12 @@
 
   <field>
     <name>created_id</name>
-    <title>Survey Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this Survey.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -167,9 +176,12 @@
 
   <field>
     <name>last_modified_id</name>
-    <title>Survey Modified</title>
+    <title>Modified By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who recently edited this Survey.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

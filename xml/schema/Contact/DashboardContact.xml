@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <title>Dashboard Contact ID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.1</add>
   </field>
   <primaryKey>
@@ -20,9 +23,12 @@
   <field>
     <name>dashboard_id</name>
     <type>int unsigned</type>
-    <title>Dashboard</title>
+    <title>Dashboard ID</title>
     <required>true</required>
     <comment>Dashboard ID</comment>
+    <html>
+      <label>Dashboard</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>
@@ -35,9 +41,12 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Dashboard Contact</title>
+    <title>Contact ID</title>
     <required>true</required>
     <comment>Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

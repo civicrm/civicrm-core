@@ -17,6 +17,9 @@
     <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -24,7 +27,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Mailing Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -32,6 +35,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which site is this mailing for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>
@@ -43,7 +49,7 @@
   </foreignKey>
   <field>
     <name>header_id</name>
-    <title>Mailing Header</title>
+    <title>Header ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_mailing_component</table>
@@ -52,6 +58,9 @@
       <condition>component_type = "Header"</condition>
     </pseudoconstant>
     <comment>FK to the header component.</comment>
+    <html>
+      <label>Header</label>
+    </html>
   </field>
   <foreignKey>
     <name>header_id</name>
@@ -61,7 +70,7 @@
   </foreignKey>
   <field>
     <name>footer_id</name>
-    <title>Mailing Footer</title>
+    <title>Footer ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_mailing_component</table>
@@ -70,6 +79,9 @@
       <condition>component_type = "Footer"</condition>
     </pseudoconstant>
     <comment>FK to the footer component.</comment>
+    <html>
+      <label>Footer</label>
+    </html>
   </field>
   <foreignKey>
     <name>footer_id</name>
@@ -79,9 +91,12 @@
   </foreignKey>
   <field>
     <name>reply_id</name>
-    <title>Mailing Reply</title>
+    <title>Reply ID</title>
     <type>int unsigned</type>
     <comment>FK to the auto-responder component.</comment>
+    <html>
+      <label>Reply</label>
+    </html>
   </field>
   <foreignKey>
     <name>reply_id</name>
@@ -91,9 +106,12 @@
   </foreignKey>
   <field>
     <name>unsubscribe_id</name>
-    <title>Mailing Unsubscribe</title>
+    <title>Unsubscribe ID</title>
     <type>int unsigned</type>
     <comment>FK to the unsubscribe component.</comment>
+    <html>
+      <label>Unsubscribe</label>
+    </html>
   </field>
   <foreignKey>
     <name>unsubscribe_id</name>
@@ -106,17 +124,14 @@
     <title>Mailing Resubscribe</title>
     <type>int unsigned</type>
   </field>
-  <foreignKey>
-    <name>optout_id</name>
-    <table>civicrm_mailing_component</table>
-    <key>id</key>
-    <onDelete>SET NULL</onDelete>
-  </foreignKey>
   <field>
     <name>optout_id</name>
-    <title>Mailing Opt Out</title>
+    <title>Opt Out ID</title>
     <type>int unsigned</type>
     <comment>FK to the opt-out component.</comment>
+    <html>
+      <label>Opt Out</label>
+    </html>
   </field>
   <foreignKey>
     <name>optout_id</name>
@@ -256,9 +271,12 @@
   </field>
   <field>
     <name>msg_template_id</name>
-    <title>Mailing Message Template</title>
+    <title>Message Template ID</title>
     <type>int unsigned</type>
     <comment>FK to the message template.</comment>
+    <html>
+      <label>Message Template</label>
+    </html>
   </field>
   <foreignKey>
     <name>msg_template_id</name>
@@ -278,9 +296,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Mailing Creator</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who first created this mailing</comment>
+    <html>
+      <label>Creator</label>
+    </html>
   </field>
   <foreignKey>
     <name>created_id</name>
@@ -313,9 +334,12 @@
   </field>
   <field>
     <name>scheduled_id</name>
-    <title>Scheduled By</title>
+    <title>Scheduled By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who scheduled this mailing</comment>
+    <html>
+      <label>Scheduled By</label>
+    </html>
   </field>
   <foreignKey>
     <name>scheduled_id</name>
@@ -338,9 +362,12 @@
   </field>
   <field>
     <name>approver_id</name>
-    <title>Approved By</title>
+    <title>Approved By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID who approved this mailing</comment>
+    <html>
+      <label>Approved By</label>
+    </html>
   </field>
   <foreignKey>
     <name>approver_id</name>
@@ -413,11 +440,12 @@
   <field>
     <name>campaign_id</name>
     <type>int unsigned</type>
-    <title>Mailing Campaign</title>
+    <title>Campaign ID</title>
     <comment>The campaign for which this mailing has been initiated.</comment>
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Campaign</label>
     </html>
   </field>
   <foreignKey>
@@ -439,11 +467,12 @@
   </field>
   <field>
     <name>sms_provider_id</name>
-    <title>Mailing SMS Provider</title>
+    <title>SMS Provider ID</title>
     <type>int unsigned</type>
     <add>4.2</add>
     <html>
       <type>Select</type>
+      <label>SMS Provider</label>
     </html>
   </field>
   <foreignKey>
@@ -468,7 +497,7 @@
   </index>
   <field>
     <name>location_type_id</name>
-    <title>Location Type</title>
+    <title>Location Type ID</title>
     <type>int unsigned</type>
     <comment>With email_selection_method, determines which email address to use</comment>
     <pseudoconstant>
@@ -476,6 +505,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>display_name</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Location Type</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>

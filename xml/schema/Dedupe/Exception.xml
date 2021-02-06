@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique dedupe exception id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -22,6 +25,9 @@
     <title>First Dupe Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>First Dupe Contact</label>
+    </html>
     <add>3.3</add>
     <required>TRUE</required>
   </field>
@@ -37,6 +43,9 @@
     <title>Second Dupe Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Second Dupe Contact</label>
+    </html>
     <add>3.3</add>
     <required>TRUE</required>
   </field>

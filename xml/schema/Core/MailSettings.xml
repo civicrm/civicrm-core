@@ -10,6 +10,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.2</add>
   </field>
   <primaryKey>
@@ -18,7 +21,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Mail Settings Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -27,6 +30,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -21,8 +24,11 @@
   </primaryKey>
   <field>
     <name>address_id</name>
-    <title>Location Block Address</title>
+    <title>Address ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>Address</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -34,8 +40,11 @@
   </foreignKey>
   <field>
     <name>email_id</name>
-    <title>Location Block Email</title>
+    <title>Email ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>Email</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -47,8 +56,11 @@
   </foreignKey>
   <field>
     <name>phone_id</name>
-    <title>Location Block Phone</title>
+    <title>Phone ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>Phone</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -60,8 +72,11 @@
   </foreignKey>
   <field>
     <name>im_id</name>
-    <title>Location Block IM</title>
+    <title>IM ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>IM</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -73,8 +88,11 @@
   </foreignKey>
   <field>
     <name>address_2_id</name>
-    <title>Location Block IM 2</title>
+    <title>IM 2 ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>IM 2</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -87,7 +105,10 @@
   <field>
     <name>email_2_id</name>
     <type>int unsigned</type>
-    <title>Email 2</title>
+    <title>Email 2 ID</title>
+    <html>
+      <label>Email 2</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -100,7 +121,10 @@
   <field>
     <name>phone_2_id</name>
     <type>int unsigned</type>
-    <title>Phone 2</title>
+    <title>Phone 2 ID</title>
+    <html>
+      <label>Phone 2</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -113,7 +137,10 @@
   <field>
     <name>im_2_id</name>
     <type>int unsigned</type>
-    <title>Instant Messenger 2</title>
+    <title>Instant Messenger 2 ID</title>
+    <html>
+      <label>Instant Messenger 2</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

@@ -14,6 +14,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.3</add>
   </field>
   <primaryKey>
@@ -60,7 +63,7 @@
   <field>
     <name>financial_account_id</name>
     <type>int unsigned</type>
-    <title>Financial Account</title>
+    <title>Financial Account ID</title>
     <required>true</required>
     <add>4.3</add>
     <comment>FK to the financial_account_id</comment>
@@ -71,6 +74,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Account</label>
     </html>
   </field>
   <foreignKey>

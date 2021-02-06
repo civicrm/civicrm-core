@@ -12,7 +12,10 @@
     <type>int unsigned</type>
     <required>true</required>
     <title>Job Log ID</title>
-    <comment>Job log entry Id</comment>
+    <comment>Job log entry ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -30,6 +33,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this scheduled job for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>

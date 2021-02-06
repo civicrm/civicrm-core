@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Organization ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -20,9 +23,13 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -68,8 +75,12 @@
   </field>
   <field>
     <name>primary_contact_id</name>
+    <title>Primary Contact ID</title>
     <type>int unsigned</type>
     <comment>Optional FK to Primary Contact for this organization.</comment>
+    <html>
+      <label>Primary Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>

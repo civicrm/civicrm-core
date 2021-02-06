@@ -9,6 +9,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Connection ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.6</add>
   </field>
   <primaryKey>

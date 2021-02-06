@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique case-activity association id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -21,10 +24,13 @@
   </primaryKey>
   <field>
     <name>case_id</name>
-    <title>Case</title>
+    <title>Case ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Case ID of case-activity association.</comment>
+    <html>
+      <label>Case</label>
+    </html>
     <add>1.8</add>
   </field>
   <foreignKey>
@@ -40,6 +46,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Activity ID of case-activity association.</comment>
+    <html>
+      <label>Activity</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

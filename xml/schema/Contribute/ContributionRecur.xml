@@ -14,6 +14,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contribution Recur ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.6</add>
   </field>
   <primaryKey>
@@ -22,13 +25,14 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Contact</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to civicrm_contact.id.</comment>
     <add>1.6</add>
     <html>
       <type>EntityRef</type>
+      <label>Contact</label>
     </html>
   </field>
   <foreignKey>
@@ -202,6 +206,9 @@
     <title>Payment Token ID</title>
     <type>int unsigned</type>
     <comment>Optionally used to store a link to a payment token used for this recurring contribution.</comment>
+    <html>
+      <label>Payment Token</label>
+    </html>
     <add>4.6</add>
   </field>
   <foreignKey>
@@ -339,7 +346,7 @@
   </field>
   <field>
     <name>payment_processor_id</name>
-    <title>Payment Processor</title>
+    <title>Payment Processor ID</title>
     <uniqueName>contribution_recur_payment_processor_id</uniqueName>
     <type>int unsigned</type>
     <comment>Foreign key to civicrm_payment_processor.id</comment>
@@ -351,6 +358,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment Processor</label>
     </html>
   </field>
   <foreignKey>
@@ -362,7 +370,7 @@
   </foreignKey>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <export>false</export>
     <type>int unsigned</type>
     <comment>FK to Financial Type</comment>
@@ -374,6 +382,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>
@@ -405,12 +414,13 @@
     <name>campaign_id</name>
     <uniqueName>contribution_campaign_id</uniqueName>
     <type>int unsigned</type>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <import>true</import>
     <comment>The campaign for which this contribution has been triggered.</comment>
     <add>4.1</add>
     <html>
       <type>Select</type>
+      <label>Campaign</label>
     </html>
   </field>
   <foreignKey>

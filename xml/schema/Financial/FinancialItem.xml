@@ -15,6 +15,9 @@
     <length>10</length>
     <required>true</required>
     <comment></comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.3</add>
   </field>
   <primaryKey>
@@ -41,10 +44,13 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Financial Item Contact ID</title>
+    <title>Contact ID</title>
     <required>true</required>
     <export>true</export>
     <comment>FK to Contact ID of contact the item is from</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -105,6 +111,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Financial Account</label>
     </html>
   </field>
   <foreignKey>

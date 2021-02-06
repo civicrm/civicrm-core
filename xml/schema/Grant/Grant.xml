@@ -22,6 +22,9 @@
     <required>true</required>
     <comment>Unique Grant id</comment>
     <import>true</import>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -38,8 +41,9 @@
     <comment>Contact ID of contact record given grant belongs to.</comment>
     <add>1.8</add>
     <html>
-       <type>EntityRef</type>
-     </html>
+      <type>EntityRef</type>
+      <label>Contact</label>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -207,7 +211,7 @@
     <required>true</required>
     <import>true</import>
     <export>false</export>
-    <comment>Id of Grant status.</comment>
+    <comment>ID of Grant status.</comment>
     <pseudoconstant>
       <optionGroupName>grant_status</optionGroupName>
     </pseudoconstant>
@@ -223,7 +227,7 @@
   </index>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -232,6 +236,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Financial Type.</comment>
+    <html>
+      <label>Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

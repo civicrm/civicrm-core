@@ -13,8 +13,11 @@
     <title>PCP Block ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>PCP block Id</comment>
+    <comment>PCP block ID</comment>
     <add>2.2</add>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -66,10 +69,13 @@
   </dynamicForeignKey>
   <field>
     <name>supporter_profile_id</name>
-    <title>Supporter Profile</title>
+    <title>Supporter Profile ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?</comment>
     <default>NULL</default>
+    <html>
+      <label>Supporter Profile</label>
+    </html>
     <add>2.2</add>
   </field>
   <foreignKey>

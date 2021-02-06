@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -56,6 +59,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <html>
+      <label>Batch</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

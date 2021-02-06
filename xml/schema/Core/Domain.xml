@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Domain ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -66,8 +69,11 @@
   <field>
     <name>contact_id</name>
     <type>int unsigned</type>
-    <title>Domain Contact</title>
+    <title>Contact ID</title>
     <comment>FK to Contact ID. This is specifically not an FK to avoid circular constraints</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

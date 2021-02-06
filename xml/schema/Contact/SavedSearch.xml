@@ -12,6 +12,9 @@
     <title>Saved Search ID</title>
     <required>true</required>
     <comment>Saved Search ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -66,6 +69,9 @@
     <type>int unsigned</type>
     <title>Mapping ID</title>
     <comment>Foreign key to civicrm_mapping used for saved search-builder searches.</comment>
+    <html>
+      <label>Mapping</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>

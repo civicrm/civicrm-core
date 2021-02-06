@@ -12,7 +12,10 @@
     <title>Group Membership History ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Internal Id</comment>
+    <comment>Internal ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -24,7 +27,10 @@
     <title>Contact ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contact Id</comment>
+    <comment>Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>
@@ -36,9 +42,9 @@
   </foreignKey>
   <field>
     <name>group_id</name>
-    <title>Group</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
-    <comment>Group Id</comment>
+    <comment>Group ID</comment>
     <add>1.1</add>
     <pseudoconstant>
       <table>civicrm_group</table>
@@ -47,6 +53,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Group</label>
     </html>
   </field>
   <foreignKey>

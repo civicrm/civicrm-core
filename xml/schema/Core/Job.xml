@@ -12,7 +12,10 @@
     <title>Job ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Job Id</comment>
+    <comment>Job ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -21,7 +24,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Job Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -30,6 +33,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this scheduled job for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>

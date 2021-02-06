@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Price Field Value</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -20,10 +23,13 @@
   </primaryKey>
   <field>
     <name>price_field_id</name>
-    <title>Price Field</title>
+    <title>Price Field ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to civicrm_price_field</comment>
+    <html>
+      <label>Price Field</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>
@@ -142,12 +148,13 @@
   </field>
   <field>
     <name>membership_type_id</name>
-    <title>Membership Type</title>
+    <title>Membership Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Membership Type</comment>
     <html>
       <type>Select</type>
+      <label>Membership Type</label>
     </html>
     <add>3.4</add>
   </field>
@@ -189,7 +196,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -201,6 +208,7 @@
     <add>4.3</add>
     <html>
       <type>Select</type>
+      <label>Financial Type</label>
     </html>
   </field>
   <foreignKey>

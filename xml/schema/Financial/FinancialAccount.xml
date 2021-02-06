@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.2</add>
   </field>
   <primaryKey>
@@ -34,6 +37,9 @@
     <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID that is responsible for the funds in this account</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>
@@ -87,8 +93,11 @@
   <field>
     <name>parent_id</name>
     <type>int unsigned</type>
-    <title>Financial Account Parent</title>
+    <title>Parent ID</title>
     <comment>Parent ID in account hierarchy</comment>
+    <html>
+      <label>Parent</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Autoincremented type id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.5</add>
   </field>
   <primaryKey>

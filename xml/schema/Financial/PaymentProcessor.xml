@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Payment Processor ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -20,7 +23,7 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
-    <title>Payment Processor Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -29,6 +32,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this match entry for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -73,7 +79,7 @@
   </field>
   <field>
     <name>payment_processor_type_id</name>
-    <title>Payment Processor Type ID</title>
+    <title>Type ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_payment_processor_type</table>
@@ -82,6 +88,9 @@
     </pseudoconstant>
     <required>true</required>
     <length>10</length>
+    <html>
+      <label>Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

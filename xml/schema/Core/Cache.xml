@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique table ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.1</add>
   </field>
   <primaryKey>
@@ -63,6 +66,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Component</label>
     </html>
   </field>
   <foreignKey>

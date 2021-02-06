@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>SMS Provider ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.2</add>
   </field>
   <primaryKey>
@@ -113,7 +116,7 @@
   </field>
   <field>
     <name>domain_id</name>
-    <title>SMS Domain</title>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -121,6 +124,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Which Domain is this sms provider for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>4.7</add>
   </field>
   <foreignKey>

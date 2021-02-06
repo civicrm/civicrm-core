@@ -12,6 +12,9 @@
     <title>Extension ID</title>
     <required>true</required>
     <comment>Local Extension ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.2</add>
   </field>
   <primaryKey>

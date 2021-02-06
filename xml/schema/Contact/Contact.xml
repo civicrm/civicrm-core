@@ -23,6 +23,9 @@
     <headerPattern>/internal|contact?|id$/i</headerPattern>
     <required>true</required>
     <comment>Unique Contact ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -716,6 +719,9 @@
     <type>int unsigned</type>
     <title>Household Primary Contact ID</title>
     <comment>Optional FK to Primary Contact for this household.</comment>
+    <html>
+      <label>Household Primary Contact</label>
+    </html>
     <add>1.1</add>
     <contactType>Household</contactType>
   </field>

@@ -12,7 +12,10 @@
     <uniqueName>event_in_cart_id</uniqueName>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Event In Cart Id</comment>
+    <comment>Event In Cart ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -21,9 +24,12 @@
   </primaryKey>
   <field>
     <name>event_id</name>
-    <title>Event</title>
+    <title>Event ID</title>
     <type>int unsigned</type>
     <comment>FK to Event ID</comment>
+    <html>
+      <label>Event</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>
@@ -35,9 +41,12 @@
   </foreignKey>
   <field>
     <name>event_cart_id</name>
-    <title>Event In Cart</title>
+    <title>Event Cart ID</title>
     <type>int unsigned</type>
     <comment>FK to Event Cart ID</comment>
+    <html>
+      <label>Event In Cart</label>
+    </html>
     <add>4.1</add>
   </field>
   <foreignKey>

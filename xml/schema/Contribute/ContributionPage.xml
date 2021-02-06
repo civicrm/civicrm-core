@@ -14,7 +14,10 @@
     <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.3</add>
   </field>
   <primaryKey>
@@ -45,7 +48,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <comment>default financial type assigned to contributions submitted via this page, e.g. Contribution, Campaign Contribution</comment>
     <pseudoconstant>
@@ -57,6 +60,9 @@
       <type>Select</type>
     </html>
     <add>4.3</add>
+    <html>
+      <label>Financial Type</label>
+    </html>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -375,9 +381,12 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Contribution Page Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this contribution page</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -417,9 +426,12 @@
   </field>
   <field>
     <name>campaign_id</name>
-    <title>Contribution Page Campaign ID</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>
+    <html>
+      <label>Campaign</label>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>

@@ -11,6 +11,9 @@
     <title>Action Mapping ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.4</add>
   </field>
   <primaryKey>

@@ -12,7 +12,10 @@
     <uniqueName>cart_id</uniqueName>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Cart Id</comment>
+    <comment>Cart ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>4.1</add>
   </field>
   <primaryKey>
@@ -21,9 +24,12 @@
   </primaryKey>
   <field>
     <name>user_id</name>
-    <title>Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact who created this cart</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>4.1</add>
   </field>
   <field>

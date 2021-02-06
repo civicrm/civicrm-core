@@ -30,7 +30,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'county_id' => 'County',
           'geo_code_1' => 'Latitude',
           'geo_code_2' => 'Longitude',
-          'master_id' => 'Master Address Belongs To',
+          'master_id' => 'Master Address ID',
           'postal_code' => 'Postal Code',
           'postal_code_suffix' => 'Postal Code Suffix',
           'state_province_id' => 'State',

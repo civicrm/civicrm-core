@@ -15,6 +15,9 @@
     <title>Custom Group ID</title>
     <required>true</required>
     <comment>Unique Custom Group ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -190,8 +193,11 @@
   <field>
     <name>created_id</name>
     <type>int unsigned</type>
-    <title>Custom Group Created By</title>
+    <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this custom group</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>

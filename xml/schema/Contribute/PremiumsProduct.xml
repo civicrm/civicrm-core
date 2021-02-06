@@ -16,6 +16,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.4</add>
   </field>
   <primaryKey>
@@ -24,10 +27,13 @@
   </primaryKey>
   <field>
     <name>premiums_id</name>
-    <title>Premium</title>
+    <title>Premium ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to premiums settings record.</comment>
+    <html>
+      <label>Premium</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -38,10 +44,13 @@
   </foreignKey>
   <field>
     <name>product_id</name>
-    <title>Product</title>
+    <title>Product ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to each product object.</comment>
+    <html>
+      <label>Product</label>
+    </html>
     <add>1.4</add>
   </field>
   <foreignKey>
@@ -59,7 +68,7 @@
   </field>
   <field>
     <name>financial_type_id</name>
-    <title>Financial Type</title>
+    <title>Financial Type ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <pseudoconstant>
@@ -68,6 +77,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>FK to Financial Type.</comment>
+    <html>
+      <label>Financial Type</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

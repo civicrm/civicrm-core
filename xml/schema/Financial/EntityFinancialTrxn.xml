@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.2</add>
   </field>
   <primaryKey>
@@ -42,8 +45,11 @@
   </dynamicForeignKey>
   <field>
     <name>financial_trxn_id</name>
-    <title>Financial Transaction Id</title>
+    <title>Financial Transaction ID</title>
     <type>int unsigned</type>
+    <html>
+      <label>Financial Transaction</label>
+    </html>
     <add>3.2</add>
   </field>
   <foreignKey>

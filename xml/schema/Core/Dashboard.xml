@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <title>DashletID</title>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.1</add>
   </field>
   <primaryKey>
@@ -20,7 +23,7 @@
   <field>
     <name>domain_id</name>
     <type>int unsigned</type>
-    <title>Dashlet Domain</title>
+    <title>Domain ID</title>
     <required>true</required>
     <pseudoconstant>
       <table>civicrm_domain</table>
@@ -28,6 +31,9 @@
       <labelColumn>name</labelColumn>
     </pseudoconstant>
     <comment>Domain for dashboard</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.1</add>
   </field>
   <foreignKey>

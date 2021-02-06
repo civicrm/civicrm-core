@@ -13,7 +13,10 @@
     <title>Widget ID</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Contribution Id</comment>
+    <comment>Contribution ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.0</add>
   </field>
   <primaryKey>
@@ -22,9 +25,12 @@
   </primaryKey>
   <field>
     <name>contribution_page_id</name>
-    <title>Contribution Page</title>
+    <title>Contribution Page ID</title>
     <type>int unsigned</type>
     <comment>The Contribution Page which triggered this contribution</comment>
+    <html>
+      <label>Contribution Page</label>
+    </html>
     <add>1.5</add>
   </field>
   <foreignKey>

@@ -12,6 +12,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Campaign Group id.</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.3</add>
   </field>
   <primaryKey>
@@ -21,10 +24,13 @@
 
   <field>
     <name>campaign_id</name>
-    <title>Campaign</title>
+    <title>Campaign ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to the activity Campaign.</comment>
+    <html>
+      <label>Campaign</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

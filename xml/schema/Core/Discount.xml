@@ -13,6 +13,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>2.1</add>
   </field>
   <primaryKey>
@@ -49,7 +52,7 @@
   <field>
     <name>price_set_id</name>
     <uniqueName>participant_discount_name</uniqueName>
-    <title>Discount Name</title>
+    <title>Price Set ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <pseudoconstant>
@@ -59,6 +62,9 @@
     </pseudoconstant>
     <export>true</export>
     <comment>FK to civicrm_price_set</comment>
+    <html>
+      <label>Price Set</label>
+    </html>
     <add>4.3</add>
   </field>
   <foreignKey>

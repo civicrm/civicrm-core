@@ -14,6 +14,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Note ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -68,9 +71,12 @@
   </field>
   <field>
     <name>contact_id</name>
-    <title>Note Created By</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID creator</comment>
+    <html>
+      <label>Created By</label>
+    </html>
     <add>1.1</add>
   </field>
   <foreignKey>

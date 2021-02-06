@@ -12,6 +12,9 @@
     <name>id</name>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -20,9 +23,13 @@
   </primaryKey>
   <field>
     <name>domain_id</name>
+    <title>Domain ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Which Domain is this menu item for</comment>
+    <html>
+      <label>Domain</label>
+    </html>
     <add>3.0</add>
   </field>
   <foreignKey>
@@ -34,8 +41,12 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>1.8</add>
   </field>
   <foreignKey>

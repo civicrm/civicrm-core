@@ -11,6 +11,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique dedupe rule id</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.8</add>
   </field>
   <primaryKey>
@@ -19,10 +22,13 @@
   </primaryKey>
   <field>
     <name>dedupe_rule_group_id</name>
-    <title>Dedupe Rule Group</title>
+    <title>Group ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>The id of the rule group this rule belongs to</comment>
+    <html>
+      <label>Group</label>
+    </html>
     <add>1.8</add>
   </field>
   <foreignKey>

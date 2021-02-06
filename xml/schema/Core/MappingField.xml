@@ -12,6 +12,9 @@
     <title>Mapping Field ID</title>
     <required>true</required>
     <comment>Mapping Field ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.2</add>
   </field>
   <primaryKey>
@@ -25,6 +28,9 @@
     <title>Mapping ID</title>
     <required>true</required>
     <comment>Mapping to which this field belongs</comment>
+    <html>
+      <label>Mapping</label>
+    </html>
     <add>1.2</add>
   </field>
   <foreignKey>
@@ -65,6 +71,9 @@
     <type>int unsigned</type>
     <title>Location type ID</title>
     <comment>Location type of this mapping, if required</comment>
+    <html>
+      <label>Location type</label>
+    </html>
     <add>1.2</add>
     <pseudoconstant>
       <table>civicrm_location_type</table>
@@ -117,6 +126,9 @@
     <type>int unsigned</type>
     <title>Relationship type ID</title>
     <comment>Relationship type, if required</comment>
+    <html>
+      <label>Relationship type</label>
+    </html>
     <add>1.2</add>
   </field>
   <foreignKey>

@@ -16,6 +16,9 @@
     <title>Address ID</title>
     <required>true</required>
     <comment>Unique Address ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -27,6 +30,9 @@
     <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>
@@ -253,7 +259,7 @@
   <field>
     <name>county_id</name>
     <type>int unsigned</type>
-    <title>County</title>
+    <title>County ID</title>
     <comment>Which County does this address belong to.</comment>
     <pseudoconstant>
       <table>civicrm_county</table>
@@ -263,6 +269,7 @@
     <html>
       <type>ChainSelect</type>
       <controlField>state_province_id</controlField>
+      <label>County</label>
     </html>
     <add>1.1</add>
   </field>
@@ -278,7 +285,7 @@
   </foreignKey>
   <field>
     <name>state_province_id</name>
-    <title>State/Province</title>
+    <title>State/Province ID</title>
     <type>int unsigned</type>
     <comment>Which State_Province does this address belong to.</comment>
     <pseudoconstant>
@@ -290,6 +297,7 @@
     <html>
       <type>ChainSelect</type>
       <controlField>country_id</controlField>
+      <label>State/Province</label>
     </html>
     <add>1.1</add>
   </field>
@@ -345,7 +353,7 @@
   </field>
   <field>
     <name>country_id</name>
-    <title>Country</title>
+    <title>Country ID</title>
     <type>int unsigned</type>
     <comment>Which Country does this address belong to.</comment>
     <pseudoconstant>
@@ -358,6 +366,7 @@
     <localize_context>country</localize_context>
     <html>
       <type>Select</type>
+      <label>Country</label>
     </html>
     <add>1.1</add>
   </field>
@@ -441,10 +450,13 @@
   </field>
   <field>
     <name>master_id</name>
-    <title>Master Address Belongs To</title>
+    <title>Master Address ID</title>
     <type>int unsigned</type>
     <import>true</import>
     <comment>FK to Address ID</comment>
+    <html>
+      <label>Master Address Belongs To</label>
+    </html>
     <add>3.3</add>
   </field>
   <foreignKey>

@@ -13,6 +13,9 @@
     <title>Relationship Type ID</title>
     <required>true</required>
     <comment>Primary key</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>

@@ -15,6 +15,9 @@
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique Phone ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
     <add>1.1</add>
   </field>
   <primaryKey>
@@ -23,9 +26,12 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Phone Contact</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>2.0</add>
   </field>
   <foreignKey>

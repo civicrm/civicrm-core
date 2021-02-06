@@ -11,6 +11,9 @@
     <title>Action Schedule ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
     <add>3.4</add>
   </field>
   <primaryKey>
@@ -19,9 +22,12 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Action Schedule Contact ID</title>
+    <title>Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to Contact ID</comment>
+    <html>
+      <label>Contact</label>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>
@@ -54,10 +60,13 @@
   </dynamicForeignKey>
   <field>
     <name>action_schedule_id</name>
-    <title>Schedule</title>
+    <title>Schedule ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to the action schedule that this action originated from.</comment>
+    <html>
+      <label>Schedule</label>
+    </html>
     <add>3.4</add>
   </field>
   <foreignKey>

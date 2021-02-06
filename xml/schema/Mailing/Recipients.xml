@@ -14,6 +14,9 @@
     <title>Mailing Recipients ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <type>Number</type>
+    </html>
   </field>
   <primaryKey>
     <name>id</name>
@@ -21,9 +24,12 @@
   </primaryKey>
   <field>
     <name>mailing_id</name>
-    <title>Mailing</title>
+    <title>Mailing ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <html>
+      <label>Mailing</label>
+    </html>
     <comment>The ID of the mailing this Job will send.</comment>
   </field>
   <foreignKey>
@@ -34,10 +40,13 @@
   </foreignKey>
   <field>
     <name>contact_id</name>
-    <title>Mailing Recipient</title>
+    <title>Recipient ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>FK to Contact</comment>
+    <html>
+      <label>Recipient</label>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -47,10 +56,13 @@
   </foreignKey>
   <field>
     <name>email_id</name>
-    <title>Recipient Email</title>
+    <title>Email ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Email</comment>
+    <html>
+      <label>Email</label>
+    </html>
   </field>
   <foreignKey>
     <name>email_id</name>
@@ -60,10 +72,13 @@
   </foreignKey>
   <field>
     <name>phone_id</name>
-    <title>Recipient Phone</title>
+    <title>Phone ID</title>
     <type>int unsigned</type>
     <default>NULL</default>
     <comment>FK to Phone</comment>
+    <html>
+      <label>Phone</label>
+    </html>
   </field>
   <foreignKey>
     <name>phone_id</name>
