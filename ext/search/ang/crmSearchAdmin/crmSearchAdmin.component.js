@@ -681,10 +681,10 @@
 
       // Sets the default select clause based on commonly-named fields
       function getDefaultSelect() {
-        var whitelist = ['id', 'name', 'subject', 'display_name', 'label', 'title'];
-        return _.transform(searchMeta.getEntity(ctrl.savedSearch.api_entity).fields, function(select, field) {
-          if (_.includes(whitelist, field.name) || _.includes(field.name, '_type_id')) {
-            select.push(field.name + (field.options ? ':label' : ''));
+        var entity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
+        return _.transform(entity.fields, function(defaultSelect, field) {
+          if (field.name === 'id' || field.name === entity.label_field) {
+            defaultSelect.push(field.name);
           }
         });
       }
