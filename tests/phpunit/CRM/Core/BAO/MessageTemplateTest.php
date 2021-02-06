@@ -92,7 +92,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
 Up the road
 London, 90210
  ~ crown@example.com ~ 1 ~ rather nice', $messageContent['text']);
-    $this->assertEquals('Default Domain Name ~  ~ Buckingham palaceUp the roadLondon, 90210~ crown@example.com ~ 1 ~ rather nice', $messageContent['subject']);
+    $this->assertEquals('Default Domain Name ~  ~ Buckingham palace Up the road London, 90210  ~ crown@example.com ~ 1 ~ rather nice', $messageContent['subject']);
   }
 
   /**
@@ -246,7 +246,7 @@ contact_id:' . $tokenData['contact_id'] . '
 ';
     $this->assertEquals($expected, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['text']);
-    $this->assertEquals(str_replace("\n", '', $expected), $messageContent['subject']);
+    $this->assertEquals(rtrim(str_replace("\n", ' ', $expected)), $messageContent['subject']);
   }
 
   /**
