@@ -217,6 +217,29 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
   protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
 
   /**
+   * Invoice ID.
+   *
+   * This is a generated unique string.
+   *
+   * @var string
+   */
+  protected $invoiceID;
+
+  /**
+   * Get the unique invoice ID.
+   *
+   * This is generated if one has not already been generated.
+   *
+   * @return string
+   */
+  public function getInvoiceID(): string {
+    if (!$this->invoiceID) {
+      $this->invoiceID = md5(uniqid(mt_rand(), TRUE));
+    }
+    return $this->invoiceID;
+  }
+
+  /**
    * Pre process function with common actions.
    *
    * @throws \CRM_Core_Exception

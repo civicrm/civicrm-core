@@ -507,7 +507,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->assign('module', 'Membership');
     $this->assign('receiptType', 'membership renewal');
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
-    $this->_params['invoice_id'] = $this->_params['invoiceID'] = md5(uniqid(rand(), TRUE));
+    $this->_params['invoice_id'] = $this->getInvoiceID();
 
     if (!empty($this->_params['send_receipt'])) {
       $this->_params['receipt_date'] = $now;
@@ -546,7 +546,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'financial_type_id' => $this->_params['financial_type_id'],
           'is_email_receipt' => !empty($this->_params['send_receipt']),
           'payment_instrument_id' => $this->_params['payment_instrument_id'],
-          'invoice_id' => $this->_params['invoice_id'],
+          'invoice_id' => $this->getInvoiceID(),
         ], $paymentParams['membership_type_id'][1]);
 
         $contributionRecurID = $contributionRecurParams['contributionRecurID'];
