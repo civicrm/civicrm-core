@@ -281,7 +281,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Latitude' => '',
       'Longitude' => '',
       'Address Name' => '',
-      'Master Address Belongs To' => '',
+      'Master Address ID' => '',
       'County' => '',
       'State' => '',
       'Country' => 'Netherlands',
@@ -310,7 +310,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership ID' => '2',
       'Primary Member ID' => '',
       'Max Related' => '',
-      'Membership Recurring Contribution' => 1,
+      'Recurring Contribution ID' => 1,
       'Campaign ID' => '',
       'Status Override' => '',
       'Total Amount' => '200.00',
@@ -1050,7 +1050,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'ids' => [$this->contactIDs[1]],
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals(CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID), $row['Home-Master Address Belongs To']);
+    $this->assertEquals(CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID), $row['Home-Master Address ID']);
   }
 
   /**
@@ -1139,7 +1139,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Latitude' => '',
       'Longitude' => '',
       'Address Name' => '',
-      'Master Address Belongs To' => '',
+      'Master Address ID' => '',
       'County' => '',
       'State' => '',
       'Country' => 'Netherlands',
@@ -2282,7 +2282,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       62 => 'Longitude',
       63 => 'Is Manually Geocoded',
       64 => 'Address Name',
-      65 => 'Master Address Belongs To',
+      65 => 'Master Address ID',
       66 => 'County',
       67 => 'State',
       68 => 'Country',
@@ -2417,7 +2417,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getParticipantHeaderDefinition() {
     return [
-      82 => 'Event',
+      82 => 'Event ID',
       83 => 'Event Title',
       84 => 'Event Start Date',
       85 => 'Event End Date',
@@ -2434,9 +2434,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       96 => 'Test',
       97 => 'Is Pay Later',
       98 => 'Fee Amount',
-      99 => 'Discount Name',
+      99 => 'Price Set ID',
       100 => 'Fee Currency',
-      101 => 'Registered By ID',
+      101 => 'Registered By Participant ID',
       102 => 'Campaign ID',
     ];
   }
@@ -2459,7 +2459,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       90 => 'Membership ID',
       91 => 'Primary Member ID',
       92 => 'Max Related',
-      93 => 'Membership Recurring Contribution',
+      93 => 'Recurring Contribution ID',
       94 => 'Campaign ID',
       95 => 'Status Override',
     ];

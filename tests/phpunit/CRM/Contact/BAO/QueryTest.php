@@ -474,7 +474,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_campaign_id', '=', '3', 1, 0]]);
     $this->assertContains('WHERE  (  ( civicrm_activity.campaign_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Campaign = 3', $queryObj->_qill[1][0]);
+    $this->assertEquals('Campaign ID = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_priority_id', '=', '3', 1, 0]]);
     $this->assertContains('WHERE  (  ( civicrm_activity.priority_id = 3 )', $queryObj->getSearchSQL());

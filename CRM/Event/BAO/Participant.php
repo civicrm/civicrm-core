@@ -736,7 +736,6 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
         ],
       ];
 
-      $participantFields['participant_status_id']['title'] .= ' (ID)';
       $participantFields['participant_role_id']['title'] .= ' (ID)';
 
       $discountFields = CRM_Core_DAO_Discount::export();

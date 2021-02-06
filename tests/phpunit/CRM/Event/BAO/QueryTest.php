@@ -117,14 +117,14 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
         [['participant_status_id', '=', 1, 0, 0]],
         [
           'where' => '( civicrm_participant.status_id = 1 )',
-          'qill' => 'Participant Status (ID) = Registered',
+          'qill' => 'Status ID = Registered',
         ],
       ],
       [
         [['participant_status_id', 'IN', [1, 2], 0, 0]],
         [
           'where' => '( civicrm_participant.status_id IN ("1", "2") )',
-          'qill' => 'Participant Status (ID) In Registered, Attended',
+          'qill' => 'Status ID In Registered, Attended',
         ],
       ],
     ];
