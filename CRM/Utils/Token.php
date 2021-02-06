@@ -249,14 +249,14 @@ class CRM_Utils_Token {
   }
 
   /**
-   * @param $token
+   * @param string $token
    * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
    * @param bool $escapeSmarty
    *
-   * @return mixed|null|string
+   * @return null|string
    */
-  public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE): ?string {
     // check if the token we were passed is valid
     // we have to do this because this function is
     // called only when we find a token in the string
@@ -266,12 +266,13 @@ class CRM_Utils_Token {
     if (!in_array($token, self::$_tokens['domain'])) {
       $value = "{domain.$token}";
     }
-    elseif ($token == 'address') {
-      static $addressCache = [];
+    elseif ($token === 'address') {
+      $cacheKey = __CLASS__ . 'address_token_cache' . CRM_Core_Config::domainID();
+      $addressCache = Civi::cache()->has($cacheKey) ? Civi::cache()->get($cacheKey) : [];
 
-      $cache_key = $html ? 'address-html' : 'address-text';
-      if (array_key_exists($cache_key, $addressCache)) {
-        return $addressCache[$cache_key];
+      $fieldKey = $html ? 'address-html' : 'address-text';
+      if (array_key_exists($fieldKey, $addressCache)) {
+        return $addressCache[$fieldKey];
       }
 
       $value = NULL;
@@ -279,19 +280,18 @@ class CRM_Utils_Token {
 
       if (!empty($loc[$token])) {
         if ($html) {
-          $value = $loc[$token][1]['display'];
-          $value = str_replace("\n", '<br />', $value);
+          $value = str_replace("\n", '<br />', $loc[$token][1]['display']);
         }
         else {
           $value = $loc[$token][1]['display_text'];
         }
-        $addressCache[$cache_key] = $value;
+        Civi::cache()->set($cacheKey, $addressCache);
       }
     }
-    elseif ($token == 'name' || $token == 'id' || $token == 'description') {
+    elseif ($token === 'name' || $token === 'id' || $token === 'description') {
       $value = $domain->$token;
     }
-    elseif ($token == 'phone' || $token == 'email') {
+    elseif ($token === 'phone' || $token === 'email') {
       // Construct the phone and email tokens
 
       $value = NULL;
@@ -1234,7 +1234,7 @@ class CRM_Utils_Token {
         if (!empty($contactDetails[$contactID]['preferred_communication_method'])
         ) {
           $communicationPreferences = [];
-          foreach ($contactDetails[$contactID]['preferred_communication_method'] as $val) {
+          foreach ((array) $contactDetails[$contactID]['preferred_communication_method'] as $val) {
             if ($val) {
               $communicationPreferences[$val] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'preferred_communication_method', $val);
             }
