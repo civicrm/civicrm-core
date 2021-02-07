@@ -592,12 +592,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param CRM_Core_Form $form
    * @param int $eventID
-   * @param bool $includeExpiredFields
+   * @param bool $doNotIncludeExpiredFields
    *   See CRM-16456.
    *
    * @throws Exception
    */
-  public static function initEventFee(&$form, $eventID, $includeExpiredFields = TRUE) {
+  public static function initEventFee(&$form, $eventID, $doNotIncludeExpiredFields = TRUE) {
     // get price info
 
     // retrive all active price set fields.
@@ -608,12 +608,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
-      CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $includeExpiredFields, $priceSetId);
     }
     else {
       $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
-      CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $includeExpiredFields, $priceSetId);
     }
+    CRM_Price_BAO_PriceSet::initSet($form, 'civicrm_event', $doNotIncludeExpiredFields, $priceSetId);
 
     if (property_exists($form, '_context') && ($form->_context == 'standalone'
         || $form->_context == 'participant')

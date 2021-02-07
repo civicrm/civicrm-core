@@ -413,13 +413,13 @@ WHERE     cpf.price_set_id = %1";
    *   Price Set ID.
    * @param bool $required
    *   Appears to have no effect based on reading the code.
-   * @param bool $validOnly
+   * @param bool $doNotIncludeExpiredFields
    *   Should only fields where today's date falls within the valid range be returned?
    *
    * @return array
    *   Array consisting of field details
    */
-  public static function getSetDetail($setID, $required = TRUE, $validOnly = FALSE) {
+  public static function getSetDetail($setID, $required = TRUE, $doNotIncludeExpiredFields = FALSE) {
     // create a new tree
     $setTree = [];
 
@@ -459,7 +459,7 @@ AND is_active = 1
 AND ( active_on IS NULL OR active_on <= {$currentTime} )
 ";
     $dateSelect = '';
-    if ($validOnly) {
+    if ($doNotIncludeExpiredFields) {
       $dateSelect = "
 AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 ";
@@ -554,11 +554,11 @@ WHERE  id = %1";
    * @param CRM_Core_Form $form
    *   Form entity id.
    * @param string $entityTable
-   * @param bool $validOnly
+   * @param bool $doNotIncludeExpiredFields
    * @param int $priceSetId
    *   Price Set ID
    */
-  public static function initSet(&$form, $entityTable = 'civicrm_event', $validOnly = FALSE, $priceSetId = NULL) {
+  public static function initSet(&$form, $entityTable = 'civicrm_event', $doNotIncludeExpiredFields = FALSE, $priceSetId = NULL) {
 
     //check if price set is is_config
     if (is_numeric($priceSetId)) {
@@ -599,7 +599,7 @@ WHERE  id = %1";
       }
 
       $form->_priceSetId = $priceSetId;
-      $priceSet = self::getSetDetail($priceSetId, $required, $validOnly);
+      $priceSet = self::getSetDetail($priceSetId, $required, $doNotIncludeExpiredFields);
       $form->_priceSet = $priceSet[$priceSetId] ?? NULL;
       $form->_values['fee'] = $form->_priceSet['fields'] ?? NULL;
 
