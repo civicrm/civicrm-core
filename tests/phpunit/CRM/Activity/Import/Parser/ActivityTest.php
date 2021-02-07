@@ -1,12 +1,6 @@
 <?php
 
 /**
- *  File for the TestActivityType class
- *
- *  (PHP 5)
- *
- * @package   CiviCRM
- *
  *   This file is part of CiviCRM
  *
  *   CiviCRM is free software; you can redistribute it and/or
@@ -25,7 +19,7 @@
  */
 
 /**
- *  Test CRM/Member/BAO Membership Log add , delete functions
+ *  Test Activity Import Parser functions
  *
  * @package   CiviCRM
  * @group headless
@@ -47,7 +41,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown():void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_activity'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_activity', 'civicrm_activity_contact'], TRUE);
     parent::tearDown();
   }
 
@@ -64,11 +58,11 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function testImport(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Activity'], 'checkbox');
     $values = [
-      'activity_detail' => 'fascinating',
+      'activity_details' => 'fascinating',
       'activity_type_id' => 1,
       'activity_date_time' => '2010-01-06',
       'target_contact_id' => $this->individualCreate(),
-      'subject' => 'riveting stuff',
+      'activity_subject' => 'riveting stuff',
       $this->getCustomFieldName('checkbox') => 'L',
     ];
     $this->importValues($values);
@@ -83,6 +77,10 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
    * @return \CRM_Activity_Import_Parser_Activity
    */
   protected function createImportObject(array $fields): \CRM_Activity_Import_Parser_Activity {
+    // @todo Eyes are weary so sanity-check this later:
+    // This loop seems the same as array_values($fields)? And this appears
+    // to only be called from one place that already has them sequentially
+    // indexed so is it even needed?
     $fieldMapper = [];
     foreach ($fields as $index => $field) {
       $fieldMapper[] = $field;

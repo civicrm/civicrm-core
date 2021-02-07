@@ -38,13 +38,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   public static $_exportableFields = NULL;
 
   /**
-   * Static field for all the activity information that we can potentially import.
-   *
-   * @var array
-   */
-  public static $_importableFields = NULL;
-
-  /**
    * Check if there is absolute minimum of data to add the object.
    *
    * @param array $params
@@ -1505,10 +1498,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   array of importable Fields
    */
   public static function &importableFields($status = FALSE) {
-    if (!self::$_importableFields) {
-      if (!self::$_importableFields) {
-        self::$_importableFields = [];
-      }
+    if (empty(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      Civi::$statics[__CLASS__][__FUNCTION__] = [];
       if (!$status) {
         $fields = ['' => ['title' => ts('- do not import -')]];
       }
@@ -1544,9 +1535,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $fields = array_merge($fields, $tmpConatctField);
       $fields = array_merge($fields, $tmpFields);
       $fields = array_merge($fields, CRM_Core_BAO_CustomField::getFieldsForImport('Activity'));
-      self::$_importableFields = $fields;
+      Civi::$statics[__CLASS__][__FUNCTION__] = $fields;
     }
-    return self::$_importableFields;
+    return Civi::$statics[__CLASS__][__FUNCTION__];
   }
 
   /**
