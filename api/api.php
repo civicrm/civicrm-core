@@ -19,6 +19,9 @@
  * @return array|int
  */
 function civicrm_api(string $entity, string $action, array $params) {
+  if ((int) $params['version'] === 3) {
+    return civicrm_api3($entity, $action, $params);
+  }
   return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
 }
 
