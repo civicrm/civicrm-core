@@ -594,7 +594,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $domain = CRM_Core_BAO_Domain::getDomain();
     $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
     $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
-    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens, $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
     return $mailContent;
   }
 
@@ -687,6 +687,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Render the message template, resolving tokens and smarty tokens.
    *
+   * As with all BAO methods this should not be called directly outside
+   * of tested core code and is highly likely to change.
+   *
    * @param array $mailContent
    * @param bool $disableSmarty
    * @param int $contactID
@@ -695,7 +698,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected static function renderMessageTemplate(array $mailContent, $disableSmarty, $contactID, $smartyAssigns): array {
+  public static function renderMessageTemplate(array $mailContent, $disableSmarty, $contactID, $smartyAssigns): array {
     $tokens = self::getTokensToResolve($mailContent);
 
     // When using Smarty we need to pass the $escapeSmarty parameter.
