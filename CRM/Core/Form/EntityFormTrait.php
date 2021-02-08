@@ -256,7 +256,7 @@ trait CRM_Core_Form_EntityFormTrait {
         if ($spec['localizable']) {
           $this->entityFields[$fieldName]['is_add_translate_dialog'] = TRUE;
         }
-        if (empty($spec['html'])) {
+        if (empty($spec['html']['type'])) {
           $this->entityFields[$fieldName]['not-auto-addable'] = TRUE;
         }
       }
