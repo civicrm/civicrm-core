@@ -221,11 +221,16 @@ class AfformAdminMeta {
     ];
 
     $data['permissions'] = [];
-    foreach (\CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $name => $perm) {
+    $perms = \Civi\Api4\Permission::get()
+      ->addWhere('group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms'])
+      ->addWhere('is_active', '=', 1)
+      ->setOrderBy(['title' => 'ASC'])
+      ->execute();
+    foreach ($perms as $perm) {
       $data['permissions'][] = [
-        'id' => $name,
-        'text' => $perm[0],
-        'description' => $perm[1] ?? NULL,
+        'id' => $perm['name'],
+        'text' => $perm['title'],
+        'description' => $perm['description'] ?? NULL,
       ];
     }
 

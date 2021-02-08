@@ -102,10 +102,17 @@ class CRM_Report_Form_Instance {
       $form->freeze('is_reserved');
     }
 
+    $getPerms = \Civi\Api4\Permission::get(0)
+      ->addWhere('is_active', '=', 1)
+      ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
+      ->setOrderBy(['title' => 'ASC'])
+      ->execute();
     $form->addElement('select',
       'permission',
       ts('Permission'),
-      ['0' => ts('Everyone (includes anonymous)')] + CRM_Core_Permission::basicPermissions()
+      // FIXME: Historically, CiviReport hard-coded an extra '0' option. This should change to the more general ALWAYS_ALLOW_PERMISSION (but may require testing/migration).
+      ['0' => ts('Everyone (includes anonymous)')] + array_combine($getPerms->column('name'), $getPerms->column('title')),
+      ['class' => 'crm-select2']
     );
 
     // prepare user_roles to save as names not as ids
