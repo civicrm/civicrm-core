@@ -69,13 +69,13 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters')
+      ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'label_field', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters')
       ->addWhere('searchable', '=', TRUE)
       ->addOrderBy('title_plural')
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();
-    $getFields = ['name', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'fk_entity'];
+    $getFields = ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'fk_entity'];
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
@@ -114,11 +114,26 @@ class Admin {
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
           \CRM_Utils_Array::remove($params, 'checkPermissions', 'debug', 'chain', 'language', 'select', 'where', 'orderBy', 'limit', 'offset');
           unset($entity['get']);
-          $schema[] = ['params' => array_keys($params)] + array_filter($entity);
+          $schema[$entity['name']] = ['params' => array_keys($params)] + array_filter($entity);
         }
       }
     }
-    return $schema;
+    // Add in FK fields for implicit joins
+    // For example, add a `campaign.title` field to the Contribution entity
+    foreach ($schema as &$entity) {
+      foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
+        if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
+          // The original field will get title instead of label since it represents the id (title usually ends in ID but label does not)
+          $entity['fields'][$index]['label'] = $field['title'];
+          // Add the label field from the other entity to this entity's list of fields
+          $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
+          $newField['name'] = str_replace('_id', '', $field['name']) . '.' . $schema[$field['fk_entity']]['label_field'];
+          $newField['label'] = $field['label'] . ' ' . $newField['label'];
+          array_splice($entity['fields'], $index, 0, [$newField]);
+        }
+      }
+    }
+    return array_values($schema);
   }
 
   /**

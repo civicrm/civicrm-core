@@ -241,6 +241,7 @@
           if ($scope.controls.join) {
             ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
             var join = searchMeta.getJoin($scope.controls.join),
+              entity = searchMeta.getEntity(join.entity),
               params = [$scope.controls.join, false];
             _.each(_.cloneDeep(join.conditions), function(condition) {
               params.push(condition);
@@ -249,6 +250,9 @@
               params.push(condition);
             });
             ctrl.savedSearch.api_params.join.push(params);
+            if (entity.label_field) {
+              ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
+            }
             loadFieldOptions();
           }
           $scope.controls.join = '';
@@ -586,7 +590,7 @@
           return value;
         }
         // Output user-facing name/label fields as a link, if possible
-        if (info.field && _.includes(['display_name', 'title', 'label', 'subject'], info.field.name) && !info.fn && typeof value === 'string') {
+        if (info.field && info.field.name === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
           var link = getEntityUrl(row, info);
           if (link) {
             return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
@@ -677,10 +681,10 @@
 
       // Sets the default select clause based on commonly-named fields
       function getDefaultSelect() {
-        var whitelist = ['id', 'name', 'subject', 'display_name', 'label', 'title'];
-        return _.transform(searchMeta.getEntity(ctrl.savedSearch.api_entity).fields, function(select, field) {
-          if (_.includes(whitelist, field.name) || _.includes(field.name, '_type_id')) {
-            select.push(field.name + (field.options ? ':label' : ''));
+        var entity = searchMeta.getEntity(ctrl.savedSearch.api_entity);
+        return _.transform(entity.fields, function(defaultSelect, field) {
+          if (field.name === 'id' || field.name === entity.label_field) {
+            defaultSelect.push(field.name);
           }
         });
       }
