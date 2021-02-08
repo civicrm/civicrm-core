@@ -1895,12 +1895,6 @@ DESC limit 1");
       $form->_contributionID = $contribution->id;
     }
 
-    // process soft credit / pcp params first
-    CRM_Contribute_BAO_ContributionSoft::formatSoftCreditParams($params, $form);
-
-    //CRM-13981, processing honor contact into soft-credit contribution
-    CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
-
     $transaction->commit();
     return $contribution;
   }
