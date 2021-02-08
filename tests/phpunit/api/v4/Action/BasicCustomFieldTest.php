@@ -22,6 +22,8 @@ namespace api\v4\Action;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Relationship;
+use Civi\Api4\RelationshipCache;
 
 /**
  * @group headless
@@ -220,6 +222,52 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertNotContains($contactId1, array_keys((array) $search));
     $this->assertNotContains($contactId2, array_keys((array) $search));
+  }
+
+  public function testRelationshipCacheCustomFields() {
+    $cgName = uniqid('RelFields');
+
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('name', $cgName)
+      ->addValue('extends', 'Relationship')
+      ->execute()
+      ->first();
+
+    CustomField::create(FALSE)
+      ->addValue('label', 'PetName')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Text')
+      ->addValue('data_type', 'String')
+      ->execute();
+
+    $parent = Contact::create(FALSE)
+      ->addValue('first_name', 'Parent')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->execute()
+      ->first()['id'];
+
+    $child = Contact::create(FALSE)
+      ->addValue('first_name', 'Child')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->execute()
+      ->first()['id'];
+
+    $relationship = Relationship::create(FALSE)
+      ->addValue('contact_id_a', $parent)
+      ->addValue('contact_id_b', $child)
+      ->addValue('relationship_type_id', 1)
+      ->addValue("$cgName.PetName", 'Buddy')
+      ->execute();
+
+    $results = RelationshipCache::get(FALSE)
+      ->addSelect("$cgName.PetName")
+      ->addWhere("$cgName.PetName", '=', 'Buddy')
+      ->execute();
+
+    $this->assertCount(2, $results);
+    $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
   }
 
 }

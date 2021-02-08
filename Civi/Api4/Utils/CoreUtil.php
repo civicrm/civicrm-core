@@ -80,4 +80,42 @@ class CoreUtil {
     return $operators;
   }
 
+  /**
+   * For a given API Entity, return the types of custom fields it supports and the column they join to.
+   *
+   * @param string $entityName
+   * @return array|mixed|null
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getCustomGroupExtends(string $entityName) {
+    // Custom_group.extends pretty much maps 1-1 with entity names, except for a couple oddballs (Contact, Participant).
+    switch ($entityName) {
+      case 'Contact':
+        return [
+          'extends' => array_merge(['Contact'], array_keys(\CRM_Core_SelectValues::contactType())),
+          'column' => 'id',
+        ];
+
+      case 'Participant':
+        return [
+          'extends' => ['Participant', 'ParticipantRole', 'ParticipantEventName', 'ParticipantEventType'],
+          'column' => 'id',
+        ];
+
+      case 'RelationshipCache':
+        return [
+          'extends' => ['Relationship'],
+          'column' => 'relationship_id',
+        ];
+    }
+    if (array_key_exists($entityName, \CRM_Core_SelectValues::customGroupExtends())) {
+      return [
+        'extends' => [$entityName],
+        'column' => 'id',
+      ];
+    }
+    return NULL;
+  }
+
 }
