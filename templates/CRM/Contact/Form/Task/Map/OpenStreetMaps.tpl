@@ -153,11 +153,12 @@
         popup.create(evt);
     }
 
-    if (window.addEventListener) {
-        window.addEventListener("load", initMap, false);
-    } else if (window.attachEvent) {
-        document.attachEvent("onreadystatechange", initMap);
-    }
+    var checkExist = setInterval(function() {
+      if (typeof OpenLayers !== 'undefined') {
+        clearInterval(checkExist);
+        initMap();
+      }
+    }, 100); // check every 100ms
 
     function gpopUp() {
         var from   = document.getElementById('from').value;

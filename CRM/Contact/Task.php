@@ -228,6 +228,8 @@ class CRM_Contact_Task extends CRM_Core_Task {
           'title' => ts('Map contacts'),
           'class' => 'CRM_Contact_Form_Task_Map',
           'result' => FALSE,
+          'url' => 'civicrm/contact/map',
+          'icon' => 'fa-map',
         );
       }
 

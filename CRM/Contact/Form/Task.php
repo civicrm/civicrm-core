@@ -86,7 +86,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->_contactIds = [];
     $form->_contactTypes = [];
 
-    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath);
+    $isStandAlone = in_array('task', $form->urlPath) || in_array('standalone', $form->urlPath) || in_array('map', $form->urlPath);
     if ($isStandAlone) {
       [$form->_task, $title] = CRM_Contact_Task::getTaskAndTitleByClass(get_class($form));
       if (!array_key_exists($form->_task, CRM_Contact_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()))) {
