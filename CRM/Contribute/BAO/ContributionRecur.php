@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
+
 /**
  *
  * @package CRM
@@ -411,29 +414,39 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *
    * @return array
    *
-   * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \API_Exception
    */
-  public static function getTemplateContribution($id, $overrides = []) {
-    // use api3 because api4 doesn't handle ContributionRecur yet...
-    $is_test = civicrm_api3('ContributionRecur', 'getvalue', [
-      'return' => "is_test",
-      'id' => $id,
-    ]);
+  public static function getTemplateContribution(int $id, $overrides = []): array {
+    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+    $recurringContribution = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->setSelect($recurFields)
+      ->execute()
+      ->first();
+    // If financial_type_id or total_amount are set on the
+    // recurring they are overrides, but of lower precedence
+    // than input parameters.
+    // we filter out null, '' and FALSE but not zero - I'm on the fence about zero.
+    $overrides = array_filter(array_merge(
+      // We filter recurringContribution as we only want the fields we asked for
+      // and specifically don't want 'id' added to overrides.
+      array_intersect_key($recurringContribution, array_fill_keys($recurFields, 1)),
+      $overrides
+    ), 'strlen');
+
     // First look for new-style template contribution with is_template=1
-    $templateContributions = \Civi\Api4\Contribution::get(FALSE)
+    $templateContributions = Contribution::get(FALSE)
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 1)
-      ->addWhere('is_test', '=', $is_test)
+      ->addWhere('is_test', '=', $recurringContribution['is_test'])
       ->addOrderBy('id', 'DESC')
       ->setLimit(1)
       ->execute();
     if (!$templateContributions->count()) {
       // Fall back to old style template contributions
-      $templateContributions = \Civi\Api4\Contribution::get(FALSE)
+      $templateContributions = Contribution::get(FALSE)
         ->addWhere('contribution_recur_id', '=', $id)
-        ->addWhere('is_test', '=', $is_test)
+        ->addWhere('is_test', '=', $recurringContribution['is_test'])
         ->addOrderBy('id', 'DESC')
         ->setLimit(1)
         ->execute();
