@@ -77,6 +77,7 @@ class CoreUtil {
   public static function getOperators() {
     $operators = \CRM_Core_DAO::acceptedSQLOperators();
     $operators[] = 'CONTAINS';
+    $operators[] = 'PROXIMITY';
     return $operators;
   }
 

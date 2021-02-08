@@ -447,7 +447,18 @@ class Api4SelectQuery {
           break;
       }
     }
-
+    if ($operator === 'PROXIMITY') {
+      $fieldParts = explode('.', $fieldAlias);
+      [$latitude, $longditude, $distance, $unit] = $value;
+      $unit = $unit ?? 'km';
+      if ($unit === 'mile') {
+        $conversionFactor = 1609.344;
+      }
+      else {
+        $conversionFactor = 1000;
+      }
+      return \CRM_Core_BAO_ProximityQuery::where($latitude, $longditude, $distance * $conversionFactor, $fieldParts[0]);
+    }
     $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
     if ($sql_clause === NULL) {
       throw new \API_Exception("Invalid value in $type clause for '$expr'");
