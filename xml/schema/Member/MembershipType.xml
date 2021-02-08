@@ -64,7 +64,7 @@
   </field>
   <field>
     <name>description</name>
-    <title>Membership Type Description</title>
+    <title>Description</title>
     <type>varchar</type>
     <html>
       <type>TextArea</type>
@@ -119,7 +119,7 @@
   </foreignKey>
   <field>
     <name>minimum_fee</name>
-    <title>Membership Type Minimum Fee</title>
+    <title>Minimum Fee</title>
     <type>decimal</type>
     <length>18,9</length>
     <comment>Minimum fee for this membership (0 for free/complimentary memberships).</comment>
