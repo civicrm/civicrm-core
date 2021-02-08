@@ -48,7 +48,6 @@
     <comment>ID of State/Province that County belongs</comment>
     <html>
       <label>State</label>
-      <label>State</label>
     </html>
     <add>1.1</add>
     <pseudoconstant>

@@ -89,9 +89,8 @@
   </foreignKey>
   <field>
     <name>phone_type_id</name>
-    <title>Phone Type</title>
-    <type>int unsigned</type>
     <title>Phone type ID</title>
+    <type>int unsigned</type>
     <comment>Which type of phone does this number belongs.</comment>
     <add>2.2</add>
   </field>

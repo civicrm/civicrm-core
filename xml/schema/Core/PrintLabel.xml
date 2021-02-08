@@ -106,7 +106,7 @@
     <title>Created By Contact ID</title>
     <comment>FK to civicrm_contact, who created this label layout</comment>
     <html>
-      <label>Created By Contact</label>
+      <label>Created By</label>
     </html>
     <add>4.4</add>
   </field>

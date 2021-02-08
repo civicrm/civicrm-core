@@ -58,11 +58,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-    </html>
-    <add>4.3</add>
-    <html>
       <label>Financial Type</label>
     </html>
+    <add>4.3</add>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -368,7 +366,6 @@
     <name>start_date</name>
     <title>Contribution Page Start Date</title>
     <type>datetime</type>
-    <title>Contribution Page Start Date</title>
     <comment>Date and time that this page starts.</comment>
     <add>1.8</add>
   </field>

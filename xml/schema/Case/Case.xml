@@ -130,7 +130,6 @@
     <type>boolean</type>
     <default>0</default>
     <import>true</import>
-    <title>Case Deleted</title>
     <html>
       <type>CheckBox</type>
     </html>
