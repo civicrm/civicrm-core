@@ -21,6 +21,11 @@
 class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {

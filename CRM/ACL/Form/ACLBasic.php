@@ -17,6 +17,11 @@
 class CRM_ACL_Form_ACLBasic extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Set default values for the form.
    */
   public function setDefaultValues() {

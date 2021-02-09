@@ -28,6 +28,11 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
   public $_defaults = [];
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Get the tpl file name.
    *
    * @return string

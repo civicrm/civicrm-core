@@ -48,6 +48,11 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   protected $_prefix = 'contribute_';
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {

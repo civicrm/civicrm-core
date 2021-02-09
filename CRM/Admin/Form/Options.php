@@ -41,6 +41,11 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   protected $_domainSpecific = FALSE;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Pre-process
    */
   public function preProcess() {

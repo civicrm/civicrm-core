@@ -21,6 +21,11 @@
 class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * The params that are sent to the query.
    *
    * @var array

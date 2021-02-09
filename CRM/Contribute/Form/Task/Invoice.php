@@ -55,6 +55,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
   public $_selectedOutput;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {

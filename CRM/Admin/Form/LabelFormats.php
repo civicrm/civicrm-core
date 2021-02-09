@@ -49,6 +49,11 @@ class CRM_Admin_Form_LabelFormats extends CRM_Admin_Form {
    */
   protected $_group = NULL;
 
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
   public function preProcess() {
     $this->_id = $this->get('id');
     $this->_group = CRM_Utils_Request::retrieve('group', 'String', $this, FALSE, 'label_format');

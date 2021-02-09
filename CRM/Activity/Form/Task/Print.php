@@ -21,6 +21,11 @@
 class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
