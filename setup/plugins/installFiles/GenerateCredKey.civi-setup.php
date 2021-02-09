@@ -18,7 +18,7 @@ if (!defined('CIVI_SETUP')) {
     };
 
   if (empty($e->getModel()->credKeys)) {
-    $e->getModel()->credKeys = ['aes-cbc:hkdf-sha256:' . $toAlphanum(random_bytes(32))];
+    $e->getModel()->credKeys = ['aes-cbc:hkdf-sha256:' . $toAlphanum(random_bytes(37))];
   }
 
   if (is_string($e->getModel()->credKeys)) {
