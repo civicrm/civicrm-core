@@ -99,6 +99,16 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
   }
 
+  public function testImplicitJoinOnExplicitJoin() {
+    $contacts = Contact::get(FALSE)
+      ->addWhere('id', '=', $this->getReference('test_contact_1')['id'])
+      ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
+      ->addSelect('id', 'address.country.iso_code')
+      ->execute();
+    $this->assertCount(1, $contacts);
+    $this->assertEquals('US', $contacts[0]['address.country.iso_code']);
+  }
+
   public function testJoinToTheSameTableTwice() {
     $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')

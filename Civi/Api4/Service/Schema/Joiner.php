@@ -42,8 +42,8 @@ class Joiner {
   /**
    * @param \Civi\Api4\Query\Api4SelectQuery $query
    *   The query object to do the joins on
-   * @param string $joinPath
-   *   A path of aliases in dot notation, e.g. contact.phone
+   * @param array $joinPath
+   *   A list of aliases, e.g. [contact, phone]
    * @param string $side
    *   Can be LEFT or INNER
    *
@@ -51,65 +51,53 @@ class Joiner {
    * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
    *   The path used to make the join
    */
-  public function join(Api4SelectQuery $query, $joinPath, $side = 'LEFT') {
-    $fullPath = $this->getPath($query->getFrom(), $joinPath);
-    $baseTable = $query::MAIN_TABLE_ALIAS;
+  public function autoJoin(Api4SelectQuery $query, array $joinPath, $side = 'LEFT') {
+    $explicitJoin = $query->getExplicitJoin($joinPath[0]);
+
+    // If the first item is the name of an explicit join, use it as the base & shift it off the path
+    if ($explicitJoin) {
+      $from = $explicitJoin['table'];
+      $baseTableAlias = array_shift($joinPath);
+    }
+    // Otherwise use the api entity as the base
+    else {
+      $from = $query->getFrom();
+      $baseTableAlias = $query::MAIN_TABLE_ALIAS;
+    }
+
+    $fullPath = $this->getPath($from, $joinPath);
 
     foreach ($fullPath as $link) {
       $target = $link->getTargetTable();
       $alias = $link->getAlias();
       $bao = \CRM_Core_DAO_AllCoreTables::getBAOClassName(\CRM_Core_DAO_AllCoreTables::getClassForTable($target));
-      $conditions = $link->getConditionsForJoin($baseTable);
+      $conditions = $link->getConditionsForJoin($baseTableAlias);
       // Custom fields do not have a bao, and currently do not have field-specific ACLs
       if ($bao) {
-        $conditions = array_merge($conditions, $query->getAclClause($alias, $bao, explode('.', $joinPath)));
+        $conditions = array_merge($conditions, $query->getAclClause($alias, $bao, $joinPath));
       }
 
       $query->join($side, $target, $alias, $conditions);
 
-      $baseTable = $link->getAlias();
+      $baseTableAlias = $link->getAlias();
     }
 
     return $fullPath;
   }
 
   /**
-   * Determines if path string points to a simple n-1 join that can be automatically added
-   *
    * @param string $baseTable
-   * @param $joinPath
-   *
-   * @return bool
-   */
-  public function canAutoJoin($baseTable, $joinPath) {
-    try {
-      $path = $this->getPath($baseTable, $joinPath);
-      foreach ($path as $joinable) {
-        if ($joinable->getJoinType() === $joinable::JOIN_TYPE_ONE_TO_MANY) {
-          return FALSE;
-        }
-      }
-      return TRUE;
-    }
-    catch (\Exception $e) {
-      return FALSE;
-    }
-  }
-
-  /**
-   * @param string $baseTable
-   * @param string $joinPath
+   * @param array $joinPath
    *
    * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
    * @throws \Exception
    */
-  protected function getPath($baseTable, $joinPath) {
-    $cacheKey = sprintf('%s.%s', $baseTable, $joinPath);
+  protected function getPath(string $baseTable, array $joinPath) {
+    $cacheKey = sprintf('%s.%s', $baseTable, implode('.', $joinPath));
     if (!isset($this->cache[$cacheKey])) {
-      $stack = explode('.', $joinPath);
       $fullPath = [];
 
-      foreach ($stack as $key => $targetAlias) {
+      foreach ($joinPath as $key => $targetAlias) {
         $links = $this->schemaMap->getPath($baseTable, $targetAlias);
 
         if (empty($links)) {

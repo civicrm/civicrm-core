@@ -77,6 +77,11 @@ class Api4SelectQuery {
   public $forceSelectId = TRUE;
 
   /**
+   * @var array
+   */
+  private $explicitJoins = [];
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -545,7 +550,16 @@ class Api4SelectQuery {
         $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
+      $tableName = CoreUtil::getTableName($entity);
+      // Save join info to be retrieved by $this->getExplicitJoin()
+      $this->explicitJoins[$alias] = [
+        'entity' => $entity,
+        'table' => $tableName,
+        'bridge' => NULL,
+      ];
+      // If the first condition is a string, it's the name of a bridge entity
       if (!empty($join[0]) && is_string($join[0]) && \CRM_Utils_Rule::alphanumeric($join[0])) {
+        $this->explicitJoins[$alias]['bridge'] = $join[0];
         $conditions = $this->getBridgeJoin($join, $entity, $alias);
       }
       else {
@@ -554,7 +568,6 @@ class Api4SelectQuery {
       foreach (array_filter($join) as $clause) {
         $conditions[] = $this->treeWalkClauses($clause, 'ON');
       }
-      $tableName = CoreUtil::getTableName($entity);
       $this->join($side, $tableName, $alias, $conditions);
     }
   }
@@ -739,14 +752,13 @@ class Api4SelectQuery {
     $joiner = \Civi::container()->get('joiner');
     // The last item in the path is the field name. We don't care about that; we'll add all fields from the joined entity.
     array_pop($pathArray);
-    $pathString = implode('.', $pathArray);
 
-    if (!$joiner->canAutoJoin($this->getFrom(), $pathString)) {
+    try {
+      $joinPath = $joiner->autoJoin($this, $pathArray);
+    }
+    catch (\Exception $e) {
       return;
     }
-
-    $joinPath = $joiner->join($this, $pathString);
-
     $lastLink = array_pop($joinPath);
 
     // Custom field names are already prefixed
@@ -859,6 +871,14 @@ class Api4SelectQuery {
    */
   public function getCheckPermissions() {
     return $this->api->getCheckPermissions();
+  }
+
+  /**
+   * @param string $alias
+   * @return array|NULL
+   */
+  public function getExplicitJoin($alias) {
+    return $this->explicitJoins[$alias] ?? NULL;
   }
 
   /**
