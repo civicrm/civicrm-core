@@ -63,6 +63,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>80</cols>
+      <label>Body in Text Format</label>
     </html>
   </field>
   <field>

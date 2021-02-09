@@ -15,6 +15,7 @@
     <comment>Price Set</comment>
     <html>
       <type>Number</type>
+      <label>ID</label>
     </html>
     <add>1.8</add>
   </field>
@@ -53,6 +54,7 @@
     <add>1.8</add>
     <html>
       <type>Text</type>
+      <label>Name</label>
     </html>
   </field>
   <index>

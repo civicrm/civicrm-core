@@ -102,6 +102,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>60</cols>
+      <label>Details</label>
     </html>
     <comment>Details populated from Open Case. Only used in the CiviCase extension.</comment>
     <add>1.8</add>

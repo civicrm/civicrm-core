@@ -86,6 +86,7 @@
       <type>TextArea</type>
       <rows>4</rows>
       <cols>80</cols>
+      <label>Pre Help</label>
     </html>
     <add>1.2</add>
   </field>

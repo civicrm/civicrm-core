@@ -191,6 +191,7 @@
     <comment>Reply-To Email of mailing</comment>
     <html>
       <type>Text</type>
+      <label>Reply-To Email</label>
     </html>
   </field>
   <field>
@@ -218,6 +219,7 @@
     <comment>Subject of mailing</comment>
     <html>
       <type>Text</type>
+      <label>Subject</label>
     </html>
   </field>
   <field>
@@ -236,6 +238,7 @@
     <comment>Should we track URL click-throughs for this mailing?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Url Tracking</label>
     </html>
   </field>
   <field>
@@ -244,6 +247,7 @@
     <comment>Should we forward replies back to the author?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Forward Replies</label>
     </html>
   </field>
   <field>
@@ -252,6 +256,7 @@
     <comment>Should we enable the auto-responder?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Auto Responder</label>
     </html>
   </field>
   <field>
@@ -292,6 +297,7 @@
     <comment>Overwrite the VERP address in Reply-To</comment>
     <html>
       <type>CheckBox</type>
+      <label>Overwrite VERP</label>
     </html>
   </field>
   <field>

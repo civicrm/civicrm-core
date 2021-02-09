@@ -57,6 +57,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event</label>
     </html>
   </field>
   <field>
@@ -70,6 +71,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event Adjust Unit</label>
     </html>
   </field>
   <field>
@@ -89,6 +91,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event</label>
     </html>
   </field>
   <field>
@@ -102,6 +105,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event Adjust Unit</label>
     </html>
   </field>
   <field>

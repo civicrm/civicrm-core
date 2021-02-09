@@ -114,6 +114,7 @@
     <add>1.1</add>
     <html>
       <type>Text</type>
+      <label>Phone</label>
     </html>
   </field>
   <field>

@@ -83,6 +83,7 @@
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Start Action Unit</label>
     </html>
   </field>
   <field>
@@ -117,6 +118,7 @@
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>Repetition Frequency Unit</label>
     </html>
   </field>
   <field>
@@ -137,6 +139,7 @@
     <add>3.4</add>
     <html>
       <type>Select</type>
+      <label>End Frequency Unit</label>
     </html>
   </field>
   <field>

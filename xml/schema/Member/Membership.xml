@@ -227,6 +227,7 @@
     <export>true</export>
     <html>
       <type>Text</type>
+      <label>Maximum number of related memberships</label>
     </html>
   </field>
   <field>

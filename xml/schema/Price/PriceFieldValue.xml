@@ -70,6 +70,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Description</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -83,6 +84,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Pre Help</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -96,6 +98,7 @@
       <type>TextArea</type>
       <rows>2</rows>
       <cols>60</cols>
+      <label>Post Help</label>
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
@@ -123,6 +126,7 @@
     <add>3.3</add>
     <html>
       <type>Text</type>
+      <label>Count</label>
     </html>
   </field>
   <field>
@@ -133,6 +137,7 @@
     <add>3.3</add>
     <html>
       <type>Text</type>
+      <label>Max Value</label>
     </html>
   </field>
   <field>
@@ -173,6 +178,7 @@
     <add>4.3</add>
     <html>
       <type>Text</type>
+      <label>Number of terms</label>
     </html>
   </field>
   <field>

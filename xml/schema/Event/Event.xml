@@ -180,6 +180,7 @@
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
+      <label>Registration Start Date</label>
     </html>
   </field>
   <field>
@@ -190,6 +191,7 @@
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
+      <label>Registration End Date</label>
     </html>
   </field>
   <field>
@@ -256,6 +258,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment Processors</label>
     </html>
     <add>1.8</add>
   </field>
@@ -457,6 +460,7 @@
     <comment>comma-separated list of email addresses to cc each time a confirmation is sent</comment>
     <html>
       <type>Text</type>
+      <label>CC Confirm</label>
     </html>
     <add>1.7</add>
   </field>
@@ -467,6 +471,7 @@
     <comment>comma-separated list of email addresses to bcc each time a confirmation is sent</comment>
     <html>
       <type>Text</type>
+      <label>BCC Confirm</label>
     </html>
     <add>1.7</add>
   </field>
@@ -647,6 +652,7 @@
     <add>3.0</add>
     <html>
       <type>CheckBox</type>
+      <label>Requires Approval</label>
     </html>
   </field>
   <field>
@@ -656,6 +662,7 @@
     <add>3.0</add>
     <html>
       <type>Text</type>
+      <label>Expiration Time</label>
     </html>
   </field>
   <field>
@@ -687,6 +694,7 @@
       <type>TextArea</type>
       <rows>4</rows>
       <cols>60</cols>
+      <label>Waitlist Text</label>
     </html>
     <localizable>true</localizable>
     <comment>Text to display when the event is full, but participants can signup for a waitlist.</comment>
@@ -699,6 +707,7 @@
       <type>TextArea</type>
       <rows>4</rows>
       <cols>60</cols>
+      <label>Approval Required Text</label>
     </html>
     <localizable>true</localizable>
     <comment>Text to display when the approval is required to complete registration for an event.</comment>
@@ -773,6 +782,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Currency</label>
     </html>
   </field>
   <field>
