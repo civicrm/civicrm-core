@@ -1863,37 +1863,35 @@ DESC limit 1");
       $receiptDate = $now;
     }
 
-    if (isset($params['amount'])) {
-      $contributionParams = array_merge([
-        'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : CRM_Utils_Time::date('YmdHis'),
-        'tax_amount' => $params['tax_amount'] ?? NULL,
-        'invoice_id' => $params['invoiceID'],
-        'currency' => $params['currencyID'],
-        'is_pay_later' => $params['is_pay_later'] ?? 0,
-        //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-        'skipLineItem' => $params['skipLineItem'] ?? 0,
-      ], $contributionParams);
+    $contributionParams = array_merge([
+      'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : CRM_Utils_Time::date('YmdHis'),
+      'tax_amount' => $params['tax_amount'] ?? NULL,
+      'invoice_id' => $params['invoiceID'],
+      'currency' => $params['currencyID'],
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
+      'skipLineItem' => $params['skipLineItem'] ?? 0,
+    ], $contributionParams);
 
-      if ($this->getSubmittedValue('send_receipt')) {
-        $contributionParams += [
-          'receipt_date' => $receiptDate,
-        ];
-      }
-
-      if ($recurringContributionID) {
-        $contributionParams['contribution_recur_id'] = $recurringContributionID;
-      }
-
-      $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-
-      // @todo this is the wrong place for this - it should be done as close to form submission
-      // as possible
-      $contributionParams['total_amount'] = $params['amount'];
-      $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
-
-      // lets store it in the form variable so postProcess hook can get to this and use it
-      $form->_contributionID = $contribution->id;
+    if ($this->getSubmittedValue('send_receipt')) {
+      $contributionParams += [
+        'receipt_date' => $receiptDate,
+      ];
     }
+
+    if ($recurringContributionID) {
+      $contributionParams['contribution_recur_id'] = $recurringContributionID;
+    }
+
+    $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+
+    // @todo this is the wrong place for this - it should be done as close to form submission
+    // as possible
+    $contributionParams['total_amount'] = $params['amount'];
+    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
+
+    // lets store it in the form variable so postProcess hook can get to this and use it
+    $form->_contributionID = $contribution->id;
 
     $transaction->commit();
     return $contribution;
