@@ -6,7 +6,7 @@
           <label for="crm-search-join-{{ $index }}">{{:: ts('With') }}</label>
           <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" disabled >
           <select class="form-control" ng-model="join[1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
-          <button class="btn btn-xs btn-danger-outline" ng-click="$ctrl.clearParam('join', $index)" title="{{:: ts('Remove join') }}">
+          <button class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
             <i class="crm-i fa-trash" aria-hidden="true"></i>
           </button>
         </div>
