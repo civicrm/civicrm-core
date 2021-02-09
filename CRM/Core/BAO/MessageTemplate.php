@@ -616,7 +616,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $domain = CRM_Core_BAO_Domain::getDomain();
     $mailContent['subject'] = CRM_Utils_Token::replaceDomainTokens($mailContent['subject'], $domain, FALSE, $tokens['subject'], $escapeSmarty);
     $mailContent['text'] = CRM_Utils_Token::replaceDomainTokens($mailContent['text'], $domain, FALSE, $tokens['text'], $escapeSmarty);
-    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens, $escapeSmarty);
+    $mailContent['html'] = CRM_Utils_Token::replaceDomainTokens($mailContent['html'], $domain, TRUE, $tokens['html'], $escapeSmarty);
     return $mailContent;
   }
 
