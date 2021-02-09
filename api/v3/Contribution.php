@@ -684,7 +684,7 @@ function _ipn_process_transaction($params, $contribution, $input, $ids) {
     'related_contact' => $ids['related_contact'] ?? NULL,
     'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
     'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-  ], $objects['contribution'],
+  ], $objects['contribution']->id ?? NULL,
     $params['is_post_payment_create'] ?? NULL);
 }
 

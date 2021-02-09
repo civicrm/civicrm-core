@@ -362,7 +362,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
       'related_contact' => NULL,
       'participant' => $params['component_id'],
       'contributionRecur' => NULL,
-    ], $contribution);
+    ], $contribution->id ?? NULL);
 
     // reset template values before processing next transactions
     $template->clearTemplateVars();
