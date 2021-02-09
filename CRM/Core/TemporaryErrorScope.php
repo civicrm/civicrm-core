@@ -35,6 +35,7 @@ class CRM_Core_TemporaryErrorScope {
    * @return CRM_Core_TemporaryErrorScope
    */
   public static function ignoreException() {
+    CRM_Core_Error::deprecatedWarning('calling functions MUST handle exceptions');
     return self::create(['CRM_Core_Error', 'nullHandler']);
   }
 

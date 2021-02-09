@@ -1554,8 +1554,7 @@ LIKE %1
     }
 
     if ($trapException) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      throw new CRM_Core_Exception('calling functions must handle exceptions');
     }
 
     if ($dao->isValidOption($options)) {
@@ -1567,11 +1566,6 @@ LIKE %1
     // since it is unbuffered, ($dao->N==0) is true.  This blocks the standard fetch() mechanism.
     if (CRM_Utils_Array::value('result_buffering', $options) === 0) {
       $dao->N = TRUE;
-    }
-
-    if (is_a($result, 'DB_Error')) {
-      CRM_Core_Error::deprecatedFunctionWarning('calling functions should handle exceptions');
-      return $result;
     }
 
     return $dao;

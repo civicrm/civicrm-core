@@ -49,26 +49,21 @@ class DefaultSender extends BaseListener {
         continue;
       }
 
-      // disable error reporting on real mailings (but leave error reporting for tests), CRM-5744
-      if ($job_date) {
-        $errorScope = \CRM_Core_TemporaryErrorScope::ignoreException();
-      }
-
       $headers = $message->headers();
-      $result = $mailer->send($headers['To'], $message->headers(), $message->get());
 
-      if ($job_date) {
-        unset($errorScope);
+      try {
+        $mailer->send($headers['To'], $message->headers(), $message->get());
+        $error = FALSE;
+      }
+      catch (\Exception $e) {
+        $error = $e;
       }
 
-      if (is_a($result, 'PEAR_Error')) {
-        /** @var \PEAR_Error $result */
-        // CRM-9191
-        $message = $result->getMessage();
-        if ($this->isTemporaryError($result->getMessage())) {
+      if ($error) {
+        if ($this->isTemporaryError($error->getMessage())) {
           // lets log this message and code
-          $code = $result->getCode();
-          \CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
+          \CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: " .
+            $error->getMessage() . ", Code: " . $error->getCode());
 
           // these are socket write errors which most likely means smtp connection errors
           // lets skip them and reconnect.
@@ -87,8 +82,9 @@ class DefaultSender extends BaseListener {
           \CRM_Utils_System::civiExit();
         }
         else {
-          $this->recordBounce($job, $task, $result->getMessage());
+          $this->recordBounce($job, $task, $error->getMessage());
         }
+        unset($error);
       }
       else {
         // Register the delivery event.
@@ -117,8 +113,6 @@ class DefaultSender extends BaseListener {
           }
         }
       }
-
-      unset($result);
 
       // seems like a successful delivery or bounce, lets decrement error count
       // only if we have smtp connection errors
