@@ -4205,10 +4205,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     unset($ids);
     $contributionID = !empty($contribution->id) ? (int) $contribution->id : NULL;
 
-    // The previous details are used when calculating line items so keep it before any code that 'does something'
-    if (!empty($contribution->id)) {
-      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);
-    }
     $inputContributionWhiteList = [
       'fee_amount',
       'net_amount',
@@ -4243,7 +4239,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
-    $changeDate = CRM_Utils_Array::value('trxn_date', $input, date('YmdHis'));
+
     if (!$contributionID) {
       $contributionResult = self::repeatTransaction($input, $contributionParams);
       $contributionID = $contributionResult['id'];
@@ -4253,7 +4249,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if ($contributionParams['contribution_status_id'] === $completedContributionStatusID) {
         self::updateMembershipBasedOnCompletionOfContribution(
           $contributionID,
-          $changeDate
+          $input['trxn_date'] ?? date('YmdHis')
         );
       }
     }
