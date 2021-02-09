@@ -510,17 +510,11 @@
             ctrl.stale = true;
           }
         }
-        if (ctrl.load) {
-          ctrl.saved = false;
-        }
       }
 
       function onChangeFilters() {
         ctrl.stale = true;
         ctrl.selectedRows.length = 0;
-        if (ctrl.load) {
-          ctrl.saved = false;
-        }
         if (ctrl.autoSearch) {
           ctrl.refreshAll();
         }
