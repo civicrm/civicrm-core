@@ -65,6 +65,9 @@
     <default>NULL</default>
     <required>false</required>
     <comment>When was this cron entry last run</comment>
+    <html>
+      <label>Last Run</label>
+    </html>
     <add>4.1</add>
   </field>
   <field>
@@ -73,6 +76,9 @@
     <default>NULL</default>
     <required>false</required>
     <comment>When is this cron entry scheduled to run</comment>
+    <html>
+      <label>Scheduled Run Date</label>
+    </html>
     <add>4.7</add>
   </field>
   <field>

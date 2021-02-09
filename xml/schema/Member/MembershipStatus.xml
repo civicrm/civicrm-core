@@ -78,6 +78,9 @@
     <name>start_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range begins this many units from start_event.</comment>
+    <html>
+      <label>Start Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -112,6 +115,9 @@
     <name>end_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range ends this many units from end_event.</comment>
+    <html>
+      <label>End Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>

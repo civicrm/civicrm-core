@@ -50,6 +50,9 @@
     <type>text</type>
     <comment>data associated with this group / name combo</comment>
     <serialize>PHP</serialize>
+    <html>
+      <label>Value</label>
+    </html>
     <add>4.1</add>
   </field>
   <field>

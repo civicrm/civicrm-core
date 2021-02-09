@@ -113,6 +113,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Url where a page should redirected to, if next url not known.</comment>
+    <html>
+      <label>Return URL</label>
+    </html>
     <add>2.1</add>
   </field>
   <field>
@@ -120,6 +123,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Arguments to pass to return_url</comment>
+    <html>
+      <label>Return URL Arguments</label>
+    </html>
     <add>2.1</add>
   </field>
   <field>

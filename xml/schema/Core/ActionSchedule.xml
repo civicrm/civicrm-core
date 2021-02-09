@@ -41,12 +41,18 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Recipient</comment>
+    <html>
+      <label>Recipient</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
     <name>limit_to</name>
     <type>boolean</type>
     <comment>Is this the recipient criteria limited to OR in addition to?</comment>
+    <html>
+      <label>Limit To</label>
+    </html>
     <add>4.4</add>
   </field>
   <field>
@@ -55,6 +61,9 @@
     <length>255</length>
     <comment>Entity value</comment>
     <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Entity value</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -63,6 +72,9 @@
     <length>64</length>
     <comment>Entity status</comment>
     <serialize>SEPARATOR_TRIMMED</serialize>
+    <html>
+      <label>Entity Status</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -70,6 +82,9 @@
     <type>int unsigned</type>
     <comment>Reminder Interval.</comment>
     <default>0</default>
+    <html>
+      <label>Start Action Offset</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -91,6 +106,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Reminder Action</comment>
+    <html>
+      <label>Start Action condition</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -98,6 +116,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity date</comment>
+    <html>
+      <label>Start Action Date</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -126,6 +147,9 @@
     <type>int unsigned</type>
     <default>0</default>
     <comment>Time interval for repeating the reminder.</comment>
+    <html>
+      <label>Repetition Frequency Interval</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -146,6 +170,9 @@
     <name>end_frequency_interval</name>
     <type>int unsigned</type>
     <comment>Time interval till repeating the reminder.</comment>
+    <html>
+      <label>End Frequency Interval</label>
+    </html>
     <add>3.4</add>
     <default>0</default>
   </field>
@@ -154,6 +181,9 @@
     <type>varchar</type>
     <length>32</length>
     <comment>Reminder Action till repeating the reminder.</comment>
+    <html>
+      <label>End Action</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -161,6 +191,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Entity end date</comment>
+    <html>
+      <label>End Date</label>
+    </html>
     <add>3.4</add>
   </field>
   <field>
@@ -345,6 +378,9 @@
     <type>varchar</type>
     <length>64</length>
     <comment>Used for repeating entity</comment>
+    <html>
+      <label>Used For</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -352,6 +388,9 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Used for multilingual installation</comment>
+    <html>
+      <label>Filter Contact Language</label>
+    </html>
     <add>4.7</add>
   </field>
   <field>
@@ -359,6 +398,9 @@
     <type>varchar</type>
     <length>8</length>
     <comment>Used for multilingual installation</comment>
+    <html>
+      <label>Communication Language</label>
+    </html>
     <add>4.7</add>
   </field>
   <field>
@@ -378,6 +420,9 @@
     <comment>When the reminder was created or modified.</comment>
     <required>false</required>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>5.34</add>
   </field>
   <field>

@@ -201,6 +201,9 @@
     <name>relationship_direction</name>
     <type>varchar</type>
     <length>128</length>
+    <html>
+      <label>Relationship Direction</label>
+    </html>
     <add>1.7</add>
     <serialize>SEPARATOR_TRIMMED</serialize>
   </field>

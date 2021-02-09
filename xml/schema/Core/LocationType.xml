@@ -51,6 +51,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Location Type Description.</comment>
+    <html>
+      <label>Description</label>
+    </html>
     <add>1.1</add>
   </field>
   <field>

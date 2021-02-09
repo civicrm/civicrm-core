@@ -63,12 +63,18 @@
     <name>secret</name>
     <type>text</type>
     <comment>Shared secret</comment>
+    <html>
+      <label>Secret</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
     <name>perm</name>
     <type>text</type>
     <comment>Permissions approved for the service (JSON)</comment>
+    <html>
+      <label>Permissions</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -76,11 +82,14 @@
     <type>text</type>
     <comment>Options for the service (JSON)</comment>
     <serialize>JSON</serialize>
+    <html>
+      <label>Options</label>
+    </html>
     <add>4.6</add>
   </field>
-  
+
   <!-- Connection lifecycle -->
-  
+
   <field>
     <name>is_active</name>
     <title>Is Active</title>
@@ -95,6 +104,9 @@
     <comment>When was the connection was created.</comment>
     <required>false</required>
     <default>NULL</default>
+    <html>
+      <label>Created Date</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -103,6 +115,9 @@
     <comment>When the connection was created or modified.</comment>
     <required>false</required>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
@@ -111,6 +126,9 @@
     <comment>The last time the application metadata was fetched.</comment>
     <required>false</required>
     <default>NULL</default>
+    <html>
+      <label>Fetched Date</label>
+    </html>
     <add>4.6</add>
   </field>
 </table>

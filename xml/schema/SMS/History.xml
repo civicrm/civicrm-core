@@ -56,6 +56,9 @@
     <name>sent_date</name>
     <type>date</type>
     <comment>When was this SMS sent</comment>
+    <html>
+      <label>Sent Date</label>
+    </html>
     <add>1.4</add>
   </field>
 </table>

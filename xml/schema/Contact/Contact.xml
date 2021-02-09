@@ -355,6 +355,9 @@
     <type>varchar</type>
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
+    <html>
+      <label>API KEY</label>
+    </html>
     <add>2.2</add>
     <permission>
       <or>administer CiviCRM, edit api keys</or>
@@ -855,6 +858,9 @@
     <required>false</required>
     <export>true</export>
     <default>NULL</default>
+    <html>
+      <label>Created Date</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>
@@ -869,6 +875,9 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>

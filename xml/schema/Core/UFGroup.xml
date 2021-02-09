@@ -125,6 +125,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Redirect to URL.</comment>
+    <html>
+      <label>Post URL</label>
+    </html>
     <add>1.4</add>
   </field>
   <field>

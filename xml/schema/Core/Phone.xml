@@ -138,6 +138,9 @@
     <type>varchar</type>
     <length>32</length>
     <comment>Phone number stripped of all whitespace, letters, and punctuation.</comment>
+    <html>
+      <label>Numeric</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>

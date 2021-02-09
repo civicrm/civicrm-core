@@ -68,6 +68,9 @@
     <type>int</type>
     <comment>column no for this widget</comment>
     <default>0</default>
+    <html>
+      <label>Column Number</label>
+    </html>
     <add>3.1</add>
   </field>
   <field>
@@ -108,6 +111,9 @@
     <name>content</name>
     <type>longtext</type>
     <comment>dashlet content</comment>
+    <html>
+      <label>Content</label>
+    </html>
     <add>3.3</add>
     <drop>4.7</drop>
   </field>

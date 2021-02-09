@@ -43,6 +43,9 @@
     <name>subject</name>
     <type>varchar</type>
     <length>255</length>
+    <html>
+      <label>Subject</label>
+    </html>
   </field>
   <field>
     <name>body_html</name>

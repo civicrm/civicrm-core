@@ -144,6 +144,9 @@
     <type>varchar</type>
     <length>255</length>
     <comment>Name of the table that holds the values for this group.</comment>
+    <html>
+      <label>Table Name</label>
+    </html>
     <add>2.0</add>
   </field>
   <field>
