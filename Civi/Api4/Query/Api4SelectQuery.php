@@ -211,10 +211,12 @@ class Api4SelectQuery {
         return strpos($item, '*') !== FALSE && strpos($item, '.') !== FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
       });
 
-      foreach ($wildFields as $item) {
-        $pos = array_search($item, array_values($select));
-        $this->autoJoinFK($item);
-        $matches = SelectUtil::getMatchingFields($item, array_keys($this->apiFieldSpec));
+      foreach ($wildFields as $wildField) {
+        $pos = array_search($wildField, array_values($select));
+        // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
+        $idField = substr($wildField, 0, strrpos($wildField, '.')) . '.id';
+        $this->autoJoinFK($idField);
+        $matches = SelectUtil::getMatchingFields($wildField, array_keys($this->apiFieldSpec));
         array_splice($select, $pos, 1, $matches);
       }
       $select = array_unique($select);
