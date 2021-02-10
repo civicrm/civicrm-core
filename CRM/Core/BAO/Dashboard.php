@@ -42,12 +42,13 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *   array of dashlets
    */
   public static function getContactDashlets() {
-    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
-      Civi::$statics[__CLASS__][__FUNCTION__] = [];
+    $cid = CRM_Core_Session::getLoggedInContactID();
+    if ($cid && !isset(Civi::$statics[__CLASS__][__FUNCTION__][$cid])) {
+      Civi::$statics[__CLASS__][__FUNCTION__][$cid] = [];
       $params = [
         'select' => ['*', 'dashboard_contact.*'],
         'join' => [
-          ['DashboardContact AS dashboard_contact', FALSE, ['dashboard_contact.contact_id', '=', CRM_Core_Session::getLoggedInContactID()]],
+          ['DashboardContact AS dashboard_contact', FALSE, ['dashboard_contact.contact_id', '=', $cid]],
         ],
         'where' => [
           ['domain_id', '=', 'current_domain'],
@@ -66,11 +67,11 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
       foreach ($results as $item) {
         if ($item['is_active'] && self::checkPermission($item['permission'], $item['permission_operator'])) {
-          Civi::$statics[__CLASS__][__FUNCTION__][] = $item;
+          Civi::$statics[__CLASS__][__FUNCTION__][$cid][] = $item;
         }
       }
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__];
+    return Civi::$statics[__CLASS__][__FUNCTION__][$cid] ?? [];
   }
 
   /**
