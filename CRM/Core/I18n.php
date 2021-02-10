@@ -184,8 +184,11 @@ class CRM_Core_I18n {
     static $enabled = NULL;
 
     if (!$all) {
-      $all = CRM_Contact_BAO_Contact::buildOptions('preferred_language');
+      // Use `getValues`, not `buildOptions` to bypass hook_civicrm_fieldOptions.  See core#1132.
+      CRM_Core_OptionValue::getValues(['name' => 'languages'], $optionValues, 'weight', TRUE);
+      $all = array_column($optionValues, 'label', 'name');
 
+      // FIXME: How is this not duplicative of the lines above?
       // get labels
       $rows = [];
       $labels = [];
