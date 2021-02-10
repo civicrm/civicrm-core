@@ -10,6 +10,7 @@ return [
   ],
   'basePages' => ['civicrm/search', 'civicrm/admin/search'],
   'requires' => ['crmSearchDisplay', 'crmUi', 'crmSearchActions', 'ui.bootstrap'],
+  'bundles' => ['bootstrap3'],
   'exports' => [
     'crm-search-display-table' => 'E',
   ],
