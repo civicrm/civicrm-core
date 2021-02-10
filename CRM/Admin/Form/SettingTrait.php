@@ -340,7 +340,7 @@ trait CRM_Admin_Form_SettingTrait {
       }
       elseif ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
         // This will be an array with one value.
-        $settings[$setting] = (int) reset($settings[$setting]);
+        $settings[$setting] = (bool) reset($settings[$setting]);
       }
     }
     civicrm_api3('setting', 'create', $settings);
