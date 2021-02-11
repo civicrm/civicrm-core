@@ -137,13 +137,24 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * @inheritDoc
+   * Evaluate the content of a single token.
+   *
+   * @param \Civi\Token\TokenRow $row
+   *   The record for which we want token values.
+   * @param string $entity
+   *   The name of the token entity.
+   * @param string $field
+   *   The name of the token field.
+   * @param mixed $prefetch
+   *   Any data that was returned by the prefetch().
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
-    $activityId = $row->context[$this->getEntityContextSchema()];
+    $entityId = $row->context[$this->getEntityContextSchema()];
 
-    $activity = $prefetch['activity'][$activityId];
+    $activity = $prefetch['activity'][$entityId];
 
     if (in_array($field, ['activity_date_time', 'created_date', 'modified_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity[$field]));
