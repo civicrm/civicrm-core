@@ -2,6 +2,14 @@
 (function(angular, $, _) {
   "use strict";
 
+  function backfillEntityDefaults(entity) {
+    // These fields did not exist in prior versions. In absence of explicit, these are the values inferred by runtime/server-side.
+    // We cannot currently backfill schema in the upgrade, so this is the next best opportunity.
+    if (entity.actions === undefined) entity.actions = {create: true, update: true};
+    if (entity.security === undefined) entity.security = 'RBAC';
+    return entity;
+  }
+
   angular.module('afGuiEditor').component('afGuiEditor', {
     templateUrl: '~/afGuiEditor/afGuiEditor.html',
     bindings: {
@@ -45,7 +53,7 @@
         if ($scope.afform.type === 'form') {
           editor.allowEntityConfig = true;
           editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0]['#children'];
-          $scope.entities = afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name');
+          $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
 
           if (editor.mode === 'create') {
             editor.addEntity(editor.entity);
@@ -56,11 +64,11 @@
         if ($scope.afform.type === 'block') {
           editor.layout['#children'] = $scope.afform.layout;
           editor.blockEntity = $scope.afform.join || $scope.afform.block;
-          $scope.entities[editor.blockEntity] = {
+          $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
             label: afGui.getEntity(editor.blockEntity).label
-          };
+          });
         }
 
         if ($scope.afform.type === 'search') {
@@ -93,13 +101,13 @@
         while (!!$scope.entities[type + num]) {
           num++;
         }
-        $scope.entities[type + num] = _.assign($parse(meta.defaults)($scope), {
+        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)($scope), {
           '#tag': 'af-entity',
           type: meta.entity,
           name: type + num,
           label: meta.label + ' ' + num,
           loading: true,
-        });
+        }));
 
         function addToCanvas() {
           // Add this af-entity tag after the last existing one
