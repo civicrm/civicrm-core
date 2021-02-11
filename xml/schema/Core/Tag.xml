@@ -108,11 +108,11 @@
   </field>
   <field>
     <name>created_id</name>
-    <title>Tag Created By Contact ID</title>
+    <title>Created By Contact ID</title>
     <type>int unsigned</type>
     <comment>FK to civicrm_contact, who created this tag</comment>
     <html>
-      <label>Tag Created By</label>
+      <label>Created By</label>
     </html>
     <add>3.4</add>
   </field>

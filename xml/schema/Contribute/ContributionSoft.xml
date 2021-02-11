@@ -18,7 +18,6 @@
     <type>int unsigned</type>
     <required>true</required>
     <import>true</import>
-    <title>Soft Credit ID</title>
     <comment>Soft Credit ID</comment>
     <html>
       <type>Number</type>

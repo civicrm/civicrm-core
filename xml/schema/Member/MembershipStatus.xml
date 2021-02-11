@@ -57,6 +57,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event</label>
     </html>
   </field>
   <field>
@@ -70,12 +71,16 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>Start Event Adjust Unit</label>
     </html>
   </field>
   <field>
     <name>start_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range begins this many units from start_event.</comment>
+    <html>
+      <label>Start Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -89,6 +94,7 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event</label>
     </html>
   </field>
   <field>
@@ -102,12 +108,16 @@
     <add>1.5</add>
     <html>
       <type>Select</type>
+      <label>End Event Adjust Unit</label>
     </html>
   </field>
   <field>
     <name>end_event_adjust_interval</name>
     <type>int</type>
     <comment>Status range ends this many units from end_event.</comment>
+    <html>
+      <label>End Event Adjust Interval</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>

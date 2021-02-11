@@ -93,6 +93,7 @@
     <default>0</default>
     <html>
       <type>CheckBox</type>
+      <label>Do Not Email</label>
     </html>
     <add>1.1</add>
   </field>
@@ -106,6 +107,7 @@
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
+      <label>Do Not Phone</label>
     </html>
   </field>
   <field>
@@ -118,6 +120,7 @@
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
+      <label>Do Not Mail</label>
     </html>
   </field>
   <field>
@@ -130,6 +133,7 @@
     <add>3.0</add>
     <html>
       <type>CheckBox</type>
+      <label>Do Not Sms</label>
     </html>
   </field>
   <field>
@@ -142,6 +146,7 @@
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
+      <label>Do Not Trade</label>
     </html>
   </field>
   <field>
@@ -155,6 +160,7 @@
     <add>1.1</add>
     <html>
       <type>CheckBox</type>
+      <label>Is Opt Out</label>
     </html>
   </field>
   <field>
@@ -168,6 +174,7 @@
     <add>1.1</add>
     <html>
       <type>Text</type>
+      <label>Legal Identifier</label>
     </html>
   </field>
   <field>
@@ -177,6 +184,7 @@
     <html>
       <type>Text</type>
       <size>8</size>
+      <label>External Identifier</label>
     </html>
 
     <import>true</import>
@@ -248,6 +256,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Legal Name</label>
     </html>
     <contactType>Organization</contactType>
     <import>true</import>
@@ -265,6 +274,7 @@
     <html>
       <type>File</type>
       <size>30</size>
+      <label>Image URL</label>
     </html>
   </field>
   <field>
@@ -322,6 +332,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Preferred Mail Format</label>
     </html>
   </field>
   <field>
@@ -344,6 +355,9 @@
     <type>varchar</type>
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
+    <html>
+      <label>API KEY</label>
+    </html>
     <add>2.2</add>
     <permission>
       <or>administer CiviCRM, edit api keys</or>
@@ -377,6 +391,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>First Name</label>
     </html>
     <import>true</import>
     <headerPattern>/^first|(f(irst\s)?name)$/i</headerPattern>
@@ -398,6 +413,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Middle Name</label>
     </html>
     <import>true</import>
     <headerPattern>/^middle|(m(iddle\s)?name)$/i</headerPattern>
@@ -414,6 +430,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Last Name</label>
     </html>
     <import>true</import>
     <headerPattern>/^last|(l(ast\s)?name)$/i</headerPattern>
@@ -479,6 +496,7 @@
     <import>true</import>
     <html>
       <type>Text</type>
+      <label>Formal Title</label>
     </html>
     <headerPattern>/^title/i</headerPattern>
     <comment>Formal (academic or similar) title in front of name. (Prof., Dr. etc.)</comment>
@@ -530,6 +548,7 @@
     <add>3.0</add>
     <html>
       <type>Text</type>
+      <label>Email Greeting Custom</label>
     </html>
   </field>
   <field>
@@ -564,6 +583,7 @@
     <add>3.0</add>
     <html>
       <type>Text</type>
+      <label>Postal Greeting Custom</label>
     </html>
   </field>
   <field>
@@ -598,6 +618,7 @@
     <add>3.0</add>
     <html>
       <type>Text</type>
+      <label>Addressee Custom</label>
     </html>
   </field>
   <field>
@@ -615,6 +636,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Job Title</label>
     </html>
     <import>true</import>
     <headerPattern>/^job|(j(ob\s)?title)$/i</headerPattern>
@@ -656,6 +678,7 @@
     <html>
       <type>Select Date</type>
       <formatType>birth</formatType>
+      <label>Birth Date</label>
     </html>
     <contactType>Individual</contactType>
   </field>
@@ -671,6 +694,7 @@
     <required>true</required>
     <html>
       <type>CheckBox</type>
+      <label>Is Deceased</label>
     </html>
     <contactType>Individual</contactType>
   </field>
@@ -690,6 +714,7 @@
     <html>
       <type>Select Date</type>
       <formatType>birth</formatType>
+      <label>Deceased Date</label>
     </html>
     <contactType>Individual</contactType>
   </field>
@@ -700,6 +725,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Household Name</label>
     </html>
     <import>true</import>
     <headerPattern>/^household|(h(ousehold\s)?name)$/i</headerPattern>
@@ -739,6 +765,7 @@
     <html>
       <type>Text</type>
       <size>30</size>
+      <label>Organization Name</label>
     </html>
     <import>true</import>
     <headerPattern>/^organization|(o(rganization\s)?name)$/i</headerPattern>
@@ -763,6 +790,7 @@
     <add>1.1</add>
     <html>
       <type>Text</type>
+      <label>SIC Code</label>
     </html>
     <contactType>Organization</contactType>
   </field>
@@ -830,6 +858,9 @@
     <required>false</required>
     <export>true</export>
     <default>NULL</default>
+    <html>
+      <label>Created Date</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>
@@ -844,6 +875,9 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>4.3</add>
   </field>
   <index>

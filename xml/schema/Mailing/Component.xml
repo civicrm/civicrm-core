@@ -43,6 +43,9 @@
     <name>subject</name>
     <type>varchar</type>
     <length>255</length>
+    <html>
+      <label>Subject</label>
+    </html>
   </field>
   <field>
     <name>body_html</name>
@@ -63,6 +66,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>80</cols>
+      <label>Body in Text Format</label>
     </html>
   </field>
   <field>

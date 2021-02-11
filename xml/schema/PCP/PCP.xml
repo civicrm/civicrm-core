@@ -74,6 +74,7 @@
     <add>2.2</add>
     <html>
       <type>TextArea</type>
+      <label>Intro Text</label>
     </html>
   </field>
   <field>
@@ -83,6 +84,7 @@
     <add>2.2</add>
     <html>
       <type>TextArea</type>
+      <label>Page Text</label>
     </html>
   </field>
   <field>

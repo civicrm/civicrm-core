@@ -99,6 +99,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Currency</label>
     </html>
   </field>
   <field>

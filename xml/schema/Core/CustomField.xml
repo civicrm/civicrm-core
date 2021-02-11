@@ -68,7 +68,7 @@
   <field>
     <name>data_type</name>
     <type>varchar</type>
-    <title>Custom Field Data Type</title>
+    <title>Data Type</title>
     <length>16</length>
     <required>true</required>
     <comment>Controls location of data storage in extended_data table.</comment>
@@ -84,7 +84,7 @@
   <field>
     <name>html_type</name>
     <type>varchar</type>
-    <title>Custom Field HTML Type</title>
+    <title>HTML Type</title>
     <length>32</length>
     <required>true</required>
     <comment>HTML types plus several built-in extended types.</comment>

@@ -159,8 +159,9 @@
     <comment>Total amount of this contribution. Use market value for non-monetary gifts.</comment>
     <add>1.3</add>
     <html>
-     <type>Text</type>
-   </html>
+      <type>Text</type>
+      <label>Total Amount</label>
+    </html>
   </field>
   <index>
     <name>index_total_amount_receive_date</name>
@@ -177,8 +178,9 @@
     <comment>actual processor fee if known - may be 0.</comment>
     <add>1.3</add>
     <html>
-     <type>Text</type>
-   </html>
+      <type>Text</type>
+      <label>Fee Amount</label>
+    </html>
   </field>
   <field>
     <name>net_amount</name>
@@ -189,8 +191,9 @@
     <comment>actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.</comment>
     <add>1.3</add>
     <html>
-     <type>Text</type>
-   </html>
+      <type>Text</type>
+      <label>Net Amount</label>
+    </html>
   </field>
   <field>
     <name>trxn_id</name>
@@ -250,6 +253,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Currency</label>
     </html>
   </field>
   <field>
@@ -290,6 +294,7 @@
     <html>
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
+      <label>Receipt Date</label>
     </html>
     <add>1.3</add>
   </field>
@@ -510,7 +515,8 @@
     <comment>Stores the date when revenue should be recognized.</comment>
     <html>
       <type>Select Date</type>
-        <formatType>activityDateTime</formatType>
+      <formatType>activityDateTime</formatType>
+      <label>Revenue Recognition Date</label>
     </html>
     <add>4.7</add>
   </field>

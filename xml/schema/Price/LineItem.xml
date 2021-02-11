@@ -115,6 +115,7 @@
     <add>1.7</add>
     <html>
       <type>Text</type>
+      <label>Unit Price</label>
     </html>
   </field>
   <field>

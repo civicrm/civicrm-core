@@ -270,6 +270,7 @@
     <add>3.4</add>
     <html>
       <type>Text</type>
+      <label>Goal Revenue</label>
     </html>
   </field>
 </table>

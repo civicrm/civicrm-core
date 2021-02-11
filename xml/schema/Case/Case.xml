@@ -102,6 +102,7 @@
       <type>TextArea</type>
       <rows>8</rows>
       <cols>60</cols>
+      <label>Details</label>
     </html>
     <comment>Details populated from Open Case. Only used in the CiviCase extension.</comment>
     <add>1.8</add>
@@ -130,7 +131,6 @@
     <type>boolean</type>
     <default>0</default>
     <import>true</import>
-    <title>Case Deleted</title>
     <html>
       <type>CheckBox</type>
     </html>
@@ -149,6 +149,9 @@
     <required>false</required>
     <export>true</export>
     <default>NULL</default>
+    <html>
+      <label>Created Date</label>
+    </html>
     <add>4.7</add>
   </field>
   <field>
@@ -159,6 +162,9 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
     <add>4.7</add>
   </field>
 </table>

@@ -58,11 +58,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
-    </html>
-    <add>4.3</add>
-    <html>
       <label>Financial Type</label>
     </html>
+    <add>4.3</add>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -83,6 +81,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment Processors</label>
     </html>
     <add>1.8</add>
   </field>
@@ -197,6 +196,9 @@
     <length>255</length>
     <localizable>true</localizable>
     <comment>Initial amount label for partial payment</comment>
+    <html>
+      <label>Initial Amount Label</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
@@ -204,12 +206,18 @@
     <type>text</type>
     <localizable>true</localizable>
     <comment>Initial amount help text for partial payment</comment>
+    <html>
+      <label>Initial Amount Help Text</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
     <name>min_initial_amount</name>
     <type>decimal</type>
     <comment>Minimum initial amount for partial payment</comment>
+    <html>
+      <label>Min. Initial Amount</label>
+    </html>
     <add>4.3</add>
   </field>
   <field>
@@ -245,6 +253,9 @@
     <name>goal_amount</name>
     <type>decimal</type>
     <comment>The target goal for this page, allows people to build a goal meter</comment>
+    <html>
+      <label>Goal Amount</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -368,7 +379,6 @@
     <name>start_date</name>
     <title>Contribution Page Start Date</title>
     <type>datetime</type>
-    <title>Contribution Page Start Date</title>
     <comment>Date and time that this page starts.</comment>
     <add>1.8</add>
   </field>

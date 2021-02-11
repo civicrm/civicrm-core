@@ -171,6 +171,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Billing Mode</label>
     </html>
     <add>1.8</add>
   </field>

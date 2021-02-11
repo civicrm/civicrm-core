@@ -191,6 +191,7 @@
     <comment>Reply-To Email of mailing</comment>
     <html>
       <type>Text</type>
+      <label>Reply-To Email</label>
     </html>
   </field>
   <field>
@@ -218,17 +219,24 @@
     <comment>Subject of mailing</comment>
     <html>
       <type>Text</type>
+      <label>Subject</label>
     </html>
   </field>
   <field>
     <name>body_text</name>
     <type>longtext</type>
     <comment>Body of the mailing in text format.</comment>
+    <html>
+      <label>Body Text</label>
+    </html>
   </field>
   <field>
     <name>body_html</name>
     <type>longtext</type>
     <comment>Body of the mailing in html format.</comment>
+    <html>
+      <label>Body HTML</label>
+    </html>
   </field>
   <field>
     <name>url_tracking</name>
@@ -236,6 +244,7 @@
     <comment>Should we track URL click-throughs for this mailing?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Url Tracking</label>
     </html>
   </field>
   <field>
@@ -244,6 +253,7 @@
     <comment>Should we forward replies back to the author?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Forward Replies</label>
     </html>
   </field>
   <field>
@@ -252,6 +262,7 @@
     <comment>Should we enable the auto-responder?</comment>
     <html>
       <type>CheckBox</type>
+      <label>Auto Responder</label>
     </html>
   </field>
   <field>
@@ -292,6 +303,7 @@
     <comment>Overwrite the VERP address in Reply-To</comment>
     <html>
       <type>CheckBox</type>
+      <label>Overwrite VERP</label>
     </html>
   </field>
   <field>
@@ -330,6 +342,9 @@
    <required>false</required>
    <export>true</export>
    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <html>
+      <label>Modified Date</label>
+    </html>
    <add>4.7</add>
   </field>
   <field>
@@ -526,6 +541,9 @@
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::emailSelectMethods</callback>
     </pseudoconstant>
+    <html>
+      <label>Email Selection Method</label>
+    </html>
     <add>4.6</add>
   </field>
   <field>
