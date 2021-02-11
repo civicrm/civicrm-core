@@ -1,5 +1,6 @@
+<!-- This example is entirely public; anonymous users may use it to submit a `Contact`, but they cannot view or modify data. -->
 <af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual', source: 'Hello'}" url-autofill="1" type="Contact" name="me" label="Myself" />
+  <af-entity data="{contact_type: 'Individual', source: 'Hello'}" url-autofill="1" security="FBAC" actions="{create: true, update: false}" type="Contact" name="me" label="Myself" />
   <fieldset af-fieldset="me">
     <legend class="af-text">Individual 1</legend>
     <div class="af-container">

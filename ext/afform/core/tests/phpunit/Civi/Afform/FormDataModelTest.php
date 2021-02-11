@@ -49,6 +49,8 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
             'propB' => ['name' => 'propB', 'defn' => ['title' => 'Whiz']],
           ],
           'joins' => [],
+          'security' => 'RBAC',
+          'actions' => ['create' => 1, 'update' => 1],
         ],
       ],
     ];
@@ -61,12 +63,30 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
           'name' => 'foobar',
           'fields' => [],
           'joins' => [],
+          'security' => 'RBAC',
+          'actions' => ['create' => 1, 'update' => 1],
         ],
         'whiz_bang' => [
           'type' => 'Whiz',
           'name' => 'whiz_bang',
           'fields' => [],
           'joins' => [],
+          'security' => 'RBAC',
+          'actions' => ['create' => 1, 'update' => 1],
+        ],
+      ],
+    ];
+
+    $cases[] = [
+      'html' => '<af-form><div><af-entity type="Foo" name="foobar" security="FBAC" actions="{create: false, update: true}"/></div></af-form>',
+      'entities' => [
+        'foobar' => [
+          'type' => 'Foo',
+          'name' => 'foobar',
+          'fields' => [],
+          'joins' => [],
+          'security' => 'FBAC',
+          'actions' => ['create' => FALSE, 'update' => TRUE],
         ],
       ],
     ];

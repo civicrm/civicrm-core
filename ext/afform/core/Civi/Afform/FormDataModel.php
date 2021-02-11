@@ -13,6 +13,8 @@ use Civi\Api4\Afform;
  */
 class FormDataModel {
 
+  protected $defaults = ['security' => 'RBAC', 'actions' => ['create' => TRUE, 'update' => TRUE]];
+
   /**
    * @var array
    *   Ex: $entities['spouse']['type'] = 'Contact';
@@ -34,6 +36,7 @@ class FormDataModel {
     $root = AHQ::makeRoot($layout);
     $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
     foreach (array_keys($this->entities) as $entity) {
+      $this->entities[$entity] = array_merge($this->defaults, $this->entities[$entity]);
       $this->entities[$entity]['fields'] = $this->entities[$entity]['joins'] = [];
     }
     // Pre-load full list of afforms in case this layout embeds other afform directives
@@ -60,14 +63,61 @@ class FormDataModel {
         throw new UnauthorizedException("Cannot delegate APIv4 calls on behalf of unrecognized entity ($entityName)");
       }
       $this->secureApi4s[$entityName] = function(string $entity, string $action, $params = [], $index = NULL) use ($entityName) {
-        // FIXME Pick real value of checkPermissions. Possibly limit by ID.
-        // \Civi::log()->info("secureApi4($entityName): call($entity, $action)");
-        // $params['checkPermissions'] = FALSE;
-        $params['checkPermissions'] = TRUE;
+        $entityDefn = $this->entities[$entityName];
+
+        switch ($entityDefn['security']) {
+          // Role-based access control. Limits driven by the current user's role/group/permissions.
+          case 'RBAC':
+            $params['checkPermissions'] = TRUE;
+            break;
+
+          // Form-based access control. Limits driven by form configuration.
+          case 'FBAC':
+            $params['checkPermissions'] = FALSE;
+            break;
+
+          default:
+            throw new UnauthorizedException("Cannot process APIv4 request for $entityName ($entity.$action): Unrecognized security model");
+        }
+
+        if (!$this->isActionAllowed($entityDefn, $entity, $action, $params)) {
+          throw new UnauthorizedException("Cannot process APIv4 request for $entityName ($entity.$action): Action is not approved");
+        }
+
         return civicrm_api4($entity, $action, $params, $index);
       };
     }
     return $this->secureApi4s[$entityName];
+  }
+
+  /**
+   * Determine if we are allowed to perform a given action for this entity.
+   *
+   * @param $entityDefn
+   * @param $entity
+   * @param $action
+   * @param $params
+   *
+   * @return bool
+   */
+  protected function isActionAllowed($entityDefn, $entity, $action, $params) {
+    if ($action === 'save') {
+      foreach ($params['records'] ?? [] as $record) {
+        $nextAction = !isset($record['id']) ? 'create' : 'update';
+        if (!$this->isActionAllowed($entityDefn, $entity, $nextAction, $record)) {
+          return FALSE;
+        }
+      }
+      return TRUE;
+    }
+
+    // "Update" effectively means "read+save".
+    if ($action === 'get') {
+      $action = 'update';
+    }
+
+    $result = !empty($entityDefn['actions'][$action]);
+    return $result;
   }
 
   /**
