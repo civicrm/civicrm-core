@@ -1,5 +1,6 @@
 <?php
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -104,6 +105,36 @@ class CRM_Utils_GuzzleMiddleware {
       default:
         return NULL;
     }
+  }
+
+  /**
+   * This logs the list of outgoing requests in curl format.
+   */
+  public static function curlLog(\Psr\Log\LoggerInterface $logger) {
+
+    $curlFmt = new class() extends \GuzzleHttp\MessageFormatter {
+
+      public function format(RequestInterface $request, ResponseInterface $response = NULL, \Exception $error = NULL) {
+        $cmd = '$ curl';
+        if ($request->getMethod() !== 'GET') {
+          $cmd .= ' -X ' . escapeshellarg($request->getMethod());
+        }
+        foreach ($request->getHeaders() as $header => $lines) {
+          foreach ($lines as $line) {
+            $cmd .= ' -H ' . escapeshellarg("$header: $line");
+          }
+        }
+        $body = (string) $request->getBody();
+        if ($body !== '') {
+          $cmd .= ' -d ' . escapeshellarg($body);
+        }
+        $cmd .= ' ' . escapeshellarg((string) $request->getUri());
+        return $cmd;
+      }
+
+    };
+
+    return \GuzzleHttp\Middleware::log($logger, $curlFmt);
   }
 
 }

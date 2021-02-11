@@ -3,6 +3,7 @@
 namespace Civi\Test;
 
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 
 /**
@@ -38,8 +39,15 @@ trait HttpTestTrait {
    */
   protected function createGuzzle($options = []) {
     $handler = HandlerStack::create();
-    $handler->push(\CRM_Utils_GuzzleMiddleware::url(), 'civi_url');
+    $handler->unshift(\CRM_Utils_GuzzleMiddleware::url(), 'civi_url');
     $handler->push(Middleware::history($this->httpHistory), 'history');
+
+    if (getenv('DEBUG') >= 2) {
+      $handler->push(Middleware::log(new \CRM_Utils_EchoLogger(), new MessageFormatter(MessageFormatter::DEBUG)), 'log');
+    }
+    elseif (getenv('DEBUG') >= 1) {
+      $handler->push(\CRM_Utils_GuzzleMiddleware::curlLog(new \CRM_Utils_EchoLogger()), 'curl_log');
+    }
 
     $defaults = [
       'handler' => $handler,
