@@ -2,6 +2,7 @@
 
 namespace Civi\Afform;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
 
 /**
@@ -23,6 +24,12 @@ class FormDataModel {
    */
   protected $blocks = [];
 
+  /**
+   * @var array
+   *   Ex: $secureApi4s['spouse'] = function($entity, $action, $params){...};
+   */
+  protected $secureApi4s = [];
+
   public function __construct($layout) {
     $root = AHQ::makeRoot($layout);
     $this->entities = array_column(AHQ::getTags($root, 'af-entity'), NULL, 'name');
@@ -32,6 +39,35 @@ class FormDataModel {
     // Pre-load full list of afforms in case this layout embeds other afform directives
     $this->blocks = (array) Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'directive_name'])->execute()->indexBy('directive_name');
     $this->parseFields($layout);
+  }
+
+  /**
+   * Prepare to access APIv4 on behalf of a particular entity. This will enforce
+   * any security options associated with that entity.
+   *
+   * $formDataModel->getSecureApi4('me')('Contact', 'get', ['where'=>[...]]);
+   * $formDataModel->getSecureApi4('me')('Email', 'create', [...]);
+   *
+   * @param string $entityName
+   *   Ex: 'Individual1', 'Individual2', 'me', 'spouse', 'children', 'theMeeting'
+   *
+   * @return callable
+   *   API4-style
+   */
+  public function getSecureApi4($entityName) {
+    if (!isset($this->secureApi4s[$entityName])) {
+      if (!isset($this->entities[$entityName])) {
+        throw new UnauthorizedException("Cannot delegate APIv4 calls on behalf of unrecognized entity ($entityName)");
+      }
+      $this->secureApi4s[$entityName] = function(string $entity, string $action, $params = [], $index = NULL) use ($entityName) {
+        // FIXME Pick real value of checkPermissions. Possibly limit by ID.
+        // \Civi::log()->info("secureApi4($entityName): call($entity, $action)");
+        // $params['checkPermissions'] = FALSE;
+        $params['checkPermissions'] = TRUE;
+        return civicrm_api4($entity, $action, $params, $index);
+      };
+    }
+    return $this->secureApi4s[$entityName];
   }
 
   /**
