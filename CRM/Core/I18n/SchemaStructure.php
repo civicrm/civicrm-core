@@ -440,10 +440,10 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'initial_amount_label' => [
-            'type' => "Text",
+            'label' => "Initial Amount Label",
           ],
           'initial_amount_help_text' => [
-            'type' => "Text",
+            'label' => "Initial Amount Help Text",
           ],
           'thankyou_title' => [
             'type' => "Text",
@@ -552,6 +552,7 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "80",
+            'label' => "Pre Help",
           ],
           'help_post' => [
             'type' => "TextArea",
@@ -601,16 +602,19 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "TextArea",
             'rows' => "2",
             'cols' => "60",
+            'label' => "Description",
           ],
           'help_pre' => [
             'type' => "TextArea",
             'rows' => "2",
             'cols' => "60",
+            'label' => "Pre Help",
           ],
           'help_post' => [
             'type' => "TextArea",
             'rows' => "2",
             'cols' => "60",
+            'label' => "Post Help",
           ],
         ],
         'civicrm_pcp_block' => [
@@ -703,11 +707,13 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",
+            'label' => "Waitlist Text",
           ],
           'approval_req_text' => [
             'type' => "TextArea",
             'rows' => "4",
             'cols' => "60",
+            'label' => "Approval Required Text",
           ],
           'template_title' => [
             'type' => "Text",
