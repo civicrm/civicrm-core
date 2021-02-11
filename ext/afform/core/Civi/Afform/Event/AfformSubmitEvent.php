@@ -1,7 +1,8 @@
 <?php
 namespace Civi\Afform\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Civi\Afform\FormDataModel;
+use Civi\Api4\Action\Afform\Submit;
 
 /**
  * Class AfformSubmitEvent
@@ -15,7 +16,7 @@ use Symfony\Component\EventDispatcher\Event;
  * methods. For the moment, this is only expected to be used internally,
  * so KISS.
  */
-class AfformSubmitEvent extends Event {
+class AfformSubmitEvent extends AfformBaseEvent {
 
   /**
    * @var array
@@ -33,10 +34,15 @@ class AfformSubmitEvent extends Event {
 
   /**
    * AfformSubmitEvent constructor.
-   * @param $entityDefns
+   *
+   * @param array $afform
+   * @param \Civi\Afform\FormDataModel $formDataModel
+   * @param \Civi\Api4\Action\Afform\Submit $apiRequest
+   * @param array $entityDefns
    * @param array $entityValues
    */
-  public function __construct($entityDefns, array $entityValues) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $entityDefns, array $entityValues) {
+    parent::__construct($afform, $formDataModel, $apiRequest);
     $this->entityDefns = $entityDefns;
     $this->entityValues = $entityValues;
   }

@@ -32,8 +32,7 @@ class Submit extends AbstractProcessor {
         }
       }
     }
-
-    $event = new AfformSubmitEvent($this->_formDataModel->getEntities(), $entityValues);
+    $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $this->_formDataModel->getEntities(), $entityValues);
     \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     foreach ($event->entityValues as $entityType => $entities) {
       if (!empty($entities)) {
