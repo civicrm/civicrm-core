@@ -1,3 +1,23 @@
+<div class="form-group">
+  <label class="control-label">
+    {{:: ts('Security') }}
+  </label>
+  <select ng-model="$ctrl.entity.security" class="form-control">
+    <option value="RBAC">{{:: ts('Role-based')}}</option>
+    <option value="FBAC">{{:: ts('Form-based')}}</option>
+  </select>
+</div>
+<div class="form-group">
+  <label>
+    {{:: ts('Actions:') }}
+  </label>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.create">{{:: ts('Create') }}</label>
+  </div>
+  <div class="checkbox-inline">
+    <label><input type="checkbox" ng-model="$ctrl.entity.actions.update">{{:: ts('Update') }}</label>
+  </div>
+</div>
 <div class="checkbox">
   <label>
     <input type="checkbox" ng-model="$ctrl.entity['url-autofill']" ng-true-value="'1'" ng-false-value="'0'" />
