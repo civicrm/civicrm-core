@@ -17,7 +17,7 @@
             var params = $route.current.params;
             return crmApi4('SearchDisplay', 'get', {
               where: [['name', '=', params.displayName], ['saved_search.name', '=', params.savedSearchName]],
-              select: ['*', 'saved_search.api_entity', 'saved_search.api_params']
+              select: ['*', 'saved_search.api_entity', 'saved_search.name']
             }, 0);
           }
         }
@@ -27,8 +27,8 @@
     // Controller for displaying a search
     .controller('crmSearchPageDisplay', function($scope, $routeParams, $location, display) {
       this.display = display;
+      this.searchName = display['saved_search.name'];
       this.apiEntity = display['saved_search.api_entity'];
-      this.apiParams = display['saved_search.api_params'];
       $scope.$ctrl = this;
     });
 

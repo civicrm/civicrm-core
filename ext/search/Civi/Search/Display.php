@@ -24,7 +24,7 @@ class Display {
     $partials = [];
     foreach (self::getDisplayTypes(['id', 'name']) as $type) {
       $partials["~/$moduleName/displayType/{$type['id']}.html"] =
-        '<' . $type['name'] . ' api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" settings="$ctrl.display.settings"></' . $type['name'] . '>';
+        '<' . $type['name'] . ' api-entity="{{:: $ctrl.apiEntity }}" search="$ctrl.searchName" display="$ctrl.display.name" settings="$ctrl.display.settings"></' . $type['name'] . '>';
     }
     return $partials;
   }

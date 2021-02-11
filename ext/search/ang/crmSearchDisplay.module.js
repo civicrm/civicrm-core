@@ -4,7 +4,7 @@
   // Declare module
   angular.module('crmSearchDisplay', CRM.angRequires('crmSearchDisplay'))
 
-    .factory('searchDisplayUtils', function() {
+    .factory('searchDisplayUtils', function(crmApi4) {
 
       function replaceTokens(str, data) {
         if (!str) {
@@ -48,69 +48,46 @@
         return result;
       }
 
-      function canAggregate(fieldName, prefix, apiParams) {
-        // If the query does not use grouping, never
-        if (!apiParams.groupBy.length) {
-          return false;
-        }
-        // If the column is used for a groupBy, no
-        if (apiParams.groupBy.indexOf(prefix + fieldName) > -1) {
-          return false;
-        }
-        // If the entity this column belongs to is being grouped by id, then also no
-        return apiParams.groupBy.indexOf(prefix + 'id') < 0;
-      }
-
-      function prepareColumns(columns, apiParams) {
+      function prepareColumns(columns) {
         columns = _.cloneDeep(columns);
-        _.each(columns, function(col, num) {
-          var index = apiParams.select.indexOf(col.expr);
-          if (_.includes(col.expr, '(') && !_.includes(col.expr, ' AS ')) {
-            col.expr += ' AS column_' + num;
-            apiParams.select[index] += ' AS column_' + num;
-          }
+        _.each(columns, function(col) {
           col.key = _.last(col.expr.split(' AS '));
         });
         return columns;
       }
 
-      function prepareParams(ctrl) {
-        var params = _.cloneDeep(ctrl.apiParams);
-        if (_.isEmpty(params.where)) {
-          params.where = [];
-        }
-        // Select the ids of joined entities (helps with displaying links)
-        _.each(params.join, function(join) {
-          var joinEntity = join[0].split(' AS ')[1],
-            idField = joinEntity + '.id';
-          if (!_.includes(params.select, idField) && !canAggregate('id', joinEntity + '.', params)) {
-            params.select.push(idField);
+      function getApiParams(ctrl, mode) {
+        return {
+          return: mode || 'page:' + ctrl.page,
+          savedSearch: ctrl.search,
+          display: ctrl.display,
+          sort: ctrl.sort,
+          filters: _.assign({}, (ctrl.afFieldset ? ctrl.afFieldset.getFieldData() : {}), ctrl.filters)
+        };
+      }
+
+      function getResults(ctrl) {
+        var params = getApiParams(ctrl);
+        crmApi4('SearchDisplay', 'run', params).then(function(results) {
+          ctrl.results = results;
+          if (ctrl.settings.pager && !ctrl.rowCount) {
+            if (results.length < ctrl.settings.limit) {
+              ctrl.rowCount = results.length;
+            } else {
+              var params = getApiParams(ctrl, 'row_count');
+              crmApi4('SearchDisplay', 'run', params).then(function(result) {
+                ctrl.rowCount = result.count;
+              });
+            }
           }
         });
-        function addFilter(value, key) {
-          if (value) {
-            params.where.push([key, 'CONTAINS', value]);
-          }
-        }
-        // Add filters explicitly passed into controller
-        _.each(ctrl.filters, addFilter);
-        // Add filters when nested in an afform fieldset
-        if (ctrl.afFieldset) {
-          _.each(ctrl.afFieldset.getFieldData(), addFilter);
-        }
-
-        if (ctrl.settings && ctrl.settings.pager && ctrl.page) {
-          params.offset = (ctrl.page - 1) * params.limit;
-          params.select.push('row_count');
-        }
-        return params;
       }
 
       return {
         formatSearchValue: formatSearchValue,
-        canAggregate: canAggregate,
         prepareColumns: prepareColumns,
-        prepareParams: prepareParams,
+        getApiParams: getApiParams,
+        getResults: getResults,
         replaceTokens: replaceTokens
       };
     });

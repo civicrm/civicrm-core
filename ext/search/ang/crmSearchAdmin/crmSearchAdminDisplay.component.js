@@ -22,7 +22,7 @@
           '  </button>\n' +
           '  <hr>\n' +
           '  <div ng-if="$ctrl.preview">\n' +
-          '    <' + type.name + ' api-entity="$ctrl.savedSearch.api_entity" api-params="$ctrl.savedSearch.api_params" settings="$ctrl.display.settings"></' + type.name + '>\n' +
+          '    <' + type.name + ' api-entity="{{:: $ctrl.savedSearch.api_entity }}" search="$ctrl.savedSearch" display="$ctrl.display" settings="$ctrl.display.settings"></' + type.name + '>\n' +
           '  </div>\n' +
           '</div>\n';
       });

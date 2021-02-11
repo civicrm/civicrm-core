@@ -40,8 +40,9 @@ class AfformSearchMetadataInjector {
                 ->execute()->first();
               if ($display) {
                 pq($component)->attr('settings', htmlspecialchars(\CRM_Utils_JS::encode($display['settings'] ?? [])));
-                pq($component)->attr('api-entity', htmlspecialchars(\CRM_Utils_JS::encode($display['saved_search.api_entity'])));
-                pq($component)->attr('api-params', htmlspecialchars(\CRM_Utils_JS::encode($display['saved_search.api_params'])));
+                pq($component)->attr('api-entity', htmlspecialchars($display['saved_search.api_entity']));
+                pq($component)->attr('search', htmlspecialchars(\CRM_Utils_JS::encode($searchName)));
+                pq($component)->attr('display', htmlspecialchars(\CRM_Utils_JS::encode($displayName)));
 
                 // Add entity names to the fieldset so that afform can populate field metadata
                 $fieldset = pq($component)->parents('[af-fieldset]');

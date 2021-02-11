@@ -3,7 +3,9 @@
 
   angular.module('crmSearchDisplayList').component('crmSearchDisplayList', {
     bindings: {
-      apiEntity: '<',
+      apiEntity: '@',
+      search: '<',
+      display: '<',
       apiParams: '<',
       settings: '<',
       filters: '<'
@@ -15,27 +17,30 @@
     controller: function($scope, crmApi4, searchDisplayUtils) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
+
       this.page = 1;
+      this.rowCount = null;
 
       this.$onInit = function() {
-        this.apiParams = _.cloneDeep(this.apiParams);
-        this.apiParams.limit = parseInt(this.settings.limit || 0, 10);
-        this.columns = searchDisplayUtils.prepareColumns(this.settings.columns, this.apiParams);
+        this.columns = searchDisplayUtils.prepareColumns(this.settings.columns);
+        this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         $scope.displayUtils = searchDisplayUtils;
+
         if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, this.getResults, true);
+          $scope.$watch(this.afFieldset.getFieldData, refresh, true);
         }
-        $scope.$watch('$ctrl.filters', ctrl.getResults, true);
+        $scope.$watch('$ctrl.filters', refresh, true);
       };
 
       this.getResults = _.debounce(function() {
-        var params = searchDisplayUtils.prepareParams(ctrl);
-
-        crmApi4(ctrl.apiEntity, 'get', params).then(function(results) {
-          ctrl.results = results;
-          ctrl.rowCount = results.count;
-        });
+        searchDisplayUtils.getResults(ctrl);
       }, 100);
+
+      function refresh() {
+        ctrl.page = 1;
+        ctrl.rowCount = null;
+        ctrl.getResults();
+      }
 
       $scope.formatResult = function(row, col) {
         var value = row[col.key],
