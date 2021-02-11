@@ -79,7 +79,9 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     $partials = [];
     foreach (CRM_Core_BAO_Dashboard::getContactDashlets() as $dashlet) {
       if (!empty($dashlet['directive'])) {
-        $partials["~/$moduleName/directives/{$dashlet['directive']}.html"] = "<{$dashlet['directive']}></{$dashlet['directive']}>";
+        // FIXME: Wrapping each directive in <div id='bootstrap-theme'> produces invalid html (duplicate ids in the dom)
+        // but it's the only practical way to selectively apply boostrap3 theming to specific dashlets
+        $partials["~/$moduleName/directives/{$dashlet['directive']}.html"] = "<div id='bootstrap-theme'><{$dashlet['directive']}></{$dashlet['directive']}></div>";
       }
     }
     return $partials;
