@@ -537,7 +537,9 @@ class Api4SelectQuery {
     if ($strict && !$field) {
       throw new \API_Exception("Invalid field '$fieldName'");
     }
-    $this->apiFieldSpec[$expr] = $field;
+    if ($field) {
+      $this->apiFieldSpec[$expr] = $field;
+    }
     return $field;
   }
 

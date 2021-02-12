@@ -40,14 +40,21 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $return;
 
+  private $_selectQuery;
+
   /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
    * @var array
    */
   protected $filters = [];
 
+  /**
+   * @param \Civi\Api4\Generic\Result $result
+   * @throws UnauthorizedException
+   * @throws \API_Exception
+   */
   public function _run(\Civi\Api4\Generic\Result $result) {
-    // Only administrators can use this in the unsecured "preview mode"
+    // Only administrators can use this in unsecured "preview mode"
     if (!(is_string($this->savedSearch) && is_string($this->display)) && $this->checkPermissions && !\CRM_Core_Permission::check('administer CiviCRM')) {
       throw new UnauthorizedException('Access denied');
     }
@@ -95,8 +102,9 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
             $apiParams['select'][] = $idField;
           }
         }
-
     }
+
+    $this->applyFilters();
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams);
 
@@ -104,6 +112,40 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     $result->exchangeArray($apiResult->getArrayCopy());
   }
 
+  /**
+   * Applies supplied filters to the where clause
+   */
+  private function applyFilters() {
+    // Global setting determines if % wildcard should be added to both sides (default) or only the end of the search term
+    $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
+
+    foreach ($this->filters as $fieldName => $value) {
+      if ($value) {
+        $field = $this->getField($fieldName) ?? [];
+        $dataType = $field['data_type'] ?? NULL;
+
+        if (!empty($field['serialize'])) {
+          $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+        }
+        elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+          $this->savedSearch['api_params']['where'][] = [$fieldName, '=', $value];
+        }
+        elseif ($prefixWithWildcard) {
+          $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+        }
+        else {
+          $this->savedSearch['api_params']['where'][] = [$fieldName, 'LIKE', $value . '%'];
+        }
+      }
+    }
+  }
+
+  /**
+   * Transforms the SORT param (which is expected to be an array of arrays)
+   * to the ORDER BY clause (which is an associative array of [field => DIR]
+   *
+   * @return array
+   */
   private function getOrderByFromSort() {
     $defaultSort = $this->display['settings']['sort'] ?? [];
     $currentSort = $this->sort;
@@ -122,12 +164,22 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     return $orderBy;
   }
 
+  /**
+   * Returns an array of field names or aliases from the SELECT clause
+   * @return string[]
+   */
   private function getSelectAliases() {
     return array_map(function($select) {
       return array_slice(explode(' AS ', $select), -1)[0];
     }, $this->savedSearch['api_params']['select']);
   }
 
+  /**
+   * Determines if a column is eligible to use an aggregate function
+   * @param $fieldName
+   * @param $prefix
+   * @return bool
+   */
   private function canAggregate($fieldName, $prefix) {
     $apiParams = $this->savedSearch['api_params'];
 
@@ -141,6 +193,19 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     }
     // If the entity this column belongs to is being grouped by id, then also no
     return !in_array($prefix . 'id', $apiParams['groupBy']);
+  }
+
+  /**
+   * Returns field definition for a given field or NULL if not found
+   * @param $fieldName
+   * @return array|null
+   */
+  private function getField($fieldName) {
+    if (!$this->_selectQuery) {
+      $api = \Civi\API\Request::create($this->savedSearch['api_entity'], 'get', $this->savedSearch['api_params']);
+      $this->_selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
+    }
+    return $this->_selectQuery->getField($fieldName, FALSE);
   }
 
 }
