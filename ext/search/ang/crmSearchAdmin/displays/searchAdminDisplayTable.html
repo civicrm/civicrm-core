@@ -12,13 +12,13 @@
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
-  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.sortableOptions">
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <legend>{{:: ts('Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" />
-        <button class="btn-xs pull-right" ng-click="$ctrl.removeCol($index)" title="{{:: ts('Hide') }}">
+        <button class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
@@ -41,13 +41,13 @@
       </div>
     </fieldset>
   </fieldset>
-  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.hiddenColumns" ui-sortable="$ctrl.sortableOptions">
+  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.parent.hiddenColumns" ui-sortable="$ctrl.parent.sortableOptions">
     <legend>{{:: ts('Hidden Columns') }}</legend>
-    <fieldset ng-repeat="col in $ctrl.hiddenColumns" class="crm-draggable">
+    <fieldset ng-repeat="col in $ctrl.parent.hiddenColumns" class="crm-draggable">
       <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input disabled class="form-control" type="text" ng-model="col.label" />
-        <button class="btn-xs pull-right" ng-click="$ctrl.restoreCol($index)" title="{{:: ts('Show') }}">
+        <button class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
           <i class="crm-i fa-undo"></i>
         </button>
       </div>

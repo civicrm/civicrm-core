@@ -38,6 +38,21 @@
 
       this.preview = this.stale = false;
 
+      this.sortableOptions = {
+        connectWith: '.crm-search-admin-edit-columns',
+        containment: '.crm-search-admin-edit-columns-wrapper'
+      };
+
+      this.removeCol = function(index) {
+        ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
+        ctrl.display.settings.columns.splice(index, 1);
+      };
+
+      this.restoreCol = function(index) {
+        ctrl.display.settings.columns.push(ctrl.hiddenColumns[index]);
+        ctrl.hiddenColumns.splice(index, 1);
+      };
+
       function fieldToColumn(fieldExpr) {
         var info = searchMeta.parseExpr(fieldExpr);
         return {
@@ -53,10 +68,10 @@
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
             columns.push(fieldToColumn(fieldExpr));
           });
-          return [];
+          ctrl.hiddenColumns = [];
         } else {
-          var activeColumns = _.collect(ctrl.display.settings.columns, 'expr'),
-            hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
+          var activeColumns = _.collect(ctrl.display.settings.columns, 'expr');
+          ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
             if (!_.includes(activeColumns, fieldExpr)) {
               hiddenColumns.push(fieldToColumn(fieldExpr));
             }
@@ -66,7 +81,6 @@
               ctrl.display.settings.columns.splice(index, 1);
             }
           });
-          return hiddenColumns;
         }
       };
 
