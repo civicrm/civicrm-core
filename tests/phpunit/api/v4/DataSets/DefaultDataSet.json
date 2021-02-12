@@ -41,5 +41,14 @@
       "phone": "+3538733439483",
       "location_type_id": "2"
     }
+  ],
+  "Address": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "street_address": "123 Sesame St.",
+      "country_id": "1228",
+      "location_type_id": "1",
+      "@ref": "test_address_1"
+    }
   ]
 }

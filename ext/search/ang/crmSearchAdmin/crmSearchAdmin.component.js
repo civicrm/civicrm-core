@@ -259,6 +259,23 @@
         });
       };
 
+      // Remove an explicit join + all SELECT, WHERE & other JOINs that use it
+      this.removeJoin = function(index) {
+        var alias = searchMeta.getJoin(ctrl.savedSearch.api_params.join[index][0]).alias;
+        ctrl.clearParam('join', index);
+        _.remove(ctrl.savedSearch.api_params.select, function(item) {
+          return item.indexOf(alias + '.') === 0;
+        });
+        _.remove(ctrl.savedSearch.api_params.where, function(clause) {
+          return clauseUsesJoin(clause, alias);
+        });
+        _.eachRight(ctrl.savedSearch.api_params.join, function(item, i) {
+          if (searchMeta.getJoin(item[0]).alias.indexOf(alias) === 0) {
+            ctrl.removeJoin(i);
+          }
+        });
+      };
+
       $scope.changeGroupBy = function(idx) {
         if (!ctrl.savedSearch.api_params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
@@ -275,6 +292,35 @@
           });
         }
       };
+
+      function clauseUsesJoin(clause, alias) {
+        if (clause[0].indexOf(alias + '.') === 0) {
+          return true;
+        }
+        if (_.isArray(clause[1])) {
+          return clause[1].some(function(subClause) {
+            return clauseUsesJoin(subClause, alias);
+          });
+        }
+        return false;
+      }
+
+      // Returns true if a clause contains one of the
+      function clauseUsesFields(clause, fields) {
+        console.log('clauseUsesFields', fields);
+        if (!fields || !fields.length) {
+          return false;
+        }
+        if (_.includes(fields, clause[0])) {
+          return true;
+        }
+        if (_.isArray(clause[1])) {
+          return clause[1].some(function(subClause) {
+            return clauseUsesField(subClause, fields);
+          });
+        }
+        return false;
+      }
 
       function validate() {
         var errors = [],
@@ -502,6 +548,12 @@
         _.each(_.difference(_.keys(ctrl.savedSearch.api_params.orderBy), newSelect), function(col) {
           delete ctrl.savedSearch.api_params.orderBy[col];
         });
+        // After removing a field from SELECT, also remove it from HAVING
+        if (oldSelect && oldSelect.length && ctrl.savedSearch.api_params.having && ctrl.savedSearch.api_params.having.length) {
+          _.remove(ctrl.savedSearch.api_params.having, function(clause) {
+            return clauseUsesFields(clause, _.difference(oldSelect, newSelect));
+          });
+        }
         // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
         if (!oldSelect || _.difference(newSelect, oldSelect).length) {
           if (ctrl.autoSearch) {
@@ -510,17 +562,11 @@
             ctrl.stale = true;
           }
         }
-        if (ctrl.load) {
-          ctrl.saved = false;
-        }
       }
 
       function onChangeFilters() {
         ctrl.stale = true;
         ctrl.selectedRows.length = 0;
-        if (ctrl.load) {
-          ctrl.saved = false;
-        }
         if (ctrl.autoSearch) {
           ctrl.refreshAll();
         }

@@ -204,8 +204,7 @@ class CRM_Core_SelectValues {
       'Address' => ts('Addresses'),
       'Campaign' => ts('Campaigns'),
     ];
-    $contactTypes = self::contactType();
-    $contactTypes = !empty($contactTypes) ? ['Contact' => 'Contacts'] + $contactTypes : [];
+    $contactTypes = ['Contact' => ts('Contacts')] + self::contactType();
     $extendObjs = CRM_Core_OptionGroup::values('cg_extend_objects');
     $customGroupExtends = array_merge($contactTypes, $customGroupExtends, $extendObjs);
     return $customGroupExtends;
