@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/authx/id</path>
+    <page_callback>CRM_Authx_Page_Id</page_callback>
+    <title>Id</title>
+    <access_arguments>*always allow*</access_arguments>
+  </item>
+</menu>
