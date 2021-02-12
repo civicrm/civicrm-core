@@ -951,6 +951,9 @@ COLS;
         continue;
       }
       $columns = $this->columnsOf($table, $force);
+      // @todo This is sort of redundant with $columns but not sure how to
+      // deal with $force.
+      $columnSpecs = $this->columnSpecsOf($table);
 
       // Use utf8mb4_bin or utf8_bin, depending on what's in use.
       $charset = 'utf8';
@@ -965,15 +968,23 @@ COLS;
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
         // exceptions may be provided with or without backticks
+        $bareColumnName = str_replace('`', '', $column);
         $excludeColumn = in_array($column, $tableExceptions) ||
-          in_array(str_replace('`', '', $column), $tableExceptions);
+          in_array($bareColumnName, $tableExceptions);
         if (!$excludeColumn) {
           // The empty string needs charset signalling to avoid errors.
           // Note that it is not a cast/convert. It just tells mysql
           // that there isn't a conflict when your system/connection defaults
           // happen to be different from $charset.
           // See https://dev.mysql.com/doc/refman/5.7/en/charset-literal.html
-          $cond[] = "IFNULL(OLD.$column,_{$charset}'') <> IFNULL(NEW.$column,_{$charset}'') COLLATE {$charset}_bin";
+          // But blob columns can't be treated this way since there's a
+          // mismatch between utf8XXX_bin and pseudo-collation `binary`.
+          if (strpos($columnSpecs[$bareColumnName]['DATA_TYPE'] ?? '', 'blob') !== FALSE) {
+            $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
+          }
+          else {
+            $cond[] = "IFNULL(OLD.$column,_{$charset}'') <> IFNULL(NEW.$column,_{$charset}'') COLLATE {$charset}_bin";
+          }
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
