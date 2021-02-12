@@ -5,6 +5,53 @@ require_once 'authx.civix.php';
 use CRM_Authx_ExtensionUtil as E;
 // phpcs:enable
 
+Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
+  if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
+    return (new \Civi\Authx\Authenticator('xheader'))->auth($e, $_SERVER['HTTP_X_CIVI_AUTH']);
+  }
+
+  if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    return (new \Civi\Authx\Authenticator('header'))->auth($e, $_SERVER['HTTP_AUTHORIZATION']);
+  }
+
+  $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
+  if (!empty($params['_authx'])) {
+    if ((implode('/', $e->args) === 'civicrm/authx/login')) {
+      (new \Civi\Authx\Authenticator('endpoint'))->auth($e, $params['_authx'], TRUE);
+      _authx_redact(['_authx']);
+    }
+    elseif (!empty($params['_authxSes'])) {
+      (new \Civi\Authx\Authenticator('auto'))->auth($e, $params['_authx'], TRUE);
+      _authx_redact(['_authx', '_authxSes']);
+    }
+    else {
+      (new \Civi\Authx\Authenticator('param'))->auth($e, $params['_authx']);
+      _authx_redact(['_authx']);
+    }
+  }
+});
+
+/**
+ * @return \Civi\Authx\AuthxInterface
+ */
+function _authx_uf() {
+  $class = 'Civi\\Authx\\' . CIVICRM_UF;
+  return class_exists($class) ? new $class() : new \Civi\Authx\None();
+}
+
+/**
+ * For parameter-based authentication, this option will hide parameters.
+ * This is mostly a precaution, hedging against the possibility that some routes
+ * make broad use of $_GET or $_PARAMS.
+ *
+ * @param array $keys
+ */
+function _authx_redact(array $keys) {
+  foreach ($keys as $key) {
+    unset($_POST[$key], $_GET[$key], $_REQUEST[$key]);
+  }
+}
+
 /**
  * Implements hook_civicrm_config().
  *
