@@ -3,6 +3,7 @@
 .use-civicrm-setup
 /ext/*
 !/ext/afform
+!/ext/authx
 !/ext/sequentialcreditnotes
 !/ext/flexmailer
 !/ext/eventcart
