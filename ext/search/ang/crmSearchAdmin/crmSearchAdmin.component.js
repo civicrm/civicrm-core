@@ -307,7 +307,6 @@
 
       // Returns true if a clause contains one of the
       function clauseUsesFields(clause, fields) {
-        console.log('clauseUsesFields', fields);
         if (!fields || !fields.length) {
           return false;
         }
@@ -361,6 +360,7 @@
        * @param $event
        */
       $scope.setOrderBy = function(col, $event) {
+        col = _.last(col.split(' AS '));
         var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
         if (!$event.shiftKey || !ctrl.savedSearch.api_params.orderBy) {
           ctrl.savedSearch.api_params.orderBy = {};
@@ -377,6 +377,7 @@
        * @returns {string}
        */
       $scope.getOrderBy = function(col) {
+        col = _.last(col.split(' AS '));
         var dir = ctrl.savedSearch.api_params.orderBy && ctrl.savedSearch.api_params.orderBy[col];
         if (dir) {
           return 'fa-sort-' + dir.toLowerCase();
@@ -417,7 +418,7 @@
         if (ctrl.savedSearch.api_params.groupBy.length) {
           _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
             if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + col + ')';
+              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + col + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_DISTINCT_' + col.replace(/[.:]/g, '_');
             }
           });
         }
@@ -544,16 +545,14 @@
       };
 
       function onChangeSelect(newSelect, oldSelect) {
-        // When removing a column from SELECT, also remove from ORDER BY
-        _.each(_.difference(_.keys(ctrl.savedSearch.api_params.orderBy), newSelect), function(col) {
+        // When removing a column from SELECT, also remove from ORDER BY & HAVING
+        _.each(_.difference(oldSelect, newSelect), function(col) {
+          col = _.last(col.split(' AS '));
           delete ctrl.savedSearch.api_params.orderBy[col];
-        });
-        // After removing a field from SELECT, also remove it from HAVING
-        if (oldSelect && oldSelect.length && ctrl.savedSearch.api_params.having && ctrl.savedSearch.api_params.having.length) {
           _.remove(ctrl.savedSearch.api_params.having, function(clause) {
-            return clauseUsesFields(clause, _.difference(oldSelect, newSelect));
+            return clauseUsesFields(clause, [col]);
           });
-        }
+        });
         // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
         if (!oldSelect || _.difference(newSelect, oldSelect).length) {
           if (ctrl.autoSearch) {
