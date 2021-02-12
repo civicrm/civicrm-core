@@ -6,6 +6,9 @@
       savedSearch: '<',
       display: '<'
     },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
+    },
     template: function() {
       // Dynamic template generates switch condition for each display type
       var html =
@@ -32,6 +35,8 @@
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
+
+      this.preview = this.stale = false;
 
       function fieldToColumn(fieldExpr) {
         var info = searchMeta.parseExpr(fieldExpr);
@@ -65,8 +70,6 @@
         }
       };
 
-      this.preview = this.stale = false;
-
       this.previewDisplay = function() {
         ctrl.preview = !ctrl.preview;
         ctrl.stale = false;
@@ -74,6 +77,26 @@
           $timeout(function() {
             ctrl.preview = true;
           }, 100);
+        }
+      };
+
+      this.fieldsForSort = function() {
+        function disabledIf(key) {
+          return _.findIndex(ctrl.display.settings.sort, [key]) >= 0;
+        }
+        return {
+          results: [{
+            text: ts('Columns'),
+            children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
+          }].concat(ctrl.crmSearchAdmin.getAllFields('', disabledIf))
+        };
+      };
+
+      // Generic function to add to a setting array if the item is not already there
+      this.pushSetting = function(name, value) {
+        ctrl.display.settings[name] = ctrl.display.settings[name] || [];
+        if (_.findIndex(ctrl.display.settings[name], value) < 0) {
+          ctrl.display.settings[name].push(value);
         }
       };
 

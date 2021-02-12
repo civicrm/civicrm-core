@@ -690,28 +690,25 @@
       }
 
       $scope.fieldsForGroupBy = function() {
-        return {results: getAllFields('', function(key) {
+        return {results: ctrl.getAllFields('', function(key) {
             return _.contains(ctrl.savedSearch.api_params.groupBy, key);
           })
         };
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: getAllFields(':label', function(key) {
+        return {results: ctrl.getAllFields(':label', function(key) {
             return _.contains(ctrl.savedSearch.api_params.select, key);
           })
         };
       };
 
       $scope.fieldsForWhere = function() {
-        return {results: getAllFields(':name', _.noop)};
+        return {results: ctrl.getAllFields(':name')};
       };
 
       $scope.fieldsForHaving = function() {
-        return {results: _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
-          var info = searchMeta.parseExpr(name);
-          fields.push({id: info.alias + info.suffix, text: ctrl.getFieldLabel(name)});
-        })};
+        return {results: ctrl.getSelectFields()};
       };
 
       $scope.sortableColumnOptions = {
@@ -735,7 +732,8 @@
         });
       }
 
-      function getAllFields(suffix, disabledIf) {
+      this.getAllFields = function(suffix, disabledIf) {
+        disabledIf = disabledIf || _.noop;
         function formatFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
             result = [];
@@ -782,7 +780,23 @@
           });
         });
         return result;
-      }
+      };
+
+      this.getSelectFields = function(disabledIf) {
+        disabledIf = disabledIf || _.noop;
+        return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
+          var info = searchMeta.parseExpr(name);
+          var item = {
+            id: info.alias + info.suffix,
+            text: ctrl.getFieldLabel(name),
+            description: info.field && info.field.description
+          };
+          if (disabledIf(item.id)) {
+            item.disabled = true;
+          }
+          fields.push(item);
+        });
+      };
 
       /**
        * Fetch pseudoconstants for main entity + joined entities
