@@ -850,7 +850,9 @@ AND    u.status = 1
       if (!defined('MAINTENANCE_MODE') || MAINTENANCE_MODE != 'update') {
         module_invoke_all('exit');
       }
-      drupal_session_commit();
+      if (!defined('_CIVICRM_FAKE_SESSION')) {
+        drupal_session_commit();
+      }
     }
   }
 
