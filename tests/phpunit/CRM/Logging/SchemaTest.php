@@ -487,4 +487,35 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     return (bool) (version_compare($this->databaseVersion, '8.0.19', '>=') && stripos($this->databaseVersion, 'mariadb') === FALSE);
   }
 
+  /**
+   * Test that we can update a table with a blob column in it with logging
+   * enabled.
+   *
+   * civicrm_file.document is a blob column
+   */
+  public function testUpdateBlobWithLogging() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    $fileDAO = new CRM_Core_DAO_File();
+    $fileDAO->mime_type = 'text/plain';
+    $fileDAO->description = 'Baby shark doodoo dodo dodo';
+    $fileDAO->uri = 'the_internet';
+    $fileDAO->upload_date = date('YmdHis');
+    $fileDAO->save();
+
+    // Update it.
+    // Description isn't the blob column, but the point is that the table
+    // just needs to contain a blob for the triggers to be sensitive.
+    // And I'm having trouble getting the right object/functions to use to
+    // actually read back what's in the blob column?
+    $fileDAO->description = 'make it stop';
+    $fileDAO->save();
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT description FROM civicrm_file WHERE id = {$fileDAO->id}");
+    $dao->fetch();
+    $this->assertEquals('make it stop', $dao->description);
+    $fileDAO->delete();
+  }
+
 }
