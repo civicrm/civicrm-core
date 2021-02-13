@@ -969,12 +969,7 @@ COLS;
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);
         if (!$excludeColumn) {
-          // The empty string needs charset signalling to avoid errors.
-          // Note that it is not a cast/convert. It just tells mysql
-          // that there isn't a conflict when your system/connection defaults
-          // happen to be different from $charset.
-          // See https://dev.mysql.com/doc/refman/5.7/en/charset-literal.html
-          $cond[] = "IFNULL(OLD.$column,_{$charset}'') <> IFNULL(NEW.$column,_{$charset}'') COLLATE {$charset}_bin";
+          $cond[] = $this->getTriggerUpdateString($column, $charset, $columnSpec['DATA_TYPE'] ?? '');
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
@@ -1080,6 +1075,28 @@ COLS;
       return array_diff($this->tables, array_keys($this->logs));
     }
     return [];
+  }
+
+  /**
+   * Compose the string to be used for the trigger during UPDATE.
+   *
+   * @param string $column
+   * @param string $charset
+   * @param string $dataType
+   * @return string
+   */
+  private function getTriggerUpdateString(string $column, string $charset, string $dataType): string {
+    // Blob columns can't have a collation like utf8XXX_bin since then
+    // there's a mismatch with their pseudo-collation which is `binary`.
+    if (strpos($dataType, 'blob') !== FALSE) {
+      return "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
+    }
+    // The empty string needs charset signalling to avoid errors.
+    // Note that it is not a cast/convert. It just tells mysql
+    // that there isn't a conflict when your system/connection defaults
+    // happen to be different from $charset.
+    // See https://dev.mysql.com/doc/refman/5.7/en/charset-literal.html
+    return "IFNULL(OLD.$column,_{$charset}'') <> IFNULL(NEW.$column,_{$charset}'') COLLATE {$charset}_bin";
   }
 
 }
