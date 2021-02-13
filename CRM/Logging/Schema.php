@@ -951,7 +951,7 @@ COLS;
         // which makes sense, in particular, for calculated fields.
         continue;
       }
-      $columns = $this->columnsOf($table, $force);
+      $columns = $this->columnSpecsOf($table, $force);
 
       // Use utf8mb4_bin or utf8_bin, depending on what's in use.
       $charset = 'utf8';
@@ -961,7 +961,7 @@ COLS;
 
       // only do the change if any data has changed
       $cond = [];
-      foreach ($columns as $column) {
+      foreach ($columns as $column => $columnSpec) {
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : [];
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
@@ -986,7 +986,7 @@ COLS;
       else {
         $sqlStmt = "INSERT INTO log_{tableName} (";
       }
-      foreach ($columns as $column) {
+      foreach ($columns as $column => $columnSpec) {
         $sqlStmt .= "$column, ";
       }
       $sqlStmt .= "log_conn_id, log_user_id, log_action) VALUES (";
@@ -995,7 +995,7 @@ COLS;
       $updateSQL .= $sqlStmt;
 
       $sqlStmt = '';
-      foreach ($columns as $column) {
+      foreach ($columns as $column => $columnSpec) {
         $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
