@@ -635,12 +635,13 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
    *
    * @param string $table
+   * @param bool $force
    *
    * @return array
    */
-  private function columnSpecsOf($table) {
+  private function columnSpecsOf($table, $force = FALSE) {
     static $civiDB = NULL;
-    if (empty(\Civi::$statics[__CLASS__]['columnSpecs'])) {
+    if ($force || empty(\Civi::$statics[__CLASS__]['columnSpecs'])) {
       \Civi::$statics[__CLASS__]['columnSpecs'] = [];
     }
     if (empty(\Civi::$statics[__CLASS__]['columnSpecs']) || !isset(\Civi::$statics[__CLASS__]['columnSpecs'][$table])) {
