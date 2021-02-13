@@ -1507,6 +1507,8 @@
 - name`       : Stevel
   jira        : stevel
 
+- github      : StijnVanhandsaeme
+
 - github      : stoob
   name        : Stuart Gaston
   organization: Korlon
@@ -1738,4 +1740,3 @@
 - github      : wintermoor
   name        : Torben Bertram
   organization: ECOPLAN
-  
