@@ -45,6 +45,7 @@
     "php": "~7.2",
     "cache/integration-tests": "~0.17.0",
     "dompdf/dompdf" : "~0.8",
+    "firebase/php-jwt": ">=3 <6",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "~3.0 || ~4.4",
     "symfony/polyfill-iconv": "~1.0",
