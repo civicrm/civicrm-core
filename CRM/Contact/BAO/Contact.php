@@ -2657,7 +2657,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Contribute_BAO_Contribution::contributionCount($contactId);
 
       case 'membership':
-        return CRM_Member_BAO_Membership::getContactMembershipCount($contactId, TRUE);
+        return CRM_Member_BAO_Membership::getContactMembershipCount((int) $contactId, TRUE);
 
       case 'participant':
         return CRM_Event_BAO_Participant::getContactParticipantCount($contactId);
