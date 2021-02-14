@@ -138,14 +138,11 @@ function createChart( chartID, divName, xSize, ySize, data ) {
       .turnOnControls(true)
       .renderTitle(true);
   }
-  // Delay rendering so that animation looks good.
-  window.setTimeout(() => {
-    div.appendChild(heading);
-    div.appendChild(chartNode);
-    div.appendChild(links);
+  div.appendChild(heading);
+  div.appendChild(chartNode);
+  div.appendChild(links);
 
-    dc.renderAll();
-  }, 1500);
+  dc.renderAll();
 }
 </script>
 {/literal}
