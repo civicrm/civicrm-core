@@ -943,6 +943,7 @@ COLS;
     }
 
     // logging is enabled, so now lets create the trigger info tables
+    $firstTable = TRUE;
     foreach ($tableNames as $table) {
       if (!isset($this->logTableSpec[$table])) {
         // Per testIgnoreCustomTableByHook this would be unset if a hook had
@@ -951,7 +952,20 @@ COLS;
         // which makes sense, in particular, for calculated fields.
         continue;
       }
-      $columns = $this->columnSpecsOf($table, $force);
+
+      // For performance reasons we only need to force for the first table,
+      // since otherwise the function reruns the same query each time.
+      // This implies a knowledge of the algorithm used by columnSpecsOf, which
+      // means if that changes then this may no longer work as intended. So
+      // there is also testColumnSpecsOfReturnsSameOnSecondCall() to help
+      // avoid that.
+      if ($firstTable) {
+        $columns = $this->columnSpecsOf($table, $force);
+        $firstTable = FALSE;
+      }
+      else {
+        $columns = $this->columnSpecsOf($table, FALSE);
+      }
 
       // Use utf8mb4_bin or utf8_bin, depending on what's in use.
       $charset = 'utf8';

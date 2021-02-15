@@ -518,4 +518,31 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $fileDAO->delete();
   }
 
+  /**
+   * There's some code in triggerInfo() that uses knowledge of how columnSpecsOf
+   * works to improve performance and only call it with $force on the first
+   * table. In order to help ensure that doesn't break in case the algorithm
+   * in columnSpecsOf changes we have this test.
+   */
+  public function testColumnSpecsOfReturnsSameOnSecondCall() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    // call with force=true
+    \Civi\Test\Invasive::call([$schema, 'columnSpecsOf'], ['civicrm_contact', TRUE]);
+    $firstRunResult = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+    // This should now contain info on all the tables not just civicrm_contact.
+    // Check a couple.
+    $this->assertArrayHasKey('first_name', $firstRunResult['civicrm_contact']);
+    $this->assertArrayHasKey('value', $firstRunResult['civicrm_option_value']);
+
+    // call with force=false on a different table
+    \Civi\Test\Invasive::call([$schema, 'columnSpecsOf'], ['civicrm_activity', FALSE]);
+    $secondRunResult = \Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
+
+    // Should be identical to the first run even though it's a different table.
+    // Our performance enhancement in triggerInfo depends on this.
+    $this->assertSame($secondRunResult, $firstRunResult);
+  }
+
 }
