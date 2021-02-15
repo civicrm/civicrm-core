@@ -78,6 +78,13 @@ class CryptoRegistry {
       }
     }
 
+    if (defined('CIVICRM_SIGN_KEYS') && CIVICRM_SIGN_KEYS !== '') {
+      foreach (explode(' ', CIVICRM_SIGN_KEYS) as $n => $keyExpr) {
+        $key = ['tags' => ['SIGN'], 'weight' => $n];
+        $registry->addSymmetricKey($registry->parseKey($keyExpr) + $key);
+      }
+    }
+
     //if (isset($_COOKIE['CIVICRM_FORM_KEY'])) {
     //  $crypto->addSymmetricKey([
     //    'key' => base64_decode($_COOKIE['CIVICRM_FORM_KEY']),

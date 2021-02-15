@@ -99,6 +99,7 @@ if (!defined('CIVI_SETUP')) {
     $params['CMSdbSSL'] = empty($m->cmsDb['ssl_params']) ? '' : addslashes('&' . http_build_query($m->cmsDb['ssl_params'], '', '&', PHP_QUERY_RFC3986));
     $params['siteKey'] = addslashes($m->siteKey);
     $params['credKeys'] = addslashes(implode(' ', $m->credKeys));
+    $params['signKeys'] = addslashes(implode(' ', $m->signKeys));
 
     $extraSettings = array();
 
