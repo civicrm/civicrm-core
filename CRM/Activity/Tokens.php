@@ -96,25 +96,24 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     }
 
     // Get data on all activities for basic and customfield tokens
-    $activities = civicrm_api3('Activity', 'get', [
+    $prefetch['activity'] = civicrm_api3('Activity', 'get', [
       'id' => ['IN' => $entityIds],
       'options' => ['limit' => 0],
       'return' => self::getReturnFields($this->activeTokens),
-    ]);
-    $prefetch['activity'] = $activities['values'];
+    ])['values'];
 
     // Store the activity types if needed
-    if (in_array('activity_type', $this->activeTokens)) {
+    if (in_array('activity_type', $this->activeTokens, TRUE)) {
       $this->activityTypes = \CRM_Core_OptionGroup::values('activity_type');
     }
 
     // Store the activity statuses if needed
-    if (in_array('status', $this->activeTokens)) {
+    if (in_array('status', $this->activeTokens, TRUE)) {
       $this->activityStatuses = \CRM_Core_OptionGroup::values('activity_status');
     }
 
     // Store the campaigns if needed
-    if (in_array('campaign', $this->activeTokens)) {
+    if (in_array('campaign', $this->activeTokens, TRUE)) {
       $this->campaigns = \CRM_Campaign_BAO_Campaign::getCampaigns();
     }
 
