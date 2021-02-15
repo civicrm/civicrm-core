@@ -254,10 +254,30 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'data_type',
         'data_type' => 'String',
+        'options' => [
+          'Integer' => ts('Integer'),
+          'Boolean' => ts('Boolean'),
+          'String' => ts('String'),
+          'Text' => ts('Text'),
+          'Date' => ts('Date'),
+          'Timestamp' => ts('Timestamp'),
+          'Array' => ts('Array'),
+        ],
       ],
       [
         'name' => 'input_type',
         'data_type' => 'String',
+        'options' => [
+          'Text' => ts('Text'),
+          'Number' => ts('Number'),
+          'Select' => ts('Select'),
+          'CheckBox' => ts('CheckBox'),
+          'Radio' => ts('Radio'),
+          'Date' => ts('Date'),
+          'File' => ts('File'),
+          'EntityRef' => ts('EntityRef'),
+          'ChainSelect' => ts('ChainSelect'),
+        ],
       ],
       [
         'name' => 'input_attrs',
