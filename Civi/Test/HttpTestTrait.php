@@ -132,7 +132,7 @@ trait HttpTestTrait {
     $response = $this->resolveResponse($response);
     list($actualType) = explode(';', $response->getHeader('Content-Type')[0]);
     $fmt = $actualType === $expectType ? '' : $this->formatFailure($response);
-    $this->assertEquals($expectType, $actualType, "Expected content-type $expectType. Received conte-tntype $actualType.\n$fmt");
+    $this->assertEquals($expectType, $actualType, "Expected content-type $expectType. Received content-type $actualType.\n$fmt");
     return $this;
   }
 
