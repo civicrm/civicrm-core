@@ -130,7 +130,7 @@
       userModifiedAmount = cj(this).val();
       userModifiedAmount = Number(userModifiedAmount.replace(/[^0-9\.]+/g,""));
       if (userModifiedAmount < feeAmount) {
-        cj('#status_id').val(partiallyPaidStatusId).change();
+        cj('.crm-participant-form-block-status_id #status_id').val(partiallyPaidStatusId).change();
       }
     }
   );
@@ -143,8 +143,8 @@
           return true;
         }
       }
-      var userSubmittedStatus = cj('#status_id').val();
-      var statusLabel = cj('#status_id option:selected').text();
+      var userSubmittedStatus = cj('.crm-participant-form-block-status_id #status_id').val();
+      var statusLabel = cj('.crm-participant-form-block-status_id #status_id option:selected').text();
       if (userModifiedAmount < feeAmount && userSubmittedStatus != partiallyPaidStatusId) {
         var msg = "{/literal}{ts escape="js" 1="%1"}Payment amount is less than the amount owed. Expected participant status is 'Partially paid'. Are you sure you want to set the participant status to %1? Click OK to continue, Cancel to change your entries.{/ts}{literal}";
         var result = confirm(ts(msg, {1: statusLabel}));
@@ -435,7 +435,7 @@
   function sendNotification() {
     var notificationStatusIds = {/literal}"{$notificationStatusIds}"{literal};
     notificationStatusIds = notificationStatusIds.split(',');
-    if (cj.inArray(cj('select#status_id option:selected').val(), notificationStatusIds) > -1) {
+    if (cj.inArray(cj('.crm-participant-form-block-status_id select#status_id option:selected').val(), notificationStatusIds) > -1) {
       cj("#notify").show();
       cj("#is_notify").prop('checked', false);
     }
