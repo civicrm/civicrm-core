@@ -224,6 +224,9 @@ class Container {
     $container->setDefinition('crypto.token', new Definition('Civi\Crypto\CryptoToken', []))
       ->setPublic(TRUE);
 
+    $container->setDefinition('crypto.jwt', new Definition('Civi\Crypto\CryptoJwt', []))
+      ->setPublic(TRUE);
+
     if (empty(\Civi::$statics[__CLASS__]['boot'])) {
       throw new \RuntimeException('Cannot initialize container. Boot services are undefined.');
     }
