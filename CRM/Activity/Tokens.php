@@ -15,6 +15,10 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\AbstractTokenSubscriber;
+use Civi\Token\Event\TokenValueEvent;
+use Civi\Token\TokenRow;
+
 /**
  * Class CRM_Member_Tokens
  *
@@ -29,7 +33,7 @@
  *
  * This has been enhanced to work with PDF/letter merge
  */
-class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Activity_Tokens extends AbstractTokenSubscriber {
 
   use CRM_Core_TokenTrait;
 
@@ -85,7 +89,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   /**
    * @inheritDoc
    */
-  public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
+  public function prefetch(TokenValueEvent $e) {
     // Find all the entity IDs
     $entityIds
       = $e->getTokenProcessor()->getContextValues('actionSearchResult', 'entityID')
@@ -124,7 +128,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   /**
    * @inheritDoc
    */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     // maps token name to api field
     $mapping = [
       'activity_id' => 'id',
@@ -172,7 +176,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @return array token name => token label
    */
-  protected function getBasicTokens() {
+  protected function getBasicTokens(): array {
     if (!isset($this->basicTokens)) {
       $this->basicTokens = [
         'activity_id' => ts('Activity ID'),

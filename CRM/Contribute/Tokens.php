@@ -10,6 +10,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\ActionSchedule\Event\MailingQueryEvent;
+use Civi\Token\AbstractTokenSubscriber;
+use Civi\Token\TokenProcessor;
+use Civi\Token\TokenRow;
+
 /**
  * Class CRM_Contribute_Tokens
  *
@@ -18,13 +23,13 @@
  * At time of writing, we don't have any particularly special tokens -- we just
  * do some basic formatting based on the corresponding DB field.
  */
-class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
 
   /**
    * Get a list of tokens whose name and title match the DB fields.
    * @return array
    */
-  protected function getPassthruTokens() {
+  protected function getPassthruTokens(): array {
     return [
       'contribution_page_id',
       'receive_date',
@@ -46,7 +51,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @return array
    */
-  protected function getAliasTokens() {
+  protected function getAliasTokens(): array {
     return [
       'id' => 'contribution_id',
       'payment_instrument' => 'payment_instrument_id',
@@ -81,7 +86,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
+  public function checkActive(TokenProcessor $processor) {
     return !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_contribution';
   }
@@ -91,7 +96,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
     if ($e->mapping->getEntity() !== 'civicrm_contribution') {
       return;
     }
@@ -108,7 +113,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   /**
    * @inheritDoc
    */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
     $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
 
