@@ -1383,7 +1383,7 @@ ORDER BY civicrm_custom_group.weight,
             elseif ($field['data_type'] == 'Money' &&
               $field['html_type'] == 'Text'
             ) {
-              $defaults[$elementName] = CRM_Utils_Money::format($value, NULL, '%a');
+              $defaults[$elementName] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($value);
             }
             else {
               $defaults[$elementName] = $value;
