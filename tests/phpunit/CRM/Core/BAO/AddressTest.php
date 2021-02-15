@@ -693,4 +693,38 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertEquals(1228, $availableCountries[2]);
   }
 
+  /**
+   * Test core#2379 fix - geocodes shouldn't be > 14 characters.
+   */
+  public function testLongGeocodes() {
+    $contactId = $this->individualCreate();
+
+    $fixParams = [
+      'street_address' => 'E 906N Pine Pl W',
+      'supplemental_address_1' => 'Editorial Dept',
+      'supplemental_address_2' => '',
+      'supplemental_address_3' => '',
+      'city' => 'El Paso',
+      'postal_code' => '88575',
+      'postal_code_suffix' => '',
+      'state_province_id' => '1001',
+      'country_id' => '1228',
+      'geo_code_1' => '41.701308979563',
+      'geo_code_2' => '-73.91941868639',
+      'location_type_id' => '1',
+      'is_primary' => '1',
+      'is_billing' => '0',
+      'contact_id' => $contactId,
+    ];
+
+    $addAddress = CRM_Core_BAO_Address::add($fixParams, TRUE);
+
+    $addParams = $this->assertDBNotNull('CRM_Core_DAO_Address', $contactId, 'id', 'contact_id',
+      'Database check for created contact address.'
+    );
+
+    $this->assertEquals('41.70130897956', $addAddress->geo_code_1, 'In line' . __LINE__);
+    $this->assertEquals('-73.9194186863', $addAddress->geo_code_2, 'In line' . __LINE__);
+  }
+
 }

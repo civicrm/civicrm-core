@@ -1304,12 +1304,21 @@ SELECT is_primary,
   public static function addGeocoderData(&$params) {
     try {
       $provider = CRM_Utils_GeocodeProvider::getConfiguredProvider();
+      $providerExists = TRUE;
     }
     catch (CRM_Core_Exception $e) {
-      return FALSE;
+      $providerExists = FALSE;
     }
-    $provider::format($params);
-    return TRUE;
+    if ($providerExists) {
+      $provider::format($params);
+    }
+    // core#2379 - Limit geocode length to 14 characters to avoid validation error on save in UI.
+    foreach (['geo_code_1', 'geo_code_2'] as $geocode) {
+      if ($params[$geocode] ?? FALSE) {
+        $params[$geocode] = (float) substr($params[$geocode], 0, 14);
+      }
+    }
+    return $providerExists;
   }
 
   /**
