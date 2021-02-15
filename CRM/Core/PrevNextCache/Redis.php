@@ -46,10 +46,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
   }
 
   public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
-    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE, NULL, FALSE, TRUE, TRUE);
-    if (is_a($dao, 'DB_Error')) {
-      throw new CRM_Core_Exception($dao->message);
-    }
+    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE);
 
     list($allKey, $dataKey, , $maxScore) = $this->initCacheKey($cacheKey);
 
