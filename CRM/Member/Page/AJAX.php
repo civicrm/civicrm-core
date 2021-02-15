@@ -46,7 +46,7 @@ WHERE   id = %1";
     }
     $details['total_amount_numeric'] = $details['total_amount'];
     // fix the display of the monetary value, CRM-4038
-    $details['total_amount'] = CRM_Utils_Money::format($details['total_amount'], NULL, '%a');
+    $details['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($details['total_amount']);
     $options = CRM_Core_SelectValues::memberAutoRenew();
     $details['auto_renew'] = $options[$details]['auto_renew'] ?? NULL;
     CRM_Utils_JSON::output($details);

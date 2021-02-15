@@ -79,7 +79,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
     }
     elseif ($field == 'fee') {
-      $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field, NULL, NULL, TRUE));
+      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($actionSearchResult->$field));
     }
     elseif (isset($actionSearchResult->$field)) {
       $row->tokens($entity, $field, $actionSearchResult->$field);

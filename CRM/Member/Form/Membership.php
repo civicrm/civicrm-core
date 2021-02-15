@@ -488,7 +488,7 @@ DESC limit 1");
       // - set the max related block
       $allMembershipInfo[$key] = [
         'financial_type_id' => $values['financial_type_id'] ?? NULL,
-        'total_amount' => CRM_Utils_Money::format($totalAmount, NULL, '%a'),
+        'total_amount' => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($totalAmount),
         'total_amount_numeric' => $totalAmount,
         'auto_renew' => $values['auto_renew'] ?? NULL,
         'has_related' => isset($values['relationship_type_id']),
