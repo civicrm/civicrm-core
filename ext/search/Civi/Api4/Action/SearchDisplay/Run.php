@@ -122,8 +122,26 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     foreach ($this->filters as $fieldName => $value) {
       if ($value) {
         $field = $this->getField($fieldName) ?? [];
-        $dataType = $field['data_type'] ?? NULL;
 
+        // If the field doesn't exist, it could be an aggregated column
+        if (!$field) {
+          // Not a real field but in the SELECT clause. It must be an aggregated column. Add to HAVING clause.
+          if (in_array($fieldName, $this->getSelectAliases())) {
+            if ($prefixWithWildcard) {
+              $this->savedSearch['api_params']['having'][] = [$fieldName, 'CONTAINS', $value];
+            }
+            else {
+              $this->savedSearch['api_params']['having'][] = [$fieldName, 'LIKE', $value . '%'];
+            }
+          }
+          // Error - field doesn't exist and isn't a column alias
+          else {
+            // Maybe throw an exception? Or just log a warning?
+          }
+          continue;
+        }
+
+        $dataType = $field['data_type'];
         if (!empty($field['serialize'])) {
           $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
         }

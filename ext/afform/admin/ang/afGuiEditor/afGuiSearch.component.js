@@ -13,6 +13,7 @@
       var ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];
+      $scope.calcFieldList = [];
       $scope.blockList = [];
       $scope.blockTitles = [];
       $scope.elementList = [];
@@ -22,10 +23,20 @@
 
       this.buildPaletteLists = function() {
         var search = $scope.controls.fieldSearch ? $scope.controls.fieldSearch.toLowerCase() : null;
+        buildCalcFieldList(search);
         buildFieldList(search);
         buildBlockList(search);
         buildElementList(search);
       };
+
+      function buildCalcFieldList(search) {
+        $scope.calcFieldList.length = 0;
+        _.each(_.cloneDeep(ctrl.display.calc_fields), function(field) {
+          if (!search || _.contains(field.defn.label.toLowerCase(), search)) {
+            $scope.calcFieldList.push(field);
+          }
+        });
+      }
 
       function buildBlockList(search) {
         $scope.blockList.length = 0;

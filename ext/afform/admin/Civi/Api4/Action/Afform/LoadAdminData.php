@@ -4,6 +4,8 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Afform;
+use Civi\Api4\Entity;
+use Civi\Api4\Query\SqlExpression;
 
 /**
  * This action is used by the Afform Admin extension to load metadata for the Admin GUI.
@@ -176,6 +178,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
           ->addWhere('saved_search.name', '=', $displayTag['search-name'])
           ->addSelect('*', 'type:name', 'type:icon', 'saved_search.name', 'saved_search.api_entity', 'saved_search.api_params')
           ->execute()->first();
+        $display['calc_fields'] = $this->getCalcFields($display['saved_search.api_entity'], $display['saved_search.api_params']);
         $info['search_displays'][] = $display;
         if ($newForm) {
           $info['definition']['layout'][0]['#children'][] = $displayTag + ['#tag' => $display['type:name']];
@@ -238,6 +241,51 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         ->execute();
       $info['blocks'] = array_merge(array_values($info['blocks']), (array) $blockInfo);
     }
+  }
+
+  /**
+   * @param string $apiEntity
+   * @param array $apiParams
+   * @return array
+   */
+  private function getCalcFields($apiEntity, $apiParams) {
+    $calcFields = [];
+    $api = \Civi\API\Request::create($apiEntity, 'get', $apiParams);
+    $selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
+    $joinMap = $joinCount = [];
+    foreach ($apiParams['join'] ?? [] as $join) {
+      [$entityName, $alias] = explode(' AS ', $join[0]);
+      $num = '';
+      if (!empty($joinCount[$entityName])) {
+        $num = ' ' . (++$joinCount[$entityName]);
+      }
+      else {
+        $joinCount[$entityName] = 1;
+      }
+      $label = Entity::get(FALSE)
+        ->addWhere('name', '=', $entityName)
+        ->addSelect('title')
+        ->execute()->first()['title'];
+      $joinMap[$alias] = $label . $num;
+    }
+
+    foreach ($apiParams['select'] ?? [] as $select) {
+      if (strstr($select, ' AS ')) {
+        $expr = SqlExpression::convert($select, TRUE);
+        $field = $expr->getFields() ? $selectQuery->getField($expr->getFields()[0]) : NULL;
+        $joinName = explode('.', $expr->getFields()[0] ?? '')[0];
+        $label = $expr::getTitle() . ': ' . (isset($joinMap[$joinName]) ? $joinMap[$joinName] . ' ' : '') . $field['title'];
+        $calcFields[] = [
+          '#tag' => 'af-field',
+          'name' => $expr->getAlias(),
+          'defn' => [
+            'label' => $label,
+            'input_type' => 'Text',
+          ],
+        ];
+      }
+    }
+    return $calcFields;
   }
 
   public function fields() {
