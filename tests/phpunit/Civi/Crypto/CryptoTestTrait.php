@@ -19,6 +19,9 @@ trait CryptoTestTrait {
       'aes-cbc:hkdf-sha256:abcd1234abcd1234',
       'aes-ctr::abcd1234abcd1234',
       'aes-cbc-hs::abcd1234abcd1234',
+      'jwt-hs256::abcd1234abcd1234',
+      'jwt-hs384:b64:8h5wNGnJbdVHpXms2RwcVx+jxCNdYEsYCdNlPpVgNLRMg9Q2xKYnxSfuihS6YCRi',
+      'jwt-hs256::fdsafdsafdsa',
     ];
   }
 
@@ -56,8 +59,27 @@ trait CryptoTestTrait {
     ]);
     $this->assertEquals(0, $key['weight']);
 
-    $this->assertEquals(4, count($examples));
-    $this->assertEquals(4 + $origCount, count($registry->getKeys()));
+    $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
+      'tags' => ['SIGN-TEST'],
+      'id' => 'sign-key-1',
+      'weight' => 1,
+    ]);
+    $this->assertEquals(1, $key['weight']);
+
+    $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
+      'tags' => ['SIGN-TEST'],
+      'id' => 'sign-key-0',
+    ]);
+    $this->assertEquals(0, $key['weight']);
+
+    $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
+      'tags' => ['SIGN-TEST-ALT'],
+      'id' => 'sign-key-alt',
+    ]);
+    $this->assertEquals(0, $key['weight']);
+
+    $this->assertEquals(7, count($examples));
+    $this->assertEquals(7 + $origCount, count($registry->getKeys()));
   }
 
 }

@@ -29,6 +29,15 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
+    if ($rev === '5.36.alpha1') {
+      if (empty(CRM_Utils_Constant::value('CIVICRM_SIGN_KEYS'))) {
+        // NOTE: We don't re-encrypt automatically because the old "civicrm.settings.php" lacks a good key, and we don't keep the old encryption because the format is ambiguous.
+        // The admin may forget to re-enable. That's OK -- this only affects 1 field, this is a secondary defense, and (in the future) we can remind the admin via status-checks.
+        $preUpgradeMessage .= '<p>' . ts('CiviCRM v5.36 introduces a new configuration option to support digital signatures. You may <a href="%1" target="_blank">setup CIVICRM_SIGN_KEYS</a> before or after upgrading. The option is not critical in v5.36, but it may be required for extensions or future upgrades.', [
+          1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#sign-key',
+        ]) . '</p>';
+      }
+    }
   }
 
   /**

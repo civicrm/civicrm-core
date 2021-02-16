@@ -325,6 +325,27 @@ if (!defined('CIVICRM_CRED_KEYS') ) {
 }
 
 /**
+ * The signing key is used to generate and verify shareable tokens.
+ *
+ * This is a space-delimited list of keys (ordered by priority). Put the preferred
+ * key first. Any old/deprecated keys may be listed after.
+ *
+ * Each key is in format "<cipher-suite>:<key-encoding>:<key-content>", as in:
+ *
+ * Ex: define('CIVICRM_SIGN_KEYS', 'jwt-hs256:hkdf-sha256:RANDOM_1')
+ * Ex: define('CIVICRM_SIGN_KEYS', 'jwt-hs256::RANDOM_2 jwt-hs256::RANDOM_3')
+ * Ex: define('CIVICRM_SIGN_KEYS', 'jwt-hs256:b64:RANDOM_4 jwt-hs256:b64:RANDOM_5')
+ *
+ * If key-encoding is blank, it will default to "hkdf-sha256".
+ */
+if (!defined('CIVICRM_SIGN_KEYS') ) {
+  define( '_CIVICRM_SIGN_KEYS', '%%signKeys%%');
+  define( 'CIVICRM_SIGN_KEYS', _CIVICRM_SIGN_KEYS === '%%' . 'signKeys' . '%%' ? '' : _CIVICRM_SIGN_KEYS );
+  // Some old installers may not set a decent value, and this extra complexity is a failsafe.
+  // Feel free to simplify post-install.
+}
+
+/**
  * Enable this constant, if you want to send your email through the smarty
  * templating engine(allows you to do conditional and more complex logic)
  *

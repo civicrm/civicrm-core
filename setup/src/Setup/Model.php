@@ -30,6 +30,8 @@ namespace Civi\Setup;
  *   Ex: 'abcd1234ABCD9876'.
  * @property string[] $credKeys
  *   Ex: ['::abcd1234ABCD9876'].
+ * @property string[] $signKeys
+ *   Ex: ['jwt-hs256::abcd1234ABCD9876'].
  * @property string|NULL $lang
  *   The language of the default dataset.
  *   Ex: 'fr_FR'.
@@ -114,6 +116,11 @@ class Model {
     $this->addField(array(
       'description' => 'Credential encryption keys',
       'name' => 'credKeys',
+      'type' => 'array',
+    ));
+    $this->addField(array(
+      'description' => 'Signing keys',
+      'name' => 'signKeys',
       'type' => 'array',
     ));
     $this->addField(array(
