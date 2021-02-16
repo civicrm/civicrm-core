@@ -65,9 +65,9 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $exs[] = ['api_key', 'param'];
     $exs[] = ['api_key', 'header'];
     $exs[] = ['api_key', 'xheader'];
-    // $exs[] = ['jwt', 'param'];
-    // $exs[] = ['jwt', 'header'];
-    // $exs[] = ['jwt', 'xheader'];
+    $exs[] = ['jwt', 'param'];
+    $exs[] = ['jwt', 'header'];
+    $exs[] = ['jwt', 'xheader'];
     return $exs;
   }
 
@@ -75,7 +75,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $exs = [];
     $exs[] = ['pass', 'auto'];
     $exs[] = ['api_key', 'auto'];
-    // $exs[] = ['jwt', 'auto'];
+    $exs[] = ['jwt', 'auto'];
     return $exs;
   }
 
@@ -288,9 +288,13 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   public function credJwt($cid) {
-    $token = \Civi::service('authx.jwt')->create([
-      'contact_id' => $cid,
-      'ttl' => 60 * 60,
+    if (empty(\Civi::service('crypto.registry')->findKeysByTag('SIGN'))) {
+      $this->markTestIncomplete('Cannot test JWT. No CIVICRM_SIGN_KEYS are defined.');
+    }
+    $token = \Civi::service('crypto.jwt')->encode([
+      'exp' => time() + 60 * 60,
+      'sub' => "cid:$cid",
+      'scope' => 'authx',
     ]);
     return 'Bearer ' . $token;
   }

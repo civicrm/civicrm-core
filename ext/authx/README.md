@@ -5,7 +5,7 @@ This is useful for automated testing and developing multi-modal pageflows (eg em
 
 ## Overview
 
-There are two general flows of authentication:
+There are two general flows of authentication, each with a few variations:
 
 * __Ephemeral / Stateless__: The client submits a singlular request (such as an API call) which includes credentials. The request is authenticated and processed, but then it is abandoned.
   There are a couple flavors of stateless authentication:
@@ -68,30 +68,59 @@ Some modes may not be supported in some environments. For example:
 
 ### JSON Web Token
 
-```php
-// First, on the server, prepare a token
-$token = Civi::service('authx.jwt')->create([
-  'contact_id' => 123,
-  'ttl' => 5*60*60,
-]);
+By default, JSON Web Tokens are accepted for authentication in all flows.
 
-// Next, on the client, use this same token
+To use JWT authentication, you must first prepare a token on the server:
+
+```php
+$token = Civi::service('crypto.jwt')->encode([
+  'exp' => time() + 5*60,       // Expires in 5 minutes
+  'sub' => 'cid:203',           // Subject (contact ID)
+  'scope' => 'authx',           // Allow general authentication
+]);
+```
+
+This `$token` should be given to some other agent (e.g.  web browser, custom script, or email client).
+
+For example, here's a custom script which uses the `$token` to call APIv3 (`Contact.get`).  The token is based with the common HTTP authorization header:
+
+```php
 $options = ['http' => [
-    'method'  => 'GET',
-    'header' => 'Authorization: Bearer '.$token
+  'method'  => 'GET',
+  'header' => "Authorization: Bearer $token",
 ]];
+$url = 'https://example.org/civicrm/ajax/rest?entity=Contact&action=get&json='
+  . urlencode(json_encode(["id" => "user_contact_id"]));
 $context  = stream_context_create($options);
 $response = file_get_contents($url, false, $context);
 ```
 
-### Username and Password
+Alternatively, if you needed to send an email with a sign-in link, the JWT could be passed as an `?_authx` parameter.
 
 ```php
-$auth = base64_encode("username:password");
-$context = stream_context_create([
-    "http" => [
-        "header" => "Authorization: Basic $auth"
-    ]
-]);
-$homepage = file_get_contents("http://example.com/file", false, $context );
+$url = CRM_Utils_System::url('civicrm/dashboard', [
+  '_authx' => "Bearer $token",
+  '_authxSes' => 1,
+], TRUE, NULL, FALSE);
+$html = sprintf('<body>Here is your login link: <a href="%s">%s</a></body>',
+  htmlentities($url), htmlentities($url));
+CRM_Utils_Mail::send([...'html' => $html...]);
+```
+
+### Username and Password
+
+By default, username/password authentication is not enabled.
+
+```
+$ curl 'https://demouser:demopass@example.org/civicrm/authx/id'
+HTTP 401 Password authentication is not supported
+```
+
+However, if you activate it, then it will work with standard HTTP clients:
+
+```
+$ cv ev 'Civi::settings()->set("authx_header_cred", ["pass","jwt"]);'
+
+$ curl 'https://demouser:demopass@example.org/civicrm/authx/id'
+{"contact_id":203,"user_id":"2"}
 ```

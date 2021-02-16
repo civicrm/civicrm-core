@@ -11,6 +11,7 @@
 
 namespace Civi\Authx;
 
+use Civi\Crypto\Exception\CryptoException;
 use GuzzleHttp\Psr7\Response;
 
 class Authenticator {
@@ -180,9 +181,21 @@ class Authenticator {
         return $c;
       }
     }
-    // if (in_array('jwt', $this->allowCreds)) {
-    //   TODO
-    // }
+    if (in_array('jwt', $this->allowCreds)) {
+      try {
+        $claims = \Civi::service('crypto.jwt')->decode($credValue);
+        $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
+        if (!in_array('authx', $scopes)) {
+          $this->reject('JWT does not permit general authentication');
+        }
+        if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
+          $this->reject('JWT does not specify the contact ID (sub)');
+        }
+        return substr($claims['sub'], 4);
+      }
+      catch (CryptoException $e) {
+      }
+    }
     return NULL;
   }
 
