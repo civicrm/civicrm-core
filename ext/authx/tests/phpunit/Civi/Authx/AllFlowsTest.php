@@ -5,9 +5,12 @@ namespace Civi\Authx;
 use Civi\Test\HttpTestTrait;
 use CRM_Authx_ExtensionUtil as E;
 use Civi\Test\EndToEndInterface;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\AppendStream;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use Psr\Http\Message\ResponseInterface;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * This is a matrix-style test which assesses all supported permutations of
@@ -71,11 +74,11 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return $exs;
   }
 
-  public function getStatefulExamples() {
+  public function getCredTypes() {
     $exs = [];
-    $exs[] = ['pass', 'auto'];
-    $exs[] = ['api_key', 'auto'];
-    $exs[] = ['jwt', 'auto'];
+    $exs[] = ['pass'];
+    $exs[] = ['api_key'];
+    $exs[] = ['jwt'];
     return $exs;
   }
 
@@ -100,82 +103,125 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @dataProvider getStatelessExamples
    */
   public function testStateless($credType, $flowType) {
-    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
-    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
-
-    $cid = \civicrm_api3('Contact', 'getvalue', [
-      'id' => '@user:' . $GLOBALS['_CV']['DEMO_USER'],
-      'return' => 'id',
-    ]);
-
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
-    $request = $this->$flowFunc($this->requestMyContact(), $this->$credFunc($cid));
+    $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
 
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertBodyRegexp(';HTTP 401;', $response);
-    $this->assertContentType('text/plain', $response);
-    if (!in_array('sendsExcessCookies', $this->quirks)) {
-      $this->assertNoCookies($response);
-    }
-    $this->assertStatusCode(401, $response);
+    $this->assertFailedDueToProhibition($response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
-    $this->assertStatusCode(200, $response);
+    $this->assertMyContact($this->getDemoCID(), $response);
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
-    $this->assertMyContact($cid, $response);
   }
 
   /**
-   * Send a request using a stateful protocol. Assert that identities are setup correctly.
+   * The login flow allows you use 'civicrm/authx/login' and 'civicrm/authx/logout'
+   * to setup/teardown a session.
    *
    * @param string $credType
-   *   The type of credential to put in the `Authorization:` header.
-   * @param string $flowType
-   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
+   *   The type of credential to put in the login request.
    * @throws \CiviCRM_API3_Exception
    * @throws \GuzzleHttp\Exception\GuzzleException
-   * @dataProvider getStatefulExamples
+   * @dataProvider getCredTypes
    */
-  public function testStateful($credType, $flowType) {
+  public function testStatefulLogin($credType) {
+    $flowType = 'login';
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
     $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
-    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
 
-    $cid = \civicrm_api3('Contact', 'getvalue', [
-      'id' => '@user:' . $GLOBALS['_CV']['DEMO_USER'],
-      'return' => 'id',
+    // Phase 0: Some pages are not accessible to anonymous users.
+    $http->get('civicrm/dashboard');
+    $this->assertStatusCode(403);
+
+    // Phase 1: Request fails if this credential type is not enabled
+    \Civi::settings()->set("authx_{$flowType}_cred", []);
+    $response = $http->post('civicrm/authx/login', [
+      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
     ]);
+    $this->assertFailedDueToProhibition($response);
 
-    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    // Phase 2: Request succeeds if this credential type is enabled
+    \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
+    $response = $http->post('civicrm/authx/login', [
+      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $response);
+    $this->assertHasCookies($response);
+
+    // Phase 3: We can use cookies to request other pages
+    $response = $http->get('civicrm/authx/id');
+    $this->assertMyContact($this->getDemoCID(), $response);
+    $response = $http->get('civicrm/dashboard');
+    $this->assertStatusCode(200)->assertContentType('text/html');
+
+    // Phase 4: After logout, requests should fail.
+    $oldCookies = clone $cookieJar;
+    $http->get('civicrm/authx/logout');
+    $this->assertStatusCode(200);
+    $http->get('civicrm/dashboard');
+    $this->assertStatusCode(403);
+
+    $httpHaxor = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $oldCookies]);
+    $httpHaxor->get('civicrm/dashboard');
+    $this->assertStatusCode(403);
+  }
+
+  /**
+   * The auto-login flow allows you to request a specific page with specific
+   * credentials. The new session is setup, and the page is displayed.
+   *
+   * @param string $credType
+   *   The type of credential to put in the login request.
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @dataProvider getCredTypes
+   */
+  public function testStatefulAuto($credType) {
+    $flowType = 'auto';
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
-    $request = $this->$flowFunc($this->requestMyContact(), $this->$credFunc($cid));
+    $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
 
     // Phase 1: Request fails if this credential type is not enabled
     \Civi::settings()->set("authx_{$flowType}_cred", []);
     $response = $http->send($request);
-    $this->assertBodyRegexp(';HTTP 401;', $response);
-    $this->assertContentType('text/plain', $response);
-    if (!in_array('sendsExcessCookies', $this->quirks)) {
-      $this->assertNoCookies($response);
-    }
-    $this->assertStatusCode(401, $response);
+    $this->assertFailedDueToProhibition($response);
 
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
-    $this->assertStatusCode(200, $response);
     $this->assertHasCookies($response);
-    $this->assertMyContact($cid, $response);
+    $this->assertMyContact($this->getDemoCID(), $response);
 
     // FIXME: Assert that re-using cookies yields correct result.
+  }
+
+  /**
+   * Filter a request, applying the given authentication options
+   *
+   * @param \Psr\Http\Message\RequestInterface $request
+   * @param string $credType
+   *   Ex: 'pass', 'jwt', 'api_key'
+   * @param string $flowType
+   *   Ex: 'param', 'header', 'xheader'
+   * @param int $cid
+   * @return \Psr\Http\Message\RequestInterface
+   */
+  protected function applyAuth($request, $credType, $flowType, $cid) {
+    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
+    $flowFunc = 'auth' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $flowType));
+    return $this->$flowFunc($request, $this->$credFunc($cid));
   }
 
   // ------------------------------------------------
@@ -254,6 +300,14 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     );
   }
 
+  public function authLogin(Request $request, $cred) {
+    return $request->withMethod('POST')
+      ->withBody(new AppendStream([
+        stream_for('_authx=' . urlencode($cred) . '&'),
+        $request->getBody(),
+      ]));
+  }
+
   public function authHeader(Request $request, $cred) {
     return $request->withHeader('Authorization', $cred);
   }
@@ -275,7 +329,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    *   The credential add to the request (e.g. "Basic ASDF==" or "Bearer FDSA").
    */
   public function credPass($cid) {
-    return 'Basic ' . base64_encode($GLOBALS['_CV']['DEMO_USER'] . ':' . $GLOBALS['_CV']['DEMO_PASS']);
+    if ($cid === $this->getDemoCID()) {
+      return 'Basic ' . base64_encode($GLOBALS['_CV']['DEMO_USER'] . ':' . $GLOBALS['_CV']['DEMO_PASS']);
+    }
+    else {
+      $this->fail("This test does have the password the requested contact.");
+    }
   }
 
   public function credApikey($cid) {
@@ -318,6 +377,19 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   /**
    * @param \Psr\Http\Message\ResponseInterface $response
    */
+  private function assertFailedDueToProhibition($response) {
+    $this->assertBodyRegexp(';HTTP 401;', $response);
+    $this->assertContentType('text/plain', $response);
+    if (!in_array('sendsExcessCookies', $this->quirks)) {
+      $this->assertNoCookies($response);
+    }
+    $this->assertStatusCode(401, $response);
+
+  }
+
+  /**
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
   private function assertNoCookies($response = NULL) {
     $response = $this->resolveResponse($response);
     $this->assertEmpty(
@@ -345,8 +417,23 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    */
   private function assertBodyRegexp($regexp, $response = NULL) {
     $response = $this->resolveResponse($response);
-    $this->assertRegexp($regexp, (string) $response->getBody());
+    $this->assertRegexp($regexp, (string) $response->getBody(),
+      'Response body does not match pattern' . $this->formatFailure($response));
     return $this;
+  }
+
+  /**
+   * @return int
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function getDemoCID(): int {
+    if (!isset(\Civi::$statics[__CLASS__]['demoId'])) {
+      \Civi::$statics[__CLASS__]['demoId'] = (int) \civicrm_api3('Contact', 'getvalue', [
+        'id' => '@user:' . $GLOBALS['_CV']['DEMO_USER'],
+        'return' => 'id',
+      ]);
+    }
+    return \Civi::$statics[__CLASS__]['demoId'];
   }
 
 }

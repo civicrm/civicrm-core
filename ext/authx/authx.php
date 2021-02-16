@@ -17,7 +17,7 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
   $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
   if (!empty($params['_authx'])) {
     if ((implode('/', $e->args) === 'civicrm/authx/login')) {
-      (new \Civi\Authx\Authenticator('endpoint'))->auth($e, $params['_authx'], TRUE);
+      (new \Civi\Authx\Authenticator('login'))->auth($e, $params['_authx'], TRUE);
       _authx_redact(['_authx']);
     }
     elseif (!empty($params['_authxSes'])) {

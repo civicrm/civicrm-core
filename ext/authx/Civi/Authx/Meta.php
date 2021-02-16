@@ -36,7 +36,7 @@ class Meta {
       'param' => E::ts('Ephemeral: Paramter'),
       'header' => E::ts('Ephemeral: Common Header'),
       'xheader' => E::ts('Ephemeral: X-Header'),
-      'endpoint' => E::ts('Persistent: End-point session'),
+      'login' => E::ts('Persistent: Login session'),
       'auto' => E::ts('Persistent: Auto session'),
     ];
   }

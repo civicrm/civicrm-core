@@ -15,7 +15,7 @@ There are two general flows of authentication, each with a few variations:
     * __X-Header (`xheader`)__: The credential is again submitted with an HTTP header (`X-Civi-Auth:`). The header behaves the same as the common header. The
       differing name means that clients must specifically support it, but it also reduces the odsd of interference.
 * __Persistent / Stateful__: The client makes a request for a persistent session, attaching the contact ID and/or user ID. These will be used in subsequent requests.
-    * __End-point session (`endpoint`)__: The client submits an explicit authentication request (`POST /civicrm/authx/login?_authx=<credential>`) which creates a session and cookie.
+    * __End-point session (`login`)__: The client submits an explicit authentication request (`POST /civicrm/authx/login?_authx=<credential>`) which creates a session and cookie.
       The authenticated session endures until one logs out (`/civicrm/authx/logout`).
     * __Auto session (`auto`)__: The clients submits a GET request for any page (`?_authx=<credential>&_authxSes=1`). The session is initialized. The user redirects
       to original page.
@@ -48,8 +48,8 @@ For each authentication flow, one may toggle support for different credentials a
     * Accepted credentials (`authx_xheader_cred`): `['jwt']`
     * User link (`authx_xheader_user`): `'optional'`
 * Persistent: End-point session flow
-    * Accepted credentials (`authx_endpoint_cred`): `['jwt']`
-    * User link (`authx_endpoint_user`): `require`
+    * Accepted credentials (`authx_login_cred`): `['jwt']`
+    * User link (`authx_login_user`): `require`
 * Persistent: Auto session flow
     * Accepted credentials (`authx_auto_cred`): `['paramalogin']` for Joomla, and `[]` for all others
     * User link (`authx_auto_user`): `require`
