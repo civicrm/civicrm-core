@@ -31,6 +31,10 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       ->execute();
   }
 
+  /**
+   * Upgrade 1000 - install schema
+   * @return bool
+   */
   public function upgrade_1000() {
     $this->ctx->log->info('Applying update 1000 - install schema.');
     // For early, early adopters who installed the extension pre-beta
@@ -38,6 +42,44 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       $this->executeSqlFile('sql/auto_install.sql');
     }
     CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET url = 'civicrm/admin/search', name = 'search_kit' WHERE url = 'civicrm/search'");
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1001 - normalize search display column keys
+   * @return bool
+   */
+  public function upgrade_1001() {
+    $this->ctx->log->info('Applying update 1001 - normalize search display columns.');
+    $savedSearches = \Civi\Api4\SavedSearch::get(FALSE)
+      ->addWhere('api_params', 'IS NOT NULL')
+      ->addChain('displays', \Civi\Api4\SearchDisplay::get()->addWhere('saved_search_id', '=', '$id'))
+      ->execute();
+    foreach ($savedSearches as $savedSearch) {
+      $newAliases = [];
+      foreach ($savedSearch['api_params']['select'] ?? [] as $i => $select) {
+        if (strstr($select, '(') && !strstr($select, ' AS ')) {
+          $alias = CRM_Utils_String::munge(str_replace(')', '', $select), '_', 256);
+          $newAliases[$select] = $alias;
+          $savedSearch['api_params']['select'][$i] = $select . ' AS ' . $alias;
+        }
+      }
+      if ($newAliases) {
+        \Civi\Api4\SavedSearch::update(FALSE)
+          ->setValues(array_diff_key($savedSearch, ['displays' => 0]))
+          ->execute();
+      }
+      foreach ($savedSearch['displays'] ?? [] as $display) {
+        foreach ($display['settings']['columns'] ?? [] as $c => $column) {
+          $key = $newAliases[$column['expr']] ?? $column['expr'];
+          unset($display['settings']['columns'][$c]['expr']);
+          $display['settings']['columns'][$c]['key'] = explode(' AS ', $key)[1] ?? $key;
+        }
+        \Civi\Api4\SearchDisplay::update(FALSE)
+          ->setValues($display)
+          ->execute();
+      }
+    }
     return TRUE;
   }
 

@@ -11,10 +11,9 @@
       parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
-    controller: function($scope, searchMeta) {
+    controller: function($scope) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
-      this.getFieldLabel = searchMeta.getDefaultLabel;
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {

@@ -53,10 +53,27 @@
         ctrl.hiddenColumns.splice(index, 1);
       };
 
+      this.getExprFromSelect = function(key) {
+        var match;
+        _.each(ctrl.savedSearch.api_params.select, function(expr) {
+          var parts = expr.split(' AS ');
+          if (_.includes(parts, key)) {
+            match = parts[0];
+            return false;
+          }
+        });
+        return match;
+      };
+
+      this.getFieldLabel = function(key) {
+        var expr = ctrl.getExprFromSelect(key);
+        return searchMeta.getDefaultLabel(expr);
+      };
+
       function fieldToColumn(fieldExpr) {
         var info = searchMeta.parseExpr(fieldExpr);
         return {
-          expr: fieldExpr,
+          key: info.alias,
           label: searchMeta.getDefaultLabel(fieldExpr),
           dataType: (info.fn && info.fn.name === 'COUNT') ? 'Integer' : info.field.data_type
         };
@@ -70,14 +87,18 @@
           });
           ctrl.hiddenColumns = [];
         } else {
-          var activeColumns = _.collect(ctrl.display.settings.columns, 'expr');
+          var activeColumns = _.collect(ctrl.display.settings.columns, 'key'),
+            selectAliases = _.map(ctrl.savedSearch.api_params.select, function(select) {
+              return _.last(select.split(' AS '));
+            });
           ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
-            if (!_.includes(activeColumns, fieldExpr)) {
+            var key = _.last(fieldExpr.split(' AS '));
+            if (!_.includes(activeColumns, key)) {
               hiddenColumns.push(fieldToColumn(fieldExpr));
             }
           });
-          _.each(activeColumns, function(fieldExpr, index) {
-            if (!_.includes(ctrl.savedSearch.api_params.select, fieldExpr)) {
+          _.eachRight(activeColumns, function(key, index) {
+            if (!_.includes(selectAliases, key)) {
               ctrl.display.settings.columns.splice(index, 1);
             }
           });

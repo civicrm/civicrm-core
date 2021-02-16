@@ -23,7 +23,6 @@
       this.allRowsSelected = false;
 
       this.$onInit = function() {
-        this.columns = searchDisplayUtils.prepareColumns(this.settings.columns);
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         $scope.displayUtils = searchDisplayUtils;
 

@@ -170,7 +170,7 @@
           return;
         }
         var splitAs = expr.split(' AS '),
-          info = {fn: null, modifier: '', field: {}},
+          info = {fn: null, modifier: '', field: {}, alias: _.last(splitAs)},
           fieldName = splitAs[0],
           bracketPos = splitAs[0].indexOf('(');
         if (bracketPos >= 0) {
@@ -188,7 +188,6 @@
           info.suffix = !split[1] ? '' : ':' + split[1];
           info.field = fieldAndJoin.field;
           info.join = fieldAndJoin.join;
-          info.alias = splitAs[1] || (info.fn ? info.fn.name + ':' + info.path : split[0]);
         }
         return info;
       }

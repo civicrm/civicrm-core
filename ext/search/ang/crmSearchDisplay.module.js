@@ -48,14 +48,6 @@
         return result;
       }
 
-      function prepareColumns(columns) {
-        columns = _.cloneDeep(columns);
-        _.each(columns, function(col) {
-          col.key = _.last(col.expr.split(' AS '));
-        });
-        return columns;
-      }
-
       function getApiParams(ctrl, mode) {
         return {
           return: mode || 'page:' + ctrl.page,
@@ -85,7 +77,6 @@
 
       return {
         formatSearchValue: formatSearchValue,
-        prepareColumns: prepareColumns,
         getApiParams: getApiParams,
         getResults: getResults,
         replaceTokens: replaceTokens

@@ -15,7 +15,7 @@
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <legend>{{:: ts('Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
+      <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" />
         <button class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
@@ -44,7 +44,7 @@
   <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.parent.hiddenColumns" ui-sortable="$ctrl.parent.sortableOptions">
     <legend>{{:: ts('Hidden Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.parent.hiddenColumns" class="crm-draggable">
-      <legend>{{ $ctrl.getFieldLabel(col.expr) }}</legend>
+      <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input disabled class="form-control" type="text" ng-model="col.label" />
         <button class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
