@@ -136,10 +136,14 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
   public static function formRule($fields, $files, $self) {
     $errors = [];
     $fieldSelected = FALSE;
+    $actualThreshold = 0;
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       if (!empty($fields["where_$count"]) || (isset($self->_defaults['is_reserved']) && !empty($self->_defaults["where_$count"]))) {
         $fieldSelected = TRUE;
         break;
+      }
+      if (!empty($self->_defaults["weight_$count"])) {
+        $actualThreshold += $self->_defaults["weight_$count"];
       }
     }
     if (empty($fields['threshold'])) {
@@ -147,6 +151,11 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
       if (!(CRM_Utils_Array::value('is_reserved', $fields) &&
         CRM_Utils_File::isIncludable("CRM/Dedupe/BAO/QueryBuilder/{$self->_defaultValues['name']}.php"))) {
         $errors['threshold'] = ts('Threshold weight cannot be empty or zero.');
+      }
+    }
+    else {
+      if ($actualThreshold < $fields['threshold']) {
+        $errors['threshold'] = ts('Total weight must be greater than or equal to the Weight Threshold.');
       }
     }
 
