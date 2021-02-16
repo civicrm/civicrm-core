@@ -425,7 +425,7 @@ class CRM_Core_Payment_BaseIPN {
       'related_contact' => $ids['related_contact'] ?? NULL,
       'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
       'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects['contribution']);
+    ], $objects['contribution']->id ?? NULL);
   }
 
   /**

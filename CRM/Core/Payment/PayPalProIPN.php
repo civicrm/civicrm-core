@@ -351,7 +351,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $contribution->id ?? NULL);
   }
 
   /**
