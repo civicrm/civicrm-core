@@ -503,6 +503,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception
    */
   public function permissionDenied() {
+    status_header(403);
     throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
   }
 
