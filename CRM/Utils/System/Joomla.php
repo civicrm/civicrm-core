@@ -465,10 +465,17 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
+   * Start a new session.
+   */
+  public function sessionStart() {
+    JFactory::getSession()->start();
+  }
+
+  /**
    * @inheritDoc
    */
   public function logout() {
-    session_destroy();
+    JFactory::getSession()->destroy();
     CRM_Utils_System::setHttpHeader("Location", "index.php");
   }
 
@@ -586,6 +593,10 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     if (!defined('JDEBUG')) {
       define('JDEBUG', FALSE);
     }
+
+    // loadBootStrap() is only used for `extern` scripts like 'rest.php' or 'open.php'
+    // which should not have sessions.
+    JFactory::getSession()->setHandler(new CRM_Utils_FakeJoomlaSession('CIVISCRIPT'));
 
     // Set timezone for Joomla on Cron
     $config = JFactory::getConfig();
