@@ -195,7 +195,7 @@ class AssetBuilder {
       }
       catch (UnknownAssetException $e) {
         // unexpected error, log and continue
-        Civi::log()->error('Unexpected error while rendering a file in the AssetBuilder: ' . $e->getMessage(), ['exception' => $e]);
+        \Civi::log()->error('Unexpected error while rendering a file in the AssetBuilder: ' . $e->getMessage(), ['exception' => $e]);
       }
     }
     return $fileName;
