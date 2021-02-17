@@ -630,7 +630,7 @@
 
       $scope.formatResult = function(row, col) {
         var info = searchMeta.parseExpr(col),
-          value = row[info.alias + info.suffix];
+          value = row[info.alias];
         if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }
@@ -786,7 +786,7 @@
         return _.transform(ctrl.savedSearch.api_params.select, function(fields, name) {
           var info = searchMeta.parseExpr(name);
           var item = {
-            id: info.alias + info.suffix,
+            id: info.alias,
             text: ctrl.getFieldLabel(name),
             description: info.field && info.field.description
           };
