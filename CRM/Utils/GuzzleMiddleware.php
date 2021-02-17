@@ -13,14 +13,18 @@ class CRM_Utils_GuzzleMiddleware {
    * the construction of Civi-related URLs. It enables URL schemes for:
    *
    * - route://ROUTE_NAME (aka) route:ROUTE_NAME
+   * - backend://ROUTE_NAME (aka) backend:ROUTE_NAME
+   * - frontend://ROUTE_NAME (aka) frontend:ROUTE_NAME
    * - var://PATH_EXPRESSION (aka) var:PATH_EXPRESSION
    * - ext://EXTENSION/FILE (aka) ext:EXTENSION/FILE
    * - assetBuilder://ASSET_NAME?PARAMS (aka) assetBuilder:ASSET_NAME?PARAMS
    *
    * Compare:
    *
-   * $http->get(CRM_Utils_System::url('civicrm/dashboard', NULL, TRUE, NULL, FALSE))
-   * $http->get('route:civicrm/dashboard')
+   * $http->get(CRM_Utils_System::url('civicrm/dashboard', NULL, TRUE, NULL, FALSE, ??))
+   * $http->get('route://civicrm/dashboard')
+   * $http->get('frontend://civicrm/dashboard')
+   * $http->get('backend://civicrm/dashboard')
    *
    * $http->get(Civi::paths()->getUrl('[civicrm.files]/foo.txt'))
    * $http->get('var:[civicrm.files]/foo.txt')
@@ -81,6 +85,11 @@ class CRM_Utils_GuzzleMiddleware {
       $scheme = ($hostPath[0] === '[') ? 'var' : 'route';
     }
 
+    if ($scheme === 'route') {
+      $menu = CRM_Core_Menu::get($hostPath);
+      $scheme = ($menu && !empty($menu['is_public'])) ? 'frontend' : 'backend';
+    }
+
     switch ($scheme) {
       case 'assetBuilder':
         // Ex: 'assetBuilder:dynamic.css' or 'assetBuilder://dynamic.css?foo=bar'
@@ -98,9 +107,13 @@ class CRM_Utils_GuzzleMiddleware {
         // Ex: 'var:[civicrm.files]/foo.txt' or  'var://[civicrm.files]/foo.txt'
         return $copyParams(\Civi::paths()->getUrl($hostPath, 'absolute'));
 
-      case 'route':
-        // Ex: 'route:civicrm/my-page' or 'route://civicrm/my-page'
+      case 'backend':
+        // Ex: 'backend:civicrm/my-page' or 'backend://civicrm/my-page'
         return $copyParams(\CRM_Utils_System::url($hostPath, NULL, TRUE, NULL, FALSE));
+
+      case 'frontend':
+        // Ex: 'frontend:civicrm/my-page' or 'frontend://civicrm/my-page'
+        return $copyParams(\CRM_Utils_System::url($hostPath, NULL, TRUE, NULL, FALSE, TRUE));
 
       default:
         return NULL;
