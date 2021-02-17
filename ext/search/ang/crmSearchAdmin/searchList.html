@@ -52,7 +52,7 @@
             </button>
             <ul class="dropdown-menu">
               <li ng-repeat="display_name in search.display_name" ng-if="::$ctrl.afformAdminEnabled">
-                <a href="{{:: $ctrl.newFormPath + '#/create/search/' + search.name + '.' + display_name }}">
+                <a href="{{:: $ctrl.afformPath + '#/create/search/' + search.name + '.' + display_name }}">
                   <i class="fa fa-plus"></i> {{:: ts('Create form for %1', {1: search.display_label[$index]}) }}
                 </a>
               </li>
@@ -63,9 +63,9 @@
                   <em ng-if="$ctrl.afforms && !$ctrl.afforms[search.name]">{{:: ts('None Found') }}</em>
                 </a>
               </li>
-              <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[search.name]" ng-class="{disabled: !afform.url}" title="{{:: afform.url ? ts('Open form in new tab') : ts('This form does not have a page') }}">
-                <a href="{{:: afform.url }}" target="_blank">
-                  <i class="crm-i {{:: afform.url ? 'fa-external-link' : 'fa-list-alt' }}"></i>
+              <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[search.name]" title="{{:: ts('Edit form') }}">
+                <a href="{{:: $ctrl.afformPath + '#/edit/' + afform.name }}">
+                  <i class="crm-i fa-pencil-square-o"></i>
                   {{:: afform.title }}
                 </a>
               </li>
