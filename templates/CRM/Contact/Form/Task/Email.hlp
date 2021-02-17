@@ -26,6 +26,15 @@
 {/if}
 {/htxt}
 
+{htxt id="id-to_email-title"}
+  {ts}To Address{/ts}
+{/htxt}
+{htxt id="id-to_email"}
+<p>{ts}Contacts in the "To" field will each receive one copy of this email, with any tokens respectively filled for their contact record.{/ts}</p>
+<p>{ts}"To" recipients will not see which other "To" recipients received an email, but they will see the list of "Cc" recipients.{/ts}</p>
+<p>{ts}Any contacts in the "Cc" or "Bcc" fields will receive a copy, one for each "To" email, but with the tokens filled for the "To" contact.{/ts}</p>
+{/htxt}
+
 {htxt id="id-token-subject-title"}
   {ts}Subject Tokens{/ts}
 {/htxt}

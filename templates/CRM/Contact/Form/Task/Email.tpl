@@ -23,7 +23,7 @@
     <tr class="crm-contactEmail-form-block-recipient">
        <td class="label">{if $single eq false}{ts}Recipient(s){/ts}{else}{$form.to.label}{/if}</td>
        <td>
-         {$form.to.html}
+         {$form.to.html} {help id="id-to_email" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
     <tr class="crm-contactEmail-form-block-cc_id" {if !$form.cc_id.value}style="display:none;"{/if}>
