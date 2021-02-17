@@ -21,6 +21,14 @@
           </div>
         </div>
       </div>
+      <div ng-if="calcFieldList.length">
+        <label>{{:: ts('Calculated Fields') }}</label>
+        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="calcFieldList">
+          <div ng-repeat="field in calcFieldList" ng-class="{disabled: fieldInUse(field.name)}">
+            {{:: field.defn.label }}
+          </div>
+        </div>
+      </div>
       <div ng-repeat="fieldGroup in fieldList">
         <div ng-if="fieldGroup.fields.length">
           <label>{{:: fieldGroup.label }}</label>

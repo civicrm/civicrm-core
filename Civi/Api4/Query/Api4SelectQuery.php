@@ -103,6 +103,9 @@ class Api4SelectQuery {
     // Add ACLs first to avoid redundant subclauses
     $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
+
+    // Add explicit joins. Other joins implied by dot notation may be added later
+    $this->addExplicitJoins();
   }
 
   /**
@@ -113,8 +116,6 @@ class Api4SelectQuery {
    * @throws \CRM_Core_Exception
    */
   public function getSql() {
-    // Add explicit joins. Other joins implied by dot notation may be added later
-    $this->addExplicitJoins();
     $this->buildSelectClause();
     $this->buildWhereClause();
     $this->buildOrderBy();
@@ -152,7 +153,6 @@ class Api4SelectQuery {
    * @throws \API_Exception
    */
   public function getCount() {
-    $this->addExplicitJoins();
     $this->buildWhereClause();
     // If no having or groupBy, we only need to select count
     if (!$this->getHaving() && !$this->getGroupBy()) {

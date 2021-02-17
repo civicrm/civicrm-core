@@ -26,13 +26,14 @@
         $scope.meta = afGui.meta;
       };
 
-      // $scope.getEntity = function() {
-      //   return ctrl.editor ? ctrl.editor.getEntity(ctrl.container.getEntityName()) : {};
-      // };
-
       // Returns the original field definition from metadata
       this.getDefn = function() {
-        return ctrl.editor ? afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name) : {};
+        var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
+        return defn ||  {
+          label: ts('Untitled'),
+          requred: false,
+          input_attrs: []
+        };
       };
 
       $scope.getOriginalLabel = function() {
