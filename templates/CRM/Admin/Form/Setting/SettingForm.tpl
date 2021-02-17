@@ -19,7 +19,7 @@
           {$form.$setting_name.html}
         {/if}
         <div class="description">
-          {ts}{$setting_detail.description}{/ts}
+          {$setting_detail.description}
         </div>
         {if $setting_detail.help_text}
           {assign var='tplhelp_id' value = $setting_name|cat:'-id'|replace:'_':'-'}{help id="$tplhelp_id"}
