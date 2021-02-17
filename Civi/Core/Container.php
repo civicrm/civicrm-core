@@ -569,6 +569,9 @@ class Container {
         $container->set($name, $obj);
       }
       \Civi::$statics[__CLASS__]['container'] = $container;
+      // Ensure api factory has loaded (in case other roots have been bypassed)
+      $container->get('dispatcher');
+
     }
     else {
       $bootServices['dispatcher.boot']->setDispatchPolicy($mainDispatchPolicy);
