@@ -2810,8 +2810,7 @@ class CRM_Contact_BAO_Query {
         return $from;
     }
   }
-
-
+  
   /**
    * The join statement required when both CaseType and ActivityType are specified
    * https://lab.civicrm.org/dev/report/-/issues/53
@@ -2821,13 +2820,12 @@ class CRM_Contact_BAO_Query {
    */
   protected static function getCaseTypeAndActivityTypeJoin($tables) {
     $join_statement = "";
-    if (array_key_exists("civicrm_case",$tables) && array_key_exists("civicrm_activity",$tables)){
+    if (array_key_exists("civicrm_case", $tables) && array_key_exists("civicrm_activity", $tables)) {
       $join_statement = "\n INNER JOIN civicrm_case_activity";
       $join_statement .= "\nON (civicrm_case_activity.case_id = civicrm_case.id AND civicrm_case_activity.activity_id = civicrm_activity.id)\n";
     }
     return $join_statement;
   }
-
 
   /**
    * WHERE / QILL clause for deleted_contacts

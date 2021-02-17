@@ -50,7 +50,7 @@ class CRM_Contact_BAO_QueryAdvancedSearchTest extends CiviCaseTestCase {
    */
   public function testCaseTypeAndActivityTypeSearch() {
     // Collect the ids from the test database that are needed in the search
-    $contact = $this-> callAPIsuccess('contact', 'get', ['display_name' => 'Test Contact']);
+    $contact = $this->callAPIsuccess('contact', 'get', ['display_name' => 'Test Contact']);
     $contact_id = $contact['id'];
     $medical = $this->callAPISuccess('OptionValue', 'Get', ['name' => 'Medical evaluation']);
     $option_value_id = $medical['id'];
@@ -63,14 +63,14 @@ class CRM_Contact_BAO_QueryAdvancedSearchTest extends CiviCaseTestCase {
     $params = [
       'contact_id' => $contact_id,
       'case_type' => "housing_support",
-      'subject' => "HousingSupportTest"
+      'subject' => "HousingSupportTest",
     ];
     $this->callAPISuccess('case', 'create', $params);
 
     $params = [
       'contact_id' => $contact_id,
       'case_type' => "adult_day_care_referral",
-      'subject' => "AdultDayCareTest"
+      'subject' => "AdultDayCareTest",
     ];
     $this->callAPISuccess('case', 'create', $params);
 
@@ -93,7 +93,7 @@ class CRM_Contact_BAO_QueryAdvancedSearchTest extends CiviCaseTestCase {
       [
         0 => 'activity_status_id',
         1 => '=',
-        2 => 1, //scheduled
+        2 => 1,
         3 => 0,
         4 => 0,
       ],
