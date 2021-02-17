@@ -2810,7 +2810,7 @@ class CRM_Contact_BAO_Query {
         return $from;
     }
   }
-  
+
   /**
    * The join statement required when both CaseType and ActivityType are specified
    * https://lab.civicrm.org/dev/report/-/issues/53
