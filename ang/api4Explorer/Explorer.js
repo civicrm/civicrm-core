@@ -1157,7 +1157,7 @@
                 $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
               });
             } else if (field.fk_entity) {
-              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
+              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}, static: field.fk_entity === 'Contact' ? ['user_contact_id'] : []});
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
                 {id: 'true', text: ts('Yes')},
