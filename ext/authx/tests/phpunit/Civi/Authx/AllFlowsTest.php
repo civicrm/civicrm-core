@@ -40,6 +40,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
 
   public function setUp() {
     $quirks = [
+      'Joomla' => ['sendsExcessCookies', 'authErrorShowsForm'],
       'WordPress' => ['sendsExcessCookies'],
     ];
     $this->quirks = $quirks[CIVICRM_UF] ?? [];
@@ -132,24 +133,18 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulLogin($credType) {
+  public function testStatefulLoginAllowed($credType) {
     $flowType = 'login';
-    $cookieJar = new CookieJar();
-    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
     $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
 
-    // Phase 0: Some pages are not accessible to anonymous users.
-    $http->get('civicrm/dashboard');
-    $this->assertStatusCode(403);
-
-    // Phase 1: Request fails if this credential type is not enabled
-    \Civi::settings()->set("authx_{$flowType}_cred", []);
-    $response = $http->post('civicrm/authx/login', [
-      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
-    ]);
-    $this->assertFailedDueToProhibition($response);
+    // Phase 1: Some pages are not accessible.
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    $http->get('civicrm/user');
+    $this->assertDashboardUnauthorized();
 
     // Phase 2: Request succeeds if this credential type is enabled
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->post('civicrm/authx/login', [
       'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
@@ -160,19 +155,40 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 3: We can use cookies to request other pages
     $response = $http->get('civicrm/authx/id');
     $this->assertMyContact($this->getDemoCID(), $response);
-    $response = $http->get('civicrm/dashboard');
-    $this->assertStatusCode(200)->assertContentType('text/html');
+    $response = $http->get('civicrm/user');
+    $this->assertDashboardOk();
 
     // Phase 4: After logout, requests should fail.
     $oldCookies = clone $cookieJar;
     $http->get('civicrm/authx/logout');
     $this->assertStatusCode(200);
-    $http->get('civicrm/dashboard');
-    $this->assertStatusCode(403);
+    $http->get('civicrm/user');
+    $this->assertDashboardUnauthorized();
 
     $httpHaxor = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $oldCookies]);
-    $httpHaxor->get('civicrm/dashboard');
-    $this->assertStatusCode(403);
+    $httpHaxor->get('civicrm/user');
+    $this->assertDashboardUnauthorized();
+  }
+
+  /**
+   * The login flow 'civicrm/authx/login' may be prohibited by policy.
+   *
+   * @param string $credType
+   *   The type of credential to put in the login request.
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @dataProvider getCredTypes
+   */
+  public function testStatefulLoginProhibited($credType) {
+    $flowType = 'login';
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
+
+    \Civi::settings()->set("authx_{$flowType}_cred", []);
+    $response = $http->post('civicrm/authx/login', [
+      'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
+    ]);
+    $this->assertFailedDueToProhibition($response);
   }
 
   /**
@@ -185,7 +201,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulAuto($credType) {
+  public function testStatefulAutoAllowed($credType) {
     $flowType = 'auto';
     $cookieJar = new CookieJar();
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
@@ -193,18 +209,35 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     /** @var \Psr\Http\Message\RequestInterface $request */
     $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
 
-    // Phase 1: Request fails if this credential type is not enabled
-    \Civi::settings()->set("authx_{$flowType}_cred", []);
-    $response = $http->send($request);
-    $this->assertFailedDueToProhibition($response);
-
-    // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
     $this->assertHasCookies($response);
     $this->assertMyContact($this->getDemoCID(), $response);
 
     // FIXME: Assert that re-using cookies yields correct result.
+  }
+
+  /**
+   * The auto-login flow allows you to request a specific page with specific
+   * credentials. The new session is setup, and the page is displayed.
+   *
+   * @param string $credType
+   *   The type of credential to put in the login request.
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @dataProvider getCredTypes
+   */
+  public function testStatefulAutoProhibited($credType) {
+    $flowType = 'auto';
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
+
+    \Civi::settings()->set("authx_{$flowType}_cred", []);
+    $response = $http->send($request);
+    $this->assertFailedDueToProhibition($response);
   }
 
   /**
@@ -263,8 +296,39 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
     $j = json_decode((string) $response->getBody(), 1);
-    $this->assertNull($j[0]['contact_id']);
-    $this->assertNull($j[0]['user_id']);
+    if (json_last_error() !== JSON_ERROR_NONE || empty($j)) {
+      $this->fail('Malformed JSON' . $this->formatFailure());
+    }
+    $this->assertTrue(array_key_exists('contact_id', $j) && $j['contact_id'] === NULL);
+    $this->assertTrue(array_key_exists('user_id', $j) && $j['user_id'] === NULL);
+  }
+
+  /**
+   * Assert that the $response indicates the user cannot view the dashboard.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public function assertDashboardUnauthorized($response = NULL) {
+    $response = $this->resolveResponse($response);
+    if (!in_array('authErrorShowsForm', $this->quirks)) {
+      $this->assertStatusCode(403, $response);
+    }
+    $this->assertFalse(
+      (bool) preg_match(';crm-dashboard-groups;', (string) $response->getBody()),
+      'Response should not contain a dashboard' . $this->formatFailure($response)
+    );
+  }
+
+  public function assertDashboardOk($response = NULL) {
+    $response = $this->resolveResponse($response);
+    $this->assertStatusCode(200, $response);
+    $this->assertContentType('text/html', $response);
+    // If the first two assertions pass but the next fails, then... perhaps the
+    // local site permissions are wrong?
+    $this->assertTrue(
+      (bool) preg_match(';crm-dashboard-groups;', (string) $response->getBody()),
+      'Response should contain a dashboard' . $this->formatFailure($response)
+    );
   }
 
   // ------------------------------------------------
