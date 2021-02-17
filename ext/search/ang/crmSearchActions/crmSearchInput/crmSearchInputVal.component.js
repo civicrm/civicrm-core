@@ -16,6 +16,7 @@
       this.$onInit = function() {
         var rendered = false;
         ctrl.dateRanges = CRM.crmSearchActions.dateRanges;
+        ctrl.entity = ctrl.field.fk_entity || ctrl.field.entity;
 
         this.ngModel.$render = function() {
           ctrl.value = ctrl.ngModel.$viewValue;
@@ -97,7 +98,7 @@
           return '~/crmSearchActions/crmSearchInput/select.html';
         }
 
-        if (ctrl.field.fk_entity) {
+        if (ctrl.field.fk_entity || ctrl.field.name === 'id') {
           return '~/crmSearchActions/crmSearchInput/entityRef.html';
         }
 
