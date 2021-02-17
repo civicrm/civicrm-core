@@ -60,7 +60,7 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
       foreach ($status as $s) {
         ${$aName}[$s] = CRM_Contribute_BAO_Contribution::getTotalAmountAndCount($s, $$dName, $nowWithTime);
         ${$aName}[$s]['url'] = CRM_Utils_System::url('civicrm/contribute/search',
-          "reset=1&force=1&status=1&start={$$dName}&end=$now&test=0"
+          "reset=1&force=1&status=1&receive_date_low={$$dName}&receive_date_high=$now&test=0"
         );
       }
 
