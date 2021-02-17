@@ -3,8 +3,9 @@
 
   angular.module('crmSearchDisplayTable').component('crmSearchDisplayTable', {
     bindings: {
-      apiEntity: '<',
-      apiParams: '<',
+      apiEntity: '@',
+      search: '<',
+      display: '<',
       settings: '<',
       filters: '<'
     },
@@ -17,37 +18,39 @@
         ctrl = this;
 
       this.page = 1;
+      this.rowCount = null;
       this.selectedRows = [];
       this.allRowsSelected = false;
 
       this.$onInit = function() {
-        this.apiParams = _.cloneDeep(this.apiParams);
-        this.apiParams.limit = parseInt(this.settings.limit || 0, 10);
-        this.columns = searchDisplayUtils.prepareColumns(this.settings.columns, this.apiParams);
+        this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
         $scope.displayUtils = searchDisplayUtils;
 
         if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, this.getResults, true);
+          $scope.$watch(this.afFieldset.getFieldData, refresh, true);
         }
-        $scope.$watch('$ctrl.filters', ctrl.getResults, true);
+        $scope.$watch('$ctrl.filters', refresh, true);
       };
 
       this.getResults = _.debounce(function() {
-        var params = searchDisplayUtils.prepareParams(ctrl);
-
-        crmApi4(ctrl.apiEntity, 'get', params).then(function(results) {
-          ctrl.results = results;
-          ctrl.rowCount = results.count;
-        });
+        searchDisplayUtils.getResults(ctrl);
       }, 100);
+
+      function refresh() {
+        ctrl.page = 1;
+        ctrl.rowCount = null;
+        ctrl.getResults();
+      }
 
       /**
        * Returns crm-i icon class for a sortable column
        * @param col
        * @returns {string}
        */
-      $scope.getOrderBy = function(col) {
-        var dir = ctrl.apiParams.orderBy && ctrl.apiParams.orderBy[col.key];
+      $scope.getSort = function(col) {
+        var dir = _.reduce(ctrl.sort, function(dir, item) {
+          return item[0] === col.key ? item[1] : dir;
+        }, null);
         if (dir) {
           return 'fa-sort-' + dir.toLowerCase();
         }
@@ -59,12 +62,17 @@
        * @param col
        * @param $event
        */
-      $scope.setOrderBy = function(col, $event) {
-        var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
-        if (!$event.shiftKey || !ctrl.apiParams.orderBy) {
-          ctrl.apiParams.orderBy = {};
+      $scope.setSort = function(col, $event) {
+        var dir = $scope.getSort(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
+        if (!$event.shiftKey || !ctrl.sort) {
+          ctrl.sort = [];
         }
-        ctrl.apiParams.orderBy[col.key] = dir;
+        var index = _.findIndex(ctrl.sort, [col.key]);
+        if (index > -1) {
+          ctrl.sort[index][1] = dir;
+        } else {
+          ctrl.sort.push([col.key, dir]);
+        }
         ctrl.getResults();
       };
 
@@ -82,17 +90,14 @@
         }
         // Select all
         ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results.length < ctrl.apiParams.limit) {
+        if (ctrl.page === 1 && ctrl.results.length < ctrl.settings.limit) {
           ctrl.selectedRows = _.pluck(ctrl.results, 'id');
           return;
         }
         // If more than one page of results, use ajax to fetch all ids
         $scope.loadingAllRows = true;
-        var params = _.cloneDeep(ctrl.apiParams);
-        delete params.limit;
-        // Select only ids unless HAVING clause is present
-        params.select = params.having && params.having.length? params.select : ['id'];
-        crmApi4(ctrl.apiEntity, 'get', params, ['id']).then(function(ids) {
+        var params = searchDisplayUtils.getApiParams(ctrl, 'id');
+        crmApi4('SearchDisplay', 'run', params, ['id']).then(function(ids) {
           $scope.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);
         });

@@ -8,28 +8,12 @@
       apiParams: '<'
     },
     require: {
-      crmSearchAdminDisplay: '^crmSearchAdminDisplay'
+      parent: '^crmSearchAdminDisplay'
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
-    controller: function($scope, searchMeta) {
+    controller: function($scope) {
       var ts = $scope.ts = CRM.ts(),
         ctrl = this;
-      this.getFieldLabel = searchMeta.getDefaultLabel;
-
-      this.sortableOptions = {
-        connectWith: '.crm-search-admin-edit-columns',
-        containment: '.crm-search-admin-edit-columns-wrapper'
-      };
-
-      this.removeCol = function(index) {
-        ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
-        ctrl.display.settings.columns.splice(index, 1);
-      };
-
-      this.restoreCol = function(index) {
-        ctrl.display.settings.columns.push(ctrl.hiddenColumns[index]);
-        ctrl.hiddenColumns.splice(index, 1);
-      };
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
@@ -38,7 +22,7 @@
             pager: true
           };
         }
-        ctrl.hiddenColumns = ctrl.crmSearchAdminDisplay.initColumns();
+        ctrl.parent.initColumns();
       };
 
     }

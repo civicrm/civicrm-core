@@ -57,6 +57,7 @@ class SqlFunctionTest extends UnitTestCase {
       ->addSelect('MAX(total_amount)')
       ->addSelect('MIN(total_amount)')
       ->addSelect('COUNT(*) AS count')
+      ->addOrderBy('average')
       ->execute()
       ->first();
     $this->assertTrue(250.0 === $agg['average']);

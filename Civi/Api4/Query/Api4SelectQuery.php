@@ -275,19 +275,32 @@ class Api4SelectQuery {
       if ($dir !== 'ASC' && $dir !== 'DESC') {
         throw new \API_Exception("Invalid sort direction. Cannot order by $item $dir");
       }
-      $expr = $this->getExpression($item);
-      $column = $expr->render($this->apiFieldSpec);
 
-      // Use FIELD() function to sort on pseudoconstant values
-      $suffix = strstr($item, ':');
-      if ($suffix && $expr->getType() === 'SqlField') {
-        $field = $this->getField($item);
-        $options = FormattingUtil::getPseudoconstantList($field, substr($suffix, 1));
-        if ($options) {
-          asort($options);
-          $column = "FIELD($column,'" . implode("','", array_keys($options)) . "')";
+      try {
+        $expr = $this->getExpression($item);
+        $column = $expr->render($this->apiFieldSpec);
+
+        // Use FIELD() function to sort on pseudoconstant values
+        $suffix = strstr($item, ':');
+        if ($suffix && $expr->getType() === 'SqlField') {
+          $field = $this->getField($item);
+          $options = FormattingUtil::getPseudoconstantList($field, substr($suffix, 1));
+          if ($options) {
+            asort($options);
+            $column = "FIELD($column,'" . implode("','", array_keys($options)) . "')";
+          }
         }
       }
+      // If the expression could not be rendered, it might be a field alias
+      catch (\API_Exception $e) {
+        if (!empty($this->selectAliases[$item])) {
+          $column = '`' . $item . '`';
+        }
+        else {
+          throw new \API_Exception("Invalid field '{$item}'");
+        }
+      }
+
       $this->query->orderBy("$column $dir");
     }
   }
@@ -524,7 +537,9 @@ class Api4SelectQuery {
     if ($strict && !$field) {
       throw new \API_Exception("Invalid field '$fieldName'");
     }
-    $this->apiFieldSpec[$expr] = $field;
+    if ($field) {
+      $this->apiFieldSpec[$expr] = $field;
+    }
     return $field;
   }
 
