@@ -49,6 +49,7 @@ tools/scripts/releaser/releaser.conf
 tools/tests/reports/logfile.tap
 tools/tests/reports/testdox.html
 tools/tests/reports/testdox.txt
+tools/extensions/org.civicrm.contactlayout
 l10n
 vendor
 civicrm.settings.php
