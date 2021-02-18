@@ -213,9 +213,7 @@ trait CRM_Admin_Form_SettingTrait {
           );
         }
         elseif ($add === 'addChainSelect') {
-          $this->addChainSelect($setting, [
-            'label' => $props['title'],
-          ]);
+          $this->addChainSelect($setting, ['label' => $props['title']] + $props['chain_select_settings']);
         }
         elseif ($add === 'addMonthDay') {
           $this->add('date', $setting, $props['title'], CRM_Core_SelectValues::date(NULL, 'M d'));
@@ -288,6 +286,7 @@ trait CRM_Admin_Form_SettingTrait {
       'text' => 'Element',
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
+      'chainselect' => 'ChainSelect',
     ];
     $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType] ?? '';

@@ -155,6 +155,9 @@ return [
     'type' => 'Integer',
     'quick_form_type' => 'ChainSelect',
     'html_type' => 'ChainSelect',
+    'chain_select_settings' => [
+      'control_field' => 'defaultContactCountry',
+    ],
     //'pseudoconstant' => array(
     //  'callback' => 'CRM_Core_PseudoConstant::stateProvince',
     //),
