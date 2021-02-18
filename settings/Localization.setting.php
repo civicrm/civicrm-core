@@ -153,7 +153,6 @@ return [
     'group' => 'localization',
     'name' => 'defaultContactStateProvince',
     'type' => 'Integer',
-    'quick_form_type' => 'ChainSelect',
     'html_type' => 'ChainSelect',
     //'pseudoconstant' => array(
     //  'callback' => 'CRM_Core_PseudoConstant::stateProvince',
