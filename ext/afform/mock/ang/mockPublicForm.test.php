@@ -10,7 +10,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   public function testGetPage() {
     $r = $this->createGuzzle()->get('civicrm/mock-public-form');
-    $this->assertContentType('text/html; charset=utf-8', $r);
+    $this->assertContentType('text/html', $r);
     $this->assertStatusCode(200, $r);
     $body = (string) $r->getBody();
     $this->assertContains('mockPublicForm', $body);
