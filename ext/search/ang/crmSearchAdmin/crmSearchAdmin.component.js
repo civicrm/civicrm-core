@@ -428,7 +428,19 @@
       function _loadResultsCallback() {
         // Multiply limit to read 2 pages at once & save ajax requests
         var params = _.merge(_.cloneDeep(ctrl.savedSearch.api_params), {debug: true, limit: ctrl.limit * 2});
-        // Select the ids of joined entities (helps with displaying links)
+        // Select the ids of implicitly joined entities (helps with displaying links)
+        _.each(params.select, function(fieldName) {
+          if (_.includes(fieldName, '.') && !_.includes(fieldName, ' AS ')) {
+            var info = searchMeta.parseExpr(fieldName);
+            if (info.field && !info.suffix && !info.fn && (info.field.entity !== info.field.baseEntity)) {
+              var idField = fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
+              if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
+                params.select.push(idField);
+              }
+            }
+          }
+        });
+        // Select the ids of explicitly joined entities (helps with displaying links)
         _.each(params.join, function(join) {
           var idField = join[0].split(' AS ')[1] + '.id';
           if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
@@ -635,7 +647,7 @@
           return value;
         }
         // Output user-facing name/label fields as a link, if possible
-        if (info.field && info.field.name === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
+        if (info.field && _.last(info.field.name.split('.')) === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
           var link = getEntityUrl(row, info);
           if (link) {
             return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
@@ -652,12 +664,17 @@
         if (path) {
           // Replace tokens in the path (e.g. [id])
           var tokens = path.match(/\[\w*]/g) || [],
-            replacements = _.transform(tokens, function(replacements, token) {
-              var fieldName = info.prefix + token.slice(1, token.length - 1);
-              if (row[fieldName]) {
-                replacements.push(row[fieldName]);
-              }
-            });
+            prefix = info.prefix;
+          // For implicit join fields
+          if (info.field.name.split('.').length > 1) {
+            prefix += info.field.name.split('.')[0] + '_';
+          }
+          var replacements = _.transform(tokens, function(replacements, token) {
+            var fieldName = prefix + token.slice(1, token.length - 1);
+            if (row[fieldName]) {
+              replacements.push(row[fieldName]);
+            }
+          });
           // Only proceed if the row contains all the necessary data to resolve tokens
           if (tokens.length === replacements.length) {
             _.each(tokens, function(token, index) {

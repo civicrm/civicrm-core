@@ -148,7 +148,7 @@
         if (dotSplit.length === 2) {
           field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
           if (field) {
-            field.entity = entityName;
+            field.baseEntity = entityName;
             return {field: field};
           }
         }
@@ -161,7 +161,7 @@
           field = _.find(getEntity(join.bridge).fields, {name: name});
         }
         if (field) {
-          field.entity = entityName;
+          field.baseEntity = entityName;
           return {field: field, join: join};
         }
       }

@@ -94,7 +94,22 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         $apiParams['orderBy'] = $this->getOrderByFromSort();
 
-        // Select the ids of joined entities (helps with displaying links)
+        // Select the ids of implicitly joined entities (helps with displaying links)
+        foreach ($apiParams['select'] as $fieldName) {
+          if (strstr($fieldName, '.') && !strstr($fieldName, ' AS ') && !strstr($fieldName, ':')) {
+            $idField = substr($fieldName, 0, strrpos($fieldName, '.')) . '_id';
+            $prefix = '';
+            $id = $idField;
+            if (strstr($id, '.')) {
+              [$prefix, $idField] = explode(',', $id);
+              $prefix .= '.';
+            }
+            if (!in_array($idField, $apiParams['select']) && !empty($this->getField($idField)['fk_entity']) && !$this->canAggregate($id, $prefix)) {
+              $apiParams['select'][] = $idField;
+            }
+          }
+        }
+        // Select the ids of explicitly joined entities (helps with displaying links)
         foreach ($apiParams['join'] ?? [] as $join) {
           $joinEntity = explode(' AS ', $join[0])[1];
           $idField = $joinEntity . '.id';
