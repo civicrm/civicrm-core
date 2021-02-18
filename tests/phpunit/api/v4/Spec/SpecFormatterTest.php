@@ -68,6 +68,7 @@ class SpecFormatterTest extends UnitTestCase {
       'html_type' => 'Select',
       'column_name' => $name,
       'serialize' => 1,
+      'is_view' => FALSE,
     ];
 
     /** @var \Civi\Api4\Service\Spec\CustomFieldSpec $field */
