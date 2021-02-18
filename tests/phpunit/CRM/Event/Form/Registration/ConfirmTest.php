@@ -20,7 +20,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testSubmit() {
+  public function testSubmit(): void {
     $event = $this->eventCreate();
     $mut = new CiviMailUtils($this, TRUE);
     CRM_Event_Form_Registration_Confirm::testSubmit([
@@ -77,15 +77,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $participant = $this->callAPISuccessGetSingle('Participant', []);
     $mut->checkMailLog([
       'Dear Logged In,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
     $mut->stop();
     $mut->clearMessages();
-    $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
-    $this->assertEquals($participant['id'], $tplVars['participantID']);
-
   }
 
   /**
@@ -486,8 +482,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $mut->checkMailLog(['Comment: ' . $event['note'] . chr(0x0A)]);
     $mut->stop();
     $mut->clearMessages();
-    $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
-    $this->assertEquals($participant['id'], $tplVars['participantID']);
     //return ['contact_id' => $contact_id, 'participant_id' => $participant['id']];
     return [$contact_id, $participant['id']];
   }
@@ -557,13 +551,17 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * /dev/event#10
    * Test submission with a note in the profile, ensuring the confirmation
    * email reflects the submitted value
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
    */
-  public function testNoteSubmission() {
+  public function testNoteSubmission(): void {
     //create an event with an attached profile containing a note
     $event = $this->creatEventWithProfile(NULL);
-    $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
+    $event['custom_pre_id'] = $this->ids['UFGroup']['our profile'];
     $event['note'] = 'This is note 1';
-    list($contact_id, $participant_id) = $this->submitWithNote($event, NULL);
+    [$contact_id, $participant_id] = $this->submitWithNote($event, NULL);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
     //now that the contact has one note, register this contact again with a different note
@@ -571,7 +569,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $event = $this->creatEventWithProfile($event);
     $event['custom_pre_id'] = $this->ids["UFGroup"]["our profile"];
     $event['note'] = 'This is note 2';
-    list($contact_id, $participant_id) = $this->submitWithNote($event, $contact_id);
+    [$contact_id, $participant_id] = $this->submitWithNote($event, $contact_id);
     civicrm_api3('Participant', 'delete', ['id' => $participant_id]);
 
     //finally, submit a blank note and confirm that the note shown in the email is blank

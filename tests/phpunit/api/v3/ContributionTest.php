@@ -3666,9 +3666,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test sending a mail via the API.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  public function testSendMail() {
+  public function testSendMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $orderParams = $this->_params;
     $orderParams['contribution_status_id'] = 'Pending';
@@ -3698,7 +3697,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
     $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
     $this->assertEquals('bob', $tplVars['billingName']);
-    $this->assertEquals("bob\nblah\n", $tplVars['address']);
   }
 
   /**

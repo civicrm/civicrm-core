@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -425,7 +427,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $params['subject'];
     }
 
-    $mailContent = self::renderMessageTemplate($mailContent, $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams']);
+    $mailContent = self::renderMessageTemplate($mailContent, (bool) $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams']);
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
@@ -692,35 +694,33 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    *
    * @param array $mailContent
    * @param bool $disableSmarty
-   * @param int $contactID
+   * @param int|NULL $contactID
    * @param array $smartyAssigns
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
-  public static function renderMessageTemplate(array $mailContent, $disableSmarty, $contactID, $smartyAssigns): array {
-    $tokens = self::getTokensToResolve($mailContent);
-
-    // When using Smarty we need to pass the $escapeSmarty parameter.
-    $escapeSmarty = !$disableSmarty;
-
-    $mailContent = self::resolveDomainTokens($mailContent, $tokens, $escapeSmarty);
-
+  public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns): array {
     if ($contactID) {
-      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, $escapeSmarty);
+      // @todo resolve contact ID below - see https://github.com/civicrm/civicrm-core/pull/19550
+      // for things to resolve first.
+      $tokens = self::getTokensToResolve($mailContent);
+      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, !$disableSmarty);
     }
+    CRM_Core_Smarty::singleton()->pushScope($smartyAssigns);
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['smarty' => !$disableSmarty]);
+    $tokenProcessor->addMessage('html', $mailContent['html'], 'text/html');
+    $tokenProcessor->addMessage('text', $mailContent['text'], 'text/plain');
+    $tokenProcessor->addMessage('subject', $mailContent['subject'], 'text/plain');
+    $tokenProcessor->addRow([]);
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      $mailContent['html'] = $row->render('html');
+      $mailContent['text'] = $row->render('text');
+      $mailContent['subject'] = $row->render('subject');
+    }
+    CRM_Core_Smarty::singleton()->popScope();
 
-    // Normally Smarty is run, but it can be disabled using the disableSmarty
-    // parameter, which may be useful for non-core uses of MessageTemplate.send
-    // In particular it helps with the mosaicomsgtpl extension.
-    if (!$disableSmarty) {
-      $mailContent = self::parseThroughSmarty($mailContent, $smartyAssigns);
-    }
-    else {
-      // Since we're not relying on Smarty for this function, we DIY.
-      // strip whitespace from ends and turn into a single line
-      $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
-    }
+    $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
     return $mailContent;
   }
 
