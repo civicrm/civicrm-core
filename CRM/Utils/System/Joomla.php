@@ -456,6 +456,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     return TRUE;
   }
 
+  public function getUfId($username) {
+    jimport('joomla.user.helper');
+    $uid = JUserHelper::getUserId($username);
+    return empty($uid) ? NULL : $uid;
+  }
+
   /**
    * FIXME: Use CMS-native approach
    * @throws \CRM_Core_Exception.
