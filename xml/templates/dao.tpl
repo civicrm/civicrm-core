@@ -202,6 +202,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.pseudoconstant}
   'pseudoconstant' => {$field.pseudoconstant|@print_array},
 {/if}
+{if $field.readonly || $field.name === $table.primaryKey.name}
+  'readonly' => TRUE,
+{/if}
   'add' => {if $field.add}'{$field.add}'{else}NULL{/if},
 ),
 {/foreach} {* table.fields *}

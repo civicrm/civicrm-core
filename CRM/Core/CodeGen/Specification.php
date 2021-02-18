@@ -317,8 +317,6 @@ class CRM_Core_CodeGen_Specification {
         $field['cols'] = isset($fieldXML->html) ? $this->value('cols', $fieldXML->html) : NULL;
         break;
 
-      break;
-
       case 'datetime':
         $field['sqlType'] = $field['phpType'] = $type;
         $field['crmType'] = 'CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME';
@@ -377,6 +375,7 @@ class CRM_Core_CodeGen_Specification {
     }
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
+    $field['readonly'] = $this->value('readonly', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);

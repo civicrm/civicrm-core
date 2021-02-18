@@ -67,6 +67,7 @@ class SpecFormatter {
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
       $field->setOptions(self::customFieldHasOptions($data));
+      $field->setreadonly($data['is_view']);
     }
     else {
       $name = $data['name'] ?? NULL;
@@ -75,6 +76,7 @@ class SpecFormatter {
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
       $field->setOptions(!empty($data['pseudoconstant']));
+      $field->setreadonly(!empty($data['readonly']));
     }
     $field->setSerialize($data['serialize'] ?? NULL);
     $field->setDefaultValue($data['default'] ?? NULL);

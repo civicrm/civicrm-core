@@ -11,8 +11,11 @@
     this.add = null;
     this.fields = null;
 
-    crmApi4(model.entity, 'getFields', {action: 'update', loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon']})
-      .then(function(fields) {
+    crmApi4(model.entity, 'getFields', {
+      action: 'update',
+      loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+      where: [["readonly", "=", false]],
+    }).then(function(fields) {
         ctrl.fields = fields;
       });
 
@@ -57,9 +60,6 @@
         var formatted = {id: item.name, text: item.label, description: item.description};
         if (fieldInUse(item.name)) {
           formatted.disabled = true;
-        }
-        if (item.name !== 'id') {
-          result.push(formatted);
         }
       }, []);
       return {results: results};

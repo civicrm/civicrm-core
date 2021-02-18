@@ -113,6 +113,11 @@ class FieldSpec {
   protected $columnName;
 
   /**
+   * @var bool
+   */
+  protected $readonly = FALSE;
+
+  /**
    * Aliases for the valid data types
    *
    * @var array
@@ -357,6 +362,23 @@ class FieldSpec {
    */
   public function setInputAttrs($inputAttrs) {
     $this->inputAttrs = $inputAttrs;
+
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getreadonly() {
+    return $this->readonly;
+  }
+
+  /**
+   * @param bool $readonly
+   * @return $this
+   */
+  public function setreadonly($readonly) {
+    $this->readonly = (bool) $readonly;
 
     return $this;
   }
