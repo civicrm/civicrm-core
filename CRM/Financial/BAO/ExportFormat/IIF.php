@@ -195,7 +195,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             'trxn_date' => $this->format($dao->trxn_date, 'date'),
             'trxn_id' => $this->format($dao->trxn_id),
             'account_name' => $this->format($dao->to_account_name),
-            'amount' => $this->format($dao->debit_total_amount, 'money'),
+            'amount' => $this->formatMoney($dao->debit_total_amount),
             'contact_name' => $this->format($dao->contact_to_name),
             'payment_instrument' => $this->format($dao->payment_instrument),
             'check_number' => $this->format($dao->check_number),
@@ -262,7 +262,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
               'trxn_date' => $this->format($itemDAO->transaction_date, 'date'),
               'spl_id' => $this->format($itemDAO->financial_item_id),
               'account_name' => $this->format($itemDAO->account_name),
-              'amount' => '-' . $this->format($itemDAO->amount, 'money'),
+              'amount' => '-' . $this->formatMoney($itemDAO->amount),
               'contact_name' => $this->format($itemDAO->contact_name),
               'payment_instrument' => $this->format($itemDAO->payment_instrument),
               'description' => $this->format($itemDAO->description),
@@ -277,7 +277,7 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
             'trxn_date' => $this->format($dao->trxn_date, 'date'),
             'spl_id' => $this->format($dao->financial_trxn_id),
             'account_name' => $this->format($dao->from_account_name),
-            'amount' => '-' . $this->format($dao->debit_total_amount, 'money'),
+            'amount' => '-' . $this->formatMoney($dao->debit_total_amount),
             'contact_name' => $this->format($dao->contact_from_name),
             'description' => $this->format($dao->item_description),
             'payment_instrument' => $this->format($dao->payment_instrument),
@@ -330,6 +330,17 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
   }
 
   /**
+   * Format money.
+   *
+   * @param float $amount
+   *
+   * @return mixed|string
+   */
+  public function formatMoney($amount) {
+    return CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(trim($amount));
+  }
+
+  /**
    * @param string $s
    *   the input string
    * @param string $type
@@ -348,10 +359,6 @@ class CRM_Financial_BAO_ExportFormat_IIF extends CRM_Financial_BAO_ExportFormat 
       case 'date':
         $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
         $sout = CRM_Utils_Date::customFormat($s1, $dateFormat);
-        break;
-
-      case 'money':
-        $sout = CRM_Utils_Money::format($s, NULL, NULL, TRUE);
         break;
 
       case 'string':
