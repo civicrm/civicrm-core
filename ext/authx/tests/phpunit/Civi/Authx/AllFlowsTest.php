@@ -103,7 +103,42 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getStatelessExamples
    */
-  public function testStateless($credType, $flowType) {
+  public function testStatelessContactOnly($credType, $flowType) {
+    if ($credType === 'pass') {
+      $this->assertTrue(TRUE, 'No need to test password credentials with non-user contacts');
+      return;
+    }
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getLebowskiCID());
+
+    // Phase 1: Request fails if this credential type is not enabled
+    \Civi::settings()->set("authx_{$flowType}_cred", []);
+    $response = $http->send($request);
+    $this->assertFailedDueToProhibition($response);
+
+    // Phase 2: Request succeeds if this credential type is enabled
+    \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
+    $response = $http->send($request);
+    $this->assertMyContact($this->getLebowskiCID(), NULL, $response);
+    if (!in_array('sendsExcessCookies', $this->quirks)) {
+      $this->assertNoCookies($response);
+    }
+  }
+
+  /**
+   * Send a request using a stateless protocol. Assert that identities are setup correctly.
+   *
+   * @param string $credType
+   *   The type of credential to put in the `Authorization:` header.
+   * @param string $flowType
+   *   The "flow" determines how the credential is added on top of the base-request (e.g. adding a parameter or header).
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @dataProvider getStatelessExamples
+   */
+  public function testStatelessUserContact($credType, $flowType) {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
@@ -117,7 +152,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     // Phase 2: Request succeeds if this credential type is enabled
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
-    $this->assertMyContact($this->getDemoCID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
@@ -149,12 +184,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $response = $http->post('civicrm/authx/login', [
       'form_params' => ['_authx' => $this->$credFunc($this->getDemoCID())],
     ]);
-    $this->assertMyContact($this->getDemoCID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
     $this->assertHasCookies($response);
 
     // Phase 3: We can use cookies to request other pages
     $response = $http->get('civicrm/authx/id');
-    $this->assertMyContact($this->getDemoCID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
     $response = $http->get('civicrm/user');
     $this->assertDashboardOk();
 
@@ -212,7 +247,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
     $response = $http->send($request);
     $this->assertHasCookies($response);
-    $this->assertMyContact($this->getDemoCID(), $response);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
 
     // FIXME: Assert that re-using cookies yields correct result.
   }
@@ -277,13 +312,18 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * Assert the AJAX request provided the expected contact.
    *
    * @param int $cid
+   *   The expected contact ID
+   * @param int|null $uid
+   *   The expected user ID
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function assertMyContact($cid, ResponseInterface $response) {
+  public function assertMyContact($cid, $uid, ResponseInterface $response) {
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
     $j = json_decode((string) $response->getBody(), 1);
-    $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $this->formatFailure($response));
+    $formattedFailure = $this->formatFailure($response);
+    $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $formattedFailure);
+    $this->assertEquals($uid, $j['user_id'], "Response did not give expected user ID\n" . $formattedFailure);
   }
 
   /**
@@ -426,18 +466,6 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return NULL;
   }
 
-  //  public function createBareJwtCred() {
-  //    $contact = \civicrm_api3('Contact', 'create', [
-  //      'contact_type' => 'Individual',
-  //      'first_name' => 'Jeffrey',
-  //      'last_name' => 'Lebowski',
-  //      'external_identifier' => __CLASS__,
-  //      'options' => [
-  //        'match' => 'external_identifier',
-  //      ],
-  //    ]);
-  //  }
-
   /**
    * @param \Psr\Http\Message\ResponseInterface $response
    */
@@ -498,6 +526,26 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ]);
     }
     return \Civi::$statics[__CLASS__]['demoId'];
+  }
+
+  private function getDemoUID(): int {
+    return \CRM_Core_Config::singleton()->userSystem->getUfId($GLOBALS['_CV']['DEMO_USER']);
+  }
+
+  public function getLebowskiCID() {
+    if (!isset(\Civi::$statics[__CLASS__]['lebowskiCID'])) {
+      $contact = \civicrm_api3('Contact', 'create', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Jeffrey',
+        'last_name' => 'Lebowski',
+        'external_identifier' => __CLASS__,
+        'options' => [
+          'match' => 'external_identifier',
+        ],
+      ]);
+      \Civi::$statics[__CLASS__]['lebowskiCID'] = $contact['id'];
+    }
+    return \Civi::$statics[__CLASS__]['lebowskiCID'];
   }
 
 }
