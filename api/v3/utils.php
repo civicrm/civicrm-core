@@ -2062,7 +2062,7 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
         $fieldValue = NULL;
       }
     }
-    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
+    if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options']) || $fieldName === 'campaign_id') {
       $additional_lookup_params = [];
       if (strtolower($entity) == 'address' && $fieldName == 'state_province_id') {
         $country_id = _civicrm_api3_resolve_country_id($params);
