@@ -113,6 +113,12 @@ class AfformMetadataInjector {
       }
 
       $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+
+      if ('Date' === $fieldInfo['input_type'] && !empty($fieldDefn['input_type']) && \CRM_Utils_JS::decode($fieldDefn['input_type']) === 'Select') {
+        $fieldInfo['input_attrs']['placeholder'] = ts('Select');
+        $fieldInfo['options'] = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
+      }
+
       foreach ($fieldInfo as $name => $prop) {
         // Merge array props 1 level deep
         if (in_array($name, $deep) && !empty($fieldDefn[$name])) {

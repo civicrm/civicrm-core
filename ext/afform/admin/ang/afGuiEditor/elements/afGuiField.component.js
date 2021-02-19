@@ -52,6 +52,9 @@
         if (ctrl.node.defn && ctrl.node.defn.options) {
           return ctrl.node.defn.options;
         }
+        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+          return CRM.afGuiEditor.dateRanges;
+        }
         return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
       };
 
@@ -69,14 +72,24 @@
         switch (type) {
           case 'CheckBox':
           case 'Radio':
+            return defn.options || defn.data_type === 'Boolean';
+
           case 'Select':
-            return !(!defn.options && defn.data_type !== 'Boolean');
+            return defn.options || defn.data_type === 'Boolean' || defn.input_type === 'Date';
+
+          case 'Date':
+            return defn.input_type === 'Date';
 
           case 'TextArea':
           case 'RichTextEditor':
             return (defn.data_type === 'Text' || defn.data_type === 'String');
+
+          case 'ChainSelect':
+            return defn.input_type === 'ChainSelect';
+
+          default:
+            return true;
         }
-        return true;
       };
 
       // Returns a value from either the local field defn or the base defn
