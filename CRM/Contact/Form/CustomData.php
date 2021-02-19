@@ -110,9 +110,19 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
 
         $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
-        $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
-        $mode = ucfirst($mode);
-        CRM_Utils_System::setTitle(ts('%1 %2 Record', [1 => $mode, 2 => $groupTitle]));
+        switch ($mode) {
+          case 'add':
+            CRM_Utils_System::setTitle(ts('Add %1', [1 => $groupTitle]));
+            break;
+
+          case 'edit':
+            CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupTitle]));
+            break;
+
+          case 'copy':
+            CRM_Utils_System::setTitle(ts('Copy %1', [1 => $groupTitle]));
+            break;
+        }
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
