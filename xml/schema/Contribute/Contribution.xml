@@ -203,6 +203,7 @@
     <import>true</import>
     <headerPattern>/tr(ansactio|x)n(.?id)?/i</headerPattern>
     <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
+    <readonly>true</readonly>
     <html>
      <type>Text</type>
    </html>
@@ -216,6 +217,7 @@
     <import>true</import>
     <headerPattern>/invoice(.?id)?/i</headerPattern>
     <comment>unique invoice id, system generated or passed in</comment>
+    <readonly>true</readonly>
     <html>
       <type>Text</type>
     </html>
@@ -530,6 +532,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <readonly>true</readonly>
     <add>5.20</add>
   </field>
 </table>

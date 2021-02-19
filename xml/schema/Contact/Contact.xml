@@ -310,6 +310,7 @@
     <comment>Which language is preferred for communication. FK to languages in civicrm_option_value.</comment>
     <headerPattern>/^lang/i</headerPattern>
     <import>true</import>
+    <readonly>true</readonly>
     <pseudoconstant>
       <optionGroupName>languages</optionGroupName>
       <keyColumn>name</keyColumn>
@@ -361,6 +362,7 @@
       <label>API KEY</label>
     </html>
     <add>2.2</add>
+    <readonly>true</readonly>
     <permission>
       <or>administer CiviCRM, edit api keys</or>
     </permission>
@@ -882,6 +884,7 @@
     </html>
     <readonly>true</readonly>
     <add>4.3</add>
+    <readonly>true</readonly>
   </field>
   <index>
     <name>index_modified_date</name>

@@ -504,6 +504,7 @@
     <length>16</length>
     <comment>Key for validating requests related to this mailing.</comment>
     <add>4.5</add>
+    <readonly>true</readonly>
   </field>
   <index>
     <name>index_hash</name>

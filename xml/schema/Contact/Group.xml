@@ -71,6 +71,7 @@
     <name>saved_search_id</name>
     <type>int unsigned</type>
     <title>Saved Search ID</title>
+    <readonly>true</readonly>
     <comment>FK to saved search table.</comment>
     <html>
       <label>Saved Search</label>
@@ -110,6 +111,7 @@
     <name>where_clause</name>
     <type>text</type>
     <title>Group Where Clause</title>
+    <readonly>true</readonly>
     <comment>the sql where clause if a saved search acl</comment>
     <add>1.6</add>
   </field>
@@ -118,6 +120,7 @@
     <type>text</type>
     <title>Tables For Select Clause</title>
     <comment>the tables to be included in a select data</comment>
+    <readonly>true</readonly>
     <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
@@ -125,6 +128,7 @@
     <name>where_tables</name>
     <type>text</type>
     <title>Tables For Where Clause</title>
+    <readonly>true</readonly>
     <comment>the tables to be included in the count statement</comment>
     <serialize>PHP</serialize>
     <add>1.6</add>
@@ -147,6 +151,7 @@
     <title>Group Cache Date</title>
     <required>false</required>
     <comment>Date when we created the cache for a smart group</comment>
+    <readonly>true</readonly>
     <add>2.1</add>
   </field>
   <index>
@@ -160,6 +165,7 @@
     <title>Next Group Refresh Time</title>
     <required>false</required>
     <comment>Date and time when we need to refresh the cache next.</comment>
+    <readonly>true</readonly>
     <add>4.3</add>
   </field>
   <field>

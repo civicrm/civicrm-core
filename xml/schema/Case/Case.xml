@@ -162,6 +162,7 @@
     <required>false</required>
     <export>true</export>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <readonly>true</readonly>
     <html>
       <label>Modified Date</label>
     </html>
