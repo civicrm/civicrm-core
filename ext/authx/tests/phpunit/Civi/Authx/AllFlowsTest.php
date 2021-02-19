@@ -276,6 +276,97 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
+   * Create a session for $demoCID. Within the session, make a single
+   * stateless request as $lebowskiCID.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testStatefulStatelessOverlap() {
+    \Civi::settings()->set("authx_login_cred", ['api_key']);
+    \Civi::settings()->set("authx_header_cred", ['api_key']);
+
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+
+    // Phase 1: Login, create a session.
+    $response = $http->post('civicrm/authx/login', [
+      'form_params' => ['_authx' => $this->credApikey($this->getDemoCID())],
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+    $this->assertHasCookies($response);
+    $response = $http->get('civicrm/authx/id');
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+
+    // Phase 2: Make a single, stateless request with different creds
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getLebowskiCID());
+    $response = $http->send($request);
+    $this->assertFailedDueToProhibition($response);
+    // The following assertion merely identifies current behavior. If you can get it working generally, then huzza.
+    $this->assertBodyRegexp(';Session already active;', $response);
+    // $this->assertMyContact($this->getLebowskiCID(), NULL, $response);
+    // $this->assertNoCookies($response);
+
+    // Phase 3: Original session is still valid
+    $response = $http->get('civicrm/authx/id');
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+  }
+
+  /**
+   * This consumer intends to make stateless requests with a handful of different identities,
+   * but their browser happens to be cookie-enabled. Ensure that identities do not leak between requests.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testMultipleStateless() {
+    \Civi::settings()->set("authx_header_cred", ['api_key']);
+    $cookieJar = new CookieJar();
+    $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
+
+    /** @var \Psr\Http\Message\RequestInterface $request */
+
+    // Alternate calls among (A)nonymous, (D)emo, and (L)ebowski
+    $planSteps = 'LADA LDLD DDLLAA';
+    $actualSteps = '';
+
+    for ($i = 0; $i < strlen($planSteps); $i++) {
+      switch ($planSteps[$i]) {
+        case 'L':
+          $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getLebowskiCID());
+          $response = $http->send($request);
+          $this->assertMyContact($this->getLebowskiCID(), NULL, $response, 'Expected Lebowski in step #' . $i);
+          $actualSteps .= 'L';
+          break;
+
+        case 'A':
+          $request = $this->requestMyContact();
+          $response = $http->send($request);
+          $this->assertNoContact(NULL, $response);
+          $actualSteps .= 'A';
+          break;
+
+        case 'D':
+          $request = $this->applyAuth($this->requestMyContact(), 'api_key', 'header', $this->getDemoCID());
+          $response = $http->send($request);
+          $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response, 'Expected demo in step #' . $i);
+          $actualSteps .= 'D';
+          break;
+
+        case ' ':
+          $actualSteps .= ' ';
+          break;
+
+        default:
+          $this->fail('Unrecognized step #' . $i);
+      }
+    }
+
+    $this->assertEquals($actualSteps, $planSteps);
+  }
+
+  /**
    * Filter a request, applying the given authentication options
    *
    * @param \Psr\Http\Message\RequestInterface $request

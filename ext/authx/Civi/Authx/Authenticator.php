@@ -112,6 +112,7 @@ class Authenticator {
         // We should probably show a more useful page - e.g. ask if they want
         // logout and/or suggest using private browser window.
         $this->reject('Cannot login. Session already active.');
+        // @see \Civi\Authx\AllFlowsTest::testStatefulStatelessOverlap()
       }
     }
 
