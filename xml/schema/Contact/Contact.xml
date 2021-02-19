@@ -48,6 +48,7 @@
     <html>
       <type>Select</type>
     </html>
+    <readonly>true</readonly>
     <add>1.1</add>
     <change>3.1</change>
     <contactType>null</contactType>
@@ -208,7 +209,7 @@
       <type>Text</type>
       <size>30</size>
     </html>
-
+    <readonly>true</readonly>
     <export>true</export>
     <comment>Name used for sorting different contact types</comment>
     <add>1.1</add>
@@ -227,7 +228,7 @@
       <type>Text</type>
       <size>30</size>
     </html>
-
+    <readonly>true</readonly>
     <export>true</export>
     <comment>Formatted name representing preferred format for display/print/other output.</comment>
     <add>1.1</add>
@@ -344,6 +345,7 @@
     <add>1.1</add>
     <change>1.5</change>
     <export>true</export>
+    <readonly>true</readonly>
   </field>
   <index>
     <name>index_hash</name>
@@ -878,6 +880,7 @@
     <html>
       <label>Modified Date</label>
     </html>
+    <readonly>true</readonly>
     <add>4.3</add>
   </field>
   <index>
