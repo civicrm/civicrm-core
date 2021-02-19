@@ -32,8 +32,7 @@ class Submit extends AbstractProcessor {
         }
       }
     }
-
-    $event = new AfformSubmitEvent($this->_formDataModel->getEntities(), $entityValues);
+    $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $this->_formDataModel->getEntities(), $entityValues);
     \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     foreach ($event->entityValues as $entityType => $entities) {
       if (!empty($entities)) {
@@ -52,9 +51,10 @@ class Submit extends AbstractProcessor {
    */
   public static function processContacts(AfformSubmitEvent $event) {
     foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contacts) {
+      $api4 = $event->formDataModel->getSecureApi4($entityName);
       foreach ($contacts as $contact) {
-        $saved = civicrm_api4('Contact', 'save', ['records' => [$contact['fields']]])->first();
-        self::saveJoins('Contact', $saved['id'], $contact['joins'] ?? []);
+        $saved = $api4('Contact', 'save', ['records' => [$contact['fields']]])->first();
+        self::saveJoins($api4, 'Contact', $saved['id'], $contact['joins'] ?? []);
       }
     }
     unset($event->entityValues['Contact']);
@@ -69,28 +69,29 @@ class Submit extends AbstractProcessor {
     foreach ($event->entityValues as $entityType => $entities) {
       // Each record is an array of one or more items (can be > 1 if af-repeat is used)
       foreach ($entities as $entityName => $records) {
+        $api4 = $event->formDataModel->getSecureApi4($entityName);
         foreach ($records as $record) {
-          $saved = civicrm_api4($entityType, 'save', ['records' => [$record['fields']]])->first();
-          self::saveJoins($entityType, $saved['id'], $record['joins'] ?? []);
+          $saved = $api4($entityType, 'save', ['records' => [$record['fields']]])->first();
+          self::saveJoins($api4, $entityType, $saved['id'], $record['joins'] ?? []);
         }
       }
       unset($event->entityValues[$entityType]);
     }
   }
 
-  protected static function saveJoins($mainEntityName, $entityId, $joins) {
+  protected static function saveJoins($api4, $mainEntityName, $entityId, $joins) {
     foreach ($joins as $joinEntityName => $join) {
       $values = self::filterEmptyJoins($joinEntityName, $join);
       // FIXME: Replace/delete should only be done to known contacts
       if ($values) {
-        civicrm_api4($joinEntityName, 'replace', [
+        $api4($joinEntityName, 'replace', [
           'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
           'records' => $values,
         ]);
       }
       else {
         try {
-          civicrm_api4($joinEntityName, 'delete', [
+          $api4($joinEntityName, 'delete', [
             'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
           ]);
         }

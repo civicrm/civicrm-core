@@ -4,6 +4,9 @@
     <testsuite name="My Test Suite">
       <directory>./tests/phpunit</directory>
     </testsuite>
+    <testsuite name="form-tests">
+      <directory suffix=".test.php">./ang</directory>
+    </testsuite>
   </testsuites>
   <filter>
     <whitelist>

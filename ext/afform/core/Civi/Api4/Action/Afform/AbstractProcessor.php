@@ -39,13 +39,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   public function _run(Result $result) {
     // This will throw an exception if the form doesn't exist
     $this->_afform = (array) civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $this->name]]], 0);
-    if ($this->getCheckPermissions()) {
-      if (!\CRM_Core_Permission::check("@afform:" . $this->_afform['name'])) {
-        throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: Cannot process form " . $this->_afform['name']);
-      }
-    }
-
     $this->_formDataModel = new FormDataModel($this->_afform['layout']);
+    $this->checkPermissions();
     $this->validateArgs();
     $result->exchangeArray($this->processForm());
   }
@@ -60,6 +55,19 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     foreach ($rawArgs as $arg => $val) {
       if (!empty($entities[$arg]['url-autofill'])) {
         $this->args[$arg] = $val;
+      }
+    }
+  }
+
+  /**
+   * Assert that the current form submission is authorized.
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function checkPermissions() {
+    if ($this->getCheckPermissions()) {
+      if (!\CRM_Core_Permission::check("@afform:" . $this->_afform['name'])) {
+        throw new \Civi\API\Exception\UnauthorizedException("Authorization failed: Cannot process form " . $this->_afform['name']);
       }
     }
   }
