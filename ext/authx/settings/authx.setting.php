@@ -16,7 +16,7 @@ use CRM_Authx_ExtensionUtil as E;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-function _authx_settings() {
+$_authx_settings = function() {
   $flows = ['param', 'header', 'xheader', 'login', 'auto'];
   $basic = [
     'group_name' => 'CiviCRM Preferences',
@@ -61,9 +61,9 @@ function _authx_settings() {
     ];
   }
   return $s;
-}
+};
 
 /**
  * Settings metadata file
  */
-return _authx_settings();
+return $_authx_settings();
