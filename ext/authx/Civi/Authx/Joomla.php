@@ -70,6 +70,17 @@ class Joomla implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
+    // Joomla CMSApplication always starts a session. It is impossible for any extension/plugin/component to influence this.
+    // See eg https://github.com/joomla/joomla-cms/issues/8772
+    // Our implementation here uses a simple (if ugly) mitigation to ensure that
+    // (1) all data is thread-local and (2) nothing is persisted from the request.
+
+    // I'm not aware of a more canonical solution. Since this tied-up with the `AbstractApplication` class
+    // hierarchy, perhaps one is supposed to make a new entry-point (`[cms.root]/components/com_civicrm/myapp.php`)?
+
+    // In any event, this work-around passes `AllFlowsTest::testMultipleStateless`.
+
+    \JFactory::getSession()->destroy();
     \JFactory::getSession()->setHandler(new \CRM_Utils_FakeJoomlaSession('CIVISCRIPT'));
     $user = new \JUser($userId);
     $session = \JFactory::getSession();
