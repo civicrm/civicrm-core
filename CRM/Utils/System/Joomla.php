@@ -842,7 +842,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $mail = 'email';
     $name = 'name';
 
-    $JUserTable = &JTable::getInstance('User', 'JTable');
+    $JUserTable = JTable::getInstance('User', 'JTable');
 
     $db = $JUserTable->getDbo();
     $query = $db->getQuery(TRUE);
