@@ -35,7 +35,15 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   protected $quirks = [];
 
   public static function setUpBeforeClass() {
-    \Civi\Test::e2e()->installMe(__DIR__)->apply();
+    \Civi\Test::e2e()
+      ->installMe(__DIR__)
+      ->callback(
+        function() {
+          \CRM_Utils_System::synchronizeUsers();
+        },
+        'synchronizeUsers'
+      )
+      ->apply();
   }
 
   public function setUp() {
