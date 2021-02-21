@@ -21,7 +21,7 @@
 class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
 
   /**
-   * The id of the object being viewed (note/relationship etc).
+   * Custom group id.
    *
    * @var int
    */
@@ -40,7 +40,23 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
    * Add a few specific things to view contact.
    */
   public function preProcess() {
-    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
+    $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
+    $this->assign('groupId', $this->_groupId);
+
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_recId = CRM_Utils_Request::retrieve('recId', 'Positive', $this);
+
+    // If no cid supplied, look it up
+    if (!$this->_contactId && $this->_recId) {
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_groupId, 'table_name');
+      if ($tableName) {
+        $this->_contactId = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = %1", [1 => [$this->_recId, 'Integer']]);
+      }
+    }
+    if (!$this->_contactId) {
+      throw new CRM_Core_Exception(ts('Could not find valid value for %1', [1 => 'cid']));
+    }
+
     $this->assign('contactId', $this->_contactId);
 
     // check logged in url permission
@@ -49,12 +65,8 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
 
-    $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
-    $this->assign('groupId', $this->_groupId);
-
     $this->_multiRecordDisplay = CRM_Utils_Request::retrieve('multiRecordDisplay', 'String', $this, FALSE);
     $this->_cgcount = CRM_Utils_Request::retrieve('cgcount', 'Positive', $this, FALSE);
-    $this->_recId = CRM_Utils_Request::retrieve('recId', 'Positive', $this, FALSE);
   }
 
   /**
