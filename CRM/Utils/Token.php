@@ -1157,7 +1157,7 @@ class CRM_Utils_Token {
    * @param bool $skipDeceased Don't return deceased contact info.
    *   Don't return deceased contact info.
    * @param array $extraParams
-   *   Extra params.
+   *   Extra params - DEPRECATED
    * @param array $tokens
    *   The list of tokens we've extracted from the content.
    * @param string|null $className
@@ -1199,6 +1199,7 @@ class CRM_Utils_Token {
     }
 
     if ($extraParams) {
+      CRM_Core_Error::deprecatedWarning('Passing $extraParams to getTokenDetails() is not supported and will be removed in a future version');
       $params = array_merge($params, $extraParams);
     }
 
