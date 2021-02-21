@@ -18,7 +18,7 @@
       <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" />
-        <button class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
+        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
@@ -47,7 +47,7 @@
       <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input disabled class="form-control" type="text" ng-model="col.label" />
-        <button class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
+        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
           <i class="crm-i fa-undo"></i>
         </button>
       </div>
