@@ -26,6 +26,17 @@ function civicrm_api3_generic_getList($apiRequest) {
   $request = $apiRequest['params'];
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE);
 
+  // If the user types an integer into the search
+  $forceIdSearch = empty($request['id']) && !empty($request['input']) && CRM_Utils_Rule::positiveInteger($request['input']);
+  // Add an extra page of results for the record with an exact id match
+  if ($forceIdSearch) {
+    $request['page_num'] = ($request['page_num'] ?? 1) - 1;
+    if (empty($request['page_num'])) {
+      $request['id'] = $request['input'];
+      unset($request['input']);
+    }
+  }
+
   // Hey api, would you like to provide default values?
   $fnName = "_civicrm_api3_{$entity}_getlist_defaults";
   $defaults = function_exists($fnName) ? $fnName($request) : [];
@@ -73,8 +84,19 @@ function civicrm_api3_generic_getList($apiRequest) {
 
   $output = ['page_num' => $request['page_num']];
 
+  if ($forceIdSearch) {
+    $output['page_num']++;
+    // When returning the single record matching id
+    if (empty($request['page_num'])) {
+      $output['more_results'] = TRUE;
+      foreach ($values as $i => $value) {
+        $description = ts('ID: %1', [1 => $value['id']]);
+        $values[$i]['description'] = array_merge([$description], $value['description'] ?? []);
+      }
+    }
+  }
   // Limit is set for searching but not fetching by id
-  if (!empty($request['params']['options']['limit'])) {
+  elseif (!empty($request['params']['options']['limit'])) {
     // If we have an extra result then this is not the last page
     $last = $request['params']['options']['limit'] - 1;
     $output['more_results'] = isset($values[$last]);
