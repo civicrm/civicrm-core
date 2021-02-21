@@ -893,11 +893,13 @@ class CRM_Utils_Date {
    *
    * @param date $birthDate
    *   Birth Date.
+   * @param date $targetDate
+   *   Target Date. (show age on specific date)
    *
    * @return int
    *   array $results contains years or months
    */
-  public static function calculateAge($birthDate) {
+  public static function calculateAge($birthDate, $targetDate = NULL) {
     $results = [];
     $formatedBirthDate = CRM_Utils_Date::customFormat($birthDate, '%Y-%m-%d');
 
@@ -905,23 +907,24 @@ class CRM_Utils_Date {
     $birthYear = $bDate[0];
     $birthMonth = $bDate[1];
     $birthDay = $bDate[2];
-    $year_diff = date("Y") - $birthYear;
+    $targetDate = strtotime($targetDate ?? date('Y-m-d'));
+
+    $year_diff = date("Y", $targetDate) - $birthYear;
 
     // don't calculate age CRM-3143
     if ($birthYear == '1902') {
       return $results;
     }
-
     switch ($year_diff) {
       case 1:
-        $month = (12 - $birthMonth) + date("m");
+        $month = (12 - $birthMonth) + date("m", $targetDate);
         if ($month < 12) {
-          if (date("d") < $birthDay) {
+          if (date("d", $targetDate) < $birthDay) {
             $month--;
           }
           $results['months'] = $month;
         }
-        elseif ($month == 12 && (date("d") < $birthDay)) {
+        elseif ($month == 12 && (date("d", $targetDate) < $birthDay)) {
           $results['months'] = $month - 1;
         }
         else {
@@ -930,13 +933,13 @@ class CRM_Utils_Date {
         break;
 
       case 0:
-        $month = date("m") - $birthMonth;
+        $month = date("m", $targetDate) - $birthMonth;
         $results['months'] = $month;
         break;
 
       default:
         $results['years'] = $year_diff;
-        if ((date("m") < $birthMonth) || (date("m") == $birthMonth) && (date("d") < $birthDay)) {
+        if ((date("m", $targetDate) < $birthMonth) || (date("m", $targetDate) == $birthMonth) && (date("d", $targetDate) < $birthDay)) {
           $results['years']--;
         }
     }

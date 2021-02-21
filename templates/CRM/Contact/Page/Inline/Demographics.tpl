@@ -34,6 +34,7 @@
             <div class="crm-content crm-contact-deceased_date_display">
               {assign var="date_format" value = $fields.birth_date.smarty_view_format}
               {$deceased_date|crmDate:$date_format}
+              {if $birth_date}({ts}Age{/ts} {if $age.y}{ts count=$age.y plural='%count years'}%count year{/ts}{elseif $age.m}{ts count=$age.m plural='%count months'}%count month{/ts}{/if}){/if}
             </div>
           </div>
         {else}
