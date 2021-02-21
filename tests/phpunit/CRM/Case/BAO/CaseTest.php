@@ -28,6 +28,9 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $this->loadAllFixtures();
 
+    // I don't understand why need to disable but if don't then only one
+    // case type is defined on 2nd and subsequent dataprovider runs.
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviCase');
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
@@ -809,6 +812,355 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals($closedStatus, $linkedCase['values'][$linkedCase['id']]['status_id']);
     $this->assertEquals(date('Y-m-d', strtotime($changeStatusActivity->activity_date_time)), $linkedCase['values'][$linkedCase['id']]['end_date']);
      */
+  }
+
+  /**
+   * test getCaseActivityQuery
+   * @dataProvider caseActivityQueryProvider
+   * @param array $input
+   * @param array $expected
+   */
+  public function testGetCaseActivityQuery(array $input, array $expected): void {
+    $activity_type_map = array_flip(CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
+
+    $loggedInUser = $this->createLoggedInUser();
+    $individual[1] = $this->individualCreate();
+    $caseObj[1] = $this->createCase($individual[1], $loggedInUser, [
+      // Unfortunately the query we're testing is not full-group-by compliant
+      // and does not have a well-defined sort order either. If we use the
+      // default casetype then there are two activities with the same date
+      // and sometimes you get one returned and sometimes the other. If the
+      // second case type timeline is altered in future it's possible the
+      // same problem could intermittently occur.
+      'case_type_id' => 2,
+      'case_type' => 'adult_day_care_referral',
+    ]);
+    $individual[2] = $this->individualCreate([], 1);
+
+    // create a second case with a different start date
+    $other_date = strtotime($input['other_date']);
+    $caseObj[2] = $this->createCase($individual[2], $loggedInUser, [
+      'case_type_id' => 2,
+      'case_type' => 'adult_day_care_referral',
+      'start_date' => date('Y-m-d', $other_date),
+      'start_date_time' => date('YmdHis', $other_date),
+    ]);
+
+    foreach (['upcoming', 'recent'] as $type) {
+      // See note above about the query being ill-defined, so this only works
+      // on mysql 5.7 and 8, similar to other tests in this file that call
+      // getCases which also uses this query.
+      $sql = CRM_Case_BAO_Case::getCaseActivityQuery($type, $loggedInUser);
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      $activities = [];
+      $counter = 0;
+      while ($dao->fetch()) {
+        $activities[$counter] = [
+          'case_id' => $dao->case_id,
+          'case_subject' => $dao->case_subject,
+          'contact_id' => (int) $dao->contact_id,
+          'phone' => $dao->phone,
+          'contact_type' => $dao->contact_type,
+          'activity_type_id' => (int) $dao->activity_type_id,
+          'case_type_id' => (int) $dao->case_type_id,
+          'case_status_id' => (int) $dao->case_status_id,
+          // This is activity status
+          'status_id' => (int) $dao->status_id,
+          'case_start_date' => $dao->case_start_date,
+          'case_role' => $dao->case_role,
+          'activity_date_time' => $dao->activity_date_time,
+        ];
+
+        // Need to replace some placeholders since we don't know what they
+        // are at the time the dataprovider is evaluated.
+        $offset = $expected[$type][$counter]['which_case_offset'];
+        unset($expected[$type][$counter]['which_case_offset']);
+        $expected[$type][$counter]['case_id'] = $caseObj[$offset]->id;
+        $expected[$type][$counter]['contact_id'] = $individual[$offset];
+        $expected[$type][$counter]['activity_type_id'] = $activity_type_map[$expected[$type][$counter]['activity_type_id']];
+        $expected[$type][$counter]['case_start_date'] = $caseObj[$offset]->start_date;
+        // To avoid a millisecond rollover bug, where e.g. the dataprovider
+        // runs a whole second before this test, we make this relative to the
+        // case start date, which it is anyway in the timeline.
+        $expected[$type][$counter]['activity_date_time'] = date('Y-m-d H:i:s', strtotime($caseObj[$offset]->start_date . $expected[$type][$counter]['activity_date_time']));
+
+        $counter++;
+      }
+      $this->assertEquals($expected[$type], $activities);
+    }
+  }
+
+  /**
+   * dataprovider for testGetCaseActivityQuery
+   * @return array
+   */
+  public function caseActivityQueryProvider(): array {
+    return [
+      0 => [
+        'input' => [
+          'other_date' => '-1 day',
+        ],
+        'expected' => [
+          'upcoming' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              // REPLACE_ME's will get replaced in the test since the values haven't been created yet at the time dataproviders get evaluated.
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+          ],
+          'recent' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+          ],
+        ],
+      ],
+
+      1 => [
+        'input' => [
+          'other_date' => '-7 day',
+        ],
+        'expected' => [
+          'upcoming' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+          ],
+          'recent' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+          ],
+        ],
+      ],
+
+      2 => [
+        'input' => [
+          'other_date' => '-14 day',
+        ],
+        'expected' => [
+          'upcoming' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+          ],
+          'recent' => [
+            0 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+          ],
+        ],
+      ],
+
+      3 => [
+        'input' => [
+          'other_date' => '-21 day',
+        ],
+        'expected' => [
+          'upcoming' => [
+            0 => [
+              'which_case_offset' => 2,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+            1 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Medical evaluation',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 1,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              'activity_date_time' => ' +3 day',
+            ],
+          ],
+          'recent' => [
+            0 => [
+              'which_case_offset' => 1,
+              'case_id' => 'REPLACE_ME',
+              'case_subject' => 'Case Subject',
+              'contact_id' => 'REPLACE_ME',
+              'phone' => NULL,
+              'contact_type' => 'Individual',
+              'activity_type_id' => 'Open Case',
+              'case_type_id' => 2,
+              'case_status_id' => 1,
+              'status_id' => 2,
+              'case_start_date' => 'REPLACE_ME',
+              'case_role' => 'Senior Services Coordinator is',
+              // means no offset from case start date
+              'activity_date_time' => '',
+            ],
+          ],
+        ],
+      ],
+    ];
   }
 
 }

@@ -3659,23 +3659,23 @@ VALUES
    *
    * @return CRM_Case_BAO_Case
    */
-  public function createCase($clientId, $loggedInUser = NULL, $extra = NULL) {
+  public function createCase($clientId, $loggedInUser = NULL, $extra = []) {
     if (empty($loggedInUser)) {
       // backwards compatibility - but it's more typical that the creator is a different person than the client
       $loggedInUser = $clientId;
     }
-    $caseParams = [
+    $caseParams = array_merge([
       'activity_subject' => 'Case Subject',
       'client_id'        => $clientId,
       'case_type_id'     => 1,
       'status_id'        => 1,
       'case_type'        => 'housing_support',
       'subject'          => 'Case Subject',
-      'start_date'       => ($extra['start_date'] ?? date("Y-m-d")),
-      'start_date_time'  => ($extra['start_date_time'] ?? date("YmdHis")),
+      'start_date'       => date("Y-m-d"),
+      'start_date_time'  => date("YmdHis"),
       'medium_id'        => 2,
       'activity_details' => '',
-    ];
+    ], $extra);
     $form = new CRM_Case_Form_Case();
     return $form->testSubmit($caseParams, 'OpenCase', $loggedInUser, 'standalone');
   }
