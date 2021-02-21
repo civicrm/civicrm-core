@@ -88,9 +88,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
 
       if ($isFirstOrLastRecurringPayment) {
         //send recurring Notification email for user
-        CRM_Contribute_BAO_ContributionPage::recurringNotify(TRUE,
-          $contributionRecur->contact_id,
-          $ids['contributionPage'],
+        CRM_Contribute_BAO_ContributionPage::recurringNotify($contributionID, TRUE,
           $contributionRecur,
           (bool) $this->getMembershipID($contributionID, $contributionRecur->id)
         );
