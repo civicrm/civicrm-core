@@ -967,16 +967,13 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
     }
 
     if (empty($filterContactFldIds)) {
+      $greetingDetails = [];
       $filterContactFldIds[] = 0;
     }
-
-    // retrieve only required contact information
-    $extraParams[] = ['contact_type', '=', $contactType, 0, 0];
-    // we do token replacement in the replaceGreetingTokens hook
-    list($greetingDetails) = CRM_Utils_Token::getTokenDetails(array_keys($filterContactFldIds),
-      $greetingsReturnProperties,
-      FALSE, FALSE, $extraParams
-    );
+    else {
+      // we do token replacement in the replaceGreetingTokens hook
+      [$greetingDetails] = CRM_Utils_Token::getTokenDetails(array_keys($filterContactFldIds), $greetingsReturnProperties, FALSE, FALSE);
+    }
     // perform token replacement and build update SQL
     $contactIds = [];
     $cacheFieldQuery = "UPDATE civicrm_contact SET {$greeting}_display = CASE id ";
