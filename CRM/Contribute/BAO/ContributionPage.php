@@ -538,18 +538,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
 
     if ($contribution['contribution_recur.is_email_receipt'] || $contribution['contribution_page.is_email_receipt']) {
       if ($contribution['contribution_page.receipt_from_email']) {
-        $receiptFrom = '"' . $contribution['contribution_page.receipt_from_name'] . '" <' . $contribution['contribution_page.receipt_from_email'] . '>';
-
         $receiptFromName = $contribution['contribution_page.receipt_from_name'];
         $receiptFromEmail = $contribution['contribution_page.receipt_from_email'];
       }
       else {
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-        $receiptFromName = $domainValues[0];
-        $receiptFromEmail = $domainValues[1];
+        [$receiptFromName, $receiptFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
       }
 
+      $receiptFrom = "$receiptFromName <$receiptFromEmail>";
       [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id'], FALSE);
       $templatesParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
