@@ -1,0 +1,12 @@
+<fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.parent.hiddenColumns" ui-sortable="$ctrl.parent.sortableOptions">
+  <legend>{{:: ts('Unused') }}</legend>
+  <fieldset ng-repeat="col in $ctrl.parent.hiddenColumns" class="crm-draggable">
+    <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
+    <div class="form-inline">
+      <label>{{:: ts('Label:') }}</label> <input disabled class="form-control" type="text" ng-model="col.label" />
+      <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
+        <i class="crm-i fa-undo"></i>
+      </button>
+    </div>
+  </fieldset>
+</fieldset>
