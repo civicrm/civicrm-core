@@ -313,12 +313,7 @@
           }
           cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
-        else {
-          if (taxRate) {
-            var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
-            cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
-          }
-        }
+
         var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
         cj('.totaltaxAmount').html(taxMessage);
       }
