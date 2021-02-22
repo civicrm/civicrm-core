@@ -129,7 +129,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         CRM_Price_BAO_PriceFieldValue::retrieve($valueParams, $defaults);
 
         // fix the display of the monetary value, CRM-4038
-        $defaults['price'] = CRM_Utils_Money::format($defaults['amount'], NULL, '%a');
+        $defaults['price'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['amount']);
         $defaults['is_active'] = $isActive;
       }
 

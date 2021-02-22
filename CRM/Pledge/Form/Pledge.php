@@ -127,12 +127,12 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       // fix the display of the monetary value, CRM-4038.
       if ($this->_isPending) {
         $defaults['eachPaymentAmount'] = $this->_values['amount'] / $this->_values['installments'];
-        $defaults['eachPaymentAmount'] = CRM_Utils_Money::format($defaults['eachPaymentAmount'], NULL, '%a');
+        $defaults['eachPaymentAmount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['eachPaymentAmount']);
       }
 
       // fix the display of the monetary value, CRM-4038
       if (isset($this->_values['amount'])) {
-        $defaults['amount'] = CRM_Utils_Money::format($this->_values['amount'], NULL, '%a');
+        $defaults['amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->_values['amount']);
       }
       $this->assign('amount', $this->_values['amount']);
       $this->assign('installments', $defaults['installments']);

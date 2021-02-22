@@ -371,7 +371,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $amountFields = ['non_deductible_amount', 'fee_amount'];
     foreach ($amountFields as $amt) {
       if (isset($defaults[$amt])) {
-        $defaults[$amt] = CRM_Utils_Money::format($defaults[$amt], NULL, '%a');
+        $defaults[$amt] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults[$amt]);
       }
     }
 
