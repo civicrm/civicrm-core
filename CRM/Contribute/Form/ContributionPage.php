@@ -316,7 +316,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
 
       // fix the display of the monetary value, CRM-4038
       if (isset($defaults['goal_amount'])) {
-        $defaults['goal_amount'] = CRM_Utils_Money::format($defaults['goal_amount'], NULL, '%a');
+        $defaults['goal_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['goal_amount']);
       }
 
       // get price set of type contributions
