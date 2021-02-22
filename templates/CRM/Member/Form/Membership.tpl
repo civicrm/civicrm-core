@@ -328,7 +328,6 @@
       cj('#num_terms').change( function( ) {
         setPaymentBlock(mode);
       });
-      setPaymentBlock(mode);
 
       // show/hide different contact section
       setDifferentContactBlock();

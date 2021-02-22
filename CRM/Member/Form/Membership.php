@@ -479,10 +479,6 @@ DESC limit 1");
         }
       }
       $totalAmount = $values['minimum_fee'] ?? NULL;
-      //CRM-18827 - override the default value if total_amount is submitted
-      if (!empty($this->_submitValues['total_amount'])) {
-        $totalAmount = CRM_Utils_Rule::cleanMoney($this->_submitValues['total_amount']);
-      }
       // build membership info array, which is used when membership type is selected to:
       // - set the payment information block
       // - set the max related block

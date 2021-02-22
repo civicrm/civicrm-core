@@ -76,8 +76,7 @@
   <tr class="crm-{$formClass}-form-block-total_amount">
     <td class="label">{$form.total_amount.label}</td>
     <td>{$form.total_amount.html}<br />
-      <span class="description">{ts}Membership payment amount.{/ts}</span>
-      <div class="totaltaxAmount" data-tax_amount_raw=0></div>
+      <span class="description">{ts}Membership payment amount.{/ts}</span><div class="totaltaxAmount"></div>
     </td>
   </tr>
   <tr class="crm-membership-form-block-contribution-contact">
