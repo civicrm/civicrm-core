@@ -139,7 +139,12 @@ class CRM_Afform_AfformScanner {
 
     $metaFile = $this->findFilePath($name, self::METADATA_FILE);
     if ($metaFile !== NULL) {
-      return array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
+      $r = array_merge($defaults, json_decode(file_get_contents($metaFile), 1));
+      // Previous revisions of GUI allowed permission==''. array_merge() doesn't catch all forms of missing-ness.
+      if ($r['permission'] === '') {
+        $r['permission'] = $defaults['permission'];
+      }
+      return $r;
     }
     elseif ($this->findFilePath($name, self::LAYOUT_FILE)) {
       return $defaults;
