@@ -1257,7 +1257,7 @@ DESC limit 1");
       // @todo this is a candidate for beginPostProcessFunction.
       $formValues['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
       $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
-      $formValues['invoiceID'] = md5(uniqid(rand(), TRUE));
+      $formValues['invoiceID'] = $this->getInvoiceID();
       $formValues['financial_type_id'] = $params['financial_type_id'];
 
       // at this point we've created a contact and stored its address etc
@@ -1354,7 +1354,7 @@ DESC limit 1");
       }
       $now = CRM_Utils_Time::date('YmdHis');
       $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
-      $params['invoice_id'] = $formValues['invoiceID'];
+      $params['invoice_id'] = $this->getInvoiceID();
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
       );
@@ -1866,7 +1866,7 @@ DESC limit 1");
     $contributionParams = array_merge([
       'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : CRM_Utils_Time::date('YmdHis'),
       'tax_amount' => $params['tax_amount'] ?? NULL,
-      'invoice_id' => $params['invoiceID'],
+      'invoice_id' => $this->getInvoiceID(),
       'currency' => $params['currencyID'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
@@ -1925,13 +1925,13 @@ DESC limit 1");
     if (!empty($params['receive_date'])) {
       $recurParams['start_date'] = date('YmdHis', CRM_Utils_Time::strtotime($params['receive_date']));
     }
-    $recurParams['invoice_id'] = $params['invoiceID'] ?? NULL;
+    $recurParams['invoice_id'] = $this->getInvoiceID();
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
     $recurParams['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
-    $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
+    $recurParams['trxn_id'] = $params['trxn_id'] ?? $this->getInvoiceID();
 
     $campaignId = $params['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL;
     $recurParams['campaign_id'] = $campaignId;
