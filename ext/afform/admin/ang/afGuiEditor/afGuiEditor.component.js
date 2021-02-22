@@ -20,6 +20,8 @@
     controllerAs: 'editor',
     controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('afform');
+      $scope.crmUrl = CRM.url;
+
       $scope.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
