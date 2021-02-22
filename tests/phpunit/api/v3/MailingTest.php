@@ -79,8 +79,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   /**
    * Test civicrm_mailing_create.
    */
-  public function testMailerCreateSuccess() {
-    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
+  public function testMailerCreateSuccess(): void {
+    $this->callAPISuccess('Campaign', 'create', ['name' => 'big campaign', 'title' => 'abc']);
+    $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign'], __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
     $this->assertEquals(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
