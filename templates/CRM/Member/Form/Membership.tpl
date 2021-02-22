@@ -268,7 +268,6 @@
       function setPaymentBlock(mode, checkboxEvent) {
         var memType = parseInt(cj('#membership_type_id_1').val( ));
         var isPriceSet = 0;
-        var existingAmount = 0;
 
         if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
           isPriceSet = 1;
@@ -318,13 +317,6 @@
           if (taxRate) {
             var feeTotal = parseFloat(Number((taxRate/100) * allMemberships[memType]['total_amount'])+Number(allMemberships[memType]['total_amount_numeric'])).toFixed(2);
             cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
-          }
-          else {
-            var feeTotal = allMemberships[memType]['total_amount'];
-            if (!existingAmount) {
-              // CRM-16680 don't set amount if there is an existing contribution.
-              cj("#total_amount").val(allMemberships[memType]['total_amount']);
-            }
           }
         }
         var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
