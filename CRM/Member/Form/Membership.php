@@ -491,6 +491,7 @@ DESC limit 1");
         'total_amount' => CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($totalAmount),
         'total_amount_numeric' => $totalAmount,
         'auto_renew' => $values['auto_renew'] ?? NULL,
+        'tax_rate' => $values['tax_rate'],
         'has_related' => isset($values['relationship_type_id']),
         'max_related' => $values['max_related'] ?? NULL,
       ];
