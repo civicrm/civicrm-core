@@ -564,12 +564,12 @@
       if (!processorId) {
         processorId = cj( '#payment_processor_id' ).val( );
       }
-      if (!membershipType) {
-        membershipType = parseInt( cj('#membership_type_id_1').val( ) );
+      if (!membershipTypeID) {
+        membershipTypeID = parseInt( cj('#membership_type_id_1').val( ) );
       }
 
       //we don't have both required values.
-      if (!processorId || !membershipType) {
+      if (!processorId || !membershipTypeID) {
         cj("#auto_renew").prop('checked', false);
         cj("#autoRenew").hide();
         showEmailOptions();
@@ -578,7 +578,7 @@
 
       var recurProcessors  = {/literal}{$recurProcessor}{literal};
       var autoRenewOptions = {/literal}{$autoRenewOptions}{literal};
-      var currentOption    = autoRenewOptions[membershipType];
+      var currentOption    = autoRenewOptions[membershipTypeID];
 
       if (!currentOption || !recurProcessors[processorId]) {
         cj("#auto_renew").prop('checked', false );
