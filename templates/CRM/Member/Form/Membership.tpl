@@ -266,23 +266,21 @@
     {literal}
     <script type="text/javascript">
       function setPaymentBlock(mode, checkboxEvent) {
-        var memType = parseInt(cj('#membership_type_id_1').val( ));
-        var isPriceSet = 0;
-
-        if ( cj('#price_set_id').length > 0 && cj('#price_set_id').val() ) {
-          isPriceSet = 1;
+        if (cj('#price_set_id').length > 0 && cj('#price_set_id').val()) {
+          return;
         }
-
-        if ( !memType || isPriceSet ) {
+        var membershipTypeID = parseInt(cj('#membership_type_id_1').val());
+        if (!membershipTypeID) {
           return;
         }
 
         var allMemberships = {/literal}{$allMembershipInfo}{literal};
+        membershipType = allMemberships[membershipTypeID];
         if (!mode) {
           //check the record_contribution checkbox if membership is a paid one
           {/literal}{if $action eq 1}{literal}
           if (!checkboxEvent) {
-            if (allMemberships[memType]['total_amount_numeric'] > 0) {
+            if (membershipType['total_amount_numeric'] > 0) {
               cj('#record_contribution').prop('checked','checked');
               cj('#recordContribution').show();
             }
@@ -295,21 +293,21 @@
         }
 
         // skip this for test and live modes because financial type is set automatically
-        cj("#financial_type_id").val(allMemberships[memType]['financial_type_id']);
+        cj("#financial_type_id").val(membershipType['financial_type_id']);
         var term = cj('#num_terms').val();
         var taxRates = {/literal}{$taxRates}{literal};
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
-        var taxRate = taxRates[allMemberships[memType]['financial_type_id']];
+        var taxRate = taxRates[membershipType['financial_type_id']];
         var currency = {/literal}{$currency_symbol|@json_encode}{literal};
-        var taxAmount = (taxRate/100)*allMemberships[memType]['total_amount_numeric'];
+        var taxAmount = (taxRate/100)*membershipType['total_amount_numeric'];
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
         if (term) {
           if (!taxRate) {
-            var feeTotal = allMemberships[memType]['total_amount_numeric'] * term;
+            var feeTotal = membershipType['total_amount_numeric'] * term;
           }
           else {
-            var feeTotal = Number((taxRate/100) * (allMemberships[memType]['total_amount_numeric'] * term))+Number
-           (allMemberships[memType]['total_amount_numeric'] * term );
+            var feeTotal = Number((taxRate/100) * (membershipType['total_amount_numeric'] * term))+Number
+           (membershipType['total_amount_numeric'] * term );
           }
           cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
         }
