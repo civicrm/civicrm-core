@@ -4612,7 +4612,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       }
     }
     $yesNoFields = [
-      'do_not_email', 'is_deceased', 'do_not_phone', 'do_not_sms', 'do_not_mail', 'is_opt_out',
+      'do_not_email', 'is_deceased', 'do_not_phone', 'do_not_sms', 'do_not_mail', 'do_not_trade', 'is_opt_out',
     ];
     foreach ($yesNoFields as $fieldName) {
       if (array_key_exists('civicrm_contact_' . $fieldName, $row)) {
@@ -4882,6 +4882,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'do_not_phone' => [],
       'do_not_mail' => [],
       'do_not_sms' => [],
+      'do_not_trade' => [],
       'is_opt_out' => [],
       'is_deceased' => [],
       'preferred_language' => [],
@@ -4950,6 +4951,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       'do_not_sms' => [
         'title' => ts('Do not SMS'),
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ],
+      'do_not_trade' => [
+        'title' => ts('Do not Trade'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
       ],
       'is_opt_out' => [
@@ -5470,7 +5475,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => FALSE,
       ];
     }
-    foreach (['do_not_email', 'do_not_phone', 'do_not_mail', 'do_not_sms', 'is_opt_out'] as $field) {
+    foreach (['do_not_email', 'do_not_phone', 'do_not_mail', 'do_not_sms', 'do_not_trade', 'is_opt_out'] as $field) {
       $spec[$options['prefix'] . $field] = [
         'name' => $field,
         'type' => CRM_Utils_Type::T_BOOLEAN,
