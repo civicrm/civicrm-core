@@ -1,5 +1,9 @@
-<select class="form-control">
-  <option value="" ng-selected="!$ctrl.column.link" >{{ ts('None') }}</option>
+<label title="{{ ts('Display as clickable link') }}" >
+  <input type="checkbox" ng-checked="$ctrl.column.link" ng-click="$ctrl.setValue($ctrl.column.link ? '' : ($ctrl.links[0] && $ctrl.links[0].path || 'civicrm/'))" >
+  {{ $ctrl.column.link ? ts('Link:') : ts('Link') }}
+</label>
+<select class="form-control" ng-show="$ctrl.links.length && $ctrl.column.link">
+  <option value="">{{ ts('None') }}</option>
   <option ng-repeat="link in $ctrl.links" value="{{ link.path }}" ng-selected="$ctrl.column.link === link.path">
     {{ link.title }}
   </option>
@@ -7,7 +11,5 @@
     {{ ts('Other...') }}
   </option>
 </select>
-<div class="form-group" ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)">
-  <input class="form-control" type="text" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" />
-  <crm-search-admin-token-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="$ctrl.column" field="link"></crm-search-admin-token-select>
-</div>
+<input class="form-control" type="text" ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" />
+<crm-search-admin-token-select ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="$ctrl.column" field="link"></crm-search-admin-token-select>
