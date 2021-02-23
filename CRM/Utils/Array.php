@@ -61,20 +61,17 @@ class CRM_Utils_Array {
    * @return mixed
    *   The value of the key, or null if the key is not found.
    */
-  public static function retrieveValueRecursive(&$params, $key) {
-    if (!is_array($params)) {
-      return NULL;
+  public static function retrieveValueRecursive(array $params, string $key) {
+    if (isset($params[$key])) {
+      return $params[$key];
     }
-    elseif ($value = CRM_Utils_Array::value($key, $params)) {
-      return $value;
-    }
-    else {
-      foreach ($params as $subParam) {
-        if (is_array($subParam) &&
-          $value = self::retrieveValueRecursive($subParam, $key)
-        ) {
-          return $value;
-        }
+    foreach ($params as $subParam) {
+      if (is_array($subParam) &&
+        // @todo - this will mishandle values like 0 and false
+        // but it's a little scary to fix.
+        $value = self::retrieveValueRecursive($subParam, $key)
+      ) {
+        return $value;
       }
     }
     return NULL;
