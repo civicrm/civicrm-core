@@ -952,12 +952,6 @@ COLS;
       }
       $columns = $this->columnsOf($table, $force);
 
-      // Use utf8mb4_bin or utf8_bin, depending on what's in use.
-      $charset = 'utf8';
-      if (stripos(CRM_Core_BAO_SchemaHandler::getInUseCollation(), 'utf8mb4') !== FALSE) {
-        $charset = 'utf8mb4';
-      }
-
       // only do the change if any data has changed
       $cond = [];
       foreach ($columns as $column) {
@@ -968,12 +962,7 @@ COLS;
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);
         if (!$excludeColumn) {
-          // The empty string needs charset signalling to avoid errors.
-          // Note that it is not a cast/convert. It just tells mysql
-          // that there isn't a conflict when your system/connection defaults
-          // happen to be different from $charset.
-          // See https://dev.mysql.com/doc/refman/5.7/en/charset-literal.html
-          $cond[] = "IFNULL(OLD.$column,_{$charset}'') <> IFNULL(NEW.$column,_{$charset}'') COLLATE {$charset}_bin";
+          $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }
       $suppressLoggingCond = "@civicrm_disable_logging IS NULL OR @civicrm_disable_logging = 0";
