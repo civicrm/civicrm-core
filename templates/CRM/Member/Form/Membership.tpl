@@ -295,24 +295,14 @@
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(membershipType['financial_type_id']);
         var term = cj('#num_terms').val();
-        var taxRates = {/literal}{$taxRates}{literal};
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
-        var taxRate = taxRates[membershipType['financial_type_id']];
         var currency = {/literal}{$currency_symbol|@json_encode}{literal};
-        var taxAmount = (taxRate/100)*membershipType['total_amount_numeric'];
+        var taxExclusiveAmount = membershipType['total_amount_numeric'] * term;
+        var taxAmount = (membershipType['tax_rate']/100)*taxExclusiveAmount;
         taxAmount = isNaN (taxAmount) ? 0:taxAmount;
-        if (term) {
-          if (!taxRate) {
-            var feeTotal = membershipType['total_amount_numeric'] * term;
-          }
-          else {
-            var feeTotal = Number((taxRate/100) * (membershipType['total_amount_numeric'] * term))+Number
-           (membershipType['total_amount_numeric'] * term );
-          }
-          cj("#total_amount").val(CRM.formatMoney(feeTotal, true));
-        }
+        cj("#total_amount").val(CRM.formatMoney(taxExclusiveAmount + taxAmount, true));
 
-        var taxMessage = taxRate!=undefined ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
+        var taxMessage = taxAmount > 0 ? 'Includes '+taxTerm+' amount of '+currency+' '+taxAmount:'';
         cj('.totaltaxAmount').html(taxMessage);
       }
 
@@ -338,7 +328,6 @@
       cj('#num_terms').change( function( ) {
         setPaymentBlock(mode);
       });
-      setPaymentBlock(mode);
 
       // show/hide different contact section
       setDifferentContactBlock();
