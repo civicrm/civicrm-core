@@ -1,13 +1,21 @@
 <div class="panel panel-default">
   <div class="panel-heading">
 
-    <div class="btn-group btn-group-md  pull-right">
-      <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !afform.title" ng-click="save()">
-        <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
-        <span ng-if="changesSaved && !saving">{{:: ts('Saved') }}</span>
-        <span ng-if="!changesSaved && !saving">{{:: ts('Save') }}</span>
-        <span ng-if="saving">{{:: ts('Saving...') }}</span>
-      </button>
+    <div class="form-inline pull-right">
+      <div class="form-group" ng-if="changesSaved && !saving && afform.server_route">
+        <a target="_blank" href="{{ crmUrl(afform.server_route) }}">
+          <i class="crm-i fa-external-link"></i>
+          {{:: ts('View Page') }}
+        </a>
+      </div>
+      <div class="btn-group btn-group-md">
+        <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !afform.title" ng-click="save()">
+          <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
+          <span ng-if="changesSaved && !saving">{{:: ts('Saved') }}</span>
+          <span ng-if="!changesSaved && !saving">{{:: ts('Save') }}</span>
+          <span ng-if="saving">{{:: ts('Saving...') }}</span>
+        </button>
+      </div>
     </div>
 
     <ul class="nav nav-tabs">
