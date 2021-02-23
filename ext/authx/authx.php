@@ -22,7 +22,12 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
     }
     elseif (!empty($params['_authxSes'])) {
       (new \Civi\Authx\Authenticator('auto'))->auth($e, $params['_authx'], TRUE);
-      _authx_redact(['_authx', '_authxSes']);
+      if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
+      }
+      else {
+        _authx_redact(['_authx', '_authxSes']);
+      }
     }
     else {
       (new \Civi\Authx\Authenticator('param'))->auth($e, $params['_authx']);
@@ -50,6 +55,23 @@ function _authx_redact(array $keys) {
   foreach ($keys as $key) {
     unset($_POST[$key], $_GET[$key], $_REQUEST[$key]);
   }
+}
+
+/**
+ * Reload the current page-view.
+ *
+ * @param string $route
+ * @param string $queryString
+ */
+function _authx_reload($route, $queryString) {
+  parse_str($queryString, $query);
+  foreach (array_keys($query) as $key) {
+    if (CRM_Utils_String::startsWith($key, '_authx')) {
+      unset($query[$key]);
+    }
+  }
+  $url = CRM_Utils_System::url($route, $query, TRUE, NULL, FALSE, CRM_Core_Config::singleton()->userSystem->isFrontEndPage());
+  CRM_Utils_System::redirect($url);
 }
 
 /**

@@ -253,8 +253,9 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
 
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
+    $this->assertEquals(0, $cookieJar->count());
     $response = $http->send($request);
-    $this->assertHasCookies($response);
+    $this->assertTrue($cookieJar->count() >= 1);
     $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
 
     // FIXME: Assert that re-using cookies yields correct result.
