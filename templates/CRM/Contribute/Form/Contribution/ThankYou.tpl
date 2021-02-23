@@ -139,7 +139,16 @@
                   {if $frequency_interval > 1}
                     <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2s.{/ts}</strong></p>
                   {else}
-                    <p><strong>{ts 1=$frequency_unit}This recurring contribution will be automatically processed every %1.{/ts}</strong></p>
+                    {* dev/translation#32 All 'every %1' strings are incorrectly using ts, but focusing on the most important one until we find a better fix. *}
+                    {if $frequency_unit eq 'day'}
+                      <p><strong>{ts}This contribution will be automatically processed every day.{/ts}</strong></p>
+                    {elseif $frequency_unit eq 'week'}
+                      <p><strong>{ts}This contribution will be automatically processed every week.{/ts}</strong></p>
+                    {elseif $frequency_unit eq 'month'}
+                      <p><strong>{ts}This contribution will be automatically processed every month.{/ts}</strong></p>
+                    {elseif $frequency_unit eq 'year'}
+                      <p><strong>{ts}This contribution will be automatically processed every year.{/ts}</strong></p>
+                    {/if}
                   {/if}
                 {/if}
                   <p>
