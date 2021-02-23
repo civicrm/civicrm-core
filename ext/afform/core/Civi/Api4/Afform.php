@@ -154,6 +154,10 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'is_token',
+          'data_type' => 'Boolean',
+        ],
+        [
           'name' => 'repeat',
           'data_type' => 'Mixed',
         ],
