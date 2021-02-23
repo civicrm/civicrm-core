@@ -9,7 +9,7 @@
     <i class="crm-i fa-users"></i>
     {{:: ts('Smart Group:') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
-  <button class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
+  <button type="button" class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
   </button>
 </li>
@@ -18,7 +18,7 @@
     <i class="crm-i {{ $ctrl.displayTypes[display.type].icon }}"></i>
     {{ display.label || ts('Untitled') }}
   </a>
-  <button class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeDisplay($index)" title="{{ display.trashed ? ts('Undelete') : ts('Delete') }}">
+  <button type="button" class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeDisplay($index)" title="{{ display.trashed ? ts('Undelete') : ts('Delete') }}">
     <i class="crm-i fa-{{ display.trashed ? 'undo' : 'trash' }}"></i>
   </button>
 </li>

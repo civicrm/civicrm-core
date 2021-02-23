@@ -1,6 +1,6 @@
 <legend>{{ $ctrl.label || ts('%1 group', {1: $ctrl.conjunctions[$ctrl.op]}) }}</legend>
 <div class="btn-group btn-group-xs" ng-if=":: $ctrl.hasParent">
-  <button class="btn btn-danger-outline" ng-click="$ctrl.deleteGroup()" title="{{:: ts('Remove group') }}">
+  <button type="button" class="btn btn-danger-outline" ng-click="$ctrl.deleteGroup()" title="{{:: ts('Remove group') }}">
     <i class="crm-i fa-trash" aria-hidden="true"></i>
   </button>
 </div>

@@ -31,7 +31,7 @@
         <div class="form-control checkbox-inline" ng-show="col.label.length" title="{{:: ts('Show label for every record even when this field is blank') }}">
           <label><input type="checkbox" ng-model="col.forceLabel"> <span>{{:: ts('Always show') }}</span></label>
         </div>
-        <button class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
+        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
@@ -61,7 +61,7 @@
       <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
       <div class="form-inline">
         <label>{{:: ts('Label:') }}</label> <input disabled class="form-control" type="text" ng-model="col.label" />
-        <button class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
+        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.restoreCol($index)" title="{{:: ts('Show') }}">
           <i class="crm-i fa-undo"></i>
         </button>
       </div>
