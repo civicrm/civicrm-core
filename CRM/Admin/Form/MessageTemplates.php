@@ -36,6 +36,11 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
   protected $_is_document = FALSE;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * PreProcess form - load existing values.
    *
    * @throws \API_Exception

@@ -23,6 +23,11 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
   const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Settings that cannot be configured in "advanced options"
    *
    * @var array

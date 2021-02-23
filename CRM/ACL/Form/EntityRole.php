@@ -17,6 +17,11 @@
 class CRM_ACL_Form_EntityRole extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {

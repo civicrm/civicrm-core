@@ -21,6 +21,11 @@
 class CRM_Admin_Form_Job extends CRM_Admin_Form {
   public $_id = NULL;
 
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
   public function preProcess() {
 
     parent::preProcess();

@@ -21,6 +21,11 @@
 class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {

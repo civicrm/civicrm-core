@@ -23,6 +23,11 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
 
   protected $_fields = NULL;
 
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
   public function preProcess() {
     parent::preProcess();
 

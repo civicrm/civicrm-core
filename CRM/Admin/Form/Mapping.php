@@ -21,6 +21,11 @@
 class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Build the form object.
    */
   public function preProcess() {

@@ -48,6 +48,11 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
   protected $deleteMessage;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {

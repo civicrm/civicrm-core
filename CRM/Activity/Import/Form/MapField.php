@@ -21,6 +21,11 @@
 class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
