@@ -503,4 +503,19 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     ];
   }
 
+  /**
+   * Get the currency in use.
+   *
+   * This just defaults to getting the default currency
+   * as other currencies are not supported on the membership
+   * forms at the moment.
+   *
+   * @param array $submittedValues
+   *
+   * @return string
+   */
+  public function getCurrency($submittedValues = []): string {
+    return CRM_Core_Config::singleton()->defaultCurrency;
+  }
+
 }

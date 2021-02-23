@@ -1251,8 +1251,7 @@ DESC limit 1");
 
       // add all the additional payment params we need
       $formValues['amount'] = $params['total_amount'];
-      // @todo this is a candidate for beginPostProcessFunction.
-      $formValues['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
+      $formValues['currencyID'] = $this->getCurrency();
       $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
       $formValues['invoiceID'] = $this->getInvoiceID();
       $formValues['financial_type_id'] = $params['financial_type_id'];
@@ -1293,6 +1292,12 @@ DESC limit 1");
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $paymentInstrumentID,
             'financial_type_id' => $params['financial_type_id'],
+            'receive_date' => CRM_Utils_Time::date('YmdHis'),
+            'tax_amount' => $params['tax_amount'] ?? NULL,
+            'invoice_id' => $this->getInvoiceID(),
+            'currency' => $this->getCurrency(),
+            'is_pay_later' => $params['is_pay_later'] ?? 0,
+            'skipLineItem' => $params['skipLineItem'] ?? 0,
           ]
         );
 
@@ -1859,16 +1864,6 @@ DESC limit 1");
     if ($params['is_email_receipt']) {
       $receiptDate = $now;
     }
-
-    $contributionParams = array_merge([
-      'receive_date' => !empty($params['receive_date']) ? CRM_Utils_Date::processDate($params['receive_date']) : CRM_Utils_Time::date('YmdHis'),
-      'tax_amount' => $params['tax_amount'] ?? NULL,
-      'invoice_id' => $this->getInvoiceID(),
-      'currency' => $params['currencyID'],
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
-      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-      'skipLineItem' => $params['skipLineItem'] ?? 0,
-    ], $contributionParams);
 
     if ($this->getSubmittedValue('send_receipt')) {
       $contributionParams += [
