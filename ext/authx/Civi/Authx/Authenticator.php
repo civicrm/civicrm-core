@@ -102,9 +102,12 @@ class Authenticator {
    */
   protected function login($contactId, $userId, bool $useSession) {
     $authxUf = _authx_uf();
+    $isSameValue = function($a, $b) {
+      return !empty($a) && (string) $a === (string) $b;
+    };
 
     if (\CRM_Core_Session::getLoggedInContactID() || $authxUf->getCurrentUserId()) {
-      if (\CRM_Core_Session::getLoggedInContactID() === $contactId && $authxUf->getCurrentUserId() === $userId) {
+      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $contactId)  && $isSameValue($authxUf->getCurrentUserId(), $userId)) {
         return;
       }
       else {
