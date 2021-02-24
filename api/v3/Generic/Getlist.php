@@ -153,26 +153,28 @@ function _civicrm_api3_generic_getList_defaults($entity, &$request, $apiDefaults
   if ($request['input']) {
     $params[$request['search_field']] = ['LIKE' => ($request['add_wildcard'] ? '%' : '') . $request['input'] . '%'];
   }
+  $request['params'] += $params;
+
   // When looking up a field e.g. displaying existing record
   if (!empty($request['id'])) {
     if (is_string($request['id']) && strpos($request['id'], ',')) {
       $request['id'] = explode(',', trim($request['id'], ', '));
     }
     // Don't run into search limits when prefilling selection
-    $params['options']['limit'] = NULL;
-    unset($params['options']['offset'], $request['params']['options']['limit'], $request['params']['options']['offset']);
-    $params[$request['id_field']] = is_array($request['id']) ? ['IN' => $request['id']] : $request['id'];
+    $request['params']['options']['limit'] = NULL;
+    unset($request['params']['options']['offset']);
+    $request['params'][$request['id_field']] = is_array($request['id']) ? ['IN' => $request['id']] : $request['id'];
   }
-  $request['params'] += $params;
-
-  $request['params']['options'] += [
-    // Add pagination parameters
-    'sort' => $request['label_field'],
-    // Adding one extra result allows us to see if there are any more
-    'limit' => $resultsPerPage + 1,
-    // Because sql is zero-based
-    'offset' => ($request['page_num'] - 1) * $resultsPerPage,
-  ];
+  else {
+    $request['params']['options'] += [
+      // Add pagination parameters
+      'sort' => $request['label_field'],
+      // Adding one extra result allows us to see if there are any more
+      'limit' => $resultsPerPage + 1,
+      // Because sql is zero-based
+      'offset' => ($request['page_num'] - 1) * $resultsPerPage,
+    ];
+  }
 }
 
 /**
