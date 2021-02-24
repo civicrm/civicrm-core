@@ -152,7 +152,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
-    if (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Closed' && !empty($params['activity_date_time'])) {
+    if (($groupingValues[$params['case_status_id']] ?? NULL) == 'Closed' && !empty($params['activity_date_time'])) {
       $params['end_date'] = CRM_Utils_Date::isoToMysql($params['activity_date_time']);
 
       // End case-specific relationships (roles)
@@ -169,8 +169,8 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         }
       }
     }
-    elseif (CRM_Utils_Array::value($params['case_status_id'], $groupingValues) == 'Opened') {
-      $params['end_date'] = "null";
+    elseif (($groupingValues[$params['case_status_id']] ?? NULL) == 'Opened') {
+      $params['end_date'] = 'null';
 
       // Reopen case-specific relationships (roles)
       foreach ($params['target_contact_id'] as $cid) {
@@ -191,7 +191,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $params['priority_id'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'priority_id', 'Normal');
     $activity->priority_id = $params['priority_id'];
 
-    foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
+    foreach ($form->_oldCaseStatus as $statusval) {
       if ($activity->subject == 'null') {
         $activity->subject = ts('Case status changed from %1 to %2', [
           1 => $form->_caseStatus[$statusval] ?? NULL,
