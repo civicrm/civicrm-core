@@ -164,6 +164,10 @@
   flex: 1;
 }
 
+#bootstrap-theme .crm-search-admin-unused-columns fieldset {
+  min-height: 60px;
+}
+
 #bootstrap-theme input[type=search]::placeholder {
   font-family: FontAwesome;
   text-align: right;

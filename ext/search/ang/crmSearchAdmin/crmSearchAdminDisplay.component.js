@@ -70,20 +70,26 @@
         return searchMeta.getDefaultLabel(expr);
       };
 
-      function fieldToColumn(fieldExpr) {
-        var info = searchMeta.parseExpr(fieldExpr);
-        return {
-          key: info.alias,
-          label: searchMeta.getDefaultLabel(fieldExpr),
-          dataType: (info.fn && info.fn.name === 'COUNT') ? 'Integer' : info.field.data_type
-        };
+      function fieldToColumn(fieldExpr, defaults) {
+        var info = searchMeta.parseExpr(fieldExpr),
+          values = _.cloneDeep(defaults);
+        if (defaults.key) {
+          values.key = info.alias;
+        }
+        if (defaults.label) {
+          values.label = searchMeta.getDefaultLabel(fieldExpr);
+        }
+        if (defaults.dataType) {
+          values.dataType = (info.fn && info.fn.name === 'COUNT') ? 'Integer' : info.field && info.field.data_type;
+        }
+        return values;
       }
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
-      this.initColumns = function() {
+      this.initColumns = function(defaults) {
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
-            columns.push(fieldToColumn(fieldExpr));
+            columns.push(fieldToColumn(fieldExpr, defaults));
           });
           ctrl.hiddenColumns = [];
         } else {
@@ -94,7 +100,7 @@
           ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
             var key = _.last(fieldExpr.split(' AS '));
             if (!_.includes(activeColumns, key)) {
-              hiddenColumns.push(fieldToColumn(fieldExpr));
+              hiddenColumns.push(fieldToColumn(fieldExpr, defaults));
             }
           });
           _.eachRight(activeColumns, function(key, index) {

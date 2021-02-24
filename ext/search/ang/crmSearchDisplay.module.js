@@ -6,30 +6,48 @@
 
     .factory('searchDisplayUtils', function(crmApi4) {
 
-      function replaceTokens(str, data) {
+      // Replace tokens keyed to rowData.
+      // If rowMeta is provided, values will be formatted; if omiited, raw values will be provided.
+      function replaceTokens(str, rowData, rowMeta) {
         if (!str) {
           return '';
         }
-        _.each(data, function(value, key) {
-          str = str.replace('[' + key + ']', value);
+        _.each(rowData, function(value, key) {
+          if (str.indexOf('[' + key + ']') >= 0) {
+            var column = rowMeta && _.findWhere(rowMeta, {key: key}),
+              replacement = column ? formatRawValue(column, value) : value;
+            str = str.replace(new RegExp(_.escapeRegExp('[' + key + ']', 'g')), replacement);
+          }
         });
         return str;
       }
 
-      function getUrl(link, row) {
-        var url = replaceTokens(link, row);
+      function getUrl(link, rowData) {
+        var url = replaceTokens(link, rowData);
         if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
           url = CRM.url(url);
         }
         return _.escape(url);
       }
 
-      function formatSearchValue(row, col, value) {
-        var type = col.dataType,
+      // Returns html-escaped display value for a single column in a row
+      function formatDisplayValue(rowData, key, rowMeta) {
+        var column = _.findWhere(rowMeta, {key: key}),
+          displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]),
+          result = _.escape(displayValue);
+        if (column.link) {
+          result = '<a href="' + getUrl(column.link, rowData) + '">' + result + '</a>';
+        }
+        return result;
+      }
+
+      // Formats raw field value according to data type
+      function formatRawValue(column, value) {
+        var type = column && column.dataType,
           result = value;
         if (_.isArray(value)) {
           return _.map(value, function(val) {
-            return formatSearchValue(row, col, val);
+            return formatRawValue(column, val);
           }).join(', ');
         }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
@@ -40,10 +58,6 @@
         }
         else if (type === 'Money' && typeof value === 'number') {
           result = CRM.formatMoney(value);
-        }
-        result = _.escape(result);
-        if (col.link) {
-          result = '<a href="' + getUrl(col.link, row) + '">' + result + '</a>';
         }
         return result;
       }
@@ -76,7 +90,7 @@
       }
 
       return {
-        formatSearchValue: formatSearchValue,
+        formatDisplayValue: formatDisplayValue,
         getApiParams: getApiParams,
         getResults: getResults,
         replaceTokens: replaceTokens

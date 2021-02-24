@@ -16,9 +16,11 @@
     <legend>{{:: ts('Columns') }}</legend>
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
-      <div class="form-inline">
-        <label>{{:: ts('Label:') }}</label> <input class="form-control" type="text" ng-model="col.label" />
-        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
+      <div class="form-inline crm-search-admin-flex-row">
+        <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header:') }}</label>
+        <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control" type="text" ng-model="col.label" >
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>

@@ -41,19 +41,13 @@
         ctrl.getResults();
       }
 
-      $scope.formatResult = function(row, col) {
-        var value = row[col.key],
-          formatted = searchDisplayUtils.formatSearchValue(row, col, value),
-          output = '';
-        if (formatted.length || (col.label && col.forceLabel)) {
-          if (col.label && (formatted.length || col.forceLabel)) {
-            output += '<label>' + _.escape(col.label) + '</label> ';
-          }
-          if (formatted.length) {
-            output += (col.prefix || '') + formatted + (col.suffix || '');
-          }
+      $scope.formatResult = function(rowData, col) {
+        var formatted = searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
+        if (col.label && (formatted.length || col.forceLabel)) {
+          var label = searchDisplayUtils.replaceTokens(col.label, rowData, ctrl.settings.columns);
+          formatted = '<label>' + _.escape(label) + '</label> ' + formatted;
         }
-        return output;
+        return formatted;
       };
 
     }
