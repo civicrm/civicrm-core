@@ -26,6 +26,10 @@
         $scope.meta = afGui.meta;
       };
 
+      this.isSearch = function() {
+        return !_.isEmpty($scope.meta.searchDisplays);
+      };
+
       // Returns the original field definition from metadata
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
@@ -75,7 +79,7 @@
             return defn.options || defn.data_type === 'Boolean';
 
           case 'Select':
-            return defn.options || defn.data_type === 'Boolean' || defn.input_type === 'Date';
+            return defn.options || defn.data_type === 'Boolean' || (defn.input_type === 'Date' && ctrl.isSearch());
 
           case 'Date':
             return defn.input_type === 'Date';
