@@ -3681,7 +3681,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       ['key' => 'organization_name', 'value' => ts('Employer name'), 'type' => 'text', 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'gender_id', 'value' => ts('Gender'), 'condition' => ['contact_type' => 'Individual']],
       ['key' => 'is_deceased', 'value' => ts('Deceased'), 'condition' => ['contact_type' => 'Individual']],
-      ['key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'],
       ['key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'],
       ['key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'],
     ];
