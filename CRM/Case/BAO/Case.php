@@ -523,7 +523,7 @@ HERESQL;
       $whereClauses[] = "(case_relationship.contact_id_b = {$userID} OR case_relationship.contact_id_a = {$userID})";
       $whereClauses[] = 'case_relationship.is_active';
     }
-    if (empty($params['status_id']) && ($type == 'upcoming' || $type == 'any')) {
+    if (empty($params['status_id']) && $type == 'upcoming') {
       $whereClauses[] = "civicrm_case.status_id != " . CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Closed');
     }
 
