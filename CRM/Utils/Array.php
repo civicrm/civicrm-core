@@ -62,7 +62,11 @@ class CRM_Utils_Array {
    *   The value of the key, or null if the key is not found.
    */
   public static function retrieveValueRecursive(array $params, string $key) {
-    if (isset($params[$key])) {
+    // Note that !empty means funky handling for 0
+    // but it is 'baked in'. We should probably deprecate this
+    // for a more logical approach.
+    // see https://github.com/civicrm/civicrm-core/pull/19478#issuecomment-785388559
+    if (!empty($params[$key])) {
       return $params[$key];
     }
     foreach ($params as $subParam) {
