@@ -236,6 +236,14 @@ class CRM_Core_ManagedEntities {
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   public function insertNewEntity($todo) {
+    // If you have an existing entity and you want to convert it to managed you have to check if it already exists.
+    // Otherwise it will crash with DB error duplicate entry (eg. for PaymentProcessorType)
+    $existingEntity = civicrm_api3($todo['entity'], 'get', $todo['params']);
+    if (!empty($existingEntity['id'])) {
+      \Civi::log()->warning('Found existing entity, overwriting with managed version.', ['todoparams' => $todo['params']]);
+      $todo['params']['id'] = $existingEntity['id'];
+    }
+
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
     if ($result['is_error']) {
       $this->onApiError($todo['entity'], 'create', $todo['params'], $result);
