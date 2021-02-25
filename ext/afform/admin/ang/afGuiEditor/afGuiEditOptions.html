@@ -13,7 +13,7 @@
 </div>
 <ul ui-sortable="{connectWith: '.af-gui-edit-options-deleted', cancel: 'input,textarea,button,select,option,a,[contenteditable]'}" ng-model="options" class="af-gui-edit-options-enabled">
   <li ng-repeat="option in options">
-    <div af-gui-editable ng-model="option.label" default-value="originalLabels[option.id]" >{{ option.label }}</div>
+    <div crm-ui-editable ng-model="option.label" default-value="originalLabels[option.id]" >{{ option.label }}</div>
     <button type="button" class="btn btn-danger-outline btn-xs pull-right" ng-click="deleteOption(option, $index)" title="{{:: ts('Remove option') }}">
       <i class="crm-i fa-trash"></i>
     </button>

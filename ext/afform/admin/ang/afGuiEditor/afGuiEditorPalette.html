@@ -7,7 +7,7 @@
       </li>
       <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntityName === entity.name}">
         <a href ng-click="editor.selectEntity(entity.name)">
-          <span ng-if="!entity.loading && editor.allowEntityConfig" af-gui-editable ng-model="entity.label">{{ entity.label }}</span>
+          <span ng-if="!entity.loading && editor.allowEntityConfig" crm-ui-editable ng-model="entity.label">{{ entity.label }}</span>
           <span ng-if="!entity.loading && !editor.allowEntityConfig">{{ entity.label }}</span>
           <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>
         </a>
