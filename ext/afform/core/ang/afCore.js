@@ -7,7 +7,7 @@
     return function(camelName, meta, d) {
       d.restrict = 'E';
       d.scope = {};
-      d.scope.options = '<';
+      d.scope.options = '=';
       d.link = {
         pre: function($scope, $el, $attr) {
           $scope.ts = CRM.ts(camelName);
