@@ -153,6 +153,10 @@
   top: 0;
 }
 
+#bootstrap-theme .crm-search-admin-edit-columns {
+  height: 100%;
+}
+
 #bootstrap-theme .crm-search-admin-flex-row {
   display: flex;
   align-items: center;
@@ -166,6 +170,28 @@
 
 #bootstrap-theme .crm-search-admin-unused-columns fieldset {
   min-height: 60px;
+}
+
+#bootstrap-theme.crm-search .crm-editable-enabled {
+  display: inline-block;
+  padding: 0 4px !important;
+  border: 2px solid transparent !important;
+  min-width: 21px;
+}
+#bootstrap-theme.crm-search .crm-editable-enabled:hover:not(:focus) {
+  border: 2px dashed grey !important;
+}
+#bootstrap-theme.crm-search .crm-editable-enabled:before,
+#bootstrap-theme.crm-search .crm-editable-enabled:after {
+  content: '';
+  display: none;
+}
+
+#bootstrap-theme .crm-search-admin-icon-col {
+  width: 24px;
+}
+#bootstrap-theme tbody .crm-search-admin-icon-col {
+  text-align: center;
 }
 
 #bootstrap-theme input[type=search]::placeholder {

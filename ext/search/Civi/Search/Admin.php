@@ -11,6 +11,8 @@
 
 namespace Civi\Search;
 
+use CRM_Search_ExtensionUtil as E;
+
 /**
  * Class Admin
  * @package Civi\Search
@@ -28,6 +30,7 @@ class Admin {
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
+      'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'afformEnabled' => (bool) \CRM_Utils_Array::findAll(
         \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),
         ['fullName' => 'org.civicrm.afform']
@@ -50,15 +53,29 @@ class Admin {
       '<' => '<',
       '>=' => '≥',
       '<=' => '≤',
-      'CONTAINS' => ts('Contains'),
-      'IN' => ts('Is One Of'),
-      'NOT IN' => ts('Not One Of'),
-      'LIKE' => ts('Is Like'),
-      'NOT LIKE' => ts('Not Like'),
-      'BETWEEN' => ts('Is Between'),
-      'NOT BETWEEN' => ts('Not Between'),
-      'IS NULL' => ts('Is Null'),
-      'IS NOT NULL' => ts('Not Null'),
+      'CONTAINS' => E::ts('Contains'),
+      'IN' => E::ts('Is One Of'),
+      'NOT IN' => E::ts('Not One Of'),
+      'LIKE' => E::ts('Is Like'),
+      'NOT LIKE' => E::ts('Not Like'),
+      'BETWEEN' => E::ts('Is Between'),
+      'NOT BETWEEN' => E::ts('Not Between'),
+      'IS NULL' => E::ts('Is Null'),
+      'IS NOT NULL' => E::ts('Not Null'),
+    ];
+  }
+
+  /**
+   * @return string[]
+   */
+  public static function getStyles():array {
+    return [
+      'default' => E::ts('Default'),
+      'primary' => E::ts('Primary'),
+      'success' => E::ts('Success'),
+      'info' => E::ts('Info'),
+      'warning' => E::ts('Warning'),
+      'danger' => E::ts('Danger'),
     ];
   }
 
@@ -84,15 +101,15 @@ class Admin {
           unset($entity['paths'][$action]);
           switch ($action) {
             case 'view':
-              $title = ts('View %1', [1 => $entity['title']]);
+              $title = E::ts('View %1', [1 => $entity['title']]);
               break;
 
             case 'update':
-              $title = ts('Edit %1', [1 => $entity['title']]);
+              $title = E::ts('Edit %1', [1 => $entity['title']]);
               break;
 
             case 'delete':
-              $title = ts('Delete %1', [1 => $entity['title']]);
+              $title = E::ts('Delete %1', [1 => $entity['title']]);
               break;
 
             default:
@@ -239,7 +256,7 @@ class Admin {
               $alias = $baseEntity['name'] . "_{$bridge}_" . $targetEntityName;
               $joins[$baseEntity['name']][] = [
                 'label' => $baseEntity['title'] . ' ' . $targetsTitle,
-                'description' => ts('Multiple %1 per %2', [1 => $targetsTitle, 2 => $baseEntity['title']]),
+                'description' => E::ts('Multiple %1 per %2', [1 => $targetsTitle, 2 => $baseEntity['title']]),
                 'entity' => $targetEntityName,
                 'conditions' => array_merge(
                   [$bridge],
@@ -254,7 +271,7 @@ class Admin {
                 $alias = $targetEntityName . "_{$bridge}_" . $baseEntity['name'];
                 $joins[$targetEntityName][] = [
                   'label' => $targetEntity['title'] . ' ' . $baseEntity['title_plural'],
-                  'description' => ts('Multiple %1 per %2', [1 => $baseEntity['title_plural'], 2 => $targetEntity['title']]),
+                  'description' => E::ts('Multiple %1 per %2', [1 => $baseEntity['title_plural'], 2 => $targetEntity['title']]),
                   'entity' => $baseEntity['name'],
                   'conditions' => array_merge(
                     [$bridge],

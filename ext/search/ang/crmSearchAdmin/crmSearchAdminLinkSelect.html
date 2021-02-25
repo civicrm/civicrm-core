@@ -3,7 +3,6 @@
   {{ $ctrl.column.link ? ts('Link:') : ts('Link') }}
 </label>
 <select class="form-control" ng-show="$ctrl.links.length && $ctrl.column.link">
-  <option value="">{{ ts('None') }}</option>
   <option ng-repeat="link in $ctrl.links" value="{{ link.path }}" ng-selected="$ctrl.column.link === link.path">
     {{ link.title }}
   </option>

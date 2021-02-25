@@ -81,7 +81,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function() {
+    .factory('searchMeta', function($q) {
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
@@ -227,8 +227,40 @@
               }
             });
           });
+        },
+        pickIcon: function() {
+          var deferred = $q.defer();
+          $('#crm-search-admin-icon-picker').off('change').siblings('.crm-icon-picker-button').click();
+          $('#crm-search-admin-icon-picker').on('change', function() {
+            deferred.resolve($(this).val());
+          });
+          return deferred.promise;
+        }
+      };
+    })
+    .directive('contenteditable', function() {
+      return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+          // view -> model
+          elm.on('blur', function() {
+            ctrl.$setViewValue(elm.html());
+          });
+
+          // model -> view
+          ctrl.$render = function() {
+            elm.html(ctrl.$viewValue);
+          };
         }
       };
     });
+
+  // Shoehorn in a non-angular widget for picking icons
+  $(function() {
+    $('#crm-container').append('<div style="display:none"><input id="crm-search-admin-icon-picker"></div>');
+    CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
+      $('#crm-search-admin-icon-picker').crmIconPicker();
+    });
+  });
 
 })(angular, CRM.$, CRM._);

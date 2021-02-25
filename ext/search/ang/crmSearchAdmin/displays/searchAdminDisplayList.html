@@ -22,32 +22,35 @@
   </div>
 </fieldset>
 <div class="crm-flex-box crm-search-admin-edit-columns-wrapper">
-  <fieldset class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+  <fieldset class="crm-flex-3">
     <legend>{{:: ts('Fields') }}</legend>
-    <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
-      <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
-        <label><input type="checkbox" ng-model="col.break"> {{:: ts('Display on new line') }}</label>
-        <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Hide') }}">
-          <i class="crm-i fa-ban"></i>
-        </button>
-      </div>
-      <div class="form-inline crm-search-admin-flex-row">
-        <label>
-          <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getFieldLabel(col.key)" >
-          {{ col.label ? ts('Label:') : ts('Label') }}
-        </label>
-        <input ng-if="col.label" class="form-control" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
-        <crm-search-admin-token-select ng-if="col.label" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="label"></crm-search-admin-token-select>
-      </div>
-      <div class="form-inline" ng-if="col.label">
-        <label style="visibility: hidden"><input type="checkbox" disabled></label>
-        <div class="checkbox">
-          <label><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Show label even when field is blank') }}</label>
+    <div ng-include="'~/crmSearchAdmin/displays/common/addColMenu.html'" class="btn-group"></div>
+    <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
+      <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
+        <legend>{{ $ctrl.parent.getColLabel(col) }}</legend>
+        <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
+          <label><input type="checkbox" ng-model="col.break"> {{:: ts('Display on new line') }}</label>
+          <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
+            <i class="crm-i fa-ban"></i>
+          </button>
         </div>
-      </div>
-      <div ng-include="'~/crmSearchAdmin/displays/common/fieldOptions.html'"></div>
-    </fieldset>
+        <div class="form-inline crm-search-admin-flex-row">
+          <label>
+            <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getFieldLabel(col.key)" >
+            {{ col.label ? ts('Label:') : ts('Label') }}
+          </label>
+          <input ng-if="col.label" class="form-control" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
+          <crm-search-admin-token-select ng-if="col.label" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="label"></crm-search-admin-token-select>
+        </div>
+        <div class="form-inline" ng-if="col.label">
+          <label style="visibility: hidden"><input type="checkbox" disabled></label><!--To indent by 1 checkbox-width-->
+          <div class="checkbox">
+            <label><input type="checkbox" ng-model="col.forceLabel"> {{:: ts('Show label even when field is blank') }}</label>
+          </div>
+        </div>
+        <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
+      </fieldset>
+    </div>
   </fieldset>
-  <div ng-include="'~/crmSearchAdmin/displays/common/unusedColumns.html'"></div>
+  <fieldset ng-include="'~/crmSearchAdmin/displays/common/unusedColumns.html'"></fieldset>
 </div>

@@ -1,5 +1,5 @@
-<fieldset class="crm-search-admin-edit-columns crm-search-admin-unused-columns" ng-model="$ctrl.parent.hiddenColumns" ui-sortable="$ctrl.parent.sortableOptions">
-  <legend>{{:: ts('Unused') }}</legend>
+<legend>{{:: ts('Unused') }}</legend>
+<div class="crm-search-admin-edit-columns crm-search-admin-unused-columns" ng-model="$ctrl.parent.hiddenColumns" ui-sortable="$ctrl.parent.sortableOptions">
   <fieldset ng-repeat="col in $ctrl.parent.hiddenColumns" class="crm-draggable">
     <legend>{{ $ctrl.parent.getFieldLabel(col.key) }}</legend>
     <div class="form-inline">
@@ -8,4 +8,4 @@
       </button>
     </div>
   </fieldset>
-</fieldset>
+</div>

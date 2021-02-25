@@ -1,4 +1,4 @@
-<crm-search-admin-link-select class="form-inline crm-search-admin-flex-row" column="col" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-select>
+<crm-search-admin-link-select class="form-inline crm-search-admin-flex-row" column="col" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" links=":: $ctrl.parent.getLinks()"></crm-search-admin-link-select>
 <div class="form-inline crm-search-admin-flex-row">
   <label>
     <input type="checkbox" ng-checked="col.title" ng-click="col.title = col.title ? null : $ctrl.parent.getFieldLabel(col.key)" >

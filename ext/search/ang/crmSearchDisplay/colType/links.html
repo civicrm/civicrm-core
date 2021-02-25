@@ -1,0 +1,6 @@
+<span ng-repeat="item in col.links">
+  <a class="text-{{:: item.style }}" href="{{:: displayUtils.getUrl(item.path, row) }}">
+    <i ng-if=":: item.icon" class="crm-i {{:: item.icon }}"></i>
+    {{:: item.text }}
+  </a>
+</span>

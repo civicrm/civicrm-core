@@ -74,6 +74,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
           $key = $newAliases[$column['expr']] ?? $column['expr'];
           unset($display['settings']['columns'][$c]['expr']);
           $display['settings']['columns'][$c]['key'] = explode(' AS ', $key)[1] ?? $key;
+          $display['settings']['columns'][$c]['type'] = 'field';
         }
         \Civi\Api4\SearchDisplay::update(FALSE)
           ->setValues($display)

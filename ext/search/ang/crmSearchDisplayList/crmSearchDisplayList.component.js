@@ -41,13 +41,8 @@
         ctrl.getResults();
       }
 
-      $scope.formatResult = function(rowData, col) {
-        var formatted = searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
-        if (col.label && (formatted.length || col.forceLabel)) {
-          var label = searchDisplayUtils.replaceTokens(col.label, rowData, ctrl.settings.columns);
-          formatted = '<label>' + _.escape(label) + '</label> ' + formatted;
-        }
-        return formatted;
+      this.formatFieldValue = function(rowData, col) {
+        return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
       };
 
     }

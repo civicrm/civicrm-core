@@ -27,7 +27,7 @@
         if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
           url = CRM.url(url);
         }
-        return _.escape(url);
+        return url;
       }
 
       // Returns html-escaped display value for a single column in a row
@@ -36,7 +36,7 @@
           displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]),
           result = _.escape(displayValue);
         if (column.link) {
-          result = '<a href="' + getUrl(column.link, rowData) + '">' + result + '</a>';
+          result = '<a href="' + _.escape(getUrl(column.link, rowData)) + '">' + result + '</a>';
         }
         return result;
       }
@@ -93,7 +93,8 @@
         formatDisplayValue: formatDisplayValue,
         getApiParams: getApiParams,
         getResults: getResults,
-        replaceTokens: replaceTokens
+        replaceTokens: replaceTokens,
+        getUrl: getUrl
       };
     });
 
