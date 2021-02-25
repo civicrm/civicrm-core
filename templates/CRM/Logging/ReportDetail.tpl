@@ -22,7 +22,7 @@
     <p>{ts 1=$whom_url 2=$whom_name|escape 3=$who_url 4=$who_name|escape 5=$log_date}Change to <a href='%1'>%2</a> made by <a href='%3'>%4</a> on %5:{/ts}</p>
     {if $layout eq 'overlay'}
       {include file="CRM/Report/Form/Layout/Overlay.tpl"}
-    {else}
+    {elseif !$chartEnabled || !$chartSupported}
       {include file="CRM/Report/Form/Layout/Table.tpl"}
     {/if}
   {else}
