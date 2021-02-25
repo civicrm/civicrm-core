@@ -302,7 +302,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     });
 
     // If any of the $navigations have children, recurse
-    foreach ($navigations as $navigation) {
+    foreach ($navigations as &$navigation) {
       if (isset($navigation['child'])) {
         self::orderByWeight($navigation['child']);
       }
