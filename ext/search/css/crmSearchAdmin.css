@@ -153,6 +153,21 @@
   top: 0;
 }
 
+#bootstrap-theme .crm-search-admin-flex-row {
+  display: flex;
+  align-items: center;
+}
+#bootstrap-theme .crm-search-admin-flex-row > *:not(:first-child) {
+  margin-left: 6px;
+}
+#bootstrap-theme .crm-search-admin-flex-row > input[type=text] {
+  flex: 1;
+}
+
+#bootstrap-theme .crm-search-admin-unused-columns fieldset {
+  min-height: 60px;
+}
+
 #bootstrap-theme input[type=search]::placeholder {
   font-family: FontAwesome;
   text-align: right;

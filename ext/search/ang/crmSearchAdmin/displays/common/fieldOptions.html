@@ -1,0 +1,17 @@
+<crm-search-admin-link-select class="form-inline crm-search-admin-flex-row" column="col" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-select>
+<div class="form-inline crm-search-admin-flex-row">
+  <label>
+    <input type="checkbox" ng-checked="col.title" ng-click="col.title = col.title ? null : $ctrl.parent.getFieldLabel(col.key)" >
+    {{ col.title ? ts('Tooltip:') : ts('Tooltip') }}
+  </label>
+  <input class="form-control" type="text" ng-model="col.title" ng-if="col.title" ng-model-options="{updateOn: 'blur'}" />
+  <crm-search-admin-token-select ng-if="col.title" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="title"></crm-search-admin-token-select>
+</div>
+<div class="form-inline crm-search-admin-flex-row">
+  <label title="{{ ts('Change the contents of this field, or combine multiple field values.') }}">
+    <input type="checkbox" ng-checked="col.rewrite" ng-click="col.rewrite = col.rewrite ? null : '['+col.key+']'" >
+    {{ col.rewrite ? ts('Rewrite:') : ts('Rewrite') }}
+  </label>
+  <input type="text" class="form-control" ng-if="col.rewrite" ng-model="col.rewrite" ng-model-options="{updateOn: 'blur'}">
+  <crm-search-admin-token-select ng-if="col.rewrite" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="rewrite"></crm-search-admin-token-select>
+</div>

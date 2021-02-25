@@ -76,9 +76,8 @@
         ctrl.getResults();
       };
 
-      $scope.formatResult = function(row, col) {
-        var value = row[col.key];
-        return searchDisplayUtils.formatSearchValue(row, col, value);
+      $scope.formatResult = function(rowData, col) {
+        return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
       };
 
       $scope.selectAllRows = function() {
