@@ -405,6 +405,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Contribution Status</label>
     </html>
     <add>1.6</add>
   </field>
