@@ -37,7 +37,7 @@
       </div>
       <div class="form-inline crm-search-admin-flex-row">
         <label>
-          <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getFieldLabel(col.key)" >
+          <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
           {{ col.label ? ts('Label:') : ts('Label') }}
         </label>
         <input ng-if="col.label" class="form-control" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
