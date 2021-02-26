@@ -38,13 +38,55 @@
 
       this.preview = this.stale = false;
 
+      this.colTypes = {
+        links: {
+          label: ts('Links'),
+          icon: 'fa-link',
+          defaults: {
+            links: []
+          }
+        },
+        buttons: {
+          label: ts('Buttons'),
+          icon: 'fa-square-o',
+          defaults: {
+            size: 'btn-sm',
+            links: []
+          }
+        },
+        menu: {
+          label: ts('Menu'),
+          icon: 'fa-bars',
+          defaults: {
+            text: ts('Actions'),
+            style: 'default',
+            size: 'btn-sm',
+            icon: 'fa-bars',
+            links: []
+          }
+        },
+      };
+
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
         containment: '.crm-search-admin-edit-columns-wrapper'
       };
 
+      this.styles = CRM.crmSearchAdmin.styles;
+
+      this.addCol = function(type) {
+        var col = _.cloneDeep(this.colTypes[type].defaults);
+        col.type = type;
+        if (this.display.type === 'table') {
+          col.alignment = 'text-right';
+        }
+        ctrl.display.settings.columns.push(col);
+      };
+
       this.removeCol = function(index) {
-        ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
+        if (ctrl.display.settings.columns[index].type === 'field') {
+          ctrl.hiddenColumns.push(ctrl.display.settings.columns[index]);
+        }
         ctrl.display.settings.columns.splice(index, 1);
       };
 
@@ -70,6 +112,13 @@
         return searchMeta.getDefaultLabel(expr);
       };
 
+      this.getColLabel = function(col) {
+        if (col.type === 'field') {
+          return ctrl.getFieldLabel(col.key);
+        }
+        return ctrl.colTypes[col.type].label;
+      };
+
       function fieldToColumn(fieldExpr, defaults) {
         var info = searchMeta.parseExpr(fieldExpr),
           values = _.cloneDeep(defaults);
@@ -84,6 +133,53 @@
         }
         return values;
       }
+
+      this.getLinks = function() {
+        if (!ctrl.links) {
+          ctrl.links = buildLinks();
+        }
+        return ctrl.links;
+      };
+
+      // Build a list of all possible links to main entity or join entities
+      function buildLinks() {
+        // Links to main entity
+        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []);
+        // Links to explicitly joined entities
+        _.each(ctrl.savedSearch.api_params.join, function(join) {
+          var joinName = join[0].split(' AS '),
+            joinEntity = searchMeta.getEntity(joinName[0]);
+          _.each(joinEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
+            links.push(link);
+          });
+        });
+        // Links to implicit joins
+        _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
+          if (!_.includes(fieldName, ' AS ')) {
+            var info = searchMeta.parseExpr(fieldName);
+            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.entity !== info.field.baseEntity)) {
+              var idField = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
+              if (!ctrl.crmSearchAdmin.canAggregate(idField)) {
+                var joinEntity = searchMeta.getEntity(info.field.fk_entity || info.field.entity);
+                _.each(joinEntity.paths, function(path) {
+                  var link = _.cloneDeep(path);
+                  link.path = link.path.replace(/\[id/g, '[' + idField);
+                  links.push(link);
+                });
+              }
+            }
+          }
+        });
+        return links;
+      }
+
+      this.pickIcon = function(model, key) {
+        searchMeta.pickIcon().then(function(icon) {
+          model[key] = icon;
+        });
+      };
 
       // Helper function to sort active from hidden columns and initialize each column with defaults
       this.initColumns = function(defaults) {
@@ -104,7 +200,7 @@
             }
           });
           _.eachRight(activeColumns, function(key, index) {
-            if (!_.includes(selectAliases, key)) {
+            if (key && !_.includes(selectAliases, key)) {
               ctrl.display.settings.columns.splice(index, 1);
             }
           });

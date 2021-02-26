@@ -22,7 +22,7 @@
             pager: true
           };
         }
-        ctrl.parent.initColumns({key: true, label: true, dataType: true});
+        ctrl.parent.initColumns({key: true, label: true, dataType: true, type: 'field'});
       };
 
     }
