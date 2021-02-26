@@ -35,6 +35,11 @@ class Authenticator {
   protected $allowCreds;
 
   /**
+   * @var \Civi\Authx\AuthxInterface
+   */
+  protected $authxUf;
+
+  /**
    * Authenticator constructor.
    *
    * @param string $flow
@@ -43,6 +48,7 @@ class Authenticator {
     $this->flow = $flow;
     $this->allowCreds = \Civi::settings()->get('authx_' . $flow . '_cred');
     $this->userMode = \Civi::settings()->get('authx_' . $flow . '_user');
+    $this->authxUf = _authx_uf();
   }
 
   /**
@@ -59,7 +65,6 @@ class Authenticator {
    *   Exits with failure
    */
   public function auth($e, $cred, $useSession = FALSE) {
-    $authxUf = _authx_uf();
     [$credType, $credValue] = explode(' ', $cred, 2);
     switch ($credType) {
       case 'Basic':
@@ -67,7 +72,7 @@ class Authenticator {
           $this->reject('Password authentication is not supported');
         }
         [$user, $pass] = explode(':', base64_decode($credValue), 2);
-        if ($userId = $authxUf->checkPassword($user, $pass)) {
+        if ($userId = $this->authxUf->checkPassword($user, $pass)) {
           $contactId = \CRM_Core_BAO_UFMatch::getContactId($userId);
           $this->login($contactId, $userId, $useSession);
           return TRUE;
@@ -101,13 +106,12 @@ class Authenticator {
    * @throws \Exception
    */
   protected function login($contactId, $userId, bool $useSession) {
-    $authxUf = _authx_uf();
     $isSameValue = function($a, $b) {
       return !empty($a) && (string) $a === (string) $b;
     };
 
-    if (\CRM_Core_Session::getLoggedInContactID() || $authxUf->getCurrentUserId()) {
-      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $contactId)  && $isSameValue($authxUf->getCurrentUserId(), $userId)) {
+    if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
+      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $userId)) {
         return;
       }
       else {
@@ -140,10 +144,10 @@ class Authenticator {
     }
 
     if ($userId && $useSession) {
-      $authxUf->loginSession($userId);
+      $this->authxUf->loginSession($userId);
     }
     if ($userId && !$useSession) {
-      $authxUf->loginStateless($userId);
+      $this->authxUf->loginStateless($userId);
     }
 
     // Post-login Civi stuff...
