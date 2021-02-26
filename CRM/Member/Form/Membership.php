@@ -917,19 +917,6 @@ DESC limit 1");
       $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
     }
 
-    if ($form->_mode) {
-      // @todo move this outside shared code as Batch entry just doesn't
-      $form->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
-        $form->_params,
-        $form->_bltID
-      ));
-
-      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($form->_params);
-      $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
-      $form->assign('is_pay_later', 0);
-      $form->assign('isPrimary', 1);
-    }
-
     $form->assign('module', 'Membership');
     $form->assign('contactID', $formValues['contact_id']);
 
@@ -1765,6 +1752,18 @@ DESC limit 1");
     $customValues = $this->getCustomValuesForReceipt($formValues, $membership);
     $this->assign('customValues', $customValues);
 
+    if ($this->_mode) {
+      // @todo move this outside shared code as Batch entry just doesn't
+      $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters(
+        $this->_params,
+        $this->_bltID
+      ));
+
+      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
+      $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+      $this->assign('is_pay_later', 0);
+      $this->assign('isPrimary', 1);
+    }
     return self::emailReceipt($this, $formValues, $membership);
   }
 
