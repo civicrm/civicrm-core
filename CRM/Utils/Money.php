@@ -215,8 +215,7 @@ class CRM_Utils_Money {
     // fix to allow us to resolve formatLocaleNumericRoundedByPrecision
     // and to make the function comments correct - but, we need to reconsider this
     // in master as it is probably better to use locale than our currency separator fields.
-    $formatter = new \NumberFormatter('en_US', NumberFormatter::CURRENCY);
-    $formatter->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, '');
+    $formatter = new \NumberFormatter('en_US', NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
     return $money->formatWith($formatter);
   }
