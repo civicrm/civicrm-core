@@ -14,25 +14,13 @@ namespace Civi\Authx;
 use Civi\Crypto\Exception\CryptoException;
 use GuzzleHttp\Psr7\Response;
 
+/**
+ * The Authenticator does the main work of authx -- ie it analyzes a credential,
+ * checks if current policy accepts this credential, and logs in as the target person.
+ *
+ * @package Civi\Authx
+ */
 class Authenticator {
-
-  /**
-   * @var string
-   *   Ex: 'param', 'xheader', 'header'
-   */
-  protected $flow;
-
-  /**
-   * @var string
-   *  Ex: 'optional', 'require', 'ignore'
-   */
-  protected $userMode;
-
-  /**
-   * @var array
-   *  Ex: ['jwt', 'pass', 'api_key']
-   */
-  protected $allowCreds;
 
   /**
    * @var \Civi\Authx\AuthxInterface
@@ -41,77 +29,142 @@ class Authenticator {
 
   /**
    * Authenticator constructor.
-   *
-   * @param string $flow
    */
-  public function __construct(string $flow) {
-    $this->flow = $flow;
-    $this->allowCreds = \Civi::settings()->get('authx_' . $flow . '_cred');
-    $this->userMode = \Civi::settings()->get('authx_' . $flow . '_user');
+  public function __construct() {
     $this->authxUf = _authx_uf();
   }
 
   /**
+   * Run the entire authentication routine, checking credentials, checking policy,
+   * and ultimately logging in.
+   *
    * @param \Civi\Core\Event\GenericHookEvent $e
-   * @param string $cred
-   *   The credential, as formatted in the 'Authorization' header.
-   *   Ex: 'Bearer 12345'
-   *   Ex: 'Basic ASDFFDSA=='
-   * @param bool $useSession
-   *   If TRUE, then the authentication should be persistent (in a session variable).
-   *   If FALSE, then the authentication should be ephemeral (single page-request).
+   *   Details for the 'civi.invoke.auth' event.
+   * @param array $details
+   *   Mix of these properties:
+   *   - string $flow (required);
+   *     The type of authentication flow being used
+   *     Ex: 'param', 'header', 'auto'
+   *   - string $cred (required)
+   *     The credential, as formatted in the 'Authorization' header.
+   *     Ex: 'Bearer 12345', 'Basic ASDFFDSA=='
+   *   - bool $useSession (default FALSE)
+   *     If TRUE, then the authentication should be persistent (in a session variable).
+   *     If FALSE, then the authentication should be ephemeral (single page-request).
    * @return bool
    *   Returns TRUE on success.
    *   Exits with failure
+   * @throws \Exception
    */
-  public function auth($e, $cred, $useSession = FALSE) {
-    [$credType, $credValue] = explode(' ', $cred, 2);
-    switch ($credType) {
+  public function auth($e, $details) {
+    $tgt = AuthenticatorTarget::create([
+      'flow' => $details['flow'],
+      'cred' => $details['cred'],
+      'useSession' => $details['useSession'] ?? FALSE,
+    ]);
+    if ($principal = $this->checkCredential($tgt)) {
+      $tgt->setPrincipal($principal);
+    }
+    $this->checkPolicy($tgt);
+    $this->login($tgt);
+    return TRUE;
+  }
+
+  /**
+   * Assess the credential ($tgt->cred) and determine the matching principal.
+   *
+   * @param \Civi\Authx\AuthenticatorTarget $tgt
+   * @return array|NULL
+   *   Array describing the authenticated principal represented by this credential.
+   *   Ex: ['userId' => 123]
+   *   Format should match setPrincipal().
+   * @see \Civi\Authx\AuthenticatorTarget::setPrincipal()
+   */
+  protected function checkCredential($tgt) {
+    [$credFmt, $credValue] = explode(' ', $tgt->cred, 2);
+
+    switch ($credFmt) {
       case 'Basic':
-        if (!in_array('pass', $this->allowCreds)) {
-          $this->reject('Password authentication is not supported');
-        }
         [$user, $pass] = explode(':', base64_decode($credValue), 2);
         if ($userId = $this->authxUf->checkPassword($user, $pass)) {
-          $contactId = \CRM_Core_BAO_UFMatch::getContactId($userId);
-          $this->login($contactId, $userId, $useSession);
-          return TRUE;
+          return ['userId' => $userId, 'credType' => 'pass'];
         }
         break;
 
       case 'Bearer':
-        if ($contactId = $this->lookupContactToken($credValue)) {
-          $userId = \CRM_Core_BAO_UFMatch::getUFId($contactId);
-          $this->login($contactId, $userId, $useSession);
-          return TRUE;
+        $c = \CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contact WHERE api_key = %1', [
+          1 => [$credValue, 'String'],
+        ]);
+        if ($c) {
+          return ['contactId' => $c, 'credType' => 'api_key'];
         }
-        break;
 
-      default:
-        $this->reject();
+        try {
+          $claims = \Civi::service('crypto.jwt')->decode($credValue);
+          $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
+          if (!in_array('authx', $scopes)) {
+            $this->reject('JWT does not permit general authentication');
+          }
+          if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
+            $this->reject('JWT does not specify the contact ID (sub)');
+          }
+          $contactId = substr($claims['sub'], 4);
+          return ['contactId' => $contactId, 'credType' => 'jwt', 'jwt' => $claims];
+        }
+        catch (CryptoException $e) {
+          // Invalid JWT. Proceed to check any other token sources.
+        }
+
+        break;
     }
 
-    $this->reject();
+    return NULL;
+  }
+
+  /**
+   * Does our policy permit this login?
+   *
+   * @param \Civi\Authx\AuthenticatorTarget $tgt
+   */
+  protected function checkPolicy(AuthenticatorTarget $tgt) {
+    if (!$tgt->hasPrincipal()) {
+      $this->reject('Invalid credential');
+    }
+
+    $allowCreds = \Civi::settings()->get('authx_' . $tgt->flow . '_cred');
+    if (!in_array($tgt->credType, $allowCreds)) {
+      $this->reject(sprintf('Authentication type "%s" is not allowed for this principal.', $tgt->credType));
+    }
+
+    $userMode = \Civi::settings()->get('authx_' . $tgt->flow . '_user');
+    switch ($userMode) {
+      case 'ignore':
+        $tgt->userId = NULL;
+        break;
+
+      case 'require':
+        if (empty($tgt->userId)) {
+          $this->reject('Cannot login. No matching user is available.');
+        }
+        break;
+    }
   }
 
   /**
    * Update Civi and UF to recognize the authenticated user.
    *
-   * @param int $contactId
-   *   The CiviCRM contact which is logging in.
-   * @param int|string|null $userId
-   *   The UF user which is logging in. May be NULL if there is no corresponding user.
-   * @param bool $useSession
-   *   Whether the login should be part of a persistent session.
+   * @param AuthenticatorTarget $tgt
+   *   Summary of the authentication request
    * @throws \Exception
    */
-  protected function login($contactId, $userId, bool $useSession) {
+  protected function login(AuthenticatorTarget $tgt) {
     $isSameValue = function($a, $b) {
       return !empty($a) && (string) $a === (string) $b;
     };
 
     if (\CRM_Core_Session::getLoggedInContactID() || $this->authxUf->getCurrentUserId()) {
-      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $userId)) {
+      if ($isSameValue(\CRM_Core_Session::getLoggedInContactID(), $tgt->contactId)  && $isSameValue($this->authxUf->getCurrentUserId(), $tgt->userId)) {
+        // Already logged in. Nothing to do.
         return;
       }
       else {
@@ -123,41 +176,30 @@ class Authenticator {
       }
     }
 
-    if (empty($contactId)) {
-      $this->reject("Cannot login. Failed to determine contact ID.");
+    if (empty($tgt->contactId)) {
+      // It shouldn't be possible to get here due policy checks. But just in case.
+      throw new \LogicException("Cannot login. Failed to determine contact ID.");
     }
 
-    switch ($this->userMode) {
-      case 'ignore':
-        $userId = NULL;
-        break;
-
-      case 'require':
-        if (empty($userId)) {
-          $this->reject('Cannot login. No matching user is available.');
-        }
-        break;
-    }
-
-    if (!$useSession) {
+    if (!($tgt->useSession)) {
       \CRM_Core_Session::useFakeSession();
     }
 
-    if ($userId && $useSession) {
-      $this->authxUf->loginSession($userId);
+    if ($tgt->userId && $tgt->useSession) {
+      $this->authxUf->loginSession($tgt->userId);
     }
-    if ($userId && !$useSession) {
-      $this->authxUf->loginStateless($userId);
+    if ($tgt->userId && !($tgt->useSession)) {
+      $this->authxUf->loginStateless($tgt->userId);
     }
 
     // Post-login Civi stuff...
 
     $session = \CRM_Core_Session::singleton();
-    $session->set('ufID', $userId);
-    $session->set('userID', $contactId);
+    $session->set('ufID', $tgt->userId);
+    $session->set('userID', $tgt->contactId);
 
     \CRM_Core_DAO::executeQuery('SET @civicrm_user_id = %1',
-      [1 => [$contactId, 'Integer']]
+      [1 => [$tgt->contactId, 'Integer']]
     );
   }
 
@@ -171,40 +213,114 @@ class Authenticator {
     \CRM_Utils_System::sendResponse($r);
   }
 
+}
+
+class AuthenticatorTarget {
+
   /**
-   * If given a bearer token, then lookup (and validate) the corresponding identity.
+   * The authentication-flow by which we received the credential.
    *
-   * @param string $credValue
-   *   Bearer token
-   *
-   * @return int|null
-   *   The authenticated contact ID.
+   * @var string
+   *   Ex: 'param', 'header', 'xheader', 'auto'
    */
-  protected function lookupContactToken($credValue) {
-    if (in_array('api_key', $this->allowCreds)) {
-      $c = \CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contact WHERE api_key = %1', [
-        1 => [$credValue, 'String'],
-      ]);
-      if ($c) {
-        return $c;
-      }
+  public $flow;
+
+  /**
+   * @var bool
+   */
+  public $useSession;
+
+  /**
+   * The raw credential as submitted.
+   *
+   * @var string
+   *   Ex: 'Basic AbCd123=' or 'Bearer xYz.321'
+   */
+  public $cred;
+
+  /**
+   * (Authenticated) The type of credential.
+   *
+   * @var string
+   *   Ex: 'pass', 'api_key', 'jwt'
+   */
+  public $credType;
+
+  /**
+   * (Authenticated) UF user ID
+   *
+   * @var int|string|null
+   */
+  public $userId;
+
+  /**
+   * (Authenticated) CiviCRM contact ID
+   *
+   * @var int|null
+   */
+  public $contactId;
+
+  /**
+   * (Authenticated) JWT claims (if applicable).
+   *
+   * @var array|null
+   */
+  public $jwt = NULL;
+
+  /**
+   * @param array $args
+   * @return $this
+   */
+  public static function create($args = []) {
+    return (new static())->set($args);
+  }
+
+  /**
+   * @param array $args
+   * @return $this
+   */
+  public function set($args) {
+    foreach ($args as $k => $v) {
+      $this->{$k} = $v;
     }
-    if (in_array('jwt', $this->allowCreds)) {
-      try {
-        $claims = \Civi::service('crypto.jwt')->decode($credValue);
-        $scopes = isset($claims['scope']) ? explode(' ', $claims['scope']) : [];
-        if (!in_array('authx', $scopes)) {
-          $this->reject('JWT does not permit general authentication');
-        }
-        if (empty($claims['sub']) || substr($claims['sub'], 0, 4) !== 'cid:') {
-          $this->reject('JWT does not specify the contact ID (sub)');
-        }
-        return substr($claims['sub'], 4);
-      }
-      catch (CryptoException $e) {
-      }
+    return $this;
+  }
+
+  /**
+   * Specify the authenticated principal for this request.
+   *
+   * @param array $args
+   *   Mix of: 'userId', 'contactId', 'credType'
+   *   It is valid to give 'userId' or 'contactId' - the missing one will be
+   *   filled in via UFMatch (if available).
+   * @return $this
+   */
+  public function setPrincipal($args) {
+    if (empty($args['userId']) && empty($args['contactId'])) {
+      throw new \InvalidArgumentException("Must specify principal by userId and/or contactId");
     }
-    return NULL;
+    if (empty($args['credType'])) {
+      throw new \InvalidArgumentException("Must specify the type of credential used to identify the principal");
+    }
+    if ($this->hasPrincipal()) {
+      throw new \LogicException("Principal has already been specified");
+    }
+
+    if (empty($args['contactId']) && !empty($args['userId'])) {
+      $args['contactId'] = \CRM_Core_BAO_UFMatch::getContactId($args['userId']);
+    }
+    if (empty($args['userId']) && !empty($args['contactId'])) {
+      $args['userId'] = \CRM_Core_BAO_UFMatch::getUFId($args['contactId']);
+    }
+
+    return $this->set($args);
+  }
+
+  /**
+   * @return bool
+   */
+  public function hasPrincipal(): bool {
+    return !empty($this->userId) || !empty($this->contactId);
   }
 
 }

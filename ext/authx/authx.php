@@ -7,21 +7,21 @@ use CRM_Authx_ExtensionUtil as E;
 
 Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
   if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
-    return (new \Civi\Authx\Authenticator('xheader'))->auth($e, $_SERVER['HTTP_X_CIVI_AUTH']);
+    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH']]);
   }
 
   if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-    return (new \Civi\Authx\Authenticator('header'))->auth($e, $_SERVER['HTTP_AUTHORIZATION']);
+    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION']]);
   }
 
   $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
   if (!empty($params['_authx'])) {
     if ((implode('/', $e->args) === 'civicrm/authx/login')) {
-      (new \Civi\Authx\Authenticator('login'))->auth($e, $params['_authx'], TRUE);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE]);
       _authx_redact(['_authx']);
     }
     elseif (!empty($params['_authxSes'])) {
-      (new \Civi\Authx\Authenticator('auto'))->auth($e, $params['_authx'], TRUE);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE]);
       if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
       }
@@ -30,7 +30,7 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
       }
     }
     else {
-      (new \Civi\Authx\Authenticator('param'))->auth($e, $params['_authx']);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'param', 'cred' => $params['_authx']]);
       _authx_redact(['_authx']);
     }
   }
