@@ -156,12 +156,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
         if (!empty($customFieldId) && is_numeric($customFieldId)) {
           // Got a custom field ID
           $label = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'label']);
-          $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
-            'custom_field_id' => $customFieldId,
-            'entity_id' => $this->_entityID,
-            'custom_field_value' => $this->_defaults[$customField],
-          ]);
-          $oldValue = $oldValue['values'][$customFieldId]['display'];
+          $oldValue = $this->_defaults[$customField];
           $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
             'custom_field_id' => $customFieldId,
             'entity_id' => $this->_entityID,
