@@ -1,5 +1,6 @@
 #civicrm-dashboard > .crm-flex-box {
   min-height: 200px;
+  column-gap: 10px;
 }
 
 #civicrm-dashboard > .crm-flex-box > .crm-flex-2 {
@@ -10,7 +11,7 @@
 }
 
 .crm-container .crm-dashlet {
-  margin: 10px;
+  margin-bottom: 10px;
   box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
   border-radius: 3px;
 }
