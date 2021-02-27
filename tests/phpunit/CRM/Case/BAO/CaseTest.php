@@ -1163,4 +1163,42 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test that if you only have "my cases" permission you can still view
+   * Manage Case for **closed** cases of yours.
+   */
+  public function testCanViewClosedCaseAsNonAdmin() {
+    $loggedInUser = $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view all contacts',
+      'edit all contacts',
+      'add cases',
+      // this is one important part we're testing
+      'access my cases and activities',
+    ];
+    $individual = $this->individualCreate();
+    $caseObj = $this->createCase($individual, $loggedInUser);
+    $caseId = $caseObj->id;
+
+    // This isn't everything needed to close a case but is good enough for
+    // our purposes.
+    $this->callAPISuccess('Case', 'create', [
+      'id' => $caseId,
+      'status_id' => 'Closed',
+    ]);
+
+    // Manage Case goes thru this tab even when not visiting from the tab.
+    $tab = new CRM_Case_Page_Tab();
+    $tab->set('action', 'view');
+    $tab->set('cid', $individual);
+    $tab->set('id', $caseId);
+    $tab->set('context', 'standalone');
+    $tab->preProcess();
+    // At this point it would have thrown PrematureExitException if we didn't have access.
+    // Let's assert something while we're here. This is also what would have
+    // failed, but by itself doesn't depend on permissions.
+    $this->assertArrayHasKey($caseId, CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']));
+  }
+
 }
