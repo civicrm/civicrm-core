@@ -520,7 +520,7 @@
 
       this.refreshAll = function() {
         ctrl.stale = true;
-        ctrl.selectedRows.length = 0;
+        clearSelection();
         loadResults();
       };
 
@@ -577,17 +577,21 @@
 
       function onChangeFilters() {
         ctrl.stale = true;
-        ctrl.selectedRows.length = 0;
+        clearSelection();
         if (ctrl.autoSearch) {
           ctrl.refreshAll();
         }
       }
 
+      function clearSelection() {
+        ctrl.allRowsSelected = false;
+        ctrl.selectedRows.length = 0;
+      }
+
       $scope.selectAllRows = function() {
         // Deselect all
         if (ctrl.allRowsSelected) {
-          ctrl.allRowsSelected = false;
-          ctrl.selectedRows.length = 0;
+          clearSelection();
           return;
         }
         // Select all
