@@ -38,7 +38,7 @@ class CRM_Core_CodeGen_Util_File {
   public static function createTempDir($prefix) {
     $newTempDir = tempnam(sys_get_temp_dir(), $prefix) . '.d';
     if (file_exists($newTempDir)) {
-      self::removeDir($newTempDir);
+      self::cleanTempDir($newTempDir);
     }
     self::createDir($newTempDir);
 
