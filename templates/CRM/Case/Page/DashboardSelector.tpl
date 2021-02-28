@@ -31,11 +31,19 @@
       var selectorClass = '.case-selector-' + list;
       var filterClass = '.case-search-options-' + list;
 
+      // Determine the url `type` parameter which is a combination of `list` and the `upcoming` checkbox.
+      // @todo This seems fragile. It makes `list` serve double-duty, and also relies on the fact that when list=all-cases that can only happen for users with all cases permission, which itself is what determines whether the upcoming checkbox is present.
+      var computeGetCasesType = function(selectorListType) {
+        return (!$("input[name='upcoming']").length) ?
+          (selectorListType == 'my-cases' ? 'any' : selectorListType) :
+          ($("input[name='upcoming']").prop('checked') ? 'upcoming' : 'any');
+      }
+
       CRM.$('table' + selectorClass).data({
         "ajax": {
           "url": {/literal}'{crmURL p="civicrm/ajax/get-cases" h=0 q="snippet=4&all=`$all`"}'{literal},
           "data": function (d) {
-            d.type = (!$("input[name='upcoming']").length) ? list : $("input[name='upcoming']").prop('checked') ? 'upcoming' : 'any';
+            d.type = computeGetCasesType(list);
             d.case_type_id = $(filterClass + ' select#case_type_id').val() || [];
             d.case_type_id = d.case_type_id.join(',');
             d.status_id = $(filterClass + ' select#case_status_id').val() || [];
