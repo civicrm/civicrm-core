@@ -37,6 +37,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * Build the form object.
    *
    * @var CRM_Core_Form $form
+   * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form) {
     // This form outputs a file so should never be submitted via ajax
@@ -222,6 +223,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    *
    * @return string $html_message
    *
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -241,12 +243,12 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $messageTemplate['pdf_format_id'] = $formValues['format_id'];
       }
-      if (!empty($formValues['saveTemplate']) && $formValues['saveTemplate']) {
+      if (!empty($formValues['saveTemplate'])) {
         $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
-      if (!empty($formValues['updateTemplate']) && $formValues['template'] && $formValues['updateTemplate']) {
+      if ($formValues['template'] && !empty($formValues['updateTemplate'])) {
         $messageTemplate['id'] = $formValues['template'];
 
         unset($messageTemplate['msg_title']);
@@ -264,13 +266,13 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
       $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
       foreach ((array) $documentInfo as $info) {
-        list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
+        [$html_message, $formValues['document_type']] = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
         $formValues['document_file_path'] = $info['fullPath'];
       }
     }
     // extract the content of uploaded document file
     elseif (!empty($formValues['document_file'])) {
-      list($html_message, $formValues['document_type']) = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type']);
+      [$html_message, $formValues['document_type']] = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type']);
       $formValues['document_file_path'] = $formValues['document_file']['name'];
     }
 
