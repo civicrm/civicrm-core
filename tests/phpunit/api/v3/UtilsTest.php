@@ -376,14 +376,44 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
     $cases[] = [
       $records,
-      ['version' => 3, 'cheese' => 'cheddar'],
+      ['version' => 3, 'cheese' => 'cheddar', 'options' => ['sort' => 'fruit desc']],
       ['b', 'c'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => 'cheddar', 'options' => ['sort' => 'fruit']],
+      ['c', 'b'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['IS NOT NULL' => 1], 'options' => ['sort' => 'fruit, cheese']],
+      ['c', 'd', 'e', 'a', 'b'],
     ];
 
     $cases[] = [
       $records,
       ['version' => 3, 'id' => 'd'],
       ['d'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'fruit' => ['!=' => 'apple']],
+      ['b'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['LIKE' => '%o%']],
+      ['d', 'e'],
+    ];
+
+    $cases[] = [
+      $records,
+      ['version' => 3, 'cheese' => ['IN' => ['swiss', 'cheddar', 'gouda']]],
+      ['a', 'b', 'c', 'd'],
     ];
 
     return $cases;
@@ -423,7 +453,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r2['values'])));
     $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r2['values'])));
 
-    $r3 = $kernel->runSafe('Widget', 'get', $params + ['options' => ['offset' => 1, 'limit' => 2]]);
+    $params['options']['offset'] = 1;
+    $params['options']['limit'] = 2;
+    $r3 = $kernel->runSafe('Widget', 'get', $params);
     $slice = array_slice($resultIds, 1, 2);
     $this->assertEquals(count($slice), $r3['count']);
     $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('snack_id', $r3['values'])));
