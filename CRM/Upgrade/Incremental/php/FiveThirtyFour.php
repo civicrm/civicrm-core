@@ -153,10 +153,11 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
       $value = unserialize($setting['value']);
       $plain = CRM_Utils_Crypt::decrypt($value['smtpPassword']);
       $value['smtpPassword'] = $cryptoToken->encrypt($plain, 'CRED');
-      CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = %2 WHERE id = %1', [
-        1 => [$setting['id'], 'Positive'],
-        2 => [serialize($value), 'String'],
-      ]);
+      $dao = new CRM_Core_BAO_Setting();
+      $dao->id = $setting['id'];
+      $dao->find(TRUE);
+      $dao->value = serialize($value);
+      $dao->save();
     }
     return TRUE;
   }
