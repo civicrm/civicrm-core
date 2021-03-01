@@ -215,7 +215,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       ],
     ];
     CRM_Core_DAO::executeQuery('DROP table if exists `test_table`');
-    CRM_Core_DAO::executeQuery('CREATE table `test_table` (`title` varchar(255), `name` varchar(255))');
+    CRM_Core_DAO::executeQuery('CREATE table `test_table` (`title` varchar(255), `name` varchar(255)) ROW_FORMAT=DYNAMIC');
     CRM_Core_BAO_SchemaHandler::createMissingIndices($indices);
     $actualIndices = CRM_Core_BAO_SchemaHandler::getIndexes(['test_table']);
     $this->assertEquals($actualIndices, $indices);
