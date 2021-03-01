@@ -156,18 +156,26 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
         if (!empty($customFieldId) && is_numeric($customFieldId)) {
           // Got a custom field ID
           $label = civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'label']);
-          $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
-            'custom_field_id' => $customFieldId,
-            'entity_id' => $this->_entityID,
-            'custom_field_value' => $this->_defaults[$customField],
-          ]);
-          $oldValue = $oldValue['values'][$customFieldId]['display'];
-          $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
-            'custom_field_id' => $customFieldId,
-            'entity_id' => $this->_entityID,
-            'custom_field_value' => $newCustomValue,
-          ]);
-          $newValue = $newValue['values'][$customFieldId]['display'];
+
+          // Convert dropdown and other machine values to human labels.
+          // Money is special for non-US locales because at this point it's in human format so we don't
+          // want to try to convert it.
+          $oldValue = $this->_defaults[$customField] ?? '';
+          $newValue = $newCustomValue;
+          if ('Money' !== civicrm_api3('CustomField', 'getvalue', ['id' => $customFieldId, 'return' => 'data_type'])) {
+            $oldValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+              'custom_field_id' => $customFieldId,
+              'entity_id' => $this->_entityID,
+              'custom_field_value' => $oldValue,
+            ]);
+            $oldValue = $oldValue['values'][$customFieldId]['display'];
+            $newValue = civicrm_api3('CustomValue', 'getdisplayvalue', [
+              'custom_field_id' => $customFieldId,
+              'entity_id' => $this->_entityID,
+              'custom_field_value' => $newCustomValue,
+            ]);
+            $newValue = $newValue['values'][$customFieldId]['display'];
+          }
           $formattedDetails[] = $label . ': ' . $oldValue . ' => ' . $newValue;
         }
 
