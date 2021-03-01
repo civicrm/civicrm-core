@@ -172,6 +172,14 @@ class SpecFormatter {
         }
       }
     }
+    // Ensure all keys use lower_case not camelCase
+    foreach ($inputAttrs as $key => $val) {
+      if ($key !== strtolower($key)) {
+        unset($inputAttrs[$key]);
+        $key = strtolower(preg_replace('/(?=[A-Z])/', '_$0', $key));
+        $inputAttrs[$key] = $val;
+      }
+    }
     $fieldSpec
       ->setInputType($inputType)
       ->setInputAttrs($inputAttrs);
