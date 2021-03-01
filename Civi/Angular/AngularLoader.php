@@ -143,7 +143,6 @@ class AngularLoader {
     });
 
     $res->addScriptFile('civicrm', 'bower_components/angular/angular.min.js', 100, $this->getRegion(), FALSE);
-    $res->addScriptFile('civicrm', 'js/crm.angular.js', 101, $this->getRegion(), FALSE);
 
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();

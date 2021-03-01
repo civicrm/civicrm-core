@@ -35,7 +35,6 @@ module.exports = function(config) {
       'js/Common.js',
       'js/crm.datepicker.js',
       'bower_components/angular/angular.js',
-      'js/crm.angular.js',
       angularTempFile,
       'bower_components/angular-file-upload/angular-file-upload.js',
       'bower_components/angular-jquery-dialog-service/dialog-service.js',
