@@ -227,7 +227,9 @@ class CRM_Core_BAO_CustomValueTable {
           }
           else {
             $set[$field['column_name']] = "%{$count}";
-            $params[$count] = [$value, $type];
+            // The second parameter is the type of the db field, which
+            // would be 'String' for a concatenated set of integers.
+            $params[$count] = [$value, $field['is_multiple'] ? 'String' : $type];
             $count++;
           }
 
@@ -266,7 +268,7 @@ class CRM_Core_BAO_CustomValueTable {
           else {
             $query = "$sqlOP SET $setClause $where";
           }
-          $dao = CRM_Core_DAO::executeQuery($query, $params);
+          CRM_Core_DAO::executeQuery($query, $params);
 
           CRM_Utils_Hook::custom($hookOP,
             $hookID,
