@@ -45,7 +45,7 @@
 
         // ChainSelect - watch control field & reload options as needed
         if (ctrl.defn.input_type === 'ChainSelect') {
-          $scope.$watch('dataProvider.getFieldData()[defn.input_attrs.controlField]', function(val) {
+          $scope.$watch('dataProvider.getFieldData()[defn.input_attrs.control_field]', function(val) {
             if (val) {
               var params = {
                 where: [['name', '=', ctrl.fieldName]],
@@ -53,7 +53,7 @@
                 loadOptions: ['id', 'label'],
                 values: {}
               };
-              params.values[ctrl.defn.input_attrs.controlField] = val;
+              params.values[ctrl.defn.input_attrs.control_field] = val;
               crmApi4($scope.dataProvider.getEntityType(), 'getFields', params, 0)
                 .then(function(data) {
                   ctrl.defn.options = data.options;

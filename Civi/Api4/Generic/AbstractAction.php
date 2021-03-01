@@ -498,7 +498,7 @@ abstract class AbstractAction implements \ArrayAccess {
             'val' => $record[$expr],
             'field' => $field,
             'suffix' => substr($expr, $suffix + 1),
-            'depends' => $field['input_attrs']['controlField'] ?? NULL,
+            'depends' => $field['input_attrs']['control_field'] ?? NULL,
           ];
           unset($record[$expr]);
         }
