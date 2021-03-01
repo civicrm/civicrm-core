@@ -174,7 +174,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'so_SO', 'so', {localize}'{ts escape="sql"}Somali{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'st_ZA', 'st', {localize}'{ts escape="sql"}Southern Sotho{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'es_ES', 'es', {localize}'{ts escape="sql"}Spanish; Castilian (Spain){/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 1, 'es_MX', 'es', {localize}'{ts escape="sql"}Spanish; Castilian (Mexico){/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'es_MX', 'es', {localize}'{ts escape="sql"}Spanish; Castilian (Latin America){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 1, 'es_PR', 'es', {localize}'{ts escape="sql"}Spanish; Castilian (Puerto Rico){/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'su_ID', 'su', {localize}'{ts escape="sql"}Sundanese{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'sw_TZ', 'sw', {localize}'{ts escape="sql"}Swahili{/ts}'{/localize}, @counter := @counter + 1),

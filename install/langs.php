@@ -40,7 +40,7 @@
   'sk_SK' => 'Slovak',
   'sl_SI' => 'Slovene',
   'es_ES' => 'Spanish; Castilian (Spain)',
-  'es_MX' => 'Spanish; Castilian (Mexico)',
+  'es_MX' => 'Spanish; Castilian (Latin America)',
   'es_PR' => 'Spanish; Castilian (Puerto Rico)',
   'sv_SE' => 'Swedish',
   'te_IN' => 'Telugu',
