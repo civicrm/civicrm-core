@@ -2687,16 +2687,15 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     ];
     if (isset($fkFields[$field->data_type])) {
       // Serialized fields store value-separated strings which are incompatible with FK constraints
-      if ($field->serialize) {
-        $params['type'] = 'varchar(255)';
-      }
-      else {
+      if (!$field->serialize) {
         $params['fk_table_name'] = $fkFields[$field->data_type];
         $params['fk_field_name'] = 'id';
         $params['fk_attributes'] = 'ON DELETE SET NULL';
       }
     }
-
+    if ($field->serialize) {
+      $params['type'] = 'varchar(255)';
+    }
     if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
     }
