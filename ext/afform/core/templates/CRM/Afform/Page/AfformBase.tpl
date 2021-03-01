@@ -1,5 +1,5 @@
-{literal}
-  <div ng-app="afformStandalone">
-    <form ng-view></form>
-  </div>
-{/literal}
+<div ng-app="afformStandalone">
+  <form id="bootstrap-theme">
+    <{$directive}></{$directive}>
+  </form>
+</div>

@@ -197,6 +197,8 @@ function afform_civicrm_angularModules(&$angularModules) {
       'basePages' => [],
       'partialsCallback' => '_afform_get_partials',
       '_afform' => $afform['name'],
+      // TODO: Allow afforms to declare their own theming requirements
+      'bundles' => ['bootstrap3'],
       'exports' => [
         $afform['directive_name'] => 'E',
       ],

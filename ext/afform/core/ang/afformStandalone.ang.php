@@ -6,5 +6,5 @@ return [
   ],
   'css' => [],
   'settings' => [],
-  'requires' => ['ngRoute'],
+  'requires' => [],
 ];

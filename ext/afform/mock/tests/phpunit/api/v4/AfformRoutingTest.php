@@ -37,7 +37,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     };
 
     $result = $http->get($url('civicrm/mock-page'));
-    $this->assertNotAuthorized($result);
+    $this->assertNotAuthorized($result, 'mock-page');
 
     Civi\Api4\Afform::update()
       ->setCheckPermissions(FALSE)
@@ -62,7 +62,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->execute();
 
     $this->assertOpensPage($http->get($url('civicrm/mock-page')), 'mock-page');
-    $this->assertNotAuthorized($http->get($url('civicrm/mock-page-renamed')));
+    $this->assertNotAuthorized($http->get($url('civicrm/mock-page-renamed')), 'mock-page');
 
     Civi\Api4\Afform::update()
       ->setCheckPermissions(FALSE)
@@ -70,18 +70,19 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->addValue('server_route', 'civicrm/mock-page-renamed')
       ->execute();
 
-    $this->assertNotAuthorized($http->get($url('civicrm/mock-page')));
+    $this->assertNotAuthorized($http->get($url('civicrm/mock-page')), 'mock-page');
     $this->assertOpensPage($http->get($url('civicrm/mock-page-renamed')), 'mock-page');
   }
 
   /**
    * @param $result
+   * @param string $directive
    */
-  private function assertNotAuthorized(Psr\Http\Message\ResponseInterface $result) {
+  private function assertNotAuthorized(Psr\Http\Message\ResponseInterface $result, $directive) {
     $contents = $result->getBody()->getContents();
     $this->assertEquals(403, $result->getStatusCode());
     $this->assertRegExp(';You are not authorized to access;', $contents);
-    $this->assertNotRegExp(';afform":\{"open":".*"\};', $contents);
+    $this->assertNotRegExp(';' . preg_quote("<$directive>", ';') . ';', $contents);
   }
 
   /**
@@ -93,7 +94,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $contents = $result->getBody()->getContents();
     $this->assertEquals(200, $result->getStatusCode());
     $this->assertNotRegExp(';You are not authorized to access;', $contents);
-    $this->assertRegExp(';afform":\{"open":"' . preg_quote($directive, ';') . '"\};', $contents);
+    $this->assertRegExp(';' . preg_quote("<$directive>", ';') . ';', $contents);
   }
 
 }
