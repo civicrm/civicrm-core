@@ -2472,11 +2472,77 @@ function _civicrm_api3_field_value_check(&$params, $fieldName, $type = NULL) {
  */
 function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filterableFields) {
   $options = _civicrm_api3_get_options_from_params($params, TRUE, $entity, 'get');
-  // TODO // $sort = CRM_Utils_Array::value('sort', $options, NULL);
   $offset = $options['offset'] ?? NULL;
   $limit = $options['limit'] ?? NULL;
 
+  $sort = !empty($options['sort']) ? explode(', ', $options['sort']) : NULL;
+  if ($sort) {
+    usort($records, function($a, $b) use ($sort) {
+      foreach ($sort as $field) {
+        [$field, $dir] = array_pad(explode(' ', $field), 2, 'asc');
+        $modifier = strtolower($dir) == 'asc' ? 1 : -1;
+        if (isset($a[$field]) && isset($b[$field])) {
+          if ($a[$field] == $b[$field]) {
+            continue;
+          }
+          return (strnatcasecmp($a[$field], $b[$field]) * $modifier);
+        }
+        elseif (isset($a[$field]) || isset($b[$field])) {
+          return ((isset($a[$field]) ? 1 : -1) * $modifier);
+        }
+      }
+      return 0;
+    });
+  }
+
   $matches = [];
+
+  $isMatch = function($recordVal, $searchVal) {
+    $operator = '=';
+    if (is_array($searchVal) && count($searchVal) === 1 && in_array(array_keys($searchVal)[0], CRM_Core_DAO::acceptedSQLOperators())) {
+      $operator = array_keys($searchVal)[0];
+      $searchVal = array_values($searchVal)[0];
+    }
+    switch ($operator) {
+      case '=':
+      case '!=':
+      case '<>':
+        return ($recordVal == $searchVal) == ($operator == '=');
+
+      case 'IS NULL':
+      case 'IS NOT NULL':
+        return is_null($recordVal) == ($operator == 'IS NULL');
+
+      case '>':
+        return $recordVal > $searchVal;
+
+      case '>=':
+        return $recordVal >= $searchVal;
+
+      case '<':
+        return $recordVal < $searchVal;
+
+      case '<=':
+        return $recordVal <= $searchVal;
+
+      case 'BETWEEN':
+      case 'NOT BETWEEN':
+        $between = ($recordVal >= $searchVal[0] && $recordVal <= $searchVal[1]);
+        return $between == ($operator == 'BETWEEN');
+
+      case 'LIKE':
+      case 'NOT LIKE':
+        $pattern = '/^' . str_replace('%', '.*', preg_quote($searchVal, '/')) . '$/i';
+        return !preg_match($pattern, $recordVal) == ($operator != 'LIKE');
+
+      case 'IN':
+      case 'NOT IN':
+        return in_array($recordVal, $searchVal) == ($operator == 'IN');
+
+      default:
+        throw new API_Exception("Unsupported operator: '$operator' cannot be used with array data");
+    }
+  };
 
   $currentOffset = 0;
   foreach ($records as $record) {
@@ -2488,7 +2554,7 @@ function _civicrm_api3_basic_array_get($entity, $params, $records, $idCol, $filt
       if ($k == 'id') {
         $k = $idCol;
       }
-      if (in_array($k, $filterableFields) && $record[$k] != $v) {
+      if (in_array($k, $filterableFields) && !$isMatch($record[$k] ?? NULL, $v)) {
         $match = FALSE;
         break;
       }
