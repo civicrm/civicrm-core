@@ -2788,13 +2788,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       );
       // CRM-13074 - create the CMSUser after the transaction is completed as it
       // is not appropriate to delete a valid contribution if a user create problem occurs
-      if (isset($params['related_contact'])) {
-        $contactID = $params['related_contact'];
+      if (isset($this->_params['related_contact'])) {
+        $contactID = $this->_params['related_contact'];
       }
-      elseif (isset($params['cms_contactID'])) {
-        $contactID = $params['cms_contactID'];
+      elseif (isset($this->_params['cms_contactID'])) {
+        $contactID = $this->_params['cms_contactID'];
       }
-      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($params,
+      CRM_Contribute_BAO_Contribution_Utils::createCMSUser($this->_params,
         $contactID,
         'email-' . $form->_bltID
       );
