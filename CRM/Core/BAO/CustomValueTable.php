@@ -229,7 +229,9 @@ class CRM_Core_BAO_CustomValueTable {
             $set[$field['column_name']] = "%{$count}";
             // The second parameter is the type of the db field, which
             // would be 'String' for a concatenated set of integers.
-            $params[$count] = [$value, $field['is_multiple'] ? 'String' : $type];
+            // However, the god-forsaken timestamp hack also needs to be kept
+            // if value is NULL.
+            $params[$count] = [$value, ($value && $field['is_multiple']) ? 'String' : $type];
             $count++;
           }
 
