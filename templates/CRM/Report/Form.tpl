@@ -16,7 +16,9 @@
 {elseif $section eq 2}
   <div class="crm-block crm-content-block crm-report-layoutTable-form-block">
     {*include the table layout*}
-    {include file="CRM/Report/Form/Layout/Table.tpl"}
+    {if !$chartEnabled || !$chartSupported}
+      {include file="CRM/Report/Form/Layout/Table.tpl"}
+    {/if}
   </div>
 {else}
   {if $criteriaForm OR $instanceForm OR $instanceFormError}
@@ -36,7 +38,10 @@
     {include file="CRM/Report/Form/Layout/Graph.tpl"}
 
     {*include the table layout*}
-    {include file="CRM/Report/Form/Layout/Table.tpl"}
+
+    {if !$chartEnabled || !$chartSupported}
+      {include file="CRM/Report/Form/Layout/Table.tpl"}
+    {/if}
     <br />
     {*Statistics at the bottom of the page*}
     {include file="CRM/Report/Form/Statistics.tpl" bottom=true}

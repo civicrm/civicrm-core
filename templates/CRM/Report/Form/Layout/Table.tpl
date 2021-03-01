@@ -7,7 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if (!$chartEnabled || !$chartSupported )&& $rows}
+{if !$rows}
+  <p>{ts}None found.{/ts}</p>
+{else}
     {if $pager and $pager->_response and $pager->_response.numPages > 1}
         <div class="report-pager">
             {include file="CRM/common/pager.tpl" location="top"}
