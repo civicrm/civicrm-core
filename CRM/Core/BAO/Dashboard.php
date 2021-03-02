@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\DashboardContact;
+
 /**
  * Class contains Contact dashboard related functions.
  */
@@ -40,37 +42,64 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    *
    * @return array
    *   array of dashlets
+   * @throws \API_Exception
    */
-  public static function getContactDashlets() {
-    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
-      Civi::$statics[__CLASS__][__FUNCTION__] = [];
+  public static function getContactDashlets(): array {
+    $cid = CRM_Core_Session::getLoggedInContactID();
+    if ($cid && !isset(Civi::$statics[__CLASS__][__FUNCTION__][$cid])) {
+      Civi::$statics[__CLASS__][__FUNCTION__][$cid] = [];
+      // If empty, then initialize default dashlets for this user.
+      if (0 === DashboardContact::get(FALSE)->selectRowCount()->addWhere('contact_id', '=', $cid)->execute()->count()) {
+        self::initializeDashlets();
+      }
+      $contactDashboards = (array) DashboardContact::get(FALSE)
+        ->addSelect('column_no', 'is_active', 'dashboard_id', 'weight', 'contact_id')
+        ->addWhere('contact_id', '=', $cid)
+        ->addOrderBy('weight')
+        ->execute()->indexBy('dashboard_id');
+
       $params = [
         'select' => ['*', 'dashboard_contact.*'],
-        'join' => [
-          ['DashboardContact AS dashboard_contact', FALSE, ['dashboard_contact.contact_id', '=', CRM_Core_Session::getLoggedInContactID()]],
-        ],
         'where' => [
           ['domain_id', '=', 'current_domain'],
         ],
-        'orderBy' => ['dashboard_contact.weight' => 'ASC'],
       ];
 
       // Get Dashboard + any joined DashboardContact records.
-      $results = civicrm_api4('Dashboard', 'get', $params);
-
-      // If empty, then initialize default dashlets for this user.
-      if (!array_filter($results->column('dashboard_contact.id'))) {
-        self::initializeDashlets();
-      }
-      $results = civicrm_api4('Dashboard', 'get', $params);
-
+      $results = (array) civicrm_api4('Dashboard', 'get', $params);
       foreach ($results as $item) {
+        $item['dashboard_contact.id'] = $contactDashboards[$item['id']]['id'] ?? NULL;
+        $item['dashboard_contact.contact_id'] = $contactDashboards[$item['id']]['contact_id'] ?? NULL;
+        $item['dashboard_contact.weight'] = $contactDashboards[$item['id']]['weight'] ?? NULL;
+        $item['dashboard_contact.column_no'] = $contactDashboards[$item['id']]['column_no'] ?? NULL;
+        $item['dashboard_contact.is_active'] = $contactDashboards[$item['id']]['is_active'] ?? NULL;
         if ($item['is_active'] && self::checkPermission($item['permission'], $item['permission_operator'])) {
-          Civi::$statics[__CLASS__][__FUNCTION__][] = $item;
+          Civi::$statics[__CLASS__][__FUNCTION__][$cid][] = $item;
         }
       }
+      usort(Civi::$statics[__CLASS__][__FUNCTION__][$cid], static function ($a, $b) {
+        // Sort by dashboard contact weight, preferring not null to null.
+        // I had hoped to do this in mysql either by
+        // 1) making the dashboard contact part of the query NOT permissioned while
+        // the parent query IS or
+        // 2) using FIELD like
+        // $params['orderBy'] = ['FIELD(id,' . implode(',', array_keys($contactDashboards)) . ')' => 'ASC'];
+        // 3) or making the dashboard contact acl more inclusive such that 'view own contact'
+        // is not required to view own contact's acl
+        // but I couldn't see a way to make any of the above work. Perhaps improve in master?
+        if (!isset($b['dashboard_contact.weight']) && !isset($a[$b['dashboard_contact.weight']])) {
+          return 0;
+        }
+        if (!isset($b['dashboard_contact.weight'])) {
+          return -1;
+        }
+        if (!isset($a['dashboard_contact.weight'])) {
+          return 1;
+        }
+        return $a['dashboard_contact.weight'] > $b['dashboard_contact.weight'];
+      });
     }
-    return Civi::$statics[__CLASS__][__FUNCTION__];
+    return Civi::$statics[__CLASS__][__FUNCTION__][$cid] ?? [];
   }
 
   /**
@@ -95,7 +124,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     }
     CRM_Utils_Hook::dashboard_defaults($allDashlets, $defaultDashlets);
     if (is_array($defaultDashlets) && !empty($defaultDashlets)) {
-      \Civi\Api4\DashboardContact::save(FALSE)
+      DashboardContact::save(FALSE)
         ->setRecords($defaultDashlets)
         ->setDefaults(['contact_id' => CRM_Core_Session::getLoggedInContactID()])
         ->execute();
