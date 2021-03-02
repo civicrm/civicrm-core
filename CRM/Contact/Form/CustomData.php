@@ -104,7 +104,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
         $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
-        if ($hasReachedMax && $mode == 'add') {
+        if ($hasReachedMax && $mode === 'add') {
           CRM_Core_Error::statusBounce(ts('The maximum record limit is reached'));
         }
         $this->_copyValueId = CRM_Utils_Request::retrieve('copyValueId', 'Positive', $this);
