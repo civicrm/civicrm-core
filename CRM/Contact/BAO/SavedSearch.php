@@ -355,7 +355,13 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       }
       $params['name'] = $name . $suffix;
     }
-
+    $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
+    if ($loggedInContactID) {
+      if (empty($params['id'])) {
+        $params['created_id'] = $loggedInContactID;
+      }
+      $params['modified_id'] = $loggedInContactID;
+    }
     return self::writeRecord($params);
   }
 
@@ -419,7 +425,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
 
     switch ($op) {
       case 'BETWEEN':
-        list($formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']) = $value;
+        [$formValues[$fieldName . '_from'], $formValues[$fieldName . '_to']] = $value;
         break;
 
       case '>=':

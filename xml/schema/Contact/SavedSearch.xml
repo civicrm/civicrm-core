@@ -136,4 +136,46 @@
     <serialize>JSON</serialize>
     <add>5.24</add>
   </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to contact table.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
+    <add>5.36</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.36</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>modified_id</name>
+    <type>int unsigned</type>
+    <title>Modified By Contact ID</title>
+    <comment>FK to contact table.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
+    <add>5.36</add>
+  </field>
+  <foreignKey>
+    <name>modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.36</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>expires_date</name>
+    <type>timestamp</type>
+    <title>Search Expiry Date</title>
+    <required>false</required>
+    <comment>Optional date after which the search is not needed</comment>
+    <add>5.36</add>
+  </field>
 </table>

@@ -53,13 +53,10 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     // I created a smart group using the CiviCRM gui. The smart group contains
     // all contacts tagged with 'company'.
     // I got the params below from the database.
-
-    $url = CIVICRM_UF_BASEURL . "/civicrm/contact/search/advanced?reset=1";
-    $serialized_url = serialize($url);
-
     // params for saved search that returns all volunteers for the
     // default organization.
     $this->params = [
+      'expires_date' => '2021-08-08',
       'form_values' => [
         // Is volunteer for
         'relation_type_id' => '6_a_b',
@@ -72,21 +69,22 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    * Create a saved search, and see whether the returned values make sense.
    */
   public function testCreateSavedSearch() {
-    // Act:
+    $contactID = $this->createLoggedInUser();
     $result = $this->callAPIAndDocument(
-        $this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
-    $this->assertEquals(1, $result['count']);
+        $this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
+    $this->assertEquals(1, count($result));
+    $savedSearch = reset($result);
 
-    // Assert:
-    // getAndCheck fails, I think because form_values is an array.
-    //$this->getAndCheck($this->params, $result['id'], $this->_entity);
-    // Check whether the new ID is correctly returned by the API.
-    $this->assertNotNull($result['values'][$result['id']]['id']);
+    $this->assertEquals($contactID, $savedSearch['created_id']);
+    $this->assertEquals($contactID, $savedSearch['modified_id']);
+    $this->assertEquals('20210808000000', $savedSearch['expires_date']);
+
+    $this->assertNotNull($savedSearch['id']);
 
     // Check whether the relation type ID is correctly returned.
     $this->assertEquals(
         $this->params['form_values']['relation_type_id'],
-        $result['values'][$result['id']]['form_values']['relation_type_id']);
+        $savedSearch['form_values']['relation_type_id']);
   }
 
   /**
