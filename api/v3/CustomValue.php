@@ -399,7 +399,7 @@ function _civicrm_api3_custom_value_getdisplayvalue_spec(&$spec) {
   ];
   $spec['custom_field_value'] = [
     'title' => 'Custom Field value',
-    'description' => 'Specify the value of the custom field to return as displayed value',
+    'description' => 'Specify the value of the custom field to return as displayed value, or omit to use the current value.',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => 0,
   ];
@@ -414,14 +414,15 @@ function _civicrm_api3_custom_value_getdisplayvalue_spec(&$spec) {
  * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_custom_value_getdisplayvalue($params) {
-  if (empty($params['custom_field_value'])) {
+  // Null or missing means use the current db value, but treat '0', 0, and '' as legitimate values to look up.
+  if (($params['custom_field_value'] ?? NULL) === NULL) {
     $params['custom_field_value'] = civicrm_api3('CustomValue', 'getsingle', [
       'return' => ["custom_{$params['custom_field_id']}"],
       'entity_id' => $params['entity_id'],
     ]);
     $params['custom_field_value'] = $params['custom_field_value']['latest'];
   }
-  $values[$params['custom_field_id']]['display'] = CRM_Core_BAO_CustomField::displayValue($params['custom_field_value'], $params['custom_field_id'], CRM_Utils_Array::value('entity_id', $params));
+  $values[$params['custom_field_id']]['display'] = CRM_Core_BAO_CustomField::displayValue($params['custom_field_value'], $params['custom_field_id'], $params['entity_id'] ?? NULL);
   $values[$params['custom_field_id']]['raw'] = $params['custom_field_value'];
   return civicrm_api3_create_success($values, $params, 'CustomValue', 'getdisplayvalue');
 }

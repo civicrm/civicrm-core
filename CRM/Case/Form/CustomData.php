@@ -146,7 +146,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $formattedDetails = [];
     foreach ($params as $customField => $newCustomValue) {
       if (substr($customField, 0, 7) == 'custom_') {
-        if ($this->_defaults[$customField] == $newCustomValue) {
+        if (($this->_defaults[$customField] ?? '') === $newCustomValue) {
           // Don't show values that did not change
           continue;
         }
