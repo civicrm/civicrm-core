@@ -25,11 +25,15 @@
     })
 
     // Controller for displaying a search
-    .controller('crmSearchPageDisplay', function($scope, $routeParams, $location, display) {
+    .controller('crmSearchPageDisplay', function($scope, $location, display) {
+      var ctrl = $scope.$ctrl = this;
       this.display = display;
       this.searchName = display['saved_search.name'];
       this.apiEntity = display['saved_search.api_entity'];
-      $scope.$ctrl = this;
+
+      $scope.$watch(function() {return $location.search();}, function(params) {
+        ctrl.filters = params;
+      });
     });
 
 })(angular, CRM.$, CRM._);
