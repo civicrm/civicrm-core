@@ -60,8 +60,8 @@ class Admin {
       'NOT LIKE' => E::ts('Not Like'),
       'BETWEEN' => E::ts('Is Between'),
       'NOT BETWEEN' => E::ts('Not Between'),
-      'IS NULL' => E::ts('Is Null'),
-      'IS NOT NULL' => E::ts('Not Null'),
+      'IS EMPTY' => E::ts('Is Empty'),
+      'IS NOT EMPTY' => E::ts('Not Empty'),
     ];
   }
 
