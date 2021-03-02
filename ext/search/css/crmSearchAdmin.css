@@ -156,6 +156,9 @@
 #bootstrap-theme .crm-search-admin-edit-columns {
   height: 100%;
 }
+#bootstrap-theme .crm-search-admin-edit-columns > fieldset {
+  background-color: rgba(255, 255, 255, .8);
+}
 
 #bootstrap-theme .crm-search-admin-flex-row {
   display: flex;

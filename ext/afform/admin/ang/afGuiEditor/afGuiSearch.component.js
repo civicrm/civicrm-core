@@ -65,7 +65,7 @@
           var joinInfo = join[0].split(' AS '),
             entity = afGui.getEntity(joinInfo[0]),
             alias = joinInfo[1];
-          entityCount[entity.entity] = entityCount[entity.entity] ? entityCount[entity.entity] + 1 : 1;
+          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
           $scope.fieldList.push({
             entityType: entity.entity,
             label: ts('%1 Fields', {1: entity.label + (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : '')}),

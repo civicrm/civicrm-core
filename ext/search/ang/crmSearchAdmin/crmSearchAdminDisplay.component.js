@@ -144,14 +144,20 @@
       // Build a list of all possible links to main entity or join entities
       function buildLinks() {
         // Links to main entity
-        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []);
+        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []),
+          entityCount = {};
+        entityCount[ctrl.savedSearch.api_entity] = 1;
         // Links to explicitly joined entities
         _.each(ctrl.savedSearch.api_params.join, function(join) {
           var joinName = join[0].split(' AS '),
             joinEntity = searchMeta.getEntity(joinName[0]);
+          entityCount[joinEntity.name] = (entityCount[joinEntity.name] || 0) + 1;
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
             link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
+            if (entityCount[joinEntity.name] > 1) {
+              link.title += ' ' + entityCount[joinEntity.name];
+            }
             links.push(link);
           });
         });
