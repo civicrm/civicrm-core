@@ -1138,7 +1138,7 @@
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
           }
           multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], op);
-          if (op === 'IS NULL' || op === 'IS NOT NULL') {
+          if (op === 'IS NULL' || op === 'IS NOT NULL' || op === 'IS EMPTY' || op === 'IS NOT EMPTY') {
             $el.hide();
             return;
           }

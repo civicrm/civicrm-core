@@ -2782,6 +2782,16 @@ SELECT contact_id
       if (in_array($operator, self::acceptedSQLOperators(), TRUE)) {
         switch ($operator) {
           // unary operators
+          case 'IS EMPTY':
+            if ($type === 'String') {
+              return (sprintf('%s', "$fieldName = '' OR $fieldName IS NULL"));
+            }
+
+          case 'IS NOT EMPTY':
+            if ($type === 'String') {
+              return (sprintf('%s', "$fieldName <> '' AND $fieldName IS NOT NULL"));
+            }
+
           case 'IS NULL':
           case 'IS NOT NULL':
             if (!$returnSanitisedArray) {
@@ -2859,6 +2869,8 @@ SELECT contact_id
       'NOT BETWEEN',
       'IS NOT NULL',
       'IS NULL',
+      'IS EMPTY',
+      'IS NOT EMPTY',
     ];
   }
 

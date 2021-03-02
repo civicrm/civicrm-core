@@ -468,7 +468,7 @@ class Api4SelectQuery {
       }
     }
 
-    $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
+    $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value], isset($field) ? $field['data_type'] : NULL);
     if ($sql_clause === NULL) {
       throw new \API_Exception("Invalid value in $type clause for '$expr'");
     }
