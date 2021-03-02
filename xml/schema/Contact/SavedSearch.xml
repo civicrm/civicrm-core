@@ -178,4 +178,20 @@
     <comment>Optional date after which the search is not needed</comment>
     <add>5.36</add>
   </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When the search was created.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.36</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the search was lase modified.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.36</add>
+  </field>
 </table>
