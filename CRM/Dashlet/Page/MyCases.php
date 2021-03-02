@@ -42,6 +42,13 @@ class CRM_Dashlet_Page_MyCases extends CRM_Core_Page {
     );
     $controller->setEmbedded(TRUE);
     $controller->process();
+
+    // Default to cases with statuses that represent Open
+    $caseStatusGroupings = CRM_Core_OptionGroup::values('case_status', TRUE, TRUE, FALSE, NULL, 'value');
+    $caseStatuses = array_keys(array_intersect($caseStatusGroupings, ['Opened']));
+    $form = current($controller->_pages);
+    $form->setDefaults(['case_status_id' => $caseStatuses]);
+
     $controller->run();
 
     if (CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any'], $context, TRUE)) {
