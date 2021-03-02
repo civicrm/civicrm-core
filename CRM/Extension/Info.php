@@ -51,6 +51,21 @@ class CRM_Extension_Info {
   public $tags = [];
 
   /**
+   * @var array
+   *   List of authors.
+   *   Ex: [0 => ['name' => 'Alice', 'email' => 'a@b', 'homepage' => 'https://example.com', 'role' => 'Person']]
+   */
+  public $authors = [];
+
+  /**
+   * @var array|null
+   *   The current maintainer at time of publication.
+   *   This is deprecated in favor of $authors.
+   * @deprecated
+   */
+  public $maintainer = NULL;
+
+  /**
    * Load extension info an XML file.
    *
    * @param $file
@@ -169,6 +184,22 @@ class CRM_Extension_Info {
       }
       elseif ($attr === 'requires') {
         $this->requires = $this->filterRequirements($val);
+      }
+      elseif ($attr === 'maintainer') {
+        $this->maintainer = CRM_Utils_XML::xmlObjToArray($val);
+        $this->authors[] = [
+          'name' => (string) $val->author,
+          'email' => (string) $val->email,
+          'role' => 'Maintainer',
+        ];
+      }
+      elseif ($attr === 'authors') {
+        foreach ($val->author as $author) {
+          $this->authors[] = $thisAuthor = CRM_Utils_XML::xmlObjToArray($author);
+          if ('maintainer' === strtolower($thisAuthor['role'] ?? '')) {
+            $this->maintainer = ['author' => $thisAuthor['name'], 'email' => $thisAuthor['email'] ?? NULL];
+          }
+        }
       }
       else {
         $this->$attr = CRM_Utils_XML::xmlObjToArray($val);
