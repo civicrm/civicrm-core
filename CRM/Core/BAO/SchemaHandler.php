@@ -809,10 +809,10 @@ MODIFY      {$columnName} varchar( $length )
     }
 
     foreach ($databases as $database) {
-      CRM_Core_DAO::executeQuery("ALTER DATABASE $database CHARACTER SET = $newCharSet COLLATE = $newCollation");
+      CRM_Core_DAO::executeQuery("ALTER DATABASE `{$database}` CHARACTER SET = $newCharSet COLLATE = $newCollation");
       $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$database}` WHERE Engine = 'InnoDB' AND (" . implode(' OR ', $tableNameLikePatterns) . ")");
       while ($dao->fetch()) {
-        $tables["{$database}.{$dao->Name}"] = [
+        $tables["`{$database}`.`{$dao->Name}`"] = [
           'Engine' => $dao->Engine,
         ];
       }
@@ -825,7 +825,7 @@ MODIFY      {$columnName} varchar( $length )
       $logging_database = $dsn['database'];
       $dao = CRM_Core_DAO::executeQuery("SHOW TABLE STATUS FROM `{$logging_database}` WHERE Engine <> 'MyISAM' AND (" . implode(' OR ', $logTableNameLikePatterns) . ")");
       while ($dao->fetch()) {
-        $tables["{$logging_database}.{$dao->Name}"] = [
+        $tables["`{$logging_database}`.`{$dao->Name}`"] = [
           'Engine' => $dao->Engine,
         ];
       }
