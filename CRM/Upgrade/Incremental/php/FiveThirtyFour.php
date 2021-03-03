@@ -35,12 +35,41 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
     }
 
     if ($rev === '5.34.alpha1') {
-      if (extension_loaded('mcrypt') && !empty(self::findSmtpPasswords())) {
+      $smtpPasswords = self::findSmtpPasswords();
+      $cryptoRegistry = \Civi\Crypto\CryptoRegistry::createDefaultRegistry();
+      if (extension_loaded('mcrypt') && !empty($smtpPasswords)) {
         // NOTE: We don't re-encrypt automatically because the old "civicrm.settings.php" lacks a good key, and we don't keep the old encryption because the format is ambiguous.
         // The admin may forget to re-enable. That's OK -- this only affects 1 field, this is a secondary defense, and (in the future) we can remind the admin via status-checks.
         $preUpgradeMessage .= '<p>' . ts('This system has an encrypted SMTP password. Encryption in v5.34+ requires CIVICRM_CRED_KEYS. You may <a href="%1" target="_blank">setup CIVICRM_CRED_KEYS</a> before or after upgrading. If you choose to wait, then the SMTP password will be stored as plain-text until you setup CIVICRM_CRED_KEYS.', [
           1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#smtp-password',
         ]) . '</p>';
+      }
+      foreach ($smtpPasswords as $setting) {
+        $settingValue = unserialize($setting['value']);
+        $canBeStored = self::canBeStored($settingValue['smtpPassword'], $cryptoRegistry);
+        $isSmtpActive = (((int) $settingValue['outBound_option'] ?? -1) == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP);
+
+        $msg = NULL;
+        if (!$canBeStored && !$isSmtpActive) {
+          $prose = ts('The SMTP password (%1) was previously stored in the database. It has unexpected content which cannot be migrated automatically. However, it appears to be inactive, so the upgrader will drop this value.', [
+            1 => "setting#" . $setting['id'],
+          ]);
+          $preUpgradeMessage .= '<p>' . $prose . '</p>';
+        }
+        elseif (!$canBeStored && $isSmtpActive) {
+          // "Misconfiguration" ==> Ex: 'mcrypt' was enabled, used to setup the password, and then disabled, leaving us with unreadable ciphertext.
+          // "Misconfiguration" ==> Ex: 'mcrypt' was enabled, used to setup the password, but the SITE_KEY was changed, leaving us with unreadable ciphertext.
+          // "Unrecognized character" ==> Ex: When using plain-text and utf8mb4, it fails to write some characters (chr(128)-chr(255)).
+          // To date, we have only seen reports where this arose from misconfiguration.
+          $prose = ts('The SMTP password (%1) has unusual content that cannot be stored as plain-text. It may be unreadable due to a previous misconfiguration, or it may rely on an unclear character-set. Your options are:', [
+            1 => "setting#" . $setting['id'],
+          ]);
+          $option_1 = ts('<a href="%1" target="_blank">Setup CIVICRM_CRED_KEYS</a> before upgrading. This warning will go away, and the current SMTP password will ultimately be preserved during upgrade.', [
+            1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#smtp-password',
+          ]);
+          $option_2 = ts('Proceed with upgrading in the current configuration. The SMTP password will be lost, but you may re-configure it after upgrade.');
+          $preUpgradeMessage .= "<p>$prose</p><ul><li>$option_1</li><li>$option_2</li></ul>";
+        }
       }
       foreach ($GLOBALS['civicrm_setting'] ?? [] as $entity => $overrides) {
         if (extension_loaded('mcrypt') && !empty($overrides['mailing_backend']['smtpPassword']) && $overrides['mailing_backend']['outBound_option'] == 0) {
@@ -147,18 +176,52 @@ class CRM_Upgrade_Incremental_php_FiveThirtyFour extends CRM_Upgrade_Incremental
    */
   public static function migrateSmtpPasswords(CRM_Queue_TaskContext $ctx) {
     $settings = self::findSmtpPasswords();
-    $cryptoToken = new \Civi\Crypto\CryptoToken(\Civi\Crypto\CryptoRegistry::createDefaultRegistry());
+    $cryptoRegistry = \Civi\Crypto\CryptoRegistry::createDefaultRegistry();
+    $cryptoToken = new \Civi\Crypto\CryptoToken($cryptoRegistry);
 
     foreach ($settings as $setting) {
-      $value = unserialize($setting['value']);
-      $plain = CRM_Utils_Crypt::decrypt($value['smtpPassword']);
-      $value['smtpPassword'] = $cryptoToken->encrypt($plain, 'CRED');
+      $new = $old = unserialize($setting['value']);
+      if (!self::canBeStored($old['smtpPassword'], $cryptoRegistry)) {
+        $new['smtpPassword'] = '';
+      }
+      else {
+        $plain = CRM_Utils_Crypt::decrypt($old['smtpPassword']);
+        $new['smtpPassword'] = $cryptoToken->encrypt($plain, 'CRED');
+      }
       CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = %2 WHERE id = %1', [
         1 => [$setting['id'], 'Positive'],
-        2 => [serialize($value), 'String'],
+        2 => [serialize($new), 'String'],
       ]);
     }
     return TRUE;
+  }
+
+  /**
+   * If you decode an old value of smtpPassword, will it be possible to store that
+   * password in the updated format?
+   *
+   * If you actually have encryption enabled, then it's straight-yes. But if you
+   * have to write in plain-text, then you're working within the constraints
+   * of php-mysqli-utf8mb4, and it does not accept anything > chr(128).
+   *
+   * Note: This could potentially change in the future if we updated `CryptToken`
+   * to put difficult strings into `^CTK?k=plain&t={base64}` format.
+   *
+   * @param string $oldCipherText
+   * @param \Civi\Crypto\CryptoRegistry $registry
+   * @return bool
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  protected static function canBeStored($oldCipherText, \Civi\Crypto\CryptoRegistry $registry) {
+    $plainText = CRM_Utils_Crypt::decrypt($oldCipherText);
+    $activeKey = $registry->findKey('CRED');
+    $isPrintable = ctype_print($plainText);
+    if ($activeKey['suite'] === 'plain' && !$isPrintable) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
   }
 
   /**
