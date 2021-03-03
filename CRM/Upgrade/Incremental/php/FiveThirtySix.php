@@ -79,6 +79,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
       'civicrm_saved_search', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the search was created.'");
     $this->addTask('core-issue#2422 - Add modified_date to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'modified_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the search was last modified.'");
+    $this->addTask('core-issue#2422 - Add description to civicrm_saved_search', 'addColumn',
+      'civicrm_saved_search', 'description', "text DEFAULT NULL");
 
     $this->addTask('core-issue#2422 - Add constraints to civicrm_saved_search', 'taskAddConstraints');
 
