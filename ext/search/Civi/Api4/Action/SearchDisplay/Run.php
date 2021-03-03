@@ -40,13 +40,27 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    */
   protected $return;
 
-  private $_selectQuery;
-
   /**
    * Search conditions that will be automatically added to the WHERE or HAVING clauses
    * @var array
    */
   protected $filters = [];
+
+  /**
+   * Name of Afform, if this display is embedded (used for permissioning)
+   * @var string
+   */
+  protected $afform;
+
+  /**
+   * @var \Civi\Api4\Query\Api4SelectQuery
+   */
+  private $_selectQuery;
+
+  /**
+   * @var array
+   */
+  private $_afform;
 
   /**
    * @param \Civi\Api4\Generic\Result $result
@@ -63,11 +77,14 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         ->addWhere('name', '=', $this->savedSearch)
         ->execute()->first();
     }
-    if (is_string($this->display)) {
+    if (is_string($this->display) && !empty($this->savedSearch['id'])) {
       $this->display = SearchDisplay::get(FALSE)
         ->addWhere('name', '=', $this->display)
         ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
         ->execute()->first();
+    }
+    if (!$this->savedSearch || !$this->display) {
+      throw new \API_Exception("Error: SearchDisplay not found.");
     }
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->savedSearch['api_params'];
@@ -131,45 +148,67 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    * Applies supplied filters to the where clause
    */
   private function applyFilters() {
+    // Ignore empty strings
+    $filters = array_filter($this->filters, function($value) {
+      return isset($value) && (strlen($value) || !is_string($value));
+    });
+    if (!$filters) {
+      return;
+    }
+
+    // Process all filters that are included in SELECT clause. These filters are implicitly allowed.
+    foreach ($this->getSelectAliases() as $fieldName) {
+      if (isset($filters[$fieldName])) {
+        $value = $filters[$fieldName];
+        unset($filters[$fieldName]);
+        $this->applyFilter($fieldName, $value);
+      }
+    }
+
+    // Other filters may be allowed if display is embedded in an afform.
+    if ($filters) {
+      foreach ($this->getAfformFilters() as $fieldName) {
+        if (isset($filters[$fieldName])) {
+          $value = $filters[$fieldName];
+          $this->applyFilter($fieldName, $value);
+        }
+      }
+    }
+  }
+
+  /**
+   * @param string $fieldName
+   * @param string $value
+   */
+  private function applyFilter(string $fieldName, string $value) {
+    $field = $this->getField($fieldName);
+
     // Global setting determines if % wildcard should be added to both sides (default) or only the end of the search term
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
-    foreach ($this->filters as $fieldName => $value) {
-      if ($value) {
-        $field = $this->getField($fieldName) ?? [];
-
-        // If the field doesn't exist, it could be an aggregated column
-        if (!$field) {
-          // Not a real field but in the SELECT clause. It must be an aggregated column. Add to HAVING clause.
-          if (in_array($fieldName, $this->getSelectAliases())) {
-            if ($prefixWithWildcard) {
-              $this->savedSearch['api_params']['having'][] = [$fieldName, 'CONTAINS', $value];
-            }
-            else {
-              $this->savedSearch['api_params']['having'][] = [$fieldName, 'LIKE', $value . '%'];
-            }
-          }
-          // Error - field doesn't exist and isn't a column alias
-          else {
-            // Maybe throw an exception? Or just log a warning?
-          }
-          continue;
-        }
-
-        $dataType = $field['data_type'];
-        if (!empty($field['serialize'])) {
-          $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
-        }
-        elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
-          $this->savedSearch['api_params']['where'][] = [$fieldName, '=', $value];
-        }
-        elseif ($prefixWithWildcard) {
-          $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
-        }
-        else {
-          $this->savedSearch['api_params']['where'][] = [$fieldName, 'LIKE', $value . '%'];
-        }
+    // Not a real field. It must be an aggregated column. Add to HAVING clause.
+    if (!$field) {
+      if ($prefixWithWildcard) {
+        $this->savedSearch['api_params']['having'][] = [$fieldName, 'CONTAINS', $value];
       }
+      else {
+        $this->savedSearch['api_params']['having'][] = [$fieldName, 'LIKE', $value . '%'];
+      }
+      return;
+    }
+
+    $dataType = $field['data_type'];
+    if (!empty($field['serialize'])) {
+      $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+    }
+    elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+      $this->savedSearch['api_params']['where'][] = [$fieldName, '=', $value];
+    }
+    elseif ($prefixWithWildcard) {
+      $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+    }
+    else {
+      $this->savedSearch['api_params']['where'][] = [$fieldName, 'LIKE', $value . '%'];
     }
   }
 
@@ -239,6 +278,44 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       $this->_selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
     }
     return $this->_selectQuery->getField($fieldName, FALSE);
+  }
+
+  /**
+   * @return array
+   */
+  private function getAfformFilters() {
+    $afform = $this->loadAfform();
+    return array_column(\CRM_Utils_Array::findAll(
+      $afform['layout'] ?? [],
+      ['#tag' => 'af-field']
+    ), 'name');
+  }
+
+  /**
+   * Return afform with name specified in api call.
+   *
+   * Verifies the searchDisplay is embedded in the afform and the user has permission to view it.
+   *
+   * @return array|false|null
+   */
+  private function loadAfform() {
+    // Only attempt to load afform once.
+    if ($this->afform && !isset($this->_afform)) {
+      $this->_afform = FALSE;
+      // Permission checks are enabled in this api call to ensure the user has permission to view the form
+      $afform = \Civi\Api4\Afform::get()
+        ->addWhere('name', '=', $this->afform)
+        ->setLayoutFormat('shallow')
+        ->execute()->first();
+      // Validate that the afform contains this search display
+      if (\CRM_Utils_Array::findAll(
+        $afform['layout'] ?? [],
+        ['#tag' => "crm-search-display-{$this->display['type']}", 'display-name' => $this->display['name']])
+      ) {
+        $this->_afform = $afform;
+      }
+    }
+    return $this->_afform;
   }
 
 }

@@ -11,7 +11,7 @@
         var self = ctrls[0];
         self.afFormCtrl = ctrls[1];
       },
-      controller: function() {
+      controller: function($scope) {
         var ctrl = this,
           localData = [];
 
@@ -30,6 +30,9 @@
             data.push({fields: {}});
           }
           return data[0].fields;
+        };
+        this.getFormName = function() {
+          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getMeta().name : $scope.meta.name;
         };
       }
     };
