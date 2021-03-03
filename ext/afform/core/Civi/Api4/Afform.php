@@ -197,6 +197,8 @@ class Afform extends Generic\AbstractEntity {
     return [
       "meta" => ["access CiviCRM"],
       "default" => ["administer CiviCRM"],
+      // These all check form-level permissions
+      'get' => [],
       'prefill' => [],
       'submit' => [],
     ];
