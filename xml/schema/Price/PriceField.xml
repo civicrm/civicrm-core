@@ -31,6 +31,10 @@
       <nameColumn>name</nameColumn>
       <labelColumn>title</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Price Set</label>
+    </html>
     <add>1.8</add>
   </field>
   <foreignKey>
