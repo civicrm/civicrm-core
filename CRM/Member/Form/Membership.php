@@ -1055,20 +1055,10 @@ DESC limit 1");
 
     $termsByType = [];
 
-    $lineItem = [$this->_priceSetId => []];
+    $lineItem = [$this->order->getPriceSetID() => $this->order->getLineItems()];
 
-    // BEGIN Fix for dev/core/issues/860
-    // Prepare fee block and call buildAmount hook - based on CRM_Price_BAO_PriceSet::buildPriceSet().
-    CRM_Utils_Hook::buildAmount('membership', $this, $this->_priceSet['fields']);
-    // END Fix for dev/core/issues/860
-
-    CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-      $formValues, $lineItem[$this->_priceSetId], $this->_priceSetId);
-
-    if (!empty($formValues['tax_amount'])) {
-      $params['tax_amount'] = $formValues['tax_amount'];
-    }
-    $params['total_amount'] = $formValues['amount'] ?? NULL;
+    $params['tax_amount'] = $this->order->getTotalTaxAmount();
+    $params['total_amount'] = $this->order->getTotalAmount();
     if (!empty($lineItem[$this->_priceSetId])) {
       foreach ($lineItem[$this->_priceSetId] as &$li) {
         if (!empty($li['membership_type_id'])) {

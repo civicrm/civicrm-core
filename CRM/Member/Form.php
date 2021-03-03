@@ -71,6 +71,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $order;
 
   /**
+   * This string is the used for passing to the buildAmount hook.
+   *
+   * @var string
+   */
+  protected $formContext = 'membership';
+
+  /**
+   * @return string
+   */
+  public function getFormContext(): string {
+    return $this->formContext;
+  }
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -465,7 +479,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->order = new CRM_Financial_BAO_Order();
     $this->order->setPriceSelectionFromUnfilteredInput($formValues);
     $this->order->setPriceSetID($this->getPriceSetID($formValues));
-    if (isset($formValues['total_amount'])) {
+    $this->order->setForm($this);
+    if ($priceSetDetails[$this->order->getPriceSetID()]['is_quick_config'] && isset($formValues['total_amount'])) {
+      // Amount overrides only permitted on quick config.
+      // Possibly Order object should enforce this...
       $this->order->setOverrideTotalAmount($formValues['total_amount']);
     }
     $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);

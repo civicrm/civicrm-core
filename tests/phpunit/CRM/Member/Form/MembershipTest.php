@@ -1153,12 +1153,14 @@ Expires: ',
   public function testTwoMembershipsViaPriceSetInBackendWithDiscount(): void {
     // Register buildAmount hook to apply discount.
     $this->hookClass->setHook('civicrm_buildAmount', [$this, 'buildAmountMembershipDiscount']);
-
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType(2);
     // Create two memberships for individual $this->_individualId, via a price set in the back end.
     $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contact_id' => $this->_individualId,
     ]);
+
     // Note: we can't check for the contribution total being discounted, because the total is set
     // when the contribution is created via $form->testSubmit(), but buildAmount isn't called
     // until testSubmit() runs. Fixing that might involve making testSubmit() more sophisticated,
@@ -1170,6 +1172,7 @@ Expires: ',
     $this->assertEquals(2, $lineItemResult['count']);
     $discountedItems = 0;
     foreach ($lineItemResult['values'] as $lineItem) {
+      $this->assertEquals($lineItem['line_total'] * .1, $lineItem['tax_amount']);
       if (CRM_Utils_String::startsWith($lineItem['label'], 'Long Haired Goat')) {
         $this->assertEquals(15.0, $lineItem['line_total']);
         $this->assertEquals('Long Haired Goat - one leg free!', $lineItem['label']);
