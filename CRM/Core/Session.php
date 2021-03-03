@@ -87,6 +87,39 @@ class CRM_Core_Session {
   }
 
   /**
+   * Replace the session object with a fake session.
+   */
+  public static function useFakeSession() {
+    self::$_singleton = new class() extends CRM_Core_Session {
+
+      public function initialize($isRead = FALSE) {
+        if ($isRead) {
+          return;
+        }
+
+        if (!isset($this->_session)) {
+          $this->_session = [];
+        }
+
+        if (!isset($this->_session[$this->_key]) || !is_array($this->_session[$this->_key])) {
+          $this->_session[$this->_key] = [];
+        }
+      }
+
+      public function isEmpty() {
+        return empty($this->_session);
+      }
+
+    };
+    self::$_singleton->_session = NULL;
+    // This is not a revocable proposition. Should survive, even with things 'System.flush'.
+    if (!defined('_CIVICRM_FAKE_SESSION')) {
+      define('_CIVICRM_FAKE_SESSION', TRUE);
+    }
+    return self::$_singleton;
+  }
+
+  /**
    * Creates an array in the session.
    *
    * All variables now will be stored under this array.

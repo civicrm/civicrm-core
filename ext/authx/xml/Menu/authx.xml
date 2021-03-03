@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/authx/id</path>
+    <page_callback>CRM_Authx_Page_AJAX::getId</page_callback>
+    <title>Id</title>
+    <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
+  </item>
+  <item>
+    <path>civicrm/authx/login</path>
+    <page_callback>CRM_Authx_Page_AJAX::login</page_callback>
+    <title>Id</title>
+    <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
+  </item>
+  <item>
+    <path>civicrm/authx/logout</path>
+    <page_callback>CRM_Authx_Page_AJAX::logout</page_callback>
+    <title>Id</title>
+    <access_arguments>*always allow*</access_arguments>
+    <is_public>true</is_public>
+  </item>
+</menu>
