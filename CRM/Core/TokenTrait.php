@@ -19,7 +19,11 @@ trait CRM_Core_TokenTrait {
   }
 
   /**
-   * @inheritDoc
+   * Check if the token processor is active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
     return in_array($this->getEntityContextSchema(), $processor->context['schema']) ||

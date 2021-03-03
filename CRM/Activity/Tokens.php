@@ -125,7 +125,18 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * @inheritDoc
+   * Evaluate the content of a single token.
+   *
+   * @param \Civi\Token\TokenRow $row
+   *   The record for which we want token values.
+   * @param string $entity
+   *   The name of the token entity.
+   * @param string $field
+   *   The name of the token field.
+   * @param mixed $prefetch
+   *   Any data that was returned by the prefetch().
+   *
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     // maps token name to api field

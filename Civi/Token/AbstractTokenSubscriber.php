@@ -186,7 +186,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    *   The name of the token field.
    * @param mixed $prefetch
    *   Any data that was returned by the prefetch().
-   * @return mixed
    */
   abstract public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL);
 
