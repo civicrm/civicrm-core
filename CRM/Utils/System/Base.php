@@ -436,7 +436,7 @@ abstract class CRM_Utils_System_Base {
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
-   *   If present, add destination to querystring (works for Drupal only).
+   *   If present, add destination to querystring (works for Drupal and WordPress only).
    *
    * @return string
    *   loginURL for the current CMS
