@@ -24,6 +24,7 @@ class Admin {
    */
   public static function getAdminSettings():array {
     $schema = self::getSchema();
+    $extensions = \CRM_Extension_System::singleton()->getMapper();
     return [
       'schema' => $schema,
       'joins' => self::getJoins(array_column($schema, NULL, 'name')),
@@ -31,14 +32,8 @@ class Admin {
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
-      'afformEnabled' => (bool) \CRM_Utils_Array::findAll(
-        \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),
-        ['fullName' => 'org.civicrm.afform']
-      ),
-      'afformAdminEnabled' => (bool) \CRM_Utils_Array::findAll(
-        \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),
-        ['fullName' => 'org.civicrm.afform_admin']
-      ),
+      'afformEnabled' => $extensions->isActiveModule('afform'),
+      'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
     ];
   }
 
