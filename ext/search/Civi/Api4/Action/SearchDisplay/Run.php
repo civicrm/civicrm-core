@@ -237,13 +237,22 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Returns an array of field names or aliases from the SELECT clause
+   * Returns an array of field names or aliases + allowed suffixes from the SELECT clause
    * @return string[]
    */
   private function getSelectAliases() {
-    return array_map(function($select) {
+    $result = [];
+    $selectAliases = array_map(function($select) {
       return array_slice(explode(' AS ', $select), -1)[0];
     }, $this->savedSearch['api_params']['select']);
+    foreach ($selectAliases as $alias) {
+      [$alias] = explode(':', $alias);
+      $result[] = $alias;
+      foreach (['name', 'label', 'abbr'] as $allowedSuffix) {
+        $result[] = $alias . ':' . $allowedSuffix;
+      }
+    }
+    return $result;
   }
 
   /**
