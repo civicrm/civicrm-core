@@ -6,22 +6,24 @@ use CRM_Authx_ExtensionUtil as E;
 // phpcs:enable
 
 Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
+  $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
+  $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;
+
   if (!empty($_SERVER['HTTP_X_CIVI_AUTH'])) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH']]);
+    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'xheader', 'cred' => $_SERVER['HTTP_X_CIVI_AUTH'], 'siteKey' => $siteKey]);
   }
 
   if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION']]);
+    return (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'header', 'cred' => $_SERVER['HTTP_AUTHORIZATION'], 'siteKey' => $siteKey]);
   }
 
-  $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
   if (!empty($params['_authx'])) {
     if ((implode('/', $e->args) === 'civicrm/authx/login')) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE]);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'login', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
       _authx_redact(['_authx']);
     }
     elseif (!empty($params['_authxSes'])) {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE]);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'auto', 'cred' => $params['_authx'], 'useSession' => TRUE, 'siteKey' => $siteKey]);
       if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         _authx_reload(implode('/', $e->args), $_SERVER['QUERY_STRING']);
       }
@@ -30,7 +32,7 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
       }
     }
     else {
-      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'param', 'cred' => $params['_authx']]);
+      (new \Civi\Authx\Authenticator())->auth($e, ['flow' => 'param', 'cred' => $params['_authx'], 'siteKey' => $siteKey]);
       _authx_redact(['_authx']);
     }
   }
@@ -210,6 +212,16 @@ function authx_civicrm_entityTypes(&$entityTypes) {
  */
 function authx_civicrm_themes(&$themes) {
   _authx_civix_civicrm_themes($themes);
+}
+
+/**
+ * Implements hook_civicrm_permission().
+ *
+ * @see CRM_Utils_Hook::permission()
+ */
+function authx_civicrm_permission(&$permissions) {
+  $permissions['authenticate with password'] = ts('AuthX: Authenticate to services with password');
+  $permissions['authenticate with api key'] = ts('AuthX: Authenticate to services with API key');
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
