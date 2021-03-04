@@ -36,6 +36,10 @@ Civi::dispatcher()->addListener('civi.invoke.auth', function($e) {
       _authx_redact(['_authx']);
     }
   }
+
+  if (count($e->args) > 2 && $e->args[1] === 'ajax' && $e->args[2] === 'rest' && (!empty($_REQUEST['api_key']) || !empty($_REQUEST['key']))) {
+    return (new \Civi\Authx\LegacyRestAuthenticator())->auth($e, ['flow' => 'legacyrest', 'cred' => 'Bearer ' . $_REQUEST['api_key'] ?? '', 'siteKey' => $_REQUEST['key'] ?? NULL]);
+  }
 });
 
 /**
