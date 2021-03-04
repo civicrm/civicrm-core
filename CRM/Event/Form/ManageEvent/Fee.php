@@ -275,7 +275,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
       $this->assign('price', TRUE);
     }
     $this->addField('price_set_id', [
-      'entity' => 'PriceSet',
+      'entity' => 'PriceField',
       'options' => $price,
       'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
     ]);

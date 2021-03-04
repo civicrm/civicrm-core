@@ -146,7 +146,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     $this->addField('price_set_id', [
-      'entity' => 'PriceSet',
+      'entity' => 'PriceField',
       'options' => $price,
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
     ]);
