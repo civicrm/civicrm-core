@@ -31,6 +31,16 @@ class Meta {
   /**
    * @return array
    */
+  public static function getGuardTypes() {
+    return [
+      'perm' => E::ts('User Permission'),
+      'site_key' => E::ts('Site Key'),
+    ];
+  }
+
+  /**
+   * @return array
+   */
   public static function getFlowTypes() {
     return [
       'param' => E::ts('Ephemeral: Paramter'),
