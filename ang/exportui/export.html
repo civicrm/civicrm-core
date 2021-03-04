@@ -19,7 +19,7 @@
     <tr>
       <td colspan="6">
         <input class="crm-action-menu fa-plus crm-export-add-field" crm-ui-select="{data: getFields, placeholder: ts('Add field')}" ng-model="new.col" />
-        <span ng-if="data.columns.length">
+        <span ng-if="data.columns.length && perms.admin">
           <button type="button" ng-click="saveMappingDialog()" crm-icon="fa-save">
             {{:: ts('Save Fields') }}
           </button>
