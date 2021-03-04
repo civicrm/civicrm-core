@@ -88,8 +88,8 @@ EOHTML;
         ->indexBy('name');
       $this->fail('Expected authorization exception from Afform.prefill');
     }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertRegExp(';Authorization failed: Cannot process form mock\d+;', $e->getMessage());
+    catch (\API_Exception $e) {
+      // Should fail permission check
     }
 
     try {
@@ -102,8 +102,8 @@ EOHTML;
         ->execute();
       $this->fail('Expected authorization exception from Afform.submit');
     }
-    catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertRegExp(';Authorization failed: Cannot process form mock\d+;', $e->getMessage());
+    catch (\API_Exception $e) {
+      // Should fail permission check
     }
   }
 

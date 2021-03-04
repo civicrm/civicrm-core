@@ -68,7 +68,8 @@
           savedSearch: ctrl.search,
           display: ctrl.display,
           sort: ctrl.sort,
-          filters: _.assign({}, (ctrl.afFieldset ? ctrl.afFieldset.getFieldData() : {}), ctrl.filters)
+          filters: _.assign({}, (ctrl.afFieldset ? ctrl.afFieldset.getFieldData() : {}), ctrl.filters),
+          afform: ctrl.afFieldset ? ctrl.afFieldset.getFormName() : null
         };
       }
 
