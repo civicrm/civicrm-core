@@ -39,12 +39,10 @@
 #bootstrap-theme .panel-heading>li>a {
   background-color: #f1f1f18c
 }
-#bootstrap-theme.api4-explorer-page .explorer-code-panel table td:first-child {
-  width: 6em;
-  word-break: break-word;
-}
-#bootstrap-theme.api4-explorer-page .explorer-code-panel table td pre {
+#bootstrap-theme.api4-explorer-page .explorer-code-panel pre {
   min-height: 3.3em;
+  word-break: break-all;
+  white-space: pre-wrap;
 }
 #bootstrap-theme.api4-explorer-page .explorer-code-panel .panel-heading.nav li a {
   text-transform: uppercase;

@@ -199,12 +199,10 @@
           </li>
         </ul>
         <div class="panel-body">
-          <table>
-            <tr ng-repeat="style in code[selectedTab.code]">
-              <td>{{:: style.label }}</td>
-              <td><pre class="prettyprint" ng-bind-html="style.code"></pre></td>
-            </tr>
-          </table>
+          <div ng-repeat="style in code[selectedTab.code]">
+            <label>{{:: style.label }}</label>
+            <div><pre class="prettyprint" ng-bind-html="style.code"></pre></div>
+          </div>
         </div>
       </div>
       <div class="panel explorer-result-panel panel-{{ status }}" >
