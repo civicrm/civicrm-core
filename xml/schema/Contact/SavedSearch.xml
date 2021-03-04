@@ -136,4 +136,73 @@
     <serialize>JSON</serialize>
     <add>5.24</add>
   </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to contact table.</comment>
+    <html>
+      <label>Created By</label>
+    </html>
+    <add>5.36</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.36</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>modified_id</name>
+    <type>int unsigned</type>
+    <title>Modified By Contact ID</title>
+    <comment>FK to contact table.</comment>
+    <html>
+      <label>Modified By</label>
+    </html>
+    <add>5.36</add>
+  </field>
+  <foreignKey>
+    <name>modified_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.36</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+  <field>
+    <name>expires_date</name>
+    <type>timestamp</type>
+    <title>Search Expiry Date</title>
+    <required>false</required>
+    <comment>Optional date after which the search is not needed</comment>
+    <add>5.36</add>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When the search was created.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.36</add>
+  </field>
+  <field>
+    <name>modified_date</name>
+    <type>timestamp</type>
+    <comment>When the search was last modified.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
+    <add>5.36</add>
+  </field>
+  <field>
+    <name>description</name>
+    <type>text</type>
+    <title>Saved Search Description</title>
+    <html>
+      <type>TextArea</type>
+      <rows>2</rows>
+      <cols>60</cols>
+    </html>
+    <add>5.36</add>
+  </field>
 </table>

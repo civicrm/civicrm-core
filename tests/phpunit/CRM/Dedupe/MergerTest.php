@@ -283,7 +283,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * The goal of this function is to test that all required tables are returned.
    */
-  public function testGetCidRefs() {
+  public function testGetCidRefs(): void {
     $sortRefs = function($a) {
       ksort($a);
       foreach ($a as &$fields) {
@@ -1368,6 +1368,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_print_label' => [
         0 => 'created_id',
       ],
+      'civicrm_saved_search' => ['created_id', 'modified_id'],
       'civicrm_relationship' => [
         0 => 'contact_id_a',
         1 => 'contact_id_b',
