@@ -11,6 +11,8 @@
 
 namespace Civi\Afform;
 
+use CRM_Afform_ExtensionUtil as E;
+
 /**
  * Class AfformMetadataInjector
  * @package Civi\Afform
@@ -109,13 +111,13 @@ class AfformMetadataInjector {
       }
       // Default placeholder for select inputs
       if ($fieldInfo['input_type'] === 'Select') {
-        $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => ts('Select')];
+        $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => E::ts('Select')];
       }
 
       $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
 
       if ('Date' === $fieldInfo['input_type'] && !empty($fieldDefn['input_type']) && \CRM_Utils_JS::decode($fieldDefn['input_type']) === 'Select') {
-        $fieldInfo['input_attrs']['placeholder'] = ts('Select');
+        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
         $fieldInfo['options'] = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
       }
 

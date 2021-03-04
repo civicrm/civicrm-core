@@ -11,7 +11,7 @@
       deleteThis: '&'
     },
     controller: function($scope, $sce, $timeout) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       this.$onInit = function() {

@@ -18,10 +18,10 @@ class AfformAdminMeta {
       ->execute();
     // Pluralize tabs (too bad option groups only store a single label)
     $plurals = [
-      'form' => ts('Custom Forms'),
-      'search' => ts('Search Displays'),
-      'block' => ts('Field Blocks'),
-      'system' => ts('System Forms'),
+      'form' => E::ts('Custom Forms'),
+      'search' => E::ts('Search Displays'),
+      'block' => E::ts('Field Blocks'),
+      'system' => E::ts('System Forms'),
     ];
     foreach ($afformTypes as $index => $type) {
       $afformTypes[$index]['plural'] = $plurals[$type['name']] ?? \CRM_Utils_String::pluralize($type['label']);

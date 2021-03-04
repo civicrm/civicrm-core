@@ -27,7 +27,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
 
     // If the user has "access civicrm" append home breadcrumb
     if (CRM_Core_Permission::check('access CiviCRM')) {
-      CRM_Utils_System::appendBreadCrumb([['title' => ts('CiviCRM'), 'url' => CRM_Utils_System::url('civicrm')]]);
+      CRM_Utils_System::appendBreadCrumb([['title' => E::ts('CiviCRM'), 'url' => CRM_Utils_System::url('civicrm')]]);
       // If the user has "admin civicrm" & the admin extension is enabled
       if (CRM_Core_Permission::check('administer CiviCRM') && CRM_Utils_Array::findAll(
           \CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(),

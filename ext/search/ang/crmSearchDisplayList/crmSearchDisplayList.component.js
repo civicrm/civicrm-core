@@ -15,7 +15,7 @@
     },
     templateUrl: '~/crmSearchDisplayList/crmSearchDisplayList.html',
     controller: function($scope, crmApi4, searchDisplayUtils) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this;
 
       this.page = 1;

@@ -13,7 +13,7 @@
       defn: '='
     },
     controller: function($scope, $element, crmApi4) {
-      var ts = $scope.ts = CRM.ts('afform'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
         boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
         // Only used for is_primary radio button

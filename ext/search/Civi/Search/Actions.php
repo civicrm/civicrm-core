@@ -11,6 +11,8 @@
 
 namespace Civi\Search;
 
+use CRM_Search_ExtensionUtil as E;
+
 /**
  * Class Tasks
  * @package Civi\Search
@@ -47,7 +49,7 @@ class Actions {
     // Note: the placeholder %1 will be replaced with entity name on the clientside
     $tasks = [
       'export' => [
-        'title' => ts('Export %1'),
+        'title' => E::ts('Export %1'),
         'icon' => 'fa-file-excel-o',
         'entities' => array_keys(\CRM_Export_BAO_Export::getComponents()),
         'crmPopup' => [
@@ -56,13 +58,13 @@ class Actions {
         ],
       ],
       'update' => [
-        'title' => ts('Update %1'),
+        'title' => E::ts('Update %1'),
         'icon' => 'fa-save',
         'entities' => [],
         'uiDialog' => ['templateUrl' => '~/crmSearchActions/crmSearchActionUpdate.html'],
       ],
       'delete' => [
-        'title' => ts('Delete %1'),
+        'title' => E::ts('Delete %1'),
         'icon' => 'fa-trash',
         'entities' => [],
         'uiDialog' => ['templateUrl' => '~/crmSearchActions/crmSearchActionDelete.html'],
