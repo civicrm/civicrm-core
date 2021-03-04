@@ -14,7 +14,7 @@
  *
  * @group e2e
  */
-class E2E_Extern_RestTest extends CiviEndToEndTestCase {
+abstract class E2E_Extern_BaseRestTest extends CiviEndToEndTestCase {
   protected $url;
   protected static $api_key;
   protected $session_id;
@@ -46,10 +46,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     $this->old_api_keys = [];
   }
 
-  protected function getRestUrl() {
-    return CRM_Core_Resources::singleton()
-      ->getUrl('civicrm', 'extern/rest.php');
-  }
+  abstract protected function getRestUrl();
 
   protected function tearDown(): void {
     if (!empty($this->old_api_keys)) {
