@@ -13,7 +13,8 @@
         <div class="crm-block crm-content-block crm-note-view-block">
           <table class="crm-info-panel">
             <tr><td class="label">{ts}Subject{/ts}</td><td>{$note.subject}</td></tr>
-            <tr><td class="label">{ts}Date:{/ts}</td><td>{$note.modified_date|crmDate}</td></tr>
+            <tr><td class="label">{ts}Date:{/ts}</td><td>{$note.note_date|crmDate}</td></tr>
+            <tr><td class="label">{ts}Modified Date:{/ts}</td><td>{$note.modified_date|crmDate}</td></tr>
             <tr><td class="label">{ts}Privacy:{/ts}</td><td>{$note.privacy}</td></tr>
             <tr><td class="label">{ts}Note:{/ts}</td><td>{$note.note|nl2br}</td></tr>
 
@@ -33,7 +34,7 @@
                     <tr><th>{ts}Comment{/ts}</th><th>{ts}Created By{/ts}</th><th>{ts}Date{/ts}</th></tr>
                 </thead>
                 {foreach from=$comments item=comment}
-                    <tr class="{cycle values='odd-row,even-row'}"><td>{$comment.note}</td><td>{$comment.createdBy}</td><td>{$comment.modified_date}</td></tr>
+                  <tr class="{cycle values='odd-row,even-row'}"><td>{$comment.note}</td><td>{$comment.createdBy}</td><td>{$comment.note_date}</td><td>{$comment.modified_date}</td></tr>
                 {/foreach}
             </table>
         </fieldset>
@@ -50,6 +51,10 @@
                 <td>
                     {$form.subject.html}
                 </td>
+            </tr>
+            <tr>
+              <td class="label">{$form.note_date.label}</td>
+              <td>{$form.note_date.html}</td>
             </tr>
             <tr>
                 <td class="label">{$form.privacy.label}</td>
@@ -149,6 +154,8 @@
                         + '</td><td>'
                         + response['values'][i].subject
                         + '</td><td>'
+                        + response['values'][i].note_date
+                        + '</td><td>'
                         + response['values'][i].modified_date
                         + '</td><td>'
                         + '<a href="'+ urlTemplate + response['values'][i].createdById +'">'+ response['values'][i].createdBy +'</a>'
@@ -193,6 +200,7 @@
           <th>{ts}Note{/ts}</th>
           <th>{ts}Subject{/ts}</th>
           <th>{ts}Date{/ts}</th>
+          <th>{ts}Modified Date{/ts}</th>
           <th>{ts}Created By{/ts}</th>
           <th data-orderable="false">{ts}Attachment(s){/ts}</th>
           <th data-orderable="false"></th>
@@ -222,6 +230,7 @@
                 {/if}
             </td>
             <td class="crm-note-subject crmf-subject crm-editable">{$note.subject}</td>
+            <td class="crm-note-note_date" data-order="{$note.note_date}">{$note.note_date|crmDate}</td>
             <td class="crm-note-modified_date" data-order="{$note.modified_date}">{$note.modified_date|crmDate}</td>
             <td class="crm-note-createdBy">
                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$note.contact_id`"}">{$note.createdBy}</a>

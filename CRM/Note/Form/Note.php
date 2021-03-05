@@ -130,6 +130,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     $this->addField('subject');
+    $this->addField('note_date', [], FALSE, FALSE);
     $this->addField('note', [], TRUE);
     $this->addField('privacy');
     $this->add('hidden', 'parent_id');

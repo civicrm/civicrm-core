@@ -477,6 +477,7 @@ ORDER BY  modified_date desc";
         $contact->fetch();
         $tree[$note->id]['createdBy'] = $contact->display_name;
         $tree[$note->id]['createdById'] = $createdById;
+        $tree[$note->id]['note_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['note_date']);
         $tree[$note->id]['modified_date'] = CRM_Utils_Date::customFormat($tree[$note->id]['modified_date']);
 
         // paper icon view for attachments part

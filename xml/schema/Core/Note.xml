@@ -87,6 +87,26 @@
     <onDelete>SET NULL</onDelete>
   </foreignKey>
   <field>
+    <name>note_date</name>
+    <title>Note Date</title>
+    <type>timestamp</type>
+    <add>5.36</add>
+    <default>CURRENT_TIMESTAMP</default>
+    <comment>Date attached to the note</comment>
+    <html>
+     <type>Select Date</type>
+     <formatType>activityDateTime</formatType>
+   </html>
+  </field>
+  <field>
+    <name>created_date</name>
+    <type>timestamp</type>
+    <comment>When the note was created.</comment>
+    <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
+    <add>5.36</add>
+  </field>
+  <field>
     <name>modified_date</name>
     <title>Note Modified By</title>
     <type>timestamp</type>
