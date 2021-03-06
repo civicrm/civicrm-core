@@ -96,6 +96,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_17_1($rev) {
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     // Need to do this again because the alpha1 version had a typo and so didn't do anything.
     $this->addTask(ts('Add pptx to accepted attachment file types'), 'updateFileTypes');
   }

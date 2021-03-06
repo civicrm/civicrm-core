@@ -58,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveFourteen extends CRM_Upgrade_Incremental_B
    * @param string $rev
    */
   public function upgrade_5_14_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     // Additional tasks here...
     // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
     // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
