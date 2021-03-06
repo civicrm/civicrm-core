@@ -88,9 +88,11 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
-   * @param $version
+   * @param string $version
+   *   Ex: '5.22' or '5.22.3'
    *
-   * @return mixed
+   * @return CRM_Upgrade_Incremental_Base
+   *   Ex: CRM_Upgrade_Incremental_php_FiveTwentyTwo
    */
   public static function &incrementalPhpObject($version) {
     static $incrementalPhpObject = [];
