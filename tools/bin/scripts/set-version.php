@@ -24,6 +24,7 @@ if (!isVersionValid($oldVersion)) {
 
 /** @var string $newVersion */
 /** @var bool $doCommit */
+/** @var bool $doSql */
 extract(parseArgs($argv));
 
 if (!isVersionValid($newVersion)) {
@@ -45,9 +46,12 @@ $phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () us
   return ob_get_clean();
 });
 
-$sqlFile = initFile("CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl", function () use ($newVersion) {
-  return "{* file to handle db changes in $newVersion during upgrade *}\n";
-});
+// It is typical for `*.alpha` to need SQL file -- and for `*.beta1` and `*.0` to NOT need a SQL file.
+if ($doSql === TRUE || ($doSql === 'auto' && preg_match(';alpha;', $newVersion))) {
+  $sqlFile = initFile("CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl", function () use ($newVersion) {
+    return "{* file to handle db changes in $newVersion during upgrade *}\n";
+  });
+}
 
 updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
@@ -68,9 +72,13 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
 });
 
 if ($doCommit) {
-  $files = "xml/version.xml sql/civicrm_generated.mysql sql/test_data_second_domain.mysql " . escapeshellarg($phpFile) . ' ' . escapeshellarg($sqlFile);
-  passthru("git add $files");
-  passthru("git commit $files -m " . escapeshellarg("Set version to $newVersion"));
+  $files = array_filter(
+    ['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile],
+    'file_exists'
+  );
+  $filesEsc = implode(' ', array_map('escapeshellarg', $files));
+  passthru("git add $filesEsc");
+  passthru("git commit $filesEsc -m " . escapeshellarg("Set version to $newVersion"));
 }
 
 /* *********************************************************************** */
@@ -134,9 +142,15 @@ function isVersionValid($v) {
  */
 function fatal($error) {
   echo $error;
-  echo "usage: set-version.php <new-version> [--commit|--no-commit]\n";
-  echo "  With --commit, any changes will be committed automatically the current git branch.\n";
-  echo "  With --no-commit, any changes will be left uncommitted.\n";
+  echo "usage: set-version.php <new-version> [--sql|--no-sql] [--commit|--no-commit]\n";
+  echo "  --sql        A placeholder *.sql file will be created.\n";
+  echo "  --no-sql     A placeholder *.sql file will not be created.\n";
+  echo "  --commit     Any changes will be committed automatically the current git branch.\n";
+  echo "  --no-commit  Any changes will be left uncommitted.\n";
+  echo "\n";
+  echo "If the SQL style is not specified, it will decide automatically. (Alpha versions get SQL files.)\n";
+  echo "\n";
+  echo "You MUST indicate whether to commit.\n";
   exit(1);
 }
 
@@ -148,6 +162,7 @@ function fatal($error) {
  */
 function parseArgs($argv) {
   $parsed = [];
+  $parsed['doSql'] = 'auto';
   $positions = ['scriptFile', 'newVersion'];
   $positional = [];
 
@@ -159,6 +174,14 @@ function parseArgs($argv) {
 
       case '--no-commit':
         $parsed['doCommit'] = FALSE;
+        break;
+
+      case '--sql':
+        $parsed['doSql'] = TRUE;
+        break;
+
+      case '--no-sql':
+        $parsed['doSql'] = FALSE;
         break;
 
       default:
