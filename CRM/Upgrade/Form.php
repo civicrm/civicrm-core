@@ -108,6 +108,29 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   /**
+   * @return array
+   *   ex: ['5.13', '5.14', '5.15']
+   */
+  public static function incrementalPhpObjectVersions() {
+    $versions = [];
+
+    $phpDir = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'Incremental', 'php']);
+    $phpFiles = glob("$phpDir/*.php");
+    foreach ($phpFiles as $phpFile) {
+      $phpWord = substr(basename($phpFile), 0, -4);
+      if (CRM_Utils_EnglishNumber::isNumeric($phpWord)) {
+        /** @var \CRM_Upgrade_Incremental_Base $instance */
+        $className = 'CRM_Upgrade_Incremental_php_' . $phpWord;
+        $instance = new $className();
+        $versions[] = $instance->getMajorMinor();
+      }
+    }
+
+    usort($versions, 'version_compare');
+    return $versions;
+  }
+
+  /**
    * @param $version
    * @param $release
    *
@@ -289,23 +312,18 @@ SET    version = '$version'
   }
 
   /**
+   * Get a list of all patch-versions that appear in upgrade steps, whether
+   * as *.mysql.tpl or as *.php.
+   *
    * @return array
    * @throws Exception
    */
   public function getRevisionSequence() {
     $revList = [];
-    $sqlDir = implode(DIRECTORY_SEPARATOR,
-      [dirname(__FILE__), 'Incremental', 'sql']
-    );
-    $sqlFiles = scandir($sqlDir);
 
-    $sqlFilePattern = '/^((\d{1,2}\.\d{1,2})\.(\d{1,2}\.)?(\d{1,2}|\w{4,7}))\.(my)?sql(\.tpl)?$/i';
-    foreach ($sqlFiles as $file) {
-      if (preg_match($sqlFilePattern, $file, $matches)) {
-        if (!in_array($matches[1], $revList)) {
-          $revList[] = $matches[1];
-        }
-      }
+    foreach (self::incrementalPhpObjectVersions() as $majorMinor) {
+      $phpUpgrader = self::incrementalPhpObject($majorMinor);
+      $revList = array_merge($revList, array_values($phpUpgrader->getRevisionSequence()));
     }
 
     usort($revList, 'version_compare');
@@ -531,6 +549,12 @@ SET    version = '$version'
     $queue->createItem($task);
 
     $revisions = $upgrade->getRevisionSequence();
+    $maxRevision = empty($revisions) ? NULL : end($revisions);
+    reset($revisions);
+    if (version_compare($latestVer, $maxRevision, '<')) {
+      throw new CRM_Core_Exception("Malformed upgrade sequence.  The incremental update $maxRevision exceeds target version $latestVer");
+    }
+
     foreach ($revisions as $rev) {
       // proceed only if $currentVer < $rev
       if (version_compare($currentVer, $rev) < 0) {
@@ -561,6 +585,16 @@ SET    version = '$version'
         );
         $queue->createItem($task);
       }
+    }
+
+    // It's possible that xml/version.xml points to a version that doesn't have any concrete revision steps.
+    if (!in_array($latestVer, $revisions)) {
+      $task = new CRM_Queue_Task(
+        ['CRM_Upgrade_Form', 'doIncrementalUpgradeFinish'],
+        [$rev, $latestVer, $latestVer, $postUpgradeMessageFile],
+        "Finish Upgrade DB to $latestVer"
+      );
+      $queue->createItem($task);
     }
 
     return $queue;
@@ -748,7 +782,12 @@ SET    version = '$version'
   }
 
   /**
-   * Perform an incremental version update.
+   * Mark an incremental update as finished.
+   *
+   * This method may be called in two cases:
+   *
+   * - After performing each incremental update (`X.X.X.mysql.tpl` or `upgrade_X_X_X()`)
+   * - If needed, one more time at the end of the upgrade for the final version-number.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $rev
