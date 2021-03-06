@@ -22,20 +22,12 @@ if (!isVersionValid($oldVersion)) {
   fatal("failed to read old version from \"xml/version.xml\"\n");
 }
 
-$newVersion = @$argv[1];
+/** @var string $newVersion */
+/** @var bool $doCommit */
+extract(parseArgs($argv));
+
 if (!isVersionValid($newVersion)) {
   fatal("failed to read new version\n");
-}
-
-switch (@$argv[2]) {
-  case '--commit':
-    $doCommit = 1;
-    break;
-  case '--no-commit':
-    $doCommit = 0;
-    break;
-  default:
-    fatal("Must specify --commit or --no-commit\n");
 }
 
 /* *********************************************************************** */
@@ -128,7 +120,7 @@ function initFile($file, $callback) {
  *   Ex: 'FiveTen'.
  */
 function makeVerName($version) {
-  list ($a, $b) = explode('.', $version);
+  [$a, $b] = explode('.', $version);
   require_once 'CRM/Utils/EnglishNumber.php';
   return CRM_Utils_EnglishNumber::toCamelCase($a) . CRM_Utils_EnglishNumber::toCamelCase($b);
 }
@@ -146,4 +138,48 @@ function fatal($error) {
   echo "  With --commit, any changes will be committed automatically the current git branch.\n";
   echo "  With --no-commit, any changes will be left uncommitted.\n";
   exit(1);
+}
+
+/**
+* @param array $argv
+ *  Ex: ['myscript.php', '--no-commit', '5.6.7']
+ * @return array
+ *  Ex: ['scriptFile' => 'myscript.php', 'doCommit' => FALSE, 'newVersion' => '5.6.7']
+ */
+function parseArgs($argv) {
+  $parsed = [];
+  $positions = ['scriptFile', 'newVersion'];
+  $positional = [];
+
+  foreach ($argv as $arg) {
+    switch ($arg) {
+      case '--commit':
+        $parsed['doCommit'] = TRUE;
+        break;
+
+      case '--no-commit':
+        $parsed['doCommit'] = FALSE;
+        break;
+
+      default:
+        if ($arg[0] !== '-') {
+          $positional[] = $arg;
+        }
+        else {
+          fatal("Unrecognized argument: $arg\n");
+        }
+        break;
+    }
+  }
+
+  foreach ($positional as $offset => $value) {
+    $name = $positions[$offset] ?? "unknown_$offset";
+    $parsed[$name] = $value;
+  }
+
+  if (!isset($parsed['doCommit'])) {
+    fatal("Must specify --commit or --no-commit\n");
+  }
+
+  return $parsed;
 }
