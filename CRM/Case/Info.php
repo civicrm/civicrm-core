@@ -239,9 +239,6 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     ) {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
       self::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
-      if (!CRM_Case_BAO_Case::createCaseViews()) {
-        throw new CRM_Core_Exception(ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission"));
-      }
     }
   }
 

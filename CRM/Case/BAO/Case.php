@@ -432,16 +432,37 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
         INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id
 HERESQL;
 
+    // 'upcoming' and 'recent' show the next scheduled and most recent
+    // not-scheduled activity on each case, respectively.
+    $scheduled_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
     switch ($type) {
       case 'upcoming':
-      case 'recent':
-        // civicrm_view_case_activity_upcoming and
-        // civicrm_view_case_activity_recent are views that show the next
-        // scheduled and most recent not-scheduled activity on each case,
-        // respectively.
         $query .= <<<HERESQL
-        INNER JOIN civicrm_view_case_activity_$type t_act
-          ON t_act.case_id = civicrm_case.id
+        INNER JOIN (SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
+         FROM civicrm_case_activity ca
+         INNER JOIN civicrm_activity a ON ca.activity_id=a.id
+         WHERE a.id =
+        (SELECT b.id FROM civicrm_case_activity bca
+         INNER JOIN civicrm_activity b ON bca.activity_id=b.id
+         WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
+         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
+         AND bca.case_id = ca.case_id ORDER BY b.activity_date_time ASC LIMIT 1)) t_act
+        ON t_act.case_id = civicrm_case.id
+HERESQL;
+        break;
+
+      case 'recent':
+        $query .= <<<HERESQL
+        INNER JOIN (SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
+         FROM civicrm_case_activity ca
+         INNER JOIN civicrm_activity a ON ca.activity_id=a.id
+         WHERE a.id =
+        (SELECT b.id FROM civicrm_case_activity bca
+         INNER JOIN civicrm_activity b ON bca.activity_id=b.id
+         WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
+         AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
+         AND bca.case_id = ca.case_id ORDER BY b.activity_date_time DESC LIMIT 1)) t_act
+        ON t_act.case_id = civicrm_case.id
 HERESQL;
         break;
 
@@ -2781,67 +2802,6 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
     }
 
     return $configured;
-  }
-
-  /**
-   * Used during case component enablement and during upgrade.
-   *
-   * @return bool
-   */
-  public static function createCaseViews() {
-    $dao = new CRM_Core_DAO();
-    try {
-      $sql = self::createCaseViewsQuery('upcoming');
-      $dao->query($sql);
-
-      $sql = self::createCaseViewsQuery('recent');
-      $dao->query($sql);
-    }
-    catch (Exception $e) {
-      return FALSE;
-    }
-
-    return TRUE;
-  }
-
-  /**
-   * Helper function, also used by the upgrade in case of error
-   *
-   * @param string $section
-   *
-   * @return string
-   */
-  public static function createCaseViewsQuery($section = 'upcoming') {
-    $sql = "";
-    $scheduled_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Scheduled');
-    switch ($section) {
-      case 'upcoming':
-        $sql = "CREATE OR REPLACE VIEW `civicrm_view_case_activity_upcoming`
- AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
- FROM civicrm_case_activity ca
- INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.id =
-(SELECT b.id FROM civicrm_case_activity bca
- INNER JOIN civicrm_activity b ON bca.activity_id=b.id
- WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
- AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
- AND bca.case_id = ca.case_id ORDER BY b.activity_date_time ASC LIMIT 1)";
-        break;
-
-      case 'recent':
-        $sql = "CREATE OR REPLACE VIEW `civicrm_view_case_activity_recent`
- AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
- FROM civicrm_case_activity ca
- INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.id =
-(SELECT b.id FROM civicrm_case_activity bca
- INNER JOIN civicrm_activity b ON bca.activity_id=b.id
- WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
- AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
- AND bca.case_id = ca.case_id ORDER BY b.activity_date_time DESC LIMIT 1)";
-        break;
-    }
-    return $sql;
   }
 
   /**

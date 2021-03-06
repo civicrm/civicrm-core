@@ -55,11 +55,6 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
       ) {
         $errors['enable_components'] = ts('You need to enable CiviContribute before enabling CiviPledge.');
       }
-      if (!empty($fields['enable_components']['CiviCase']) &&
-        !CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)
-      ) {
-        $errors['enable_components'] = ts('CiviCase requires CREATE VIEW and DROP VIEW permissions for the database.');
-      }
     }
 
     return $errors;
