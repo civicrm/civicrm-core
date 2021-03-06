@@ -80,7 +80,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyFive extends CRM_Upgrade_Incremental
   }
 
   public function upgrade_5_25_beta3($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Convert CiviContribute settings', 'updateContributeSettings');
   }
 
