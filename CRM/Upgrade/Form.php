@@ -311,19 +311,6 @@ SET    version = '$version'
   }
 
   /**
-   * @param $rev
-   * @param int $index
-   *
-   * @return null
-   */
-  public static function getRevisionPart($rev, $index = 1) {
-    $revPattern = '/^((\d{1,2})\.\d{1,2})\.(\d{1,2}|\w{4,7})?$/i';
-    preg_match($revPattern, $rev, $matches);
-
-    return array_key_exists($index, $matches) ? $matches[$index] : NULL;
-  }
-
-  /**
    * @param $tplFile
    * @param $rev
    *
