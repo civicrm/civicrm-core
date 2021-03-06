@@ -1066,14 +1066,6 @@ DESC limit 1");
             $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
           }
         }
-
-        ///CRM-11529 for quick config backoffice transactions
-        //when financial_type_id is passed in form, update the
-        //lineitems with the financial type selected in form
-        $submittedFinancialType = $formValues['financial_type_id'] ?? NULL;
-        if ($isQuickConfig && $submittedFinancialType) {
-          $li['financial_type_id'] = $submittedFinancialType;
-        }
       }
     }
 

@@ -17,6 +17,8 @@
  * @author Walt Haas <walt@dharmatech.org> (801) 534-1262
  */
 
+use Civi\Api4\FinancialType;
+
 /**
  *  Test CRM_Member_Form_Membership functions.
  *
@@ -753,6 +755,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    * Test the submit function of the membership form.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -776,6 +779,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'auto_renew' => TRUE,
     ]);
     $params = $this->getBaseSubmitParams();
+    // Change financial_type_id to test our override flows through to the line item.
+    $params['financial_type_id'] = FinancialType::get(FALSE)->addWhere('id', '!=', $params['financial_type_id'])->addSelect('id')->execute()->first()['id'];
     $form = $this->getForm();
     $this->createLoggedInUser();
     $form->_mode = 'test';
@@ -800,6 +805,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
       'contribution_id' => $contribution['id'],
+      'financial_type_id' => $params['financial_type_id'],
     ], 1);
     $this->assertEquals([
       [
@@ -1286,7 +1292,6 @@ Expires: ',
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
-      // This format reflects the 23 being the organisation & the 25 being the type.
       "price_" . $this->getPriceFieldID() => $pfvIDs,
       'price_set_id' => $this->getPriceSetID(),
       'membership_type_id' => [1 => 0],
