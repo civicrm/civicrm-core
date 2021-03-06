@@ -73,7 +73,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
 
   public function upgrade_5_31_beta2($rev) {
     $this->addTask('Restore null-ity of "civicrm_group.title" field', 'groupTitleRestore');
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
   public static function enableEwaySingleExtension(CRM_Queue_TaskContext $ctx) {
