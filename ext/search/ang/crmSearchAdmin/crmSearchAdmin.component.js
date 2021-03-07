@@ -264,7 +264,8 @@
         var alias = searchMeta.getJoin(ctrl.savedSearch.api_params.join[index][0]).alias;
         ctrl.clearParam('join', index);
         _.remove(ctrl.savedSearch.api_params.select, function(item) {
-          return item.indexOf(alias + '.') === 0;
+          var pattern = new RegExp('\\b' + alias + '\\.');
+          return pattern.test(item.split(' AS ')[0]);
         });
         _.remove(ctrl.savedSearch.api_params.where, function(clause) {
           return clauseUsesJoin(clause, alias);
