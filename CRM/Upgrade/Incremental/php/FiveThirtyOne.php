@@ -58,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_31_alpha1($rev) {
-    $this->addTask('Expand internal civicrm group title field to be 255 in length', 'grouptitlefieldExpand');
+    $this->addTask('Expand internal civicrm group title field to be 255 in length', 'groupTitleRestore');
     $this->addTask('Add in optional public title group table', 'addColumn', 'civicrm_group', 'frontend_title', "varchar(255)   DEFAULT NULL COMMENT 'Alternative public title for this Group.'", TRUE, '5.31.alpha1', FALSE);
     $this->addTask('Add in optional public description group table', 'addColumn', 'civicrm_group', 'frontend_description', "text   DEFAULT NULL COMMENT 'Alternative public description of the group.'", TRUE, '5.31.alpha1');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
@@ -142,30 +142,6 @@ class CRM_Upgrade_Incremental_php_FiveThirtyOne extends CRM_Upgrade_Incremental_
     ]);
     CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
 
-    return TRUE;
-  }
-
-  /**
-   * Expands the length of the civicrm_group.title field in the database to be 255.
-   *
-   * @param \CRM_Queue_TaskContext $ctx
-   *
-   * @return bool
-   */
-  public static function grouptitlefieldExpand(CRM_Queue_TaskContext $ctx) {
-    $locales = CRM_Core_I18n::getMultilingual();
-    $queries = [];
-    if ($locales) {
-      foreach ($locales as $locale) {
-        $queries[] = "ALTER TABLE civicrm_group CHANGE `title_{$locale}` `title_{$locale}` varchar(255) NOT NULL COMMENT 'Name of Group.'";
-      }
-    }
-    else {
-      $queries[] = "ALTER TABLE civicrm_group CHANGE `title` `title` varchar(255) NOT NULL COMMENT 'Name of Group.'";
-    }
-    foreach ($queries as $query) {
-      CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
-    }
     return TRUE;
   }
 
