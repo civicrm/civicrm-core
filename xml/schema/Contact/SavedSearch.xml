@@ -161,6 +161,7 @@
     <html>
       <label>Modified By</label>
     </html>
+    <readonly>true</readonly>
     <add>5.36</add>
   </field>
   <foreignKey>
@@ -193,6 +194,7 @@
     <required>true</required>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>5.36</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>description</name>

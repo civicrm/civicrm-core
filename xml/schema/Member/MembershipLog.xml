@@ -82,6 +82,7 @@
     <html>
       <label>Modified By</label>
     </html>
+    <readonly>true</readonly>
     <add>1.5</add>
   </field>
   <foreignKey>

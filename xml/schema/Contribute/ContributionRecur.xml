@@ -149,6 +149,7 @@
     </html>
     <uniqueName>contribution_recur_modified_date</uniqueName>
     <uniqueTitle>Recurring Contribution Modified Date</uniqueTitle>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>cancel_date</name>

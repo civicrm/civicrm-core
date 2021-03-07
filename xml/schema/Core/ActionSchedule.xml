@@ -424,6 +424,7 @@
       <label>Modified Date</label>
     </html>
     <add>5.34</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>effective_start_date</name>

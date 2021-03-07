@@ -237,6 +237,7 @@
     <html>
       <label>Modified By</label>
     </html>
+    <readonly>true</readonly>
     <add>4.5</add>
   </field>
   <foreignKey>

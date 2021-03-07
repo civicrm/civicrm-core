@@ -172,17 +172,21 @@ class Afform extends Generic\AbstractEntity {
       if ($self->getAction() === 'get') {
         $fields[] = [
           'name' => 'module_name',
+          'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'directive_name',
+          'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_local',
           'data_type' => 'Boolean',
+          'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_base',
           'data_type' => 'Boolean',
+          'readonly' => TRUE,
         ];
       }
 

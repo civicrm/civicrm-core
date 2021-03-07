@@ -93,6 +93,7 @@
     <comment>When was this note last modified/edited</comment>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>1.1</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>subject</name>

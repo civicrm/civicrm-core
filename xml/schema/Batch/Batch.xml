@@ -105,7 +105,8 @@
     <name>modified_date</name>
     <title>Batch Modified Date</title>
     <type>datetime</type>
-    <comment>When was this item created</comment>
+    <comment>When was this item modified</comment>
+    <readonly>true</readonly>
     <add>3.3</add>
   </field>
   <foreignKey>
