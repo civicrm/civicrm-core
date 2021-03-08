@@ -19,6 +19,7 @@
 
 namespace api\v4\Query;
 
+use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use api\v4\UnitTestCase;
 
@@ -50,7 +51,7 @@ class Api4SelectQueryTest extends UnitTestCase {
     $phoneNum = $this->getReference('test_phone_1')['phone'];
     $contact = $this->getReference('test_contact_1');
 
-    $api = \Civi\API\Request::create('Phone', 'get', [
+    $api = Request::create('Phone', 'get', [
       'version' => 4,
       'checkPermissions' => FALSE,
       'select' => ['id', 'phone', 'contact.display_name', 'contact.first_name'],
@@ -64,8 +65,30 @@ class Api4SelectQueryTest extends UnitTestCase {
     $this->assertEquals($contact['display_name'], $firstResult['contact.display_name']);
   }
 
-  public function testInvaidSort() {
-    $api = \Civi\API\Request::create('Contact', 'get', [
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testAggregateNoGroupBy(): void {
+    $api = Request::create('Pledge', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['SUM(amount) AS SUM_amount'],
+    ]);
+    $query = new Api4SelectQuery($api);
+    $this->assertEquals(
+      'SELECT SUM(`a`.`amount`) AS `SUM_amount`
+FROM civicrm_pledge a',
+      trim($query->getSql())
+    );
+  }
+
+  /**
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testInvalidSort(): void {
+    $api = Request::create('Contact', 'get', [
       'version' => 4,
       'checkPermissions' => FALSE,
       'select' => ['id', 'display_name'],
@@ -74,12 +97,13 @@ class Api4SelectQueryTest extends UnitTestCase {
     ]);
     $query = new Api4SelectQuery($api);
     try {
-      $results = $query->run();
+      $query->run();
       $this->fail('An Exception Should have been raised');
     }
     catch (\API_Exception $e) {
     }
-    $api = \Civi\API\Request::create('Contact', 'get', [
+
+    $api = Request::create('Contact', 'get', [
       'version' => 4,
       'checkPermissions' => FALSE,
       'select' => ['id', 'display_name'],
@@ -88,7 +112,7 @@ class Api4SelectQueryTest extends UnitTestCase {
     ]);
     $query = new Api4SelectQuery($api);
     try {
-      $results = $query->run();
+      $query->run();
       $this->fail('An Exception Should have been raised');
     }
     catch (\API_Exception $e) {
