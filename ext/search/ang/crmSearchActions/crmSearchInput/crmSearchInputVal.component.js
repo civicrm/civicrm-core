@@ -106,6 +106,10 @@
           return '~/crmSearchActions/crmSearchInput/integer.html';
         }
 
+        if (ctrl.field.data_type === 'Float') {
+          return '~/crmSearchActions/crmSearchInput/float.html';
+        }
+
         return '~/crmSearchActions/crmSearchInput/text.html';
       };
 
