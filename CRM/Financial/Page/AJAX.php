@@ -198,10 +198,6 @@ class CRM_Financial_Page_AJAX {
             $params['id'] = $recordID;
             break;
 
-          case 'export':
-            CRM_Utils_System::redirect("civicrm/financial/batch/export?reset=1&id=$recordID");
-            break;
-
           case 'delete':
             $params = $recordID;
             break;
