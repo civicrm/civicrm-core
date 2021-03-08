@@ -1842,21 +1842,13 @@ DESC limit 1");
 
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $contributionParams['financial_type_id'];
-
-    $params['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     $params['is_recur'] = TRUE;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
-    $now = CRM_Utils_Time::date('YmdHis');
-    $receiptDate = $params['receipt_date'] ?? NULL;
-    if ($params['is_email_receipt']) {
-      $receiptDate = $now;
-    }
-
     if ($this->getSubmittedValue('send_receipt')) {
       $contributionParams += [
-        'receipt_date' => $receiptDate,
+        'receipt_date' => CRM_Utils_Time::date('YmdHis'),
       ];
     }
 
