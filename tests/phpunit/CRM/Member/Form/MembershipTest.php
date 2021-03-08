@@ -827,11 +827,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'membership_type_id' => NULL,
+      // Set financial type id to null to check it is retrieved from the price set.
+      'financial_type_id' => NULL,
     ];
     $form->testSubmit(array_merge($this->getBaseSubmitParams(), $priceParams));
     $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
-    $this->callAPISuccessGetSingle('Contribution', []);
+    $this->callAPISuccessGetSingle('Contribution', ['financial_type_id' => 1]);
     $this->callAPISuccessGetCount('MembershipPayment', [], 2);
     $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $lines);

@@ -79,6 +79,13 @@ class CRM_Financial_BAO_Order {
   protected $priceFieldMetadata = [];
 
   /**
+   * Metadata for price sets.
+   *
+   * @var array
+   */
+  protected $priceSetMetadata = [];
+
+  /**
    * Get form object.
    *
    * @return \CRM_Core_Form|NULL
@@ -245,12 +252,38 @@ class CRM_Financial_BAO_Order {
    */
   public function getPriceFieldsMetadata(): array {
     if (empty($this->priceFieldMetadata)) {
-      $this->priceFieldMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID())['fields'];
+      $this->getPriceSetMetadata();
       if ($this->getForm()) {
         CRM_Utils_Hook::buildAmount($this->form->getFormContext(), $this->form, $this->priceFieldMetadata);
       }
     }
     return $this->priceFieldMetadata;
+  }
+
+  /**
+   * Get the metadata for the fields in the price set.
+   *
+   * @return array
+   */
+  public function getPriceSetMetadata(): array {
+    if (empty($this->priceSetMetadata)) {
+      $priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
+      $this->priceFieldMetadata = $priceSetMetadata['fields'];
+      unset($priceSetMetadata['fields']);
+      $this->priceSetMetadata = $priceSetMetadata;
+    }
+    return $this->priceSetMetadata;
+  }
+
+  /**
+   * Get the financial type id for the order.
+   *
+   * This may differ to the line items....
+   *
+   * @return int
+   */
+  public function getFinancialTypeID(): int {
+    return (int) $this->getOverrideFinancialTypeID() ?: $this->getPriceSetMetadata()['financial_type_id'];
   }
 
   /**
