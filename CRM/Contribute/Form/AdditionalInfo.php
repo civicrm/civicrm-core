@@ -421,19 +421,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 
-    $template = CRM_Core_Smarty::singleton();
-    $taxAmt = $template->get_template_vars('dataArray');
-    $eventTaxAmt = $template->get_template_vars('totalTaxAmount');
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $prefixValue['invoicing'] ?? NULL;
-    if ((!empty($taxAmt) || isset($eventTaxAmt)) && (isset($invoicing) && isset($prefixValue['is_email_pdf']))) {
-      $isEmailPdf = TRUE;
-    }
-    else {
-      $isEmailPdf = FALSE;
-    }
-
-    list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_offline_receipt',
@@ -444,7 +432,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => $isEmailPdf,
+        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
       ]
     );
 
