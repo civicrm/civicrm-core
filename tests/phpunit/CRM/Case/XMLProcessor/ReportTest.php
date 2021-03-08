@@ -582,4 +582,47 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
     $this->callAPISuccess('CaseType', 'create', $caseType);
   }
 
+  /**
+   * Test getOtherRelationships()
+   */
+  public function testGetOtherRelationships() {
+    // Create a case.
+    $client_id = $this->individualCreate([], 0, TRUE);
+    $caseObj1 = $this->createCase($client_id, $this->_loggedInUser);
+
+    // Assign a role
+    $role1 = $this->individualCreate([], 1, TRUE);
+    $benefit_specialist = $this->callAPISuccess('RelationshipType', 'getsingle', ['name_b_a' => 'Benefits Specialist']);
+    $this->callAPISuccess('Relationship', 'create', [
+      'case_id' => $caseObj1->id,
+      'contact_id_a' => $client_id,
+      'contact_id_b' => $role1,
+      'relationship_type_id' => $benefit_specialist['id'],
+    ]);
+
+    // Assign a non-case relationship
+    $relation2 = $this->individualCreate([], 2, TRUE);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $client_id,
+      'contact_id_b' => $relation2,
+      'relationship_type_id' => $benefit_specialist['id'],
+    ]);
+
+    // we need this for the function we're testing
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($client_id, $caseObj1->id);
+
+    // Run the function
+    $report = new CRM_Case_XMLProcessor_Report(FALSE);
+    $otherRelationships = \Civi\Test\Invasive::call([$report, 'getOtherRelationships'], [$client_id, $caseObj1->id, FALSE, $report, $caseRelationships]);
+
+    // We should only have our non-case benefit specialist listed
+    $this->assertCount(1, $otherRelationships);
+    $otherRelationship = $otherRelationships[0];
+    $this->assertEquals($client_id, $otherRelationship['contact_id_a']);
+    $this->assertEquals($relation2, $otherRelationship['contact_id_b']);
+    $this->assertEquals($relation2, $otherRelationship['cid']);
+    $this->assertEquals($benefit_specialist['id'], $otherRelationship['relationship_type_id']);
+    $this->assertNull($otherRelationship['case_id']);
+  }
+
 }
