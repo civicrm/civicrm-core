@@ -232,6 +232,7 @@
     <type>datetime</type>
     <title>Pledge Modified Date</title>
     <comment>Last updated date for this pledge record.</comment>
+    <readonly>true</readonly>
     <add>2.1</add>
   </field>
   <field>

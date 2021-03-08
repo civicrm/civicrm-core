@@ -44,7 +44,7 @@
   </field>
 
   <!-- Connection details -->
-  
+
   <field>
     <name>cxn_guid</name>
     <title>Connection GUID</title>
@@ -119,6 +119,7 @@
       <label>Modified Date</label>
     </html>
     <add>4.6</add>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>fetched_date</name>

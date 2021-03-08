@@ -345,6 +345,7 @@
     <html>
       <label>Modified Date</label>
     </html>
+    <readonly>true</readonly>
    <add>4.7</add>
   </field>
   <field>
