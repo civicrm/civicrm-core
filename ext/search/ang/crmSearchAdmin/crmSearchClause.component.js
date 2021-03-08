@@ -13,7 +13,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this,
         meta = {};
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};

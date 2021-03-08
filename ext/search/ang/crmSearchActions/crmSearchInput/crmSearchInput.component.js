@@ -11,7 +11,7 @@
     require: {ngModel: 'ngModel'},
     templateUrl: '~/crmSearchActions/crmSearchInput/crmSearchInput.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this;
 
       this.isMulti = function() {

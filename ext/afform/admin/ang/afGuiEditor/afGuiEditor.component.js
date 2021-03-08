@@ -19,7 +19,7 @@
     },
     controllerAs: 'editor',
     controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
-      var ts = $scope.ts = CRM.ts('afform');
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       $scope.crmUrl = CRM.url;
 
       $scope.afform = null;

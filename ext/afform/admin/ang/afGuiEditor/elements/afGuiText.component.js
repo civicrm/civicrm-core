@@ -9,7 +9,7 @@
       deleteThis: '&'
     },
     controller: function($scope, afGui) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       $scope.tags = {

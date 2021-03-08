@@ -12,7 +12,7 @@ use Civi\Api4\Action\Afform\Submit;
  */
 function _afform_fields_filter($params) {
   $result = [];
-  $fields = \Civi\Api4\Afform::getfields()->setCheckPermissions(FALSE)->setAction('create')->execute()->indexBy('name');
+  $fields = \Civi\Api4\Afform::getfields(FALSE)->setAction('create')->execute()->indexBy('name');
   foreach ($fields as $fieldName => $field) {
     if (isset($params[$fieldName])) {
       $result[$fieldName] = $params[$fieldName];
@@ -156,7 +156,7 @@ function afform_civicrm_managed(&$entities) {
         'domain_id' => CRM_Core_BAO_Domain::getDomain()->id,
         'is_active' => TRUE,
         'name' => $afform['name'],
-        'label' => $afform['title'] ?? ts('(Untitled)'),
+        'label' => $afform['title'] ?? E::ts('(Untitled)'),
         'directive' => _afform_angular_module_name($afform['name'], 'dash'),
         'permission' => "@afform:" . $afform['name'],
       ],
@@ -348,7 +348,7 @@ function afform_civicrm_permissionList(&$permissions) {
   foreach ($scanner->getMetas() as $name => $meta) {
     $permissions['@afform:' . $name] = [
       'group' => 'afform',
-      'title' => ts('Afform: Inherit permission of %1', [
+      'title' => E::ts('Afform: Inherit permission of %1', [
         1 => $name,
       ]),
     ];

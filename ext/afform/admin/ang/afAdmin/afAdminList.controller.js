@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus) {
-    var ts = $scope.ts = CRM.ts(),
+    var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
 
     $scope.crmUrl = CRM.url;

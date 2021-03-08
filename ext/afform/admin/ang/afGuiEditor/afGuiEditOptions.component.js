@@ -6,7 +6,7 @@
     templateUrl: '~/afGuiEditor/afGuiEditOptions.html',
     require: {field: '^^afGuiField'},
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       this.$onInit = function() {

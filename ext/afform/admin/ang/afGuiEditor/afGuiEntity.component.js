@@ -9,7 +9,7 @@
     },
     require: {editor: '^^afGuiEditor'},
     controller: function ($scope, $timeout, afGui) {
-      var ts = $scope.ts = CRM.ts();
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
       var ctrl = this;
       $scope.controls = {};
       $scope.fieldList = [];

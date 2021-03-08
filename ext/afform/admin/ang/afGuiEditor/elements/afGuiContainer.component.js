@@ -12,7 +12,7 @@
     },
     require: {editor: '^^afGuiEditor'},
     controller: function($scope, crmApi4, dialogService, afGui) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
       this.$onInit = function() {

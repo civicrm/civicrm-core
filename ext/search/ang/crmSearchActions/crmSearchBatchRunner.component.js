@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchActions/crmSearchBatchRunner.html',
     controller: function($scope, $timeout, $interval, crmApi4) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this,
         currentBatch = 0,
         totalBatches,

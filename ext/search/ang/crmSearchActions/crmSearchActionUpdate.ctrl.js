@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmSearchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService) {
-    var ts = $scope.ts = CRM.ts(),
+    var ts = $scope.ts = CRM.ts('org.civicrm.search'),
       model = $scope.model,
       ctrl = $scope.$ctrl = this;
 

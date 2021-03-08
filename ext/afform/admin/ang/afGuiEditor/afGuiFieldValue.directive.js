@@ -10,7 +10,7 @@
       },
       require: 'ngModel',
       link: function (scope, element, attrs, ctrl) {
-        var ts = scope.ts = CRM.ts(),
+        var ts = scope.ts = CRM.ts('org.civicrm.afform_admin'),
           multi;
 
         function destroyWidget() {

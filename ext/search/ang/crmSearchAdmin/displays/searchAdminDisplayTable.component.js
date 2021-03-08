@@ -12,7 +12,7 @@
     },
     templateUrl: '~/crmSearchAdmin/displays/searchAdminDisplayTable.html',
     controller: function($scope) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this;
 
       this.$onInit = function () {

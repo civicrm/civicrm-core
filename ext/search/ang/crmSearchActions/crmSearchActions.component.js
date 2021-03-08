@@ -9,7 +9,7 @@
     },
     templateUrl: '~/crmSearchActions/crmSearchActions.html',
     controller: function($scope, crmApi4, dialogService) {
-      var ts = $scope.ts = CRM.ts(),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
         ctrl = this,
         initialized = false,
         unwatchIDs = $scope.$watch('$ctrl.ids.length', watchIDs);
