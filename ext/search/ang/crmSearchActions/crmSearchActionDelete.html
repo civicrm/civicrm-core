@@ -1,5 +1,5 @@
 <div id="bootstrap-theme">
-  <form ng-controller="crmSearchActionDelete">
+  <form ng-controller="crmSearchActionDelete as $ctrl">
     <p><strong>{{:: ts('Are you sure you want to delete %1 %2?', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <hr />
     <div ng-if="$ctrl.run" class="crm-search-action-progress">

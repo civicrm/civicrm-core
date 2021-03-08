@@ -1,5 +1,5 @@
 <div id="bootstrap-theme">
-  <form ng-controller="crmSearchActionUpdate">
+  <form ng-controller="crmSearchActionUpdate as $ctrl">
     <p><strong>{{:: ts('Update the %1 selected %2 with the following values:', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <div class="form-inline" ng-repeat="clause in $ctrl.values" >
       <input class="form-control" ng-change="$ctrl.updateField($index)" ng-disabled="$ctrl.run" ng-model="clause[0]" crm-ui-select="{data: $ctrl.availableFields, allowClear: true, placeholder: 'Field'}" />
