@@ -27,6 +27,13 @@ use Civi\Api4\MockBasicEntity;
  */
 class BasicActionsTest extends UnitTestCase {
 
+  private function replaceRecords(&$records) {
+    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
+    foreach ($records as &$record) {
+      $record['id'] = MockBasicEntity::create()->setValues($record)->execute()->first()['id'];
+    }
+  }
+
   public function testCrud() {
     MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
 
@@ -89,8 +96,6 @@ class BasicActionsTest extends UnitTestCase {
   }
 
   public function testReplace() {
-    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
-
     $objects = [
       ['group' => 'one', 'color' => 'red'],
       ['group' => 'one', 'color' => 'blue'],
@@ -98,9 +103,7 @@ class BasicActionsTest extends UnitTestCase {
       ['group' => 'two', 'color' => 'orange'],
     ];
 
-    foreach ($objects as &$object) {
-      $object['id'] = MockBasicEntity::create()->setValues($object)->execute()->first()['id'];
-    }
+    $this->replaceRecords($objects);
 
     // Keep red, change blue, delete green, and add yellow
     $replacements = [
@@ -125,17 +128,13 @@ class BasicActionsTest extends UnitTestCase {
   }
 
   public function testBatchFrobnicate() {
-    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
-
     $objects = [
       ['group' => 'one', 'color' => 'red', 'number' => 10],
       ['group' => 'one', 'color' => 'blue', 'number' => 20],
       ['group' => 'one', 'color' => 'green', 'number' => 30],
       ['group' => 'two', 'color' => 'blue', 'number' => 40],
     ];
-    foreach ($objects as &$object) {
-      $object['id'] = MockBasicEntity::create()->setValues($object)->execute()->first()['id'];
-    }
+    $this->replaceRecords($objects);
 
     $result = MockBasicEntity::batchFrobnicate()->addWhere('color', '=', 'blue')->execute();
     $this->assertEquals(2, count($result));
@@ -235,13 +234,11 @@ class BasicActionsTest extends UnitTestCase {
   }
 
   public function testWildcardSelect() {
-    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
-
     $records = [
       ['group' => 'one', 'color' => 'red', 'shape' => 'round', 'size' => 'med', 'weight' => 10],
       ['group' => 'two', 'color' => 'blue', 'shape' => 'round', 'size' => 'med', 'weight' => 20],
     ];
-    MockBasicEntity::save()->setRecords($records)->execute();
+    $this->replaceRecords($records);
 
     foreach (MockBasicEntity::get()->addSelect('*')->execute() as $result) {
       ksort($result);
@@ -255,14 +252,57 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
   }
 
-  public function testContainsOperator() {
-    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
+  public function testEmptyAndNullOperators() {
+    $records = [
+      [],
+      ['color' => '', 'weight' => 0],
+      ['color' => 'yellow', 'weight' => 100000000000],
+    ];
+    $this->replaceRecords($records);
 
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'IS NULL')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($records[0]['id'], (array) $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'IS EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($records[2]['id'], (array) $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'IS NOT EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($records[2]['id'], (array) $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'IS NULL')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($records[0]['id'], (array) $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'IS EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($records[2]['id'], (array) $result);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('weight', 'IS NOT EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($records[2]['id'], (array) $result);
+  }
+
+  public function testContainsOperator() {
     $records = [
       ['group' => 'one', 'fruit:name' => ['apple', 'pear'], 'weight' => 11],
       ['group' => 'two', 'fruit:name' => ['pear', 'banana'], 'weight' => 12],
     ];
-    MockBasicEntity::save()->setRecords($records)->execute();
+    $this->replaceRecords($records);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', 'apple')
@@ -299,13 +339,11 @@ class BasicActionsTest extends UnitTestCase {
   }
 
   public function testPseudoconstantMatch() {
-    MockBasicEntity::delete()->addWhere('id', '>', 0)->execute();
-
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
       ['group:name' => 'Second', 'shape' => 'square', 'fruit:label' => 'Pear'],
     ];
-    MockBasicEntity::save()->setRecords($records)->execute();
+    $this->replaceRecords($records);
 
     $results = MockBasicEntity::get()
       ->addSelect('*', 'group:label', 'group:name', 'fruit:name', 'fruit:color', 'fruit:label')

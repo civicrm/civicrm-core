@@ -130,6 +130,10 @@ trait ArrayQueryActionTrait {
       case 'IS NOT NULL':
         return is_null($value) == ($operator == 'IS NULL');
 
+      case 'IS EMPTY':
+      case 'IS NOT EMPTY':
+        return empty($value) == ($operator == 'IS EMPTY');
+
       case '>':
         return $value > $expected;
 
