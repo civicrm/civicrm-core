@@ -418,11 +418,24 @@ if (!CRM.vars) CRM.vars = {};
           formatResult: formatCrmSelect2,
           formatSelection: formatCrmSelect2
         };
+
       // quickform doesn't support optgroups so here's a hack :(
+      var optGroups = {};
       $('option[value^=crm_optgroup]', this).each(function () {
-        $(this).nextUntil('option[value^=crm_optgroup]').wrapAll('<optgroup label="' + $(this).text() + '" />');
+        var groupHtml = '';
+          $(this).nextUntil('option[value^=crm_optgroup]').each(function () {
+          groupHtml += this.outerHTML;
+        });
+        optGroups[$(this).text()] = groupHtml;
         $(this).remove();
       });
+      var replacedHtml = '';
+      for (var groupLabel in optGroups) {
+        replacedHtml += '<optgroup label="' + groupLabel + '">' + optGroups[groupLabel] + '</optgroup>';
+      }
+      if (replacedHtml) {
+        $el.html(replacedHtml);
+      }
 
       // quickform does not support disabled option, so yet another hack to
       // add disabled property for option values
