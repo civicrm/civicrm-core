@@ -22,6 +22,9 @@
       contact_type: '',
       columns: []
     };
+    $scope.perms = {
+      admin: CRM.checkPerm('administer CiviCRM')
+    };
     // For the "add new field" dropdown
     $scope.new = {col: ''};
     var contactTypes = _.transform($scope.contact_types, function(result, type) {
