@@ -434,7 +434,7 @@ class Api4SelectQuery {
         if ($fieldName && $valExpr->getType() === 'SqlString') {
           $value = $valExpr->getExpr();
           FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
-          return \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
+          return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName]);
         }
         else {
           $value = $valExpr->render($this->apiFieldSpec);
@@ -447,6 +447,22 @@ class Api4SelectQuery {
       }
     }
 
+    $sqlClause = $this->createSQLClause($fieldAlias, $operator, $value, $field ?? NULL);
+    if ($sqlClause === NULL) {
+      throw new \API_Exception("Invalid value in $type clause for '$expr'");
+    }
+    return $sqlClause;
+  }
+
+  /**
+   * @param string $fieldAlias
+   * @param string $operator
+   * @param mixed $value
+   * @param array|null $field
+   * @return array|string|NULL
+   * @throws \Exception
+   */
+  protected function createSQLClause($fieldAlias, $operator, $value, $field) {
     if ($operator === 'CONTAINS') {
       switch ($field['serialize'] ?? NULL) {
         case \CRM_Core_DAO::SERIALIZE_JSON:
@@ -468,11 +484,18 @@ class Api4SelectQuery {
       }
     }
 
-    $sql_clause = \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
-    if ($sql_clause === NULL) {
-      throw new \API_Exception("Invalid value in $type clause for '$expr'");
+    if ($operator === 'IS EMPTY' || $operator === 'IS NOT EMPTY') {
+      // If field is not a string or number, this will pass through and use IS NULL/IS NOT NULL
+      $operator = str_replace('EMPTY', 'NULL', $operator);
+      // For strings & numbers, create an OR grouping of empty value OR null
+      if (in_array($field['data_type'] ?? NULL, ['String', 'Integer', 'Float'], TRUE)) {
+        $emptyVal = $field['data_type'] === 'String' ? '""' : '0';
+        $isEmptyClause = $operator === 'IS NULL' ? "= $emptyVal OR" : "<> $emptyVal AND";
+        return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
+      }
     }
-    return $sql_clause;
+
+    return \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
   }
 
   /**

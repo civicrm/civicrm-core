@@ -132,4 +132,66 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     }
   }
 
+  public function testEmptyAndNullOperators() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $bob = Contact::create()
+      ->setValues(['first_name' => 'Bob', 'last_name' => $last_name, 'prefix_id' => 0])
+      ->execute()->first();
+    // Initial value is NULL, but to test the empty operator, change it to an empty string
+    \CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET middle_name = '' WHERE id = " . $bob['id']);
+
+    $jan = Contact::create()
+      ->setValues(['first_name' => 'Jan', 'middle_name' => 'J', 'last_name' => $last_name, 'prefix_id' => 1])
+      ->execute()->first();
+
+    $dan = Contact::create()
+      ->setValues(['first_name' => 'Dan', 'last_name' => $last_name, 'prefix_id' => NULL])
+      ->execute()->first();
+
+    // Test EMPTY and NULL operators on string fields
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'IS EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($jan['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'IS NOT NULL')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($dan['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('middle_name', 'IS NOT EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($jan['id'], (array) $result);
+
+    // Test EMPTY and NULL operators on Integer fields
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('prefix_id', 'IS EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($jan['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('prefix_id', 'IS NOT NULL')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayNotHasKey($dan['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('prefix_id', 'IS NOT EMPTY')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($jan['id'], (array) $result);
+  }
+
 }

@@ -1098,7 +1098,7 @@
 
       // Add/remove value if operator allows for one
       this.changeClauseOperator = function(clause) {
-        if (_.contains(clause[1], 'NULL')) {
+        if (_.contains(clause[1], 'IS ')) {
           clause.length = 2;
         } else if (clause.length === 2) {
           clause.push('');
@@ -1138,7 +1138,8 @@
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
           }
           multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], op);
-          if (op === 'IS NULL' || op === 'IS NOT NULL') {
+          // IS NULL, IS EMPTY, etc.
+          if (_.contains(op, 'IS ')) {
             $el.hide();
             return;
           }

@@ -83,9 +83,14 @@
         }
       };
 
+      // Returns false for 'IS NULL', 'IS EMPTY', etc. true otherwise.
+      this.operatorTakesInput = function(operator) {
+        return operator.indexOf('IS ') !== 0;
+      };
+
       this.changeClauseOperator = function(clause) {
-        // Add/remove value if operator allows for one
-        if (_.contains(clause[1], 'NULL')) {
+        // Add/remove value depending on whether operator allows for one
+        if (!ctrl.operatorTakesInput(clause[1])) {
           clause.length = 2;
         } else {
           if (clause.length === 2) {
