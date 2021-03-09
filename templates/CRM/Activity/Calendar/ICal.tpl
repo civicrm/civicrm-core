@@ -16,8 +16,8 @@ BEGIN:VEVENT
 UID:CIVICRMACTIVITY{$activity->id}
 SUMMARY:{$activity->subject|crmICalText}
 CALSCALE:GREGORIAN
-DTSTAMP;VALUE=DATE-TIME:{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|crmICalDate}
-DTSTART;VALUE=DATE-TIME:{$activity->activity_date_time|crmICalDate}
+DTSTAMP;TZID={$timezone}:{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|crmICalDate}
+DTSTART;TZID={$timezone}:{$activity->activity_date_time|crmICalDate}
 DURATION:PT{$activity->duration}M
 {if $activity->location}
 LOCATION:{$activity->location|crmICalText}
