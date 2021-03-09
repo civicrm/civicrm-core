@@ -3358,6 +3358,9 @@ span.crm-select-item-color {
 }
 .crm-container span.crm-editable-enabled {
   display: inline-block !important;
+  padding-right: 2px;
+  min-height: 1em;
+  min-width: 3em;
 }
 
 .crm-container .crm-editable-enabled .crm-i {

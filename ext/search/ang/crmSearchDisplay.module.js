@@ -74,9 +74,9 @@
       }
 
       function getResults(ctrl) {
-        var params = getApiParams(ctrl);
-        crmApi4('SearchDisplay', 'run', params).then(function(results) {
+        return crmApi4('SearchDisplay', 'run', getApiParams(ctrl)).then(function(results) {
           ctrl.results = results;
+          ctrl.editing = false;
           if (ctrl.settings.pager && !ctrl.rowCount) {
             if (results.length < ctrl.settings.limit) {
               ctrl.rowCount = results.length;

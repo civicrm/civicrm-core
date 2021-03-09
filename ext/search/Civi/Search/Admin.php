@@ -87,7 +87,7 @@ class Admin {
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();
-    $getFields = ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity'];
+    $getFields = ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly'];
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {

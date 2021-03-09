@@ -134,6 +134,12 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
             $apiParams['select'][] = $idField;
           }
         }
+        // Select value fields for in-place editing
+        foreach ($settings['columns'] ?? [] as $column) {
+          if (isset($column['editable']['value']) && !in_array($column['editable']['value'], $apiParams['select'])) {
+            $apiParams['select'][] = $column['editable']['value'];
+          }
+        }
     }
 
     $this->applyFilters();

@@ -19,6 +19,7 @@
         if (link) {
           ctrl.column.link = link.path;
           ctrl.column.title = link.title;
+          delete ctrl.column.editable;
         } else {
           if (val === 'civicrm/') {
             ctrl.column.link = val;
