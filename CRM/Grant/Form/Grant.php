@@ -149,14 +149,14 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Grant_DAO_Grant');
-    $this->addSelect('grant_type_id', ['onChange' => "CRM.buildCustomData( 'Grant', this.value );"], TRUE);
+    $this->addSelect('grant_type_id', ['placeholder' => ts('- select type -'), 'onChange' => "CRM.buildCustomData( 'Grant', this.value );"], TRUE);
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Grant');
     $this->assign('customDataSubType', $this->_grantType);
     $this->assign('entityID', $this->_id);
 
-    $this->addSelect('status_id', [], TRUE);
+    $this->addSelect('status_id', ['placeholder' => ts('- select status -')], TRUE);
 
     $this->add('datepicker', 'application_received_date', ts('Application Received'), [], FALSE, ['time' => FALSE]);
     $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
