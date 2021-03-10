@@ -92,15 +92,24 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
    * @return bool
    */
   public static function taskAddConstraints(CRM_Queue_TaskContext $ctx): bool {
-    CRM_Core_DAO::executeQuery("
-      ALTER TABLE `civicrm_saved_search`
-        ADD CONSTRAINT `FK_civicrm_saved_search_created_id`
-          FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact` (`id`)
-          ON DELETE SET NULL,
-        ADD CONSTRAINT `FK_civicrm_saved_search_modified_id`
-          FOREIGN KEY (`modified_id`) REFERENCES `civicrm_contact` (`id`)
-          ON DELETE SET NULL;
-    ");
+    if (!self::checkFKExists('civicrm_saved_search', 'FK_civicrm_saved_search_created_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_saved_search`
+          ADD CONSTRAINT `FK_civicrm_saved_search_created_id`
+            FOREIGN KEY (`created_id`) REFERENCES `civicrm_contact` (`id`)
+            ON DELETE SET NULL;
+      ");
+    }
+
+    if (!self::checkFKExists('civicrm_saved_search', 'FK_civicrm_saved_search_modified_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_saved_search`
+          ADD CONSTRAINT `FK_civicrm_saved_search_modified_id`
+            FOREIGN KEY (`modified_id`) REFERENCES `civicrm_contact` (`id`)
+            ON DELETE SET NULL;
+      ");
+    }
+
     return TRUE;
   }
 
