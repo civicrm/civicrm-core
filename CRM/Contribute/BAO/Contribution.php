@@ -3458,10 +3458,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['payment_processor_id'] = $params['payment_processor'];
       }
 
-      if (isset($fromFinancialAccountId)) {
-        $trxnParams['from_financial_account_id'] = $fromFinancialAccountId;
-      }
-
       // consider external values passed for recording transaction entry
       if (!empty($financialTrxnValues)) {
         $trxnParams = array_merge($trxnParams, $financialTrxnValues);
