@@ -2,7 +2,7 @@
   <button type="button" class="btn btn-default-outline dropdown-toggle" ng-click="$ctrl.initTokens()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     {{:: ts('Tokens') }} <span class="caret"></span>
   </button>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu dropdown-menu-right">
     <li ng-repeat="(id, token) in $ctrl.tokens" >
       <a href ng-click="$ctrl.insertToken(id)">{{ token.label }}</a>
     </li>
