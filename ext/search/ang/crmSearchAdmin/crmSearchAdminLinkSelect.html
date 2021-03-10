@@ -1,14 +1,20 @@
-<label title="{{ ts('Display as clickable link') }}" >
-  <input type="checkbox" ng-checked="$ctrl.column.link" ng-click="$ctrl.setValue($ctrl.column.link ? '' : ($ctrl.links[0] && $ctrl.links[0].path || 'civicrm/'))" >
-  {{ $ctrl.column.link ? ts('Link:') : ts('Link') }}
-</label>
-<select class="form-control" ng-show="$ctrl.links.length && $ctrl.column.link">
-  <option ng-repeat="link in $ctrl.links" value="{{ link.path }}" ng-selected="$ctrl.column.link === link.path">
-    {{ link.title }}
-  </option>
-  <option value="civicrm/" ng-selected="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)">
-    {{ ts('Other...') }}
-  </option>
-</select>
-<input class="form-control" type="text" ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" ng-model="$ctrl.column.link" ng-model-options="{updateOn: 'blur'}" />
-<crm-search-admin-token-select ng-if="$ctrl.column.link && !$ctrl.getLink($ctrl.column.link)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="$ctrl.column" field="link"></crm-search-admin-token-select>
+<div class="crm-flex-1 input-group" >
+  <input type="text" class="form-control" ng-if="!$ctrl.getLink($ctrl.link.path)" ng-model="$ctrl.link.path" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChange({before: 'civicrm/', after: $ctrl.link.path})">
+  <div class="input-group-btn" style="{{ $ctrl.getLink($ctrl.link.path) ? '' : 'width:27px' }}">
+    <button type="button" class="btn btn-default-outline dropdown-toggle" style="min-width: 200px; text-align: left;" ng-if="$ctrl.getLink($ctrl.link.path)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ $ctrl.getLink($ctrl.link.path).title }}
+    </button>
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu {{ $ctrl.getLink($ctrl.link.path) ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">
+      <li ng-repeat="link in $ctrl.links" ng-class="{disabled: $ctrl.link.path === link.path}">
+        <a href ng-click="$ctrl.setValue(link.path)">{{:: link.title }}</a>
+      </li>
+      <li ng-class="{disabled: !$ctrl.getLink($ctrl.link.path)}">
+        <a href ng-click="$ctrl.setValue('civicrm/')">{{:: ts('Other...') }}</a>
+      </li>
+    </ul>
+  </div>
+</div>
+<crm-search-admin-token-select ng-if="!$ctrl.getLink($ctrl.link.path)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="$ctrl.link" field="path"></crm-search-admin-token-select>

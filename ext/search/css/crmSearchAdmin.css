@@ -160,15 +160,13 @@
   background-color: rgba(255, 255, 255, .8);
 }
 
+/* A flex-row arranges elements inline, with the 'crm-flex-*' item(s) taking up all remaining space */
 #bootstrap-theme .crm-search-admin-flex-row {
   display: flex;
   align-items: center;
 }
 #bootstrap-theme .crm-search-admin-flex-row > *:not(:first-child) {
   margin-left: 6px;
-}
-#bootstrap-theme .crm-search-admin-flex-row > input[type=text] {
-  flex: 1;
 }
 
 #bootstrap-theme .crm-search-admin-unused-columns fieldset {

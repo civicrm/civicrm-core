@@ -15,19 +15,8 @@
 
       this.styles = CRM.crmSearchAdmin.styles;
 
-      this.setValue = function(val, index) {
-        var link = ctrl.getLink(val),
-          item = ctrl.group[index];
-        if (item.path === val) {
-          return;
-        }
-        item.path = val;
-        item.icon = link ? defaultIcons[link.action] : 'fa-external-link';
-        if (val === 'civicrm/') {
-          $timeout(function () {
-            $('tr:eq(' + index + ') input[type=text]', $element).focus();
-          });
-        }
+      this.getStyle = function(item) {
+        return _.findWhere(this.styles, {key: item.style});
       };
 
       this.sortableOptions = {
@@ -78,15 +67,11 @@
             ctrl.addItem('civicrm/');
           }
         }
-        $element.on('change', 'select.crm-search-admin-select-path', function() {
+        $element.on('change', 'select.crm-search-admin-add-link', function() {
           var $select = $(this);
           $scope.$apply(function() {
-            if ($select.closest('tfoot').length) {
-              ctrl.addItem($select.val());
-              $select.val('');
-            } else {
-              ctrl.setValue($select.val(), $select.closest('tr').index());
-            }
+            ctrl.addItem($select.val());
+            $select.val('');
           });
         });
       };

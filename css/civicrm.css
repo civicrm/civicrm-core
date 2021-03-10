@@ -24,21 +24,24 @@
   flex-wrap: wrap;
   box-sizing: border-box;
 }
-.crm-container .crm-flex-box > * {
+.crm-flex-box > * {
   flex: 1;
   box-sizing: border-box;
   min-width: 0; /* prevents getting squashed by whitespace:nowrap content */
 }
-.crm-container .crm-flex-box > .crm-flex-2 {
+.crm-container .crm-flex-1 {
+  flex: 1;
+}
+.crm-container .crm-flex-2 {
   flex: 2;
 }
-.crm-container .crm-flex-box > .crm-flex-3 {
+.crm-container .crm-flex-3 {
   flex: 3;
 }
-.crm-container .crm-flex-box > .crm-flex-4 {
+.crm-container .crm-flex-4 {
   flex: 4;
 }
-.crm-container .crm-flex-box > .crm-flex-5 {
+.crm-container .crm-flex-5 {
   flex: 5;
 }
 

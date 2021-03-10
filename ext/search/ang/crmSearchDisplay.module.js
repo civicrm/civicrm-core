@@ -36,7 +36,11 @@
           displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]),
           result = _.escape(displayValue);
         if (column.link) {
-          result = '<a href="' + _.escape(getUrl(column.link, rowData)) + '">' + result + '</a>';
+          var target = '';
+          if (column.link.target) {
+            target = column.link.target === 'crm-popup' ? 'class="crm-popup" ' : 'target="' + column.link.target + '" ';
+          }
+          result = '<a ' + target + 'href="' + _.escape(getUrl(column.link.path, rowData)) + '">' + result + '</a>';
         }
         return result;
       }

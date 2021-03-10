@@ -84,4 +84,30 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Upgrade 1002 - embellish search display link data
+   * @return bool
+   */
+  public function upgrade_1002() {
+    $this->ctx->log->info('Applying update 1002 - embellish search display link data.');
+    $displays = \Civi\Api4\SearchDisplay::get(FALSE)
+      ->setSelect(['id', 'settings'])
+      ->execute();
+    foreach ($displays as $display) {
+      $update = FALSE;
+      foreach ($display['settings']['columns'] ?? [] as $c => $column) {
+        if (!empty($column['link'])) {
+          $display['settings']['columns'][$c]['link'] = ['path' => $column['link']];
+          $update = TRUE;
+        }
+      }
+      if ($update) {
+        \Civi\Api4\SearchDisplay::update(FALSE)
+          ->setValues($display)
+          ->execute();
+      }
+    }
+    return TRUE;
+  }
+
 }

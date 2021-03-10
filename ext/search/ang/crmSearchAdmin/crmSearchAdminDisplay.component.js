@@ -173,6 +173,31 @@
         return values;
       }
 
+      this.toggleLink = function(column) {
+        if (column.link) {
+          ctrl.onChangeLink(column, column.link.path, '');
+        } else {
+          var defaultLink = ctrl.getLinks()[0];
+          column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
+          ctrl.onChangeLink(column, null, column.link.path);
+        }
+      };
+
+      this.onChangeLink = function(column, before, after) {
+        var beforeLink = before && _.findWhere(ctrl.getLinks(), {path: before}),
+          afterLink = after && _.findWhere(ctrl.getLinks(), {path: after});
+        if (!after) {
+          if (beforeLink && column.title === beforeLink.title) {
+            delete column.title;
+          }
+          delete column.link;
+        } else if (afterLink && ((!column.title && !before) || (beforeLink && beforeLink.title === column.title))) {
+          column.title = afterLink.title;
+        } else if (!afterLink && (beforeLink && beforeLink.title === column.title)) {
+          delete column.title;
+        }
+      };
+
       this.getLinks = function() {
         if (!ctrl.links) {
           ctrl.links = buildLinks();

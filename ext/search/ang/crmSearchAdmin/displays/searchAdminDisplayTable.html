@@ -21,7 +21,7 @@
       <legend>{{ $ctrl.parent.getColLabel(col) }}</legend>
       <div class="form-inline crm-search-admin-flex-row">
         <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header:') }}</label>
-        <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control" type="text" ng-model="col.label" >
+        <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
           <i class="crm-i fa-ban"></i>
         </button>
