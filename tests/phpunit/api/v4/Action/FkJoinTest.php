@@ -34,15 +34,19 @@ use Civi\Api4\Tag;
 class FkJoinTest extends UnitTestCase {
 
   public function setUpHeadless() {
+    $this->loadDataSet('DefaultDataSet');
+
+    return parent::setUpHeadless();
+  }
+
+  public function tearDown() {
     $relatedTables = [
       'civicrm_activity',
       'civicrm_phone',
       'civicrm_activity_contact',
     ];
     $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('DefaultDataSet');
-
-    return parent::setUpHeadless();
+    parent::tearDown();
   }
 
   /**

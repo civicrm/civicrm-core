@@ -22,6 +22,7 @@ namespace api\v4\Action;
 use api\v4\UnitTestCase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
@@ -31,22 +32,27 @@ use Civi\Api4\Contact;
  */
 class ComplexQueryTest extends UnitTestCase {
 
-  public function setUpHeadless() {
+  public function setUpHeadless(): CiviEnvBuilder {
+    $this->loadDataSet('DefaultDataSet');
+    return parent::setUpHeadless();
+  }
+
+  public function tearDown(): void {
     $relatedTables = [
       'civicrm_activity',
       'civicrm_activity_contact',
     ];
     $this->cleanup(['tablesToTruncate' => $relatedTables]);
-    $this->loadDataSet('DefaultDataSet');
-
-    return parent::setUpHeadless();
+    parent::tearDown();
   }
 
   /**
    * Fetch all phone call activities
    * Expects at least one activity loaded from the data set.
+   *
+   * @throws \API_Exception
    */
-  public function testGetAllHousingSupportActivities() {
+  public function testGetAllHousingSupportActivities(): void {
     $results = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Phone Call')
       ->execute();

@@ -88,7 +88,7 @@ class Api4SelectQuery {
     $this->api = $apiGet;
 
     // Always select ID of main table unless grouping by something else
-    $this->forceSelectId = !$this->getGroupBy() || $this->getGroupBy() === ['id'];
+    $this->forceSelectId = !$this->isAggregateQuery() || $this->getGroupBy() === ['id'];
 
     // Build field lists
     foreach ($this->api->entityFields() as $field) {
@@ -106,6 +106,19 @@ class Api4SelectQuery {
 
     // Add explicit joins. Other joins implied by dot notation may be added later
     $this->addExplicitJoins();
+  }
+
+  protected function isAggregateQuery() {
+    if ($this->getGroupBy()) {
+      return TRUE;
+    }
+    foreach ($this->getSelect() as $sql) {
+      $classname = get_class(SqlExpression::convert($sql, TRUE));
+      if (method_exists($classname, 'getCategory') && $classname::getCategory() === SqlFunction::CATEGORY_AGGREGATE) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -381,7 +394,7 @@ class Api4SelectQuery {
    */
   protected function composeClause(array $clause, string $type) {
     // Pad array for unary operators
-    list($expr, $operator, $value) = array_pad($clause, 3, NULL);
+    [$expr, $operator, $value] = array_pad($clause, 3, NULL);
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \API_Exception('Illegal operator');
     }
