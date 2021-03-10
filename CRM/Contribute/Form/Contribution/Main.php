@@ -1472,7 +1472,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $paymentBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_ccid);
     //bounce if the contribution is not pending.
-    if ((int) $paymentBalance <= 0) {
+    if ((float) $paymentBalance <= 0) {
       CRM_Core_Error::statusBounce(ts("Returning since contribution has already been handled."));
     }
     if (!empty($paymentBalance)) {
