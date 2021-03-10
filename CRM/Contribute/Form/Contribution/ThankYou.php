@@ -310,7 +310,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $membershipTypeIds = $membershipTypes = $radio = $radioOptAttrs = [];
       $membershipPriceset = (!empty($this->_priceSetId) && $this->_useForMember);
 
-      $allowAutoRenewMembership = $autoRenewOption = FALSE;
       $autoRenewMembershipTypeOptions = [];
 
       $separateMembershipPayment = $this->_membershipBlock['is_separate_payment'] ?? NULL;
@@ -428,7 +427,6 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('membershipBlock', $this->_membershipBlock);
       $this->assign('showRadio', FALSE);
       $this->assign('membershipTypes', $membershipTypes);
-      $this->assign('allowAutoRenewMembership', $allowAutoRenewMembership);
       $this->assign('autoRenewMembershipTypeOptions', json_encode($autoRenewMembershipTypeOptions));
       //give preference to user submitted auto_renew value.
       $takeUserSubmittedAutoRenew = (!empty($_POST) || $this->isSubmitted());
