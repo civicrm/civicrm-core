@@ -321,8 +321,8 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
               'title' => ts('Contribution Ordinality'),
               'operatorType' => CRM_Report_Form::OP_MULTISELECT,
               'options' => [
-                0 => 'First by Contributor',
-                1 => 'Second or Later by Contributor',
+                0 => ts('First by Contributor'),
+                1 => ts('Second or Later by Contributor'),
               ],
               'type' => CRM_Utils_Type::T_INT,
             ],
