@@ -361,6 +361,7 @@
       <label>API KEY</label>
     </html>
     <add>2.2</add>
+    <readonly>true</readonly>
     <permission>
       <or>administer CiviCRM, edit api keys</or>
     </permission>
