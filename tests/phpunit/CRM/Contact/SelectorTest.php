@@ -517,7 +517,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $sql = $selector->getQueryObject()->query();
 
     $expectedQuery = [
-      0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
+      0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-address`.id as `Non_ASCII_Location_Type-address_id`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
       // @TODO these FROM clause doesn't matches due to extra spaces or special character
       2 => "WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND ( 1 ) AND (contact_a.is_deleted = 0)",
     ];
