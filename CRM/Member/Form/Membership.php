@@ -993,7 +993,6 @@ DESC limit 1");
     $endDate = NULL;
     $membership = $calcDate = [];
 
-    $paymentInstrumentID = $this->_paymentProcessor['object']->getPaymentInstrumentID();
     $params = $softParams = $ids = [];
 
     $mailSend = FALSE;
@@ -1247,7 +1246,7 @@ DESC limit 1");
             'is_test' => $this->isTest(),
             'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-            'payment_instrument_id' => $paymentInstrumentID,
+            'payment_instrument_id' => $this->getPaymentInstrumentID(),
             'financial_type_id' => $this->getFinancialTypeID(),
             'receive_date' => CRM_Utils_Time::date('YmdHis'),
             'tax_amount' => $params['tax_amount'] ?? NULL,
@@ -1368,7 +1367,7 @@ DESC limit 1");
           // of a single path!
           unset($membershipParams['lineItems']);
         }
-        $membershipParams['payment_instrument_id'] = $paymentInstrumentID;
+        $membershipParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
         // @todo stop passing $ids (membership and userId only are set above)
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = $membershipParams['contribution'] ?? NULL;
@@ -1826,7 +1825,6 @@ DESC limit 1");
     // add these values for the recurringContrib function ,CRM-10188
     $params['financial_type_id'] = $this->getFinancialTypeID();
     $params['is_recur'] = TRUE;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
     if ($recurringContributionID) {
@@ -1862,7 +1860,7 @@ DESC limit 1");
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['financial_type_id'] = $this->getFinancialTypeID();
     $recurParams['currency'] = $params['currency'] ?? NULL;
-    $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
+    $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
 
     $recurParams['is_test'] = $this->isTest();
 
