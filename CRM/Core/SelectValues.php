@@ -619,6 +619,9 @@ class CRM_Core_SelectValues {
         'legal_identifier',
         'contact_sub_type',
         'user_unique_id',
+        'addressee_id',
+        'email_greeting_id',
+        'postal_greeting_id',
       ];
 
       $customFields = CRM_Core_BAO_CustomField::getFields(['Individual', 'Address']);

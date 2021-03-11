@@ -192,9 +192,6 @@ individual_prefix:Mr.
 individual_suffix:II
 formal_title:Dogsbody
 communication_style:Formal
-email_greeting_id:Dear {contact.first_name}
-postal_greeting_id:Dear {contact.first_name}
-addressee_id:{contact.individual_prefix}{ } {contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}
 job_title:Busy person
 gender:Female
 birth_date:December 31st, 1998
@@ -317,9 +314,6 @@ contact_id:' . $tokenData['contact_id'] . '
       'individual_suffix' => 'II',
       'formal_title' => 'Dogsbody',
       'communication_style' => 'Formal',
-      'email_greeting_id' => 1,
-      'postal_greeting_id' => 1,
-      'addressee_id' => 1,
       'job_title' => 'Busy person',
       'gender' => 'Female',
       'birth_date' => '1998-12-31',
