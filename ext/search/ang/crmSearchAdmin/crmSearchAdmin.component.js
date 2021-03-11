@@ -26,13 +26,14 @@
 
       $scope.controls = {tab: 'compose'};
       $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
-      $scope.groupOptions = CRM.crmSearchActions.groupOptions;
       // Try to create a sensible list of entities one might want to search for,
       // excluding those whos primary purpose is to provide joins or option lists to other entities
       var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
         return !_.includes(entity.type, 'EntityBridge') && !_.includes(entity.type, 'OptionList');
       });
       $scope.entities = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
+      $scope.getEntity = searchMeta.getEntity;
+      $scope.getField = searchMeta.getField;
       this.perm = {
         editGroups: CRM.checkPerm('edit groups')
       };
@@ -170,6 +171,7 @@
 
       $scope.selectTab = function(tab) {
         if (tab === 'group') {
+          loadFieldOptions('Group');
           $scope.smartGroupColumns = searchMeta.getSmartGroupColumns(ctrl.savedSearch.api_entity, ctrl.savedSearch.api_params);
           var smartGroupColumns = _.map($scope.smartGroupColumns, 'id');
           if (smartGroupColumns.length && !_.includes(smartGroupColumns, ctrl.savedSearch.api_params.select[0])) {
@@ -182,6 +184,7 @@
 
       this.removeGroup = function() {
         ctrl.groupExists = !ctrl.groupExists;
+        $scope.status = 'unsaved';
         if (!ctrl.groupExists && (!ctrl.savedSearch.groups.length || !ctrl.savedSearch.groups[0].id)) {
           ctrl.savedSearch.groups.length = 0;
         }
@@ -823,8 +826,10 @@
        * Fetch pseudoconstants for main entity + joined entities
        *
        * Sets an optionsLoaded property on each entity to avoid duplicate requests
+       *
+       * @var string entity - optional additional entity to load
        */
-      function loadFieldOptions() {
+      function loadFieldOptions(entity) {
         var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
           entities = {};
 
@@ -840,6 +845,12 @@
         if (typeof mainEntity.optionsLoaded === 'undefined') {
           enqueue(mainEntity);
         }
+
+        // Optional additional entity
+        if (entity && typeof searchMeta.getEntity(entity).optionsLoaded === 'undefined') {
+          enqueue(searchMeta.getEntity(entity));
+        }
+
         _.each(ctrl.savedSearch.api_params.join, function(join) {
           var joinInfo = searchMeta.getJoin(join[0]),
             joinEntity = searchMeta.getEntity(joinInfo.entity),

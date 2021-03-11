@@ -9,19 +9,29 @@
   <input id="api-save-search-select-column" ng-model="$ctrl.savedSearch.api_params.select[0]" class="form-control huge" crm-ui-select="{data: smartGroupColumns}"/>
 </div>
 <fieldset ng-show="smartGroupColumns.length">
-  <label>{{:: ts('Description:') }}</label>
+  <label>{{:: getField('description', 'Group').label }}</label>
   <textarea class="form-control" ng-model="$ctrl.savedSearch.groups[0].description"></textarea>
-  <div class="form-inline">
-    <label>{{:: ts('Group Type:') }} </label>
-    <div class="checkbox" ng-repeat="option in groupOptions.group_type track by option.id">&nbsp;
-      <label>
-        <input type="checkbox" checklist-model="$ctrl.savedSearch.groups[0].group_type" checklist-value="option.id">
-        {{ option.label }}
-      </label>&nbsp;
+  <div ng-if="getEntity('Group').optionsLoaded">
+    <div class="form-inline">
+      <label>{{:: getField('group_type', 'Group').label }}</label>
+      <div class="checkbox" ng-repeat="option in getField('group_type', 'Group').options">&nbsp;
+        <label>
+          <input type="checkbox" checklist-model="$ctrl.savedSearch.groups[0].group_type" checklist-value="option.id">
+          {{:: option.label }}
+        </label>&nbsp;
+      </div>
+    </div>
+    <div class="form-inline">
+      <label>{{:: getField('visibility', 'Group').label }}</label>
+      <crm-search-input-val field=":: getField('visibility', 'Group')" ng-model="$ctrl.savedSearch.groups[0].visibility"></crm-search-input-val>
+    </div>
+    <hr>
+    <div class="form-inline" ng-repeat="field in getEntity('Group').fields | filter:{name: '.', entity: 'Group'}">
+      <label>{{:: field.label }}</label>
+      <crm-search-input-val field="field" ng-model="$ctrl.savedSearch.groups[0][field.name]"></crm-search-input-val>
     </div>
   </div>
-  <div class="form-inline">
-    <label>{{:: ts('Visibility:') }}</label>
-    <select class="form-control" ng-model="$ctrl.savedSearch.groups[0].visibility" ng-options="item.id as item.label for item in groupOptions.visibility track by item.id" crm-ui-select></select>
+  <div ng-if="!getEntity('Group').optionsLoaded">
+    <i class="crm-i fa-spinner fa-spin"></i>
   </div>
 </fieldset>

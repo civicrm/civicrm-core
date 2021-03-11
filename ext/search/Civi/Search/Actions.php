@@ -25,21 +25,8 @@ class Actions {
   public static function getActionSettings():array {
     return [
       'tasks' => self::getTasks(),
-      'groupOptions' => self::getGroupOptions(),
       'dateRanges' => \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'text'),
     ];
-  }
-
-  /**
-   * @return array
-   */
-  public static function getGroupOptions():array {
-    return \Civi\Api4\Group::getFields(FALSE)
-      ->setLoadOptions(['id', 'label'])
-      ->addWhere('name', 'IN', ['group_type', 'visibility'])
-      ->execute()
-      ->indexBy('name')
-      ->column('options');
   }
 
   /**
