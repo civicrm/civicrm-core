@@ -83,7 +83,6 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
       'civicrm_saved_search', 'description', "text DEFAULT NULL");
 
     $this->addTask('core-issue#2422 - Add constraints to civicrm_saved_search', 'taskAddConstraints');
-
   }
 
   /**
