@@ -80,32 +80,34 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    *
    * @return \CRM_Contribute_Form_Contribution_Main
    */
-  protected function getContributionForm() {
-    $form = new CRM_Contribute_Form_Contribution_Main();
-    $form->_values['is_monetary'] = 1;
-    $form->_values['is_pay_later'] = 0;
-    $form->_priceSetId = $this->callAPISuccessGetValue('PriceSet', [
+  protected function getContributionForm($params = []) {
+    $params['priceSetID'] = $params['priceSetID'] ?? $this->callAPISuccessGetValue('PriceSet', [
       'name' => 'default_membership_type_amount',
       'return' => 'id',
     ]);
-    $priceFields = $this->callAPISuccess('PriceField', 'get', ['id' => $form->_priceSetId]);
-    $form->_priceSet['fields'] = $priceFields['values'];
-    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
-    $form->_paymentProcessor = [
-      'billing_mode' => CRM_Core_Payment::BILLING_MODE_FORM,
-      'object' => Civi\Payment\System::singleton()->getById($paymentProcessorID),
-      'is_recur' => TRUE,
-    ];
-    $form->_values = [
-      'title' => "Test Contribution Page",
-      'financial_type_id' => 1,
+
+    $contributionPageParams = (array_merge($params, [
       'currency' => 'NZD',
       'goal_amount' => 6000,
-      'is_pay_later' => 1,
-      'is_monetary' => TRUE,
+      'is_pay_later' => 0,
+      'is_monetary' => 1,
       'pay_later_text' => 'Front up',
       'pay_later_receipt' => 'Ta',
-    ];
+      'is_email_receipt' => 1,
+      'payment_processor' => $this->paymentProcessorCreate([
+        'payment_processor_type_id' => 'Dummy',
+        'is_test' => 0,
+      ]),
+      'amount_block_is_active' => 1,
+    ]));
+
+    /** @var \CRM_Contribute_Form_Contribution_Main $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main');
+    $contributionPage = reset($this->contributionPageCreate($contributionPageParams)['values']);
+    $form->set('id', $contributionPage['id']);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPage['id'], $params['priceSetID']);
+    $form->preProcess();
+    $form->buildQuickForm();
     return $form;
   }
 
@@ -113,7 +115,6 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * Test expired priceset are not returned from buildPriceSet() Function
    */
   public function testExpiredPriceSet() {
-    $form = $this->getContributionForm();
     $priceSetParams1 = [
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
@@ -124,12 +125,10 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'is_reserved' => 1,
     ];
     $priceSet = $this->callAPISuccess('price_set', 'create', $priceSetParams1);
-    $form->_priceSetId = $priceSet['id'];
 
-    $form->controller = new CRM_Core_Controller();
-    $form->set('priceSetId', $form->_priceSetId);
+    // Create valid price field.
     $params = [
-      'price_set_id' => $form->_priceSetId,
+      'price_set_id' => $priceSet['id'],
       'name' => 'testvalidpf',
       'label' => 'test valid pf',
       'html_type' => 'Radio',
@@ -138,9 +137,9 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     ];
     $priceField1 = $this->callAPISuccess('PriceField', 'create', $params);
 
-    //Create expired price field.
+    // Create expired price field.
     $params = [
-      'price_set_id' => $form->_priceSetId,
+      'price_set_id' => $priceSet['id'],
       'name' => 'testexpiredpf',
       'label' => 'test expired pf',
       'html_type' => 'Radio',
@@ -166,9 +165,8 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       $this->callAPISuccess('PriceFieldValue', 'create', $priceFieldValueParams);
     }
 
-    $priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSet['id']));
-    $form->_values['fee'] = $form->_feeBlock = $priceSet['fields'];
-    foreach ($priceSet['fields'] as $pField) {
+    $form = $this->getContributionForm(['priceSetID' => $priceSet['id']]);
+    foreach ($form->_priceSet['fields'] as $pField) {
       foreach ($pField['options'] as $opId => $opValues) {
         $membershipTypeIds[$opValues['membership_type_id']] = $opValues['membership_type_id'];
       }
@@ -178,9 +176,9 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     //This function should not update form priceSet with the expired one.
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
 
-    $this->assertEquals(count($form->_priceSet['fields']), 1);
+    $this->assertEquals(1, count($form->_priceSet['fields']));
     $field = current($form->_priceSet['fields']);
-    $this->assertEquals($field['name'], 'testvalidpf');
+    $this->assertEquals('testvalidpf', $field['name']);
   }
 
 }
