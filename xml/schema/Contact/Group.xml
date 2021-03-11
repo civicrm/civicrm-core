@@ -111,6 +111,7 @@
     <type>text</type>
     <title>Group Where Clause</title>
     <comment>the sql where clause if a saved search acl</comment>
+    <readonly>true</readonly>
     <add>1.6</add>
   </field>
   <field>
@@ -118,6 +119,7 @@
     <type>text</type>
     <title>Tables For Select Clause</title>
     <comment>the tables to be included in a select data</comment>
+    <readonly>true</readonly>
     <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
@@ -126,6 +128,7 @@
     <type>text</type>
     <title>Tables For Where Clause</title>
     <comment>the tables to be included in the count statement</comment>
+    <readonly>true</readonly>
     <serialize>PHP</serialize>
     <add>1.6</add>
   </field>
@@ -146,6 +149,7 @@
     <type>timestamp</type>
     <title>Group Cache Date</title>
     <required>false</required>
+    <readonly>true</readonly>
     <comment>Date when we created the cache for a smart group</comment>
     <add>2.1</add>
   </field>
@@ -159,6 +163,7 @@
     <type>timestamp</type>
     <title>Next Group Refresh Time</title>
     <required>false</required>
+    <readonly>true</readonly>
     <comment>Date and time when we need to refresh the cache next.</comment>
     <add>4.3</add>
   </field>

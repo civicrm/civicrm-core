@@ -203,6 +203,7 @@
     <import>true</import>
     <headerPattern>/tr(ansactio|x)n(.?id)?/i</headerPattern>
     <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
+    <readonly>true</readonly>
     <html>
      <type>Text</type>
    </html>
@@ -216,6 +217,7 @@
     <import>true</import>
     <headerPattern>/invoice(.?id)?/i</headerPattern>
     <comment>unique invoice id, system generated or passed in</comment>
+    <readonly>true</readonly>
     <html>
       <type>Text</type>
     </html>
@@ -359,6 +361,7 @@
     <type>int unsigned</type>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each contribution made in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
     <export>true</export>
+    <readonly>true</readonly>
     <html>
       <label>Recurring Contribution</label>
     </html>
@@ -521,13 +524,14 @@
     </html>
     <add>4.7</add>
   </field>
-   <field>
+  <field>
     <name>is_template</name>
     <title>Is a Template Contribution</title>
     <type>boolean</type>
     <default>0</default>
     <import>true</import>
     <comment>Shows this is a template for recurring contributions.</comment>
+    <readonly>true</readonly>
     <html>
       <type>CheckBox</type>
     </html>
