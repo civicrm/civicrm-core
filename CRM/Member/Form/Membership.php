@@ -1819,8 +1819,6 @@ DESC limit 1");
     $params,
     $contributionParams
   ) {
-    $form = $this;
-    $transaction = new CRM_Core_Transaction();
     $contactID = $contributionParams['contact_id'];
 
     // add these values for the recurringContrib function ,CRM-10188
@@ -1833,13 +1831,7 @@ DESC limit 1");
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
-
-    // lets store it in the form variable so postProcess hook can get to this and use it
-    $form->_contributionID = $contribution->id;
-
-    $transaction->commit();
-    return $contribution;
+    return CRM_Contribute_BAO_Contribution::add($contributionParams);
   }
 
   /**
