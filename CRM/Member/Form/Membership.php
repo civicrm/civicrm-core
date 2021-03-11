@@ -1067,24 +1067,7 @@ DESC limit 1");
 
     $params['contact_id'] = $this->_contactID;
 
-    $fields = [
-      'status_id',
-      'source',
-      'is_override',
-      'status_override_end_date',
-      'campaign_id',
-    ];
-
-    foreach ($fields as $f) {
-      $params[$f] = $formValues[$f] ?? NULL;
-    }
-
-    // fix for CRM-3724
-    // when is_override false ignore is_admin statuses during membership
-    // status calculation. similarly we did fix for import in CRM-3570.
-    if (empty($params['is_override'])) {
-      $params['exclude_is_admin'] = TRUE;
-    }
+    $params = array_merge($params, $this->getFormMembershipParams());
 
     $joinDate = $formValues['join_date'];
     $startDate = $formValues['start_date'];
@@ -1119,10 +1102,6 @@ DESC limit 1");
         // max related memberships - take from form or inherit from membership type
         $membershipTypeValues[$memType]['max_related'] = $formValues['max_related'] ?? NULL;
       }
-      $membershipTypeValues[$memType]['custom'] = CRM_Core_BAO_CustomField::postProcess($formValues,
-        $this->_id,
-        'Membership'
-      );
     }
 
     // Retrieve the name and email of the current user - this will be the FROM for the receipt email
@@ -1892,6 +1871,38 @@ DESC limit 1");
    */
   protected function getFinancialTypeID(): int {
     return (int) $this->getSubmittedValue('financial_type_id') ?: $this->order->getFinancialTypeID();
+  }
+
+  /**
+   * Get values that should be passed to all membership create actions.
+   *
+   * These parameters are generic to all memberships created from the form,
+   * whether a single membership or multiple by price set (although
+   * the form will not expose all in the latter case.
+   *
+   * By referencing the submitted values directly we can call this
+   * from anywhere in postProcess and get the same result (protects
+   * against breakage if code is moved around).
+   *
+   * @return array
+   */
+  protected function getFormMembershipParams(): array {
+    $submittedValues = $this->controller->exportValues($this->_name);
+    return [
+      'status_id' => $this->getSubmittedValue('status_id'),
+      'source' => $this->getSubmittedValue('source'),
+      'is_override' => $this->getSubmittedValue('is_override'),
+      'status_override_end_date' => $this->getSubmittedValue('status_override_end_date'),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'custom' => CRM_Core_BAO_CustomField::postProcess($submittedValues,
+        $this->_id,
+        'Membership'
+      ),
+      // fix for CRM-3724
+      // when is_override false ignore is_admin statuses during membership
+      // status calculation. similarly we did fix for import in CRM-3570.
+      'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
+    ];
   }
 
 }
