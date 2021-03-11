@@ -330,4 +330,66 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
     return strtr($input, $conversion_table);
   }
 
+  /**
+   * Test that when custom case data is edited but not changed that it doesn't
+   * create a meaningless empty activity.
+   */
+  public function testCustomDataNoChangeNoActivity() {
+    // Create a custom group and field
+    $customField = $this->callAPISuccess('custom_field', 'create', [
+      'custom_group_id' => $this->custom_group['id'],
+      'label' => 'What?',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'is_active' => 1,
+    ]);
+    $customField = $customField['values'][$customField['id']];
+
+    // Create a case and set the custom field to something
+    $individual = $this->individualCreate();
+    $caseObj = $this->createCase($individual, $this->_loggedInUser);
+    $caseId = $caseObj->id;
+    $this->callAPISuccess('CustomValue', 'create', [
+      "custom_{$customField['id']}" => 'immutable text',
+      'entity_id' => $caseId,
+    ]);
+
+    // run the form
+    $form = new CRM_Case_Form_CustomData();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_CustomData', 'Case Data');
+    $form->set('groupID', $this->custom_group['id']);
+    $form->set('entityID', $caseId);
+    // this is case type
+    $form->set('subType', 1);
+    $form->set('cid', $individual);
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    ob_end_clean();
+
+    // Don't change any field values and now call postProcess.
+    // Because the form does a redirect it triggers an exception during unit
+    // tests but that's ok.
+    $hadException = FALSE;
+    try {
+      $form->controller->_actions['upload']->perform($form, 'upload');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $hadException = TRUE;
+      $this->assertEquals('redirect', $e->errorData['context']);
+      // compare parts of query string separately to avoid any clean url format mismatches
+      $this->assertStringContainsString('civicrm/contact/view/case', $e->errorData['url']);
+      $this->assertStringContainsString("reset=1&id={$caseId}&cid={$individual}&action=view", $e->errorData['url']);
+    }
+    // Make sure we did have an exception since otherwise we might get a
+    // false pass for the asserts above since they'd never run.
+    $this->assertTrue($hadException);
+
+    // there shouldn't be an activity of type Change Custom Data on the case
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'activity_type_id' => 'Change Custom Data',
+      'case_id' => $caseId,
+    ]);
+    $this->assertEquals(0, $result['count']);
+  }
+
 }

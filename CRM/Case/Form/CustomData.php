@@ -112,24 +112,27 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
-    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
-    $activityParams = [
-      'activity_type_id' => $activityTypeID,
-      'source_contact_id' => $session->get('userID'),
-      'is_auto' => TRUE,
-      'subject' => $this->_customTitle . " : change data",
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
-      'target_contact_id' => $this->_contactID,
-      'details' => $this->formatCustomDataChangesForDetail($params),
-      'activity_date_time' => date('YmdHis'),
-    ];
-    $activity = CRM_Activity_BAO_Activity::create($activityParams);
+    $formattedDetails = $this->formatCustomDataChangesForDetail($params);
+    if (!empty($formattedDetails)) {
+      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
+      $activityParams = [
+        'activity_type_id' => $activityTypeID,
+        'source_contact_id' => $session->get('userID'),
+        'is_auto' => TRUE,
+        'subject' => $this->_customTitle . " : change data",
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
+        'target_contact_id' => $this->_contactID,
+        'details' => $formattedDetails,
+        'activity_date_time' => date('YmdHis'),
+      ];
+      $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
-    $caseParams = [
-      'activity_id' => $activity->id,
-      'case_id' => $this->_entityID,
-    ];
-    CRM_Case_BAO_Case::processCaseActivity($caseParams);
+      $caseParams = [
+        'activity_id' => $activity->id,
+        'case_id' => $this->_entityID,
+      ];
+      CRM_Case_BAO_Case::processCaseActivity($caseParams);
+    }
 
     $transaction->commit();
   }
