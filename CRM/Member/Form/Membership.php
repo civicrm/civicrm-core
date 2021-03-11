@@ -1014,10 +1014,7 @@ DESC limit 1");
       $this->_priceSet,
       $formValues
     );
-    if (empty($formValues['financial_type_id'])) {
-      $formValues['financial_type_id'] = $this->_priceSet['financial_type_id'];
-    }
-
+    $formValues['financial_type_id'] = $this->getFinancialTypeID();
     $membershipTypeValues = [];
     foreach ($this->_memTypeSelected as $memType) {
       $membershipTypeValues[$memType]['membership_type_id'] = $memType;
@@ -1146,7 +1143,6 @@ DESC limit 1");
     if (!empty($formValues['record_contribution'])) {
       $recordContribution = [
         'total_amount',
-        'financial_type_id',
         'payment_instrument_id',
         'trxn_id',
         'contribution_status_id',
@@ -1160,6 +1156,7 @@ DESC limit 1");
       foreach ($recordContribution as $f) {
         $params[$f] = $formValues[$f] ?? NULL;
       }
+      $params['financial_type_id'] = $this->getFinancialTypeID();
 
       if (empty($formValues['source'])) {
         $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', [
@@ -1187,7 +1184,7 @@ DESC limit 1");
 
       //insert financial type name in receipt.
       $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-        $formValues['financial_type_id']
+        $this->getFinancialTypeID()
       );
     }
 
@@ -1203,16 +1200,7 @@ DESC limit 1");
       //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
       $params['card_type_id'] = $this->_params['card_type_id'] ?? NULL;
       $params['pan_truncation'] = $this->_params['pan_truncation'] ?? NULL;
-
-      if (!$isQuickConfig) {
-        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet',
-          $this->_priceSetId,
-          'financial_type_id'
-        );
-      }
-      else {
-        $params['financial_type_id'] = $formValues['financial_type_id'] ?? NULL;
-      }
+      $params['financial_type_id'] = $this->getFinancialTypeID();
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
@@ -1223,7 +1211,7 @@ DESC limit 1");
       $formValues['currencyID'] = $this->getCurrency();
       $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
       $formValues['invoiceID'] = $this->getInvoiceID();
-      $formValues['financial_type_id'] = $params['financial_type_id'];
+      $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
@@ -1260,7 +1248,7 @@ DESC limit 1");
             'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $paymentInstrumentID,
-            'financial_type_id' => $params['financial_type_id'],
+            'financial_type_id' => $this->getFinancialTypeID(),
             'receive_date' => CRM_Utils_Time::date('YmdHis'),
             'tax_amount' => $params['tax_amount'] ?? NULL,
             'invoice_id' => $this->getInvoiceID(),
@@ -1833,7 +1821,7 @@ DESC limit 1");
     $contactID = $contributionParams['contact_id'];
 
     // add these values for the recurringContrib function ,CRM-10188
-    $params['financial_type_id'] = $contributionParams['financial_type_id'];
+    $params['financial_type_id'] = $this->getFinancialTypeID();
     $params['is_recur'] = TRUE;
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
@@ -1880,7 +1868,7 @@ DESC limit 1");
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
-    $recurParams['financial_type_id'] = $params['financial_type_id'];
+    $recurParams['financial_type_id'] = $this->getFinancialTypeID();
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
 
@@ -1910,6 +1898,18 @@ DESC limit 1");
    */
   protected function isTest(): int {
     return ($this->_mode === 'test') ? TRUE : FALSE;
+  }
+
+  /**
+   * Get the financial type id relevant to the contribution.
+   *
+   * Financial type id is optional when price sets are in use.
+   * Otherwise they are required for the form to submit.
+   *
+   * @return int
+   */
+  protected function getFinancialTypeID(): int {
+    return (int) $this->getSubmittedValue('financial_type_id') ?: $this->order->getFinancialTypeID();
   }
 
 }
