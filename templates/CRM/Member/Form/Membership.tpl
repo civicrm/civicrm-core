@@ -528,7 +528,7 @@
       buildAutoRenew( null, null, '{$membershipMode}');
     {/if}
     {literal}
-    function buildAutoRenew( membershipType, processorId, mode ) {
+    function buildAutoRenew(membershipTypeID, processorId, mode ) {
       var action = {/literal}'{$action}'{literal};
 
       //for update lets hide it when not already recurring.
