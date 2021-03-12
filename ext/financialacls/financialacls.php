@@ -192,6 +192,7 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
   switch ($entity) {
     case 'LineItem':
     case 'MembershipType':
+    case 'ContributionRecur':
       $types = [];
       CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
       if ($types) {
@@ -303,7 +304,7 @@ function financialacls_civicrm_fieldOptions($entity, $field, &$options, $params)
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if ($entity === 'Contribution' && $field === 'financial_type_id' && $params['context'] === 'search') {
+  if (in_array($entity, ['Contribution', 'ContributionRecur'], TRUE) && $field === 'financial_type_id' && $params['context'] === 'search') {
     $action = CRM_Core_Action::VIEW;
     // At this stage we are only considering the view action. Code from
     // CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes().
