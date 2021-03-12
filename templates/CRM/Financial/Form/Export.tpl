@@ -40,7 +40,8 @@
     $('input[name="export_format"]').filter('[value=IIF]').prop('checked', true);
     $('#_qf_Export_next').click(function(){
       $(this).hide();
-      $('#_qf_Export_cancel').val('{/literal}{ts}Done{/ts}{literal}');
+      {/literal}{capture assign=tsdone}{ts}Done{/ts}{/capture}{literal}
+      $('#_qf_Export_cancel').html('<i aria-hidden="true" class="crm-i fa-check"></i> {/literal}{$tsdone|escape}{literal}');
     });
   });
 </script>
