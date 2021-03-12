@@ -1994,6 +1994,11 @@ WHERE  id IN ( %1, %2 )
       }
     }
 
+    // Remove option group IDs from fields changed to Text html_type.
+    if ($htmlType == 'Text') {
+      $params['option_group_id'] = '';
+    }
+
     // check for orphan option groups
     if (!empty($params['option_group_id'])) {
       if (!empty($params['id'])) {
