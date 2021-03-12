@@ -632,7 +632,6 @@ class CRM_Core_Permission {
     // Add any permissions defined in hook_civicrm_permission implementations.
     $module_permissions = $config->userPermissionClass->getAllModulePermissions($descriptions);
     $permissions = array_merge($permissions, $module_permissions);
-    CRM_Financial_BAO_FinancialType::permissionedFinancialTypes($permissions, $descriptions);
     return $permissions;
   }
 
