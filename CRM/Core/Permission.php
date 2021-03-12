@@ -588,12 +588,7 @@ class CRM_Core_Permission {
    */
   public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE) {
     $config = CRM_Core_Config::singleton();
-    $prefix = ts('CiviCRM') . ': ';
     $permissions = self::getCorePermissions();
-
-    if (self::isMultisiteEnabled()) {
-      $permissions['administer Multiple Organizations'] = [$prefix . ts('administer Multiple Organizations')];
-    }
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -909,6 +904,14 @@ class CRM_Core_Permission {
         'description' => ts('Permit altering all restricted data options'),
       ],
     ];
+    if (self::isMultisiteEnabled()) {
+      // This could arguably be moved to the multisite extension but
+      // within core it does permit editing group-organization records.
+      $permissions['administer Multiple Organizations'] = [
+        'label' => $prefix . ts('administer Multiple Organizations'),
+        'description' => ts('Administer multiple organizations. In practice this allows editing the group organization link'),
+      ];
+    }
     foreach (self::getImpliedPermissions() as $name => $includes) {
       foreach ($includes as $permission) {
         $permissions[$name][] = $permissions[$permission];
