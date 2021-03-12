@@ -395,6 +395,7 @@ class CRM_Core_Permission_Base {
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public function getAllModulePermissions($descriptions = FALSE) {
+    // Passing in false here is to be deprecated.
     $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
