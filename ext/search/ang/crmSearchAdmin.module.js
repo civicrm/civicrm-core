@@ -50,7 +50,7 @@
             return crmApi4('SavedSearch', 'get', {
               where: [['id', '=', params.id]],
               chain: {
-                groups: ['Group', 'get', {select: ['id', 'title', 'description', 'visibility', 'group_type'], where: [['saved_search_id', '=', '$id']]}],
+                groups: ['Group', 'get', {select: ['id', 'title', 'description', 'visibility', 'group_type', 'custom.*'], where: [['saved_search_id', '=', '$id']]}],
                 displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
               }
             }, 0);
