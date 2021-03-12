@@ -50,7 +50,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'idHash' => substr(sha1(CIVICRM_SITE_KEY . '1234'), 0, 7),
     ];
 
-    [$sent, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    [, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'valueName' => 'case_activity',
         'contactId' => $contact_id,
@@ -139,7 +139,7 @@ London, 90210
    * @throws \CiviCRM_API3_Exception
    */
   public function testContactTokens(): void {
-    $this->createCustomGroupWithFieldOfType([], 'contact_reference');
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
     $tokenData = $this->getAllContactTokens();
     $this->callAPISuccess('Contact', 'create', $tokenData);
     $address = $this->callAPISuccess('Address', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
@@ -237,7 +237,18 @@ im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
 url:http://civicrm.org
-custom_1:Mr. Spider Man II
+custom_1:Bobsled
+custom_2:Red
+custom_3:01/20/2021 12:00AM
+custom_4:999
+custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_7:New Zealand
+custom_8:France, Canada
+custom_9:Mr. Spider Man II
+custom_10:Queensland
+custom_11:Victoria, New South Wales
+custom_12:Yes
+custom_13:Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
 ';
@@ -373,6 +384,18 @@ contact_id:' . $tokenData['contact_id'] . '
       'openid' => 'OpenID',
       'world_region' => 'World Region',
       'url' => 'http://civicrm.org',
+      $this->getCustomFieldName('text') => 'Bobsled',
+      $this->getCustomFieldName('select_string') => 'R',
+      $this->getCustomFieldName('select_date') => '2021-01-20',
+      $this->getCustomFieldName('int') => 999,
+      $this->getCustomFieldName('link') => 'http://civicrm.org',
+      $this->getCustomFieldName('country') => 'New Zealand',
+      $this->getCustomFieldName('multi_country') => ['France', 'Canada'],
+      $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
+      $this->getCustomFieldName('state') => 'Queensland',
+      $this->getCustomFieldName('multi_state') => ['Victoria', 'New South Wales'],
+      $this->getCustomFieldName('boolean') => TRUE,
+      $this->getCustomFieldName('checkbox') => 'P',
       $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
       'checksum' => 'Checksum',
       'contact_id' => $this->individualCreate(['first_name' => 'Peter', 'last_name' => 'Parker']),
