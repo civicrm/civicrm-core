@@ -1251,10 +1251,13 @@ DESC limit 1");
             'financial_type_id' => $this->getFinancialTypeID(),
             'receive_date' => CRM_Utils_Time::date('YmdHis'),
             'tax_amount' => $params['tax_amount'] ?? NULL,
+            'total_amount' => $this->order->getTotalAmount(),
             'invoice_id' => $this->getInvoiceID(),
             'currency' => $this->getCurrency(),
             'is_pay_later' => $params['is_pay_later'] ?? 0,
             'skipLineItem' => $params['skipLineItem'] ?? 0,
+            'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+            'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
           ]
         );
 
@@ -1826,21 +1829,10 @@ DESC limit 1");
     $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
-    if ($this->getSubmittedValue('send_receipt')) {
-      $contributionParams += [
-        'receipt_date' => CRM_Utils_Time::date('YmdHis'),
-      ];
-    }
-
     if ($recurringContributionID) {
       $contributionParams['contribution_recur_id'] = $recurringContributionID;
     }
 
-    $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-
-    // @todo this is the wrong place for this - it should be done as close to form submission
-    // as possible
-    $contributionParams['total_amount'] = $params['amount'];
     $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
     // lets store it in the form variable so postProcess hook can get to this and use it
