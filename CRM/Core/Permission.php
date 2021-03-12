@@ -589,7 +589,7 @@ class CRM_Core_Permission {
   public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE) {
     $config = CRM_Core_Config::singleton();
     $prefix = ts('CiviCRM') . ': ';
-    $permissions = self::getCorePermissions($descriptions);
+    $permissions = self::getCorePermissions();
 
     if (self::isMultisiteEnabled()) {
       $permissions['administer Multiple Organizations'] = [$prefix . ts('administer Multiple Organizations')];
