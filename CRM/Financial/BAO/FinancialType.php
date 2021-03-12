@@ -200,6 +200,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return bool
    */
   public static function permissionedFinancialTypes(&$permissions, $descriptions) {
+    CRM_Core_Error::deprecatedFunctionWarning('not done via hook.');
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
     }

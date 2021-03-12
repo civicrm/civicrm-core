@@ -254,6 +254,38 @@ function financialacls_civicrm_membershipTypeValues($form, &$membershipTypeValue
 }
 
 /**
+ * Add permissions.
+ *
+ * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_permission/
+ *
+ * @param array $permissions
+ */
+function financialacls_civicrm_permission(&$permissions) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+  $actions = [
+    'add' => ts('add'),
+    'view' => ts('view'),
+    'edit' => ts('edit'),
+    'delete' => ts('delete'),
+  ];
+  $financialTypes = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'validate');
+  foreach ($financialTypes as $id => $type) {
+    foreach ($actions as $action => $action_ts) {
+      $permissions[$action . ' contributions of type ' . $type] = [
+        ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
+        ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
+      ];
+    }
+  }
+  $permissions['administer CiviCRM Financial Types'] = [
+    ts('CiviCRM: administer CiviCRM Financial Types'),
+    ts('Administer access to Financial Types'),
+  ];
+}
+
+/**
  * Remove unpermitted financial types from field Options in search context.
  *
  * Search context is described as
