@@ -57,7 +57,7 @@ class CRM_Core_Permission_Base {
    *   a permission name
    */
   public function translatePermission($perm, $nativePrefix, $map) {
-    list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
+    [$civiPrefix, $name] = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case $nativePrefix:
         return $name;
@@ -272,9 +272,12 @@ class CRM_Core_Permission_Base {
    *   The permission to check.
    * @param int $userId
    *
+   * @return bool;
+   *
    */
   public function check($str, $userId = NULL) {
     //no default behaviour
+    return FALSE;
   }
 
   /**
@@ -374,7 +377,7 @@ class CRM_Core_Permission_Base {
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions
    */
-  public static function getModulePermissions($module) {
+  public function getModulePermissions($module): array {
     $return_permissions = [];
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
@@ -390,14 +393,15 @@ class CRM_Core_Permission_Base {
    * in all enabled CiviCRM module extensions.
    *
    * @param bool $descriptions
+   * @param array $permissions
    *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  public function getAllModulePermissions($descriptions = FALSE) {
-    // Passing in false here is to be deprecated.
-    $permissions = [];
-    CRM_Utils_Hook::permission($permissions);
+  public function getAllModulePermissions($descriptions = FALSE, &$permissions): array {
+    $newPermissions = [];
+    CRM_Utils_Hook::permission($newPermissions, $permissions);
+    $permissions = array_merge($permissions, $newPermissions);
 
     if ($descriptions) {
       foreach ($permissions as $permission => $label) {
@@ -405,6 +409,7 @@ class CRM_Core_Permission_Base {
       }
     }
     else {
+      // Passing in false here is to be deprecated.
       foreach ($permissions as $permission => $label) {
         $permissions[$permission] = (is_array($label)) ? array_shift($label) : $label;
       }

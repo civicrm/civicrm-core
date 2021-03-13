@@ -12,7 +12,7 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
    * @return array
    *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
-  public function translateData() {
+  public function translateData(): array {
     $cases = [];
 
     $cases[] = ['administer CiviCRM', 'administer CiviCRM'];
@@ -35,7 +35,7 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
    * @param string $expected
    *   The name of an actual permission (based on translation matrix for "runtime").
    */
-  public function testTranslate($input, $expected) {
+  public function testTranslate(string $input, string $expected): void {
     $perm = new CRM_Core_Permission_Base();
     $actual = $perm->translatePermission($input, 'myruntime', [
       'universal name' => 'local name',
@@ -48,12 +48,23 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
   /**
    * Test that the user has the implied permission of administer CiviCRM data by virtue of having administer CiviCRM.
    */
-  public function testImpliedPermission() {
+  public function testImpliedPermission(): void {
     $this->createLoggedInUser();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
       'administer CiviCRM',
     ];
     $this->assertTrue(CRM_Core_Permission::check('administer CiviCRM data'));
+  }
+
+  /**
+   * Test that the super permission gives the implied permission of the whole shebang.
+   */
+  public function testImpliedPermissionSuperDuper(): void {
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'all CiviCRM permissions and ACLs',
+    ];
+    $this->assertTrue(CRM_Core_Permission::check('view all contacts'));
   }
 
 }
