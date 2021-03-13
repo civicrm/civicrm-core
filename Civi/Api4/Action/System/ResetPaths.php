@@ -13,12 +13,7 @@
 namespace Civi\Api4\Action\System;
 
 /**
- * Clear CiviCRM caches, and optionally rebuild triggers and reset sessions.
- *
- * @method bool getTriggers
- * @method $this setTriggers(bool $triggers)
- * @method bool getSession
- * @method $this setSession(bool $session)
+ * Reset paths using doSiteMove().
  */
 class ResetPaths extends \Civi\Api4\Generic\AbstractAction {
 
