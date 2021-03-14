@@ -491,7 +491,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
-    $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);
     $form->_mode = 'test';
     $this->createLoggedInUser();
@@ -591,7 +590,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testContributionUpdateOnMembershipTypeChange(): void {
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $form = $this->getForm();
-    $form->preProcess();
     $this->mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
     $priceSet = $this->callAPISuccess('PriceSet', 'Get', ["extends" => "CiviMember"]);
