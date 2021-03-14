@@ -589,44 +589,16 @@ class CRM_Core_Permission {
   public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE) {
     $config = CRM_Core_Config::singleton();
     $permissions = self::getCorePermissions();
+    $permissions = array_merge($permissions, self::getComponentPermissions($all));
 
+    // Add any permissions defined in hook_civicrm_permission implementations.
+    $module_permissions = $config->userPermissionClass->getAllModulePermissions(TRUE);
+    $permissions = array_merge($permissions, $module_permissions);
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
         $permissions[$name] = array_shift($attr);
       }
     }
-    if (!$all) {
-      $components = CRM_Core_Component::getEnabledComponents();
-    }
-    else {
-      $components = CRM_Core_Component::getComponents();
-    }
-
-    foreach ($components as $comp) {
-      $perm = $comp->getPermissions($all, $descriptions);
-      if ($perm) {
-        $info = $comp->getInfo();
-        foreach ($perm as $p => $attr) {
-
-          if (!is_array($attr)) {
-            $attr = [$attr];
-          }
-
-          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
-
-          if ($descriptions) {
-            $permissions[$p] = $attr;
-          }
-          else {
-            $permissions[$p] = $attr[0];
-          }
-        }
-      }
-    }
-
-    // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = $config->userPermissionClass->getAllModulePermissions($descriptions);
-    $permissions = array_merge($permissions, $module_permissions);
     return $permissions;
   }
 
@@ -1709,6 +1681,39 @@ class CRM_Core_Permission {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * @param bool $includeDisabled
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getComponentPermissions(bool $includeDisabled): array {
+    if (!$includeDisabled) {
+      $components = CRM_Core_Component::getEnabledComponents();
+    }
+    else {
+      $components = CRM_Core_Component::getComponents();
+    }
+
+    $permissions = [];
+    foreach ($components as $comp) {
+      $perm = $comp->getPermissions($includeDisabled, TRUE);
+      if ($perm) {
+        $info = $comp->getInfo();
+        foreach ($perm as $p => $attr) {
+
+          if (!is_array($attr)) {
+            $attr = [$attr];
+          }
+
+          $attr[0] = $info['translatedName'] . ': ' . $attr[0];
+          $permissions[$p] = $attr;
+        }
+      }
+    }
+    return $permissions;
   }
 
 }
