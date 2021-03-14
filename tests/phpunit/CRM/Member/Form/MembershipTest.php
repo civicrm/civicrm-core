@@ -1221,9 +1221,7 @@ Expires: ',
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
-    $form = new CRM_Member_Form_Membership();
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $form->controller = new CRM_Core_Controller();
+    $form = $this->getFormObject('CRM_Member_Form_Membership');
     $form->preProcess();
     return $form;
   }
