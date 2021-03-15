@@ -336,7 +336,33 @@
               CRM.menubar.open('QuickSearch');
             }
           }
-        });
+        })
+        .autocomplete( "instance" )._renderItem = function( ul, item ) {
+          var uiMenuItemWrapper = $("<div class='ui-menu-item-uiMenuItemWrapper'>");
+          if (item.value == 0) {
+            uiMenuItemWrapper.text(item.label);
+          }
+          else {
+            uiMenuItemWrapper.append($('<a>')
+              .attr('href', CRM.url('civicrm/contact/view', {reset: 1, cid: item.value}))
+              .css({ display: 'block' })
+              .text(item.label)
+              .click(function(e) {
+                if (e.ctrlKey || e.shiftKey || e.altKey) {
+                  // Special-clicking lets you open several tabs.
+                  e.stopPropagation();
+                }
+                else {
+                  // Fall back to original behaviour.
+                  e.preventDefault();
+                }
+              }));
+          }
+
+          return $( "<li class='ui-menu-item'>" )
+            .append(uiMenuItemWrapper)
+            .appendTo( ul );
+        };
       $('#crm-qsearch > a').keyup(function(e) {
         if ($(e.target).is(this)) {
           $('#crm-qsearch-input').focus();
