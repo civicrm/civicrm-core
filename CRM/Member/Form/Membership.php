@@ -1242,7 +1242,7 @@ DESC limit 1");
         //create new soft-credit record, CRM-13981
         if ($softParams) {
           $softParams['contribution_id'] = $contribution->id;
-          $softParams['currency'] = $contribution->currency;
+          $softParams['currency'] = $this->getCurrency();
           $softParams['amount'] = $contribution->total_amount;
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
@@ -1798,10 +1798,6 @@ DESC limit 1");
     $contributionParams
   ) {
     $contactID = $contributionParams['contact_id'];
-
-    // add these values for the recurringContrib function ,CRM-10188
-    $params['financial_type_id'] = $this->getFinancialTypeID();
-    $params['is_recur'] = TRUE;
     $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
 
     if ($recurringContributionID) {
@@ -1820,19 +1816,19 @@ DESC limit 1");
    * @param int $contactID
    *
    * @return int
+   * @throws \CiviCRM_API3_Exception
    */
   protected function legacyProcessRecurringContribution(array $params, $contactID): int {
 
     $recurParams = ['contact_id' => $contactID];
-    $recurParams['amount'] = $params['amount'] ?? NULL;
+    $recurParams['amount'] = $this->order->getTotalAmount();
     $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['financial_type_id'] = $this->getFinancialTypeID();
-    $recurParams['currency'] = $params['currency'] ?? NULL;
+    $recurParams['currency'] = $this->getCurrency();
     $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
-
     $recurParams['is_test'] = $this->isTest();
 
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::date('YmdHis');
@@ -1857,7 +1853,7 @@ DESC limit 1");
    *
    * @return bool
    */
-  protected function isTest(): int {
+  protected function isTest(): bool {
     return ($this->_mode === 'test') ? TRUE : FALSE;
   }
 
