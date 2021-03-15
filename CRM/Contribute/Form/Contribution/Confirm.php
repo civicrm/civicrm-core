@@ -2772,7 +2772,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($form->_paymentProcessor)) {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
-      
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
