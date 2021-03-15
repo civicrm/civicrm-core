@@ -182,10 +182,8 @@ Default Domain Name
   public function testContactTokensRenderedByTokenProcessor(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
     $tokenData = $this->getAllContactTokens();
-    // @todo - these 2 still need fixing/ syncing.
-    unset($tokenData['preferred_communication_method'], $tokenData['addressee']);
     $address = $this->setupContactFromTokeData($tokenData);
-    $tokenString ='';
+    $tokenString = '';
     foreach (array_keys($tokenData) as $key) {
       $tokenString .= "{$key}:{contact.{$key}}\n";
     }
@@ -198,8 +196,9 @@ Default Domain Name
       $rendered = (string) $row->render('html');
     }
     $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
-    // @todo - fix these 2 & stop stripping them out.
-    $expected = str_replace(["preferred_communication_method:\n", "addressee:Mr. Robert Frank Smith II\n"], '', $expected);
+    // @todo - this works better in token processor than in CRM_Core_Token.
+    // once synced we can fix $this->getExpectedContactOutput to return the right thing.
+    $expected = str_replace("preferred_communication_method:\n", "preferred_communication_method:Phone\n", $expected);
     $this->assertEquals($expected, $rendered);
   }
 
@@ -364,23 +363,25 @@ Default Domain Name
       'is_primary' => TRUE,
       'name' => $tokenData['im'],
       'provider_id' => $tokenData['im_provider'],
-      'contact_id' => $tokenData['contact_id']
+      'contact_id' => $tokenData['contact_id'],
     ]);
     $this->callAPISuccess('OpenID', 'create', array_merge($tokenData, [
       'is_primary' => TRUE,
       'contact_id' => $tokenData['contact_id'],
-      'openid' => $tokenData['openid']
+      'openid' => $tokenData['openid'],
     ]));
     return $address;
   }
 
   /**
-   * @param array|null $contact
-   * @param $id
+   * Get the expected rendered string.
+   *
+   * @param int $id
    * @param array $tokenData
-   * @param bool $checksum
+   * @param string $actualOutput
    *
    * @return string
+   * @throws \API_Exception
    */
   protected function getExpectedContactOutput($id, array $tokenData, string $actualOutput): string {
     $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
