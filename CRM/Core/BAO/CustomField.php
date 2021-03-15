@@ -1517,7 +1517,7 @@ SELECT id
         $value = 0;
       }
 
-      if ($customFields[$customFieldId]['data_type'] == 'Money') {
+      if ($customFields[$customFieldId]['data_type'] == 'Money' && $customFields[$customFieldId]['html_type'] == 'Text') {
         $value = CRM_Utils_Rule::cleanMoney($value);
       }
     }
@@ -2695,6 +2695,9 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     }
     if ($field->serialize) {
       $params['type'] = 'varchar(255)';
+    }
+    if ($field->data_type == 'Money' && $field->html_type !== 'Text') {
+      $params['type'] = 'varchar(512)';
     }
     if (isset($field->default_value)) {
       $params['default'] = "'{$field->default_value}'";
