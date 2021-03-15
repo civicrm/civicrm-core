@@ -732,22 +732,12 @@ class CRM_Utils_Token {
       $value = "cs={$cs}";
     }
     else {
-      $value = CRM_Utils_Array::retrieveValueRecursive($contact, $token);
+      $value = (array) CRM_Utils_Array::retrieveValueRecursive($contact, $token);
 
-      // FIXME: for some pseudoconstants we get array ( 0 => id, 1 => label )
-      if (is_array($value)) {
-        $value = $value[1];
+      foreach ($value as $index => $item) {
+        $value[$index] = self::convertPseudoConstantsUsingMetadata($value[$index], $token);
       }
-      // Convert pseudoconstants using metadata
-      elseif ($value && is_numeric($value)) {
-        $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
-        if (!empty($allFields[$token]['pseudoconstant'])) {
-          $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
-        }
-      }
-      elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
-        $value = CRM_Utils_Date::customFormat($value);
-      }
+      $value = implode(', ', $value);
     }
 
     if (!$html) {
@@ -1895,6 +1885,26 @@ class CRM_Utils_Token {
     }
 
     return $output;
+  }
+
+  /**
+   * @param $value
+   * @param $token
+   *
+   * @return bool|int|mixed|string|null
+   */
+  protected static function convertPseudoConstantsUsingMetadata($value, $token) {
+    // Convert pseudoconstants using metadata
+    if ($value && is_numeric($value)) {
+      $allFields = CRM_Contact_BAO_Contact::exportableFields('All');
+      if (!empty($allFields[$token]['pseudoconstant'])) {
+        $value = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $token, $value);
+      }
+    }
+    elseif ($value && CRM_Utils_String::endsWith($token, '_date')) {
+      $value = CRM_Utils_Date::customFormat($value);
+    }
+    return $value;
   }
 
 }
