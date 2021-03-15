@@ -625,6 +625,10 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function boolean($value) {
+    if ($value === TRUE || $value === FALSE) {
+      return TRUE;
+    }
+    // This is intentionally not using === comparison - but will fail on FALSE.
     return preg_match(
       '/(^(1|0)$)|(^(Y(es)?|N(o)?)$)|(^(T(rue)?|F(alse)?)$)/i', $value
     ) ? TRUE : FALSE;

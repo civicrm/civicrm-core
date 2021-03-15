@@ -80,6 +80,28 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider booleanDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testBoolean($inputData, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::boolean($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function booleanDataProvider() {
+    return [
+      [TRUE, TRUE],
+      ['TRUE', TRUE],
+      [FALSE, TRUE],
+      ['false', TRUE],
+      ['banana', FALSE],
+    ];
+  }
+
+  /**
    * @dataProvider moneyDataProvider
    * @param $inputData
    * @param $decimalPoint
