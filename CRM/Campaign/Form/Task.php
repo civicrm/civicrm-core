@@ -35,7 +35,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
 
     $this->_task = $values['task'];
 
-    $ids = $form->getSelectedIDs($values);
+    $ids = $this->getSelectedIDs($values);
 
     if (!$ids) {
       $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
