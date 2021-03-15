@@ -109,6 +109,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
+    // @todo - this should probably call getCoreAndComponentPermissions.
     $civicrm_perms = array_keys(CRM_Core_Permission::getCorePermissions());
     if (empty($civicrm_perms)) {
       throw new CRM_Core_Exception("Cannot upgrade permissions: permission list missing");

@@ -585,14 +585,13 @@ class CRM_Core_Permission {
    *   whether to return descriptions
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    $permissions = self::getCorePermissions();
-    $permissions = array_merge($permissions, self::getComponentPermissions($all));
+  public static function assembleBasicPermissions($all = FALSE, $descriptions = FALSE): array {
+    $permissions = self::getCoreAndComponentPermissions($all);
 
     // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = $config->userPermissionClass->getAllModulePermissions(TRUE);
+    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE);
     $permissions = array_merge($permissions, $module_permissions);
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -1684,6 +1683,8 @@ class CRM_Core_Permission {
   }
 
   /**
+   * Get permissions for components.
+   *
    * @param bool $includeDisabled
    *
    * @return array
@@ -1713,6 +1714,20 @@ class CRM_Core_Permission {
         }
       }
     }
+    return $permissions;
+  }
+
+  /**
+   * Get permissions for core functionality and for that of core components.
+   *
+   * @param bool $all
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getCoreAndComponentPermissions(bool $all): array {
+    $permissions = self::getCorePermissions();
+    $permissions = array_merge($permissions, self::getComponentPermissions($all));
     return $permissions;
   }
 
