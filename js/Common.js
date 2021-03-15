@@ -420,6 +420,8 @@ if (!CRM.vars) CRM.vars = {};
         };
 
       // quickform doesn't support optgroups so here's a hack :(
+      // Instead of using wrapAll or similar that repeatedly appends options to the group and redraw the page (=> very slow on large lists),
+      // build bulk HTML and insert in single shot
       var optGroups = {};
       $('option[value^=crm_optgroup]', this).each(function () {
         var groupHtml = '';
