@@ -1176,7 +1176,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Exception
    */
   public static function getRowsElementsAndInfo($mainId, $otherId, $checkPermissions = TRUE) {
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';

@@ -23,9 +23,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Tear down.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_group_contact',
@@ -38,7 +38,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function createDupeContacts() {
+  public function createDupeContacts(): void {
     // create a group to hold contacts, so that dupe checks don't consider any other contacts in the DB
     $params = [
       'name' => 'Test Dupe Merger Group',
@@ -140,7 +140,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Delete all created contacts.
    */
-  public function deleteDupeContacts() {
+  public function deleteDupeContacts(): void {
     foreach ($this->_contactIds as $contactId) {
       $this->contactDelete($contactId);
     }
@@ -150,9 +150,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Test the batch merge.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testBatchMergeSelectedDuplicates() {
+  public function testBatchMergeSelectedDuplicates(): void {
     $this->createDupeContacts();
 
     // verify that all contacts have been created separately
@@ -198,8 +200,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     CRM_Core_DAO::singleValueQuery("UPDATE civicrm_prevnext_cache SET is_selected = 1 WHERE id IN ({$pnDupePairs[0]['prevnext_id']}, {$pnDupePairs[1]['prevnext_id']})");
 
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertEquals($pnDupePairs[0]['is_selected'], 1, 'Check if first record in dupe pairs is marked as selected.');
-    $this->assertEquals($pnDupePairs[0]['is_selected'], 1, 'Check if second record in dupe pairs is marked as selected.');
+    $this->assertEquals(1, $pnDupePairs[0]['is_selected'], 'Check if first record in dupe pairs is marked as selected.');
+    $this->assertEquals(1, $pnDupePairs[0]['is_selected'], 'Check if second record in dupe pairs is marked as selected.');
 
     // batch merge selected dupes
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
@@ -313,7 +315,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetMatches() {
+  public function testGetMatches(): void {
     $this->setupMatchData();
 
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
@@ -351,7 +353,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetMatchesExcludeDeleted($isReverse) {
+  public function testGetMatchesExcludeDeleted(bool $isReverse): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -372,8 +374,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test that location type is ignored when deduping by postal address.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesIgnoreLocationType() {
+  public function testGetMatchesIgnoreLocationType(): void {
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
     $this->callAPISuccess('address', 'create', [
@@ -396,15 +399,16 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $dupeCount = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => $ruleGroup['id'],
     ])['count'];
-    $this->assertEquals($dupeCount, 1);
+    $this->assertEquals(1, $dupeCount);
   }
 
   /**
    * Test results are returned when criteria are passed in.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesCriteriaMatched() {
+  public function testGetMatchesCriteriaMatched(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -417,8 +421,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test results are returned when criteria are passed in & limit is  respected.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesCriteriaMatchedWithLimit() {
+  public function testGetMatchesCriteriaMatchedWithLimit(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -429,11 +434,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test results are returned when criteria are passed in & limit is  respected.
+   * Test results are returned when criteria are passed in & limit is
+   * respected.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesCriteriaMatchedWithSearchLimit() {
+  public function testGetMatchesCriteriaMatchedWithSearchLimit(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -447,8 +454,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test getting matches where there are  no criteria.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesNoCriteria() {
+  public function testGetMatchesNoCriteria(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -460,8 +468,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Test getting matches with a limit in play.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetMatchesNoCriteriaButLimit() {
+  public function testGetMatchesNoCriteriaButLimit(): void {
     $this->setupMatchData();
     $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
       'rule_group_id' => 1,
@@ -490,7 +499,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function testGetOrganizationMatches() {
+  public function testGetOrganizationMatches(): void {
     $this->setupMatchData();
     $ruleGroups = $this->callAPISuccessGetSingle('RuleGroup', [
       'contact_type' => 'Organization',
@@ -778,7 +787,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19653 : Test that custom field data should/shouldn't be overriden on
+   * CRM-19653 : Test that custom field data should/shouldn't be overridden on
    *   selecting/not selecting option to migrate data respectively
    *
    * @throws \CRM_Core_Exception
@@ -787,7 +796,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // Create Custom Field
     $createGroup = $this->setupCustomGroupForIndividual();
     $createField = $this->setupCustomField('Graduation', $createGroup);
-    $customFieldName = "custom_" . $createField['id'];
+    $customFieldName = 'custom_' . $createField['id'];
 
     // Contacts setup
     $this->setupMatchData();
@@ -801,7 +810,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // update the text custom field for original contact with value 'abc'
     $this->callAPISuccess('Contact', 'create', [
       'id' => $originalContactID,
-      "{$customFieldName}" => 'abc',
+      $customFieldName => 'abc',
     ]);
     $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
 
@@ -868,7 +877,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'id' => $this->contacts[0]['id'],
       'return' => ['created_date'],
     ])['created_date'];
-    // Assume contats have been flipped in the UL so merging into the higher id
+    // Assume contacts have been flipped in the UL so merging into the higher id
     $this->mergeContacts($this->contacts[$keepContactKey]['id'], $this->contacts[$duplicateContactKey]['id'], []);
     $this->assertEquals($lowerContactCreatedDate, $this->callAPISuccess('Contact', 'getsingle', ['id' => $this->contacts[$keepContactKey]['id'], 'return' => ['created_date']])['created_date']);
   }
@@ -928,6 +937,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * no records on the custom group table.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testMigrationOfSomeCustomDataOnEmptyCustomRecord() {
     // Create Custom Fields
@@ -1057,9 +1067,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function mergeContacts($originalContactID, $duplicateContactID, $params) {
+  private function mergeContacts($originalContactID, $duplicateContactID, $params): void {
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
 
     $migrationData = [
@@ -1081,7 +1090,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName) {
+  private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName): void {
     $this->assertEntityCustomFieldValue('Contact', $contactID, $expectedValue, $customFieldName);
   }
 
@@ -1156,9 +1165,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   /**
    * Set up some contacts for our matching.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function setupMatchData() {
+  public function setupMatchData(): void {
     $fixtures = [
       [
         'first_name' => 'Mickey',
