@@ -32,10 +32,11 @@ class Permission extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return \Civi\Api4\Generic\BasicGetAction
+   * @return Action\Permission\Get
    */
   public static function get($checkPermissions = TRUE) {
-    return (new \Civi\Api4\Action\Permission\Get(__CLASS__, __FUNCTION__))->setCheckPermissions($checkPermissions);
+    return (new Action\Permission\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   /**
@@ -48,31 +49,26 @@ class Permission extends Generic\AbstractEntity {
         [
           'name' => 'group',
           'title' => 'Group',
-          'required' => TRUE,
           'data_type' => 'String',
         ],
         [
           'name' => 'name',
           'title' => 'Name',
-          'required' => TRUE,
           'data_type' => 'String',
         ],
         [
           'name' => 'title',
           'title' => 'Title',
-          'required' => TRUE,
           'data_type' => 'String',
         ],
         [
           'name' => 'description',
           'title' => 'Description',
-          'required' => FALSE,
           'data_type' => 'String',
         ],
         [
           'name' => 'is_synthetic',
           'title' => 'Is Synthetic',
-          'required' => FALSE,
           'data_type' => 'Boolean',
         ],
         [
@@ -80,7 +76,6 @@ class Permission extends Generic\AbstractEntity {
           'title' => 'Is Active',
           'description' => '',
           'default' => TRUE,
-          'required' => FALSE,
           'data_type' => 'Boolean',
         ],
       ];

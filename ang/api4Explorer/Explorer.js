@@ -194,16 +194,20 @@
       $scope.helpContent = helpContent = formatHelp(content);
     }
 
-    // Convert plain-text help to markdown; replace variables and format links
+    // Format help text with markdown; replace variables and format links
     function formatHelp(rawContent) {
       function formatRefs(see) {
         _.each(see, function(ref, idx) {
-          var match = ref.match(/^\\Civi\\Api4\\([a-zA-Z]+)$/);
+          var match = ref.match(/^(\\Civi\\Api4\\)?([a-zA-Z]+)$/);
           if (match) {
-            ref = '#/explorer/' + match[1];
+            ref = '#/explorer/' + match[2];
           }
-          if (ref[0] === '\\') {
-            ref = 'https://github.com/civicrm/civicrm-core/blob/master' + ref.replace(/\\/i, '/') + '.php';
+          // Link to php classes on GitHub.
+          // Fixme: Only works for files in the core repo
+          if (ref[0] === '\\' || ref.indexOf('Civi\\') === 0 || ref.indexOf('CRM_') === 0) {
+            var classFunction = _.trim(ref, '\\').split('::'),
+              replacement = new RegExp(classFunction[0].indexOf('CRM_') === 0 ? '_' : '\\\\', 'g');
+            ref = 'https://github.com/civicrm/civicrm-core/blob/master/' + classFunction[0].replace(replacement, '/') + '.php';
           }
           see[idx] = '<a target="' + (ref[0] === '#' ? '_self' : '_blank') + '" href="' + ref + '">' + see[idx] + '</a>';
         });
