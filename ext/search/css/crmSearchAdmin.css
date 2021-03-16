@@ -96,8 +96,11 @@
   display: inline-block;
 }
 
-#bootstrap-theme.crm-search i.fa-arrows {
-  cursor: move;
+#bootstrap-theme.crm-search i.crm-search-move-icon {
+  opacity: .5;
+}
+#bootstrap-theme.crm-search .crm-draggable:hover > * > i.crm-search-move-icon {
+  opacity: 1;
 }
 
 #bootstrap-theme.crm-search .api4-clause-badge {
@@ -112,6 +115,7 @@
 #bootstrap-theme.crm-search .api4-clause-badge .caret {
   margin: 0;
 }
+/* Icon only shown while dragging */
 #bootstrap-theme.crm-search .api4-clause-badge .crm-i {
   display: none;
   padding: 0 6px;

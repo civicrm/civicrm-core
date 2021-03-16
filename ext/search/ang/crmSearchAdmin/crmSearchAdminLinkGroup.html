@@ -11,9 +11,9 @@
     </tr>
   </thead>
   <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.group">
-    <tr ng-repeat="item in $ctrl.group">
+    <tr ng-repeat="item in $ctrl.group" class="crm-draggable">
       <td class="crm-search-admin-icon-col">
-        <i class="crm-i fa-arrows disabled"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon"></i>
       </td>
       <td class="crm-search-admin-icon-col">
         <span class="crm-editable-enabled" ng-click="pickIcon($index)">
