@@ -413,7 +413,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // send the mail
-    list($sent, $activityId) = CRM_Activity_BAO_Activity::sendEmail(
+    list($sent, $activityIds) = CRM_Activity_BAO_Activity::sendEmail(
       $formattedContactDetails,
       $this->getSubject($formValues['subject']),
       $formValues['text_message'],
@@ -432,7 +432,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
     );
 
     if ($sent) {
-      $followupStatus = $this->createFollowUpActivities($formValues, $activityId);
+      $arbitraryActivityId = current($activityIds);
+      if (!empty($arbitraryActivityId)) {
+        $followupStatus = $this->createFollowUpActivities($formValues, $arbitraryActivityId);
+      }
       $count_success = count($this->_toContactDetails);
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', [
         'plural' => '%count messages were sent successfully. ',
@@ -453,11 +456,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $cases = explode(',', $this->_caseId);
       foreach ($cases as $key => $val) {
         if (is_numeric($val)) {
-          $caseParams = [
-            'activity_id' => $activityId,
-            'case_id' => $val,
-          ];
-          CRM_Case_BAO_Case::processCaseActivity($caseParams);
+          foreach ($activityIds as $activityId) {
+            $caseParams = [
+              'activity_id' => $activityId,
+              'case_id' => $val,
+            ];
+            CRM_Case_BAO_Case::processCaseActivity($caseParams);
+          }
         }
       }
     }

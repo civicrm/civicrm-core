@@ -1017,7 +1017,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param int $caseId
    *
    * @return array
-   *   ( sent, activityId) if any email is sent and activityId
+   *   ( sent, activityIds) if any email is sent and the corresponding activity ids
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -1116,6 +1116,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $sent = $notSent = [];
     $attachmentFileIds = [];
+    $activityIds = [];
     $firstActivityCreated = FALSE;
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
@@ -1154,10 +1155,18 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $tokenHtml = NULL;
       }
 
+      $firstCaseId = NULL;
       if ($caseId) {
-        $tokenSubject = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenSubject, $subjectToken, $escapeSmarty);
-        $tokenText = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenText, $messageToken, $escapeSmarty);
-        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken, $escapeSmarty);
+        // Sometimes caseId is a comma separated list, but what does that mean
+        // for token replacement? Just take first one.
+        if (strpos($caseId, ',') !== FALSE) {
+          $firstCaseId = explode(',', $caseId)[0];
+        }
+      }
+      if ($firstCaseId) {
+        $tokenSubject = CRM_Utils_Token::replaceCaseTokens($firstCaseId, $tokenSubject, $subjectToken, $escapeSmarty);
+        $tokenText = CRM_Utils_Token::replaceCaseTokens($firstCaseId, $tokenText, $messageToken, $escapeSmarty);
+        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($firstCaseId, $tokenHtml, $messageToken, $escapeSmarty);
       }
 
       if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
@@ -1177,7 +1186,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       // Create email activity.
-      $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $caseId);
+      $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $firstCaseId);
+      $activityIds[$activityID] = $activityID;
 
       if ($firstActivityCreated == FALSE && !empty($attachments)) {
         $attachmentFileIds = self::getAttachmentFileIds($activityID, $attachments);
@@ -1203,7 +1213,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    return [$sent, $activityID];
+    return [$sent, $activityIds];
   }
 
   /**
