@@ -529,4 +529,30 @@ class CRM_Utils_Type {
     return array_combine($types, $types);
   }
 
+  /**
+   * Get all the types that are text-like.
+   *
+   * The returned types would all legitimately be compared to '' by mysql
+   * in a query.
+   *
+   * e.g
+   * WHERE display_name = '' is valid
+   * WHERE id = '' is not and in some mysql configurations and queries
+   * could cause an error.
+   *
+   * @return array
+   */
+  public static function getTextTypes(): array {
+    return [
+      self::T_STRING,
+      self::T_ENUM,
+      self::T_TEXT,
+      self::T_LONGTEXT,
+      self::T_BLOB,
+      self::T_EMAIL,
+      self::T_URL,
+      self::T_MEDIUMBLOB,
+    ];
+  }
+
 }
