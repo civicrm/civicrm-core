@@ -979,7 +979,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @return array
    */
-  public function &getImportedContacts() {
+  public function getImportedContacts() {
     return $this->_newContacts;
   }
 

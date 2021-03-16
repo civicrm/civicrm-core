@@ -423,7 +423,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     );
 
     // add the new contacts to selected groups
-    $contactIds = &$parser->getImportedContacts();
+    $contactIds = $parser->getImportedContacts();
 
     // add the new related contacts to selected groups
     $relatedContactIds = &$parser->getRelatedImportedContacts();
