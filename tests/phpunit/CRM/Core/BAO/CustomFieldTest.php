@@ -51,6 +51,34 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test changing a data type from multiple-choice to Text.
+   */
+  public function testChangeDataType() {
+    $customGroup = $this->createCustomField();
+    $fields = [
+      'label' => 'Radio to Text',
+      'is_active' => 1,
+      'data_type' => 'String',
+      'html_type' => 'Radio',
+      'custom_group_id' => $customGroup['id'],
+      'option_type' => 1,
+      'option_label' => ["One", "Two"],
+      'option_value' => [1, 2],
+      'option_weight' => [1, 2],
+      'option_status' => [1, 1],
+    ];
+    $customField = CRM_Core_BAO_CustomField::create($fields);
+    $this->assertNotNull($customField->option_group_id);
+    $fieldsNew = [
+      'id' => $customField->id,
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    ];
+    $customFieldModified = CRM_Core_BAO_CustomField::create($fieldsNew);
+    $this->assertFalse($customFieldModified->option_group_id ?? FALSE);
+  }
+
+  /**
    * Test custom field create accepts passed column name.
    */
   public function testCreateCustomFieldColumnName() {
