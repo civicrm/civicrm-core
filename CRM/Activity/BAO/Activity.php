@@ -1162,6 +1162,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         if (strpos($caseId, ',') !== FALSE) {
           $firstCaseId = explode(',', $caseId)[0];
         }
+        else {
+          $firstCaseId = $caseId;
+        }
       }
       if ($firstCaseId) {
         $tokenSubject = CRM_Utils_Token::replaceCaseTokens($firstCaseId, $tokenSubject, $subjectToken, $escapeSmarty);
