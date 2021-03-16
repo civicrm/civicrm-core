@@ -261,7 +261,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           // CRM_Core_Error::deprecatedWarning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api');
         }
         if (!empty($params['id']) && empty($params[$dateField])) {
-          $fieldsToLoad[] = $dateField;
+          // Fix to dev#2462. Leave end_date as-it-is (if empty) when editing a lifetime Membership
+          $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
+          if ($membershipType["duration_unit"] != "lifetime") {
+            $fieldsToLoad[] = $dateField;
+          }
         }
       }
       if (!empty($fieldsToLoad)) {
