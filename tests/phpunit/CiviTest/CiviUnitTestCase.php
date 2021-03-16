@@ -372,12 +372,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     $this->renameLabels();
     $this->_sethtmlGlobals();
+    $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
   }
 
   /**
    * Read everything from the datasets directory and insert into the db.
    */
-  public function loadAllFixtures() {
+  public function loadAllFixtures(): void {
     $fixturesDir = __DIR__ . '/../../fixtures';
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
@@ -3788,6 +3789,17 @@ WHERE a1.is_primary = 0
   AND a2.id IS NULL
   AND a1.contact_id IS NOT NULL) as primary_descrepancies
     '));
+  }
+
+  /**
+   * Ensure the specified mysql mode/s are activated.
+   *
+   * @param array $modes
+   */
+  protected function ensureMySQLMode(array $modes): void {
+    $currentModes = array_fill_keys(CRM_Utils_SQL::getSqlModes(), 1);
+    $currentModes = array_merge($currentModes, array_fill_keys($modes, 1));
+    CRM_Core_DAO::executeQuery("SET GLOBAL sql_mode = '" . implode(',', array_keys($currentModes)) . "'");
   }
 
 }
