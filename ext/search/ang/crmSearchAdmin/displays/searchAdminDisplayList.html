@@ -28,7 +28,7 @@
   </legend>
   <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
-      <legend>{{ $ctrl.parent.getColLabel(col) }}</legend>
+      <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
       <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
         <label><input type="checkbox" ng-model="col.break"> {{:: ts('Display on new line') }}</label>
         <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
@@ -40,7 +40,7 @@
           <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
           {{ col.label ? ts('Label:') : ts('Label') }}
         </label>
-        <input ng-if="col.label" class="form-control" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
+        <input ng-if="col.label" class="form-control crm-flex-1" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
         <crm-search-admin-token-select ng-if="col.label" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="label"></crm-search-admin-token-select>
       </div>
       <div class="form-inline" ng-if="col.label">

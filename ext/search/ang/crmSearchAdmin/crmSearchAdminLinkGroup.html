@@ -3,6 +3,7 @@
     <tr>
       <th class="crm-search-admin-icon-col"></th>
       <th class="crm-search-admin-icon-col">{{:: ts('Icon') }}</th>
+      <th>{{:: ts('Open') }}</th>
       <th>{{:: ts('Text') }}</th>
       <th>{{:: ts('Link') }}</th>
       <th>{{:: ts('Style') }}</th>
@@ -10,34 +11,39 @@
     </tr>
   </thead>
   <tbody ui-sortable="$ctrl.sortableOptions" ng-model="$ctrl.group">
-    <tr ng-repeat="item in $ctrl.group" class="bg-{{ item.style }}">
+    <tr ng-repeat="item in $ctrl.group" class="crm-draggable">
       <td class="crm-search-admin-icon-col">
-        <i class="crm-i fa-arrows disabled"></i>
+        <i class="crm-i fa-arrows crm-search-move-icon"></i>
       </td>
       <td class="crm-search-admin-icon-col">
         <span class="crm-editable-enabled" ng-click="pickIcon($index)">
-          <i class="{{ item.icon ? 'crm-i ' + item.icon : '' }}"></i>
+          <i class="{{ item.icon ? 'crm-i ' + item.icon : '' }}" style="opacity: 1"></i>
         </span>
+      </td>
+      <td>
+        <select class="form-control" ng-model="item.target">
+          <option value>{{:: ts('Normal') }}</option>
+          <option value="_blank">{{:: ts('New tab') }}</option>
+          <option value="crm-popup">{{:: ts('Popup dialog') }}</option>
+        </select>
       </td>
       <td>
         <input type="text" class="form-control" ng-model="item.text">
       </td>
       <td class="form-inline">
-        <select class="form-control crm-search-admin-select-path" ng-show="$ctrl.links.length">
-          <option ng-repeat="link in $ctrl.links" value="{{ link.path }}" ng-selected="item.path === link.path">
-            {{ link.title }}
-          </option>
-          <option value="civicrm/" ng-selected="item.path && !$ctrl.getLink(item.path)">
-            {{ ts('Other...') }}
-          </option>
-        </select>
-        <input class="form-control" type="text" ng-if="item.path && !$ctrl.getLink(item.path)" ng-model="item.path" ng-model-options="{updateOn: 'blur'}" />
-        <crm-search-admin-token-select ng-if="item.path && !$ctrl.getLink(item.path)" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="item" field="path"></crm-search-admin-token-select>
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links"></crm-search-admin-link-select>
       </td>
-      <td class="form-inline">
-        <select class="form-control" ng-model="item.style">
-          <option ng-repeat="opt in $ctrl.styles" value="{{ opt.key }}">{{ opt.value }}</option>
-        </select>
+      <td>
+        <div class="btn-group">
+          <button type="button" style="min-width: 85px" class="btn btn-{{ item.style }} dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            {{ $ctrl.getStyle(item).value }} <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-right">
+            <li ng-repeat="opt in $ctrl.styles">
+              <a href class="bg-{{:: opt.key }}" ng-click="item.style = opt.key">{{:: opt.value }}</a>
+            </li>
+          </ul>
+        </div>
       </td>
       <td class="crm-search-admin-icon-col">
         <button ng-if="$ctrl.group.length > 1" type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.group.splice($index, 1)">
@@ -49,7 +55,7 @@
   <tfoot>
     <tr>
       <td colspan="6" class="form-inline">
-        <select class="form-control crm-search-admin-select-path" ng-show="$ctrl.links.length">
+        <select class="form-control crm-search-admin-add-link" ng-show="$ctrl.links.length">
           <option value="">
             + {{:: ts('Add...') }}
           </option>

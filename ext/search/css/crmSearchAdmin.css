@@ -96,8 +96,11 @@
   display: inline-block;
 }
 
-#bootstrap-theme.crm-search i.fa-arrows {
-  cursor: move;
+#bootstrap-theme.crm-search i.crm-search-move-icon {
+  opacity: .5;
+}
+#bootstrap-theme.crm-search .crm-draggable:hover > * > i.crm-search-move-icon {
+  opacity: 1;
 }
 
 #bootstrap-theme.crm-search .api4-clause-badge {
@@ -112,6 +115,7 @@
 #bootstrap-theme.crm-search .api4-clause-badge .caret {
   margin: 0;
 }
+/* Icon only shown while dragging */
 #bootstrap-theme.crm-search .api4-clause-badge .crm-i {
   display: none;
   padding: 0 6px;
@@ -160,15 +164,13 @@
   background-color: rgba(255, 255, 255, .8);
 }
 
+/* A flex-row arranges elements inline, with the 'crm-flex-*' item(s) taking up all remaining space */
 #bootstrap-theme .crm-search-admin-flex-row {
   display: flex;
   align-items: center;
 }
 #bootstrap-theme .crm-search-admin-flex-row > *:not(:first-child) {
   margin-left: 6px;
-}
-#bootstrap-theme .crm-search-admin-flex-row > input[type=text] {
-  flex: 1;
 }
 
 #bootstrap-theme .crm-search-admin-unused-columns fieldset {

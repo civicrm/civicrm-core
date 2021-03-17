@@ -36,7 +36,11 @@
           displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]),
           result = _.escape(displayValue);
         if (column.link) {
-          result = '<a href="' + _.escape(getUrl(column.link, rowData)) + '">' + result + '</a>';
+          var target = '';
+          if (column.link.target) {
+            target = column.link.target === 'crm-popup' ? 'class="crm-popup" ' : 'target="' + column.link.target + '" ';
+          }
+          result = '<a ' + target + 'href="' + _.escape(getUrl(column.link.path, rowData)) + '">' + result + '</a>';
         }
         return result;
       }
@@ -74,9 +78,9 @@
       }
 
       function getResults(ctrl) {
-        var params = getApiParams(ctrl);
-        crmApi4('SearchDisplay', 'run', params).then(function(results) {
+        return crmApi4('SearchDisplay', 'run', getApiParams(ctrl)).then(function(results) {
           ctrl.results = results;
+          ctrl.editing = false;
           if (ctrl.settings.pager && !ctrl.rowCount) {
             if (results.length < ctrl.settings.limit) {
               ctrl.rowCount = results.length;

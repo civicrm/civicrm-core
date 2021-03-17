@@ -26,16 +26,21 @@
         $scope.displayUtils = searchDisplayUtils;
 
         if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, refresh, true);
+          $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
         }
-        $scope.$watch('$ctrl.filters', refresh, true);
+        $scope.$watch('$ctrl.filters', onChangeFilters, true);
       };
 
       this.getResults = _.debounce(function() {
         searchDisplayUtils.getResults(ctrl);
       }, 100);
 
-      function refresh() {
+      // Refresh current page
+      this.refresh = function(row) {
+        searchDisplayUtils.getResults(ctrl);
+      };
+
+      function onChangeFilters() {
         ctrl.page = 1;
         ctrl.rowCount = null;
         ctrl.getResults();

@@ -119,6 +119,45 @@
         return ctrl.colTypes[col.type].label;
       };
 
+      this.toggleRewrite = function(col) {
+        if (col.rewrite) {
+          col.rewrite = '';
+        } else {
+          col.rewrite = '[' + col.key + ']';
+          delete col.editable;
+        }
+      };
+
+      this.toggleEditable = function(col) {
+        if (col.editable) {
+          delete col.editable;
+          return;
+        }
+
+        var info = searchMeta.parseExpr(col.key),
+          value = col.key.split(':')[0];
+        // If field is an implicit join, use the original fk field
+        if (info.field.entity !== info.field.baseEntity) {
+          value = value.substr(0, value.indexOf('.')) + '_id';
+          info = searchMeta.parseExpr(value);
+        }
+        col.editable = {
+          entity: info.field.baseEntity,
+          options: !!info.field.options,
+          serialize: !!info.field.serialize,
+          fk_entity: info.field.fk_entity,
+          id: info.prefix + 'id',
+          name: info.field.name,
+          value: value
+        };
+      };
+
+      this.isEditable = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        return !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
+      };
+
       function fieldToColumn(fieldExpr, defaults) {
         var info = searchMeta.parseExpr(fieldExpr),
           values = _.cloneDeep(defaults);
@@ -133,6 +172,31 @@
         }
         return values;
       }
+
+      this.toggleLink = function(column) {
+        if (column.link) {
+          ctrl.onChangeLink(column, column.link.path, '');
+        } else {
+          var defaultLink = ctrl.getLinks()[0];
+          column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
+          ctrl.onChangeLink(column, null, column.link.path);
+        }
+      };
+
+      this.onChangeLink = function(column, before, after) {
+        var beforeLink = before && _.findWhere(ctrl.getLinks(), {path: before}),
+          afterLink = after && _.findWhere(ctrl.getLinks(), {path: after});
+        if (!after) {
+          if (beforeLink && column.title === beforeLink.title) {
+            delete column.title;
+          }
+          delete column.link;
+        } else if (afterLink && ((!column.title && !before) || (beforeLink && beforeLink.title === column.title))) {
+          column.title = afterLink.title;
+        } else if (!afterLink && (beforeLink && beforeLink.title === column.title)) {
+          delete column.title;
+        }
+      };
 
       this.getLinks = function() {
         if (!ctrl.links) {
@@ -169,7 +233,7 @@
               var idField = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
               if (!ctrl.crmSearchAdmin.canAggregate(idField)) {
                 var joinEntity = searchMeta.getEntity(info.field.fk_entity || info.field.entity);
-                _.each(joinEntity.paths, function(path) {
+                _.each((joinEntity || {}).paths, function(path) {
                   var link = _.cloneDeep(path);
                   link.path = link.path.replace(/\[id/g, '[' + idField);
                   links.push(link);

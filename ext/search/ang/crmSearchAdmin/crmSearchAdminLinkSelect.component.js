@@ -3,10 +3,11 @@
 
   angular.module('crmSearchAdmin').component('crmSearchAdminLinkSelect', {
     bindings: {
-      column: '<',
+      link: '<',
       apiEntity: '<',
       apiParams: '<',
-      links: '<'
+      links: '<',
+      onChange: '&'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkSelect.html',
     controller: function ($scope, $element, $timeout) {
@@ -14,37 +15,16 @@
         ctrl = this;
 
       this.setValue = function(val) {
+        ctrl.link  = ctrl.link  || {};
         var link = ctrl.getLink(val),
-          oldLink = ctrl.getLink(ctrl.column.link);
-        if (link) {
-          ctrl.column.link = link.path;
-          ctrl.column.title = link.title;
-        } else {
-          if (val === 'civicrm/') {
-            ctrl.column.link = val;
-            $timeout(function () {
-              $('input[type=text]', $element).focus();
-            });
-          } else {
-            ctrl.column.link = '';
-          }
-          if (oldLink && ctrl.column.title === oldLink.title) {
-            ctrl.column.title = '';
-          }
+          oldVal = ctrl.link.path;
+        ctrl.link.path = val;
+        if (!link) {
+          $timeout(function () {
+            $('input[type=text]', $element).focus();
+          });
         }
-      };
-
-      function onChange() {
-        var val = $('select', $element).val();
-        if (val !== ctrl.column.link) {
-          ctrl.setValue(val);
-        }
-      }
-
-      this.$onInit = function() {
-        $('select', $element).on('change', function() {
-          $scope.$apply(onChange);
-        });
+        ctrl.onChange({before: oldVal, after: val});
       };
 
       this.getLink = function(path) {

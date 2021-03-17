@@ -1,3 +1,5 @@
-<ol ng-if=":: $ctrl.settings.style === 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayListItems.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ol>
-<ul ng-if=":: $ctrl.settings.style !== 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayListItems.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ul>
-<div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
+<div class="crm-search-display crm-search-display-list">
+  <ol ng-if=":: $ctrl.settings.style === 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayListItems.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ol>
+  <ul ng-if=":: $ctrl.settings.style !== 'ol'" ng-include="'~/crmSearchDisplayList/crmSearchDisplayListItems.html'" ng-style="{'list-style': $ctrl.settings.symbol}"></ul>
+  <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
+</div>

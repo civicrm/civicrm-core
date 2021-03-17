@@ -27,18 +27,33 @@
         $scope.displayUtils = searchDisplayUtils;
 
         if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, refresh, true);
+          $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
         }
-        $scope.$watch('$ctrl.filters', refresh, true);
+        $scope.$watch('$ctrl.filters', onChangeFilters, true);
       };
 
       this.getResults = _.debounce(function() {
         searchDisplayUtils.getResults(ctrl);
       }, 100);
 
-      function refresh() {
+      // Refresh page after inline-editing a row
+      this.refresh = function(row) {
+        var rowId = row.id;
+        searchDisplayUtils.getResults(ctrl)
+          .then(function() {
+            // If edited row disappears (because edits cause it to not meet search criteria), deselect it
+            var index = ctrl.selectedRows.indexOf(rowId);
+            if (index > -1 && !_.findWhere(ctrl.results, {id: rowId})) {
+              ctrl.selectedRows.splice(index, 1);
+            }
+          });
+      };
+
+      function onChangeFilters() {
         ctrl.page = 1;
         ctrl.rowCount = null;
+        ctrl.selectedRows.legth = 0;
+        ctrl.allRowsSelected = false;
         ctrl.getResults();
       }
 
