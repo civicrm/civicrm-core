@@ -117,6 +117,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
     CRM_Core_Resources::singleton()->resetCacheCode();
+    $this->rebuildMenu();
 
     CRM_Core_Session::setStatus(" ", ts('Changes Saved'), "success");
   }

@@ -58,8 +58,6 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
   public function postProcess() {
     parent::postProcess();
-
-    parent::rebuildMenu();
   }
 
 }

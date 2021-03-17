@@ -81,8 +81,6 @@ class CRM_Admin_Form_Setting_Url extends CRM_Admin_Form_Setting {
     $session->getStatus(TRUE);
 
     parent::postProcess();
-
-    parent::rebuildMenu();
   }
 
 }
