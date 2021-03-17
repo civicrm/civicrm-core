@@ -31,6 +31,8 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - Upload Directories'));
@@ -54,10 +56,6 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
       );
     }
 
-  }
-
-  public function postProcess() {
-    parent::postProcess();
   }
 
 }
