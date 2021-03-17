@@ -1588,10 +1588,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testCreateIndividualWithJustEmail($version) {
     $this->_apiversion = $version;
-    $params = [
-      'contact_type' => 'Individual',
-      'email' => 'garlic@example.com',
-    ];
+    $params = ['contact_type' => 'Individual'];
+    if ($version == 3) {
+      $params['email'] = 'garlic@example.com';
+    }
+    else {
+      $params['api.Email.create'] = [
+        'location_type_id' => CRM_Core_BAO_LocationType::getDefault()->id,
+        'email' => 'garlic@example.com',
+      ];
+    }
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
     $created = Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->addSelect('sort_name', 'display_name')->execute()->first();
