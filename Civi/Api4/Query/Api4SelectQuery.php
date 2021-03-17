@@ -613,15 +613,15 @@ class Api4SelectQuery {
       // If the first condition is a string, it's the name of a bridge entity
       if (!empty($join[0]) && is_string($join[0]) && \CRM_Utils_Rule::alphanumeric($join[0])) {
         $this->explicitJoins[$alias]['bridge'] = $join[0];
-        $conditions = $this->getBridgeJoin($join, $entity, $alias);
+        $this->addBridgeJoin($join, $entity, $alias, $side);
       }
       else {
         $conditions = $this->getJoinConditions($join, $entity, $alias, $joinEntityFields);
+        foreach (array_filter($join) as $clause) {
+          $conditions[] = $this->treeWalkClauses($clause, 'ON');
+        }
+        $this->join($side, $tableName, $alias, $conditions);
       }
-      foreach (array_filter($join) as $clause) {
-        $conditions[] = $this->treeWalkClauses($clause, 'ON');
-      }
-      $this->join($side, $tableName, $alias, $conditions);
     }
   }
 
@@ -683,41 +683,15 @@ class Api4SelectQuery {
    * @param array $joinTree
    * @param string $joinEntity
    * @param string $alias
+   * @param string $side
    * @return array
    * @throws \API_Exception
    */
-  protected function getBridgeJoin(&$joinTree, $joinEntity, $alias) {
+  protected function addBridgeJoin($joinTree, $joinEntity, $alias, $side) {
     $bridgeEntity = array_shift($joinTree);
-    /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
-    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
     $bridgeAlias = $alias . '_via_' . strtolower($bridgeEntity);
-    $bridgeInfo = $bridgeEntityClass::getInfo();
-    $bridgeFields = $bridgeInfo['bridge'] ?? [];
-    // Sanity check - bridge entity should declare exactly 2 FK fields
-    if (count($bridgeFields) !== 2) {
-      throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
-    }
-    /* @var \CRM_Core_DAO $bridgeDAO */
-    $bridgeDAO = $bridgeInfo['dao'];
-    $bridgeTable = $bridgeDAO::getTableName();
-
     $joinTable = CoreUtil::getTableName($joinEntity);
-    $bridgeEntityGet = $bridgeEntityClass::get($this->getCheckPermissions());
-    // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
-    $joinRef = $baseRef = NULL;
-    foreach ($bridgeDAO::getReferenceColumns() as $ref) {
-      if (in_array($ref->getReferenceKey(), $bridgeFields)) {
-        if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
-          $joinRef = $ref;
-        }
-        else {
-          $baseRef = $ref;
-        }
-      }
-    }
-    if (!$joinRef || !$baseRef) {
-      throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
-    }
+    [$bridgeTable, $baseRef, $joinRef] = $this->getBridgeRefs($bridgeEntity, $joinEntity);
     // Create link between bridge entity and join entity
     $joinConditions = [
       "`$bridgeAlias`.`{$joinRef->getReferenceKey()}` = `$alias`.`{$joinRef->getTargetKey()}`",
@@ -728,8 +702,10 @@ class Api4SelectQuery {
     }
     // Register fields (other than bridge FK fields) from the bridge entity as if they belong to the join entity
     $fakeFields = [];
-    foreach ($bridgeEntityGet->entityFields() as $name => $field) {
-      if ($name === 'id' || $name === $joinRef->getReferenceKey() || $name === $joinRef->getTypeColumn() || $name === $baseRef->getReferenceKey() || $name === $baseRef->getTypeColumn()) {
+    $bridgeFkFields = [$joinRef->getReferenceKey(), $joinRef->getTypeColumn(), $baseRef->getReferenceKey(), $baseRef->getTypeColumn()];
+    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
+    foreach ($bridgeEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
+      if ($name === 'id' || in_array($name, $bridgeFkFields, TRUE)) {
         continue;
       }
       // Note these fields get a sql alias pointing to the bridge entity, but an api alias pretending they belong to the join entity
@@ -784,7 +760,50 @@ class Api4SelectQuery {
 
     $baoName = CoreUtil::getBAOFromApiName($joinEntity);
     $acls = array_values($this->getAclClause($alias, $baoName, [NULL, NULL]));
-    return array_merge($acls, $joinConditions);
+    $joinConditions = array_merge($acls, $joinConditions);
+    foreach (array_filter($joinTree) as $clause) {
+      $joinConditions[] = $this->treeWalkClauses($clause, 'ON');
+    }
+    $this->join($side, $joinTable, $alias, $joinConditions);
+  }
+
+  /**
+   * Get the table name and 2 reference columns from a bridge entity
+   *
+   * @param string $bridgeEntity
+   * @param string $joinEntity
+   * @return array
+   * @throws \API_Exception
+   */
+  private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
+    /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
+    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
+    $bridgeInfo = $bridgeEntityClass::getInfo();
+    $bridgeFields = $bridgeInfo['bridge'] ?? [];
+    // Sanity check - bridge entity should declare exactly 2 FK fields
+    if (count($bridgeFields) !== 2) {
+      throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
+    }
+    /* @var \CRM_Core_DAO $bridgeDAO */
+    $bridgeDAO = $bridgeInfo['dao'];
+    $bridgeTable = $bridgeDAO::getTableName();
+
+    // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
+    $joinRef = $baseRef = NULL;
+    foreach ($bridgeDAO::getReferenceColumns() as $ref) {
+      if (in_array($ref->getReferenceKey(), $bridgeFields)) {
+        if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
+          $joinRef = $ref;
+        }
+        else {
+          $baseRef = $ref;
+        }
+      }
+    }
+    if (!$joinRef || !$baseRef) {
+      throw new \API_Exception("Unable to join $bridgeEntity to $joinEntity");
+    }
+    return [$bridgeTable, $baseRef, $joinRef];
   }
 
   /**
