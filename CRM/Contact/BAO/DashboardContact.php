@@ -17,10 +17,11 @@ class CRM_Contact_BAO_DashboardContact extends CRM_Contact_DAO_DashboardContact 
 
   /**
    * @param array $record
+   *
    * @return CRM_Contact_DAO_DashboardContact
-   * @throws CRM_Core_Exception
+   * @throws \CRM_Core_Exception
    */
-  public static function writeRecord(array $record) {
+  public static function writeRecord(array $record): CRM_Core_DAO {
     self::checkEditPermission($record);
     return parent::writeRecord($record);
   }

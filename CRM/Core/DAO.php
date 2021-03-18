@@ -887,10 +887,11 @@ class CRM_Core_DAO extends DB_DataObject {
    * Otherwise a new record will be created.
    *
    * @param array $record
-   * @return CRM_Core_DAO
-   * @throws CRM_Core_Exception
+   *
+   * @return $this
+   * @throws \CRM_Core_Exception
    */
-  public static function writeRecord(array $record) {
+  public static function writeRecord(array $record): CRM_Core_DAO {
     $hook = empty($record['id']) ? 'create' : 'edit';
     $className = CRM_Core_DAO_AllCoreTables::getCanonicalClassName(static::class);
     if ($className === 'CRM_Core_DAO') {

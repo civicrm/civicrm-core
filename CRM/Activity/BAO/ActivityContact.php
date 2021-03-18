@@ -21,32 +21,28 @@
 class CRM_Activity_BAO_ActivityContact extends CRM_Activity_DAO_ActivityContact {
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Function to add activity contact.
    *
    * @param array $params
    *   The values for this table: activity id, contact id, record type.
    *
-   * @return object
+   * @return CRM_Activity_DAO_ActivityContact
    *   activity_contact object
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \PEAR_Exception
    */
-  public static function create($params) {
-    $activityContact = new CRM_Activity_DAO_ActivityContact();
-    $activityContact->copyValues($params);
+  public static function create(array $params): CRM_Activity_DAO_ActivityContact {
     try {
-      return $activityContact->save();
+      return self::writeRecord($params);
     }
     catch (PEAR_Exception $e) {
       // This check used to be done first, creating an extra query before each insert.
       // However, in none of the core tests was this ever called with values that already
       // existed, meaning that this line would never or almost never be hit.
       // hence it's better to save the select query here.
+      $activityContact = new CRM_Activity_DAO_ActivityContact();
+      $activityContact->copyValues($params);
       if ($activityContact->find(TRUE)) {
         return $activityContact;
       }
