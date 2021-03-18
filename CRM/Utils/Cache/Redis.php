@@ -145,7 +145,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    $this->_cache->delete($this->_prefix . $key);
+    $this->_cache->del($this->_prefix . $key);
     return TRUE;
   }
 
