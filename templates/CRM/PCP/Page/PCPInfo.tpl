@@ -38,7 +38,7 @@
 <div class="campaign">
 {crmRegion name="pcp-page-pcpinfo"}
     <div class="pcp-intro-text">
-      {$pcp.intro_text}
+      {$pcp.intro_text|purify}
   </div>
     {if $image}
     <div class="pcp-image">

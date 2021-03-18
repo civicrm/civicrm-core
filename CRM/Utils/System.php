@@ -629,7 +629,7 @@ class CRM_Utils_System {
       );
     }
 
-    if ($key !== $siteKey) {
+    if (!hash_equals($siteKey, $key)) {
       return self::authenticateAbort(
         "ERROR: Invalid key value sent. " . $docAdd . "\n",
         $abort

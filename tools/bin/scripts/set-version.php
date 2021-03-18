@@ -10,7 +10,10 @@
 
 /* *********************************************************************** */
 /* Boot */
-
+if (!(php_sapi_name() == 'cli' || (is_numeric($_SERVER['argc']) && $_SERVER['argc'] > 0))) {
+  header("HTTP/1.0 404 Not Found");
+  return;
+}
 $civicrm_root = dirname(dirname(dirname(__DIR__)));
 chdir($civicrm_root);
 
