@@ -129,7 +129,7 @@
         "path": "bower_components/{$id}"
       },
       "angular": {
-        "url": "https://github.com/angular/bower-angular/archive/v1.8.0.zip"
+        "url": "https://github.com/angular/bower-angular/archive/v1.8.2.zip"
       },
       "angular-bootstrap": {
         "url": "https://github.com/angular-ui/bootstrap-bower/archive/2.5.0.zip"
