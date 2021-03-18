@@ -447,20 +447,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
         'plural' => '%count Messages Not Sent',
       ]), 'info');
     }
-
-    if (isset($this->_caseId)) {
-      // if case-id is found in the url, create case activity record
-      $cases = explode(',', $this->_caseId);
-      foreach ($cases as $key => $val) {
-        if (is_numeric($val)) {
-          $caseParams = [
-            'activity_id' => $activityId,
-            'case_id' => $val,
-          ];
-          CRM_Case_BAO_Case::processCaseActivity($caseParams);
-        }
-      }
-    }
   }
 
   /**
