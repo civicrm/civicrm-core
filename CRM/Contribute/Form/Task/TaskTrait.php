@@ -39,15 +39,14 @@ trait CRM_Contribute_Form_Task_TaskTrait {
       $returnProperties[$sortCol] = 1;
     }
 
-    $form->_includesSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
     $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
       CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
     // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
     // can we remove? if not why not?
-    if ($form->_includesSoftCredits) {
-      $query->_rowCountClause = " count(civicrm_contribution.id)";
-      $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
+    if ($this->isQueryIncludesSoftCredits()) {
+      $query->_rowCountClause = ' count(civicrm_contribution.id)';
+      $query->_groupByComponentClause = ' GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ';
     }
     else {
       $query->_distinctComponentClause = ' civicrm_contribution.id';
@@ -79,6 +78,15 @@ trait CRM_Contribute_Form_Task_TaskTrait {
       0,
     ];
     return $queryParams;
+  }
+
+  /**
+   * Has soft credit information been requested in the query filters.
+   *
+   * @return bool
+   */
+  public function isQueryIncludesSoftCredits(): bool {
+    return (bool) CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->getQueryParams());
   }
 
 }

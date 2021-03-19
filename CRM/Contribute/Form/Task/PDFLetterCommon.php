@@ -78,11 +78,11 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $skipOnHold = $form->skipOnHold ?? FALSE;
     $skipDeceased = $form->skipDeceased ?? TRUE;
     $contributionIDs = $form->getVar('_contributionIds');
-    if ($form->_includesSoftCredits) {
+    if ($form->isQueryIncludesSoftCredits()) {
       //@todo - comment on what is stored there
       $contributionIDs = $form->getVar('_contributionContactIds');
     }
-    [$contributions, $contacts] = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->_includesSoftCredits);
+    [$contributions, $contacts] = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->isQueryIncludesSoftCredits());
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
