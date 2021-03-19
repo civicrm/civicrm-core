@@ -497,7 +497,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   public function testSubmit(array $formValues): void {
     $this->exportedValues = $formValues;
     $this->setContextVariables($formValues);
-    $this->_memType = $formValues['membership_type_id'][1];
+    $this->_memType = !empty($formValues['membership_type_id']) ? $formValues['membership_type_id'][1] : NULL;
     $this->_params = $formValues;
     $this->submit();
   }
