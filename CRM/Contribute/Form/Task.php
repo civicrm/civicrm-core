@@ -59,13 +59,11 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $ids = $form->getSelectedIDs($values);
     if (!$ids) {
       $result = $form->getSearchQueryResults();
-      $form->_includesSoftCredits = $form->isQueryIncludesSoftCredits();
-      $contributionContactIds = $contactIds = [];
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
         if ($form->isQueryIncludesSoftCredits()) {
-          $contactIds[$result->contact_id] = $result->contact_id;
-          $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
+          $form->_contactIds[$result->contact_id] = $result->contact_id;
+          $form->_contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
       }
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
@@ -75,10 +73,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       $form->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $ids) . ' ) ';
 
       $form->assign('totalSelectedContributions', count($ids));
-    }
-    if (!empty($form->isQueryIncludesSoftCredits()) && !empty($contactIds)) {
-      $form->_contactIds = $contactIds;
-      $form->_contributionContactIds = $contributionContactIds;
     }
 
     $form->_contributionIds = $form->_componentIds = $ids;
@@ -99,7 +93,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * Given the contribution id, compute the contact id
    * since its used for things like send email
    */
-  public function setContactIDs() {
+  public function setContactIDs(): void {
     if (!$this->isQueryIncludesSoftCredits()) {
       $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent(
         $this->_contributionIds,
