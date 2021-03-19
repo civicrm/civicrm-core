@@ -25,7 +25,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     // Mock the getTrackerURL call; we don't need to test creating a row in a table.
     // If you want this to work without runkit, then either (a) make the dummy rows or (b) switch this to a hook/event that is runtime-configurable.
     require_once 'CRM/Mailing/BAO/TrackableURL.php';
@@ -34,7 +34,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     // Reset the class.
     runkit7_method_remove('\CRM_Mailing_BAO_TrackableURL', 'getBasicTrackerURL');
     runkit7_method_rename('\CRM_Mailing_BAO_TrackableURL', 'orig_getBasicTrackerURL', 'getBasicTrackerURL');
@@ -44,7 +44,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Example: Test that a link without any tokens works.
    */
-  public function testLinkWithoutTokens() {
+  public function testLinkWithoutTokens(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&c=d#frag';
     $result = $filter->filterContent($msg, 1, 1);
@@ -54,7 +54,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Example: Test that a link with tokens in the query works.
    */
-  public function testLinkWithTokensInQueryWithStaticParams() {
+  public function testLinkWithTokensInQueryWithStaticParams(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
@@ -64,7 +64,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Example: Test that a link with tokens in the query works.
    */
-  public function testLinkWithTokensInQueryWithMultipleStaticParams() {
+  public function testLinkWithTokensInQueryWithMultipleStaticParams(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?cs={contact.checksum}&a=b&cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
@@ -74,7 +74,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Example: Test that a link with tokens in the query works.
    */
-  public function testLinkWithTokensInQueryWithMultipleStaticParamsHtml() {
+  public function testLinkWithTokensInQueryWithMultipleStaticParamsHtml(): void {
     $filter = new HtmlClickTracker();
     $msg = '<a href="https://example.com/foo/bar?cs={contact.checksum}&amp;a=b&amp;cid={contact.id}">See this</a>';
     $result = $filter->filterContent($msg, 1, 1);
@@ -84,7 +84,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * Example: Test that a link with tokens in the query works.
    */
-  public function testLinkWithTokensInQueryWithoutStaticParams() {
+  public function testLinkWithTokensInQueryWithoutStaticParams(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
@@ -97,7 +97,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
    * Seems browsers maintain the fragment when they receive a redirect, so a
    * token here might still work.
    */
-  public function testLinkWithTokensInFragment() {
+  public function testLinkWithTokensInFragment(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b#cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
@@ -110,7 +110,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
    * Seems browsers maintain the fragment when they receive a redirect, so a
    * token here might still work.
    */
-  public function testLinkWithTokensInQueryAndFragment() {
+  public function testLinkWithTokensInQueryAndFragment(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&cid={contact.id}#cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
@@ -120,7 +120,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * We can't handle tokens in the domain so it should not be tracked.
    */
-  public function testLinkWithTokensInDomainFails() {
+  public function testLinkWithTokensInDomainFails(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://{some.domain}.com/foo/bar';
     $result = $filter->filterContent($msg, 1, 1);
@@ -130,7 +130,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   /**
    * We can't handle tokens in the path so it should not be tracked.
    */
-  public function testLinkWithTokensInPathFails() {
+  public function testLinkWithTokensInPathFails(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/{some.path}';
     $result = $filter->filterContent($msg, 1, 1);

@@ -29,7 +29,7 @@ use Civi\FlexMailer\FlexMailerTask;
  */
 class SimpleFilterTest extends \CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
@@ -42,7 +42,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
   /**
    * Ensure that the utility `SimpleFilter::byValue()` correctly filters.
    */
-  public function testByValue() {
+  public function testByValue(): void {
     $test = $this;
     list($tasks, $e) = $this->createExampleBatch();
 
@@ -63,7 +63,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
   /**
    * Ensure that the utility `SimpleFilter::byColumn()` correctly filters.
    */
-  public function testByColumn() {
+  public function testByColumn(): void {
     $test = $this;
     list($tasks, $e) = $this->createExampleBatch();
 

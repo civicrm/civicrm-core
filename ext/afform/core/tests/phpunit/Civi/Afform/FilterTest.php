@@ -34,7 +34,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     return $htmls[$fileName];
   }
 
-  public function testDefnInjection() {
+  public function testDefnInjection(): void {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<div af-fieldset="person"><af-field name="first_name" /></div>');
     $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
@@ -46,7 +46,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $this->assertEquals('First Name', $myField['defn']['label']);
   }
 
-  public function testDefnInjectionNested() {
+  public function testDefnInjectionNested(): void {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<span><div af-fieldset="person"><foo><af-field name="first_name" /></foo></div></span>');
     $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);
@@ -58,7 +58,7 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $this->assertEquals('First Name', $myField['defn']['label']);
   }
 
-  public function testDefnOverrideTitle() {
+  public function testDefnOverrideTitle(): void {
     $inputHtml = sprintf(self::PERSON_TPL,
       '<div af-fieldset="person"><af-field name="first_name" defn="{label: \'Given name\'}" /></div>');
     $filteredHtml = $this->htmlFilter('~/afform/MyForm.aff.html', $inputHtml);

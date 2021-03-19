@@ -18,15 +18,15 @@ class CRM_OAuth_MailSetupTest extends \PHPUnit\Framework\TestCase implements Hea
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
-  public function testEvalArrayTemplate() {
+  public function testEvalArrayTemplate(): void {
     $vars = array(
       'token' => [
         'client_id' => 10,

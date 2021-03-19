@@ -34,7 +34,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    */
   protected $quirks = [];
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     \Civi\Test::e2e()
       ->installMe(__DIR__)
       ->callback(
@@ -46,7 +46,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     $quirks = [
       'Joomla' => ['sendsExcessCookies', 'authErrorShowsForm'],
       'WordPress' => ['sendsExcessCookies'],
@@ -62,7 +62,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     }
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     foreach ($this->settingsBackup as $setting => $value) {
       \Civi::settings()->set($setting, $value);
     }
@@ -91,7 +91,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     return $exs;
   }
 
-  public function testAnonymous() {
+  public function testAnonymous(): void {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
@@ -111,7 +111,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getStatelessExamples
    */
-  public function testStatelessContactOnly($credType, $flowType) {
+  public function testStatelessContactOnly($credType, $flowType): void {
     if ($credType === 'pass') {
       $this->assertTrue(TRUE, 'No need to test password credentials with non-user contacts');
       return;
@@ -146,7 +146,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getStatelessExamples
    */
-  public function testStatelessUserContact($credType, $flowType) {
+  public function testStatelessUserContact($credType, $flowType): void {
     $http = $this->createGuzzle(['http_errors' => FALSE]);
 
     /** @var \Psr\Http\Message\RequestInterface $request */
@@ -176,7 +176,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulLoginAllowed($credType) {
+  public function testStatefulLoginAllowed($credType): void {
     $flowType = 'login';
     $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
 
@@ -222,7 +222,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulLoginProhibited($credType) {
+  public function testStatefulLoginProhibited($credType): void {
     $flowType = 'login';
     $http = $this->createGuzzle(['http_errors' => FALSE]);
     $credFunc = 'cred' . ucfirst(preg_replace(';[^a-zA-Z0-9];', '', $credType));
@@ -244,7 +244,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulAutoAllowed($credType) {
+  public function testStatefulAutoAllowed($credType): void {
     $flowType = 'auto';
     $cookieJar = new CookieJar();
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
@@ -271,7 +271,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \GuzzleHttp\Exception\GuzzleException
    * @dataProvider getCredTypes
    */
-  public function testStatefulAutoProhibited($credType) {
+  public function testStatefulAutoProhibited($credType): void {
     $flowType = 'auto';
     $cookieJar = new CookieJar();
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
@@ -291,7 +291,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \CiviCRM_API3_Exception
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function testStatefulStatelessOverlap() {
+  public function testStatefulStatelessOverlap(): void {
     \Civi::settings()->set("authx_login_cred", ['api_key']);
     \Civi::settings()->set("authx_header_cred", ['api_key']);
 
@@ -329,7 +329,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    * @throws \CiviCRM_API3_Exception
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function testMultipleStateless() {
+  public function testMultipleStateless(): void {
     \Civi::settings()->set("authx_header_cred", ['api_key']);
     $cookieJar = new CookieJar();
     $http = $this->createGuzzle(['http_errors' => FALSE, 'cookies' => $cookieJar]);
@@ -417,7 +417,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    *   The expected user ID
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function assertMyContact($cid, $uid, ResponseInterface $response) {
+  public function assertMyContact($cid, $uid, ResponseInterface $response): void {
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
     $j = json_decode((string) $response->getBody(), 1);
@@ -431,7 +431,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    *
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function assertAnonymousContact(ResponseInterface $response) {
+  public function assertAnonymousContact(ResponseInterface $response): void {
     $formattedFailure = $this->formatFailure($response);
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
@@ -448,7 +448,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
    *
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function assertDashboardUnauthorized($response = NULL) {
+  public function assertDashboardUnauthorized($response = NULL): void {
     $response = $this->resolveResponse($response);
     if (!in_array('authErrorShowsForm', $this->quirks)) {
       $this->assertStatusCode(403, $response);
@@ -459,7 +459,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     );
   }
 
-  public function assertDashboardOk($response = NULL) {
+  public function assertDashboardOk($response = NULL): void {
     $response = $this->resolveResponse($response);
     $this->assertStatusCode(200, $response);
     $this->assertContentType('text/html', $response);
@@ -569,7 +569,7 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   /**
    * @param \Psr\Http\Message\ResponseInterface $response
    */
-  private function assertFailedDueToProhibition($response) {
+  private function assertFailedDueToProhibition($response): void {
     $this->assertBodyRegexp(';HTTP 401;', $response);
     $this->assertContentType('text/plain', $response);
     if (!in_array('sendsExcessCookies', $this->quirks)) {

@@ -13,7 +13,7 @@ class OptionsTest extends BaseTestClass {
   /**
    * Test buildMembershipTypes.
    */
-  public function testBuildOptions() {
+  public function testBuildOptions(): void {
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $options = \CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes();
     $this->assertEquals(['Donation'], array_merge($options));

@@ -31,13 +31,13 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     $this->setUpEwayProcessor();
     $this->processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['eWAY']);
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->callAPISuccess('PaymentProcessor', 'delete', ['id' => $this->ids['PaymentProcessor']['eWAY']]);
     parent::tearDown();
   }
@@ -45,7 +45,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
   /**
    * Test making a once off payment
    */
-  public function testSinglePayment() {
+  public function testSinglePayment(): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 10.00;
@@ -69,7 +69,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
   /**
    * Test making a failed once off payment
    */
-  public function testErrorSinglePayment() {
+  public function testErrorSinglePayment(): void {
     $this->setupMockHandler(NULL, TRUE);
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;
@@ -125,7 +125,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
     ];
   }
 
-  public function setUpEwayProcessor() {
+  public function setUpEwayProcessor(): void {
     $params = [
       'name' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -164,7 +164,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    *
    * @throws \CiviCRM_API3_Exception
    */
-  protected function setupMockHandler($id = NULL, $error = FALSE) {
+  protected function setupMockHandler($id = NULL, $error = FALSE): void {
     if ($id) {
       $this->processor = Civi\Payment\System::singleton()->getById($id);
     }
@@ -181,7 +181,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    *
    * @return array
    */
-  public function getExpectedSinglePaymentResponses() {
+  public function getExpectedSinglePaymentResponses(): array {
     return [
       '<ewayResponse><ewayTrxnStatus>True</ewayTrxnStatus><ewayTrxnNumber>10002</ewayTrxnNumber><ewayTrxnReference>xyz</ewayTrxnReference><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>1000</ewayReturnAmount><ewayTrxnError>00,Transaction Approved(Test Gateway)</ewayTrxnError></ewayResponse>',
     ];
@@ -192,7 +192,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    *
    * @return array
    */
-  public function getExpectedSinglePaymentRequests() {
+  public function getExpectedSinglePaymentRequests(): array {
     return [
       '<ewaygateway><ewayCustomerID>87654321</ewayCustomerID><ewayTotalAmount>1000</ewayTotalAmount><ewayCardHoldersName>John O&apos;Connor</ewayCardHoldersName><ewayCardNumber>4444333322221111</ewayCardNumber><ewayCardExpiryMonth>10</ewayCardExpiryMonth><ewayCardExpiryYear>22</ewayCardExpiryYear><ewayTrxnNumber>xyz</ewayTrxnNumber><ewayCustomerInvoiceDescription>Test Contribution</ewayCustomerInvoiceDescription><ewayCustomerFirstName>John</ewayCustomerFirstName><ewayCustomerLastName>O&apos;Connor</ewayCustomerLastName><ewayCustomerEmail>unittesteway@civicrm.org</ewayCustomerEmail><ewayCustomerAddress>8 Hobbitton Road, The Shire, NSW.</ewayCustomerAddress><ewayCustomerPostcode>5010</ewayCustomerPostcode><ewayCustomerInvoiceRef>xyz</ewayCustomerInvoiceRef><ewayCVN>123</ewayCVN><ewayOption1></ewayOption1><ewayOption2></ewayOption2><ewayOption3></ewayOption3><ewayCustomerIPAddress>127.0.0.1</ewayCustomerIPAddress><ewayCustomerBillingCountry>AUS</ewayCustomerBillingCountry></ewaygateway>',
     ];
@@ -203,7 +203,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
    *
    * @return array
    */
-  public function getExpectedSinglePaymentErrorResponses() {
+  public function getExpectedSinglePaymentErrorResponses(): array {
     return [
       '<ewayResponse><ewayTrxnStatus>False</ewayTrxnStatus><ewayTrxnNumber>10003</ewayTrxnNumber><ewayTrxnReference>xyz</ewayTrxnReference><ewayTrxnOption1/><ewayTrxnOption2/><ewayTrxnOption3/><ewayAuthCode>123456</ewayAuthCode><ewayReturnAmount>524</ewayReturnAmount><ewayTrxnError>24,Do Not Honour(Test Gateway)</ewayTrxnError></ewayResponse>',
     ];

@@ -33,7 +33,7 @@ require_once 'tests/phpunit/api/v3/JobProcessMailingTest.php';
  */
 class ConcurrentDeliveryTest extends \api_v3_JobProcessMailingTest {
 
-  public function setUp() {
+  public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
@@ -45,7 +45,7 @@ class ConcurrentDeliveryTest extends \api_v3_JobProcessMailingTest {
     \Civi::settings()->set('flexmailer_traditional', 'flexmailer');
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     // We're building on someone else's test and don't fully trust them to
     // protect our settings. Make sure they did.
     $ok = ('flexmailer' == \Civi::settings()->get('flexmailer_traditional'))
@@ -65,11 +65,11 @@ class ConcurrentDeliveryTest extends \api_v3_JobProcessMailingTest {
    * @dataProvider concurrencyExamples
    * @see          _testConcurrencyCommon
    */
-  public function testConcurrency($settings, $expectedTallies, $expectedTotal) {
+  public function testConcurrency($settings, $expectedTallies, $expectedTotal): void {
     parent::testConcurrency($settings, $expectedTallies, $expectedTotal);
   }
 
-  public function testBasic() {
+  public function testBasic(): void {
     parent::testBasic();
   }
 

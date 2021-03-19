@@ -39,7 +39,7 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
 
   private $counts;
 
-  public function setUp() {
+  public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
@@ -80,7 +80,7 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     $this->assertEquals('flexmailer', $context);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->assertNotEmpty($this->counts['hook_alterMailParams']);
     foreach (FlexMailer::getEventTypes() as $event => $class) {
@@ -106,7 +106,7 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     $htmlUrlRegex,
     $textUrlRegex,
     $params
-  ) {
+  ): void {
     parent::testUrlTracking($inputHtml, $htmlUrlRegex, $textUrlRegex, $params);
   }
 
@@ -132,19 +132,19 @@ class FlexMailerSystemTest extends \CRM_Mailing_BaseMailingSystemTest {
     return $cases;
   }
 
-  public function testBasicHeaders() {
+  public function testBasicHeaders(): void {
     parent::testBasicHeaders();
   }
 
-  public function testText() {
+  public function testText(): void {
     parent::testText();
   }
 
-  public function testHtmlWithOpenTracking() {
+  public function testHtmlWithOpenTracking(): void {
     parent::testHtmlWithOpenTracking();
   }
 
-  public function testHtmlWithOpenAndUrlTracking() {
+  public function testHtmlWithOpenAndUrlTracking(): void {
     parent::testHtmlWithOpenAndUrlTracking();
   }
 

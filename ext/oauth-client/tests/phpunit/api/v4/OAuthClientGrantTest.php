@@ -18,19 +18,19 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
   /**
    * Basic sanity check - create, read, and delete a client.
    */
-  public function testAuthorizationCode() {
+  public function testAuthorizationCode(): void {
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];
       \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_merge($base, $ps);

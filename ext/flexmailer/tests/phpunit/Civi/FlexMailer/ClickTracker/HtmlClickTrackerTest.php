@@ -19,7 +19,7 @@ use Civi\FlexMailer\ClickTracker\HtmlClickTracker;
  */
 class HtmlClickTrackerTest extends \CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
@@ -79,7 +79,7 @@ class HtmlClickTrackerTest extends \CiviUnitTestCase {
    * @param $expectHtml
    * @dataProvider getHrefExamples
    */
-  public function testReplaceHref($inputHtml, $expectHtml) {
+  public function testReplaceHref($inputHtml, $expectHtml): void {
     $actual = HtmlClickTracker::replaceHrefUrls($inputHtml, function($url) {
       return "tracking($url)";
     });

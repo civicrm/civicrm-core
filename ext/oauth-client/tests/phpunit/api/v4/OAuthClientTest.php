@@ -18,19 +18,19 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
   /**
    * Basic sanity check - create, read, and delete a client.
    */
-  public function testBasic() {
+  public function testBasic(): void {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];
@@ -83,7 +83,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
     }
   }
 
-  public function testUpdateBadProvider() {
+  public function testUpdateBadProvider(): void {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];

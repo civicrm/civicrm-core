@@ -13,7 +13,7 @@ class api_v4_AfformUsageTest extends api_v4_AfformTestCase {
 
   protected $formName;
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     self::$layouts['aboutMe'] = <<<EOHTML
 <af-form ctrl="modelListCtrl">
@@ -26,12 +26,12 @@ class api_v4_AfformUsageTest extends api_v4_AfformTestCase {
 EOHTML;
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->formName = 'mock' . rand(0, 100000);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     Civi\Api4\Afform::revert()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', $this->formName)
@@ -39,7 +39,7 @@ EOHTML;
     parent::tearDown();
   }
 
-  public function testAboutMeAllowed() {
+  public function testAboutMeAllowed(): void {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
@@ -71,7 +71,7 @@ EOHTML;
     $this->assertEquals('Lasty', $contact['last_name']);
   }
 
-  public function testAboutMeForbidden() {
+  public function testAboutMeForbidden(): void {
     $this->useValues([
       'layout' => self::$layouts['aboutMe'],
       'permission' => CRM_Core_Permission::ALWAYS_DENY_PERMISSION,

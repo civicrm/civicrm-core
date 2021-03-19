@@ -56,7 +56,7 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
    * @dataProvider getNameExamples
    * @throws \Exception
    */
-  public function testNameConversion($inputFileName, $toFormat, $expected) {
+  public function testNameConversion($inputFileName, $toFormat, $expected): void {
     $actual = _afform_angular_module_name($inputFileName, $toFormat);
     $this->assertEquals($expected, $actual);
   }
