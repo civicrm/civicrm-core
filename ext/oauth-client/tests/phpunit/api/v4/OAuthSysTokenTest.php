@@ -18,20 +18,20 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client'));
     $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_systoken'));
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
   /**
    * Create, read, and destroy token - with full access to secrets.
    */
-  public function testFullApiAccess() {
+  public function testFullApiAccess(): void {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];
@@ -86,7 +86,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
   /**
    * Create, read, and destroy a token - with limited API access (cannot access token secrets).
    */
-  public function testLimitedApiAccess() {
+  public function testLimitedApiAccess(): void {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];
@@ -159,7 +159,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
   }
 
-  public function testGetByScope() {
+  public function testGetByScope(): void {
     $random = CRM_Utils_String::createRandom(16, CRM_Utils_String::ALPHANUMERIC);
     $usePerms = function($ps) {
       $base = ['access CiviCRM'];

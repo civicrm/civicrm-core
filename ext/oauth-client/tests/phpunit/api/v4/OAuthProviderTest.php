@@ -17,18 +17,18 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
   /**
    * Create, read, and destroy token - with full access to secrets.
    */
-  public function testGet() {
+  public function testGet(): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
 
     $examples = Civi\Api4\OAuthProvider::get()

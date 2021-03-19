@@ -15,7 +15,7 @@ class MembershipTypesTest extends BaseTestClass {
   /**
    * Test buildMembershipTypes.
    */
-  public function testMembershipTypesHook() {
+  public function testMembershipTypesHook(): void {
     $types = MembershipType::save(FALSE)->setRecords([
       ['name' => 'Forbidden', 'financial_type_id:name' => 'Member Dues'],
       ['name' => 'Go for it', 'financial_type_id:name' => 'Donation'],

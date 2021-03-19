@@ -17,7 +17,7 @@ namespace Civi\FlexMailer;
  */
 class ValidatorTest extends \CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     // Activate before transactions are setup.
     $manager = \CRM_Extension_System::singleton()->getManager();
     if ($manager->getStatus('org.civicrm.flexmailer') !== \CRM_Extension_Manager::STATUS_INSTALLED) {
@@ -85,7 +85,7 @@ class ValidatorTest extends \CiviUnitTestCase {
    * @param array $expectedErrors
    * @dataProvider getExamples
    */
-  public function testExamples($mailingData, $expectedErrors) {
+  public function testExamples($mailingData, $expectedErrors): void {
     $mailing = new \CRM_Mailing_DAO_Mailing();
     $mailing->copyValues($mailingData);
     $actualErrors = Validator::createAndRun($mailing);

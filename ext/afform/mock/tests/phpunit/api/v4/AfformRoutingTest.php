@@ -14,7 +14,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     Civi\Api4\Afform::revert()
       ->setCheckPermissions(FALSE)
@@ -22,7 +22,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->execute();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     Civi\Api4\Afform::revert()
       ->setCheckPermissions(FALSE)
@@ -30,7 +30,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
       ->execute();
   }
 
-  public function testChangingPermissions() {
+  public function testChangingPermissions(): void {
     $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
     $url = function ($path, $query = NULL) {
       return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);
@@ -49,7 +49,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
     $this->assertOpensPage($result, 'mock-page');
   }
 
-  public function testChangingPath() {
+  public function testChangingPath(): void {
     $http = new \GuzzleHttp\Client(['http_errors' => FALSE]);
     $url = function ($path, $query = NULL) {
       return CRM_Utils_System::url($path, $query, TRUE, NULL, FALSE);

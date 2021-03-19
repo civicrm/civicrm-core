@@ -90,7 +90,7 @@ class SymbolsTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfa
    *   Types are (e)lement, (a)ttribute, (c)lass
    * @dataProvider getExamples
    */
-  public function testSymbols($html, $expect) {
+  public function testSymbols($html, $expect): void {
     $expectDefaults = ['e' => [], 'a' => [], 'c' => []];
     $expect = array_merge($expectDefaults, $expect);
     $actual = Symbols::scan($html);

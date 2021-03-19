@@ -45,7 +45,7 @@ class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements H
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testCreateCreditNoteId() {
+  public function testCreateCreditNoteId(): void {
     $this->_apiversion = 4;
     $contactId = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => 'b@example.com'])['id'];
 

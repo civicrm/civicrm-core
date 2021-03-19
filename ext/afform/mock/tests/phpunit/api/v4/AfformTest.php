@@ -45,7 +45,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    * @param array $originalMetadata
    * @dataProvider getBasicDirectives
    */
-  public function testGetUpdateRevert($formName, $originalMetadata) {
+  public function testGetUpdateRevert($formName, $originalMetadata): void {
     $get = function($arr, $key) {
       return isset($arr[$key]) ? $arr[$key] : NULL;
     };
@@ -134,7 +134,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    *   (For debug messages) A symbolic name of the example data-set being tested.
    * @dataProvider getFormatExamples
    */
-  public function testBasicConvert($formName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName) {
+  public function testBasicConvert($formName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName): void {
     $actual = Civi\Api4\Afform::convert()->setLayout($updateLayout)
       ->setFrom($updateFormat)
       ->setTo($readFormat)
@@ -177,7 +177,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    *   (For debug messages) A symbolic name of the example data-set being tested.
    * @dataProvider getFormatExamples
    */
-  public function testUpdateAndGetFormat($formName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName) {
+  public function testUpdateAndGetFormat($formName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName): void {
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
 
     Civi\Api4\Afform::update()
@@ -213,7 +213,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    *
    * @dataProvider getWhitespaceExamples
    */
-  public function testWhitespaceFormat($directiveName, $example, $exampleName) {
+  public function testWhitespaceFormat($directiveName, $example, $exampleName): void {
     Civi\Api4\Afform::save()
       ->addRecord(['name' => $directiveName, 'layout' => $example['html']])
       ->setLayoutFormat('html')
@@ -243,7 +243,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($example['pretty'], $this->fudgeMarkup($result['layout']));
   }
 
-  public function testAutoRequires() {
+  public function testAutoRequires(): void {
     $formName = 'mockPage';
     $this->createLoggedInUser();
 

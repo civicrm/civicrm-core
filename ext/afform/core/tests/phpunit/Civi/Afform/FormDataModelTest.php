@@ -99,7 +99,7 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
    * @param $expectEntities
    * @dataProvider getEntityExamples
    */
-  public function testGetEntities($html, $expectEntities) {
+  public function testGetEntities($html, $expectEntities): void {
     $parser = new \CRM_Afform_ArrayHtml();
     $fdm = new FormDataModel($parser->convertHtmlToArray($html));
     $this->assertEquals($expectEntities, $fdm->getEntities());

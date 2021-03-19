@@ -19,7 +19,7 @@ class BuildAmountHookTest extends BaseTestClass {
   /**
    * Test api applies permissions on line item actions (delete & get).
    */
-  public function testBuildAmount() {
+  public function testBuildAmount(): void {
     $priceSet = PriceSet::create()->setValues(['name' => 'test', 'title' => 'test', 'extends' => 'CiviMember'])->execute()->first();
     PriceField::create()->setValues([
       'financial_type_id:name' => 'Donation',

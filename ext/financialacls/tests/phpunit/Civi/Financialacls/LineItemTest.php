@@ -28,7 +28,7 @@ class LineItemTest extends BaseTestClass {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testLineItemApiPermissions($version) {
+  public function testLineItemApiPermissions($version): void {
     $contact1 = $this->individualCreate();
     $defaultPriceFieldID = $this->getDefaultPriceFieldID();
     $order = $this->callAPISuccess('Order', 'create', [
