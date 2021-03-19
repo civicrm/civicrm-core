@@ -1120,6 +1120,11 @@ class CRM_Export_BAO_ExportProcessor {
           return $result['values'][$result['id']]['url'];
         }
 
+        // Do not export HTML markup for links
+        if ($html_type === 'Link' && $fieldValue) {
+          return $fieldValue;
+        }
+
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
       elseif (in_array($field, [
