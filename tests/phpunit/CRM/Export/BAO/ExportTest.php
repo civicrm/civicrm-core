@@ -734,6 +734,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $longString .= 'Blah';
     }
     $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
+    $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
 
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
@@ -741,12 +742,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('country') => 'LA',
       $this->getCustomFieldName('select_string') => 'blah',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
+      $this->getCustomFieldName('link') => $longUrl,
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
       ['name' => $this->getCustomFieldName('text')],
       ['name' => $this->getCustomFieldName('country')],
       ['name' => $this->getCustomFieldName('select_string')],
+      ['name' => $this->getCustomFieldName('link')],
     ];
 
     $this->doExportTest([
@@ -758,6 +761,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
     $this->assertEquals($longString, $row['Pick Color']);
+    $this->assertEquals($longUrl, $row['test_link']);
   }
 
   /**
