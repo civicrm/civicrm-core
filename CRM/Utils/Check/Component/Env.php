@@ -972,12 +972,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $path = $pieces[0];
       if (!file_exists($path) || !is_executable($path)) {  
         $messages[] = new CRM_Utils_Check_Message(
-        __FUNCTION__,
-        ts('CiviCRM is configured to use the wkhtmltopdf package to produce PDFs however it is missing, as such the system will fall back to using the DOMPDF package, this may mean that the output is different to what was expected. You should resolve this by either clearing the setting at Administer -> System Settings -> Miscellaneous or by getting your system administrator to install the wkhtmltopdf package'),
-        ts('Missing System Package: wkhtmltopdf'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
-      );
+          __FUNCTION__,
+          ts('CiviCRM is configured to use the wkhtmltopdf package to produce PDFs however it is missing, as such the system will fall back to using the DOMPDF package, this may mean that the output is different to what was expected. You should resolve this by either clearing the setting at Administer -> System Settings -> Miscellaneous or by getting your system administrator to install the wkhtmltopdf package'),
+          ts('Missing System Package: wkhtmltopdf'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-server'
+        );
       }
     }
     return $messages;
