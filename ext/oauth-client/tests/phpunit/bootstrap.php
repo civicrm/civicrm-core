@@ -1,7 +1,6 @@
 <?php
 
 ini_set('memory_limit', '2G');
-ini_set('safe_mode', 0);
 define('CIVICRM_TEST', 1);
 // phpcs:disable
 eval(cv('php:boot --level=classloader', 'phpcode'));

@@ -3,7 +3,6 @@
 require_once dirname(dirname(__DIR__)) . '/flexmailer.php';
 
 ini_set('memory_limit', '2G');
-ini_set('safe_mode', 0);
 
 // We need to allow CiviUnitTestCase... but may break E2E support....
 

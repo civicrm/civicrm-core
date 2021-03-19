@@ -1,7 +1,6 @@
 <?php
 
 ini_set('memory_limit', '2G');
-ini_set('safe_mode', 0);
 // phpcs:ignore
 eval(cv('php:boot --level=classloader', 'phpcode'));
 

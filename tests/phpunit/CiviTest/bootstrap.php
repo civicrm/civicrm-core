@@ -1,7 +1,6 @@
 <?php
 // ADAPTED FROM tools/scripts/phpunit
 
-ini_set('safe_mode', 0);
 ini_set('include_path', dirname(__DIR__) . PATH_SEPARATOR . ini_get('include_path'));
 
 #  Relying on system timezone setting produces a warning,
