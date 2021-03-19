@@ -62,7 +62,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   /**
    * @return string
    */
-  public function getDefaultEntity() {
+  public function getDefaultEntity(): string {
     return 'Activity';
   }
 
@@ -72,7 +72,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function preProcess() {
+  public function preProcess(): void {
     $this->set('searchFormName', 'Search');
 
     // set the button names
@@ -83,10 +83,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     parent::preProcess();
 
-    if (empty($this->_formValues)) {
-      if (isset($this->_ssID)) {
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
-      }
+    if (empty($this->_formValues) && isset($this->_ssID)) {
+      $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -98,7 +96,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       $this->_context
     );
     $prefix = NULL;
-    if ($this->_context == 'user') {
+    if ($this->_context === 'user') {
       $prefix = $this->_prefix;
     }
 
@@ -125,7 +123,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->addSortNameField();
 
@@ -155,9 +153,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * The processing consists of using a Selector / Controller framework for getting the
    * search results.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function postProcess() {
+  public function postProcess(): void {
     if ($this->_done) {
       return;
     }
@@ -184,7 +182,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     // We don't show test records in summaries or dashboards
     if (empty($this->_formValues['activity_test']) && $this->_force) {
-      $this->_formValues["activity_test"] = 0;
+      $this->_formValues['activity_test'] = 0;
     }
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
@@ -286,7 +284,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
-      if (substr($key, 0, 7) != 'custom_') {
+      if (substr($key, 0, 7) !== 'custom_') {
         continue;
       }
       elseif (empty($requestParams[$key])) {
