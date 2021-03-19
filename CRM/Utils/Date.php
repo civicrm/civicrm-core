@@ -262,6 +262,8 @@ class CRM_Utils_Date {
     return mktime(CRM_Utils_Array::value('hour', $parsedDate),
       CRM_Utils_Array::value('minute', $parsedDate),
       59,
+      CRM_Utils_Array::value('second', $parsedDate),
+      59,
       CRM_Utils_Array::value('month', $parsedDate),
       CRM_Utils_Array::value('day', $parsedDate),
       CRM_Utils_Array::value('year', $parsedDate)
@@ -283,6 +285,7 @@ class CRM_Utils_Date {
    * %l - hour in 12-hour format, blank-padded (' 1'..'12')
    * %m - month as a decimal number, 0-padded ('01'..'12')
    * %M - minute, 0-padded ('00'..'60')
+   * %S - second, 0-padded ('00'..'60')
    * %p - lowercase ante/post meridiem ('am', 'pm')
    * %P - uppercase ante/post meridiem ('AM', 'PM')
    * %Y - year as a decimal number including the century ('2005')
@@ -352,6 +355,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 11, 2);
         $minute = (int) substr($dateString, 14, 2);
+        $second = (int) substr($dateString, 17, 2);
       }
       else {
         $year = (int) substr($dateString, 0, 4);
@@ -360,6 +364,7 @@ class CRM_Utils_Date {
 
         $hour24 = (int) substr($dateString, 8, 2);
         $minute = (int) substr($dateString, 10, 2);
+        $second = (int) substr($dateString, 12, 2);
       }
 
       if ($day % 10 == 1 and $day != 11) {
@@ -409,6 +414,8 @@ class CRM_Utils_Date {
         '%m' => $month > 9 ? $month : '0' . $month,
         '%M' => $minute > 9 ? $minute : '0' . $minute,
         '%i' => $minute > 9 ? $minute : '0' . $minute,
+        '%S' => $second > 9 ? $second : '0' . $second,
+        '%T' => $second > 9 ? $second : '0' . $second,
         '%p' => strtolower($type),
         '%P' => $type,
         '%A' => $type,
@@ -867,7 +874,7 @@ class CRM_Utils_Date {
    * @return array
    *   start date, end date
    */
-  public static function getFromTo($relative, $from = NULL, $to = NULL, $fromTime = NULL, $toTime = '235959') {
+  public static function getFromTo($relative, $from, $to, $fromTime = NULL, $toTime = '235959') {
     if ($relative) {
       list($term, $unit) = explode('.', $relative, 2);
       $dateRange = self::relativeToAbsolute($term, $unit);
@@ -893,13 +900,11 @@ class CRM_Utils_Date {
    *
    * @param date $birthDate
    *   Birth Date.
-   * @param date $targetDate
-   *   Target Date. (show age on specific date)
    *
    * @return int
    *   array $results contains years or months
    */
-  public static function calculateAge($birthDate, $targetDate = NULL) {
+  public static function calculateAge($birthDate) {
     $results = [];
     $formatedBirthDate = CRM_Utils_Date::customFormat($birthDate, '%Y-%m-%d');
 
@@ -907,24 +912,23 @@ class CRM_Utils_Date {
     $birthYear = $bDate[0];
     $birthMonth = $bDate[1];
     $birthDay = $bDate[2];
-    $targetDate = strtotime($targetDate ?? date('Y-m-d'));
-
-    $year_diff = date("Y", $targetDate) - $birthYear;
+    $year_diff = date("Y") - $birthYear;
 
     // don't calculate age CRM-3143
     if ($birthYear == '1902') {
       return $results;
     }
+
     switch ($year_diff) {
       case 1:
-        $month = (12 - $birthMonth) + date("m", $targetDate);
+        $month = (12 - $birthMonth) + date("m");
         if ($month < 12) {
-          if (date("d", $targetDate) < $birthDay) {
+          if (date("d") < $birthDay) {
             $month--;
           }
           $results['months'] = $month;
         }
-        elseif ($month == 12 && (date("d", $targetDate) < $birthDay)) {
+        elseif ($month == 12 && (date("d") < $birthDay)) {
           $results['months'] = $month - 1;
         }
         else {
@@ -933,13 +937,13 @@ class CRM_Utils_Date {
         break;
 
       case 0:
-        $month = date("m", $targetDate) - $birthMonth;
+        $month = date("m") - $birthMonth;
         $results['months'] = $month;
         break;
 
       default:
         $results['years'] = $year_diff;
-        if ((date("m", $targetDate) < $birthMonth) || (date("m", $targetDate) == $birthMonth) && (date("d", $targetDate) < $birthDay)) {
+        if ((date("m") < $birthMonth) || (date("m") == $birthMonth) && (date("d") < $birthDay)) {
           $results['years']--;
         }
     }
@@ -1162,6 +1166,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('year', -1, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1171,6 +1176,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $to['d'] = $now['mday'];
             $to['M'] = $now['mon'];
             $to['Y'] = $now['year'];
@@ -1182,6 +1188,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('year', -2, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1192,6 +1199,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('year', -3, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1228,6 +1236,7 @@ class CRM_Utils_Date {
                 $to['Y'] = $now['year'];
                 $to['H'] = 23;
                 $to['i'] = $to['s'] = 59;
+                $to['s'] = 59;
                 $from = self::intervalAdd('year', -$relativeTermSuffix, $to);
                 $from = self::intervalAdd('second', 1, $from);
                 break;
@@ -1261,6 +1270,7 @@ class CRM_Utils_Date {
             $to['Y'] = $fiscalEnd['0'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             if (is_numeric($relativeTermSuffix)) {
               $from = self::intervalAdd('year', (-$relativeTermSuffix), $to);
               $from = self::intervalAdd('second', 1, $from);
@@ -1277,6 +1287,7 @@ class CRM_Utils_Date {
               $to['Y'] = $fiscalEnd['0'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
             }
             else {
               $from['Y'] = $fYear - $relativeTermSuffix;
@@ -1287,6 +1298,7 @@ class CRM_Utils_Date {
               $to['Y'] = $fYear;
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
             }
             break;
 
@@ -1422,6 +1434,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('day', -90, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1436,6 +1449,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             break;
 
           case 'less':
@@ -1473,6 +1487,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
+            $from['s'] = 00;
             $to = self::intervalAdd('day', 90, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
@@ -1484,6 +1499,7 @@ class CRM_Utils_Date {
               $to['Y'] = $now['year'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
               $from = self::intervalAdd('month', -($relativeTermSuffix * 3), $to);
               $from = self::intervalAdd('second', 1, $from);
             }
@@ -1591,6 +1607,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('day', -60, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1601,6 +1618,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('day', -30, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1614,6 +1632,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             break;
 
           case 'less':
@@ -1643,6 +1662,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
+            $from['s'] = 00;
             $to = self::intervalAdd('day', 30, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
@@ -1653,6 +1673,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
+            $from['s'] = 00;
             $to = self::intervalAdd('day', 60, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
@@ -1664,6 +1685,7 @@ class CRM_Utils_Date {
               $to['Y'] = $now['year'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
               $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
               $from = self::intervalAdd('second', 1, $from);
             }
@@ -1742,6 +1764,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             $from = self::intervalAdd('day', -7, $to);
             $from = self::intervalAdd('second', 1, $from);
             break;
@@ -1756,6 +1779,7 @@ class CRM_Utils_Date {
             $to['Y'] = $now['year'];
             $to['H'] = 23;
             $to['i'] = $to['s'] = 59;
+            $to['s'] = 59;
             break;
 
           case 'less':
@@ -1781,6 +1805,7 @@ class CRM_Utils_Date {
             $from['Y'] = $now['year'];
             $from['H'] = 00;
             $from['i'] = $to['s'] = 00;
+            $from['s'] = 00;
             $to = self::intervalAdd('day', 7, $from);
             $to = self::intervalAdd('second', -1, $to);
             break;
@@ -1792,6 +1817,7 @@ class CRM_Utils_Date {
               $to['Y'] = $now['year'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
               $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
               $from = self::intervalAdd('second', 1, $from);
             }
@@ -1866,6 +1892,7 @@ class CRM_Utils_Date {
               $to['Y'] = $now['year'];
               $to['H'] = 23;
               $to['i'] = $to['s'] = 59;
+              $to['s'] = 59;
               $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
               $from = self::intervalAdd('second', 1, $from);
             }
@@ -2060,7 +2087,7 @@ class CRM_Utils_Date {
     $actualTimeFormat = "g:iA";
     $appendZeroLength = 7;
     if ($timeFormat > 1) {
-      $actualTimeFormat = "G:i";
+      $actualTimeFormat = "G:is";
       $appendZeroLength = 5;
     }
 
@@ -2136,7 +2163,7 @@ class CRM_Utils_Date {
       if ($valid) {
         // format date and time to default.
         if ($ruleName == 'dateTime') {
-          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", "", $dateVal), '%Y%m%d%H%i');
+          $dateVal = CRM_Utils_Date::customFormat(preg_replace("/(:|\s)?/", "", $dateVal), '%Y%m%d%H%i%S');
           // hack to add seconds
           $dateVal .= '00';
         }
