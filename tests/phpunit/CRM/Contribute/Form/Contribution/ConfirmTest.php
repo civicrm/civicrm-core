@@ -65,6 +65,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_recur' => FALSE,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit card'),
     ];
+    $form->_values = [
+      'id' => $contributionPageID2,
+    ];
     $form->_params = [
       'contribution_id' => $contribution['id'],
       'credit_card_number' => 4111111111111111,
