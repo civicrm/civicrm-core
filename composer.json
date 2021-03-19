@@ -84,7 +84,8 @@
     "ext-intl": "*",
     "pear/mail_mime": "~1.10",
     "pear/db": "1.10",
-    "civicrm/composer-compile-lib": "~0.3 || ~1.0"
+    "civicrm/composer-compile-lib": "~0.3 || ~1.0",
+    "ext-json": "*"
   },
   "scripts": {
     "post-install-cmd": [
