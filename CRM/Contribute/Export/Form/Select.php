@@ -20,8 +20,12 @@
  */
 class CRM_Contribute_Export_Form_Select extends CRM_Export_Form_Select {
 
+  use CRM_Contribute_Form_Task_TaskTrait;
+
   /**
    * Call the pre-processing function.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function callPreProcessing(): void {
     CRM_Contribute_Form_Task::preProcessCommon($this);
