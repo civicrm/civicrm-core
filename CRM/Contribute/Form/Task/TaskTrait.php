@@ -29,25 +29,7 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    */
   public function getSearchQueryResults(): CRM_Core_DAO {
     $form = $this;
-    $queryParams = $form->get('queryParams');
-    $isTest = FALSE;
-    if (is_array($queryParams)) {
-      foreach ($queryParams as $fields) {
-        if ($fields[0] === 'contribution_test') {
-          $isTest = TRUE;
-          break;
-        }
-      }
-    }
-    if (!$isTest) {
-      $queryParams[] = [
-        'contribution_test',
-        '=',
-        0,
-        0,
-        0,
-      ];
-    }
+    $queryParams = $this->getQueryParams();
     $returnProperties = ['contribution_id' => 1];
     $sortOrder = $sortCol = NULL;
     if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
@@ -72,6 +54,31 @@ trait CRM_Contribute_Form_Task_TaskTrait {
       $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
     }
     return $query->searchQuery(0, 0, $sortOrder);
+  }
+
+  /**
+   * Get the query parameters, adding test = FALSE if needed.
+   *
+   * @return array|null
+   */
+  protected function getQueryParams(): ?array {
+    $queryParams = $this->get('queryParams');
+    if (!is_array($queryParams)) {
+      return NULL;
+    }
+    foreach ($queryParams as $fields) {
+      if ($fields[0] === 'contribution_test') {
+        return $queryParams;
+      }
+    }
+    $queryParams[] = [
+      'contribution_test',
+      '=',
+      0,
+      0,
+      0,
+    ];
+    return $queryParams;
   }
 
 }
