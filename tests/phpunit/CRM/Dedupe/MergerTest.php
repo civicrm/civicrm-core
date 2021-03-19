@@ -1429,8 +1429,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $cidRefs = [];
     $sql = "
 SELECT
-    table_name,
-    column_name
+    table_name AS table_name,
+    column_name AS column_name
 FROM information_schema.key_column_usage
 WHERE
     referenced_table_schema = database() AND

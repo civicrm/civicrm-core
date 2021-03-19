@@ -52,6 +52,8 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     $this->assertTrue(
       in_array("  `logging_test` int(11) DEFAULT '0'", $create)
       || in_array("  `logging_test` int(11) DEFAULT 0", $create)
+      || in_array("  `logging_test` int DEFAULT '0'", $create)
+      || in_array("  `logging_test` int DEFAULT 0", $create)
     );
     CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_option_value` DROP COLUMN `logging_test`", [], FALSE, NULL, FALSE, FALSE);
     $query = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_civicrm_option_value`", [], TRUE, NULL, FALSE, FALSE);
@@ -65,7 +67,10 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     Civi::service('sql_triggers')->rebuild('civicrm_option_value');
     $this->assertTrue(
       in_array("  `logging_test` int(11) DEFAULT '0'", $create)
-      || in_array("  `logging_test` int(11) DEFAULT 0", $create));
+      || in_array("  `logging_test` int(11) DEFAULT 0", $create)
+      || in_array("  `logging_test` int DEFAULT '0'", $create)
+      || in_array("  `logging_test` int DEFAULT 0", $create)
+    );
     $logging->disableLogging();
   }
 
