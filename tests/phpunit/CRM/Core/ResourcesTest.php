@@ -35,7 +35,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   protected $originalRequest;
   protected $originalGet;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     list ($this->basedir, $this->container, $this->mapper) = $this->_createMapper();
@@ -55,9 +55,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   /**
    * Restore globals so this test doesn't interfere with others.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $_REQUEST = $this->originalRequest;
     $_GET = $this->originalGet;
+    parent::tearDown();
   }
 
   public function testCreateBasicBundle() {
