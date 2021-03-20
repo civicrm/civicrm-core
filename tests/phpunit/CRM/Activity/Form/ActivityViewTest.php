@@ -5,11 +5,12 @@
  */
 class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
+  /**
+   * Cleanup after class.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',
@@ -20,8 +21,11 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
   /**
    * Test that the smarty template for ActivityView contains what we expect
    * after preProcess().
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testActivityViewPreProcess() {
+  public function testActivityViewPreProcess(): void {
     // create activity
     $activity = $this->activityCreate();
 
@@ -38,7 +42,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
 
     // check one of the smarty template vars
     // not checking EVERYTHING
-    $templateVar = $activityViewForm->getTemplate()->get_template_vars('values');
+    $templateVar = CRM_Activity_Form_ActivityView::getTemplate()->get_template_vars('values');
     $expected = [
       'assignee_contact' => [0 => $activity['target_contact_id']],
       // it's always Julia
