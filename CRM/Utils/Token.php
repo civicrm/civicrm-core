@@ -237,7 +237,7 @@ class CRM_Utils_Token {
     ) {
       return $str;
     }
-
+    throw new CRM_Core_Exception('test');
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use ($domain, $html, $escapeSmarty) {

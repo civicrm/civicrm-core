@@ -131,4 +131,20 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     }
   }
 
+  protected function replaceDomainTokens($str, $domain, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
+    $key = 'domain';
+    if (
+      !$knownTokens || empty($knownTokens[$key])
+    ) {
+      return $str;
+    }
+    return preg_replace_callback(
+      self::tokenRegex($key),
+      function ($matches) use ($domain, $html, $escapeSmarty) {
+        return CRM_Utils_Token::getDomainTokenReplacement($matches[1], $domain, $html, $escapeSmarty);
+      },
+      $str
+    );
+  }
+
 }
