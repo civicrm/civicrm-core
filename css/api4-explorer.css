@@ -16,16 +16,9 @@
 #bootstrap-theme .explorer-params-panel .panel-heading .form-inline > .select2-container {
   max-width: 25% !important;
 }
-#bootstrap-theme.api4-explorer-page .api4-explorer-row {
-  display: flex;
-}
-#bootstrap-theme.api4-explorer-page > div > .panel {
-  flex: 1;
+#bootstrap-theme .api4-explorer-row > .panel {
   margin: 10px;
   min-height: 500px;
-}
-#bootstrap-theme.api4-explorer-page > div > form.panel {
-  flex: 2;
 }
 /* Fix weird shorditch style */
 #bootstrap-theme.api4-explorer-page .api4-explorer-row .panel .panel-heading {
