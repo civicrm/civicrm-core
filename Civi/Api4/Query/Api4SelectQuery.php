@@ -595,7 +595,18 @@ class Api4SelectQuery {
       $alias = $alias ? \CRM_Utils_String::munge($alias, '_', 256) : strtolower($entity);
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
-      $side = array_shift($join) ? 'INNER' : 'LEFT';
+      $side = array_shift($join);
+      // If omitted, supply default (LEFT); and legacy support for boolean values
+      if (!is_string($side)) {
+        $side = $side ? 'INNER' : 'LEFT';
+      }
+      if (!in_array($side, ['INNER', 'LEFT', 'EXCLUDE'])) {
+        throw new \API_Exception("Illegal value for join side: '$side'.");
+      }
+      if ($side === 'EXCLUDE') {
+        $side = 'LEFT';
+        $this->api->addWhere("$alias.id", 'IS NULL');
+      }
       // Add all fields from joined entity to spec
       $joinEntityGet = \Civi\API\Request::create($entity, 'get', ['version' => 4, 'checkPermissions' => $this->getCheckPermissions()]);
       $joinEntityFields = $joinEntityGet->entityFields();

@@ -3,9 +3,8 @@
     <div ng-if=":: $ctrl.paramExists('join')">
       <fieldset ng-repeat="join in $ctrl.savedSearch.api_params.join">
         <div class="form-inline">
-          <label for="crm-search-join-{{ $index }}">{{:: ts('With') }}</label>
+          <select class="form-control" ng-model="join[1]" ng-change="$ctrl.changeJoinType(join)" ng-options="o.k as o.v for o in ::joinTypes" ></select>
           <input id="crm-search-join-{{ $index }}" class="form-control huge" ng-model="join[0]" crm-ui-select="{placeholder: ' ', data: getJoinEntities}" disabled >
-          <select class="form-control" ng-model="join[1]" ng-options="o.k as o.v for o in ::joinTypes" ></select>
           <button type="button" class="btn btn-xs btn-danger-outline" ng-click="$ctrl.removeJoin($index)" title="{{:: ts('Remove join') }}">
             <i class="crm-i fa-trash" aria-hidden="true"></i>
           </button>
@@ -16,7 +15,8 @@
       </fieldset>
       <fieldset>
         <div class="form-inline">
-          <input id="crm-search-add-join" class="form-control crm-action-menu fa-plus huge" ng-model="controls.join" crm-ui-select="{placeholder: ts('With'), data: getJoinEntities}" ng-change="addJoin()"/>
+          <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
+          <input id="crm-search-add-join" class="form-control crm-action-menu fa-plus huge" ng-model="controls.join" crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities}" ng-change="addJoin()"/>
         </div>
       </fieldset>
     </div>

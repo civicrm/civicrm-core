@@ -164,16 +164,16 @@ class DAOGetAction extends AbstractGetAction {
 
   /**
    * @param string $entity
-   * @param bool $required
+   * @param string|bool $type
    * @param string $bridge
    * @param array ...$conditions
    * @return DAOGetAction
    */
-  public function addJoin(string $entity, bool $required = FALSE, $bridge = NULL, ...$conditions): DAOGetAction {
+  public function addJoin(string $entity, $type = 'LEFT', $bridge = NULL, ...$conditions): DAOGetAction {
     if ($bridge) {
       array_unshift($conditions, $bridge);
     }
-    array_unshift($conditions, $entity, $required);
+    array_unshift($conditions, $entity, $type);
     $this->join[] = $conditions;
     return $this;
   }
