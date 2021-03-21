@@ -5,8 +5,8 @@
     {{:: ts('CiviCRM APIv4') }}{{ entity ? (' (' + entity + '::' + action + ')') : '' }}
   </h1>
 
-  <div class="api4-explorer-row">
-      <form name="api4-explorer" class="panel panel-default explorer-params-panel">
+  <div class="api4-explorer-row crm-flex-box">
+      <form name="api4-explorer" class="panel panel-default explorer-params-panel crm-flex-2">
         <div class="panel-heading">
           <div class="form-inline">
             <span ng-mouseenter="help('entity', paramDoc('$entity'))" ng-mouseleave="help()">
@@ -189,7 +189,7 @@
         </div>
       </div>
   </div>
-  <div class="api4-explorer-row">
+  <div class="api4-explorer-row crm-flex-box">
       <div class="panel panel-info explorer-code-panel">
         <ul class="panel-heading nav nav-tabs">
           <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
