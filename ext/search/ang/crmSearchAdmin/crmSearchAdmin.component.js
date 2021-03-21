@@ -24,8 +24,12 @@
       // Have the filters (WHERE, HAVING, GROUP BY, JOIN) changed?
       this.stale = true;
 
-      $scope.controls = {tab: 'compose'};
-      $scope.joinTypes = [{k: false, v: ts('Optional')}, {k: true, v: ts('Required')}];
+      $scope.controls = {tab: 'compose', joinType: 'LEFT'};
+      $scope.joinTypes = [
+        {k: 'LEFT', v: ts('With (optional)')},
+        {k: 'INNER', v: ts('With (required)')},
+        {k: 'EXCLUDE', v: ts('Without')},
+      ];
       // Try to create a sensible list of entities one might want to search for,
       // excluding those whos primary purpose is to provide joins or option lists to other entities
       var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
@@ -245,7 +249,7 @@
             ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
             var join = searchMeta.getJoin($scope.controls.join),
               entity = searchMeta.getEntity(join.entity),
-              params = [$scope.controls.join, false];
+              params = [$scope.controls.join, $scope.controls.joinType || 'LEFT'];
             _.each(_.cloneDeep(join.conditions), function(condition) {
               params.push(condition);
             });
@@ -253,7 +257,7 @@
               params.push(condition);
             });
             ctrl.savedSearch.api_params.join.push(params);
-            if (entity.label_field) {
+            if (entity.label_field && $scope.controls.joinType !== 'EXCLUDE') {
               ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
             }
             loadFieldOptions();
@@ -266,6 +270,10 @@
       this.removeJoin = function(index) {
         var alias = searchMeta.getJoin(ctrl.savedSearch.api_params.join[index][0]).alias;
         ctrl.clearParam('join', index);
+        removeJoinStuff(alias);
+      };
+
+      function removeJoinStuff(alias) {
         _.remove(ctrl.savedSearch.api_params.select, function(item) {
           var pattern = new RegExp('\\b' + alias + '\\.');
           return pattern.test(item.split(' AS ')[0]);
@@ -274,10 +282,17 @@
           return clauseUsesJoin(clause, alias);
         });
         _.eachRight(ctrl.savedSearch.api_params.join, function(item, i) {
-          if (searchMeta.getJoin(item[0]).alias.indexOf(alias) === 0) {
+          var joinAlias = searchMeta.getJoin(item[0]).alias;
+          if (joinAlias !== alias && joinAlias.indexOf(alias) === 0) {
             ctrl.removeJoin(i);
           }
         });
+      }
+
+      this.changeJoinType = function(join) {
+        if (join[1] === 'EXCLUDE') {
+          removeJoinStuff(searchMeta.getJoin(join[0]).alias);
+        }
       };
 
       $scope.changeGroupBy = function(idx) {

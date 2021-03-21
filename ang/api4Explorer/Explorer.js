@@ -56,7 +56,7 @@
     $scope.loading = false;
     $scope.controls = {};
     $scope.langs = ['php', 'js', 'ang', 'cli'];
-    $scope.joinTypes = [{k: false, v: 'FALSE (LEFT JOIN)'}, {k: true, v: 'TRUE (INNER JOIN)'}];
+    $scope.joinTypes = [{k: 'LEFT', v: 'LEFT JOIN'}, {k: 'INNER', v: 'INNER JOIN'}, {k: 'EXCLUDE', v: 'EXCLUDE'}];
     $scope.bridgeEntities = _.filter(schema, function(entity) {return _.includes(entity.type, 'EntityBridge');});
     $scope.code = {
       php: [
@@ -529,7 +529,7 @@
               $timeout(function() {
                 if (field) {
                   if (name === 'join') {
-                    $scope.params[name].push([field + ' AS ' + _.snakeCase(field), false]);
+                    $scope.params[name].push([field + ' AS ' + _.snakeCase(field), 'LEFT']);
                     ctrl.buildFieldList();
                   }
                   else if (typeof objectParams[name] === 'undefined') {
