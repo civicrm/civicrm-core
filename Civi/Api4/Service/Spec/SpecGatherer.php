@@ -132,7 +132,7 @@ class SpecGatherer {
     $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group.extends', 'IN', $extends)
       ->addWhere('custom_group.is_multiple', '=', '0')
-      ->setSelect(['custom_group.name', '*'])
+      ->setSelect(['custom_group.name', 'custom_group.title', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {
@@ -148,7 +148,7 @@ class SpecGatherer {
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get(FALSE)
       ->addWhere('custom_group.name', '=', $customGroup)
-      ->setSelect(['custom_group.name', 'custom_group.table_name', '*'])
+      ->setSelect(['custom_group.name', 'custom_group.table_name', 'custom_group.title', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {

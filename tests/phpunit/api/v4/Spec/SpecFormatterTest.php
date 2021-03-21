@@ -62,8 +62,10 @@ class SpecFormatterTest extends UnitTestCase {
     $data = [
       'custom_group_id' => $customGroupId,
       'custom_group.name' => 'my_group',
+      'custom_group.title' => 'My Group',
       'id' => $customFieldId,
       'name' => $name,
+      'label' => $name,
       'data_type' => 'String',
       'html_type' => 'Select',
       'column_name' => $name,
