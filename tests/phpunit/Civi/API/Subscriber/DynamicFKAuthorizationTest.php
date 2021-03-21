@@ -2,6 +2,7 @@
 namespace Civi\API\Subscriber;
 
 use Civi\API\Kernel;
+use Civi\API\Provider\StaticProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
@@ -27,12 +28,12 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    */
   public $kernel;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     \CRM_Core_DAO_AllCoreTables::init(TRUE);
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('FakeFile', 'CRM_Fake_DAO_FakeFile', 'fake_file');
-    $fileProvider = new \Civi\API\Provider\StaticProvider(
+    $fileProvider = new StaticProvider(
       3,
       'FakeFile',
       ['id', 'entity_table', 'entity_id'],
@@ -44,7 +45,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     );
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('Widget', 'CRM_Fake_DAO_Widget', 'fake_widget');
-    $widgetProvider = new \Civi\API\Provider\StaticProvider(3, 'Widget',
+    $widgetProvider = new StaticProvider(3, 'Widget',
       ['id', 'title'],
       [],
       [
@@ -53,7 +54,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     );
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('Forbidden', 'CRM_Fake_DAO_Forbidden', 'fake_forbidden');
-    $forbiddenProvider = new \Civi\API\Provider\StaticProvider(
+    $forbiddenProvider = new StaticProvider(
       3,
       'Forbidden',
       ['id', 'label'],
@@ -90,18 +91,18 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
         else null
       end as entity_table,
       case %1
-        when " . self::FILE_WIDGET_ID . " then " . self::WIDGET_ID . "
-        when " . self::FILE_FORBIDDEN_ID . " then " . self::FORBIDDEN_ID . "
+        when " . self::FILE_WIDGET_ID . ' then ' . self::WIDGET_ID . '
+        when ' . self::FILE_FORBIDDEN_ID . ' then ' . self::FORBIDDEN_ID . '
         else null
       end as entity_id
-      ",
+      ',
       // Get a list of custom fields (field_name,table_name,extends)
-      "select",
+      'select',
       ['fake_widget', 'fake_forbidden']
     ));
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
     \CRM_Core_DAO_AllCoreTables::init(TRUE);
   }
@@ -196,10 +197,10 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   }
 
   /**
-   * @param $entity
-   * @param $action
+   * @param string $entity
+   * @param int $action
    * @param array $params
-   * @param $expectedError
+   * @param array $expectedError
    * @dataProvider badDataProvider
    */
   public function testBad($entity, $action, $params, $expectedError) {

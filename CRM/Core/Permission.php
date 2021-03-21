@@ -911,12 +911,17 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function getImpliedPermissionsFor(string $permission): array {
+    if (in_array($permission[0], ['@', '*'], TRUE)) {
+      // Special permissions like '*always deny*' - see DynamicFKAuthorizationTest.
+      // Also '@afform - see AfformUsageTest.
+      return [];
+    }
     $implied = Civi::cache('metadata')->get('implied_permissions', []);
     if (isset($implied[$permission])) {
       return $implied[$permission];
     }
-    $implied[$permission] = [];
-    foreach (self::basicPermissions(FALSE, TRUE) as $key => $details) {
+    $implied[$permission] = ['all CiviCRM permissions and ACLs'];
+    foreach (self::getImpliedAdminPermissions() as $key => $details) {
       if (in_array($permission, $details['implied_permissions'] ?? [], TRUE)) {
         $implied[$permission][] = $key;
       }
