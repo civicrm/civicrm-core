@@ -302,6 +302,8 @@ WHERE  email = %2
    *   Is this domain-level?.
    * @param int $job
    *   The job ID.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
@@ -372,15 +374,15 @@ WHERE  email = %2
     $bao->body_text = $text;
     $bao->body_html = $html;
     $tokens = $bao->getTokens();
-    if ($eq->format == 'HTML' || $eq->format == 'Both') {
+    if ($eq->format === 'HTML' || $eq->format === 'Both') {
       $html = CRM_Utils_Token::replaceDomainTokens($html, $domain, TRUE, $tokens['html']);
-      $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $domain, $groups, TRUE, $eq->contact_id, $eq->hash);
+      $html = CRM_Utils_Token::replaceUnsubscribeTokens($html, $groups);
       $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
       $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
     }
-    if (!$html || $eq->format == 'Text' || $eq->format == 'Both') {
+    if (!$html || $eq->format === 'Text' || $eq->format === 'Both') {
       $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
-      $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $domain, $groups, FALSE, $eq->contact_id, $eq->hash);
+      $text = CRM_Utils_Token::replaceUnsubscribeTokens($text, $groups);
       $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
       $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
     }

@@ -874,43 +874,16 @@ class CRM_Utils_Token {
    *
    * @param string $str
    *   The string with tokens to be replaced.
-   * @param object $domain
-   *   The domain BAO.
    * @param array $groups
    *   The groups (if any) being unsubscribed.
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   * @param int $contact_id
-   *   The contact ID.
-   * @param string $hash The security hash of the unsub event
    *
    * @return string
    *   The processed string
    */
-  public static function &replaceUnsubscribeTokens(
-    $str,
-    &$domain,
-    &$groups,
-    $html,
-    $contact_id,
-    $hash
-  ) {
-    if (self::token_match('unsubscribe', 'group', $str)) {
-      if (!empty($groups)) {
-        $config = CRM_Core_Config::singleton();
-        $base = CRM_Utils_System::baseURL();
-
-        // FIXME: an ugly hack for CRM-2035, to be dropped once CRM-1799 is implemented
-        $dao = new CRM_Contact_DAO_Group();
-        $dao->find();
-        while ($dao->fetch()) {
-          if (substr($dao->visibility, 0, 6) == 'Public') {
-            $visibleGroups[] = $dao->id;
-          }
-        }
-        $value = implode(', ', $groups);
-        self::token_replace('unsubscribe', 'group', $value, $str);
-      }
+  public static function replaceUnsubscribeTokens(string $str, array $groups): string {
+    if (!empty($groups) && self::token_match('unsubscribe', 'group', $str)) {
+      $value = implode(', ', $groups);
+      self::token_replace('unsubscribe', 'group', $value, $str);
     }
     return $str;
   }
