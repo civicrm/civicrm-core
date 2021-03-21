@@ -220,8 +220,8 @@ function authx_civicrm_themes(&$themes) {
  * @see CRM_Utils_Hook::permission()
  */
 function authx_civicrm_permission(&$permissions) {
-  $permissions['authenticate with password'] = ts('AuthX: Authenticate to services with password');
-  $permissions['authenticate with api key'] = ts('AuthX: Authenticate to services with API key');
+  $permissions['authenticate with password'] = E::ts('AuthX: Authenticate to services with password');
+  $permissions['authenticate with api key'] = E::ts('AuthX: Authenticate to services with API key');
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
