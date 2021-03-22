@@ -23,6 +23,8 @@ use Civi\Api4\ActivityContact;
  */
 class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   /**
    * @var CiviMailUtils
    */
@@ -783,11 +785,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_participant',
       'civicrm_event',
       'civicrm_email',
-    ]);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->fixtures['contact_custom_token']['id']]);
-    $this->callAPISuccess('CustomGroup', 'delete', [
-      'id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', 'test_contact_cg', 'id', 'name'),
-    ]);
+    ], TRUE);
     $this->_tearDown();
   }
 
@@ -1956,31 +1954,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test reminders sent on custom data anniversary.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testContactCustomDate_Anniversary(): void {
-    $group = [
-      'title' => 'Test_Group now',
-      'name' => 'test_group_now',
-      'extends' => ['Individual'],
-      'style' => 'Inline',
-      'is_multiple' => FALSE,
-      'is_active' => 1,
-    ];
-    $createGroup = $this->callAPISuccess('custom_group', 'create', $group);
-    $field = [
-      'label' => 'Graduation',
-      'data_type' => 'Date',
-      'html_type' => 'Select Date',
-      'custom_group_id' => $createGroup['id'],
-    ];
-    $createField = $this->callAPISuccess('custom_field', 'create', $field);
-
+    $this->createCustomGroupWithFieldOfType([], 'date');
     $contactParams = $this->fixtures['contact'];
-    $contactParams["custom_{$createField['id']}"] = '2013-12-16';
+    $contactParams[$this->getCustomFieldName('date')] = '2013-12-16';
     $contact = $this->callAPISuccess('Contact', 'create', $contactParams);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
-    $this->fixtures['sched_contact_grad_anniversary']['entity_value'] = "custom_{$createField['id']}";
+    $this->fixtures['sched_contact_grad_anniversary']['entity_value'] = $this->getCustomFieldName('date');
     $this->createScheduleFromFixtures('sched_contact_grad_anniversary');
 
     $this->assertCronRuns([
@@ -1995,7 +1978,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => [['test-member@example.com']],
       ],
     ]);
-    $this->callAPISuccess('custom_group', 'delete', ['id' => $createGroup['id']]);
   }
 
   /**
