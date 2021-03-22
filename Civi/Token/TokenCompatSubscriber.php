@@ -131,8 +131,16 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
 
     if ($useSmarty) {
       $smarty = \CRM_Core_Smarty::singleton();
-      $e->string = $smarty->fetch("string:" . $e->string);
+      set_error_handler([$this, 'handleSmartyError'], E_USER_ERROR);
+      $e->string = $smarty->fetch('string:' . $e->string);
+      restore_error_handler();
     }
+  }
+
+  public function handleSmartyError($errno, $errstr, $errfile, $errline) {
+    $event = new \Civi\Core\Event\SmartyErrorEvent($errno, $errstr);
+    \Civi::dispatcher()->dispatch('civi.smarty.error', $event);
+    throw new \CRM_Core_Exception('message was not parsed');
   }
 
 }
