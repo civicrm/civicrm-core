@@ -56,10 +56,12 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     parent::setUp();
     $this->settingsBackup = [];
     foreach (\Civi\Authx\Meta::getFlowTypes() as $flowType) {
-      foreach (["authx_{$flowType}_cred", "authx_{$flowType}_user"] as $setting) {
+      foreach (["authx_{$flowType}_cred", "authx_{$flowType}_user", "authx_guards"] as $setting) {
         $this->settingsBackup[$setting] = \Civi::settings()->get($setting);
       }
     }
+
+    \Civi::settings()->set('authx_guards', []);
   }
 
   public function tearDown(): void {
@@ -164,6 +166,52 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     if (!in_array('sendsExcessCookies', $this->quirks)) {
       $this->assertNoCookies($response);
     }
+  }
+
+  /**
+   * The setting "authx_guard" may be used to require (or not require) the site_key.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testStatelessGuardSiteKey() {
+    if (!defined('CIVICRM_SITE_KEY')) {
+      $this->markTestIncomplete("Cannot run test without CIVICRM_SITE_KEY");
+    }
+
+    $addParam = function($request, $key, $value) {
+      $query = $request->getUri()->getQuery();
+      return $request->withUri(
+        $request->getUri()->withQuery($query . '&' . urlencode($key) . '=' . urlencode($value))
+      );
+    };
+
+    [$credType, $flowType] = ['pass', 'header'];
+    $http = $this->createGuzzle(['http_errors' => FALSE]);
+    \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
+
+    /** @var \Psr\Http\Message\RequestInterface $request */
+    $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
+
+    // Request OK. Policy requires site_key, and we have one.
+    \Civi::settings()->set("authx_guards", ['site_key']);
+    $response = $http->send($request->withHeader('X-Civi-Key', CIVICRM_SITE_KEY));
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+
+    // Request OK. Policy does not require site_key, and we do not have one
+    \Civi::settings()->set("authx_guards", []);
+    $response = $http->send($request);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $response);
+
+    // Request fails. Policy requires site_key, but we don't have the wrong value.
+    \Civi::settings()->set("authx_guards", ['site_key']);
+    $response = $http->send($request->withHeader('X-Civi-Key', 'not-the-site-key'));
+    $this->assertFailedDueToProhibition($response);
+
+    // Request fails. Policy requires site_key, but we don't have one.
+    \Civi::settings()->set("authx_guards", ['site_key']);
+    $response = $http->send($request);
+    $this->assertFailedDueToProhibition($response);
   }
 
   /**
