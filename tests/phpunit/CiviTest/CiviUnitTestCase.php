@@ -3800,6 +3800,7 @@ WHERE a1.is_primary = 0
     $currentModes = array_fill_keys(CRM_Utils_SQL::getSqlModes(), 1);
     $currentModes = array_merge($currentModes, array_fill_keys($modes, 1));
     CRM_Core_DAO::executeQuery("SET GLOBAL sql_mode = '" . implode(',', array_keys($currentModes)) . "'");
+    CRM_Core_DAO::executeQuery("SET sql_mode = '" . implode(',', array_keys($currentModes)) . "'");
   }
 
 }
