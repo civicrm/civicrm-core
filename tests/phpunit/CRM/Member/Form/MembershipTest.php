@@ -674,6 +674,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(50, $payment['paid']);
     // balance remaining
     $this->assertEquals(-25, $payment['balance']);
+
+    //Update to lifetime membership.
+    $params['membership_type_id'] = [$this->ids['contact']['organization'], $this->ids['membership_type']['lifetime']];
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals($this->ids['membership_type']['lifetime'], $membership['membership_type_id']);
+    $this->assertTrue(empty($membership['end_date']), 'Lifetime Membership on the individual has an End date.');
   }
 
   /**

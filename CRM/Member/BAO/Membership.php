@@ -246,6 +246,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * @throws CRM_Core_Exception
    */
   public static function create(&$params, $ids = []) {
+    $isLifeTime = FALSE;
+    if (!empty($params['membership_type_id'])) {
+      $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
+      $isLifeTime = $memTypeDetails['duration_unit'] === 'lifetime' ? TRUE : FALSE;
+    }
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -260,7 +265,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           // @todo enable this once core is using the api.
           // CRM_Core_Error::deprecatedWarning('Relying on the BAO to clean up dates is deprecated. Call membership create via the api');
         }
-        if (!empty($params['id']) && empty($params[$dateField])) {
+        if (!empty($params['id']) && empty($params[$dateField]) && !($isLifeTime && $dateField == 'end_date')) {
           $fieldsToLoad[] = $dateField;
         }
       }
