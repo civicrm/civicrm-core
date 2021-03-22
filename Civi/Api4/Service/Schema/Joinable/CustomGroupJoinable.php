@@ -60,7 +60,7 @@ class CustomGroupJoinable extends Joinable {
     $entityFields = (array) \Civi::cache('metadata')->get($cacheKey);
     if (!$entityFields) {
       $fields = CustomField::get(FALSE)
-        ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', '*'])
+        ->setSelect(['custom_group.name', 'custom_group.extends', 'custom_group.table_name', 'custom_group.title', '*'])
         ->addWhere('custom_group.table_name', '=', $this->getTargetTable())
         ->execute();
       foreach ($fields as $field) {
