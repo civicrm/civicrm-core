@@ -39,7 +39,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->mut = new CiviMailUtils($this, TRUE);
@@ -92,7 +92,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'status_id' => '8',
     ];
 
-    $this->fixtures['phonecall'] = [
+    $this->fixtures['phone_call'] = [
       'status_id' => 1,
       'activity_type_id' => 2,
       'activity_date_time' => '20120615100000',
@@ -769,7 +769,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->mut->clearMessages();
     $this->mut->stop();
@@ -794,7 +794,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @return array
    */
-  public function mailerExamples() {
+  public function mailerExamples(): array {
     $cases = [];
 
     // Some tokens - short as subject has 128char limit in DB.
@@ -905,12 +905,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @dataProvider mailerExamples
    *
    */
-  public function testMailer($schedule, $patterns) {
+  public function testMailer($schedule, $patterns): void {
     $actionSchedule = array_merge($this->fixtures['sched_activity_1day'], $schedule);
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
 
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
     $this->assertInternalType('numeric', $activity->id);
     $contact = $this->callAPISuccess('contact', 'create', array_merge(
       $this->fixtures['contact'],
@@ -962,13 +962,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testActivityDateTimeMatchNonRepeatableSchedule() {
+  public function testActivityDateTimeMatchNonRepeatableSchedule(): void {
     $this->createScheduleFromFixtures('sched_activity_1day');
 
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
     $this->assertInternalType('numeric', $activity->id);
     $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
-    $activity->subject = 'Test subject for Phonecall';
+    $activity->subject = 'Test subject for phone_call';
     $activity->save();
 
     $source['contact_id'] = $contact['id'];
@@ -1011,10 +1011,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testActivityDateTimeMatchRepeatableSchedule() {
+  public function testActivityDateTimeMatchRepeatableSchedule(): void {
     $this->createScheduleFromFixtures('sched_activity_1day_r');
 
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
     $this->assertTrue(is_numeric($activity->id));
     $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
@@ -1028,7 +1028,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertCronRuns([
       [
         // Before the 24-hour mark, no email
-        'time' => '012-06-14 04:00:00',
+        'time' => '2012-06-14 04:00:00',
         'recipients' => [],
         'subjects' => [],
       ],
@@ -1056,10 +1056,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testActivityDateTimeMatchRepeatableScheduleOnAbsDate() {
+  public function testActivityDateTimeMatchRepeatableScheduleOnAbsDate(): void {
     $this->createScheduleFromFixtures('sched_activity_1day_r_on_abs_date');
 
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phonecall']);
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
     $this->assertInternalType('numeric', $activity->id);
     $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
     $activity->save();
@@ -1103,7 +1103,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventNameWithAbsoluteDateAndNothingElse() {
+  public function testEventNameWithAbsoluteDateAndNothingElse(): void {
     $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 1]));
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $participant->contact_id,
@@ -1149,7 +1149,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipDateMatch() {
+  public function testMembershipDateMatch(): void {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1]));
     $this->assertInternalType('numeric', $membership->id);
     $this->callAPISuccess('Email', 'create', [
@@ -1207,8 +1207,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * CRM-21675: Support parent and smart group in 'Limit to' field
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testScheduleReminderWithParentGroup() {
+  public function testScheduleReminderWithParentGroup(): void {
     // Contact A with birth-date at '07-07-2005' and gender - Male, later got added in smart group
     $this->individualCreate(['birth_date' => '20050707', 'gender_id' => 1, 'email' => 'abc@test.com']);
     // Contact B with birth-date at '07-07-2005', later got added in regular group
@@ -1299,9 +1300,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * an email should be sent.
    *
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMembershipJoinDateNonMatch() {
+  public function testMembershipJoinDateNonMatch(): void {
     $this->createMembershipFromFixture('rolling_membership', '', ['email' => 'test-member@example.com']);
     // Add an alternative membership type, and only send messages for that type
     $extraMembershipType = $this->createTestObject('CRM_Member_DAO_MembershipType', []);
@@ -1324,9 +1326,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test that the first and SECOND notifications are sent out.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipEndDateRepeat() {
+  public function testMembershipEndDateRepeat(): void {
     // creates membership with end_date = 20120615
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current');
     $this->callAPISuccess('Email', 'create', [
@@ -1389,9 +1392,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * between
    *  see CRM-15376
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipEndDateRepeatChangedEndDate_CRM_15376() {
+  public function testMembershipEndDateRepeatChangedEndDate_CRM_15376(): void {
     // creates membership with end_date = 20120615
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current');
     $this->callAPISuccess('Email', 'create', [
@@ -1433,7 +1437,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMembershipEndDateMatch() {
+  public function testMembershipEndDateMatch(): void {
     // creates membership with end_date = 20120615
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current');
     $this->callAPISuccess('Email', 'create', [
@@ -1553,7 +1557,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMultipleMembershipEndDateMatch() {
+  public function testMultipleMembershipEndDateMatch(): void {
     $membershipTypeId = $this->membershipTypeCreate($this->fixtures['rolling_membership']['membership_type_id']);
     $membershipOne = $this->createMembershipAndContact($this->fixtures['contact'], $membershipTypeId);
     $membershipTwo = $this->createMembershipAndContact($this->fixtures['contact_2'], $membershipTypeId);
@@ -1620,9 +1624,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * For contacts/members which match schedule based on end date,
    * an email should be sent.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipEndDateNoMatch() {
+  public function testMembershipEndDateNoMatch(): void {
     // creates membership with end_date = 20120615
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Grace');
     $this->callAPISuccess('Email', 'create', [
@@ -1654,7 +1659,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testContactBirthDateNoAnniv() {
+  public function testContactBirthDateNoAnniv(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_yesterday'];
@@ -1677,7 +1682,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testContactBirthDateAnniversary() {
+  public function testContactBirthDateAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $actionSchedule = $this->fixtures['sched_contact_bday_anniv'];
@@ -1700,7 +1705,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testContactCustomDateNoAnniversary() {
+  public function testContactCustomDateNoAnniversary(): void {
     $group = [
       'title' => 'Test_Group',
       'name' => 'test_group',
@@ -1743,7 +1748,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function testContactCreatedNoAnniversary() {
+  public function testContactCreatedNoAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $this->createScheduleFromFixtures('sched_contact_created_yesterday');
@@ -1766,7 +1771,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContactModifiedAnniversary() {
+  public function testContactModifiedAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
     $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $modifiedDate = $this->callAPISuccess('Contact', 'getvalue', ['id' => $contact['id'], 'return' => 'modified_date']);
@@ -1794,7 +1799,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMembershipLimitToNone() {
+  public function testMembershipLimitToNone(): void {
     // creates membership with end_date = 20120615
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current');
     $result = $this->callAPISuccess('Email', 'create', [
@@ -1829,7 +1834,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMembershipWithReferenceDate() {
+  public function testMembershipWithReferenceDate(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current', ['email' => 'member@example.com']);
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership->contact_id]));
 
@@ -1890,7 +1895,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMembershipOnMultipleReminder() {
+  public function testMembershipOnMultipleReminder(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'Current', ['email' => 'member@example.com']);
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership->contact_id]));
 
@@ -2008,7 +2013,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContactCustomDate_Anniversary() {
+  public function testContactCustomDate_Anniversary(): void {
     $group = [
       'title' => 'Test_Group now',
       'name' => 'test_group_now',
@@ -2053,8 +2058,9 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * Test sched reminder set via registration date.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testEventTypeRegistrationDate() {
+  public function testEventTypeRegistrationDate(): void {
     $contact = $this->individualCreate(['email' => 'test-event@example.com']);
     //Add it as a participant to an event ending registration - 7 days from now.
     $params = [
@@ -2125,7 +2131,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventTypeStartDate() {
+  public function testEventTypeStartDate(): void {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 2]));
     $this->callAPISuccess('Email', 'create', [
@@ -2165,7 +2171,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testEventTypeEndDateRepeat() {
+  public function testEventTypeEndDateRepeat(): void {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 2]));
     $this->callAPISuccess('Email', 'create', [
@@ -2228,7 +2234,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function assertCronRuns($cronRuns) {
+  public function assertCronRuns($cronRuns): void {
     foreach ($cronRuns as $cronRun) {
       CRM_Utils_Time::setTime($cronRun['time']);
       $this->callAPISuccess('job', 'send_reminder', []);
@@ -2251,7 +2257,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function _setUp() {
+  protected function _setUp(): void {
     $this->_testObjects = [];
   }
 
@@ -2260,7 +2266,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  protected function _tearDown() {
+  protected function _tearDown(): void {
     parent::tearDown();
     $this->deleteTestObjects();
   }
@@ -2293,7 +2299,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @param array $objects
    *   DAO or BAO objects.
    */
-  public function registerTestObjects($objects) {
+  public function registerTestObjects($objects): void {
     //if (is_object($objects)) {
     //  $objects = array($objects);
     //}
@@ -2303,7 +2309,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     }
   }
 
-  public function deleteTestObjects() {
+  public function deleteTestObjects(): void {
     // Note: You might argue that the FK relations between test
     // objects could make this problematic; however, it should
     // behave intuitively as long as we mentally split our
@@ -2321,7 +2327,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * Test that the various repetition units work correctly.
    * @see https://issues.civicrm.org/jira/browse/CRM-17028
    */
-  public function testRepetitionFrequencyUnit() {
+  public function testRepetitionFrequencyUnit(): void {
     $membershipTypeParams = [
       'duration_interval' => '1',
       'duration_unit' => 'year',
@@ -2403,7 +2409,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testInheritedMembershipPermissions() {
+  public function testInheritedMembershipPermissions(): void {
     // Set up common parameters for memberships.
     $membershipParams = $this->fixtures['rolling_membership'];
     $membershipParams['status_id'] = 1;
@@ -2519,7 +2525,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @return DateTime
    */
-  public function createModifiedDateTime($origDateTime, $modifyRule) {
+  public function createModifiedDateTime($origDateTime, $modifyRule): \DateTime {
     $newDateTime = clone($origDateTime);
     $newDateTime->modify($modifyRule);
     return $newDateTime;
@@ -2528,9 +2534,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test absolute date handling for membership.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testMembershipScheduleWithAbsoluteDate() {
+  public function testMembershipScheduleWithAbsoluteDate(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'New', [
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
@@ -2575,7 +2582,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function createMembershipFromFixture($fixture, $status, $emailParams = []) {
+  protected function createMembershipFromFixture($fixture, $status, $emailParams = []): \CRM_Member_DAO_Membership {
     /* @var CRM_Member_DAO_Membership $membership */
     $membership = $this->createTestObject(
       'CRM_Member_DAO_Membership',
@@ -2596,7 +2603,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * @param string $fixture
    */
-  protected function createScheduleFromFixtures($fixture) {
+  protected function createScheduleFromFixtures($fixture): void {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($this->fixtures[$fixture]);
     $this->assertInternalType('numeric', $actionScheduleDao->id);
   }
