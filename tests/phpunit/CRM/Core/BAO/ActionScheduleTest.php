@@ -1112,12 +1112,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
-   * For contacts/activities which don't match the schedule filter,
-   * an email should *not* be sent.
-   */
-  // TODO // function testActivityDateTime_NonMatch() { }
-
-  /**
    * For contacts/members which match schedule based on join/start date,
    * an email should be sent.
    *
@@ -1752,7 +1746,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       [
         // Before the 2-week mark, no email.
         'time' => '2012-05-31 01:00:00',
-        // 'time' => '2012-06-01 01:00:00', // FIXME: Is this the right boundary?
         'recipients' => [],
       ],
     ]);
@@ -2126,12 +2119,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
   }
 
-  // TODO // function testMembershipEndDate_NonMatch() { }
-  // TODO // function testEventTypeStartDate_Match() { }
-  // TODO // function testEventTypeEndDate_Match() { }
-  // TODO // function testEventNameStartDate_Match() { }
-  // TODO // function testEventNameEndDate_Match() { }
-
   /**
    * Run a series of cron jobs and make an assertion about email deliveries.
    *
@@ -2157,6 +2144,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * @var array
+   *
    * (DAO_Name => array(int)) List of items to garbage-collect during tearDown
    */
   private $_testObjects;
