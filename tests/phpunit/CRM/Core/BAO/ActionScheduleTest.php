@@ -1007,16 +1007,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActivityDateTimeMatchRepeatableSchedule(): void {
     $this->createScheduleFromFixtures('sched_activity_1day_r');
-
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
-    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
-    $activity->save();
-
-    $source['contact_id'] = $contact['id'];
-    $source['activity_id'] = $activity->id;
-    $source['record_type_id'] = 2;
-    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
-    $activityContact->save();
+    $this->createActivityAndContactFromFixtures();
 
     $this->assertCronRuns([
       [
@@ -1051,16 +1042,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActivityDateTimeMatchRepeatableScheduleOnAbsDate(): void {
     $this->createScheduleFromFixtures('sched_activity_1day_r_on_abs_date');
-
-    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
-    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
-    $activity->save();
-
-    $source['contact_id'] = $contact['id'];
-    $source['activity_id'] = $activity->id;
-    $source['record_type_id'] = 2;
-    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
-    $activityContact->save();
+    $this->createActivityAndContactFromFixtures();
 
     $this->assertCronRuns([
       [
@@ -2527,6 +2509,25 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   protected function createScheduleFromFixtures(string $fixture, $extraParams = []): void {
     $id = $this->callAPISuccess('ActionSchedule', 'create', array_merge($this->fixtures[$fixture], $extraParams))['id'];
     $this->fixtures[$fixture]['action_schedule_id'] = (int) $id;
+  }
+
+  /**
+   * @param string $activityKey
+   * @param string $contactKey
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function createActivityAndContactFromFixtures(string $activityKey = 'phone_call', string $contactKey = 'contact'): void {
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures[$activityKey]);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures[$contactKey]);
+    $activity->save();
+
+    $source = [];
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
   }
 
 }
