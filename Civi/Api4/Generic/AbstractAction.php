@@ -18,6 +18,7 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
 
@@ -399,7 +400,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return array
    */
   public function getPermissions() {
-    $permissions = call_user_func(["\\Civi\\Api4\\" . $this->_entityName, 'permissions']);
+    $permissions = call_user_func([CoreUtil::getApiClass($this->_entityName), 'permissions']);
     $permissions += [
       // applies to getFields, getActions, etc.
       'meta' => ['access CiviCRM'],

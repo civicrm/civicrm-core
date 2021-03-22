@@ -20,7 +20,9 @@
 namespace Civi\Api4\Action\Entity;
 
 use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomValue;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Get the names & docblocks of all APIv4 entities.
@@ -57,14 +59,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];
           preg_match('/(\w*)\.php$/', $file, $matches);
-          $entity = '\Civi\Api4\\' . $matches[1];
-          if (
-            (!$toGet || in_array($matches[1], $toGet))
-            && is_a($entity, '\Civi\Api4\Generic\AbstractEntity', TRUE)
-          ) {
-            $info = $entity::getInfo();
+          $className = '\Civi\Api4\\' . $matches[1];
+          if (is_a($className, '\Civi\Api4\Generic\AbstractEntity', TRUE)) {
+            $info = $className::getInfo();
+            $entityName = $info['name'];
+            $daoName = $info['dao'] ?? NULL;
             // Only include DAO entities from enabled components
-            if (empty($info['dao']) || !defined($info['dao'] . '::COMPONENT') || in_array(constant($info['dao'] . '::COMPONENT'), $enabledComponents)) {
+            if ((!$toGet || in_array($entityName, $toGet)) &&
+              (!$daoName || !defined("{$daoName}::COMPONENT") || in_array($daoName::COMPONENT, $enabledComponents))
+            ) {
               $entities[$info['name']] = $info;
             }
           }
@@ -94,25 +97,20 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
       ->setCheckPermissions(FALSE)
       ->execute();
+    $baseInfo = CustomValue::getInfo();
     foreach ($customEntities as $customEntity) {
       $fieldName = 'Custom_' . $customEntity['name'];
-      $baseEntity = '\Civi\Api4\\' . CustomGroupJoinable::getEntityFromExtends($customEntity['extends']);
+      $baseEntity = CoreUtil::getApiClass(CustomGroupJoinable::getEntityFromExtends($customEntity['extends']));
       $entities[$fieldName] = [
         'name' => $fieldName,
         'title' => $customEntity['title'],
         'title_plural' => $customEntity['title'],
         'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
-        'searchable' => TRUE,
-        'type' => ['CustomValue'],
         'paths' => [
           'view' => "civicrm/contact/view/cd?reset=1&gid={$customEntity['id']}&recId=[id]&multiRecordDisplay=single",
         ],
-        'see' => [
-          'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
-          '\\Civi\\Api4\\CustomGroup',
-        ],
-        'icon' => $customEntity['icon'],
-      ];
+        'icon' => $customEntity['icon'] ?: NULL,
+      ] + $baseInfo;
       if (!empty($customEntity['help_pre'])) {
         $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);
       }
