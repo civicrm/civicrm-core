@@ -41,6 +41,13 @@
               </label>
               <p class="help-block">{{ts('The general look/feel should match the frontend')}}</p>
             </div>
+            <div class="form-group" ng-if="!!resultForm.server_route">
+              <label for="af_config_form_is_token">
+                <input type="checkbox" id="af_config_form_is_token" ng-model="resultForm.is_token">
+                {{ ts('Enable email token') }}
+              </label>
+              <p class="help-block">{{ts('Allow email authors to easily link to this form')}}</p>
+            </div>
             <div class="form-group">
               <label for="af_config_form_is_dashlet">
                 <input type="checkbox" id="af_config_form_is_dashlet" ng-model="resultForm.is_dashlet">

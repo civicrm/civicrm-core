@@ -49,10 +49,19 @@ function afform_civicrm_config(&$config) {
   }
   Civi::$statics[__FUNCTION__] = 1;
 
-  Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
-  Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
-  Civi::dispatcher()->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
-  Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
+  $dispatcher = Civi::dispatcher();
+  $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], 500);
+  $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
+  $dispatcher->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
+  $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
+  $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
+
+  // Register support for email tokens
+  if (CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
+    $dispatcher->addListener('hook_civicrm_alterMailContent', ['\Civi\Afform\Tokens', 'applyCkeditorWorkaround']);
+    $dispatcher->addListener('hook_civicrm_tokens', ['\Civi\Afform\Tokens', 'hook_civicrm_tokens']);
+    $dispatcher->addListener('hook_civicrm_tokenValues', ['\Civi\Afform\Tokens', 'hook_civicrm_tokenValues']);
+  }
 }
 
 /**

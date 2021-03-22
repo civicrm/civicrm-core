@@ -132,6 +132,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'description' => '',
         'is_dashlet' => FALSE,
         'is_public' => FALSE,
+        'is_token' => FALSE,
         'permission' => 'access CiviCRM',
         'join' => 'Custom_' . $custom['name'],
         'block' => $custom['extends'],
