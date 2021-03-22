@@ -11,7 +11,7 @@ return [
     'html_type' => 'select',
     'html_attributes' => ['class' => 'crm-select2'],
     'pseudoconstant' => ['callback' => '_flexmailer_traditional_options'],
-    'default' => 'auto',
+    'default' => 'flexmailer',
     'add' => '5.13',
     'title' => E::ts('Traditional Mailing Handler'),
     'is_domain' => 1,
