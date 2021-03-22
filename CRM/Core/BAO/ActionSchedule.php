@@ -588,7 +588,7 @@ FROM civicrm_action_schedule cas
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
     $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
     if ($actionSchedule->from_email) {
-      $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
+      $fromEmailAddress = "\"$actionSchedule->from_name\" <$actionSchedule->from_email>";
       return $fromEmailAddress;
     }
     return $fromEmailAddress;
