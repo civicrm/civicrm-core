@@ -1020,9 +1020,7 @@ DESC limit 1");
     }
 
     //take the required membership recur values.
-    if ($this->_mode && !empty($formValues['auto_renew'])) {
-      $params['is_recur'] = $formValues['is_recur'] = TRUE;
-
+    if ($this->isCreateRecurringContribution()) {
       $count = 0;
       foreach ($this->_memTypeSelected as $memType) {
         $recurMembershipTypeValues = CRM_Utils_Array::value($memType,
@@ -1214,7 +1212,7 @@ DESC limit 1");
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
       $result = NULL;
-      if (!empty($paymentParams['is_recur'])) {
+      if ($this->isCreateRecurringContribution()) {
         $this->_params = $formValues;
 
         $contribution = $this->processContribution(
@@ -1250,6 +1248,7 @@ DESC limit 1");
         $paymentParams['contactID'] = $this->_contactID;
         $paymentParams['contributionID'] = $contribution->id;
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
+        $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
         $params['contribution_id'] = $paymentParams['contributionID'];
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
       }
@@ -1328,7 +1327,7 @@ DESC limit 1");
 
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
         //CRM-15366
-        if (!empty($softParams) && empty($paymentParams['is_recur'])) {
+        if (!empty($softParams) && !$this->isCreateRecurringContribution()) {
           $membershipParams['soft_credit'] = $softParams;
         }
         if (isset($result['fee_amount'])) {
@@ -1341,7 +1340,7 @@ DESC limit 1");
         // process -
         // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
         $membershipParams['contribution_status_id'] = $result['payment_status_id'] ?? NULL;
-        if (!empty($paymentParams['is_recur'])) {
+        if ($this->isCreateRecurringContribution()) {
           // The earlier process created the line items (although we want to get rid of the earlier one in favour
           // of a single path!
           unset($membershipParams['lineItems']);
@@ -1389,13 +1388,12 @@ DESC limit 1");
         CRM_Member_BAO_Membership::recordMembershipContribution($params);
       }
     }
-    $isRecur = $params['is_recur'] ?? NULL;
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
       $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $createdMemberships,
-        $isRecur, $calcDates));
+        $this->isCreateRecurringContribution(), $calcDates));
     }
 
     // This would always be true as we always add price set id into both
@@ -1499,7 +1497,7 @@ DESC limit 1");
     // if selected membership doesn't match with earlier membership
       !in_array($this->_memType, $this->_memTypeSelected)
     ) {
-      if (!empty($inputParams['is_recur'])) {
+      if ($this->isCreateRecurringContribution()) {
         CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
         return;
       }
@@ -1798,28 +1796,25 @@ DESC limit 1");
     $contributionParams
   ) {
     $contactID = $contributionParams['contact_id'];
-    $recurringContributionID = $this->legacyProcessRecurringContribution($params, $contactID);
-
-    if ($recurringContributionID) {
-      $contributionParams['contribution_recur_id'] = $recurringContributionID;
-    }
-
+    $contributionParams['contribution_recur_id'] = $this->legacyProcessRecurringContribution($params, $contactID);
     return CRM_Contribute_BAO_Contribution::add($contributionParams);
   }
 
   /**
-   * Create the recurring contribution record.
+   * Create the recurring contribution record if the form submission requires it.
    *
    * This function was copied from another form & needs cleanup.
    *
    * @param array $params
    * @param int $contactID
    *
-   * @return int
+   * @return int|null
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessRecurringContribution(array $params, $contactID): int {
-
+  protected function legacyProcessRecurringContribution(array $params, $contactID): ?int {
+    if (!$this->isCreateRecurringContribution()) {
+      return NULL;
+    }
     $recurParams = ['contact_id' => $contactID];
     $recurParams['amount'] = $this->order->getTotalAmount();
     $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
@@ -1899,6 +1894,15 @@ DESC limit 1");
       // status calculation. similarly we did fix for import in CRM-3570.
       'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
     ];
+  }
+
+  /**
+   * Is it necessary to create a recurring contribution.
+   *
+   * @return bool
+   */
+  protected function isCreateRecurringContribution(): bool {
+    return $this->_mode && $this->getSubmittedValue('auto_renew');
   }
 
 }
