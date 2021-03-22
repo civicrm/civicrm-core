@@ -27,6 +27,22 @@ $_authx_settings = function() {
   ];
 
   $s = [];
+  $s["authx_guards"] = $basic + [
+    'name' => 'authx_guards',
+    'type' => 'Array',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
+    'html_attributes' => [
+      'multiple' => 1,
+      'class' => 'crm-select2',
+    ],
+    'default' => ['site_key', 'perm'],
+    'title' => ts('Authentication guard'),
+    'help_text' => ts('Enable an authentication guard if you want to limit which users may authenticate via authx. The permission-based guard is satisfied by checking user permissions. The key-based guard is satisfied by checking the secret site-key. The JWT guard is satisfied if the user presents a signed token. If there are no guards, then any user can authenticate.'),
+    'pseudoconstant' => [
+      'callback' => ['\Civi\Authx\Meta', 'getGuardTypes'],
+    ],
+  ];
   foreach ($flows as $flow) {
     $s["authx_{$flow}_cred"] = $basic + [
       'name' => "authx_{$flow}_cred",

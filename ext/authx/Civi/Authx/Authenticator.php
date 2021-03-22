@@ -60,6 +60,7 @@ class Authenticator {
     $tgt = AuthenticatorTarget::create([
       'flow' => $details['flow'],
       'cred' => $details['cred'],
+      'siteKey' => $details['siteKey'] ?? NULL,
       'useSession' => $details['useSession'] ?? FALSE,
     ]);
     if ($principal = $this->checkCredential($tgt)) {
@@ -148,6 +149,23 @@ class Authenticator {
         }
         break;
     }
+
+    $useGuards = \Civi::settings()->get('authx_guards');
+    if (!empty($useGuards)) {
+      // array(string $credType => string $requiredPermissionToUseThisCred)
+      $perms['pass'] = 'authenticate with password';
+      $perms['api_key'] = 'authenticate with api key';
+
+      // If any one of these passes, then we allow the authentication.
+      $passGuard = [];
+      $passGuard[] = in_array('site_key', $useGuards) && defined('CIVICRM_SITE_KEY') && hash_equals(CIVICRM_SITE_KEY, $tgt->siteKey);
+      $passGuard[] = in_array('perm', $useGuards) && isset($perms[$tgt->credType]) && \CRM_Core_Permission::check($perms[$tgt->credType], $tgt->contactId);
+      // JWTs are signed by us. We don't need user to prove that they're allowed to use them.
+      $passGuard[] = ($tgt->credType === 'jwt');
+      if (!max($passGuard)) {
+        $this->reject(sprintf('Login not permitted. Must satisfy guard (%s).', implode(', ', $useGuards)));
+      }
+    }
   }
 
   /**
@@ -209,6 +227,7 @@ class Authenticator {
    * @param string $message
    */
   protected function reject($message = 'Authentication failed') {
+    \CRM_Core_Session::useFakeSession();
     $r = new Response(401, ['Content-Type' => 'text/plain'], "HTTP 401 $message");
     \CRM_Utils_System::sendResponse($r);
   }
@@ -237,6 +256,12 @@ class AuthenticatorTarget {
    *   Ex: 'Basic AbCd123=' or 'Bearer xYz.321'
    */
   public $cred;
+
+  /**
+   * The raw site-key as submitted (if applicable).
+   * @var string
+   */
+  public $siteKey;
 
   /**
    * (Authenticated) The type of credential.
