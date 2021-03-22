@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 
 /**
@@ -955,6 +956,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test calculated activity schedule.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testActivityDateTimeMatchNonRepeatableSchedule(): void {
@@ -990,13 +992,13 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'recipients' => [],
       ],
     ]);
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-    $activityDAO = new CRM_Activity_DAO_Activity();
-    $activityDAO->source_record_id = $activity->id;
-    $activityDAO->activity_type_id = array_search('Reminder Sent', $activityTypes);
-    $activityDAO->find();
-    while ($activityDAO->fetch()) {
-      $this->assertContains($activity->subject, $activityDAO->details);
+    $activities = Activity::get(FALSE)
+      ->setSelect(['details'])
+      ->addWhere('activity_type_id:name', '=', 'Reminder Sent')
+      ->addWhere('source_record_id', '=', $activity->id)
+      ->execute();
+    foreach ($activities as $activityDetails) {
+      $this->assertContains($activity->subject, $activityDetails['details']);
     }
   }
 
