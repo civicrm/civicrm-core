@@ -122,7 +122,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     $where = ['acl.entity_table = "civicrm_acl_role" AND acl.entity_id IN (' . implode(',', array_keys(CRM_Core_OptionGroup::values('acl_role'))) . ')'];
 
     if (!empty($contact_id)) {
-      $where[] = " acl.entity_table  = 'civicrm_contact' AND acl.is_active = 1 AND acl.entity_id = $contact_id";
+      return [];
     }
 
     $results = [];
