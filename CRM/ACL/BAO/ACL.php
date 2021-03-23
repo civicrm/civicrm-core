@@ -73,38 +73,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   }
 
   /**
-   * Retrieve ACLs for a contact or group.  Note that including a contact id
-   * without a group id will return those ACL rules which are granted
-   * directly to the contact, but not those granted to the contact through
-   * any/all of his group memberships.
-   *
-   * @param int $contact_id
-   *   ID of a contact to search for.
-   *
-   * @return array
-   *   Array of assoc. arrays of ACL rules
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getACLs(int $contact_id) {
-    $results = [];
-    $query = " SELECT acl.*
-      FROM civicrm_acl acl
-      WHERE   acl.entity_table   = 'civicrm_contact'
-      AND acl.entity_id      = $contact_id";
-
-    $rule = CRM_Core_DAO::executeQuery($query);
-
-    while ($rule->fetch()) {
-      $results[$rule->id] = $rule->toArray();
-    }
-
-    $results += self::getACLRoles($contact_id);
-
-    return $results;
-  }
-
-  /**
    * Get all of the ACLs through ACL groups.
    *
    * @param int $contact_id
@@ -258,7 +226,18 @@ SELECT acl.*
 
     /* First, the contact-specific ACLs, including ACL Roles */
     if ($contact_id) {
-      $result += self::getACLs((int) $contact_id);
+      $query = " SELECT acl.*
+      FROM civicrm_acl acl
+      WHERE   acl.entity_table   = 'civicrm_contact'
+      AND acl.entity_id      = $contact_id";
+
+      $rule = CRM_Core_DAO::executeQuery($query);
+
+      while ($rule->fetch()) {
+        $result[$rule->id] = $rule->toArray();
+      }
+
+      $result += self::getACLRoles($contact_id);
     }
 
     /* Then, all ACLs granted through group membership */
