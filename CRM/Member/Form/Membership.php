@@ -1397,9 +1397,6 @@ DESC limit 1");
     // This would always be true as we always add price set id into both
     // quick config & non quick config price sets.
     if (!empty($lineItem[$this->_priceSetId])) {
-      $invoicing = Civi::settings()->get('invoicing');
-      $taxAmount = FALSE;
-      $totalTaxAmount = 0;
       foreach ($lineItem[$this->_priceSetId] as & $priceFieldOp) {
         if (!empty($priceFieldOp['membership_type_id'])) {
           $priceFieldOp['start_date'] = $membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date'] ? CRM_Utils_Date::formatDateOnlyLong($membershipTypeValues[$priceFieldOp['membership_type_id']]['start_date']) : '-';
@@ -1408,12 +1405,8 @@ DESC limit 1");
         else {
           $priceFieldOp['start_date'] = $priceFieldOp['end_date'] = 'N/A';
         }
-        if ($invoicing && isset($priceFieldOp['tax_amount'])) {
-          $taxAmount = TRUE;
-          $totalTaxAmount += $priceFieldOp['tax_amount'];
-        }
       }
-      if ($invoicing) {
+      if (Civi::settings()->get('invoicing')) {
         $dataArray = [];
         foreach ($lineItem[$this->_priceSetId] as $key => $value) {
           if (isset($value['tax_amount']) && isset($value['tax_rate'])) {
@@ -1425,11 +1418,10 @@ DESC limit 1");
             }
           }
         }
-        if ($taxAmount) {
-          $this->assign('totalTaxAmount', $totalTaxAmount);
-          // Not sure why would need this on Submit.... unless it's being used when sending mails in which case this is the wrong place
-          $this->assign('taxTerm', $this->getSalesTaxTerm());
-        }
+
+        $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
+        // Not sure why would need this on Submit.... unless it's being used when sending mails in which case this is the wrong place
+        $this->assign('taxTerm', $this->getSalesTaxTerm());
         $this->assign('dataArray', $dataArray);
       }
     }
