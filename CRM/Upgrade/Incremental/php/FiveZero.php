@@ -47,15 +47,6 @@ class CRM_Upgrade_Incremental_php_FiveZero extends CRM_Upgrade_Incremental_Base 
     //}
   }
 
-  /**
-   * Upgrade function.
-   *
-   * @param string $rev
-   */
-  public function upgrade_5_0_0($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  }
-
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version

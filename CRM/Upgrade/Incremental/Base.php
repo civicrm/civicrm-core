@@ -18,6 +18,57 @@ class CRM_Upgrade_Incremental_Base {
   const BATCH_SIZE = 5000;
 
   /**
+   * @var string|null
+   */
+  protected $majorMinor;
+
+  /**
+   * Get the major and minor version for this class (based on English-style class name).
+   *
+   * @return string
+   *   Ex: '5.34' or '4.7'
+   */
+  public function getMajorMinor() {
+    if (!$this->majorMinor) {
+      $className = explode('_', static::CLASS);
+      $numbers = preg_split("/([[:upper:]][[:lower:]]+)/", array_pop($className), -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+      $major = CRM_Utils_EnglishNumber::toInt(array_shift($numbers));
+      $minor = CRM_Utils_EnglishNumber::toInt(implode('', $numbers));
+      $this->majorMinor = $major . '.' . $minor;
+    }
+    return $this->majorMinor;
+  }
+
+  /**
+   * Get a list of revisions (PATCH releases) related to this class.
+   *
+   * @return array
+   *   Ex: ['4.5.6', '4.5.7']
+   * @throws \ReflectionException
+   */
+  public function getRevisionSequence() {
+    $revList = [];
+
+    $sqlGlob = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'sql', $this->getMajorMinor() . '.*.mysql.tpl']);
+    $sqlFiles = glob($sqlGlob);;
+    foreach ($sqlFiles as $file) {
+      $revList[] = str_replace('.mysql.tpl', '', basename($file));
+    }
+
+    $c = new ReflectionClass(static::class);
+    foreach ($c->getMethods() as $method) {
+      /** @var \ReflectionMethod $method */
+      if (preg_match(';^upgrade_([0-9_alphabeta]+)$;', $method->getName(), $m)) {
+        $revList[] = str_replace('_', '.', $m[1]);
+      }
+    }
+
+    $revList = array_unique($revList);
+    usort($revList, 'version_compare');
+    return $revList;
+  }
+
+  /**
    * Verify DB state.
    *
    * @param $errors

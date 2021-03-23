@@ -122,4 +122,60 @@ class CRM_Utils_EnglishNumber {
     }
   }
 
+  /**
+   * Convert an English-style number to an int.
+   *
+   * @param string $english
+   *   Ex: 'TwentyTwo' or 'forty-four'
+   *
+   * @return int
+   *   22 or 44
+   */
+  public static function toInt(string $english) {
+    $intBuf = 0;
+    $strBuf = strtolower(str_replace('-', '', $english));
+
+    foreach (self::$intervalsOfTen as $num => $name) {
+      if (CRM_Utils_String::startsWith($strBuf, strtolower($name))) {
+        $intBuf += 10 * $num;
+        $strBuf = substr($strBuf, strlen($name));
+        break;
+      }
+    }
+    foreach (array_reverse(self::$lowNumbers, TRUE) as $num => $name) {
+      if (CRM_Utils_String::startsWith($strBuf, strtolower($name))) {
+        $intBuf += $num;
+        $strBuf = substr($strBuf, strlen($name));
+        break;
+      }
+    }
+
+    if (!empty($strBuf)) {
+      throw new InvalidArgumentException("Failed to parse english number: $strBuf");
+    }
+
+    return $intBuf;
+  }
+
+  /**
+   * Determine if a string looks like
+   *
+   * @param string $english
+   *
+   * @return bool
+   */
+  public static function isNumeric(string $english): bool {
+    static $pat;
+    if (empty($pat)) {
+      $words = array_map(
+        function($w) {
+          return preg_quote(strtolower($w));
+        },
+        array_merge(array_values(self::$lowNumbers), array_values(self::$intervalsOfTen))
+      );
+      $pat = '/^(\-|' . implode('|', $words) . ')+$/';
+    }
+    return (bool) preg_match($pat, strtolower($english));
+  }
+
 }

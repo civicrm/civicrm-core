@@ -22,8 +22,8 @@ class CRM_Upgrade_Incremental_php_<?php echo $camelNumber; ?> extends CRM_Upgrad
   /**
    * Compute any messages which should be displayed beforeupgrade.
    *
-   * Note: This function is called iteratively for each upcoming
-   * revision to the database.
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
    *
    * @param string $preUpgradeMessage
    * @param string $rev
@@ -39,6 +39,9 @@ class CRM_Upgrade_Incremental_php_<?php echo $camelNumber; ?> extends CRM_Upgrad
 
   /**
    * Compute any messages which should be displayed after upgrade.
+   *
+   * Note: This function is called iteratively for each incremental upgrade step.
+   * There must be a concrete step (eg 'X.Y.Z.mysql.tpl' or 'upgrade_X_Y_Z()').
    *
    * @param string $postUpgradeMessage
    *   alterable.
