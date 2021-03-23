@@ -1033,8 +1033,6 @@ DESC limit 1");
           'frequency_interval' => 'duration_interval',
           'frequency_unit' => 'duration_unit',
         ] as $mapVal => $mapParam) {
-          $membershipTypeValues[$memType][$mapVal] = $recurMembershipTypeValues[$mapParam];
-
           if (!$count) {
             $formValues[$mapVal] = CRM_Utils_Array::value($mapParam,
               $recurMembershipTypeValues
