@@ -38,13 +38,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
   protected $_contributionContactIds = [];
 
   /**
-   * The flag to tell if there are soft credits included.
-   *
-   * @var bool
-   */
-  public $_includesSoftCredits = FALSE;
-
-  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -66,10 +59,11 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
     $ids = $form->getSelectedIDs($values);
     if (!$ids) {
       $result = $form->getSearchQueryResults();
+      $form->_includesSoftCredits = $form->isQueryIncludesSoftCredits();
       $contributionContactIds = $contactIds = [];
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
-        if ($form->_includesSoftCredits) {
+        if ($form->isQueryIncludesSoftCredits()) {
           $contactIds[$result->contact_id] = $result->contact_id;
           $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
         }
@@ -82,7 +76,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
       $form->assign('totalSelectedContributions', count($ids));
     }
-    if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
+    if (!empty($form->isQueryIncludesSoftCredits()) && !empty($contactIds)) {
       $form->_contactIds = $contactIds;
       $form->_contributionContactIds = $contributionContactIds;
     }
@@ -106,7 +100,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    if (!$this->_includesSoftCredits) {
+    if (!$this->isQueryIncludesSoftCredits()) {
       $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent(
         $this->_contributionIds,
         'civicrm_contribution'
