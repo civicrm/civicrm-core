@@ -591,7 +591,7 @@ class CRM_Core_Permission {
     $permissions = self::getCoreAndComponentPermissions($all);
 
     // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE);
+    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE, $permissions);
     $permissions = array_merge($permissions, $module_permissions);
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -874,6 +874,10 @@ class CRM_Core_Permission {
         'label' => $prefix . ts('administer CiviCRM Data'),
         'description' => ts('Permit altering all restricted data options'),
       ],
+      'all CiviCRM permissions and ACLs' => [
+        'label' => $prefix . ts('all CiviCRM permissions and ACLs'),
+        'description' => ts('Administer and use CiviCRM bypassing any other permission or ACL checks and enabling the creation of displays and forms that allow others to bypass checks. This permission should be given out with care'),
+      ],
     ];
     if (self::isMultisiteEnabled()) {
       // This could arguably be moved to the multisite extension but
@@ -883,11 +887,6 @@ class CRM_Core_Permission {
         'description' => ts('Administer multiple organizations. In practice this allows editing the group organization link'),
       ];
     }
-    foreach (self::getImpliedPermissions() as $name => $includes) {
-      foreach ($includes as $permission) {
-        $permissions[$name][] = $permissions[$permission];
-      }
-    }
     return $permissions;
   }
 
@@ -896,11 +895,11 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  public static function getImpliedPermissions() {
+  public static function getImpliedAdminPermissions(): array {
     return [
-      'administer CiviCRM' => ['administer CiviCRM system', 'administer CiviCRM data'],
-      'administer CiviCRM data' => ['edit message templates', 'administer dedupe rules'],
-      'administer CiviCRM system' => ['edit system workflow message templates'],
+      'administer CiviCRM' => ['implied_permissions' => ['administer CiviCRM system', 'administer CiviCRM data']],
+      'administer CiviCRM data' => ['implied_permissions' => ['edit message templates', 'administer dedupe rules']],
+      'administer CiviCRM system' => ['implied_permissions' => ['edit system workflow message templates']],
     ];
   }
 
@@ -911,14 +910,24 @@ class CRM_Core_Permission {
    *
    * @return array
    */
-  public static function getImpliedPermissionsFor(string $permission) {
-    $return = [];
-    foreach (self::getImpliedPermissions() as $superPermission => $components) {
-      if (in_array($permission, $components, TRUE)) {
-        $return[$superPermission] = $superPermission;
+  public static function getImpliedPermissionsFor(string $permission): array {
+    if (in_array($permission[0], ['@', '*'], TRUE)) {
+      // Special permissions like '*always deny*' - see DynamicFKAuthorizationTest.
+      // Also '@afform - see AfformUsageTest.
+      return [];
+    }
+    $implied = Civi::cache('metadata')->get('implied_permissions', []);
+    if (isset($implied[$permission])) {
+      return $implied[$permission];
+    }
+    $implied[$permission] = ['all CiviCRM permissions and ACLs'];
+    foreach (self::getImpliedAdminPermissions() as $key => $details) {
+      if (in_array($permission, $details['implied_permissions'] ?? [], TRUE)) {
+        $implied[$permission][] = $key;
       }
     }
-    return $return;
+    Civi::cache('metadata')->set('implied_permissions', $implied);
+    return $implied[$permission];
   }
 
   /**
@@ -1728,6 +1737,7 @@ class CRM_Core_Permission {
   protected static function getCoreAndComponentPermissions(bool $all): array {
     $permissions = self::getCorePermissions();
     $permissions = array_merge($permissions, self::getComponentPermissions($all));
+    $permissions['all CiviCRM permissions and ACLs']['implied_permissions'] = array_keys($permissions);
     return $permissions;
   }
 

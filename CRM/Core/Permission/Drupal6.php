@@ -192,7 +192,7 @@ class CRM_Core_Permission_Drupal6 extends CRM_Core_Permission_DrupalBase {
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  public static function getModulePermissions($module) {
+  public function getModulePermissions($module):array {
     $return_permissions = [];
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
