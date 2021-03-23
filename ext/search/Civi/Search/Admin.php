@@ -133,15 +133,17 @@ class Admin {
     // Add in FK fields for implicit joins
     // For example, add a `campaign.title` field to the Contribution entity
     foreach ($schema as &$entity) {
-      foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
-        if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
-          // The original field will get title instead of label since it represents the id (title usually ends in ID but label does not)
-          $entity['fields'][$index]['label'] = $field['title'];
-          // Add the label field from the other entity to this entity's list of fields
-          $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
-          $newField['name'] = str_replace('_id', '', $field['name']) . '.' . $schema[$field['fk_entity']]['label_field'];
-          $newField['label'] = $field['label'] . ' ' . $newField['label'];
-          array_splice($entity['fields'], $index, 0, [$newField]);
+      if (in_array('DAOEntity', $entity['type'], TRUE) && !in_array('EntityBridge', $entity['type'], TRUE)) {
+        foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
+          if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
+            // The original field will get title instead of label since it represents the id (title usually ends in ID but label does not)
+            $entity['fields'][$index]['label'] = $field['title'];
+            // Add the label field from the other entity to this entity's list of fields
+            $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
+            $newField['name'] = str_replace('_id', '', $field['name']) . '.' . $schema[$field['fk_entity']]['label_field'];
+            $newField['label'] = $field['label'] . ' ' . $newField['label'];
+            array_splice($entity['fields'], $index, 0, [$newField]);
+          }
         }
       }
     }
