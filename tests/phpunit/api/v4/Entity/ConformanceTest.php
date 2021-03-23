@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Entity;
 use api\v4\UnitTestCase;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @group headless
@@ -124,7 +125,7 @@ class ConformanceTest extends UnitTestCase {
    * @throws \API_Exception
    */
   public function testConformance($entity): void {
-    $entityClass = 'Civi\Api4\\' . $entity;
+    $entityClass = CoreUtil::getApiClass($entity);
 
     $this->checkEntityInfo($entityClass);
     $actions = $this->checkActions($entityClass);

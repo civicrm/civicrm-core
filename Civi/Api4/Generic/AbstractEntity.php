@@ -110,8 +110,9 @@ abstract class AbstractEntity {
    */
   public static function __callStatic($action, $args) {
     $entity = self::getEntityName();
+    $nameSpace = str_replace('Civi\Api4\\', 'Civi\Api4\Action\\', static::class);
     // Find class for this action
-    $entityAction = "\\Civi\\Api4\\Action\\$entity\\" . ucfirst($action);
+    $entityAction = "$nameSpace\\" . ucfirst($action);
     if (class_exists($entityAction)) {
       $actionObject = new $entityAction($entity, $action);
       if (isset($args[0]) && $args[0] === FALSE) {
@@ -137,6 +138,7 @@ abstract class AbstractEntity {
       'title_plural' => static::getEntityTitle(TRUE),
       'type' => [self::stripNamespace(get_parent_class(static::class))],
       'paths' => static::getEntityPaths(),
+      'class' => static::class,
     ];
     // Add info for entities with a corresponding DAO
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);

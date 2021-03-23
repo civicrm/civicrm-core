@@ -729,7 +729,7 @@ class Api4SelectQuery {
     }
     // For LEFT joins, construct a subquery to link the bridge & join tables as one
     else {
-      $joinEntityClass = '\Civi\Api4\\' . $joinEntity;
+      $joinEntityClass = CoreUtil::getApiClass($joinEntity);
       foreach ($joinEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
         $bridgeFields[$field['column_name']] = '`' . $joinAlias . '`.`' . $field['column_name'] . '`';
       }
@@ -751,7 +751,7 @@ class Api4SelectQuery {
    */
   private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
     /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
-    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
+    $bridgeEntityClass = CoreUtil::getApiClass($bridgeEntity);
     $bridgeInfo = $bridgeEntityClass::getInfo();
     $bridgeFields = $bridgeInfo['bridge'] ?? [];
     // Sanity check - bridge entity should declare exactly 2 FK fields
@@ -814,7 +814,7 @@ class Api4SelectQuery {
   private function registerBridgeJoinFields($bridgeEntity, $joinRef, $baseRef, string $alias, string $bridgeAlias, string $side): array {
     $fakeFields = [];
     $bridgeFkFields = [$joinRef->getReferenceKey(), $joinRef->getTypeColumn(), $baseRef->getReferenceKey(), $baseRef->getTypeColumn()];
-    $bridgeEntityClass = '\Civi\Api4\\' . $bridgeEntity;
+    $bridgeEntityClass = CoreUtil::getApiClass($bridgeEntity);
     foreach ($bridgeEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
       if ($name === 'id' || ($side === 'INNER' && in_array($name, $bridgeFkFields, TRUE))) {
         continue;

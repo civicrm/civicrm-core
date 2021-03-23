@@ -16,7 +16,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-
 namespace Civi\Api4;
 
 /**
@@ -124,7 +123,8 @@ class CustomValue {
   }
 
   /**
-   * @inheritDoc
+   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
+   * @return array
    */
   public static function permissions() {
     $entity = 'contact';
@@ -132,6 +132,22 @@ class CustomValue {
 
     // Merge permissions for this entity with the defaults
     return \CRM_Utils_Array::value($entity, $permissions, []) + $permissions['default'];
+  }
+
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::getInfo()
+   * @return array
+   */
+  public static function getInfo() {
+    return [
+      'class' => __CLASS__,
+      'type' => ['CustomValue'],
+      'searchable' => TRUE,
+      'see' => [
+        'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
+        '\Civi\Api4\CustomGroup',
+      ],
+    ];
   }
 
 }

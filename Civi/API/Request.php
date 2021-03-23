@@ -10,6 +10,8 @@
  */
 namespace Civi\API;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Class Request
  * @package Civi\API
@@ -48,7 +50,7 @@ class Request {
           $apiRequest = \Civi\Api4\CustomValue::$action(substr($entity, 7));
         }
         else {
-          $callable = ["\\Civi\\Api4\\$entity", $action];
+          $callable = [CoreUtil::getApiClass($entity), $action];
           if (!is_callable($callable)) {
             throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
           }
