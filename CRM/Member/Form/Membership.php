@@ -1121,7 +1121,6 @@ DESC limit 1");
         'trxn_id',
         'contribution_status_id',
         'check_number',
-        'campaign_id',
         'receive_date',
         'card_type_id',
         'pan_truncation',
@@ -1131,6 +1130,7 @@ DESC limit 1");
         $params[$f] = $formValues[$f] ?? NULL;
       }
       $params['financial_type_id'] = $this->getFinancialTypeID();
+      $params['campaign_id'] = $this->getSubmittedValue('campaign_id');
 
       if (empty($formValues['source'])) {
         $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', [
@@ -1219,7 +1219,7 @@ DESC limit 1");
             'contact_id' => $this->_contributorContactID,
             'line_item' => [$this->order->getPriceSetID() => $this->order->getLineItems()],
             'is_test' => $this->isTest(),
-            'campaign_id' => $paymentParams['campaign_id'] ?? NULL,
+            'campaign_id' => $this->getSubmittedValue('campaign_id'),
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $this->getPaymentInstrumentID(),
             'financial_type_id' => $this->getFinancialTypeID(),
@@ -1827,9 +1827,7 @@ DESC limit 1");
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $params['trxn_id'] ?? $this->getInvoiceID();
-
-    $campaignId = $params['campaign_id'] ?? $this->_values['campaign_id'] ?? NULL;
-    $recurParams['campaign_id'] = $campaignId;
+    $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
     return CRM_Contribute_BAO_ContributionRecur::add($recurParams)->id;
   }
 
