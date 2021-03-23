@@ -1,59 +1,63 @@
 <ng-form name="config_form">
 
-<div class="form-group">
-  <label for="af_config_form_title">
-    {{:: ts('Title:') }} <span class="crm-marker">*</span>
-  </label>
-  <input ng-model="afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" />
-</div>
+  <div class="form-group">
+    <label for="af_config_form_title">
+      {{:: ts('Title:') }} <span class="crm-marker">*</span>
+    </label>
+    <p class="help-block">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
+    <input ng-model="afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" />
+  </div>
 
-<div class="form-group">
-  <label for="af_config_form_description">
-    {{:: ts('Description:') }}
-  </label>
-  <textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
-  <p class="help-block">{{:: ts('Semi-private description about the form\'s purpose.') }}</p>
-  <!-- "Semi-private": not generally public, but not audited for secrecy -->
-</div>
+  <div class="form-group">
+    <label for="af_config_form_description">
+      {{:: ts('Description:') }}
+    </label>
+    <textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
+    <p class="help-block">{{:: ts("Internal note about the form's purpose (not displayed on form).") }}</p>
+    <!-- Description is "semi-private": not generally public, but not audited for secrecy -->
+  </div>
 
-<div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
-  <label for="af_config_form_server_route">
-    {{:: ts('Page:') }}
-  </label>
-  <input ng-model="afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}">
-  <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
-</div>
+  <div class="form-group">
+    <label for="af_config_form_permission">
+      {{:: ts('Permission:') }}
+    </label>
+    <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" />
+    <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
+  </div>
 
-<div class="form-group" ng-if="!!afform.server_route">
-  <label for="af_config_form_is_public">
-    <input type="checkbox" id="af_config_form_is_public" ng-model="afform.is_public">
-    {{:: ts('Enable frontend styling') }}
-  </label>
-  <p class="help-block">{{ts('The general look/feel should match the frontend')}}</p>
-</div>
+  <fieldset>
+    <legend>{{:: ts('Placement') }}</legend>
 
-<div class="form-group" ng-if="!!afform.server_route">
-  <label for="af_config_form_is_token">
-    <input type="checkbox" id="af_config_form_is_token" ng-model="afform.is_token">
-    {{:: ts('Enable email token') }}
-  </label>
-  <p class="help-block">{{ts('Allow email authors to easily link to this form')}}</p>
-</div>
+    <div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
+      <label for="af_config_form_server_route">
+        {{:: ts('Page:') }}
+      </label>
+      <input ng-model="afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}">
+      <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
+    </div>
 
-<div class="form-group">
-  <label for="af_config_form_is_dashlet">
-    <input type="checkbox" id="af_config_form_is_dashlet" ng-model="afform.is_dashlet">
-    {{:: ts('Enable dashlet') }}
-  </label>
-  <p class="help-block">{{:: ts('Allow backend users to embed the form on the dashboard.') }}</p>
-</div>
+    <div class="form-group" ng-if="!!afform.server_route">
+      <label>
+        <input type="checkbox" ng-model="afform.is_public">
+        {{:: ts('Style page to match front-end website') }}
+      </label>
+    </div>
 
-<div class="form-group">
-  <label for="af_config_form_permission">
-    {{:: ts('Permission:') }}
-  </label>
-  <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" />
-  <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
-</div>
+    <div class="form-group" ng-if="!!afform.server_route">
+      <label>
+        <input type="checkbox" ng-model="afform.is_token">
+        {{:: ts('Provide email token') }}
+      </label>
+      <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" ng-model="afform.is_dashlet">
+        {{:: ts('Add to dashboard') }}
+      </label>
+      <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
+    </div>
+  </fieldset>
 
 </ng-form>
