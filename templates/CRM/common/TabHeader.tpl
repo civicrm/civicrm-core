@@ -28,7 +28,7 @@
     </ul>
       {foreach from=$tabHeader key=tabName item=tabValue}
         {if !empty($tabValue.template)}
-          <div id="#panel_{$tabName}">
+          <div id="panel_{$tabName}">
             {include file=$tabValue.template}
           </div>
         {/if}
