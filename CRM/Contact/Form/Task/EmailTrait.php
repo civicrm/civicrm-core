@@ -630,7 +630,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $params['followup_activity_subject'] = $formValues['followup_activity_subject'];
       $params['followup_date'] = $formValues['followup_date'];
       $params['target_contact_id'] = $this->_contactIds;
-      $params['followup_assignee_contact_id'] = explode(',', $formValues['followup_assignee_contact_id']);
+      $params['followup_assignee_contact_id'] = array_filter(explode(',', $formValues['followup_assignee_contact_id']));
       $followupActivity = CRM_Activity_BAO_Activity::createFollowupActivity($activityId, $params);
       $followupStatus = ts('A followup activity has been scheduled.');
 
