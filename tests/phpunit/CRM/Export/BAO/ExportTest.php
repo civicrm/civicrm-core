@@ -769,10 +769,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testExportIMData() {
+  public function testExportIMData(): void {
     // Use default providers.
-    $providers = ['Aim', 'Gtalk', 'Jabber', 'Msn', 'Skype', 'Yahoo'];
+    $providers = ['Yahoo', 'Aim', 'Gtalk', 'Jabber', 'Msn', 'Skype'];
     // Main sure labels are not all anglo chars.
     $this->diversifyLocationTypes();
 
@@ -833,8 +834,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     foreach ($this->csv->getRecords() as $row) {
       $id = $row['Contact ID'];
-      $this->assertEquals('AIM', $row['Billing-IM Provider']);
-      $this->assertEquals('AIM', $row['Whare Kai-IM Provider']);
+      $this->assertEquals('Yahoo', $row['Billing-IM Provider']);
+      $this->assertEquals('Yahoo', $row['Whare Kai-IM Provider']);
       $this->assertEquals('BillingJabber' . $id, $row['Billing-IM Screen Name-Jabber']);
       $this->assertEquals('Whare KaiJabber' . $id, $row['Whare Kai-IM Screen Name-Jabber']);
       $this->assertEquals('BillingSkype' . $id, $row['Billing-IM Screen Name-Skype']);
@@ -2908,7 +2909,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\Exception
    */
-  protected function doExportTest($params) {
+  protected function doExportTest($params): void {
     $fields = $params['fields'] ?? [];
     $fieldDefaults = ['contact_type' => 'Individual', 'phone_type_id' => NULL, 'location_type_id' => NULL];
     foreach ($fields as $key => $field) {
