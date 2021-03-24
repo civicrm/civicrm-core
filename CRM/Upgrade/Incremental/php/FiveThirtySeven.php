@@ -55,6 +55,16 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
    * (change the x in the function name):
    */
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_37_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('core-issue#1845 - Alter Foreign key on civicrm_group to delete when the associated group when the saved search is deleted', 'alterSavedSearchFK');
+  }
+
   //  /**
   //   * Upgrade function.
   //   *
@@ -71,5 +81,17 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
   //   return TRUE;
   // }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function alterSavedSearchFK(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group', 'FK_civicrm_group_saved_search_id');
+    CRM_Core_DAO::executeQuery('DELETE civicrm_saved_search FROM civicrm_saved_search LEFT JOIN civicrm_group ON civicrm_saved_search.id = civicrm_group.saved_search_id WHERE civicrm_group.id IS NULL AND form_values IS NOT NULL and api_params IS NULL');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_group ADD CONSTRAINT `FK_civicrm_group_saved_search_id` FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search`(`id`) ON DELETE CASCADE', [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
 
 }

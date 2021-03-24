@@ -40,7 +40,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   protected $_entity;
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // The line below makes it unneccessary to do cleanup after a test,
@@ -68,7 +68,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   /**
    * Create a saved search, and see whether the returned values make sense.
    */
-  public function testCreateSavedSearch() {
+  public function testCreateSavedSearch(): void {
     $contactID = $this->createLoggedInUser();
     $result = $this->callAPIAndDocument(
         $this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
@@ -91,7 +91,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    * Create a saved search, retrieve it again, and check for ID and one of
    * the field values.
    */
-  public function testCreateAndGetSavedSearch() {
+  public function testCreateAndGetSavedSearch(): void {
     // Arrange:
     // (create a saved search)
     $create_result = $this->callAPISuccess(
@@ -115,7 +115,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
    * Create a saved search, and test whether it can be used for a smart
    * group.
    */
-  public function testCreateSavedSearchWithSmartGroup() {
+  public function testCreateSavedSearchWithSmartGroup(): void {
     // First create a volunteer for the default organization
 
     $result = $this->callAPISuccess('Contact', 'create', [
@@ -161,7 +161,61 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $this->assertEquals($contact_id, $get_result['values'][$contact_id]['id']);
   }
 
-  public function testDeleteSavedSearch() {
+  /**
+   * Create a saved search, and test whether it can be used for a smart
+   * group. Also check that when the Group is deleted the associated saved search gets deleted.
+   * @dataProvider versionThreeAndFour
+   */
+  public function testSavedSearchIsDeletedWhenSmartGroupIs($apiVersion): void {
+    $this->_apiVersion = $apiVersion;
+    // First create a volunteer for the default organization
+
+    $result = $this->callAPISuccess('Contact', 'create', [
+      'first_name' => 'Joe',
+      'last_name' => 'Schmoe',
+      'contact_type' => 'Individual',
+      'api.Relationship.create' => [
+        'contact_id_a' => '$value.id',
+        // default organization:
+        'contact_id_b' => 1,
+        // volunteer relationship:
+        'relationship_type_id' => 6,
+        'is_active' => 1,
+      ],
+    ]);
+    $contact_id = $result['id'];
+
+    // Now create our saved search, and chain the creation of a smart group.
+    $params = $this->params;
+    $params['api.Group.create'] = [
+      'name' => 'my_smartgroup',
+      'title' => 'my smartgroup',
+      'description' => 'Volunteers for the default organization',
+      'saved_search_id' => '$value.id',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+      'is_hidden' => 0,
+      'is_reserved' => 0,
+    ];
+
+    $create_result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $created_search = CRM_Utils_Array::first($create_result['values']);
+    $group_id = $created_search['api.Group.create']['id'];
+
+    // Search for contacts in our new smart group
+    $get_result = $this->callAPISuccess('Contact', 'get', ['group' => $group_id]);
+
+    // Expect our contact to be there.
+    $this->assertEquals(1, $get_result['count']);
+    $this->assertEquals($contact_id, $get_result['values'][$contact_id]['id']);
+
+    $this->callAPISuccess('Group', 'delete', ['id' => $group_id]);
+    $savedSearch = $this->callAPISuccess('SavedSearch', 'get', ['id' => $created_search['id']]);
+    $this->assertCount(0, $savedSearch['values']);
+  }
+
+  public function testDeleteSavedSearch(): void {
     // Create saved search, delete it again, and try to get it
     $create_result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $delete_params = ['id' => $create_result['id']];
