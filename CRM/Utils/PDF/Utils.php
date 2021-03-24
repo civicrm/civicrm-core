@@ -215,8 +215,12 @@ class CRM_Utils_PDF_Utils {
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
     $config = CRM_Core_Config::singleton();
     // if the path doesn't exist fall back on the current backup which is DOMPDF.
-    if (!file_exists($config->wkhtmltopdfPath)) {
-      return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
+    if (!empty($config->wkhtmltopdfPath)) {
+      $pieces = explode(' ',$config->wkhtmltopdfPath);
+      $path = $pieces[0];
+      if (!file_exists($path) || !is_executable($path)) {
+        return self::_html2pdf_dompdf($paper_size, $orientation, $html, $output, $fileName);
+      }
     }
     require_once 'snappy/src/autoload.php';
     $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
