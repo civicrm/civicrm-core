@@ -32,8 +32,6 @@
             <div class="crm-content crm-custom-data crm-contact-reference">
               {', '|implode:$element.contact_ref_links}
             </div>
-          {elseif $element.field_data_type EQ 'Money'}
-            <div class="crm-content crm-custom-data">{$element.field_value|crmMoney}</div>
           {else}
             <div class="crm-content crm-custom-data">{$element.field_value}</div>
           {/if}
