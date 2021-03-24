@@ -338,6 +338,13 @@ class CRM_Core_Menu {
 
       $menu->save();
     }
+
+    // Little hack for drupal 8 and drupal 9 to rebuild the router of drupal
+    // so that drupal will reconignize any new menu items.
+    // See https://lab.civicrm.org/dev/drupal/-/issues/158
+    if (class_exists('Drupal', FALSE)) {
+      \Drupal::service('router.builder')->rebuild();
+    }
   }
 
   /**
