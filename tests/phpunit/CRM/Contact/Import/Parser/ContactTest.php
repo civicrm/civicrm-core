@@ -461,7 +461,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testPrefixLabel() {
+  public function testPrefixLabel(): void {
     $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'individual_prefix', 'name' => 'new_one', 'label' => 'special', 'value' => 70]);
     $mapping = [
       ['name' => 'first_name', 'column_number' => 0],
@@ -491,9 +491,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that labels work for importing custom data.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCustomDataLabel() {
+  public function testCustomDataLabel(): void {
     $this->createCustomGroupWithFieldOfType([], 'select');
     $contactValues = [
       'first_name' => 'Bill',

@@ -1077,6 +1077,11 @@ function _civicrm_api3_object_to_array_unique_fields(&$dao, &$values) {
  *   ID of entity per $extends.
  */
 function _civicrm_api3_custom_format_params($params, &$values, $extends, $entityId = NULL) {
+  if (!empty($params['custom'])) {
+    // The Import class does the formatting first - ideally it wouldn't but this early return
+    // provides transitional support.
+    return;
+  }
   $values['custom'] = [];
   $checkCheckBoxField = FALSE;
   $entity = $extends;
