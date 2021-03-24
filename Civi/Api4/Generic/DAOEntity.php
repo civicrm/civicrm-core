@@ -32,7 +32,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAOGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new DAOGetAction(static::class, __FUNCTION__))
+    return (new DAOGetAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -41,7 +41,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAOSaveAction
    */
   public static function save($checkPermissions = TRUE) {
-    return (new DAOSaveAction(static::class, __FUNCTION__))
+    return (new DAOSaveAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -50,7 +50,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAOGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new DAOGetFieldsAction(static::class, __FUNCTION__))
+    return (new DAOGetFieldsAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -59,7 +59,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAOCreateAction
    */
   public static function create($checkPermissions = TRUE) {
-    return (new DAOCreateAction(static::class, __FUNCTION__))
+    return (new DAOCreateAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -68,7 +68,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAOUpdateAction
    */
   public static function update($checkPermissions = TRUE) {
-    return (new DAOUpdateAction(static::class, __FUNCTION__))
+    return (new DAOUpdateAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -77,7 +77,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return DAODeleteAction
    */
   public static function delete($checkPermissions = TRUE) {
-    return (new DAODeleteAction(static::class, __FUNCTION__))
+    return (new DAODeleteAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -86,7 +86,7 @@ abstract class DAOEntity extends AbstractEntity {
    * @return BasicReplaceAction
    */
   public static function replace($checkPermissions = TRUE) {
-    return (new BasicReplaceAction(static::class, __FUNCTION__))
+    return (new BasicReplaceAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

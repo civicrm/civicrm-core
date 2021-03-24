@@ -34,7 +34,7 @@ class MailSettings extends Generic\DAOEntity {
    * @return \Civi\Api4\Action\MailSettings\TestConnection
    */
   public static function testConnection($checkPermissions = TRUE) {
-    $action = new \Civi\Api4\Action\MailSettings\TestConnection(static::class, __FUNCTION__);
+    $action = new \Civi\Api4\Action\MailSettings\TestConnection(__CLASS__, __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
   }
 

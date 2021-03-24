@@ -87,7 +87,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new BasicGetAction(static::class, __FUNCTION__, static::$getter))
+    return (new BasicGetAction(static::getEntityName(), __FUNCTION__, static::$getter))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -96,7 +96,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicCreateAction
    */
   public static function create($checkPermissions = TRUE) {
-    return (new BasicCreateAction(static::class, __FUNCTION__, static::$setter))
+    return (new BasicCreateAction(static::getEntityName(), __FUNCTION__, static::$setter))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -105,7 +105,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicSaveAction
    */
   public static function save($checkPermissions = TRUE) {
-    return (new BasicSaveAction(static::class, __FUNCTION__, static::$idField, static::$setter))
+    return (new BasicSaveAction(static::getEntityName(), __FUNCTION__, static::$idField, static::$setter))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -114,7 +114,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicUpdateAction
    */
   public static function update($checkPermissions = TRUE) {
-    return (new BasicUpdateAction(static::class, __FUNCTION__, static::$idField, static::$setter))
+    return (new BasicUpdateAction(static::getEntityName(), __FUNCTION__, static::$idField, static::$setter))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -123,7 +123,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicBatchAction
    */
   public static function delete($checkPermissions = TRUE) {
-    return (new BasicBatchAction(static::class, __FUNCTION__, static::$idField, static::$deleter))
+    return (new BasicBatchAction(static::getEntityName(), __FUNCTION__, static::$idField, static::$deleter))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -132,7 +132,7 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicReplaceAction
    */
   public static function replace($checkPermissions = TRUE) {
-    return (new BasicReplaceAction(static::class, __FUNCTION__))
+    return (new BasicReplaceAction(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
