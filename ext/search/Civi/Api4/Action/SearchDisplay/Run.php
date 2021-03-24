@@ -80,6 +80,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     }
     if (is_string($this->display) && !empty($this->savedSearch['id'])) {
       $this->display = SearchDisplay::get(FALSE)
+        ->setSelect(['*', 'type:name'])
         ->addWhere('name', '=', $this->display)
         ->addWhere('saved_search_id', '=', $this->savedSearch['id'])
         ->execute()->first();
@@ -317,10 +318,20 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    */
   private function getAfformFilters() {
     $afform = $this->loadAfform();
-    return array_column(\CRM_Utils_Array::findAll(
+    if (!$afform) {
+      return [];
+    }
+    // Get afform field filters
+    $filters = array_column(\CRM_Utils_Array::findAll(
       $afform['layout'] ?? [],
       ['#tag' => 'af-field']
     ), 'name');
+    // Get filters passed into search display directive
+    $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
+    if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
+      $filters = array_unique(array_merge($filters, array_keys(\CRM_Utils_JS::getRawProps($filterAttr))));
+    }
+    return $filters;
   }
 
   /**
@@ -340,10 +351,11 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         ->setLayoutFormat('shallow')
         ->execute()->first();
       // Validate that the afform contains this search display
-      if (\CRM_Utils_Array::findAll(
+      $afform['searchDisplay'] = \CRM_Utils_Array::findAll(
         $afform['layout'] ?? [],
-        ['#tag' => "crm-search-display-{$this->display['type']}", 'display-name' => $this->display['name']])
-      ) {
+        ['#tag' => "{$this->display['type:name']}", 'display-name' => $this->display['name']]
+      )[0] ?? NULL;
+      if ($afform['searchDisplay']) {
         $this->_afform = $afform;
       }
     }

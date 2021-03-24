@@ -58,6 +58,31 @@
       </label>
       <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
     </div>
+
+    <div class="form-group">
+      <div class="form-inline">
+        <label>
+          <input type="checkbox" ng-checked="afform.contact_summary" ng-click="editor.toggleContactSummary()">
+          {{:: ts('Add to contact summary page') }}
+        </label>
+        <select class="form-control" ng-model="afform.contact_summary" ng-if="afform.contact_summary">
+          <option value="block">{{:: ts('As Block') }}</option>
+          <option value="tab">{{:: ts('As Tab') }}</option>
+        </select>
+      </div>
+      <p class="help-block">{{:: ts('Placement can be configured using the Contact Layout Editor.') }}</p>
+    </div>
+    <div class="form-group" ng-if="afform.contact_summary && editor.searchDisplay && editor.searchFilters.length > 1">
+      <div class="form-inline">
+        <label for="af_config_form_search_filters">
+          {{:: ts('Filter on:') }}
+        </label>
+        <select class="form-control" id="af_config_form_search_filters" ng-model="editor.searchDisplay.filters">
+          <option ng-repeat="option in editor.searchFilters" value="{{ option.key }}">{{ option.label }}</option>
+        </select>
+      </div>
+      <p class="help-block">{{:: ts('Choose which contact from the search should match the contact being viewed.') }}</p>
+    </div>
   </fieldset>
 
 </ng-form>

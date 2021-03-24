@@ -6,15 +6,17 @@
     .service('afGui', function(crmApi4, $parse, $q) {
 
       // Parse strings of javascript that php couldn't interpret
+      // TODO: Figure out which attributes actually need to be evaluated, as a whitelist would be less error-prone than a blacklist
+      var doNotEval = ['filters'];
       function evaluate(collection) {
         _.each(collection, function(item) {
           if (_.isPlainObject(item)) {
             evaluate(item['#children']);
-            _.each(item, function(node, idx) {
-              if (_.isString(node)) {
-                var str = _.trim(node);
+            _.each(item, function(prop, key) {
+              if (_.isString(prop) && !_.includes(doNotEval, key)) {
+                var str = _.trim(prop);
                 if (str[0] === '{' || str[0] === '[' || str.slice(0, 3) === 'ts(') {
-                  item[idx] = $parse(str)({ts: CRM.ts('afform')});
+                  item[key] = $parse(str)({ts: CRM.ts('afform')});
                 }
               }
             });

@@ -75,6 +75,10 @@
 
         else if (editor.getFormType() === 'search') {
           editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'af-fieldset': ''})[0]['#children'];
+          editor.searchDisplay = afGui.findRecursive(editor.layout['#children'], function(item) {
+            return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
+          })[0];
+          editor.searchFilters = getSearchFilterOptions();
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -174,6 +178,55 @@
       this.getAfform = function() {
         return $scope.afform;
       };
+
+      this.toggleContactSummary = function() {
+        if ($scope.afform.contact_summary) {
+          $scope.afform.contact_summary = false;
+          if ($scope.afform.type === 'search') {
+            delete editor.searchDisplay.filters;
+          }
+        } else {
+          $scope.afform.contact_summary = 'block';
+          if ($scope.afform.type === 'search') {
+            editor.searchDisplay.filters = editor.searchFilters[0].key;
+          }
+        }
+      };
+
+      function getSearchFilterOptions() {
+        var searchDisplay = editor.meta.searchDisplays[editor.searchDisplay['search-name'] + '.' + editor.searchDisplay['display-name']],
+          entityCount = {},
+          options = [];
+
+        addFields(searchDisplay['saved_search.api_entity'], '');
+
+        _.each(searchDisplay['saved_search.api_params'].join, function(join) {
+          var joinInfo = join[0].split(' AS ');
+          addFields(joinInfo[0], joinInfo[1] + '.');
+        });
+
+        function addFields(entityName, prefix) {
+          var entity = afGui.getEntity(entityName);
+          entityCount[entity.entity] = (entityCount[entity.entity] || 0) + 1;
+          var count = (entityCount[entity.entity] > 1 ? ' ' + entityCount[entity.entity] : '');
+          if (entityName === 'Contact') {
+            options.push({
+              key: "{'" + prefix + "id': options.contact_id}",
+              label: entity.label + count
+            });
+          } else {
+            _.each(entity.fields, function(field) {
+              if (field.fk_entity === 'Contact') {
+                options.push({
+                  key: "{'" + prefix + field.name + "': options.contact_id}",
+                  label: entity.label + count + ' ' + field.label
+                });
+              }
+            });
+          }
+        }
+        return options;
+      }
 
       // Validates that a drag-n-drop action is allowed
       this.onDrop = function(event, ui) {
