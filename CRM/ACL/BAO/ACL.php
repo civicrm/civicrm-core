@@ -47,8 +47,7 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *   Array of assoc. arrays of ACL rules
    * @throws \CRM_Core_Exception
    */
-  protected static function getGroupACLRoles($contact_id) {
-    $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
+  protected static function getGroupACLRoles(int $contact_id) {
 
     $query = "   SELECT          acl.*
                         FROM            civicrm_acl acl
@@ -74,26 +73,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
     $rule = CRM_Core_DAO::executeQuery($query);
 
-    while ($rule->fetch()) {
-      $results[$rule->id] = $rule->toArray();
-    }
-
-    // also get all acls for "Any Role" case
-    // and authenticated User Role if present
-    $roles = "0";
-    $session = CRM_Core_Session::singleton();
-    if ($session->get('ufID') > 0) {
-      $roles .= ",2";
-    }
-
-    $query = "
-SELECT acl.*
-  FROM civicrm_acl acl
- WHERE acl.entity_id      IN ( $roles )
-   AND acl.entity_table   = 'civicrm_acl_role'
-";
-
-    $rule = CRM_Core_DAO::executeQuery($query);
     while ($rule->fetch()) {
       $results[$rule->id] = $rule->toArray();
     }
@@ -141,8 +120,27 @@ SELECT      acl.*
       while ($rule->fetch()) {
         $result[$rule->id] = $rule->toArray();
       }
+      $result += self::getGroupACLRoles($contact_id);
     }
-    $result += self::getGroupACLRoles($contact_id);
+    // also get all acls for "Any Role" case
+    // and authenticated User Role if present
+    $roles = '0';
+    $session = CRM_Core_Session::singleton();
+    if ($session->get('ufID') > 0) {
+      $roles .= ',2';
+    }
+
+    $query = "
+SELECT acl.*
+  FROM civicrm_acl acl
+ WHERE acl.entity_id      IN ( $roles )
+   AND acl.entity_table   = 'civicrm_acl_role'
+";
+
+    $rule = CRM_Core_DAO::executeQuery($query);
+    while ($rule->fetch()) {
+      $result[$rule->id] = $rule->toArray();
+    }
     return $result;
   }
 
