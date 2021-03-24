@@ -18,6 +18,7 @@
  */
 
 use Civi\Api4\FinancialType;
+use Civi\Api4\MembershipType;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -83,7 +84,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->_apiversion = 3;
     parent::setUp();
 
@@ -188,12 +189,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
     $this->assertType('array', $rc);
-    $this->assertTrue(array_key_exists('membership_type_id', $rc));
+    $this->assertArrayHasKey('membership_type_id', $rc);
 
     $params['membership_type_id'] = [1 => 3];
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
     $this->assertType('array', $rc);
-    $this->assertTrue(array_key_exists('join_date', $rc));
+    $this->assertArrayHasKey('join_date', $rc);
   }
 
   /**
@@ -203,7 +204,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * that has an start date before the join date and a rolling
    * membership type.
    */
-  public function testFormRuleRollingEarlyStart() {
+  public function testFormRuleRollingEarlyStart(): void {
     $unixNow = time();
     $unixYesterday = $unixNow - (24 * 60 * 60);
     $ymdYesterday = date('Y-m-d', $unixYesterday);
@@ -828,16 +829,18 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function testSubmitRecurTwoRows(): void {
     $pfvIDs = $this->createMembershipPriceSet();
+    MembershipType::update()
+      ->addWhere('id', '=', $this->ids['membership_type']['AnnualRollingOrg2'])
+      ->setValues(['frequency_interval' => 1, 'frequency_unit' => 'month', 'auto_renew' => 1])->execute();
     $form = $this->getForm();
     $form->_mode = 'live';
     $priceParams = [
       'price_' . $this->getPriceFieldID() => $pfvIDs,
       'price_set_id' => $this->getPriceSetID(),
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
       'membership_type_id' => NULL,
       // Set financial type id to null to check it is retrieved from the price set.
       'financial_type_id' => NULL,
