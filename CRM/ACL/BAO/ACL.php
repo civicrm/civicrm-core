@@ -19,57 +19,21 @@
  *  Access Control List
  */
 class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
-  /**
-   * @var string
-   */
-  public static $_entityTable = NULL;
-  public static $_objectTable = NULL;
-  public static $_operation = NULL;
-
-  public static $_fieldKeys = NULL;
 
   /**
    * Available operations for  pseudoconstant.
    *
    * @return array
    */
-  public static function operation() {
-    if (!self::$_operation) {
-      self::$_operation = [
-        'View' => ts('View'),
-        'Edit' => ts('Edit'),
-        'Create' => ts('Create'),
-        'Delete' => ts('Delete'),
-        'Search' => ts('Search'),
-        'All' => ts('All'),
-      ];
-    }
-    return self::$_operation;
-  }
-
-  /**
-   * Construct an associative array of an ACL rule's properties
-   *
-   * @param string $format
-   *   Sprintf format for array.
-   * @param bool $hideEmpty
-   *   Only return elements that have a value set.
-   *
-   * @return array
-   *   Assoc. array of the ACL rule's properties
-   */
-  public function toArray($format = '%s', $hideEmpty = FALSE) {
-    $result = [];
-
-    if (!self::$_fieldKeys) {
-      $fields = CRM_ACL_DAO_ACL::fields();
-      self::$_fieldKeys = array_keys($fields);
-    }
-
-    foreach (self::$_fieldKeys as $field) {
-      $result[$field] = $this->$field;
-    }
-    return $result;
+  public static function operation(): array {
+    return [
+      'View' => ts('View'),
+      'Edit' => ts('Edit'),
+      'Create' => ts('Create'),
+      'Delete' => ts('Delete'),
+      'Search' => ts('Search'),
+      'All' => ts('All'),
+    ];
   }
 
   /**
