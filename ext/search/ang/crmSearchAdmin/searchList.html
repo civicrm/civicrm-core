@@ -17,14 +17,16 @@
         <th>{{:: ts('Displays') }}</th>
         <th>{{:: ts('Smart Group') }}</th>
         <th ng-if="$ctrl.afformEnabled">{{:: ts('Forms') }}</th>
+        <th>{{:: ts('Created') }}</th>
+        <th>{{:: ts('Last Modified') }}</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="search in $ctrl.savedSearches | filter:$ctrl.searchFilter">
-        <td>{{ search.id }}</td>
-        <td>{{ search.label }}</td>
-        <td>{{ $ctrl.entityTitles[search.api_entity] }}</td>
+        <td>{{:: search.id }}</td>
+        <td>{{:: search.label }}</td>
+        <td>{{:: $ctrl.entityTitles[search.api_entity] }}</td>
         <td>
           <div class="btn-group">
             <button type="button" disabled ng-if="!search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline">
@@ -43,7 +45,7 @@
             </ul>
           </div>
         </td>
-        <td>{{ search.groups.join(', ') }}</td>
+        <td>{{:: search.groups.join(', ') }}</td>
         <td ng-if="::$ctrl.afformEnabled">
           <div class="btn-group">
             <button type="button" ng-click="$ctrl.loadAfforms()" ng-if="search.display_name" class="btn btn-xs dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -72,6 +74,8 @@
             </ul>
           </div>
         </td>
+        <td>{{:: ts('%1 by %2', {1: formatDate(search.created_date), 2: search['created.display_name']}) }}</td>
+        <td>{{:: ts('%1 by %2', {1: formatDate(search.created_date), 2: search['modified.display_name']}) }}</td>
         <td class="text-right">
           <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}">{{:: ts('Edit') }}</a>
           <a class="btn btn-xs btn-default" href="#/create/{{:: search.api_entity + '?params=' + $ctrl.encode(search.api_params) }}">{{:: ts('Clone') }}</a>
