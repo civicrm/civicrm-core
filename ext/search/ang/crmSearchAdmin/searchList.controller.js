@@ -4,6 +4,7 @@
   angular.module('crmSearchAdmin').controller('searchList', function($scope, savedSearches, crmApi4) {
     var ts = $scope.ts = CRM.ts('org.civicrm.search'),
       ctrl = $scope.$ctrl = this;
+    $scope.formatDate = CRM.utils.formatDate;
     this.savedSearches = savedSearches;
     this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
     this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
