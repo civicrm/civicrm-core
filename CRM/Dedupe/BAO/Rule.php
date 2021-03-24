@@ -65,11 +65,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
       "t2.{$this->rule_field} IS NOT NULL",
       "t1.{$this->rule_field} = t2.{$this->rule_field}",
     ];
-    if ($this->getFieldType($this->rule_field) === CRM_Utils_Type::T_DATE) {
-      $innerJoinClauses[] = "t1.{$this->rule_field} > '1000-01-01'";
-      $innerJoinClauses[] = "t2.{$this->rule_field} > '1000-01-01'";
-    }
-    else {
+
+    if (in_array($this->getFieldType($this->rule_field), CRM_Utils_Type::getTextTypes(), TRUE)) {
       $innerJoinClauses[] = "t1.{$this->rule_field} <> ''";
       $innerJoinClauses[] = "t2.{$this->rule_field} <> ''";
     }
