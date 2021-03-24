@@ -483,6 +483,8 @@ WHERE  id IN ( $groupIDs )
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery}");
     }
 
+    CRM_Core_DAO::reenableFullGroupByMode();
+
     if ($group->children) {
 
       // Store a list of contacts who are removed from the parent group
