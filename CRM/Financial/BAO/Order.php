@@ -341,6 +341,38 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get an array of all membership types included in the order.
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getMembershipTypes(): array {
+    $types = [];
+    foreach ($this->getMembershipLineItems() as $line) {
+      $types[$line['membership_type_id']] = CRM_Member_BAO_MembershipType::getMembershipType((int) $line['membership_type_id']);
+    }
+    return $types;
+  }
+
+  /**
+   * Get an array of all membership types included in the order.
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getRenewableMembershipTypes(): array {
+    $types = [];
+    foreach ($this->getMembershipTypes() as $id => $type) {
+      if (!empty($type['auto_renew'])) {
+        $types[$id] = $type;
+      }
+    }
+    return $types;
+  }
+
+  /**
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
