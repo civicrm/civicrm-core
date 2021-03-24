@@ -320,6 +320,27 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get line items that specifically relate to memberships.
+   *
+   * return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getMembershipLineItems():array {
+    $lines = $this->getLineItems();
+    foreach ($lines as $index => $line) {
+      if (empty($line['membership_type_id'])) {
+        unset($lines[$index]);
+        continue;
+      }
+      if (empty($line['membership_num_terms'])) {
+        $lines[$index]['membership_num_terms'] = 1;
+      }
+    }
+    return $lines;
+  }
+
+  /**
    * @return array
    * @throws \CiviCRM_API3_Exception
    */

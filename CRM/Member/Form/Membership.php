@@ -1051,16 +1051,6 @@ DESC limit 1");
 
     $params['tax_amount'] = $this->order->getTotalTaxAmount();
     $params['total_amount'] = $this->order->getTotalAmount();
-    if (!empty($lineItem[$this->_priceSetId])) {
-      foreach ($lineItem[$this->_priceSetId] as &$li) {
-        if (!empty($li['membership_type_id'])) {
-          if (!empty($li['membership_num_terms'])) {
-            $termsByType[$li['membership_type_id']] = $li['membership_num_terms'];
-          }
-        }
-      }
-    }
-
     $params['contact_id'] = $this->_contactID;
 
     $params = array_merge($params, $this->getFormMembershipParams());
@@ -1069,14 +1059,10 @@ DESC limit 1");
     $startDate = $formValues['start_date'];
     $endDate = $formValues['end_date'];
 
-    $memTypeNumTerms = empty($termsByType) ? CRM_Utils_Array::value('num_terms', $formValues) : NULL;
-
     $calcDates = [];
-    foreach ($this->_memTypeSelected as $memType) {
-      if (empty($memTypeNumTerms)) {
-        $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, 1);
-      }
-      $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
+    foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
+      $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
+      $calcDates[$membershipLineItem['membership_type_id']] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipLineItem['membership_type_id'],
         $joinDate, $startDate, $endDate, $memTypeNumTerms
       );
     }
