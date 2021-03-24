@@ -664,8 +664,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       }
     }
 
-    _civicrm_api3_custom_format_params($params, $values, 'Membership');
-
     if ($create) {
       // CRM_Member_BAO_Membership::create() handles membership_start_date, membership_join_date,
       // membership_end_date and membership_source. So, if $values contains
