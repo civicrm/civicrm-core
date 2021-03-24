@@ -46,7 +46,7 @@ abstract class AbstractEntity {
    * @return \Civi\Api4\Action\GetActions
    */
   public static function getActions($checkPermissions = TRUE) {
-    return (new \Civi\Api4\Action\GetActions(self::getEntityName(), __FUNCTION__))
+    return (new \Civi\Api4\Action\GetActions(static::getEntityName(), __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -109,7 +109,7 @@ abstract class AbstractEntity {
    * @throws NotImplementedException
    */
   public static function __callStatic($action, $args) {
-    $entity = self::getEntityName();
+    $entity = static::getEntityName();
     $nameSpace = str_replace('Civi\Api4\\', 'Civi\Api4\Action\\', static::class);
     // Find class for this action
     $entityAction = "$nameSpace\\" . ucfirst($action);

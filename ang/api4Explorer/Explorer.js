@@ -713,13 +713,14 @@
 
     // Format oop params
     function formatOOP(entity, action, params, indent) {
-      var code = '',
+      var info = getEntity(entity),
         newLine = "\n" + _.repeat(' ', indent),
+        code = '\\' + info.class + '::' + action + '(',
         perm = params.checkPermissions === false ? 'FALSE' : '';
       if (entity.substr(0, 7) !== 'Custom_') {
-        code = "\\Civi\\Api4\\" + entity + '::' + action + '(' + perm + ')';
+        code += perm + ')';
       } else {
-        code = "\\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
+        code += "'" + entity.substr(7) + "'" + (perm ? ', ' : '') + perm + ")";
       }
       _.each(params, function(param, key) {
         var val = '';

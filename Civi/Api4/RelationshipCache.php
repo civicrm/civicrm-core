@@ -35,7 +35,7 @@ class RelationshipCache extends Generic\AbstractEntity {
    * @return Generic\DAOGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new Generic\DAOGetAction(static::class, __FUNCTION__))
+    return (new Generic\DAOGetAction(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -44,7 +44,7 @@ class RelationshipCache extends Generic\AbstractEntity {
    * @return Generic\DAOGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new Generic\DAOGetFieldsAction(static::class, __FUNCTION__))
+    return (new Generic\DAOGetFieldsAction(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
