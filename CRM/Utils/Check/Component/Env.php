@@ -963,7 +963,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkWkHtmlToPDFPath() {
     $messages = [];
     $wkhtmltopdfPath = CRM_Core_Config::singleton()->wkhtmltopdfPath;
-    if (!empty($wkhtmltopdfPath) {
+    if (!empty($wkhtmltopdfPath)) {
       // check and ensure that this leads to the wkhtmltopdf binary
       // and it is a valid executable binary
       // Only check the first space separated piece to allow for a value
