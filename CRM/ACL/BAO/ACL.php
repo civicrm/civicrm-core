@@ -73,38 +73,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   }
 
   /**
-   * Get all of the ACLs through ACL groups.
-   *
-   * @param int $contact_id
-   *   ID of a contact to search for.
-   *
-   * @return array
-   *   Array of assoc. arrays of ACL rules
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getACLRoles($contact_id = NULL) {
-    $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
-
-    $query = 'SELECT acl.* FROM civicrm_acl acl';
-    $where = ['acl.entity_table = "civicrm_acl_role" AND acl.entity_id IN (' . implode(',', array_keys(CRM_Core_OptionGroup::values('acl_role'))) . ')'];
-
-    if (!empty($contact_id)) {
-      return [];
-    }
-
-    $results = [];
-
-    $rule = CRM_Core_DAO::executeQuery($query . ' WHERE ' . implode(' AND ', $where));
-
-    while ($rule->fetch()) {
-      $results[$rule->id] = $rule->toArray();
-    }
-
-    return $results;
-  }
-
-  /**
    * Get all ACLs granted to a contact through all group memberships.
    *
    * @param int $contact_id
@@ -236,8 +204,6 @@ SELECT acl.*
       while ($rule->fetch()) {
         $result[$rule->id] = $rule->toArray();
       }
-
-      $result += self::getACLRoles($contact_id);
     }
 
     /* Then, all ACLs granted through group membership */
