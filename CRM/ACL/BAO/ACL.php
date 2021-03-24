@@ -73,47 +73,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   }
 
   /**
-   * Get all ACLs granted to a contact through all group memberships.
-   *
-   * @param int $contact_id
-   *   The contact's ID.
-   * @param bool $aclRoles
-   *   Include ACL Roles?.
-   *
-   * @return array
-   *   Assoc array of ACL rules
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getGroupACLs($contact_id, $aclRoles = FALSE) {
-    $contact_id = CRM_Utils_Type::escape($contact_id, 'Integer');
-
-    $results = [];
-
-    if ($contact_id) {
-      $query = "
-SELECT      acl.*
-  FROM      civicrm_acl acl
- INNER JOIN  civicrm_group_contact group_contact
-        ON  acl.entity_id      = group_contact.group_id
-     WHERE  acl.entity_table   = 'civicrm_group'
-       AND  group_contact.contact_id     = $contact_id
-       AND  group_contact.status         = 'Added'";
-
-      $rule = CRM_Core_DAO::executeQuery($query);
-
-      while ($rule->fetch()) {
-        $results[$rule->id] = $rule->toArray();
-      }
-    }
-
-    if ($aclRoles) {
-      $results += self::getGroupACLRoles($contact_id);
-    }
-
-    return $results;
-  }
-
-  /**
    * Get all of the ACLs for a contact through ACL groups owned by Contact.
    * groups.
    *
@@ -181,7 +140,7 @@ SELECT acl.*
   /**
    * Get all ACLs owned by a given contact, including domain and group-level.
    *
-   * @param int $contact_id
+   * @param int|null $contact_id
    *   The contact ID.
    *
    * @return array
@@ -189,7 +148,7 @@ SELECT acl.*
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getAllByContact($contact_id) {
+  public static function getAllByContact(?int $contact_id): array {
     $result = [];
 
     /* First, the contact-specific ACLs, including ACL Roles */
@@ -204,11 +163,22 @@ SELECT acl.*
       while ($rule->fetch()) {
         $result[$rule->id] = $rule->toArray();
       }
+      $query = "
+SELECT      acl.*
+  FROM      civicrm_acl acl
+ INNER JOIN  civicrm_group_contact group_contact
+        ON  acl.entity_id      = group_contact.group_id
+     WHERE  acl.entity_table   = 'civicrm_group'
+       AND  group_contact.contact_id     = $contact_id
+       AND  group_contact.status         = 'Added'";
+
+      $rule = CRM_Core_DAO::executeQuery($query);
+
+      while ($rule->fetch()) {
+        $result[$rule->id] = $rule->toArray();
+      }
     }
-
-    /* Then, all ACLs granted through group membership */
-    $result += self::getGroupACLs($contact_id, TRUE);
-
+    $result += self::getGroupACLRoles($contact_id);
     return $result;
   }
 
