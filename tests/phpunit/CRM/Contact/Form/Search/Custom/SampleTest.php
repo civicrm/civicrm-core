@@ -51,13 +51,6 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     return new CRM_Contact_Form_Search_Custom_SampleTestDataProvider();
   }
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-  }
-
   /**
    *  Test CRM_Contact_Form_Search_Custom_Sample::count()
    * @dataProvider dataProvider

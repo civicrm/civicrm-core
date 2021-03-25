@@ -18,21 +18,6 @@
 class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-  }
-
-  /**
    *  Pass zero as an id and make sure no Assignees are retrieved.
    */
   public function testRetrieveAssigneeIdsByActivityIdNoId() {

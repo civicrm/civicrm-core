@@ -56,13 +56,6 @@
  */
 class CRM_Contact_Form_Search_Custom_PriceSetTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-  }
-
   public function testRunSearch() {
     $order = $this->callAPISuccess('Order', 'create', $this->getParticipantOrderParams());
     $this->callAPISuccess('Payment', 'create', [
