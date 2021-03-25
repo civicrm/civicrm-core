@@ -20,7 +20,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->setExtensionSystem($this->system);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->system = NULL;
   }

@@ -101,7 +101,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->relationshipTypeDelete($this->relationshipTypeID);
     $this->quickCleanUpFinancialEntities();
     $this->restoreMembershipTypes();

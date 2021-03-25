@@ -18,7 +18,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $schema = new CRM_Logging_Schema();
     $schema->disableLogging();
     $this->databaseVersion = NULL;

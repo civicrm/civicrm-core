@@ -57,7 +57,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
 
   /**
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
     // DGW

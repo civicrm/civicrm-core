@@ -19,7 +19,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     CRM_Utils_Hook::singleton()->reset();
   }

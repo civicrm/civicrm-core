@@ -96,7 +96,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_membership',
       'civicrm_membership_log',

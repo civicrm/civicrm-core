@@ -27,7 +27,7 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
     self::$activeTest = $this;
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     self::$activeTest = $this;
     parent::tearDown();
   }

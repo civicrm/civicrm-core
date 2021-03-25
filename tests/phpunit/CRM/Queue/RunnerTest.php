@@ -25,7 +25,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     self::$_recordedValues = [];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     unset($this->queue);
     unset($this->queueService);
 

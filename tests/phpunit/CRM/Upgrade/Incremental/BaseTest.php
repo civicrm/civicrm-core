@@ -7,7 +7,7 @@
 class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_saved_search']);
   }
 

@@ -20,7 +20,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
       CRM_Core_I18n_Schema::makeSinglelingual('en_US');

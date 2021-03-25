@@ -27,7 +27,7 @@ class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
     $this->quickCleanup(['civicrm_payment_processor']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->system = NULL;
     $this->quickCleanup(['civicrm_payment_processor']);

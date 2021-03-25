@@ -51,7 +51,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->groupCreate(['title' => 'not-me-active', 'is_active' => 1, 'name' => 'not-me-active']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
     $this->quickCleanup(['civicrm_group']);
     $config = CRM_Core_Config::singleton();

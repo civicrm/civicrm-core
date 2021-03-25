@@ -47,7 +47,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Utils_Time::resetTime();
 
     $tablesToTruncate = ['civicrm_queue_item'];

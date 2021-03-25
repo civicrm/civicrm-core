@@ -37,7 +37,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     $this->client = new CRM_Utils_HttpClient();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name = 'verifySSL'");
     CRM_Core_Config::singleton(TRUE);
     parent::tearDown();
