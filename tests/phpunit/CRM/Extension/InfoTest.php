@@ -55,7 +55,10 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
 
   public function testGood_string_extras() {
     $data = "<extension key='test.bar' type='module'><file>testbar</file>
-      <classloader><psr4 prefix=\"Civi\\\" path=\"Civi\"/></classloader>
+      <classloader>
+        <psr4 prefix=\"Civi\\\" path=\"Civi\"/>
+        <psr0 prefix=\"CRM_\" path=\"\"/>
+      </classloader>
       <requires><ext>org.civicrm.a</ext><ext>org.civicrm.b</ext></requires>
     </extension>
     ";
@@ -65,6 +68,10 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('testbar', $info->file);
     $this->assertEquals('Civi\\', $info->classloader[0]['prefix']);
     $this->assertEquals('Civi', $info->classloader[0]['path']);
+    $this->assertEquals('psr4', $info->classloader[0]['type']);
+    $this->assertEquals('CRM_', $info->classloader[1]['prefix']);
+    $this->assertEquals('', $info->classloader[1]['path']);
+    $this->assertEquals('psr0', $info->classloader[1]['type']);
     $this->assertEquals(['org.civicrm.a', 'org.civicrm.b'], $info->requires);
   }
 

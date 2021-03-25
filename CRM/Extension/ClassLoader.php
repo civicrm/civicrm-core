@@ -15,6 +15,13 @@
 class CRM_Extension_ClassLoader {
 
   /**
+   * List of class-loader features that are valid in this version of Civi.
+   *
+   * This may be useful for some extensions which enable/disable polyfills based on environment.
+   */
+  const FEATURES = ',psr0,psr4,';
+
+  /**
    * @var CRM_Extension_Mapper
    */
   protected $mapper;
@@ -92,6 +99,10 @@ class CRM_Extension_ClassLoader {
       if (!empty($info->classloader)) {
         foreach ($info->classloader as $mapping) {
           switch ($mapping['type']) {
+            case 'psr0':
+              $loader->add($mapping['prefix'], CRM_Utils_File::addTrailingSlash($path . '/' . $mapping['path']));
+              break;
+
             case 'psr4':
               $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
               break;

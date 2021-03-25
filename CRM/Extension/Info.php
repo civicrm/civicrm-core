@@ -175,6 +175,13 @@ class CRM_Extension_Info {
             'path' => (string) $psr4->attributes()->path,
           ];
         }
+        foreach ($val->psr0 as $psr0) {
+          $this->classloader[] = [
+            'type' => 'psr0',
+            'prefix' => (string) $psr0->attributes()->prefix,
+            'path' => (string) $psr0->attributes()->path,
+          ];
+        }
       }
       elseif ($attr === 'tags') {
         $this->tags = [];
