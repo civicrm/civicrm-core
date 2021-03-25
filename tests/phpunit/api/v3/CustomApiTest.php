@@ -24,7 +24,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
     $this->installApi();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_mailing_provider_data');
   }

@@ -40,7 +40,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     //  Truncate the tables
     $this->quickCleanup(
       [

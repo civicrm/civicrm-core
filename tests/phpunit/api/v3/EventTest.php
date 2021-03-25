@@ -81,7 +81,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     }
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     foreach ($this->eventIds as $eventId) {
       $this->eventDelete($eventId);
     }

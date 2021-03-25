@@ -30,7 +30,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   /**
    * Clean up log tables.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);
     parent::tearDown();
     $this->callAPISuccess('Setting', 'create', ['logging' => FALSE]);

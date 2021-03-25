@@ -36,7 +36,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
   }

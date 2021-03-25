@@ -70,7 +70,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     parent::tearDown();

@@ -90,7 +90,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     CRM_Core_BAO_CustomField::getTableColumnGroup($this->IndiStudentField['id'], TRUE);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = ['civicrm_contact', 'civicrm_cache'];
     $this->quickCleanup($tablesToTruncate, TRUE);
   }

@@ -22,7 +22,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
   /**
    * Set up for tests.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_groupID = $this->groupCreate();
     $config = CRM_Core_Config::singleton();
@@ -34,7 +34,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
     $config = CRM_Core_Config::singleton();
     unset($config->userPermissionClass->permissions);

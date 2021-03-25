@@ -40,7 +40,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);

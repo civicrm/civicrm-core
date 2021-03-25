@@ -39,7 +39,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * (non-PHPdoc)
    * @see CiviUnitTestCase::tearDown()
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->cleanUpAfterACLs();
     $tablesToTruncate = [
       'civicrm_contact',

@@ -80,7 +80,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->settingsStack = new \Civi\Core\SettingsStack();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->settingsStack->popAll();
     parent::tearDown();
   }

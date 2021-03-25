@@ -59,7 +59,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
    */
-  public function setUp() {
+  public function setUp(): void {
     // Connect to the database
     parent::setUp();
 
@@ -104,7 +104,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_activity',

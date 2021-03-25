@@ -29,7 +29,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     parent::tearDown();
   }

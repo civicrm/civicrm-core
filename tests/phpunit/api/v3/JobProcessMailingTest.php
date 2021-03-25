@@ -80,7 +80,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
   /**
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
     $this->cleanupMailingTest();

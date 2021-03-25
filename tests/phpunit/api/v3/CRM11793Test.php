@@ -26,7 +26,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     $this->organizationCreate();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 

@@ -128,7 +128,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   /**
    * Cleanup after function.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

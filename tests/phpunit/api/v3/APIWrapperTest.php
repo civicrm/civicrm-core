@@ -27,18 +27,10 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
    * Sets up the fixture, for example, opens a network connection.
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_apiWrappers', [$this, 'onApiWrappers']);
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
-    parent::tearDown();
   }
 
   /**
