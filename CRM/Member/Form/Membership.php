@@ -1138,7 +1138,7 @@ DESC limit 1");
       if ($this->isCreateRecurringContribution()) {
         $this->_params = $formValues;
 
-        $contribution = $this->processContribution(
+        $contribution = civicrm_api3('Contribution', 'create',
           [
             'contact_id' => $this->_contributorContactID,
             'line_item' => [$this->order->getPriceSetID() => $this->order->getLineItems()],
@@ -1147,29 +1147,29 @@ DESC limit 1");
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $this->getPaymentInstrumentID(),
             'financial_type_id' => $this->getFinancialTypeID(),
-            'receive_date' => CRM_Utils_Time::date('YmdHis'),
+            'receive_date' => $this->getReceiveDate(),
             'tax_amount' => $this->order->getTotalTaxAmount(),
             'total_amount' => $this->order->getTotalAmount(),
             'invoice_id' => $this->getInvoiceID(),
             'currency' => $this->getCurrency(),
-            'is_pay_later' => $params['is_pay_later'] ?? 0,
-            'skipLineItem' => $params['skipLineItem'] ?? 0,
-            'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+            'contribution_status_id' => 'Pending',
             'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
             'contribution_recur_id' => $this->getContributionRecurID(),
+            'skipCleanMoney' => TRUE,
           ]
         );
 
         //create new soft-credit record, CRM-13981
         if ($softParams) {
-          $softParams['contribution_id'] = $contribution->id;
+          $softParams['contribution_id'] = $contribution['id'];
           $softParams['currency'] = $this->getCurrency();
           $softParams['amount'] = $this->order->getTotalAmount();
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
 
         $paymentParams['contactID'] = $this->_contactID;
-        $paymentParams['contributionID'] = $contribution->id;
+        $paymentParams['contributionID'] = $contribution['id'];
+
         $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
         $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
         $params['contribution_id'] = $paymentParams['contributionID'];
@@ -1677,38 +1677,6 @@ DESC limit 1");
       $this->createRecurringContribution();
     }
     return $this->ids['ContributionRecur'];
-  }
-
-  /**
-   * Legacy contribution processing function.
-   *
-   * This is copied from a shared function in order to clean it up. Most of the
-   * stuff in it, maybe all except the ContributionRecur create is
-   * not applicable to this form & can be removed in follow up cleanup.
-   *
-   * It's like the contribution create being done here is actively bad and
-   * being fixed later.
-   *
-   * @param array $contributionParams
-   *   Parameters to be passed to contribution create action.
-   *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
-   *   passed consistently & 2) documenting them here.
-   *   - contact_id
-   *   - line_item
-   *   - is_test
-   *   - campaign_id
-   *   - source
-   *   - payment_type_id
-   *
-   * @return \CRM_Contribute_DAO_Contribution
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected function processContribution(
-    $contributionParams
-  ) {
-    return CRM_Contribute_BAO_Contribution::add($contributionParams);
   }
 
   /**
