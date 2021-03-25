@@ -559,9 +559,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       }
 
       //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify($isFirstOrLastRecurringPayment,
-        $ids['contact'],
-        $ids['contributionPage'],
+      CRM_Contribute_BAO_ContributionPage::recurringNotify(
+        $ids['contribution'],
+        $isFirstOrLastRecurringPayment,
         $recur,
         $autoRenewMembership
       );

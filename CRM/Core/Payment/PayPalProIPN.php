@@ -258,9 +258,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
     if ($sendNotification) {
       //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify($subscriptionPaymentStatus,
-        $ids['contact'],
-        $ids['contributionPage'],
+      CRM_Contribute_BAO_ContributionPage::recurringNotify(
+        $ids['contribution'],
+        $subscriptionPaymentStatus,
         $recur,
         !empty($ids['membership'])
       );

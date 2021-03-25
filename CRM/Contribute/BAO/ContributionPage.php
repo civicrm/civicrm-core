@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * This class contains Contribution Page related functions.
  */
@@ -309,7 +311,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
             $userID = $values['related_contact'] ?? NULL;
           }
         }
-        list($values['customPre_grouptitle'], $values['customPre']) = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
+        [$values['customPre_grouptitle'], $values['customPre']] = self::getProfileNameAndFields($preID, $userID, $params['custom_pre_id']);
       }
       $userID = $contactID;
       if ($postID = CRM_Utils_Array::value('custom_post_id', $values)) {
@@ -503,55 +505,48 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
   /**
    * Send the emails for Recurring Contribution Notification.
    *
+   * @param int $contributionID
    * @param string $type
    *   TxnType.
-   * @param int $contactID
-   *   Contact id for contributor.
-   * @param int $pageID
    *   Contribution page id.
    * @param object $recur
    *   Object of recurring contribution table.
    * @param bool|object $autoRenewMembership is it a auto renew membership.
+   *
+   * @throws \API_Exception
    */
-  public static function recurringNotify($type, $contactID, $pageID, $recur, $autoRenewMembership = FALSE) {
-    $value = [];
-    $isEmailReceipt = FALSE;
-    if ($pageID) {
-      CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id', $pageID, $value, [
-        'title',
-        'is_email_receipt',
-        'receipt_from_name',
-        'receipt_from_email',
-        'cc_receipt',
-        'bcc_receipt',
-      ]);
-      $isEmailReceipt = $value[$pageID]['is_email_receipt'] ?? NULL;
-    }
-    elseif ($recur->id) {
-      // This means we are coming from back-office - ie. no page ID, but recurring.
-      // Ideally this information would be passed into the function clearly rather than guessing by convention.
-      $isEmailReceipt = TRUE;
-    }
+  public static function recurringNotify($contributionID, $type, $recur, $autoRenewMembership = FALSE): void {
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->setSelect([
+        'contribution_page_id',
+        'contact_id',
+        'contribution_recur_id',
+        'contribution_recur.is_email_receipt',
+        'contribution_page.title',
+        'contribution_page.is_email_receipt',
+        'contribution_page.receipt_from_name',
+        'contribution_page.receipt_from_email',
+        'contribution_page.cc_receipt',
+        'contribution_page.bcc_receipt',
+      ])
+      ->execute()->first();
 
-    if ($isEmailReceipt) {
-      if ($pageID) {
-        $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$pageID]) . '" <' . $value[$pageID]['receipt_from_email'] . '>';
-
-        $receiptFromName = $value[$pageID]['receipt_from_name'];
-        $receiptFromEmail = $value[$pageID]['receipt_from_email'];
+    if ($contribution['contribution_recur.is_email_receipt'] || $contribution['contribution_page.is_email_receipt']) {
+      if ($contribution['contribution_page.receipt_from_email']) {
+        $receiptFromName = $contribution['contribution_page.receipt_from_name'];
+        $receiptFromEmail = $contribution['contribution_page.receipt_from_email'];
       }
       else {
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-        $receiptFromName = $domainValues[0];
-        $receiptFromEmail = $domainValues[1];
+        [$receiptFromName, $receiptFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
       }
 
-      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE);
+      $receiptFrom = "$receiptFromName <$receiptFromEmail>";
+      [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id'], FALSE);
       $templatesParams = [
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_recurring_notify',
-        'contactId' => $contactID,
+        'contactId' => $contribution['contact_id'],
         'tplParams' => [
           'recur_frequency_interval' => $recur->frequency_interval,
           'recur_frequency_unit' => $recur->frequency_unit,
@@ -570,10 +565,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'toEmail' => $email,
       ];
       //CRM-13811
-      if ($pageID) {
-        $templatesParams['cc'] = $value[$pageID]['cc_receipt'] ?? NULL;
-        $templatesParams['bcc'] = $value[$pageID]['bcc_receipt'] ?? NULL;
-      }
+      $templatesParams['cc'] = $contribution['contribution_page.cc_receipt'];
+      $templatesParams['bcc'] = $contribution['contribution_page.cc_receipt'];
       if ($recur->id) {
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.
         // like in PaypalPro, & therefore we set it here additionally.
