@@ -1771,8 +1771,7 @@ DESC limit 1");
     $params,
     $contributionParams
   ) {
-    $contactID = $contributionParams['contact_id'];
-    $contributionParams['contribution_recur_id'] = $this->legacyProcessRecurringContribution($params, $contactID);
+    $contributionParams['contribution_recur_id'] = $this->legacyProcessRecurringContribution($params);
     return CRM_Contribute_BAO_Contribution::add($contributionParams);
   }
 
@@ -1782,16 +1781,15 @@ DESC limit 1");
    * This function was copied from another form & needs cleanup.
    *
    * @param array $params
-   * @param int $contactID
    *
    * @return int|null
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessRecurringContribution(array $params, $contactID): ?int {
+  protected function legacyProcessRecurringContribution(array $params): ?int {
     if (!$this->isCreateRecurringContribution()) {
       return NULL;
     }
-    $recurParams = ['contact_id' => $contactID];
+    $recurParams = ['contact_id' => $this->getContributionContactID()];
     $recurParams['amount'] = $this->order->getTotalAmount();
     $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
     $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
