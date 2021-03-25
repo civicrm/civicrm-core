@@ -27,7 +27,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   protected $_entity;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_entity = 'Address';
     parent::setUp();
 

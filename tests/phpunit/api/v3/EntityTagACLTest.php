@@ -45,7 +45,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
   /**
    * Set up permissions for test.
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
     $individualID = $this->individualCreate();

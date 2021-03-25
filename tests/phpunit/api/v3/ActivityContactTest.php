@@ -23,7 +23,7 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   protected $_activityID;
   protected $_params;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

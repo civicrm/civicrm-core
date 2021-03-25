@@ -22,7 +22,7 @@
  */
 class api_v3_ExtensionTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     $url = 'file://' . dirname(dirname(dirname(dirname(__FILE__)))) . '/mock/extension_browser_results';
     Civi::settings()->set('ext_repo_url', $url);
   }

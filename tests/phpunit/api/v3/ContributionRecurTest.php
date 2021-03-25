@@ -25,7 +25,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
     $this->ids['contact'][0] = $this->individualCreate();

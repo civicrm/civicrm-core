@@ -60,7 +60,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
    */
   public $_tomorrow;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->loadReferenceDates();
     $this->loadMembershipStatuses();

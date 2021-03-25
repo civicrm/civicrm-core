@@ -18,7 +18,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_entity;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_apiversion = 3;
     $this->_entity = 'event';

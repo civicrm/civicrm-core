@@ -19,7 +19,7 @@
 class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_params;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [

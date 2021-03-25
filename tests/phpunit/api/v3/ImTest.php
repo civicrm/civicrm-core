@@ -23,7 +23,7 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

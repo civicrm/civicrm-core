@@ -68,7 +68,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
    */
   public $customGroupID = NULL;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $customGroup = $this->customGroupCreate();
     $this->customGroupID = $customGroup['id'];

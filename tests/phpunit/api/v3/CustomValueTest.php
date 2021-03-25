@@ -21,10 +21,6 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function _populateOptionAndCustomGroup($type = NULL) {
     $dataValues = [
       'integer' => [1, 2, 3],

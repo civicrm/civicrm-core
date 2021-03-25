@@ -54,7 +54,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->contactIds[] = $this->individualCreate();
     $this->params = [

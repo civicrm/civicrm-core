@@ -39,7 +39,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   /**
    * Test setup for every test.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }
