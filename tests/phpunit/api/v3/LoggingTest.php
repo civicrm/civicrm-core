@@ -22,7 +22,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->ensureTempColIsCleanedUp();
     parent::setUp();
   }

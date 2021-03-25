@@ -24,7 +24,7 @@ class api_v3_GrantTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->params = [

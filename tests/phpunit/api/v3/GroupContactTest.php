@@ -34,7 +34,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
    *
    * @todo set up calls function that doesn't work @ the moment
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

@@ -21,7 +21,7 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 

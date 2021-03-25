@@ -22,7 +22,7 @@ class api_v3_ExceptionTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
   }

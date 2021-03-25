@@ -18,7 +18,7 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->individualCreate();

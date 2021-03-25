@@ -15,7 +15,7 @@
  */
 class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     $this->quickCleanup(['civicrm_case_type']);
     parent::setUp();
 

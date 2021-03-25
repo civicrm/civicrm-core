@@ -19,7 +19,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->installApi();
   }

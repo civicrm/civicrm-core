@@ -16,7 +16,7 @@
 class api_v3_ContactTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $params = [

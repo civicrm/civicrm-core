@@ -34,7 +34,7 @@
 class api_v3_ActivityTypeTest extends CiviUnitTestCase {
   protected $_apiversion;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_apiversion = 3;
     CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
     parent::setUp();

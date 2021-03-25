@@ -45,7 +45,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return self::$filePrefix;
   }
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

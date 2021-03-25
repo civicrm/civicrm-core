@@ -46,7 +46,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->_apiversion = 3;

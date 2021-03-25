@@ -22,7 +22,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->ids['Group'] = [];

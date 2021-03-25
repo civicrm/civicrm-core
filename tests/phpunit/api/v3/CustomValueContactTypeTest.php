@@ -22,7 +22,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   protected $CustomGroupIndividual;
   protected $individualStudent;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     //  Create Group For Individual  Contact Type
     $groupIndividual = [

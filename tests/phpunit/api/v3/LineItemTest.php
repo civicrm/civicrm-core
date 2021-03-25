@@ -24,7 +24,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
     $contributionParams = [

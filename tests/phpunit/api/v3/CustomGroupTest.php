@@ -23,7 +23,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
   public $DBResetRequired = TRUE;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_entity = 'CustomGroup';
     $this->_params = [
       'title' => 'Test_Group_1',

@@ -28,7 +28,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   public $DBResetRequired = FALSE;
   protected $_entity;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
     $this->callAPISuccess('Phone', 'create', ['id' => $this->individualCreate(['email' => '']), 'phone' => '911', 'location_type_id' => 'Home']);

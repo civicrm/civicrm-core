@@ -26,7 +26,7 @@
 class api_v3_MailingContactTest extends CiviUnitTestCase {
   protected $_entity = 'mailing';
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $params = [
       'first_name' => 'abc1',
