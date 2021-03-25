@@ -35,6 +35,7 @@
       <label>Relationship</label>
     </html>
     <add>5.29</add>
+    <readonly>true</readonly>
   </field>
   <foreignKey>
     <name>relationship_id</name>
@@ -54,6 +55,7 @@
       <label>Relationship Type</label>
     </html>
     <add>5.29</add>
+    <readonly>true</readonly>
   </field>
   <foreignKey>
     <name>relationship_type_id</name>
@@ -74,6 +76,7 @@
     </pseudoconstant>
     <comment>The cache record is a permutation of the original relationship record. The orientation indicates whether it is forward (a_b) or reverse (b_a) relationship.</comment>
     <add>5.29</add>
+    <readonly>true</readonly>
   </field>
 
   <field>
@@ -87,6 +90,7 @@
       <type>EntityRef</type>
       <label>Contact (Near side)</label>
     </html>
+    <readonly>true</readonly>
   </field>
   <foreignKey>
     <name>near_contact_id</name>
@@ -109,6 +113,7 @@
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
     </pseudoconstant>
+    <readonly>true</readonly>
   </field>
 
   <field>
@@ -122,6 +127,7 @@
       <type>EntityRef</type>
       <label>Contact (Far side)</label>
     </html>
+    <readonly>true</readonly>
   </field>
   <foreignKey>
     <name>far_contact_id</name>
@@ -144,6 +150,7 @@
     <pseudoconstant>
       <callback>CRM_Core_PseudoConstant::relationshipTypeOptions</callback>
     </pseudoconstant>
+    <readonly>true</readonly>
   </field>
 
   <index>
@@ -186,6 +193,7 @@
     <html>
       <type>CheckBox</type>
     </html>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>start_date</name>
@@ -198,6 +206,7 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <readonly>true</readonly>
   </field>
   <field>
     <name>end_date</name>
@@ -210,5 +219,6 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <readonly>true</readonly>
   </field>
 </table>
