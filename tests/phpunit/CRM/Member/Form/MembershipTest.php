@@ -487,7 +487,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmit(string $thousandSeparator) {
+  public function testSubmit(string $thousandSeparator): void {
     CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm();
@@ -496,6 +496,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = [
       'cid' => $this->_individualId,
+      'contact_id' => $this->_individualId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -786,7 +787,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $params = $this->getBaseSubmitParams();
     // Change financial_type_id to test our override flows through to the line item.
     $params['financial_type_id'] = FinancialType::get(FALSE)->addWhere('id', '!=', $params['financial_type_id'])->addSelect('id')->execute()->first()['id'];
-    $form = $this->getForm();
+    $form = $this->getForm($params);
     $this->createLoggedInUser();
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
@@ -905,12 +906,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPayLaterWithBilling() {
+  public function testSubmitPayLaterWithBilling(): void {
     $form = $this->getForm();
-    $form->preProcess();
     $this->createLoggedInUser();
     $params = [
-      'cid' => $this->_individualId,
+      'contact_id' => $this->_individualId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -933,7 +933,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'trxn_id' => 777,
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_middle_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -1010,9 +1010,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitRecurCompleteInstant() {
-    $form = $this->getForm();
+  public function testSubmitRecurCompleteInstant(): void {
     $mut = new CiviMailUtils($this, TRUE);
+    /* @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($this->_paymentProcessorID);
     $processor->setDoDirectPaymentResult([
       'payment_status_id' => 1,
@@ -1026,12 +1026,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'duration_interval' => 1,
       'auto_renew' => TRUE,
     ]);
-    $form->preProcess();
+    $form = $this->getForm($this->getBaseSubmitParams());
     $this->createLoggedInUser();
-    $params = $this->getBaseSubmitParams();
     $form->_mode = 'test';
     $form->_contactID = $this->_individualId;
-    $form->testSubmit($params);
+    $form->testSubmit();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->_individualId], 1);
 
@@ -1053,7 +1052,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       '===========================================================
 Billing Name and Address
 ===========================================================
-Test
+Test Last
 10 Test St
 Test, AR 90210
 US',
@@ -1218,15 +1217,16 @@ Expires: ',
    * We need to instantiate the form to run preprocess, which means we have to
    * trick it about the request method.
    *
+   * @param array $formValues
+   *
    * @return \CRM_Member_Form_Membership
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  protected function getForm() {
+  protected function getForm($formValues = []) {
     if (isset($_REQUEST['cid'])) {
       unset($_REQUEST['cid']);
     }
-    $form = $this->getFormObject('CRM_Member_Form_Membership');
+    $form = $this->getFormObject('CRM_Member_Form_Membership', $formValues);
     $form->preProcess();
     return $form;
   }
@@ -1234,8 +1234,9 @@ Expires: ',
   /**
    * @return array
    */
-  protected function getBaseSubmitParams() {
-    $params = [
+  protected function getBaseSubmitParams(): array {
+    return [
+      'contact_id' => $this->_individualId,
       'cid' => $this->_individualId,
       'price_set_id' => 0,
       'join_date' => date('Y-m-d'),
@@ -1265,7 +1266,7 @@ Expires: ',
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_middle_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -1273,7 +1274,6 @@ Expires: ',
       'billing_country_id-5' => '1228',
       'send_receipt' => 1,
     ];
-    return $params;
   }
 
   /**
