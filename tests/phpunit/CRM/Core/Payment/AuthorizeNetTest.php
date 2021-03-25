@@ -31,7 +31,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $GLOBALS['_PEAR_ERRORSTACK_OVERRIDE_CALLBACK'] = [];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
   }
 

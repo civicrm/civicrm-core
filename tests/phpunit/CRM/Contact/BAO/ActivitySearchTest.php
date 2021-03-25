@@ -85,7 +85,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_activity',

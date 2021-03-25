@@ -16,7 +16,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup([], TRUE);
     parent::tearDown();
   }

@@ -18,7 +18,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
   /**
    * Clean up after tests.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

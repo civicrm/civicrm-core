@@ -42,7 +42,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email'], TRUE);
     parent::tearDown();
   }

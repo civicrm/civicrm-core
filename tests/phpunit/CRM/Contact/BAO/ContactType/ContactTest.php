@@ -50,7 +50,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
     $this->team = $params['name'];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact']);
     $query = "
 DELETE FROM civicrm_contact_type

@@ -21,7 +21,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->process = new CRM_Case_XMLProcessor_Process();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->deleteMoreRelationshipTypes();
 
     parent::tearDown();

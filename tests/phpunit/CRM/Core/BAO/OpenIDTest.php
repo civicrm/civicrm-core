@@ -8,7 +8,7 @@ use Civi\Api4\OpenID;
  */
 class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact', 'civicrm_openid', 'civicrm_email']);
     parent::tearDown();
   }

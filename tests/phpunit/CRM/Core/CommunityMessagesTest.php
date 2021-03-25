@@ -129,7 +129,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     self::initWebResponses();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Utils_Time::resetTime();
   }

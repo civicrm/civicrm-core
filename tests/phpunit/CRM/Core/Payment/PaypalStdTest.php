@@ -40,7 +40,7 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
   /**
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

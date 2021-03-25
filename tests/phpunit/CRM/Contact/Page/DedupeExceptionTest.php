@@ -30,7 +30,7 @@ class CRM_Contact_Page_DedupeExceptionTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
   }
 

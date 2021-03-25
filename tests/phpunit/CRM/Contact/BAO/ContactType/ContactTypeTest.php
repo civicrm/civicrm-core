@@ -51,7 +51,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     ContactType::delete()->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
   }

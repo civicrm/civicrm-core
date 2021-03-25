@@ -30,7 +30,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $this->ids['Contact']['contactID2'] = $this->individualCreate([], 2);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

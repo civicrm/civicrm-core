@@ -48,7 +48,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     };
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
     CRM_Core_DAO_AllCoreTables::init(1);
     parent::tearDown();

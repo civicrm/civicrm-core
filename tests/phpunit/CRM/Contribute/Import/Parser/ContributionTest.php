@@ -23,7 +23,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

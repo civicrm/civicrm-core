@@ -97,7 +97,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->apiKernel->registerApiProvider($this->adhocProvider);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     \Civi::reset();
   }

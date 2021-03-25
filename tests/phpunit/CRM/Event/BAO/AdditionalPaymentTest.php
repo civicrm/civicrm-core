@@ -40,7 +40,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->eventDelete($this->_eventId);
     $this->quickCleanUpFinancialEntities();
   }

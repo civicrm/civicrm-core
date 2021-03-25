@@ -23,7 +23,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Clean up after tests.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

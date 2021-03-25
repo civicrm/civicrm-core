@@ -35,7 +35,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', [$this, 'hook_civicrm_fieldOptions']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->quickCleanup(['civicrm_custom_field', 'civicrm_custom_group']);
   }

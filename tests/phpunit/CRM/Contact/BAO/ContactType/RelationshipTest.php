@@ -78,7 +78,7 @@ class CRM_Contact_BAO_ContactType_RelationshipTest extends CiviUnitTestCase {
     $this->organization_sponsor = $this->organizationCreate($params);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact']);
 
     $query = "

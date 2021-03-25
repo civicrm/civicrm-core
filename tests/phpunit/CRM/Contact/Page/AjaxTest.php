@@ -20,7 +20,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->originalRequest = $_REQUEST;
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $_REQUEST = $this->originalRequest;
     parent::tearDown();
   }

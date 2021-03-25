@@ -36,7 +36,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->quickCleanup(['civicrm_batch']);
   }

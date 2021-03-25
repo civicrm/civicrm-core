@@ -56,7 +56,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);
   }

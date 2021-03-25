@@ -22,7 +22,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $config->configAndLogDir = $this->createTempDir('test-log-');
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $config = CRM_Core_Config::singleton();
     $config->configAndLogDir = $this->oldConfigAndLogDir;
     parent::tearDown();

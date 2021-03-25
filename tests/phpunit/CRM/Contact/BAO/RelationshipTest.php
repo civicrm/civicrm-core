@@ -33,7 +33,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup([
       'civicrm_relationship_type',
       'civicrm_relationship',

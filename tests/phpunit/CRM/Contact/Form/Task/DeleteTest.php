@@ -30,7 +30,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     ]);
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup([
       'civicrm_contact',
     ]);

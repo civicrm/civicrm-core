@@ -15,7 +15,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
     $this->report = new CRM_Case_XMLProcessor_Report();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 

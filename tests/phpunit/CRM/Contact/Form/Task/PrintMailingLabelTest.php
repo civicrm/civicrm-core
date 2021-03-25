@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     unset($this->_contactIds);
     parent::tearDown();
   }

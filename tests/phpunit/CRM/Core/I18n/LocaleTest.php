@@ -14,14 +14,6 @@
  */
 class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-    parent::tearDown();
-  }
-
   /**
    *
    */

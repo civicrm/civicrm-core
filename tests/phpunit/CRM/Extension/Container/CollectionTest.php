@@ -19,7 +19,7 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
