@@ -76,7 +76,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->_apiversion = 3;
     parent::setUp();
     $this->_userId = $this->createLoggedInUser();

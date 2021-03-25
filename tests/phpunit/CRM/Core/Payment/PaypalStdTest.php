@@ -23,7 +23,7 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
   /**
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $processorID = $this->processorCreate([
       'payment_processor_type_id' => 'PayPal_Standard',

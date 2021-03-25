@@ -6,7 +6,7 @@
  */
 class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
 

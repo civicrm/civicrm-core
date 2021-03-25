@@ -26,7 +26,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     return $tables;
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 

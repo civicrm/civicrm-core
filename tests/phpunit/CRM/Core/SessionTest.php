@@ -6,7 +6,7 @@
  */
 class CRM_Core_SessionTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     CRM_Core_Smarty::singleton()->clearTemplateVars();
   }
 

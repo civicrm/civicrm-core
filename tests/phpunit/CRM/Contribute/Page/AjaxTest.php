@@ -17,7 +17,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
 
   protected $_params = [];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->_fields = ['amount', 'sct_label'];

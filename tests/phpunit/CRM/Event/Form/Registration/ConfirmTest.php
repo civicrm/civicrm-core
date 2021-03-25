@@ -10,7 +10,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
   use CRMTraits_Profile_ProfileTrait;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
   }

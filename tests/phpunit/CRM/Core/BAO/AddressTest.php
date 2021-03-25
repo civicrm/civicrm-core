@@ -17,7 +17,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->quickCleanup(['civicrm_contact', 'civicrm_address']);

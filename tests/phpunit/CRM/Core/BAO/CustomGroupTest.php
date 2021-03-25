@@ -15,10 +15,6 @@
  */
 class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test getTree().
    */

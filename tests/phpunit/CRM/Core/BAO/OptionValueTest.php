@@ -21,7 +21,7 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
   /**
    * Test setup for every test.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }

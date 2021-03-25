@@ -30,7 +30,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
    */
   public $targetField;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', [$this, 'hook_civicrm_fieldOptions']);
   }

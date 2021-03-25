@@ -16,7 +16,7 @@
  */
 class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate();

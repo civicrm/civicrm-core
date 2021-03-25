@@ -18,7 +18,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
   /**
    * Test setup for every test.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 

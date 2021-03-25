@@ -6,7 +6,7 @@
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->quickCleanup(['civicrm_uf_group', 'civicrm_uf_field']);

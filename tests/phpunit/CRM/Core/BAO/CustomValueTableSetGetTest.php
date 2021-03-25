@@ -6,10 +6,6 @@
  */
 class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test setValues() and GetValues() methods with custom Date field
    *

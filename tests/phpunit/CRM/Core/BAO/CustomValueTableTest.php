@@ -6,10 +6,6 @@
  */
 class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test store function for country.
    */

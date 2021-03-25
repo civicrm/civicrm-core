@@ -11,7 +11,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    *
    * Here we ensure we are starting from a default report navigation.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
   }

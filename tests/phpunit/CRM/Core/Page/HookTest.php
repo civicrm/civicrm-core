@@ -47,7 +47,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
   /**
    * Set up the list of pages to evaluate by going through the menu.
    */
-  public function setUp() {
+  public function setUp(): void {
     // Get all of the menu items in CiviCRM.
     $items = CRM_Core_Menu::items(TRUE);
     // Check if they extend the class we care about; test if needed.

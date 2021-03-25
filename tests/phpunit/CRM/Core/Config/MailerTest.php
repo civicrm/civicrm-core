@@ -30,7 +30,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
    */
   public $calls;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->calls = [
       'civicrm_alterMailer' => 0,
       'send' => 0,

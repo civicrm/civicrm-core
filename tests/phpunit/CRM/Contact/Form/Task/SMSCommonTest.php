@@ -22,7 +22,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $mobile_type_id = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Mobile');
     $phone_type_id = CRM_Core_PseudoConstant::getKey('CRM_Core_DAO_Phone', 'phone_type_id', 'Phone');

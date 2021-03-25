@@ -11,7 +11,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup(['civicrm_contact', 'civicrm_email']);
   }

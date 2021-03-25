@@ -22,7 +22,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => 0]);
     $this->_contactID = $this->individualCreate();

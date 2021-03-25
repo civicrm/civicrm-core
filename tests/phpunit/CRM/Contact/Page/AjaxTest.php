@@ -14,7 +14,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
    */
   protected $originalRequest = [];
 
-  public function setUp() {
+  public function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->originalRequest = $_REQUEST;

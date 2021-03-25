@@ -19,7 +19,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    */
   private $cids;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup(['civicrm_contact', 'civicrm_activity']);
     $this->callbackLog = [];

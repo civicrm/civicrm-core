@@ -6,10 +6,6 @@
  */
 class CRM_Logging_LoggingTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function tearDown(): void {
     CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     $logging = new CRM_Logging_Schema();

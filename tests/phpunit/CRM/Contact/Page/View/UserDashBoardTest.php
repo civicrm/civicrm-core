@@ -36,7 +36,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
   /**
    * Prepare for test
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();
     $this->listenForPageContent();

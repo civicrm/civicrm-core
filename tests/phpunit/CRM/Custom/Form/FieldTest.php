@@ -6,7 +6,7 @@
  */
 class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 
