@@ -7,13 +7,6 @@
 class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
   /**
-   * Set up function.
-   */
-  public function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Test case for add( ).
    *
    * test with empty params.

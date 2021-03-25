@@ -32,7 +32,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
 
   protected $tagID;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->tag = $this->tagCreate();

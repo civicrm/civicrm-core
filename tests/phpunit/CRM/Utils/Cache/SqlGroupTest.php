@@ -6,14 +6,6 @@
  */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-    parent::tearDown();
-  }
-
   /**
    * Add and remove two items from the same cache instance.
    */

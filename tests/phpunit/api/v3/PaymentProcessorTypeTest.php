@@ -17,7 +17,7 @@
 class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
   protected $_ppTypeID;
 
-  public function setUp() {
+  public function setUp(): void {
 
     parent::setUp();
     $this->useTransaction(TRUE);

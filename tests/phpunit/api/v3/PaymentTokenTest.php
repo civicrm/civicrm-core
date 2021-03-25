@@ -20,7 +20,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_apiversion = 3;
     $this->useTransaction(TRUE);
     parent::setUp();

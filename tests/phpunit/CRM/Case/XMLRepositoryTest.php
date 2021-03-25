@@ -7,7 +7,7 @@
 class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
   protected $fixtures = [];
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->fixtures['CaseTypeWithSingleActivityType'] = '
 <CaseType>

@@ -20,7 +20,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
   protected $_locationType;
   protected $_params;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [

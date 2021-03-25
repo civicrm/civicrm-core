@@ -17,7 +17,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp():void {
     parent::setUp();
     $this->prepareForACLs();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM'];

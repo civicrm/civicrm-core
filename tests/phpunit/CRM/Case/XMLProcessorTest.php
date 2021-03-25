@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->processor = new CRM_Case_XMLProcessor();

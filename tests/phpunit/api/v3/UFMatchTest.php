@@ -26,7 +26,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_contactId;
   protected $_params = [];
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->quickCleanup(
       [

@@ -23,7 +23,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_membershipStatusID;
   protected $_contribution = [];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

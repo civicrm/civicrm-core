@@ -19,7 +19,7 @@ class api_v3_ProductTest extends CiviUnitTestCase {
 
   protected $_entity = 'Product';
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
     $this->_params = [

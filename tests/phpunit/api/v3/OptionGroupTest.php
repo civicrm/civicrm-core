@@ -20,7 +20,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
 
   protected $_entity = 'OptionGroup';
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_params = [

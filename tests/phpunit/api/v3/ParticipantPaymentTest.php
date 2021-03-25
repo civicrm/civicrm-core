@@ -29,7 +29,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
   /**
    * Set up for tests.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $event = $this->eventCreate(NULL);

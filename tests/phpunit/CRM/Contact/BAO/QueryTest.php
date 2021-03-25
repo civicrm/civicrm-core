@@ -17,10 +17,6 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     return new CRM_Contact_BAO_QueryTestDataProvider();
   }
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Clean up after test.
    *

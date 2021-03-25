@@ -17,14 +17,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
   const TESTING_TYPE = 'report';
   const OTHER_TESTING_TYPE = 'module';
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     list ($this->basedir, $this->container) = $this->_createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**

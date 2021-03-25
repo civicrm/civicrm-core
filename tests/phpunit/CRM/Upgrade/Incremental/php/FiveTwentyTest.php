@@ -7,10 +7,6 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Upgrade_Incremental_php_FiveTwentyTest extends CiviCaseTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test that the upgrade task changes the direction but only
    * for bidirectional relationship types that are b_a.

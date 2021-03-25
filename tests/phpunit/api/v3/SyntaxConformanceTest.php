@@ -81,7 +81,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * and that will never exist (eg an obsoleted Entity
    * they need to be returned by the function toBeSkipped_{$action} (because it has to be a static method and therefore couldn't access a this->toBeSkipped)
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->enableCiviCampaign();
     $this->toBeImplemented['get'] = [

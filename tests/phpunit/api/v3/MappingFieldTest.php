@@ -25,7 +25,7 @@ class api_v3_MappingFieldTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
 

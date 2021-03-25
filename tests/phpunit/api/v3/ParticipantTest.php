@@ -31,7 +31,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_params;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_apiversion = 3;
     parent::setUp();
     $this->_entity = 'participant';

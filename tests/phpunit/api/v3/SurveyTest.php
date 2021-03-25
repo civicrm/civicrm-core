@@ -33,7 +33,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $entity = 'survey';
   public $DBResetRequired = FALSE;
 
-  public function setUp() {
+  public function setUp(): void {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', [
       'label' => 'PhoneBank',
       'return' => 'value',

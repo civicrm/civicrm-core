@@ -20,7 +20,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   /**
    * Set up for tests.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->_contactID = $this->organizationCreate();

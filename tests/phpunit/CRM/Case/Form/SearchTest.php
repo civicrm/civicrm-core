@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp():void {
     parent::setUp();
     $this->quickCleanup(['civicrm_case_contact', 'civicrm_case', 'civicrm_contact']);
   }

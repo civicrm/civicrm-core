@@ -17,7 +17,7 @@
  */
 class CRM_Contact_BAO_RelationshipCacheTest extends CiviUnitTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
   }

@@ -6,7 +6,7 @@
  */
 class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->tablesToTruncate = [

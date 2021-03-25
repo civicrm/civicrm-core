@@ -23,7 +23,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->ids['Contact'][0] = $this->individualCreate();
     $this->_params = [
@@ -41,13 +41,6 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'amount' => 300,
     ];
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   * This method is called after a test is executed.
-   */
-  protected function tearDown() {
   }
 
   /**

@@ -28,7 +28,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    *
    * This method is called before a test is executed.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
   }

@@ -75,7 +75,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   protected $_contactID4 = NULL;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $params = [

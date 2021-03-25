@@ -31,7 +31,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
     $this->a = $this->b = NULL;
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     parent::tearDown();
     if ($this->a) {
       $this->a->clear();

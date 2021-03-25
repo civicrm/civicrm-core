@@ -26,16 +26,6 @@
  */
 class CRM_Utils_DateTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    // There are only unit tests here at present, we can skip database loading.
-    return TRUE;
-  }
-
-  public function tearDown() {
-    // There are only unit tests here at present, we can skip database loading.
-    return TRUE;
-  }
-
   /**
    * Used by testGetFromTo
    */

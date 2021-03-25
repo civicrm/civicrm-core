@@ -27,7 +27,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
   /**
    * Set up for test.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $config = CRM_Core_Config::singleton();
     $countryLimit = $config->countryLimit;

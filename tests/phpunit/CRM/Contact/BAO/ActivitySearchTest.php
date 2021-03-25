@@ -52,7 +52,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file
    */
-  public function setUp() {
+  public function setUp(): void {
     // Connect to the database
     parent::setUp();
 

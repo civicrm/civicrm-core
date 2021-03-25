@@ -29,7 +29,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    */
   protected $isLocationTypesOnPostAssert = TRUE;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->_entity = 'Phone';
     parent::setUp();
     $this->useTransaction();

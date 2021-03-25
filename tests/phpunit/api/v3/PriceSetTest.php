@@ -25,7 +25,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
   /**
    * Set up for class.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_params = [
       'name' => 'default_goat_priceset',

@@ -23,7 +23,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     // Create dummy processor

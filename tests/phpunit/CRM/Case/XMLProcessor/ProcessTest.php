@@ -7,7 +7,7 @@ require_once 'CiviTest/CiviCaseTestCase.php';
  */
 class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->defaultAssigneeOptionsValues = [];
