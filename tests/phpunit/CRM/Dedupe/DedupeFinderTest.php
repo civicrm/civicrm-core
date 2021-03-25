@@ -26,7 +26,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
 
     foreach ($this->contactIDs as $contactId) {
       $this->contactDelete($contactId);

@@ -15,7 +15,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',

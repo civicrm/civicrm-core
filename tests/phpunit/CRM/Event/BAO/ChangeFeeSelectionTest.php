@@ -78,7 +78,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   /**
    * Clean up after test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->eventDelete($this->_eventId);
     $this->quickCleanUpFinancialEntities();
   }

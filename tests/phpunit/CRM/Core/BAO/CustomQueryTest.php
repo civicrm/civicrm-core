@@ -14,7 +14,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_contact',
     ];

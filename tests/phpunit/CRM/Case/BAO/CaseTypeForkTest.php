@@ -12,7 +12,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }

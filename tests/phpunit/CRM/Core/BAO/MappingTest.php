@@ -12,7 +12,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup(['civicrm_mapping_field', 'civicrm_mapping']);
     parent::tearDown();
   }

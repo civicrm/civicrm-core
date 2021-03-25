@@ -24,7 +24,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->callAPISuccess('System', 'updateindexes', []);
   }

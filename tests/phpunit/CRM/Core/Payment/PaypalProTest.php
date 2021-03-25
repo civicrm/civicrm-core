@@ -27,7 +27,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
     $this->processor = Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['paypal_pro']);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

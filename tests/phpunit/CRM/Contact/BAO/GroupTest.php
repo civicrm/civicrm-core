@@ -31,7 +31,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup(['civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search']);
   }
 

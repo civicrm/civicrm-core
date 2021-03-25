@@ -21,7 +21,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   /**
    * Clean up DB.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
   }
 

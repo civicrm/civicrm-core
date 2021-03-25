@@ -33,7 +33,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     global $civicrm_setting;
     $civicrm_setting = $this->origSetting;
     $this->quickCleanup(['civicrm_contribution']);

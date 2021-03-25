@@ -6,7 +6,7 @@
  */
 class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
 
-  public function tearDown() {
+  public function tearDown(): void {
     // May or may not cleanup well if there's a bug in the indexer.
     // This is better than nothing -- and better than duplicating the
     // cleanup logic.

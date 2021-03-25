@@ -26,7 +26,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $tablesToTruncate = [
       'civicrm_group_contact',

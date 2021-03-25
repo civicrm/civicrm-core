@@ -33,7 +33,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
    *
    * This method is called after a test is executed.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     if (!empty($this->ids['CustomField'])) {
       foreach ($this->ids['CustomField'] as $type => $id) {
         $field = civicrm_api3('CustomField', 'getsingle', ['id' => $id]);

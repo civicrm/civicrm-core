@@ -10,7 +10,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 

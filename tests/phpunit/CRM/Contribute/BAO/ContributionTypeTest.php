@@ -20,7 +20,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
     $this->organizationCreate();
   }
 
-  public function teardown() {
+  public function tearDown(): void {
     $this->financialAccountDelete('Donations');
   }
 

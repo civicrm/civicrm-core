@@ -30,7 +30,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',

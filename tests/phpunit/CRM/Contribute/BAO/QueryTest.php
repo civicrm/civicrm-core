@@ -7,7 +7,7 @@
  */
 class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

@@ -47,7 +47,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   /**
    * Tear down function.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
   }
 
