@@ -55,7 +55,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->quickCleanup(
       [
         'civicrm_group',

@@ -29,7 +29,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     parent::tearDown();

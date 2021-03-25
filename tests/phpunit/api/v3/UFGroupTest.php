@@ -68,7 +68,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     //  Truncate the tables
     $this->quickCleanup(
       [

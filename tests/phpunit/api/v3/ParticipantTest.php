@@ -68,7 +68,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->eventDelete($this->_eventID);
     $tablesToTruncate = [
       'civicrm_custom_group',

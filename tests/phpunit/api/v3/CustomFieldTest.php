@@ -22,7 +22,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_file',

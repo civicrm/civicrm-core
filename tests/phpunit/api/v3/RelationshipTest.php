@@ -79,7 +79,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->contactDelete($this->_cId_a);
     $this->contactDelete($this->_cId_a_2);
     $this->contactDelete($this->_cId_b);

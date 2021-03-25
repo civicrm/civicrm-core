@@ -56,7 +56,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_contribution',

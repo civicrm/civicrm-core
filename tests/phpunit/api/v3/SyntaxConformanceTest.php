@@ -132,7 +132,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->deletableTestObjects = [];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     foreach ($this->deletableTestObjects as $entityName => $entities) {
       foreach ($entities as $entityID) {
         CRM_Core_DAO::deleteTestObjects($entityName, ['id' => $entityID]);

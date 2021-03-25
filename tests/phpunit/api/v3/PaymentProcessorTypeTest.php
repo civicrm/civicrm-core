@@ -23,7 +23,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
   }
 
-  //  function tearDown() {
+  //  function tearDown(): void {
   //
   //    $tablesToTruncate = array(
   //      'civicrm_payment_processor_type',

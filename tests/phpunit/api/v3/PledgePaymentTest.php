@@ -39,7 +39,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
    * Clean up after function.
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_contribution',
       'civicrm_contact',

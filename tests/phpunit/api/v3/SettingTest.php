@@ -50,7 +50,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
     $this->callAPISuccess('system', 'flush', []);

@@ -43,7 +43,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
 
     $this->quickCleanup([
       'civicrm_contact',

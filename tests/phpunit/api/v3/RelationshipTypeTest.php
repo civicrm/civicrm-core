@@ -27,7 +27,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $this->_cId_b = $this->organizationCreate();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
 
     $tablesToTruncate = [
       'civicrm_contact',
