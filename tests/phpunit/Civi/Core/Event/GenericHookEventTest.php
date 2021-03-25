@@ -3,7 +3,7 @@ namespace Civi\Core\Event;
 
 class GenericHookEventTest extends \CiviUnitTestCase {
 
-  public function tearDown() {
+  public function tearDown(): void {
     \CRM_Utils_Hook::singleton()->reset();
     parent::tearDown();
   }

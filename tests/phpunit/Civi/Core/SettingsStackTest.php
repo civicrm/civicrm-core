@@ -3,13 +3,9 @@ namespace Civi\Core;
 
 class SettingsStackTest extends \CiviUnitTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**

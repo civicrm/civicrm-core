@@ -19,7 +19,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     return \Civi\Test::headless()->apply();
   }
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
     ]);
@@ -27,7 +27,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $session->set('userID', $this->contact->id);
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->contact->delete();
   }
 

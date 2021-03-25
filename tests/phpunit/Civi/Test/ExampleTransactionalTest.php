@@ -21,7 +21,7 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
     return \Civi\Test::headless()->apply();
   }
 
-  protected function setUp() {
+  protected function setUp(): void {
     /** @var \CRM_Contact_DAO_Contact $contact */
     $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
@@ -58,9 +58,6 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
     $dao = new \CRM_Contact_DAO_Contact();
     $dao->id = self::$contactIds['testDummy2'];
     $this->assertTrue((bool) $dao->find());
-  }
-
-  public function tearDown() {
   }
 
   /**

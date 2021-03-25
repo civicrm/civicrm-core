@@ -22,18 +22,10 @@ abstract class api_v4_AfformTestCase extends \PHPUnit\Framework\TestCase impleme
   /**
    * The setup() method is executed before the test is executed (optional).
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
     CRM_Core_Config::singleton()->userPermissionTemp->grant('administer CiviCRM');
-  }
-
-  /**
-   * The tearDown() method is executed after the test was executed (optional)
-   * This can be used for cleanup.
-   */
-  public function tearDown() {
-    parent::tearDown();
   }
 
 }
