@@ -8,10 +8,6 @@ use Civi\Test\Invasive;
  */
 class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * @var array
    */
@@ -91,7 +87,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     ],
   ];
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $vc = new CRM_Utils_VersionCheck();
     if (file_exists($vc->cacheFile)) {

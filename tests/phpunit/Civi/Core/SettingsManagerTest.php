@@ -38,7 +38,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     ];
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
     parent::tearDown();
   }

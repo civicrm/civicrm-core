@@ -30,8 +30,8 @@ use Civi\Api4\CustomGroup;
  */
 class ChainTest extends UnitTestCase {
 
-  public function tearDown() {
-    $result = CustomField::delete()
+  public function tearDown(): void {
+    CustomField::delete()
       ->setCheckPermissions(FALSE)
       ->addWhere('name', '=', 'FavPerson')
       ->addChain('group', CustomGroup::delete()->addWhere('name', '=', 'TestActCus'))

@@ -26,7 +26,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   /**
    * Set up function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorCreate(['is_test' => 0, 'payment_processor_type_id' => 'PayPal_Standard']);
     $this->_contactID = $this->individualCreate();
@@ -42,7 +42,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   /**
    * Tear down function.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }

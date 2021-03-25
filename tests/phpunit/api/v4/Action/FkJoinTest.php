@@ -39,7 +39,7 @@ class FkJoinTest extends UnitTestCase {
     return parent::setUpHeadless();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $relatedTables = [
       'civicrm_activity',
       'civicrm_phone',
