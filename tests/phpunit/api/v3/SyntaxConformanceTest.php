@@ -753,6 +753,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'website_type_id',
           // Not a real field
           'option.autoweight',
+          'field_name',
         ],
         'break_return' => [
           // These fields get auto-adjusted by the BAO prior to saving
