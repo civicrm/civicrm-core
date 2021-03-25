@@ -15,12 +15,9 @@
  */
 class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_financialTypeID = 1;
-  }
-
-  public function tearDown() {
   }
 
   /**
