@@ -1133,7 +1133,6 @@ DESC limit 1");
         $this->_params = $formValues;
 
         $contribution = $this->processContribution(
-          $paymentParams,
           [
             'contact_id' => $this->_contributorContactID,
             'line_item' => [$this->order->getPriceSetID() => $this->order->getLineItems()],
@@ -1661,7 +1660,6 @@ DESC limit 1");
    * It's like the contribution create being done here is actively bad and
    * being fixed later.
    *
-   * @param array $params
    * @param array $contributionParams
    *   Parameters to be passed to contribution create action.
    *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
@@ -1679,10 +1677,9 @@ DESC limit 1");
    * @throws \CiviCRM_API3_Exception
    */
   protected function processContribution(
-    $params,
     $contributionParams
   ) {
-    $contributionParams['contribution_recur_id'] = $this->legacyProcessRecurringContribution($params);
+    $contributionParams['contribution_recur_id'] = $this->legacyProcessRecurringContribution();
     return CRM_Contribute_BAO_Contribution::add($contributionParams);
   }
 
@@ -1691,12 +1688,10 @@ DESC limit 1");
    *
    * This function was copied from another form & needs cleanup.
    *
-   * @param array $params
-   *
    * @return int|null
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessRecurringContribution(array $params): ?int {
+  protected function legacyProcessRecurringContribution(): ?int {
     if (!$this->isCreateRecurringContribution()) {
       return NULL;
     }
@@ -1711,10 +1706,8 @@ DESC limit 1");
     $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
     $recurParams['is_test'] = $this->isTest();
 
-    $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::date('YmdHis');
-    if (!empty($params['receive_date'])) {
-      $recurParams['start_date'] = date('YmdHis', CRM_Utils_Time::strtotime($params['receive_date']));
-    }
+    $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::date('YmdHis');
+    $recurParams['start_date'] = $this->getReceiveDate();
     $recurParams['invoice_id'] = $this->getInvoiceID();
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $recurParams['payment_processor_id'] = $this->getPaymentProcessorID();
@@ -1905,6 +1898,15 @@ DESC limit 1");
       1 => $this->getSelectedMembershipLabels(),
       2 => $userName,
     ]);
+  }
+
+  /**
+   * Get the receive date for the contribution.
+   *
+   * @return string $receive_date
+   */
+  protected function getReceiveDate(): string {
+    return $this->getSubmittedValue('receive_date') ?: date('YmdHis');
   }
 
 }
