@@ -1181,7 +1181,7 @@ DESC limit 1");
       if ($this->isCreateRecurringContribution()) {
         $this->_params = $formValues;
 
-        $contribution = $this->processContribution(
+        $contribution = civicrm_api3('Contribution', 'create',
           [
             'contact_id' => $this->_contributorContactID,
             'line_item' => [$this->order->getPriceSetID() => $this->order->getLineItems()],
@@ -1190,14 +1190,12 @@ DESC limit 1");
             'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
             'payment_instrument_id' => $this->getPaymentInstrumentID(),
             'financial_type_id' => $this->getFinancialTypeID(),
-            'receive_date' => CRM_Utils_Time::date('YmdHis'),
+            'receive_date' => $this->getReceiveDate(),
             'tax_amount' => $this->order->getTotalTaxAmount(),
             'total_amount' => $this->order->getTotalAmount(),
             'invoice_id' => $this->getInvoiceID(),
             'currency' => $this->getCurrency(),
-            'is_pay_later' => $params['is_pay_later'] ?? 0,
-            'skipLineItem' => $params['skipLineItem'] ?? 0,
-            'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+            'contribution_status_id' => 'Pending',
             'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
             'contribution_recur_id' => $this->createRecurringContribution(),
           ]
@@ -1703,38 +1701,6 @@ DESC limit 1");
   }
 
   /**
-   * Legacy contribution processing function.
-   *
-   * This is copied from a shared function in order to clean it up. Most of the
-   * stuff in it, maybe all except the ContributionRecur create is
-   * not applicable to this form & can be removed in follow up cleanup.
-   *
-   * It's like the contribution create being done here is actively bad and
-   * being fixed later.
-   *
-   * @param array $contributionParams
-   *   Parameters to be passed to contribution create action.
-   *   This differs from params in that we are currently adding params to it and 1) ensuring they are being
-   *   passed consistently & 2) documenting them here.
-   *   - contact_id
-   *   - line_item
-   *   - is_test
-   *   - campaign_id
-   *   - source
-   *   - payment_type_id
-   *
-   * @return \CRM_Contribute_DAO_Contribution
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected function processContribution(
-    $contributionParams
-  ) {
-    return CRM_Contribute_BAO_Contribution::add($contributionParams);
-  }
-
-  /**
    * Create the recurring contribution record if the form submission requires it.
    *
    * This function was copied from another form & needs cleanup.
@@ -1756,7 +1722,6 @@ DESC limit 1");
     $recurParams['currency'] = $this->getCurrency();
     $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
     $recurParams['is_test'] = $this->isTest();
-
     $recurParams['create_date'] = $recurParams['modified_date'] = CRM_Utils_Time::date('YmdHis');
     $recurParams['start_date'] = $this->getReceiveDate();
     $recurParams['invoice_id'] = $this->getInvoiceID();
@@ -1767,7 +1732,7 @@ DESC limit 1");
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $this->getInvoiceID();
     $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
-    ContributionRecur::create(FALSE)->setValues($recurParams)->execute()->first()['id'];
+    return ContributionRecur::create(FALSE)->setValues($recurParams)->execute()->first()['id'];
   }
 
   /**
