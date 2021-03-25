@@ -31,13 +31,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
   protected $_contributionIds;
 
   /**
-   * The array that holds all the mapping contribution and contact ids.
-   *
-   * @var array
-   */
-  protected $_contributionContactIds = [];
-
-  /**
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
@@ -61,10 +54,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
       $result = $form->getSearchQueryResults();
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
-        if ($form->isQueryIncludesSoftCredits()) {
-          $form->_contactIds[$result->contact_id] = $result->contact_id;
-          $form->_contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
-        }
       }
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
