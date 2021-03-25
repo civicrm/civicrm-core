@@ -7,6 +7,14 @@
       "@ref": "test_contact_1"
     }
   ],
+  "Case": [
+    {
+      "case_type_id": 1,
+      "status_id": 1,
+      "contact_id": "@ref test_contact_1.id",
+      "creator_id": "@ref test_contact_1.id"
+    }
+  ],
   "CustomGroup": [
     {
       "name": "MyFavoriteThings",

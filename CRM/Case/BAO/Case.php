@@ -230,6 +230,14 @@ WHERE civicrm_case.id = %1";
   }
 
   /**
+   * @param $id
+   * @return bool
+   */
+  public static function del($id) {
+    return self::deleteCase($id);
+  }
+
+  /**
    * Enable disable case related relationships.
    *
    * @param int $caseId

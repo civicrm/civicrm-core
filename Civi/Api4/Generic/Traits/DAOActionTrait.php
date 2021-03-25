@@ -15,6 +15,7 @@ namespace Civi\Api4\Generic\Traits;
 use Civi\Api4\CustomField;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
 use Civi\Api4\Utils\FormattingUtil;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @method string getLanguage()
@@ -35,8 +36,7 @@ trait DAOActionTrait {
    * @return \CRM_Core_DAO|string
    */
   protected function getBaoName() {
-    require_once 'api/v3/utils.php';
-    return \_civicrm_api3_get_BAO($this->getEntityName());
+    return CoreUtil::getBAOFromApiName($this->getEntityName());
   }
 
   /**
@@ -157,8 +157,6 @@ trait DAOActionTrait {
   /**
    * @param array $params
    * @param int $entityId
-   *
-   * @return mixed
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception

@@ -64,7 +64,7 @@ class GetActions extends BasicGetAction {
       foreach (glob("$dir/*.php") as $file) {
         $actionName = basename($file, '.php');
         $actionClass = new \ReflectionClass($nameSpace . '\\' . $actionName);
-        if ($actionClass->isInstantiable() && $actionClass->isSubclassOf('\Civi\\Api4\Generic\AbstractAction')) {
+        if ($actionClass->isInstantiable() && $actionClass->isSubclassOf('\Civi\Api4\Generic\AbstractAction')) {
           $this->loadAction(lcfirst($actionName));
         }
       }
