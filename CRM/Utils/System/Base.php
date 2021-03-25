@@ -1012,4 +1012,10 @@ abstract class CRM_Utils_System_Base {
     return [];
   }
 
+  /**
+   * Invalidates the cache of dynamic routes and forces a rebuild.
+   */
+  public function invalidateRouteCache() {
+  }
+
 }
