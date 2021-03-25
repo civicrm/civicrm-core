@@ -31,7 +31,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
   }

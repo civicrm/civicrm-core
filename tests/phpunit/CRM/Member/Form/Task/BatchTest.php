@@ -23,7 +23,7 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     $this->validateAllContributions();
     $this->validateAllPayments();
     $this->quickCleanUpFinancialEntities();

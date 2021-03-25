@@ -19,7 +19,7 @@ class CRM_SMS_PreviewTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);
   }

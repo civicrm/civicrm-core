@@ -19,7 +19,7 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
     $this->_mut = new CiviMailUtils($this, TRUE);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->_mut->stop();
     parent::tearDown();
   }

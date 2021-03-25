@@ -15,7 +15,7 @@
  */
 class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     foreach ($this->ids as $entity => $ids) {
       foreach ($ids as $id) {
         $this->callAPISuccess($entity, 'Delete', ['id' => $id]);

@@ -28,7 +28,7 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     $this->quickCleanup($this->_tablesToTruncate);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS civireport_activity_temp_target');
   }

@@ -12,7 +12,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',

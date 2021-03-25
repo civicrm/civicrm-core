@@ -27,7 +27,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $noise = $this->callAPISuccess('Contact', 'get', [
       'id' => $this->noise['individual'],
       'return' => ['email'],

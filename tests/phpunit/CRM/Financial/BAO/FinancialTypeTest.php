@@ -20,7 +20,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $this->_orgContactID = $this->organizationCreate();
   }
 
-  public function teardown() {
+  public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {
       CRM_Core_I18n_Schema::makeSinglelingual('en_US');

@@ -32,7 +32,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
     $this->quickCleanup(['civicrm_email', 'civicrm_phone', 'civicrm_activity', 'civicrm_activity_contact']);
     $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);

@@ -11,7 +11,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->file = NULL;
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     if ($this->file) {
       unlink($this->file);
     }

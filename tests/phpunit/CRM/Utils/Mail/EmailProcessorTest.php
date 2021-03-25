@@ -34,7 +34,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     ]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     CRM_Utils_File::cleanDir(__DIR__ . '/data/mail');
     parent::tearDown();
     $this->quickCleanup([
