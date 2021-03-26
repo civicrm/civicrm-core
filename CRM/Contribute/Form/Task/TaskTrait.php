@@ -21,11 +21,11 @@
 trait CRM_Contribute_Form_Task_TaskTrait {
 
   /**
-   * Query result object.
+   * Selected IDs for the action.
    *
-   * @var \CRM_Core_DAO
+   * @var array
    */
-  protected $queryBAO;
+  protected $ids;
 
   /**
    * Get the results from the BAO_Query object based search.
@@ -94,6 +94,48 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    */
   public function isQueryIncludesSoftCredits(): bool {
     return (bool) CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->getQueryParams());
+  }
+
+  /**
+   * Get ids selected for the task.
+   *
+   * @return array|bool
+   * @throws \CRM_Core_Exception
+   */
+  public function getIDs() {
+    if (!$this->ids) {
+      $this->ids = $this->calculateIDS();
+    }
+    return $this->ids;
+  }
+
+  /**
+   * @return array|bool|string[]
+   * @throws \CRM_Core_Exception
+   */
+  protected function calculateIDS() {
+    if ($this->controller->get('id')) {
+      return explode(',', $this->controller->get('id'));
+    }
+    $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    if (!$ids) {
+      $result = $this->getSearchQueryResults();
+      while ($result->fetch()) {
+        $ids[] = $result->contribution_id;
+      }
+    }
+    return $ids;
+  }
+
+  /**
+   * Get the clause to add to queries to hone the results.
+   *
+   * In practice this generally means the query to limit by selected ids.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getComponentClause(): string {
+    return ' civicrm_contribution.id IN ( ' . implode(',', $this->getIDs()) . ' ) ';
   }
 
 }

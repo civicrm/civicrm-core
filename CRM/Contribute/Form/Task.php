@@ -49,21 +49,9 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
 
     $form->_task = $values['task'] ?? NULL;
 
-    $ids = $form->getSelectedIDs($values);
-    if (!$ids) {
-      $result = $form->getSearchQueryResults();
-      while ($result->fetch()) {
-        $ids[] = $result->contribution_id;
-      }
-      $form->assign('totalSelectedContributions', $form->get('rowCount'));
-    }
-
-    if (!empty($ids)) {
-      $form->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $ids) . ' ) ';
-
-      $form->assign('totalSelectedContributions', count($ids));
-    }
-
+    $ids = $form->getIDs();
+    $form->_componentClause = $form->getComponentClause();
+    $form->assign('totalSelectedContributions', count($ids));
     $form->_contributionIds = $form->_componentIds = $ids;
     $form->set('contributionIds', $form->_contributionIds);
     $form->setNextUrl('contribute');
