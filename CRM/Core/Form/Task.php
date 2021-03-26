@@ -74,6 +74,13 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
   public static $entityShortname = NULL;
 
   /**
+   * Any ids tracked by the form.
+   *
+   * @var array
+   */
+  protected $ids = [];
+
+  /**
    * Set where the browser should be directed to next.
    *
    * @param string $pathPart

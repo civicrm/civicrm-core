@@ -1197,7 +1197,7 @@ DESC limit 1");
             'currency' => $this->getCurrency(),
             'contribution_status_id' => 'Pending',
             'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
-            'contribution_recur_id' => $this->createRecurringContribution(),
+            'contribution_recur_id' => $this->getContributionRecurID(),
           ]
         );
 
@@ -1210,11 +1210,11 @@ DESC limit 1");
         }
 
         $paymentParams['contactID'] = $this->_contactID;
-        $paymentParams['contributionID'] = $contribution->id;
-        $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
+        $paymentParams['contributionID'] = $contribution['id'];
+        $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
         $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
         $params['contribution_id'] = $paymentParams['contributionID'];
-        $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
+        $params['contribution_recur_id'] = $this->getContributionRecurID();
       }
       $paymentStatus = NULL;
 
@@ -1230,8 +1230,8 @@ DESC limit 1");
             CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $this->_contactID,
               $e->getMessage());
           }
-          if (!empty($paymentParams['contributionRecurID'])) {
-            CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($paymentParams['contributionRecurID']);
+          if ($this->getContributionRecurID()) {
+            CRM_Contribute_BAO_ContributionRecur::deleteRecurContribution($this->getContributionRecurID());
           }
 
           CRM_Core_Session::singleton()->setStatus($e->getMessage());
@@ -1701,17 +1701,35 @@ DESC limit 1");
   }
 
   /**
+   * Get the recurring contribution id, if one is applicable.
+   *
+   * If the recurring contribution is applicable and not yet
+   * created it will be created at this stage.
+   *
+   * @return int|null
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getContributionRecurID():?int {
+    if (!isset($this->ids['ContributionRecur'])) {
+      $this->createRecurringContribution();
+    }
+    return $this->ids['ContributionRecur'];
+  }
+
+  /**
    * Create the recurring contribution record if the form submission requires it.
    *
    * This function was copied from another form & needs cleanup.
    *
-   * @return int|null
    * @throws \API_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function createRecurringContribution(): ?int {
+  protected function createRecurringContribution(): void {
     if (!$this->isCreateRecurringContribution()) {
-      return NULL;
+      $this->ids['ContributionRecur'] = NULL;
+      return;
     }
     $recurParams = ['contact_id' => $this->getContributionContactID()];
     $recurParams['amount'] = $this->order->getTotalAmount();
@@ -1732,7 +1750,7 @@ DESC limit 1");
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['trxn_id'] = $this->getInvoiceID();
     $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
-    return ContributionRecur::create(FALSE)->setValues($recurParams)->execute()->first()['id'];
+    $this->ids['ContributionRecur'] = ContributionRecur::create(FALSE)->setValues($recurParams)->execute()->first()['id'];
   }
 
   /**
