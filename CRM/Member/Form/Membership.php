@@ -1163,7 +1163,7 @@ DESC limit 1");
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
-      $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->_paymentProcessor['id'];
+      $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->getPaymentProcessorID();
       $params['register_date'] = CRM_Utils_Time::date('YmdHis');
 
       // add all the additional payment params we need
@@ -1808,7 +1808,7 @@ DESC limit 1");
     }
     $recurParams['invoice_id'] = $this->getInvoiceID();
     $recurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    $recurParams['payment_processor_id'] = $params['payment_processor_id'] ?? NULL;
+    $recurParams['payment_processor_id'] = $this->getPaymentProcessorID();
     $recurParams['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
@@ -1877,6 +1877,15 @@ DESC limit 1");
    */
   protected function isCreateRecurringContribution(): bool {
     return $this->_mode && $this->getSubmittedValue('auto_renew');
+  }
+
+  /**
+   * Get the payment processor ID.
+   *
+   * @return int
+   */
+  public function getPaymentProcessorID(): int {
+    return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
   }
 
 }
