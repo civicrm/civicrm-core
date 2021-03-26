@@ -1017,10 +1017,6 @@ DESC limit 1");
       $formValues
     );
     $formValues['financial_type_id'] = $this->getFinancialTypeID();
-    $membershipTypeValues = [];
-    foreach ($this->_memTypeSelected as $memType) {
-      $membershipTypeValues[$memType]['membership_type_id'] = $memType;
-    }
 
     $isQuickConfig = $this->_priceSet['is_quick_config'];
 
@@ -1034,36 +1030,11 @@ DESC limit 1");
 
     $params = array_merge($params, $this->getFormMembershipParams());
 
-    $joinDate = $formValues['join_date'];
-    $startDate = $formValues['start_date'];
-    $endDate = $formValues['end_date'];
-
-    $calcDates = [];
-    foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
-      $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
-      $calcDates[$membershipLineItem['membership_type_id']] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipLineItem['membership_type_id'],
-        $joinDate, $startDate, $endDate, $memTypeNumTerms
-      );
-    }
-
-    foreach ($calcDates as $memType => $calcDate) {
-      foreach (['join_date', 'start_date', 'end_date'] as $d) {
-        //first give priority to form values then calDates.
-        $date = $formValues[$d] ?? NULL;
-        if (!$date) {
-          $date = $calcDate[$d] ?? NULL;
-        }
-
-        $membershipTypeValues[$memType][$d] = CRM_Utils_Date::processDate($date);
-      }
-    }
-
-    foreach ($this->_memTypeSelected as $memType) {
-      if (array_key_exists('max_related', $formValues)) {
-        // max related memberships - take from form or inherit from membership type
-        $membershipTypeValues[$memType]['max_related'] = $formValues['max_related'] ?? NULL;
-      }
-    }
+    [
+      $membershipTypeValues,
+      $endDate,
+      $calcDates
+    ] = $this->getMembershipParameters($formValues);
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
@@ -1884,6 +1855,54 @@ DESC limit 1");
       1 => $this->getSelectedMembershipLabels(),
       2 => $userName,
     ]);
+  }
+
+  /**
+   * Get the arrays of membership specific params.
+   *
+   * This function is an interim refactoring step.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getMembershipParameters(array $formValues): array {
+    $membershipTypeValues = [];
+    foreach ($this->_memTypeSelected as $memType) {
+      $membershipTypeValues[$memType]['membership_type_id'] = $memType;
+    }
+    $joinDate = $formValues['join_date'];
+    $startDate = $formValues['start_date'];
+    $endDate = $formValues['end_date'];
+
+    $calcDates = [];
+    foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
+      $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
+      $calcDates[$membershipLineItem['membership_type_id']] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipLineItem['membership_type_id'],
+        $joinDate, $startDate, $endDate, $memTypeNumTerms
+      );
+    }
+
+    foreach ($calcDates as $memType => $calcDate) {
+      foreach (['join_date', 'start_date', 'end_date'] as $d) {
+        //first give priority to form values then calDates.
+        $date = $formValues[$d] ?? NULL;
+        if (!$date) {
+          $date = $calcDate[$d] ?? NULL;
+        }
+
+        $membershipTypeValues[$memType][$d] = CRM_Utils_Date::processDate($date);
+      }
+    }
+
+    foreach ($this->_memTypeSelected as $memType) {
+      if (array_key_exists('max_related', $formValues)) {
+        // max related memberships - take from form or inherit from membership type
+        $membershipTypeValues[$memType]['max_related'] = $formValues['max_related'] ?? NULL;
+      }
+    }
+    return [$membershipTypeValues, $endDate, $calcDates];
   }
 
 }
