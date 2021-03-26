@@ -1373,11 +1373,10 @@ DESC limit 1");
       }
     }
     if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
+      $this->addStatusMessage($this->getStatusMessageForUpdate($membership));
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $createdMemberships,
-        $this->isCreateRecurringContribution(), $calcDates));
+      $this->addStatusMessage($this->getStatusMessageForCreate($createdMemberships));
     }
 
     // This would always be true as we always add price set id into both
@@ -1568,13 +1567,13 @@ DESC limit 1");
    * Get status message for updating membership.
    *
    * @param CRM_Member_BAO_Membership $membership
-   * @param string $endDate
    *
    * @return string
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getStatusMessageForUpdate($membership, $endDate) {
-    // End date can be modified by hooks, so if end date is set then use it.
-    $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
+  protected function getStatusMessageForUpdate($membership): string {
+    // End date can be modified by hooks, so reload it.
+    $endDate = civicrm_api3('Membership', 'getsingle', ['id' => $membership->id])['end_date'] ?? '';
 
     $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
     if ($endDate && $endDate !== 'null') {
@@ -1587,15 +1586,12 @@ DESC limit 1");
   /**
    * Get status message for create action.
    *
-   * @param string $endDate
    * @param array $createdMemberships
-   * @param bool $isRecur
-   * @param array $calcDates
    *
    * @return array|string
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getStatusMessageForCreate($endDate, $createdMemberships,
-                                               $isRecur, $calcDates) {
+  protected function getStatusMessageForCreate(array $createdMemberships) {
     // FIX ME: fix status messages
 
     $statusMsg = [];
@@ -1606,12 +1602,8 @@ DESC limit 1");
       ]);
 
       $membership = $createdMemberships[$membershipTypeID];
-      $memEndDate = $membership->end_date ?: $endDate;
-
-      //get the end date from calculated dates.
-      if (!$memEndDate && !$isRecur) {
-        $memEndDate = $calcDates[$membershipTypeID]['end_date'] ?? NULL;
-      }
+      // Refetch in case a hook altered it.
+      $memEndDate = civicrm_api3('Membership', 'getsingle', ['id' => $membership->id])['end_date'] ?? '';
 
       if ($memEndDate && $memEndDate !== 'null') {
         $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
