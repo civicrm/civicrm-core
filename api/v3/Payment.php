@@ -135,12 +135,6 @@ function civicrm_api3_payment_create($params) {
       }
     }
   }
-  if (!empty($params['payment_processor'])) {
-    // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
-    // also anticipates it.
-    CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
-    $params['payment_processor_id'] = $params['payment_processor'];
-  }
   // Check if it is an update
   if (!empty($params['id'])) {
     $amount = $params['total_amount'];
