@@ -1027,12 +1027,7 @@ DESC limit 1");
     $params['contact_id'] = $this->_contactID;
 
     $params = array_merge($params, $this->getFormMembershipParams());
-
-    [
-      $membershipTypeValues,
-      $endDate,
-      $calcDates
-    ] = $this->getMembershipParameters($formValues);
+    $membershipTypeValues = $this->getMembershipParameters();
 
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
@@ -1865,10 +1860,11 @@ DESC limit 1");
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  protected function getMembershipParameters(array $formValues): array {
+  protected function getMembershipParameters(): array {
     $membershipTypeValues = [];
     foreach ($this->_memTypeSelected as $memType) {
       $membershipTypeValues[$memType]['membership_type_id'] = $memType;
+      $membershipTypeValues[$memType]['max_related'] = $this->getSubmittedValue('max_related');
     }
 
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
@@ -1884,14 +1880,7 @@ DESC limit 1");
       $membershipTypeValues[$membershipLineItem['membership_type_id']]['start_date'] = $calcDates['start_date'];
       $membershipTypeValues[$membershipLineItem['membership_type_id']]['end_date'] = $calcDates['end_date'];
     }
-
-    foreach ($this->_memTypeSelected as $memType) {
-      if (array_key_exists('max_related', $formValues)) {
-        // max related memberships - take from form or inherit from membership type
-        $membershipTypeValues[$memType]['max_related'] = $formValues['max_related'] ?? NULL;
-      }
-    }
-    return [$membershipTypeValues, $endDate, $calcDates];
+    return $membershipTypeValues;
   }
 
 }
