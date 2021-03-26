@@ -2,6 +2,7 @@
 
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Token\TokenProcessor;
 
 /**
  * Class CRM_Core_BAO_MessageTemplateTest
@@ -17,7 +18,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown():void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email']);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email'], TRUE);
     parent::tearDown();
   }
 
@@ -141,13 +142,7 @@ London, 90210
   public function testContactTokens(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
     $tokenData = $this->getAllContactTokens();
-    $this->callAPISuccess('Contact', 'create', $tokenData);
-    $address = $this->callAPISuccess('Address', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
-    $this->callAPISuccess('Phone', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
-    $this->callAPISuccess('Email', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
-    $this->callAPISuccess('Website', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
-    $this->callAPISuccess('Im', 'create', ['is_primary' => TRUE, 'name' => $tokenData['im'], 'provider_id' => $tokenData['im_provider'], 'contact_id' => $tokenData['contact_id']]);
-    $this->callAPISuccess('OpenID', 'create', array_merge($tokenData, ['is_primary' => TRUE, 'contact_id' => $tokenData['contact_id'], 'openid' => $tokenData['openid']]));
+    $address = $this->setupContactFromTokeData($tokenData);
 
     CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'wee');
     // This string contains the 4 types of possible replaces just to be sure they
@@ -164,97 +159,47 @@ London, 90210
       'subject' => $tokenString . ' ',
       'text' => $tokenString,
     ], FALSE, $tokenData['contact_id'], ['passed_smarty' => 'whoa']);
-    $checksum = substr($messageContent['html'], (strpos($messageContent['html'], 'cs=') + 3), 47);
-    $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
     $expected = 'weewhoa
 Default Domain Name
-contact_type:Individual
-do_not_email:1
-do_not_phone:
-do_not_mail:1
-do_not_sms:1
-do_not_trade:1
-is_opt_out:1
-external_identifier:blah
-sort_name:Smith, Robert
-display_name:Mr. Robert Smith II
-nick_name:Bob
-image_URL:https://example.com
-preferred_communication_method:
-preferred_language:fr_CA
-preferred_mail_format:Both
-hash:xyz
-contact_source:Contact Source
-first_name:Robert
-middle_name:Frank
-last_name:Smith
-individual_prefix:Mr.
-individual_suffix:II
-formal_title:Dogsbody
-communication_style:Formal
-job_title:Busy person
-gender:Female
-birth_date:December 31st, 1998
-current_employer_id:' . $contact['employer_id'] . '
-contact_is_deleted:
-created_date:January 1st, 2020 12:00 AM
-modified_date:' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
-addressee:Mr. Robert Frank Smith II
-email_greeting:Dear Robert
-postal_greeting:Dear Robert
-current_employer:Unit Test Organization
-location_type:Home
-address_id:' . $address['id'] . '
-street_address:Street Address
-street_number:123
-street_number_suffix:S
-street_name:Main St
-street_unit:45B
-supplemental_address_1:Round the corner
-supplemental_address_2:Up the road
-supplemental_address_3:By the big tree
-city:New York
-postal_code_suffix:4578
-postal_code:90210
-geo_code_1:48.858093
-geo_code_2:2.294694
-manual_geo_code:1
-address_name:The white house
-master_id:' . $tokenData['master_id'] . '
-county:
-state_province:TX
-country:United States
-phone:123-456
-phone_ext:77
-phone_type_id:
-phone_type:Mobile
-email:anthony_anderson@civicrm.org
-on_hold:
-signature_text:Yours sincerely
-signature_html:&lt;p&gt;Yours&lt;/p&gt;
-im_provider:1
-im:IM Screen Name
-openid:OpenID
-world_region:America South, Central, North and Caribbean
-url:http://civicrm.org
-custom_1:Bobsled
-custom_2:Red
-custom_3:01/20/2021 12:00AM
-custom_4:999
-custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
-custom_7:New Zealand
-custom_8:France, Canada
-custom_9:Mr. Spider Man II
-custom_10:Queensland
-custom_11:Victoria, New South Wales
-custom_12:Yes
-custom_13:Purple
-checksum:cs=' . $checksum . '
-contact_id:' . $tokenData['contact_id'] . '
 ';
+    $expected .= $this->getExpectedContactOutput($address['id'], $tokenData, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['text']);
     $this->assertEquals(rtrim(str_replace("\n", ' ', $expected)), $messageContent['subject']);
+  }
+
+  /**
+   * Test the contact tokens rendered by the token processor.
+   *
+   * This test will be obsolete once the renderMessageTemplate
+   * function uses the token processor - at that point the test above
+   * will be testing the same thing.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testContactTokensRenderedByTokenProcessor(): void {
+    $this->createCustomGroupWithFieldsOfAllTypes([]);
+    $tokenData = $this->getAllContactTokens();
+    $address = $this->setupContactFromTokeData($tokenData);
+    $tokenString = '';
+    foreach (array_keys($tokenData) as $key) {
+      $tokenString .= "{$key}:{contact.{$key}}\n";
+    }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), []);
+    $tokenProcessor->addMessage('html', $tokenString, 'text/html');
+    $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
+    $tokenProcessor->evaluate();
+    $rendered = '';
+    foreach ($tokenProcessor->getRows() as $row) {
+      $rendered = (string) $row->render('html');
+    }
+    $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
+    // @todo - this works better in token processor than in CRM_Core_Token.
+    // once synced we can fix $this->getExpectedContactOutput to return the right thing.
+    $expected = str_replace("preferred_communication_method:\n", "preferred_communication_method:Phone\n", $expected);
+    $this->assertEquals($expected, $rendered);
   }
 
   /**
@@ -400,6 +345,132 @@ contact_id:' . $tokenData['contact_id'] . '
       'checksum' => 'Checksum',
       'contact_id' => $this->individualCreate(['first_name' => 'Peter', 'last_name' => 'Parker']),
     ];
+  }
+
+  /**
+   * @param array $tokenData
+   *
+   * @return array|int
+   * @throws \CRM_Core_Exception
+   */
+  protected function setupContactFromTokeData(array $tokenData) {
+    $this->callAPISuccess('Contact', 'create', $tokenData);
+    $address = $this->callAPISuccess('Address', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
+    $this->callAPISuccess('Phone', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
+    $this->callAPISuccess('Email', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
+    $this->callAPISuccess('Website', 'create', array_merge($tokenData, ['is_primary' => TRUE]));
+    $this->callAPISuccess('Im', 'create', [
+      'is_primary' => TRUE,
+      'name' => $tokenData['im'],
+      'provider_id' => $tokenData['im_provider'],
+      'contact_id' => $tokenData['contact_id'],
+    ]);
+    $this->callAPISuccess('OpenID', 'create', array_merge($tokenData, [
+      'is_primary' => TRUE,
+      'contact_id' => $tokenData['contact_id'],
+      'openid' => $tokenData['openid'],
+    ]));
+    return $address;
+  }
+
+  /**
+   * Get the expected rendered string.
+   *
+   * @param int $id
+   * @param array $tokenData
+   * @param string $actualOutput
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  protected function getExpectedContactOutput($id, array $tokenData, string $actualOutput): string {
+    $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
+    $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
+    $expected = 'contact_type:Individual
+do_not_email:1
+do_not_phone:
+do_not_mail:1
+do_not_sms:1
+do_not_trade:1
+is_opt_out:1
+external_identifier:blah
+sort_name:Smith, Robert
+display_name:Mr. Robert Smith II
+nick_name:Bob
+image_URL:https://example.com
+preferred_communication_method:
+preferred_language:fr_CA
+preferred_mail_format:Both
+hash:xyz
+contact_source:Contact Source
+first_name:Robert
+middle_name:Frank
+last_name:Smith
+individual_prefix:Mr.
+individual_suffix:II
+formal_title:Dogsbody
+communication_style:Formal
+job_title:Busy person
+gender:Female
+birth_date:December 31st, 1998
+current_employer_id:' . $contact['employer_id'] . '
+contact_is_deleted:
+created_date:January 1st, 2020 12:00 AM
+modified_date:' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
+addressee:Mr. Robert Frank Smith II
+email_greeting:Dear Robert
+postal_greeting:Dear Robert
+current_employer:Unit Test Organization
+location_type:Home
+address_id:' . $id . '
+street_address:Street Address
+street_number:123
+street_number_suffix:S
+street_name:Main St
+street_unit:45B
+supplemental_address_1:Round the corner
+supplemental_address_2:Up the road
+supplemental_address_3:By the big tree
+city:New York
+postal_code_suffix:4578
+postal_code:90210
+geo_code_1:48.858093
+geo_code_2:2.294694
+manual_geo_code:1
+address_name:The white house
+master_id:' . $tokenData['master_id'] . '
+county:
+state_province:TX
+country:United States
+phone:123-456
+phone_ext:77
+phone_type_id:
+phone_type:Mobile
+email:anthony_anderson@civicrm.org
+on_hold:
+signature_text:Yours sincerely
+signature_html:&lt;p&gt;Yours&lt;/p&gt;
+im_provider:1
+im:IM Screen Name
+openid:OpenID
+world_region:America South, Central, North and Caribbean
+url:http://civicrm.org
+custom_1:Bobsled
+custom_2:Red
+custom_3:01/20/2021 12:00AM
+custom_4:999
+custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_7:New Zealand
+custom_8:France, Canada
+custom_9:Mr. Spider Man II
+custom_10:Queensland
+custom_11:Victoria, New South Wales
+custom_12:Yes
+custom_13:Purple
+checksum:cs=' . $checksum . '
+contact_id:' . $tokenData['contact_id'] . '
+';
+    return $expected;
   }
 
 }
