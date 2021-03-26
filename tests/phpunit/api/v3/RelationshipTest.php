@@ -41,7 +41,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   /**
    * Set up function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_cId_a = $this->individualCreate();
     $this->_cId_a_2 = $this->individualCreate([

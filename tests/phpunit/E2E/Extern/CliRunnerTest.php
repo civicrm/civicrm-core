@@ -23,7 +23,7 @@
  */
 class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     foreach (['CIVI_CORE', 'CMS_ROOT', 'CMS_URL'] as $var) {
@@ -31,10 +31,6 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
         $this->markTestSkipped("Test environment does provide the civibuild/cv variable ($var)");
       }
     }
-  }
-
-  protected function tearDown() {
-    parent::tearDown();
   }
 
   /**

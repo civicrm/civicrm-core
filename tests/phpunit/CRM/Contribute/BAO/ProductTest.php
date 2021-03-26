@@ -15,10 +15,6 @@
  */
 class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Check method add()
    */

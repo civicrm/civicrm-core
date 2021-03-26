@@ -22,13 +22,9 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
     'civicrm_address',
   ];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**

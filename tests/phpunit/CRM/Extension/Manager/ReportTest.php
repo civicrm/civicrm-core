@@ -6,7 +6,7 @@
  */
 class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     //if (class_exists('test_extension_manager_reporttest')) {
     //  test_extension_manager_reporttest::$counts = array();
@@ -15,10 +15,6 @@ class CRM_Extension_Manager_ReportTest extends CiviUnitTestCase {
       'extensionsDir' => '',
       'extensionsURL' => '',
     ]);
-  }
-
-  public function tearDown() {
-    parent::tearDown();
   }
 
   /**

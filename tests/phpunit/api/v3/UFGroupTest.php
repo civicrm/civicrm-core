@@ -27,7 +27,7 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   protected $_groupId;
   protected $params;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->_groupId = $this->groupCreate();
     $this->_contactId = $this->individualCreate();

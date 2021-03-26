@@ -9,7 +9,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
   protected $custom_group;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->custom_group = $this->customGroupCreate(['extends' => 'Case']);
     $this->custom_group = $this->custom_group['values'][$this->custom_group['id']];

@@ -44,7 +44,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   protected $footer;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
     // DGW

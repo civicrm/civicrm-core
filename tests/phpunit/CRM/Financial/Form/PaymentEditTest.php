@@ -19,7 +19,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->createLoggedInUser();
 

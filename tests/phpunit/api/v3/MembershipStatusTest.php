@@ -21,7 +21,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   protected $_apiversion = 3;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_contactID = $this->individualCreate();
     $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);

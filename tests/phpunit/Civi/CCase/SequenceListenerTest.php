@@ -9,7 +9,7 @@ namespace Civi\CCase;
  */
 class SequenceListenerTest extends \CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_params = [
       'case_type' => $this->caseType,

@@ -6,7 +6,7 @@
  */
 class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $params = [

@@ -462,7 +462,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    *  Common teardown functions for all unit tests.
    */
-  protected function tearDown() {
+  protected function tearDown(): void {
     $this->_apiversion = 3;
     $this->resetLabels();
 

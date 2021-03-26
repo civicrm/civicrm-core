@@ -5,12 +5,6 @@
  * @group headless
  */
 class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
-  protected $_apiversion;
-
-  public function setUp() {
-    $this->_apiversion = 3;
-    parent::setUp();
-  }
 
   public function tearDown(): void {
     $tablesToTruncate = [

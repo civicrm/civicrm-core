@@ -29,7 +29,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   protected $_domainID2;
   protected $_domainID3;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $params = [
       'name' => __CLASS__ . 'Second Domain',

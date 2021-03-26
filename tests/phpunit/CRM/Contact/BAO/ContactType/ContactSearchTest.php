@@ -6,7 +6,7 @@
  */
 class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $students = 'indivi_student' . substr(sha1(rand()), 0, 7);
     $params = [

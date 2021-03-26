@@ -6,7 +6,7 @@
  */
 class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp():void {
     parent::setUp();
     // $query = "INSERT INTO civicrm_domain ( name, version ) VALUES ( 'domain', 3 )";
     // $result = CRM_Core_DAO::executeQuery($query);

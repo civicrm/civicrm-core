@@ -20,7 +20,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
   private $hookEntity;
   private $hookCondition = [];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
     CRM_Utils_Hook::singleton()->setHook('civicrm_selectWhereClause', [$this, 'hook_civicrm_selectWhereClause']);

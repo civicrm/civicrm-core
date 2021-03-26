@@ -27,7 +27,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
    */
   protected $b;
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     if (function_exists('timecop_return')) {
       timecop_return();
     }

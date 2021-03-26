@@ -13,7 +13,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   /**
    * Set up function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     // $this->quickCleanup(array('civicrm_acl_contact_cache'), TRUE);
     $this->useTransaction(TRUE);

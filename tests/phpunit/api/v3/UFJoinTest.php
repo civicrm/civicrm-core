@@ -25,7 +25,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   protected $_ufFieldId;
   protected $_contactId = 69;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     //  Truncate the tables
     $this->quickCleanup(

@@ -31,7 +31,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   protected $halfFinancialAccId;
   protected $halfFinancialTypeId;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_individualId = $this->individualCreate();
     $this->_orgId = $this->organizationCreate(NULL);

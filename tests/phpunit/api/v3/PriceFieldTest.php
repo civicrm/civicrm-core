@@ -24,7 +24,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $priceSetparams = [
       'name' => 'default_goat_priceset',

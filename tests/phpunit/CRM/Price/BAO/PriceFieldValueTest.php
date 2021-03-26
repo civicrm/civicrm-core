@@ -16,19 +16,6 @@
 class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixtures.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture.
-   */
-  protected function tearDown() {
-  }
-
-  /**
    * Verifies visibility field exists and is configured as a pseudoconstant
    * referencing the 'visibility' option group.
    */

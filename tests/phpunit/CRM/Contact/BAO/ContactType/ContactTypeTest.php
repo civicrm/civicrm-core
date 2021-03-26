@@ -7,7 +7,7 @@ use Civi\Api4\ContactType;
  */
 class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $params = [
       'label' => 'sub1_individual',

@@ -20,7 +20,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
   protected $_noteID;
   protected $_note;
 
-  public function setUp() {
+  public function setUp(): void {
 
     // Connect to the database.
     parent::setUp();

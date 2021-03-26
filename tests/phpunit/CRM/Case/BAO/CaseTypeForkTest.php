@@ -7,7 +7,7 @@
  */
 class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }

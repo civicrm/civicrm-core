@@ -5,7 +5,7 @@
  */
 class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->loadAllFixtures();

@@ -37,7 +37,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
    *
    * @throws \Exception
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->quickCleanup(
       [

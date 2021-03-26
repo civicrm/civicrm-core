@@ -36,7 +36,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     //$this->assertEquals($cmpvar, $apiResult['is_error'], $prefix . print_r($apiResult, TRUE));
   }
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     if (empty($GLOBALS['_CV']['CIVI_SITE_KEY'])) {
@@ -51,7 +51,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       ->getUrl('civicrm', 'extern/rest.php');
   }
 
-  protected function tearDown() {
+  protected function tearDown(): void {
     if (!empty($this->old_api_keys)) {
       foreach ($this->old_api_keys as $cid => $apiKey) {
         civicrm_api3('Contact', 'create', array(
