@@ -1870,28 +1870,19 @@ DESC limit 1");
     foreach ($this->_memTypeSelected as $memType) {
       $membershipTypeValues[$memType]['membership_type_id'] = $memType;
     }
-    $joinDate = $formValues['join_date'];
-    $startDate = $formValues['start_date'];
-    $endDate = $formValues['end_date'];
 
-    $calcDates = [];
     foreach ($this->order->getMembershipLineItems() as $membershipLineItem) {
       $memTypeNumTerms = $this->getSubmittedValue('num_terms') ?: $membershipLineItem['membership_num_terms'];
-      $calcDates[$membershipLineItem['membership_type_id']] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipLineItem['membership_type_id'],
-        $joinDate, $startDate, $endDate, $memTypeNumTerms
+      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+        $membershipLineItem['membership_type_id'],
+        $this->getSubmittedValue('join_date'),
+        $this->getSubmittedValue('start_date'),
+        $this->getSubmittedValue('end_date'),
+        $memTypeNumTerms
       );
-    }
-
-    foreach ($calcDates as $memType => $calcDate) {
-      foreach (['join_date', 'start_date', 'end_date'] as $d) {
-        //first give priority to form values then calDates.
-        $date = $formValues[$d] ?? NULL;
-        if (!$date) {
-          $date = $calcDate[$d] ?? NULL;
-        }
-
-        $membershipTypeValues[$memType][$d] = CRM_Utils_Date::processDate($date);
-      }
+      $membershipTypeValues[$membershipLineItem['membership_type_id']]['join_date'] = $calcDates['join_date'];
+      $membershipTypeValues[$membershipLineItem['membership_type_id']]['start_date'] = $calcDates['start_date'];
+      $membershipTypeValues[$membershipLineItem['membership_type_id']]['end_date'] = $calcDates['end_date'];
     }
 
     foreach ($this->_memTypeSelected as $memType) {
