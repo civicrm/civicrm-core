@@ -349,17 +349,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       $params['contribution'] = self::recordMembershipContribution($memInfo);
     }
 
-    // Add/update MembershipPayment record for this membership if it is a related contribution
-    // @todo remove this - called from one remaining place in CRM_Member_Form_Membership
-    if (!empty($params['relate_contribution_id'])) {
-      $membershipPaymentParams = [
-        'membership_id' => $membership->id,
-        'membership_type_id' => $membership->membership_type_id,
-        'contribution_id' => $params['relate_contribution_id'],
-      ];
-      civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
-    }
-
     // If the membership has no associated contribution then we ensure
     // the line items are 'correct' here. This is a lazy legacy
     // hack whereby they are deleted and recreated
