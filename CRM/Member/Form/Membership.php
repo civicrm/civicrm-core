@@ -1081,10 +1081,6 @@ DESC limit 1");
         $params['receipt_date'] = $formValues['receive_date'] ?? NULL;
       }
 
-      //insert financial type name in receipt.
-      $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
-        $this->getFinancialTypeID()
-      );
     }
 
     // process line items, until no previous line items.
@@ -1607,6 +1603,10 @@ DESC limit 1");
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
+    //insert financial type name in receipt.
+    $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
+      $this->getFinancialTypeID()
+    );
     return $this->emailReceipt($this, $formValues, $membership);
   }
 
