@@ -1153,7 +1153,7 @@ DESC limit 1");
       $params['lineItems'] = $lineItem;
       $params['processPriceSet'] = TRUE;
     }
-    $createdMemberships = [];
+
     if ($this->_mode) {
       $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
 
@@ -1273,7 +1273,7 @@ DESC limit 1");
           $membershipTypeValues[$memType]['startDate'] = NULL;
           $membershipTypeValues[$memType]['endDate'] = NULL;
         }
-        $endDate = $startDate = NULL;
+        $startDate = NULL;
       }
       $now = CRM_Utils_Time::date('YmdHis');
       $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
@@ -1335,7 +1335,6 @@ DESC limit 1");
         $params['contribution'] = $membershipParams['contribution'] ?? NULL;
         unset($params['lineItems']);
         $this->_membershipIDs[] = $membership->id;
-        $createdMemberships[$memType] = $membership;
         $count++;
       }
 
@@ -1365,7 +1364,6 @@ DESC limit 1");
         $lineItem[$this->_priceSetId][$id]['entity_table'] = 'civicrm_membership';
 
         $this->_membershipIDs[] = $membership->id;
-        $createdMemberships[$membership->membership_type_id] = $membership;
       }
       $params['lineItems'] = $lineItem;
       if (!empty($formValues['record_contribution'])) {
@@ -1373,11 +1371,10 @@ DESC limit 1");
       }
     }
     if (($this->_action & CRM_Core_Action::UPDATE)) {
-      $this->addStatusMessage($this->getStatusMessageForUpdate($membership, $endDate));
+      $this->addStatusMessage($this->getStatusMessageForUpdate());
     }
     elseif (($this->_action & CRM_Core_Action::ADD)) {
-      $this->addStatusMessage($this->getStatusMessageForCreate($endDate, $createdMemberships,
-        $this->isCreateRecurringContribution(), $calcDates));
+      $this->addStatusMessage($this->getStatusMessageForCreate());
     }
 
     // This would always be true as we always add price set id into both
@@ -1567,17 +1564,15 @@ DESC limit 1");
   /**
    * Get status message for updating membership.
    *
-   * @param CRM_Member_BAO_Membership $membership
-   * @param string $endDate
-   *
    * @return string
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getStatusMessageForUpdate($membership, $endDate) {
-    // End date can be modified by hooks, so if end date is set then use it.
-    $endDate = ($membership->end_date) ? $membership->end_date : $endDate;
-
+  protected function getStatusMessageForUpdate(): string {
+    foreach ($this->getCreatedMemberships() as $membership) {
+      $endDate = $membership['end_date'] ?? NULL;
+    }
     $statusMsg = ts('Membership for %1 has been updated.', [1 => $this->_memberDisplayName]);
-    if ($endDate && $endDate !== 'null') {
+    if ($endDate) {
       $endDate = CRM_Utils_Date::customFormat($endDate);
       $statusMsg .= ' ' . ts('The membership End Date is %1.', [1 => $endDate]);
     }
@@ -1587,39 +1582,25 @@ DESC limit 1");
   /**
    * Get status message for create action.
    *
-   * @param string $endDate
-   * @param array $createdMemberships
-   * @param bool $isRecur
-   * @param array $calcDates
-   *
    * @return array|string
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function getStatusMessageForCreate($endDate, $createdMemberships,
-                                               $isRecur, $calcDates) {
-    // FIX ME: fix status messages
-
-    $statusMsg = [];
-    foreach ($this->_memTypeSelected as $membershipTypeID) {
-      $statusMsg[$membershipTypeID] = ts('%1 membership for %2 has been added.', [
-        1 => $this->allMembershipTypeDetails[$membershipTypeID]['name'],
+  protected function getStatusMessageForCreate(): string {
+    foreach ($this->getCreatedMemberships() as $membership) {
+      $statusMsg[$membership['membership_type_id']] = ts('%1 membership for %2 has been added.', [
+        1 => $this->allMembershipTypeDetails[$membership['membership_type_id']]['name'],
         2 => $this->_memberDisplayName,
       ]);
 
-      $membership = $createdMemberships[$membershipTypeID];
-      $memEndDate = $membership->end_date ?: $endDate;
+      $memEndDate = $membership['end_date'] ?? NULL;
 
-      //get the end date from calculated dates.
-      if (!$memEndDate && !$isRecur) {
-        $memEndDate = $calcDates[$membershipTypeID]['end_date'] ?? NULL;
-      }
-
-      if ($memEndDate && $memEndDate !== 'null') {
+      if ($memEndDate) {
         $memEndDate = CRM_Utils_Date::formatDateOnlyLong($memEndDate);
-        $statusMsg[$membershipTypeID] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
+        $statusMsg[$membership['membership_type_id']] .= ' ' . ts('The new membership End Date is %1.', [1 => $memEndDate]);
       }
     }
     $statusMsg = implode('<br/>', $statusMsg);
-    return $statusMsg;
+    return $statusMsg ?? '';
   }
 
   /**
@@ -1886,6 +1867,16 @@ DESC limit 1");
    */
   public function getPaymentProcessorID(): int {
     return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
+  }
+
+  /**
+   * Get memberships submitted through the form submission.
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getCreatedMemberships(): array {
+    return civicrm_api3('Membership', 'get', ['id' => ['IN' => $this->_membershipIDs]])['values'];
   }
 
 }
