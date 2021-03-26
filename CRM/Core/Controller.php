@@ -241,6 +241,11 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       // in this case we'll also cache the url as a hidden form variable, this allows us to
       // redirect in case the session has disappeared on us
       $this->_entryURL = CRM_Utils_System::makeURL(NULL, TRUE, FALSE, NULL, TRUE);
+      // In WordPress Shortcodes the standard entryURL generated via makeURL doesn't generally have id=x&reset=1 included so we add them here
+      // This prevents infinite loops caused when the session has timed out.
+      if (stripos($this->_entryURL, 'id') === FALSE && (stripos($this->_entryURL, 'transact') !== FALSE || stripos($this->_entryURL, 'register') !== FALSE)) {
+        $this->_entryURL .= '&id=' . CRM_Utils_Request::retrieveValue('id', 'Positive') . '&reset=1';
+      }
       $this->set('entryURL', $this->_entryURL);
     }
 
