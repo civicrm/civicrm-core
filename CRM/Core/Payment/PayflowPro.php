@@ -147,7 +147,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       //attempts occur until the term is complete.
       // $payflow_query_array['RETRYNUMDAYS'] = (not set as can't assume business rule
 
-      switch ($params['frequency_unit']) {
+      $interval = $params['frequency_interval'] . " " . $params['frequency_unit'];
+      switch ($interval) {
         case '1 week':
           $params['next_sched_contribution_date'] = mktime(0, 0, 0, date("m"), date("d") + 7,
             date("Y")
