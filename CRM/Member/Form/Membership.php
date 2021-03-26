@@ -994,7 +994,7 @@ DESC limit 1");
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $endDate = NULL;
-    $membership = $calcDate = [];
+    $membership = [];
 
     $params = $softParams = $ids = [];
 
@@ -1019,8 +1019,6 @@ DESC limit 1");
     $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
     $isQuickConfig = $this->_priceSet['is_quick_config'];
-
-    $termsByType = [];
 
     $lineItem = [$this->order->getPriceSetID() => $this->order->getLineItems()];
 
@@ -1159,7 +1157,7 @@ DESC limit 1");
 
         //create new soft-credit record, CRM-13981
         if ($softParams) {
-          $softParams['contribution_id'] = $contribution->id;
+          $softParams['contribution_id'] = $contribution['id'];
           $softParams['currency'] = $this->getCurrency();
           $softParams['amount'] = $this->order->getTotalAmount();
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
@@ -1603,7 +1601,7 @@ DESC limit 1");
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
-    //insert financial type name in receipt.
+
     $formValues['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
       $this->getFinancialTypeID()
     );
