@@ -858,4 +858,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return \Drupal::entityTypeManager()->getStorage('user')->load($userID);
   }
 
+  /**
+   * Helper function to rebuild the Drupal 8 or 9 dynamic routing cache.
+   * We need to do this after enabling extensions that add routes and it's worth doing when we reset Civi paths.
+   */
+  public function invalidateRouteCache() {
+    if (class_exists('\Drupal') && \Drupal::hasContainer()) {
+      \Drupal::service('router.builder')->rebuild();
+    }
+  }
+
 }

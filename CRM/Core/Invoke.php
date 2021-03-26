@@ -394,6 +394,7 @@ class CRM_Core_Invoke {
       CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
     ) {
       CRM_Core_DAO::triggerRebuild();
+      $config->userSystem->invalidateRouteCache();
     }
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
