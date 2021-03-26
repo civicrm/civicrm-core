@@ -1155,7 +1155,7 @@ DESC limit 1");
     }
     $createdMemberships = [];
     if ($this->_mode) {
-      $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
+      $params['total_amount'] = $this->order->getTotalAmount();
 
       //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
       $params['card_type_id'] = $this->_params['card_type_id'] ?? NULL;
@@ -1225,7 +1225,7 @@ DESC limit 1");
         if ($softParams) {
           $softParams['contribution_id'] = $contribution->id;
           $softParams['currency'] = $this->getCurrency();
-          $softParams['amount'] = $contribution->total_amount;
+          $softParams['amount'] = $this->order->getTotalAmount();
           CRM_Contribute_BAO_ContributionSoft::add($softParams);
         }
 
@@ -1238,14 +1238,12 @@ DESC limit 1");
       }
       $paymentStatus = NULL;
 
-      if ($params['total_amount'] > 0.0) {
+      if ($this->order->getTotalAmount() > 0.0) {
         $payment = $this->_paymentProcessor['object'];
         try {
           $result = $payment->doPayment($paymentParams);
           $formValues = array_merge($formValues, $result);
           $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['payment_status_id']);
-          // Assign amount to template if payment was successful.
-          $this->assign('amount', $params['total_amount']);
         }
         catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
           if (!empty($paymentParams['contributionID'])) {
@@ -1405,9 +1403,6 @@ DESC limit 1");
           }
         }
 
-        $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
-        // Not sure why would need this on Submit.... unless it's being used when sending mails in which case this is the wrong place
-        $this->assign('taxTerm', $this->getSalesTaxTerm());
         $this->assign('dataArray', $dataArray);
       }
     }
@@ -1672,10 +1667,14 @@ DESC limit 1");
    *
    * @return bool
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function emailMembershipReceipt($formValues, $membership) {
     $customValues = $this->getCustomValuesForReceipt($formValues, $membership);
     $this->assign('customValues', $customValues);
+    $this->assign('total_amount', $this->order->getTotalAmount());
+    $this->assign('totalTaxAmount', $this->order->getTotalTaxAmount());
+    $this->assign('taxTerm', $this->getSalesTaxTerm());
 
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
