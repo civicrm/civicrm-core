@@ -907,7 +907,7 @@ DESC limit 1");
    *   & needs rationalising.
    *
    */
-  public static function emailReceipt($form, &$formValues, $membership) {
+  protected function emailReceipt($form, &$formValues, $membership) {
     // retrieve 'from email id' for acknowledgement
     $receiptFrom = $formValues['from_email_address'] ?? NULL;
 
@@ -1689,7 +1689,7 @@ DESC limit 1");
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
-    return self::emailReceipt($this, $formValues, $membership);
+    return $this->emailReceipt($this, $formValues, $membership);
   }
 
   /**

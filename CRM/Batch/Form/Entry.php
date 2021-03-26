@@ -830,7 +830,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = $value['source'] ?? NULL;
-          list($membership) = CRM_Member_BAO_Membership::processMembership(
+          [$membership] = CRM_Member_BAO_Membership::processMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
             NULL, NULL, $value['custom'], 1, NULL, FALSE,
@@ -860,7 +860,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
-            list($products, $options) = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
+            [$products, $options] = CRM_Contribute_BAO_Premium::getPremiumProductInfo();
 
             $value['hidden_Premium'] = 1;
             $value['product_option'] = CRM_Utils_Array::value(
@@ -889,11 +889,90 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $value['from_email_address'] = $domainEmail;
           $value['membership_id'] = $membership->id;
           $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
-          CRM_Member_Form_Membership::emailReceipt($this, $value, $membership);
+          $this->emailReceipt($this, $value, $membership);
         }
       }
     }
     return $batchTotal;
+  }
+
+  /**
+   * Send email receipt.
+   *
+   * @param CRM_Core_Form $form
+   *   Form object.
+   * @param array $formValues
+   * @param object $membership
+   *   Object.
+   *
+   * @return bool
+   *   true if mail was sent successfully
+   * @throws \CRM_Core_Exception
+   *
+   * @deprecated
+   *   This function is shared with Batch_Entry which has limited overlap
+   *   & needs rationalising.
+   *
+   */
+  public function emailReceipt($form, &$formValues, $membership) {
+    // retrieve 'from email id' for acknowledgement
+    $receiptFrom = $formValues['from_email_address'] ?? NULL;
+
+    // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
+    if (!empty($formValues['payment_instrument_id'])) {
+      $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
+      $formValues['paidBy'] = $paymentInstrument[$formValues['payment_instrument_id']];
+    }
+
+    $form->assign('module', 'Membership');
+    $form->assign('contactID', $formValues['contact_id']);
+
+    $form->assign('membershipID', CRM_Utils_Array::value('membership_id', $form->_params, CRM_Utils_Array::value('membership_id', $form->_defaultValues)));
+
+    if (!empty($formValues['contribution_id'])) {
+      $form->assign('contributionID', $formValues['contribution_id']);
+    }
+
+    if (!empty($formValues['contribution_status_id'])) {
+      $form->assign('contributionStatusID', $formValues['contribution_status_id']);
+      $form->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
+    }
+
+    if (!empty($formValues['is_renew'])) {
+      $form->assign('receiptType', 'membership renewal');
+    }
+    else {
+      $form->assign('receiptType', 'membership signup');
+    }
+    $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
+    $form->assign('formValues', $formValues);
+
+    $form->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
+    if (!CRM_Utils_System::isNull($membership->end_date)) {
+      $form->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
+    }
+    $form->assign('membership_name', CRM_Member_PseudoConstant::membershipType($membership->membership_type_id));
+
+    [$form->_contributorDisplayName, $form->_contributorEmail]
+      = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
+    $form->_receiptContactId = $formValues['contact_id'];
+
+    CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'groupName' => 'msg_tpl_workflow_membership',
+        'valueName' => 'membership_offline_receipt',
+        'contactId' => $form->_receiptContactId,
+        'from' => $receiptFrom,
+        'toName' => $form->_contributorDisplayName,
+        'toEmail' => $form->_contributorEmail,
+        'PDFFilename' => ts('receipt') . '.pdf',
+        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
+        'contributionId' => $formValues['contribution_id'],
+        'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
+      ]
+    );
+
+    return TRUE;
   }
 
   /**
@@ -902,7 +981,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param array $value
    *   Associated array of submitted values.
    */
-  private function updateContactInfo(&$value) {
+  private function updateContactInfo(array &$value) {
     $value['preserveDBName'] = $this->_preserveDefault;
 
     //parse street address, CRM-7768
