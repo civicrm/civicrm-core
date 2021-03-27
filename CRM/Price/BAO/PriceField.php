@@ -330,7 +330,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
             $qf->assign('priceset', $elementName);
             $extra = [
               'onclick' => 'useAmountOther();',
-              'autocomplete' => 'off'
+              'autocomplete' => 'off',
             ];
           }
         }
