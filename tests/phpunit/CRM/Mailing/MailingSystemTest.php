@@ -40,7 +40,9 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   public function setUp() {
     parent::setUp();
-    Civi::settings()->add(['experimentalFlexMailerEngine' => FALSE]);
+    // If we happen to execute with flexmailer active, use BAO mode.
+    // There is a parallel FlexMailerSystemTest which runs in flexmailer mode.
+    Civi::settings()->add(['flexmailer_traditional' => 'bao']);
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
