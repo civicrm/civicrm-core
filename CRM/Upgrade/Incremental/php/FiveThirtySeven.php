@@ -29,6 +29,10 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
     // if ($rev == '5.12.34') {
     //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
     // }
+    if ($rev === '5.37.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('Some mail-merge tokens may display differently when used with Scheduled Reminders, Mosaico templates, or PDF letters. For details, see <a href="%1" target="_blank">upgrade notes</a>.',
+          [1 => 'https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/#token-format']) . '</p>';
+    }
   }
 
   /**
