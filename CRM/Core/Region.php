@@ -142,6 +142,7 @@ class CRM_Core_Region implements CRM_Core_Resources_CollectionInterface, CRM_Cor
       }
     };
 
+    Civi::dispatcher()->dispatch('civi.region.render', \Civi\Core\Event\GenericHookEvent::create(['region' => $this]));
     foreach ($this->snippets as $snippet) {
       if (empty($snippet['disabled'])) {
         $renderSnippet($snippet);

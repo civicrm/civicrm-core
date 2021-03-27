@@ -123,6 +123,9 @@ class Container {
     ))
       ->setFactory([new Reference(self::SELF), 'createAngularManager'])->setPublic(TRUE);
 
+    $container->setDefinition('angularjs.loader', new Definition('Civi\Angular\AngularLoader', []))
+      ->setPublic(TRUE);
+
     $container->setDefinition('dispatcher', new Definition(
       'Civi\Core\CiviEventDispatcher',
       []
@@ -351,6 +354,7 @@ class Container {
    */
   public function createEventDispatcher() {
     // Continue building on the original dispatcher created during bootstrap.
+    /** @var CiviEventDispatcher $dispatcher */
     $dispatcher = static::getBootService('dispatcher.boot');
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
@@ -370,6 +374,7 @@ class Container {
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\API\Events', 'hookEventDefs']);
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\Event\SystemInstallEvent', 'hookEventDefs']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\Civi\Angular\Page\Modules', 'buildAngularModules']);
+    $dispatcher->addListenerService('civi.region.render', ['angularjs.loader', 'onRegionRender']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetJs']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Utils_VisualBundle', 'buildAssetCss']);
     $dispatcher->addListener('hook_civicrm_buildAsset', ['\CRM_Core_Resources', 'renderMenubarStylesheet']);
