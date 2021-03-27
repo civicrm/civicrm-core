@@ -18,7 +18,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    */
   protected $counts;
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->dispatcher = new EventDispatcher();

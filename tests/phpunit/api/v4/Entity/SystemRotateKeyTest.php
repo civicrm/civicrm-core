@@ -33,7 +33,7 @@ class RotateKeyTest extends UnitTestCase {
   /**
    * Set up baseline for testing
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     \CRM_Utils_Hook::singleton()->setHook('civicrm_crypto', [$this, 'registerExampleKeys']);
     \CRM_Utils_Hook::singleton()->setHook('civicrm_cryptoRotateKey', [$this, 'onRotateKey']);

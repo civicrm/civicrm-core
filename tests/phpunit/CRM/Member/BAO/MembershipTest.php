@@ -19,7 +19,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   private $_membershipStatusID;
   private $_membershipTypeID;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->_contactID = $this->organizationCreate();

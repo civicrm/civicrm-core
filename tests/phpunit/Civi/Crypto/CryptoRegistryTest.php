@@ -20,7 +20,7 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
 
   use CryptoTestTrait;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     \CRM_Utils_Hook::singleton()->setHook('civicrm_crypto', [$this, 'registerExampleKeys']);
   }

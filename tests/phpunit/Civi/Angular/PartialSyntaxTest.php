@@ -29,7 +29,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
   /**
    * @inheritDoc
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
     $this->createLoggedInUser();

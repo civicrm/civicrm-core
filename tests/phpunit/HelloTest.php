@@ -38,7 +38,7 @@ class HelloTest extends PHPUnit\Framework\TestCase {
    * this function is defined in PHPUnit_TestCase and overwritten
    * here
    */
-  public function setUp() {
+  public function setUp(): void {
     // create a new instance of String with the
     // string 'abc'
     $this->abc = 'hello';

@@ -27,7 +27,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
    */
   protected $prevNext;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->prevNext = \Civi::service('prevnext');
     $this->cacheKey = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);

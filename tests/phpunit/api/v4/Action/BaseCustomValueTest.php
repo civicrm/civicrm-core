@@ -32,7 +32,7 @@ abstract class BaseCustomValueTest extends UnitTestCase {
   /**
    * Set up baseline for testing
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->setUpOptionCleanup();
     $cleanup_params = [
       'tablesToTruncate' => [

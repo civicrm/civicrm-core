@@ -31,7 +31,7 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
   /**
    * Remove the custom tables
    */
-  public function setUp() {
+  public function setUp(): void {
     $this->dropByPrefix('civicrm_value_financial');
     $this->dropByPrefix('civicrm_value_favorite');
     parent::setUp();

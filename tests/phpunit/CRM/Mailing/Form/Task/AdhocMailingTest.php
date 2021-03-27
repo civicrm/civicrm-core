@@ -17,7 +17,7 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
   /**
    * @throws \Exception
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->_contactIds = [
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),

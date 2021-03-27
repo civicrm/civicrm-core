@@ -63,7 +63,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $params = [

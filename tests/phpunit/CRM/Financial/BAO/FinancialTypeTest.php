@@ -15,7 +15,7 @@
  */
 class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_orgContactID = $this->organizationCreate();
   }

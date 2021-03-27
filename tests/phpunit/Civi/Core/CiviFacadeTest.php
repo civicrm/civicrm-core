@@ -5,7 +5,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
 
   protected $origSetting;
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
 
     parent::setUp();

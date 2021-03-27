@@ -24,7 +24,7 @@ class KernelTest extends \CiviUnitTestCase {
    */
   public $kernel;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->actualEventSequence = [];
     $this->dispatcher = new EventDispatcher();

@@ -9,7 +9,7 @@ namespace Civi\Core;
  */
 class ThemesTest extends \CiviUnitTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction();
     parent::setUp();
   }

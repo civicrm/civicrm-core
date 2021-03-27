@@ -53,7 +53,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $params = [

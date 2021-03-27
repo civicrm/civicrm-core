@@ -19,7 +19,7 @@ class LoaderTest extends \CiviUnitTestCase {
   public static $dummy_setting_count = 0;
   public static $dummy_callback_count = 0;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->hookClass->setHook('civicrm_angularModules', [$this, 'hook_angularModules']);
     self::$dummy_setting_count = 0;

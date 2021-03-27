@@ -15,7 +15,7 @@
  */
 class CRM_Utils_ZipTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->file = FALSE;
   }

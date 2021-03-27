@@ -25,7 +25,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
   protected $_params = [];
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_params = [
       'page' => 1,

@@ -10,7 +10,7 @@ class CRM_SMS_PreviewTest extends CiviUnitTestCase {
   /**
    * Set Up Function
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $option = $this->callAPISuccess('option_value', 'create', ['option_group_id' => 'sms_provider_name', 'name' => 'test_provider_name', 'label' => 'Test Provider Label', 'value' => 1]);
     $this->option_value = $option['id'];
