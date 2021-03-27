@@ -48,13 +48,10 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js')
       ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css');
 
-    $loader = new Civi\Angular\AngularLoader();
-    $loader->setModules(['api4Explorer']);
-    $loader->setPageName('civicrm/api4');
-    $loader->useApp([
-      'defaultRoute' => '/explorer',
-    ]);
-    $loader->load();
+    Civi::service('angularjs.loader')
+      ->addModules('api4Explorer')
+      ->useApp(['defaultRoute' => '/explorer']);
+
     parent::run();
   }
 

@@ -338,6 +338,10 @@ class AngularLoader {
   }
 
   /**
+   * Replace all previously set modules.
+   *
+   * Use with caution, as it can cause conflicts with other extensions who have added modules.
+   *
    * @param array $modules
    * @return AngularLoader
    */
