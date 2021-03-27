@@ -40,15 +40,10 @@ class Abdicator {
     }
 
     switch (\Civi::settings()->get('flexmailer_traditional')) {
-      case 'auto':
-        // Transitional support for old hidden setting "experimentalFlexMailerEngine" (bool)
-        // TODO: Remove this. Maybe after Q4 2019.
-        // TODO: Change this to default to flexmailer
-        return (bool) \Civi::settings()->get('experimentalFlexMailerEngine');
-
       case 'bao':
         return FALSE;
 
+      case 'auto':
       case 'flexmailer':
         return TRUE;
 
