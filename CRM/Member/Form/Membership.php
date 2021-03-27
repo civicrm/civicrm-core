@@ -1019,30 +1019,6 @@ DESC limit 1");
       $membershipTypeValues[$memType]['membership_type_id'] = $memType;
     }
 
-    //take the required membership recur values.
-    if ($this->isCreateRecurringContribution()) {
-      $count = 0;
-      foreach ($this->_memTypeSelected as $memType) {
-        $recurMembershipTypeValues = CRM_Utils_Array::value($memType,
-          $this->allMembershipTypeDetails, []
-        );
-        if (!$recurMembershipTypeValues['auto_renew']) {
-          continue;
-        }
-        foreach ([
-          'frequency_interval' => 'duration_interval',
-          'frequency_unit' => 'duration_unit',
-        ] as $mapVal => $mapParam) {
-          if (!$count) {
-            $formValues[$mapVal] = CRM_Utils_Array::value($mapParam,
-              $recurMembershipTypeValues
-            );
-          }
-        }
-        $count++;
-      }
-    }
-
     $isQuickConfig = $this->_priceSet['is_quick_config'];
 
     $termsByType = [];
@@ -1177,6 +1153,9 @@ DESC limit 1");
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
       $paymentParams = $formValues;
+      $paymentParams['frequency_unit'] = $this->getFrequencyUnit();
+      $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
+
       $paymentParams['contactID'] = $this->_contributorContactID;
       //CRM-10377 if payment is by an alternate contact then we need to set that person
       // as the contact in the payment params
@@ -1774,9 +1753,10 @@ DESC limit 1");
     }
     $recurParams = ['contact_id' => $contactID];
     $recurParams['amount'] = $this->order->getTotalAmount();
-    $recurParams['auto_renew'] = $params['auto_renew'] ?? NULL;
-    $recurParams['frequency_unit'] = $params['frequency_unit'] ?? NULL;
-    $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
+    // for the legacyProcessRecurringContribution function to be reached auto_renew must be true
+    $recurParams['auto_renew'] = TRUE;
+    $recurParams['frequency_unit'] = $this->getFrequencyUnit();
+    $recurParams['frequency_interval'] = $this->getFrequencyInterval();
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['financial_type_id'] = $this->getFinancialTypeID();
     $recurParams['currency'] = $this->getCurrency();
@@ -1817,6 +1797,41 @@ DESC limit 1");
    */
   protected function getFinancialTypeID(): int {
     return (int) $this->getSubmittedValue('financial_type_id') ?: $this->order->getFinancialTypeID();
+  }
+
+  /**
+   * Get the membership type, if any, to be recurred.
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getRecurMembershipType(): array {
+    foreach ($this->order->getRenewableMembershipTypes() as $type) {
+      return $type;
+    }
+    return [];
+  }
+
+  /**
+   * Get the frequency interval.
+   *
+   * @return int|null
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getFrequencyInterval(): ?int {
+    $membershipType = $this->getRecurMembershipType();
+    return empty($membershipType) ? NULL : (int) $membershipType['duration_interval'];
+  }
+
+  /**
+   * Get the frequency interval.
+   *
+   * @return string|null
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function getFrequencyUnit(): ?string {
+    $membershipType = $this->getRecurMembershipType();
+    return empty($membershipType) ? NULL : (string) $membershipType['duration_unit'];
   }
 
   /**
