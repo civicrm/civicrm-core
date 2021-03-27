@@ -25,12 +25,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Setup function.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
-
-    $this->_apiversion = 3;
     $this->_individualId = $this->individualCreate();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
   }
@@ -50,30 +48,36 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test Get Payment api.
    *
+   * @dataProvider versionThreeAndFour
+   *
+   * @param int $version
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetPayment() {
+  public function testGetPayment(int $version): void {
+    $this->_apiversion = 4;
     $p = [
-      'contact_id' => $this->_individualId,
+      'contact_id' => $this->individualCreate(),
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
       'financial_type_id' => $this->_financialTypeId,
       'trxn_id' => 23456,
       'contribution_status_id' => 1,
     ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $p);
+    $contribution = $this->callAPISuccess('Contribution', 'create', $p);
 
     $params = [
       'contribution_id' => $contribution['id'],
       'check_permissions' => TRUE,
     ];
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
-    $this->callAPIFailure('payment', 'get', $params, 'API permission check failed for Payment/get call; insufficient permission: require access CiviCRM and access CiviContribute');
+    $this->callAPIFailure('payment', 'get', $params);
 
-    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviContribute');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access CiviContribute';
     $this->callAPISuccess('payment', 'get', $params);
 
-    $payment = $this->callAPIAndDocument('payment', 'get', $params, __FUNCTION__, __FILE__);
+    $payment = $this->callAPIAndDocument('Payment', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $payment['count']);
 
     $expectedResult = [
