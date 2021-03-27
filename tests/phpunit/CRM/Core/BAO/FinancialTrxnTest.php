@@ -15,10 +15,6 @@
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Check method create().
    *

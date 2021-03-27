@@ -5,7 +5,7 @@
  */
 class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
   }
 

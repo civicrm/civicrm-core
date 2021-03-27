@@ -19,7 +19,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   use CRM_Core_Payment_AuthorizeNetTrait;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate();
 

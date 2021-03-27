@@ -21,7 +21,7 @@
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->quickCleanup([

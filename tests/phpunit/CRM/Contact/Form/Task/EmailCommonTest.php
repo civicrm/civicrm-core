@@ -22,7 +22,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->_contactIds = [
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),

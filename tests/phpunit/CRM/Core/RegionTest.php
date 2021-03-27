@@ -7,7 +7,7 @@
  */
 class CRM_Core_RegionTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // Templates injected into regions should normally be file names, but for unit-testing it's handy to use "string:" notation

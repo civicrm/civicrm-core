@@ -6,11 +6,7 @@
  */
 class CRM_Core_BAO_CustomValueTableMultipleTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function testCustomGroupMultipleSingle() {
+  public function testCustomGroupMultipleSingle(): void {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate(['is_multiple' => 1]);
     $fields = [

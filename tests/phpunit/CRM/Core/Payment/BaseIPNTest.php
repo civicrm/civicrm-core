@@ -61,7 +61,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_processorId = $this->paymentProcessorAuthorizeNetCreate(['is_test' => 0]);
     $this->input = $this->ids = $this->objects = [];

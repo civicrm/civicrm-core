@@ -15,10 +15,6 @@
  */
 class CRM_Core_JobManagerTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testHookCron() {
     $hook = $this->getMockBuilder(stdClass::class)
       ->setMethods(['civicrm_cron'])

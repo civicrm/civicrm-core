@@ -17,7 +17,7 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
   use CRMTraits_ACL_PermissionTrait;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_contactId = $this->createLoggedInUser();
     $this->createOwnEvent();

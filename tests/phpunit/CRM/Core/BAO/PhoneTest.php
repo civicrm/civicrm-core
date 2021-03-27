@@ -15,10 +15,6 @@
  */
 class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Add() method (create and update modes)
    */

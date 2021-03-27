@@ -18,23 +18,6 @@
 class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   */
-  protected function setUp() {
-    parent::setUp();
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   *
-   * This method is called after a test is executed.
-   */
-  protected function tearDown(): void {
-    parent::tearDown();
-  }
-
-  /**
    * Test that the list of the contact's joined groups, on the Contact Dashboard,
    * contains the correct groups.
    */

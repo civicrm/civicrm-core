@@ -15,7 +15,7 @@
  */
 class CRM_Extension_Manager_PaymentTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     if (class_exists('test_extension_manager_paymenttest')) {
       test_extension_manager_paymenttest::$counts = [];

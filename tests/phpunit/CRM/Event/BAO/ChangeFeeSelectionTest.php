@@ -63,7 +63,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate(['is_monetary' => 1]);

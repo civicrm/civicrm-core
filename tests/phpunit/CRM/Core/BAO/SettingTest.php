@@ -21,7 +21,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    */
   private $origSetting;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     global $civicrm_setting;
     $this->origSetting = $civicrm_setting;

@@ -19,7 +19,7 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
 
   protected $_contactIds = NULL;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->_contactIds = [
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),

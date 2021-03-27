@@ -5,7 +5,7 @@
  */
 class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->individualID = $this->individualCreate();
     $this->event = $this->eventCreate();

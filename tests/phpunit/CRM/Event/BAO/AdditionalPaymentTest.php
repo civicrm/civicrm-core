@@ -28,7 +28,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->contactID = $this->individualCreate();
     $event = $this->eventCreate();
