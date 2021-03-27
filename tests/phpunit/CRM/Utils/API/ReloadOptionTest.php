@@ -11,7 +11,7 @@
  */
 class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_post', [$this, 'onPost']);
   }

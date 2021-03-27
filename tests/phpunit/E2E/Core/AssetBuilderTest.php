@@ -17,7 +17,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   /**
    * @inheritDoc
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     \Civi::service('asset_builder')->clear();

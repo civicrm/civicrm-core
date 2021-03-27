@@ -6,10 +6,6 @@
  */
 class CRM_Utils_MoneyTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * @dataProvider subtractCurrenciesDataProvider
    * @param string $leftOp

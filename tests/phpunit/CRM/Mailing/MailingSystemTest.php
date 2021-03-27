@@ -38,7 +38,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   private $counts;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     // If we happen to execute with flexmailer active, use BAO mode.
     // There is a parallel FlexMailerSystemTest which runs in flexmailer mode.

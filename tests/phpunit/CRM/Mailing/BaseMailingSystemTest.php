@@ -36,7 +36,7 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
    */
   private $_mut;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->useTransaction();
     parent::setUp();
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;

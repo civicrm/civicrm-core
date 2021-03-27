@@ -184,7 +184,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
   /**
    * Setup an empty schedule and some contacts.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->useTransaction();
 

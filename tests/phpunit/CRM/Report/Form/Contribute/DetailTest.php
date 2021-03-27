@@ -49,7 +49,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     ];
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
   }

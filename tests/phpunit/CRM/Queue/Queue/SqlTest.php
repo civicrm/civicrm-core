@@ -39,7 +39,7 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
    * Per-provider tests
    *
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->queueService = CRM_Queue_Service::singleton(TRUE);
   }

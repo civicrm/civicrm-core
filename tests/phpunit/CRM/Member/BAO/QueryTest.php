@@ -11,7 +11,7 @@ class CRM_Member_BAO_QueryTest extends CiviUnitTestCase {
    *
    * Ensure CiviCase is enabled.
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }

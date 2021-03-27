@@ -8,7 +8,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   protected $publicFieldParams;
   protected $adminFieldParams;
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->visibilityOptionsKeys = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceFieldValue', 'visibility_id', [

@@ -8,7 +8,7 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
 
   public $foo;
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction();
     parent::setUp();
   }

@@ -17,7 +17,7 @@ use Civi\Api4\MembershipType;
  */
 class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     //create relationship

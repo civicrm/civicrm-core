@@ -19,7 +19,7 @@ class PrepareEventTest extends \CiviUnitTestCase {
    */
   public $kernel;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->dispatcher = new EventDispatcher();
     $this->kernel = new Kernel($this->dispatcher);

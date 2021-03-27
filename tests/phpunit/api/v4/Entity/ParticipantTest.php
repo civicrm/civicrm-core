@@ -27,7 +27,7 @@ use api\v4\UnitTestCase;
  */
 class ParticipantTest extends UnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $cleanup_params = [
       'tablesToTruncate' => [

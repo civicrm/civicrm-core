@@ -16,7 +16,7 @@
  */
 class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     $this->_orgContactID = $this->organizationCreate();

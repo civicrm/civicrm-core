@@ -30,7 +30,7 @@ trait OptionCleanupTrait {
    */
   protected $optionValueMaxId;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->optionGroupMaxId = \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_option_group');
     $this->optionValueMaxId = \CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_option_value');
   }

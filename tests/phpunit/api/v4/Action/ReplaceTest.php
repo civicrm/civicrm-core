@@ -36,7 +36,7 @@ class ReplaceTest extends UnitTestCase {
   /**
    * Set up baseline for testing
    */
-  public function setUp() {
+  public function setUp(): void {
     $tablesToTruncate = [
       'civicrm_custom_group',
       'civicrm_custom_field',

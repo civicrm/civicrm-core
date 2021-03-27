@@ -26,7 +26,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
    */
   protected $b;
 
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->a = $this->b = NULL;
   }

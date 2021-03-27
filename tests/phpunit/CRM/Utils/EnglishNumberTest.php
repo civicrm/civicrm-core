@@ -7,7 +7,7 @@
  */
 class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
   }

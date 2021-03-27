@@ -5,7 +5,7 @@
  */
 class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
 
-  protected function setUp() {
+  protected function setUp(): void {
     $this->useTransaction();
     parent::setUp();
     $this->callAPISuccess('mail_settings', 'get',

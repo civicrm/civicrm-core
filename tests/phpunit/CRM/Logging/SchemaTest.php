@@ -8,7 +8,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
 
   protected $databaseVersion;
 
-  public function setUp() {
+  public function setUp(): void {
     $this->databaseVersion = CRM_Utils_SQL::getDatabaseVersion();
     parent::setUp();
   }
