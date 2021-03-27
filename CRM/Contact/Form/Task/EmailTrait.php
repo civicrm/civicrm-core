@@ -413,7 +413,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // send the mail
-    list($sent, $activityId) = CRM_Activity_BAO_Activity::sendEmail(
+    list($sent, $activityIds) = CRM_Activity_BAO_Activity::sendEmail(
       $formattedContactDetails,
       $this->getSubject($formValues['subject']),
       $formValues['text_message'],
@@ -432,7 +432,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
     );
 
     if ($sent) {
-      $followupStatus = $this->createFollowUpActivities($formValues, $activityId);
+      // Only use the first activity id if there's multiple.
+      // If there's multiple recipients the idea behind multiple activities
+      // is to record the token value replacements separately, but that
+      // has no meaning for followup activities, and this doesn't prevent
+      // creating more manually if desired.
+      $followupStatus = $this->createFollowUpActivities($formValues, $activityIds[0]);
       $count_success = count($this->_toContactDetails);
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', [
         'plural' => '%count messages were sent successfully. ',

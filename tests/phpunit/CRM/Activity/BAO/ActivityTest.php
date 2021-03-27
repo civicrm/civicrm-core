@@ -1221,7 +1221,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $text = __FUNCTION__ . ' text';
     $userID = $loggedInUser;
 
-    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    list($sent, $activity_ids) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1231,7 +1231,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $from = __FUNCTION__ . '@example.com'
     );
 
-    $activity = $this->civicrm_api('activity', 'getsingle', ['id' => $activity_id, 'version' => $this->_apiversion]);
+    $activity = $this->civicrm_api('activity', 'getsingle', ['id' => $activity_ids[0], 'version' => $this->_apiversion]);
     $details = "-ALTERNATIVE ITEM 0-
 $html
 -ALTERNATIVE ITEM 1-
@@ -1278,7 +1278,7 @@ $text
     $text = __FUNCTION__ . ' text';
     $userID = $loggedInUser;
 
-    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    list($sent, $activity_ids) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1294,7 +1294,7 @@ $text
       NULL,
       $campaign_id
     );
-    $activity = $this->civicrm_api('activity', 'getsingle', ['id' => $activity_id, 'version' => $this->_apiversion]);
+    $activity = $this->civicrm_api('activity', 'getsingle', ['id' => $activity_ids[0], 'version' => $this->_apiversion]);
     $this->assertEquals($activity['campaign_id'], $campaign_id, 'Activity campaign_id does not match.');
   }
 
@@ -1543,7 +1543,7 @@ $text
     $text = __FUNCTION__ . ' text';
 
     $mut = new CiviMailUtils($this, TRUE);
-    list($sent, $activity_id) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    list($sent, $activity_ids) = $email_result = CRM_Activity_BAO_Activity::sendEmail(
       $contact['values'],
       $subject,
       $text,
@@ -1560,7 +1560,7 @@ $text
       NULL,
       $caseId
     );
-    $activity = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity_id, 'return' => ['case_id']]);
+    $activity = $this->callAPISuccess('Activity', 'getsingle', ['id' => $activity_ids[0], 'return' => ['case_id']]);
     $this->assertEquals($caseId, $activity['case_id'][0], 'Activity case_id does not match.');
     $mut->checkMailLog(['subject my case']);
     $mut->stop();
@@ -2449,6 +2449,63 @@ $textValue
         ],
       ],
     ];
+  }
+
+  /**
+   * Test the returned activity ids when there are multiple "To" recipients.
+   * Similar to testSendEmailWillReplaceTokensUniquelyForEachContact but we're
+   * checking the activity ids returned from sendEmail.
+   */
+  public function testSendEmailWithMultipleToRecipients() {
+    $contactId1 = $this->individualCreate(['first_name' => 'Aaaa', 'last_name' => 'Bbbb']);
+    $contactId2 = $this->individualCreate(['first_name' => 'Cccc', 'last_name' => 'Dddd']);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $loggedInUser = $this->createLoggedInUser();
+    $contacts = $this->callAPISuccess('Contact', 'get', [
+      'sequential' => 1,
+      'id' => ['IN' => [$contactId1, $contactId2]],
+    ]);
+
+    list($sent, $activityIds) = CRM_Activity_BAO_Activity::sendEmail(
+      $contacts['values'],
+      'a subject',
+      'here is some text',
+      '<p>here is some html</p>',
+      $contacts['values'][0]['email'],
+      $loggedInUser,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments = NULL,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = array_column($contacts['values'], 'id'),
+      $additionalDetails = NULL,
+      NULL,
+     $campaign_id = NULL
+    );
+
+    // Get all activities for these contacts
+    $result = $this->callAPISuccess('activity', 'get', [
+      'sequential' => 1,
+      'return' => ['target_contact_id'],
+      'target_contact_id' => ['IN' => [$contactId1, $contactId2]],
+    ]);
+
+    // There should be one activity created for each of the two contacts
+    $this->assertEquals(2, $result['count']);
+
+    // Activity ids returned from sendEmail should match the ones returned from api call.
+    $this->assertEquals($activityIds, array_column($result['values'], 'id'));
+
+    // Is it the right contacts?
+    $this->assertEquals(
+      [0 => [0 => $contactId1], 1 => [0 => $contactId2]],
+      array_column($result['values'], 'target_contact_id')
+    );
+    $this->assertEquals(
+      [0 => [$contactId1 => 'Bbbb, Aaaa'], 1 => [$contactId2 => 'Dddd, Cccc']],
+      array_column($result['values'], 'target_contact_sort_name')
+    );
   }
 
 }
