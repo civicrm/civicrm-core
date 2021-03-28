@@ -27,12 +27,15 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
 
     $this->_contactID = $this->organizationCreate(NULL);
+    $this->_createdDate = date('Y-m-d H:i:s', strtotime('-10 years'));
 
     $this->_params = [
       'entity_table' => 'civicrm_contact',
       'entity_id' => $this->_contactID,
       'note' => 'Hello!!! m testing Note',
       'contact_id' => $this->_contactID,
+      'created_date' => $this->_createdDate,
+      'note_date' => $this->_createdDate,
       'modified_date' => '2011-01-31',
       'subject' => 'Test Note',
     ];
@@ -137,6 +140,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
 
     $result = $this->callAPIAndDocument('note', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note');
+    $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['created_date'])));
+    $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['note_date'])));
     $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])));
 
     $this->assertArrayHasKey('id', $result);
@@ -153,6 +158,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_id' => $this->_contactID,
       'note' => "Hello!!! ' testing Note",
       'contact_id' => $this->_contactID,
+      'note_date' => $this->_createdDate,
+      'created_date' => $this->_createdDate,
       'modified_date' => '2011-01-31',
       'subject' => "With a '",
       'sequential' => 1,
@@ -221,6 +228,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
       'note' => 'Note1',
       'subject' => 'Hello World',
+      'note_date' => date('Y-m-d H:i:s', strtotime('-2 years')),
     ];
 
     // Update Note.
@@ -229,6 +237,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals($note['id'], $this->_noteID);
     $this->assertEquals($note['values'][$this->_noteID]['entity_id'], $this->_contactID);
     $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact');
+    $this->assertEquals($note['values'][$this->_noteID]['note_date'], $params['note_date']);
+    $this->assertEquals(date('Y-m-d', strtotime($note['values'][$this->_noteID]['created_date'])), date('Y-m-d'));
     $this->assertEquals('Hello World', $note['values'][$this->_noteID]['subject']);
     $this->assertEquals('Note1', $note['values'][$this->_noteID]['note']);
   }
