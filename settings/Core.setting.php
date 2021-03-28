@@ -358,8 +358,25 @@ return [
     'pseudoconstant' => [
       'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
     ],
-    'description' => ts('Should the smart groups be by cron jobs or user actions'),
+    'description' => ts('Should the smart groups be flushed by cron jobs or user actions'),
     'help_text' => ts('In "Opportunistic Flush" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In "Cron Flush" mode, you should schedule a cron job to flush caches; this can improve latency on form-submissions but requires more setup.'),
+  ],
+  'acl_cache_refresh_mode' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'acl_cache_refresh_mode',
+    'type' => 'String',
+    'html_type' => 'radio',
+    'default' => 'opportunistic',
+    'add' => '5.37.0',
+    'title' => ts('ACL Group Refresh Mode'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'pseudoconstant' => [
+      'callback' => 'CRM_Contact_BAO_GroupContactCache::getModes',
+    ],
+    'description' => ts('Should the acl cache be by cron jobs or user actions'),
+    'help_text' => ts('In "Opportunistic Flush" mode, caches are flushed in response to user actions; this mode is broadly compatible but may add latency during form-submissions. In "Cron Flush" mode, you should schedule a cron job to flush caches if your site uses ACLs; this can improve latency on form-submissions but requires more setup.'),
   ],
   'installed' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
