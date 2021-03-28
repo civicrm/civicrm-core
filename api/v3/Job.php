@@ -711,18 +711,38 @@ function civicrm_api3_job_group_rebuild($params) {
 /**
  * Flush smart groups caches.
  *
- * This job purges aged smart group cache data (based on the timeout value). Sites can decide whether they want this
- * job and / or the group cache rebuild job to run. In some cases performance is better when old caches are cleared out
- * prior to any attempt to rebuild them. Also, many sites are very happy to have caches built on demand, provided the
- * user is not having to wait for deadlocks to clear when invalidating them.
+ * This job purges aged smart group cache data (based on the timeout value).
+ * Sites can decide whether they want this job and / or the group cache rebuild
+ * job to run. In some cases performance is better when old caches are cleared
+ * out prior to any attempt to rebuild them. Also, many sites are very happy to
+ * have caches built on demand, provided the user is not having to wait for
+ * deadlocks to clear when invalidating them.
  *
  * @param array $params
  *
  * @return array
- * @throws \API_Exception
+ * @throws \CiviCRM_API3_Exception
  */
-function civicrm_api3_job_group_cache_flush($params) {
+function civicrm_api3_job_group_cache_flush(array $params): array {
   CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
+  return civicrm_api3_create_success();
+}
+
+/**
+ * Flush acl caches.
+ *
+ * This job flushes the acl cache. For many sites it is better to do
+ * this by cron (or not at all if acls are not used) than whenever
+ * a contact is edited.
+ *
+ * @param array $params
+ *
+ * @return array
+ *
+ * @throws \CiviCRM_API3_Exception
+ */
+function civicrm_api3_job_acl_cache_flush(array $params): array {
+  CRM_ACL_BAO_Cache::resetCache();
   return civicrm_api3_create_success();
 }
 

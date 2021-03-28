@@ -116,9 +116,22 @@ WHERE contact_id = %1
   }
 
   /**
+   * Do an opportunistic cache refresh if the site is configured for these.
+   *
+   * Sites that use acls and do not run the acl cache clearing cron job should
+   * refresh the caches on demand. The user session will be forced to wait
+   * and this is a common source of deadlocks, so it is less ideal.
+   */
+  public static function opportunisticCacheFlush(): void {
+    if (Civi::settings()->get('acl_cache_refresh_mode') === 'opportunistic') {
+      self::resetCache();
+    }
+  }
+
+  /**
    * Deletes all the cache entries.
    */
-  public static function resetCache() {
+  public static function resetCache(): void {
     if (!CRM_Core_Config::isPermitCacheFlushMode()) {
       return;
     }

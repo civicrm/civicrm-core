@@ -866,7 +866,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    *   likely affect user experience in unexpected ways. Existing behaviour retained
    *   ... reluctantly.
    */
-  public static function clearContactCaches($isEmptyPrevNextTable = FALSE) {
+  public static function clearContactCaches($isEmptyPrevNextTable = FALSE): void {
     if (!CRM_Core_Config::isPermitCacheFlushMode()) {
       return;
     }
@@ -876,8 +876,8 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       Civi::service('prevnext')->deleteItem();
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
-    // clear acl cache if any.
-    CRM_ACL_BAO_Cache::resetCache();
+
+    CRM_ACL_BAO_Cache::opportunisticCacheFlush();
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
