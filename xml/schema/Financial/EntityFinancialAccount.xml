@@ -32,6 +32,9 @@
     <import>true</import>
     <add>4.3</add>
     <comment>Links to an entity_table like civicrm_financial_type</comment>
+    <pseudoconstant>
+      <callback>CRM_Financial_BAO_EntityFinancialAccount::entityTables</callback>
+    </pseudoconstant>
   </field>
   <field>
     <name>entity_id</name>
