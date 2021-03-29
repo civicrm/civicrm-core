@@ -40,10 +40,11 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    *
    * @return object
    *   $batch batch object
+   * @throws \Exception
    */
   public static function create(&$params) {
     if (empty($params['id']) && empty($params['name'])) {
-      $params['name'] = CRM_Utils_String::titleToVar($params['title']);
+      $params['name'] = CRM_Utils_String::titleToVar($params['title'] ?? 'batch_ref_' . random_int(0, 100000));
     }
     return self::writeRecord($params);
   }
