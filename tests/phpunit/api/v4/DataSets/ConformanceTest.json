@@ -55,5 +55,10 @@
       "create_date" :  "now",
       "status_id:name" : "Pending"
     }
+  ],
+  "PaymentProcessor" : [
+    {
+      "payment_processor_type_id:name": "Dummy"
+    }
   ]
 }
