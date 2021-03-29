@@ -328,7 +328,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if (!empty($qf->_quickConfig) && !empty($qf->_contributionAmount) && strtolower($fieldOptions[$optionKey]['name']) == 'other_amount') {
             $label .= '  ' . $currencySymbol;
             $qf->assign('priceset', $elementName);
-            $extra = ['onclick' => 'useAmountOther();'];
+            $extra = [
+              'onclick' => 'useAmountOther();',
+              'autocomplete' => 'off',
+            ];
           }
         }
 
