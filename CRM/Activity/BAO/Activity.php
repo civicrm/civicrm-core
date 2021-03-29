@@ -1017,7 +1017,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param int $caseId
    *
    * @return array
-   *   ( sent, activityId) if any email is sent and activityId
+   *   bool $sent FIXME: this only indicates the status of the last email sent.
+   *   array $activityIds The activity ids created, one per "To" recipient.
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
@@ -1116,6 +1118,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     $sent = $notSent = [];
     $attachmentFileIds = [];
+    $activityIds = [];
     $firstActivityCreated = FALSE;
     foreach ($contactDetails as $values) {
       $contactId = $values['contact_id'];
@@ -1178,6 +1181,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
       // Create email activity.
       $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $caseId);
+      $activityIds[] = $activityID;
 
       if ($firstActivityCreated == FALSE && !empty($attachments)) {
         $attachmentFileIds = self::getAttachmentFileIds($activityID, $attachments);
@@ -1203,7 +1207,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
     }
 
-    return [$sent, $activityID];
+    return [$sent, $activityIds];
   }
 
   /**
