@@ -93,6 +93,7 @@
     <title>Interval (number of units)</title>
     <type>int unsigned</type>
     <required>true</required>
+    <default>1</default>
     <comment>Number of time units for recurrence of payment.</comment>
     <add>1.6</add>
     <html>
@@ -114,6 +115,7 @@
     <title>Start Date</title>
     <type>datetime</type>
     <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>The date the first scheduled recurring contribution occurs.</comment>
     <add>1.6</add>
     <html>
@@ -128,6 +130,7 @@
     <title>Created Date</title>
     <type>datetime</type>
     <required>true</required>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>When this recurring contribution record was created.</comment>
     <add>1.6</add>
     <html>
@@ -141,6 +144,7 @@
     <name>modified_date</name>
     <title>Modified Date</title>
     <type>datetime</type>
+    <default>CURRENT_TIMESTAMP</default>
     <comment>Last updated date for this record. mostly the last time a payment was received</comment>
     <add>1.6</add>
     <html>
@@ -259,7 +263,7 @@
     <uniqueName>contribution_recur_contribution_status_id</uniqueName>
     <title>Status</title>
     <type>int unsigned</type>
-    <default>1</default>
+    <default>2</default>
     <import>true</import>
     <add>1.6</add>
     <pseudoconstant>
