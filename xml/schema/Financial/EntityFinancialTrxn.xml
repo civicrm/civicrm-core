@@ -28,6 +28,9 @@
     <length>64</length>
     <required>true</required>
     <import>true</import>
+    <pseudoconstant>
+      <callback>CRM_Financial_BAO_EntityFinancialTrxn::entityTables</callback>
+    </pseudoconstant>
     <add>3.2</add>
     <comment>May contain civicrm_financial_item, civicrm_contribution, civicrm_financial_trxn, civicrm_grant, etc</comment>
   </field>
