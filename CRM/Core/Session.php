@@ -513,6 +513,9 @@ class CRM_Core_Session {
         'options' => $options ? $options : NULL,
       ];
     }
+    if ($type !== 'success') {
+      trigger_error($text, E_USER_ERROR);
+    }
   }
 
   /**
