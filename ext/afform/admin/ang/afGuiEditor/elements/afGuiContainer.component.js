@@ -38,6 +38,14 @@
         }
       };
 
+      this.sortableOptions = {
+        handle: '.af-gui-bar',
+        connectWith: '[ui-sortable]',
+        cancel: 'input,textarea,button,select,option,a,.dropdown-menu',
+        placeholder: 'af-gui-dropzone',
+        containment: '#afGuiEditor-canvas-body'
+      };
+
       $scope.isSelectedFieldset = function(entityName) {
         return entityName === ctrl.editor.getSelectedEntityName();
       };

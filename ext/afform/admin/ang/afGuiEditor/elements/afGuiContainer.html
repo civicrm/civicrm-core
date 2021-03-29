@@ -15,7 +15,7 @@
   </div>
   <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner"></i></div>
 </div>
-<div ng-if="!$ctrl.loading" ui-sortable="{handle: '.af-gui-bar', connectWith: '[ui-sortable]', cancel: 'input,textarea,button,select,option,a,.dropdown-menu', placeholder: 'af-gui-dropzone', containment: '#afGuiEditor-canvas-body'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
+<div ng-if="!$ctrl.loading" ui-sortable="$ctrl.sortableOptions" ui-sortable-update="$ctrl.editor.onDrop" ng-model="getSetChildren" ng-model-options="{getterSetter: true}" class="af-gui-layout {{ getLayout() }}">
   <div ng-repeat="item in getSetChildren()" >
     <div ng-switch="$ctrl.getNodeType(item)">
       <af-gui-container ng-switch-when="fieldset" node="item" delete-this="$ctrl.removeElement(item)" style="{{ item.style }}" class="af-gui-container af-gui-fieldset af-gui-container-type-{{ item['#tag'] }}" ng-class="{'af-entity-selected': isSelectedFieldset(item['af-fieldset'])}" entity-name="item['af-fieldset']" data-entity="{{ item['af-fieldset'] }}" ></af-gui-container>
