@@ -87,7 +87,7 @@ class CRM_Contact_BAO_SearchCustom {
    * @param int $ssID
    *
    * @return CRM_Contact_Form_Search_Custom_Base
-   * @throws Exception
+   * @throws CRM_Core_Exception
    */
   public static function customClass($csID, $ssID) {
     list($customSearchID, $customSearchClass, $formValues) = self::details($csID, $ssID);
