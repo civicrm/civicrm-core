@@ -146,7 +146,7 @@
         <tr class="columnheader"><td scope="column">{ts}Fee Label{/ts}</td><td scope="column">{ts}Amount{/ts}</td><td scope="column">{ts}Default?{/ts}<br />{$form.default.0.html}</td></tr>
         {section name=loop start=1 loop=11}
            {assign var=idx value=$smarty.section.loop.index}
-           <tr><td class="even-row crm-event-manage-fee-form-block-label_{$idx}">{$form.label.$idx.html}</td><td class="crm-event-manage-fee-form-block-value_{$idx}">{$form.value.$idx.html|crmMoney}</td><td class="even-row crm-event-manage-fee-form-block-default_{$idx}">{$form.default.$idx.html}</td></tr>
+           <tr><td class="even-row crm-event-manage-fee-form-block-label_{$idx}">{$form.label.$idx.html}</td><td class="crm-event-manage-fee-form-block-value_{$idx}">{$form.value.$idx.html}</td><td class="even-row crm-event-manage-fee-form-block-default_{$idx}">{$form.default.$idx.html}</td></tr>
         {/section}
         </table>
         </fieldset>
@@ -208,7 +208,7 @@
             {section name=loop1 start=1 loop=6}
                      {assign var=idy value=$smarty.section.loop1.index}
           {if $form.discount_name.$idy.value}
-                <td>{$form.discounted_value.$idx.$idy.html|crmMoney}</td>
+                <td>{$form.discounted_value.$idx.$idy.html}</td>
           {/if}
             {/section}
             <td class="even-row">{$form.discounted_default.$idx.html}</td>

@@ -64,19 +64,19 @@
     </tr>
     <tr class="crm-contribution-form-block-min_contribution">
        <td class="label">{$form.min_contribution.label}</td>
-       <td class="html-adjust">{$form.min_contribution.html|crmMoney}<br />
+       <td class="html-adjust">{$form.min_contribution.html}<br />
           <span class="description">{ts}The minimum contribution amount required to be eligible to select this premium. If you want to offer it to all contributors regardless of contribution amount, enter '0'. If display of minimum contribution amounts is enabled then this text is displayed:{/ts} <em>{ts}(Contribute at least X to be eligible for this gift.){/ts}</em></span>
        </td>
     </tr>
     <tr class="crm-contribution-form-block-price">
        <td class="label">{$form.price.label}</td>
-       <td class="html-adjust">{$form.price.html|crmMoney}<br />
+       <td class="html-adjust">{$form.price.html}<br />
      <span class="description">{ts}The market value of this premium (e.g. retail price). For tax-deductible contributions, this amount will be used to set the non-deductible amount in the contribution record and receipt.{/ts}</span>
        </td>
     </tr>
     <tr class="crm-contribution-form-block-cost">
        <td class="label">{$form.cost.label}</td>
-       <td class="html-adjust">{$form.cost.html|crmMoney}<br />
+       <td class="html-adjust">{$form.cost.html}<br />
         <span class="description">{ts}You may optionally record the actual cost of this premium to your organization. This may be useful when evaluating net return for this incentive.{/ts}</span>
        </td>
     </tr>

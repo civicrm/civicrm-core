@@ -96,7 +96,7 @@
       {else}
         <div class="display-block">
           <td class="label">{$form.total_amount.label}</td>
-          <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
+          <td><span>{$form.total_amount.html}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
         </div>
       {/if}
     {else}
