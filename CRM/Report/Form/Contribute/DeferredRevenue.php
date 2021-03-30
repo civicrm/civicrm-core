@@ -425,6 +425,8 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    *
    * @param string $sql
    * @param array $rows
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
@@ -449,7 +451,11 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             $row[$key] = CRM_Utils_Date::customFormat($dao->$key, $dateFormat);
           }
           elseif (CRM_Utils_Array::value('type', $value) & CRM_Utils_Type::T_MONEY) {
-            $row[$key] = CRM_Utils_Money::format($dao->$key);
+            $values = [];
+            foreach (explode(',', $dao->$key) as $moneyValue) {
+              $values[] = CRM_Utils_Money::format($moneyValue);
+            }
+            $row[$key] = implode(',', $values);
           }
           else {
             $row[$key] = $dao->$key;
@@ -460,9 +466,9 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
         $rows[$arraykey]['label'] = "Deferred Revenue Account: {$dao->civicrm_financial_account_name} ({$dao->civicrm_financial_account_accounting_code}), Revenue Account: {$dao->civicrm_financial_account_1_name} {$dao->civicrm_financial_account_1_accounting_code}";
         $trxnDate = explode(',', $dao->civicrm_financial_trxn_1_trxn_date);
         $trxnAmount = explode(',', $dao->civicrm_financial_trxn_1_total_amount);
-        foreach ($trxnDate as $key => $date) {
+        foreach ($trxnDate as $trxnKey => $date) {
           $keyDate = date('M, Y', strtotime($date));
-          $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$key]);
+          $rows[$arraykey]['rows'][$dao->civicrm_financial_item_id][$keyDate] = CRM_Utils_Money::format($trxnAmount[$trxnKey]);
         }
       }
     }
