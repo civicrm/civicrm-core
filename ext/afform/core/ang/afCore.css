@@ -15,7 +15,7 @@ a.af-api4-action-idle {
 .af-container.af-layout-inline > * {
     display: inline-block;
     margin-right: .5em;
-    vertical-align: bottom;
+    vertical-align: top;
 }
 
 [af-repeat-item] {
