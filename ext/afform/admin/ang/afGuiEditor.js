@@ -172,12 +172,28 @@
       };
     });
 
-  // Shoehorn in a non-angular widget for picking icons
   $(function() {
+    // Shoehorn in a non-angular widget for picking icons
     $('#crm-container').append('<div style="display:none"><input id="af-gui-icon-picker"></div>');
     CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
       $('#af-gui-icon-picker').crmIconPicker();
     });
+    // Add css class while dragging
+    $('#crm-container')
+      .on('sortover', function(e) {
+        $('.af-gui-container').removeClass('af-gui-dragtarget');
+        $(e.target).closest('.af-gui-container').addClass('af-gui-dragtarget');
+      })
+      .on('sortout', '.af-gui-container', function() {
+        $(this).removeClass('af-gui-dragtarget');
+      })
+      .on('sortstart', '#afGuiEditor', function() {
+        $('#afGuiEditor').addClass('af-gui-dragging');
+      })
+      .on('sortstop', '#afGuiEditor', function() {
+        $('.af-gui-dragging').removeClass('af-gui-dragging');
+        $('.af-gui-dragtarget').removeClass('af-gui-dragtarget');
+      });
   });
 
   // Connect bootstrap dropdown.js with angular
