@@ -119,7 +119,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testReportTemplateSelectWhere($reportID) {
+  public function testReportTemplateSelectWhere($reportID): void {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'hookSelectWhere']);
     $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
@@ -1032,8 +1032,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * Test Deferred Revenue Report.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testDeferredRevenueReport() {
+  public function testDeferredRevenueReport(): void {
     $indv1 = $this->individualCreate();
     $indv2 = $this->individualCreate();
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
