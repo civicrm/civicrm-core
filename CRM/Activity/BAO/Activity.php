@@ -1528,6 +1528,8 @@ WHERE entity_id =%1 AND entity_table = %2";
       'text' => $text_message,
       'html' => $html_message,
       'attachments' => $attachments,
+      'activityID' => $activityID,
+      'toContactID' => $toID,
     ];
 
     if (!CRM_Utils_Mail::send($mailParams)) {

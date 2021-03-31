@@ -2481,7 +2481,7 @@ $textValue
       $contactIds = array_column($contacts['values'], 'id'),
       $additionalDetails = NULL,
       NULL,
-     $campaign_id = NULL
+      $campaign_id = NULL
     );
 
     // Get all activities for these contacts
@@ -2506,6 +2506,106 @@ $textValue
       [0 => [$contactId1 => 'Bbbb, Aaaa'], 1 => [$contactId2 => 'Dddd, Cccc']],
       array_column($result['values'], 'target_contact_sort_name')
     );
+  }
+
+  /**
+   * Test that the mail hooks receive the activity ids
+   * @dataProvider hooksListProvider
+   * @param array $hookInfo
+   */
+  public function testSendEmailWithHook(array $hookInfo): void {
+    \Civi::dispatcher()->addListener($hookInfo['hook'], [$this, $hookInfo['impl']]);
+
+    $contactId1 = $this->individualCreate(['first_name' => 'Aaaa', 'last_name' => 'Bbbb']);
+    $contactId2 = $this->individualCreate(['first_name' => 'Cccc', 'last_name' => 'Dddd']);
+    $contacts = $this->callAPISuccess('Contact', 'get', [
+      'sequential' => 1,
+      'id' => ['IN' => [$contactId1, $contactId2]],
+    ]);
+    $loggedInUser = $this->createLoggedInUser();
+
+    $this->listOfSentEmails = [];
+
+    list($sent, $activityIds) = CRM_Activity_BAO_Activity::sendEmail(
+      $contacts['values'],
+      'a subject',
+      'here is some text',
+      '<p>here is some html</p>',
+      $contacts['values'][0]['email'],
+      $loggedInUser,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments = NULL,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = array_column($contacts['values'], 'id'),
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id = NULL
+    );
+
+    // Get all activities for these contacts
+    $result = $this->callAPISuccess('activity', 'get', [
+      'sequential' => 1,
+      'return' => ['target_contact_id'],
+      'target_contact_id' => ['IN' => [$contactId1, $contactId2]],
+    ]);
+
+    // put it in the same format as the list that our hook built
+    $contactsAndActivities = array_map(function($v) {
+      return [
+        'contact_id' => $v['target_contact_id'][0],
+        'activity_id' => $v['id'],
+      ];
+    }, $result['values']);
+
+    $this->assertNotEmpty($this->listOfSentEmails);
+    $this->assertEquals($contactsAndActivities, $this->listOfSentEmails);
+  }
+
+  /**
+   * Data provider for testSendEmailWithHook
+   * @return array
+   */
+  public function hooksListProvider(): array {
+    return [
+      [
+        [
+          'hook' => 'hook_civicrm_alterMailParams',
+          'impl' => 'hookForAlterMailParams',
+        ],
+      ],
+      [
+        [
+          'hook' => 'hook_civicrm_postEmailSend',
+          'impl' => 'hookForPostEmailSend',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * This is the listener for hook_civicrm_alterMailParams
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function hookForAlterMailParams(\Civi\Core\Event\GenericHookEvent $e) {
+    $this->assertEquals('singleEmail', $e->context);
+    $this->listOfSentEmails[] = [
+      'contact_id' => $e->params['toContactID'],
+      'activity_id' => $e->params['activityID'],
+    ];
+  }
+
+  /**
+   * This is the listener for hook_civicrm_postEmailSend
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function hookForPostEmailSend(\Civi\Core\Event\GenericHookEvent $e) {
+    $this->listOfSentEmails[] = [
+      'contact_id' => $e->params['toContactID'],
+      'activity_id' => $e->params['activityID'],
+    ];
   }
 
 }
