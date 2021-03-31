@@ -104,21 +104,38 @@ class AfformMetadataInjector {
     // Merge field definition data with whatever's already in the markup.
     $deep = ['input_attrs'];
     if ($fieldInfo) {
+      // Defaults for attributes not in spec
+      $fieldInfo['search_range'] = FALSE;
+
       $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
       if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
         // If it's not an object, don't mess with it.
         return;
       }
+
+      // Get field defn from afform markup
+      $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
+      // This is the input type set on the form (may be different from the default input type in the field spec)
+      $inputType = !empty($fieldDefn['input_type']) ? \CRM_Utils_JS::decode($fieldDefn['input_type']) : $fieldInfo['input_type'];
+      // On a search form, search_range will present a pair of fields (or possibly 3 fields for date select + range)
+      $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
+
       // Default placeholder for select inputs
-      if ($fieldInfo['input_type'] === 'Select') {
-        $fieldInfo['input_attrs'] = ($fieldInfo['input_attrs'] ?? []) + ['placeholder' => E::ts('Select')];
+      if ($inputType === 'Select') {
+        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
       }
 
-      $fieldDefn = $existingFieldDefn ? \CRM_Utils_JS::getRawProps($existingFieldDefn) : [];
-
-      if ('Date' === $fieldInfo['input_type'] && !empty($fieldDefn['input_type']) && \CRM_Utils_JS::decode($fieldDefn['input_type']) === 'Select') {
-        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
-        $fieldInfo['options'] = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
+      if ($fieldInfo['input_type'] === 'Date') {
+        // This flag gets used by the afField controller
+        $fieldDefn['is_date'] = TRUE;
+        // For date fields that have been converted to Select
+        if ($inputType === 'Select') {
+          $dateOptions = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
+          if ($isSearchRange) {
+            $dateOptions = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateOptions);
+          }
+          $fieldInfo['options'] = $dateOptions;
+        }
       }
 
       foreach ($fieldInfo as $name => $prop) {

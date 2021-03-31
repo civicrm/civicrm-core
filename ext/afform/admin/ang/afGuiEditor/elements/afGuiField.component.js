@@ -20,7 +20,13 @@
       var yesNo = [
         {id: '1', label: ts('Yes')},
         {id: '0', label: ts('No')}
-      ];
+      ],
+        singleElement = [''],
+        // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
+        rangeElements = ['', '2'],
+        dateRangeElements = ['1', '2'],
+        relativeDatesWithPickRange = CRM.afGuiEditor.dateRanges,
+        relativeDatesWithoutPickRange = relativeDatesWithPickRange.slice(1);
 
       this.$onInit = function() {
         $scope.meta = afGui.meta;
@@ -30,14 +36,35 @@
         return !_.isEmpty($scope.meta.searchDisplays);
       };
 
+      this.canBeRange = function() {
+        return this.isSearch() &&
+          !ctrl.getDefn().input_attrs.multiple &&
+          _.includes(['Date', 'Timestamp', 'Integer', 'Float'], ctrl.getDefn().data_type) &&
+          _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'));
+      };
+
+      this.canBeMultiple = function() {
+        return this.isSearch() &&
+          !_.includes(['Date', 'Timestamp'], ctrl.getDefn().data_type) &&
+          $scope.getProp('input_type') === 'Select';
+      };
+
+      this.getRangeElements = function(type) {
+        if (!$scope.getProp('search_range') || (type === 'Select' && ctrl.getDefn().input_type === 'Date')) {
+          return singleElement;
+        }
+        return type === 'Date' ? dateRangeElements : rangeElements;
+      };
+
       // Returns the original field definition from metadata
       this.getDefn = function() {
         var defn = afGui.getField(ctrl.container.getFieldEntityType(ctrl.node.name), ctrl.node.name);
-        return defn ||  {
+        defn = defn || {
           label: ts('Untitled'),
-          requred: false,
-          input_attrs: []
+          required: false
         };
+        defn.input_attrs = _.isEmpty(defn.input_attrs) ? {} : defn.input_attrs;
+        return defn;
       };
 
       $scope.getOriginalLabel = function() {
@@ -52,12 +79,12 @@
         return _.contains(['CheckBox', 'Radio', 'Select'], inputType) && !(inputType === 'CheckBox' && !ctrl.getDefn().options);
       };
 
-      $scope.getOptions = this.getOptions = function() {
+      this.getOptions = function() {
         if (ctrl.node.defn && ctrl.node.defn.options) {
           return ctrl.node.defn.options;
         }
         if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
-          return CRM.afGuiEditor.dateRanges;
+          return $scope.getProp('search_range') ? relativeDatesWithPickRange : relativeDatesWithoutPickRange;
         }
         return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
       };
@@ -122,6 +149,20 @@
         }
       };
 
+      $scope.toggleMultiple = function() {
+        var newVal = getSet('input_attrs.multiple', !getSet('input_attrs.multiple'));
+        if (newVal && getSet('search_range')) {
+          getSet('search_range', false);
+        }
+      };
+
+      $scope.toggleSearchRange = function() {
+        var newVal = getSet('search_range', !getSet('search_range'));
+        if (newVal && getSet('input_attrs.multiple')) {
+          getSet('input_attrs.multiple', false);
+        }
+      };
+
       $scope.toggleRequired = function() {
         getSet('required', !getSet('required'));
         return false;
@@ -151,6 +192,10 @@
             delete localDefn[item];
             clearOut(ctrl.node, ['defn'].concat(path));
           }
+          // When changing input_type
+          if (propName === 'input_type' && ctrl.node.defn && ctrl.node.defn.search_range && !ctrl.canBeRange()) {
+            delete ctrl.node.defn.search_range;
+          }
           return val;
         }
         return $scope.getProp(propName);
@@ -171,10 +216,15 @@
         return container;
       }
 
+      // Returns true only if value is [], {}, '', null, or undefined.
+      function isEmpty(val) {
+        return typeof val !== 'boolean' && typeof val !== 'number' && _.isEmpty(val);
+      }
+
       // Recursively clears out empty arrays and objects
       function clearOut(parent, path) {
         var item;
-        while (path.length && _.every(drillDown(parent, path), _.isEmpty)) {
+        while (path.length && _.every(drillDown(parent, path), isEmpty)) {
           item = path.pop();
           delete drillDown(parent, path)[item];
         }
