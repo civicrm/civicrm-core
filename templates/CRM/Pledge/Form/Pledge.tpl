@@ -51,7 +51,7 @@
             <td>{$form.installments.html} {ts}installments of{/ts}
               <span class='currency-symbol'>
                 {if $action eq 1 or $isPending}
-                  {$form.eachPaymentAmount.html|crmMoney:$currency}
+                  {$form.eachPaymentAmount.html}
                 {elseif $action eq 2 and !$isPending}
                   {$eachPaymentAmount|crmMoney:$currency}
                 {/if}

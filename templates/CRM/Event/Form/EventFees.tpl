@@ -68,7 +68,7 @@
                     <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
                     <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
                 </tr>
-                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
+                <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html}</td></tr>
                 <tr>
                     <td class="label" >{$form.receive_date.label}</td>
                     <td>{$form.receive_date.html}</td>
