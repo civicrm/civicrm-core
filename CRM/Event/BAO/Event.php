@@ -1320,7 +1320,7 @@ WHERE civicrm_event.is_active = 1
         $groupTitle = NULL;
         foreach ($fields as $k => $v) {
           if (!$groupTitle) {
-            $groupTitle = $v['groupTitle'];
+            $groupTitle = $v['groupDisplayTitle'];
           }
           // suppress all file fields from display
           if (

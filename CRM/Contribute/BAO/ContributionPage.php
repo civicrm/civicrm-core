@@ -483,7 +483,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE, NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
         foreach ($fields as $k => $v) {
           if (!$groupTitle) {
-            $groupTitle = $v['groupTitle'];
+            $groupTitle = $v['groupDisplayTitle'];
           }
           // suppress all file fields from display and formatting fields
           if (
