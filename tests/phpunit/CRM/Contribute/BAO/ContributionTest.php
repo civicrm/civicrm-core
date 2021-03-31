@@ -1688,4 +1688,136 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertCount(0, $payments);
   }
 
+  /**
+   * Test contribution update when more than one quick
+   * config line item is linked to contribution.
+   *
+   * @throws CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   */
+  public function testContributionQuickConfigTwoLineItems(): void {
+    $contactId1 = $this->individualCreate();
+    $contactId2 = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+
+    // Created new contribution to bypass the deprecated error
+    // 'Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required.'
+    // in CRM_Price_BAO_LineItem::processPriceSet();
+    $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Completed',
+      'total_amount' => 150,
+    ]);
+    $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Completed',
+      'total_amount' => 150,
+    ]);
+
+    // create membership type
+    $membershipTypeId1 = $this->callAPISuccess('MembershipType', 'create', [
+      'domain_id' => 1,
+      'member_of_contact_id' => $membershipOrganizationId,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'minimum_fee' => 100,
+      'name' => 'Parent',
+    ])['id'];
+
+    $membershipTypeId2 = $this->callAPISuccess('MembershipType', 'create', [
+      'domain_id' => 1,
+      'member_of_contact_id' => $membershipOrganizationId,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'month',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'minimum_fee' => 50,
+      'name' => 'Child',
+    ])['id'];
+
+    $contactIds = [
+      $contactId1 => $membershipTypeId1,
+      $contactId2 => $membershipTypeId2,
+    ];
+
+    $priceFields = CRM_Price_BAO_PriceSet::getDefaultPriceSet('membership');
+
+    // prepare order api params.
+    $p = [
+      'contact_id' => $contactId1,
+      'receive_date' => '2010-01-20',
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Pending',
+      'total_amount' => 150,
+      'api.Payment.create' => ['total_amount' => 150],
+    ];
+
+    $now = date('Ymd');
+    foreach ($priceFields as $priceField) {
+      $lineItems = [];
+      $contactId = array_search($priceField['membership_type_id'], $contactIds);
+      $lineItems[1] = [
+        'price_field_id' => $priceField['priceFieldID'],
+        'price_field_value_id' => $priceField['priceFieldValueID'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => $priceField['membership_type_id'],
+      ];
+      $p['line_items'][] = [
+        'line_item' => $lineItems,
+        'params' => [
+          'contact_id' => $contactId,
+          'membership_type_id' => $priceField['membership_type_id'],
+          'source' => 'Payment',
+          'join_date' => '2020-04-28',
+          'start_date' => '2020-04-28',
+          'status_id' => 'Pending',
+          'is_override' => 1,
+        ],
+      ];
+    }
+    $order = $this->callAPISuccess('order', 'create', $p);
+    $contributionId = $order['id'];
+
+    $count = CRM_Core_DAO::singleValueQuery('
+      SELECT count(*), total_amount
+      FROM civicrm_contribution cc
+        INNER JOIN civicrm_line_item cli
+          ON cli.contribution_id = cc.id
+           AND cc.id = %1
+      GROUP BY cc.id, total_amount
+      HAVING SUM(cli.line_total) != total_amount
+    ', [1 => [$contributionId, 'Integer']]);
+
+    $this->assertEquals(0, $count);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $contributionId,
+      'total_amount' => 150,
+    ]);
+    $count = CRM_Core_DAO::singleValueQuery('
+      SELECT count(*), total_amount
+      FROM civicrm_contribution cc
+        INNER JOIN civicrm_line_item cli
+          ON cli.contribution_id = cc.id
+           AND cc.id = %1
+      GROUP BY cc.id, total_amount
+      HAVING SUM(cli.line_total) != total_amount
+    ', [1 => [$contributionId, 'Integer']]);
+
+    $this->assertEquals(0, $count);
+  }
+
 }
