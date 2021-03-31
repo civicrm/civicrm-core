@@ -192,7 +192,12 @@ class CRM_Utils_Money {
     if (!extension_loaded('intl') || !is_numeric($amount)) {
       // @todo - we should not attempt to format non-numeric strings. For now
       // these will not fail but will give notices on php 7.4
-      self::missingIntlNotice();
+      if (!is_numeric($amount)) {
+        CRM_Core_Error::deprecatedWarning('Formatting non-numeric values is no longer supported: ' . htmlspecialchars($amount));
+      }
+      else {
+        self::missingIntlNotice();
+      }
       return self::formatNumericByFormat($amount, '%!.' . $numberOfPlaces . 'i');
     }
     $money = Money::of($amount, CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
