@@ -662,33 +662,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   }
 
   /**
-   * Given a contact ID, will check if a record exists in given table.
-   *
-   * @param int $contactID
-   * @param string $table
-   * @param string $idField
-   *   Field where the contact's ID is stored in the table
-   *
-   * @return bool
-   *   True if a record is found for the given contact ID, false otherwise
-   */
-  private static function customRecordExists($contactID, $table, $idField) {
-    $sql = "
-      SELECT COUNT(*) AS count
-      FROM $table
-      WHERE $idField = $contactID
-    ";
-    $dbResult = CRM_Core_DAO::executeQuery($sql);
-    $dbResult->fetch();
-
-    if ($dbResult->count > 0) {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  /**
    * Load all non-empty fields for the contacts
    *
    * @param array $main
