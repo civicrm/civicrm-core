@@ -32,7 +32,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    * Array of fields to use for ordering the results
    * @var array
    */
-  protected $sort;
+  protected $sort = [];
 
   /**
    * Should this api call return a page of results or the row_count or the ids
