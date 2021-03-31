@@ -194,9 +194,11 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
+    $contributionCompletedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     $clauses = [
       "contrib.contact_id = contact_a.id",
       "contrib.is_test = 0",
+      "contrib.contribution_status_id = " . intval($contributionCompletedStatusId),
     ];
 
     foreach ([
