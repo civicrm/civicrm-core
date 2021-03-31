@@ -140,10 +140,10 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       if (!empty($fields["where_$count"]) || (isset($self->_defaults['is_reserved']) && !empty($self->_defaults["where_$count"]))) {
         $fieldSelected = TRUE;
+        if (!empty($fields["weight_$count"])) {
+          $actualThreshold += $fields["weight_$count"];
+        }
         break;
-      }
-      if (!empty($self->_defaults["weight_$count"])) {
-        $actualThreshold += $self->_defaults["weight_$count"];
       }
     }
     if (empty($fields['threshold'])) {
