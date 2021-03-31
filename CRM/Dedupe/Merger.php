@@ -657,7 +657,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // This parameter causes blank fields to be be emptied out.
     // We can probably remove.
     $params['updateBlankLocInfo'] = TRUE;
-    list($data) = CRM_Contact_BAO_Contact::formatProfileContactParams($params, [], $contactID);
+    [$data] = CRM_Contact_BAO_Contact::formatProfileContactParams($params, [], $contactID);
     CRM_Contact_BAO_Contact::create($data);
   }
 
@@ -1021,7 +1021,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
-    $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode)['conflicts'];
+    $conflicts = self::getConflicts($migrationInfo, (int) $mainId, (int) $otherId, $mode)['conflicts'];
     // A hook could have set skip_merge in order to alter merge behaviour.
     // This is a something we might ideally deprecate since they really 'should'
     // mess with the conflicts array instead.
@@ -1236,7 +1236,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $locations = ['main' => [], 'other' => []];
 
     foreach ($locationBlocks as $blockName => $blockInfo) {
-      list($locations, $rows, $elements, $migrationInfo) = self::addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
+      [$locations, $rows, $elements, $migrationInfo] = self::addLocationFieldInfo($mainId, $otherId, $blockInfo, $blockName, $locations, $rows, $elements, $migrationInfo);
     } // End loop through each location block entity
 
     // add the related tables and unset the ones that don't sport any of the duplicate contact's info
@@ -1454,7 +1454,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $submitted = [];
     }
     foreach ($submitted as $key => $value) {
-      list($cFields, $submitted) = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
+      [$cFields, $submitted] = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
     }
 
     // move view only custom fields CRM-5362
@@ -2119,7 +2119,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getConflicts(&$migrationInfo, $mainId, $otherId, $mode) {
+  public static function getConflicts(array &$migrationInfo, int $mainId, int $otherId, string $mode): array {
     $conflicts = [];
     // Generate var $migrationInfo. The variable structure is exactly same as
     // $formValues submitted during a UI merge for a pair of contacts.
@@ -2138,8 +2138,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
-          substr($key, 0, 12) === 'move_custom_'
-        ) and $val != NULL
+          strpos($key, 'move_custom_') === 0
+        ) and $val !== NULL
       ) {
         // Rule: If both main-contact, and other-contact have a field with a
         // different value, then let $mode decide if to merge it or not
