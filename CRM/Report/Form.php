@@ -4004,7 +4004,9 @@ ORDER BY cg.weight, cf.weight";
         case 'Money':
           $curFilters[$fieldName]['operatorType'] = CRM_Report_Form::OP_FLOAT;
           $curFilters[$fieldName]['type'] = CRM_Utils_Type::T_MONEY;
-          $curFields[$fieldName]['type'] = CRM_Utils_Type::T_MONEY;
+          // Use T_FLOAT instead of T_MONEY as the money number format happens
+          // by calling CRM_Core_BAO_CustomField::displayValue in alterCustomDataDisplay
+          $curFields[$fieldName]['type'] = CRM_Utils_Type::T_FLOAT;
           break;
 
         case 'Float':
