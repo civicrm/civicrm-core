@@ -1228,7 +1228,7 @@ function civicrm_api3_contact_get_merge_conflicts($params) {
   foreach ((array) $params['mode'] as $mode) {
     $result[$mode] = CRM_Dedupe_Merger::getConflicts(
       $migrationInfo,
-      $params['to_remove_id'], $params['to_keep_id'],
+      (int) $params['to_remove_id'], (int) $params['to_keep_id'],
       $mode
     );
   }
