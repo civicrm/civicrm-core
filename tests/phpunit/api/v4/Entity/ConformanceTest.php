@@ -43,6 +43,7 @@ class ConformanceTest extends UnitTestCase {
    */
   public function setUp(): void {
     $tablesToTruncate = [
+      'civicrm_case_type',
       'civicrm_custom_group',
       'civicrm_custom_field',
       'civicrm_group',

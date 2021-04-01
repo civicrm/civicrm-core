@@ -209,6 +209,10 @@ class FormattingUtil {
         if (!$field) {
           continue;
         }
+        if (!empty($field['output_formatters'])) {
+          self::applyFormatters($result, $fieldName, $field, $value);
+          $dataType = NULL;
+        }
         // Evaluate pseudoconstant suffixes
         $suffix = strrpos($fieldName, ':');
         if ($suffix) {
@@ -296,6 +300,19 @@ class FormattingUtil {
       }
     }
     return is_array($value) ? $matches : $matches[0] ?? NULL;
+  }
+
+  private static function applyFormatters($result, $fieldName, $field, &$value) {
+    $row = [];
+    $prefix = substr($fieldName, 0, strpos($fieldName, $field['name']));
+    foreach ($result as $key => $val) {
+      if (!$prefix || strpos($key, $prefix) === 0) {
+        $row[substr($key, strlen($prefix))] = $val;
+      }
+    }
+    foreach ($field['output_formatters'] as $formatter) {
+      $formatter($value, $row, $field);
+    }
   }
 
   /**
