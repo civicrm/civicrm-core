@@ -62,6 +62,8 @@ class PropertyBag implements \ArrayAccess {
     'frequency_interval'          => 'recurFrequencyInterval',
     'recurFrequencyUnit'          => TRUE,
     'frequency_unit'              => 'recurFrequencyUnit',
+    'recurInstallments'           => TRUE,
+    'installments'                => 'recurInstallments',
     'subscriptionId'              => 'recurProcessorID',
     'recurProcessorID'            => TRUE,
     'transactionID'               => TRUE,
@@ -988,6 +990,31 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("recurFrequencyUnit must be day|week|month|year");
     }
     return $this->set('recurFrequencyUnit', $label, $recurFrequencyUnit);
+  }
+
+  /**
+   * @param string $label
+   *
+   * @return int
+   */
+  public function getRecurInstallments($label = 'default') {
+    return $this->get('recurInstallments', $label);
+  }
+
+  /**
+   * @param int $recurInstallments
+   * @param string $label
+   *
+   * @return \Civi\Payment\PropertyBag
+   * @throws \CRM_Core_Exception
+   */
+  public function setRecurInstallments($recurInstallments, $label = 'default') {
+    // Counts zero as positive which is ok - means no installments
+    if (!\CRM_Utils_Type::validate($recurInstallments, 'Positive')) {
+      throw new InvalidArgumentException('recurInstallments must be 0 or a positive integer');
+    }
+
+    return $this->set('recurInstallments', $label, (int) $recurInstallments);
   }
 
   /**
