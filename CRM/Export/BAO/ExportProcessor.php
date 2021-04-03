@@ -1458,7 +1458,9 @@ class CRM_Export_BAO_ExportProcessor {
           if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
             return "`$fieldName` varchar(255)";
           }
-          return "`$fieldName` varchar(16)";
+          // some of those will be exported as a (localisable) string
+          // @see https://lab.civicrm.org/dev/core/-/issues/2164
+          return "`$fieldName` varchar(64)";
 
         case CRM_Utils_Type::T_STRING:
           if (isset($fieldSpec['maxlength'])) {
