@@ -495,7 +495,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `civicrm_extension` WRITE;
 /*!40000 ALTER TABLE `civicrm_extension` DISABLE KEYS */;
-INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `file`, `schema_version`, `is_active`) VALUES (1,'module','sequentialcreditnotes','Sequential credit notes','Sequential credit notes','sequentialcreditnotes',NULL,1),(2,'module','greenwich','Theme: Greenwich','Theme: Greenwich','greenwich',NULL,1),(3,'module','eventcart','Event cart','Event cart','eventcart',NULL,1),(4,'module','financialacls','Financial ACLs','Financial ACLs','financialacls',NULL,1),(5,'module','contributioncancelactions','Contribution cancel actions','Contribution cancel actions','contributioncancelactions',NULL,1);
+INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `file`, `schema_version`, `is_active`) VALUES (1,'module','sequentialcreditnotes','Sequential credit notes','Sequential credit notes','sequentialcreditnotes',NULL,1),(2,'module','greenwich','Theme: Greenwich','Theme: Greenwich','greenwich',NULL,1),(3,'module','eventcart','Event cart','Event cart','eventcart',NULL,1),(4,'module','financialacls','Financial ACLs','Financial ACLs','financialacls',NULL,1),(5,'module','contributioncancelactions','Contribution cancel actions','Contribution cancel actions','contributioncancelactions',NULL,1),(6,'module','recaptcha','reCAPTCHA','reCAPTCHA','recaptcha',NULL,1);
 /*!40000 ALTER TABLE `civicrm_extension` ENABLE KEYS */;
 UNLOCK TABLES;
 

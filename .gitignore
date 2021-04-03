@@ -15,6 +15,7 @@
 !/ext/search
 !/ext/financialacls
 !/ext/contributioncancelactions
+!/ext/recaptcha
 backdrop/
 bower_components
 CRM/Case/xml/configuration

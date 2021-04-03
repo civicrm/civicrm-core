@@ -55,8 +55,8 @@
         <td>{ts}Adjust search behaviors including wildcards, and data to include in quick search results. Adjusting search settings can improve performance for larger datasets.{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.){/ts}</a></td>
-        <td>{ts}Version reporting and alerts, reCAPTCHA configuration and attachments.{/ts}</td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/misc" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Misc (Undelete, PDFs, Limits, Logging, etc.){/ts}</a></td>
+        <td>{ts}Version reporting, alerts and attachments.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/subtype" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Contact Types{/ts}</a></td>

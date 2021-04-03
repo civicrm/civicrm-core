@@ -74,7 +74,7 @@
 
 <tr>
     <td class="nowrap"><a href="{crmURL p='civicrm/admin/setting/misc' q='reset=1'}" id="idMisc"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Miscellaneous Settings{/ts}</a></td>
-    <td>{ts}Dashboard caching time, move to trash / undelete, change logging, version checking and reCAPTCHA (prevents automated abuse of public forms).{/ts}</td>
+    <td>{ts}Dashboard caching time, move to trash / undelete, change logging and version checking.{/ts}</td>
 </tr>
 
 <tr>

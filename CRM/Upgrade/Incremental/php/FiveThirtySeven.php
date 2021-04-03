@@ -73,6 +73,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
      'civicrm_note', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the note was created'");
     $this->addTask('core-issue#2243 - Update existing note_date and created_date', 'updateNoteDates');
     $this->addTask('core-issue#2487 Add / alter defaults for civicrm_contribution_recur', 'updateDBDefaultsForContributionRecur');
+    $this->addTask('Install reCAPTCHA extension', 'installReCaptchaExtension');
   }
 
   //  /**
@@ -136,6 +137,42 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
       MODIFY COLUMN `contribution_status_id` int(10) unsigned DEFAULT {$pendingID},
       MODIFY COLUMN `frequency_interval` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'Number of time units for recurrence of payment.';
     ");
+    return TRUE;
+  }
+
+  /**
+   * Install recaptcha extension.
+   *
+   * This feature is restructured as a core extension - which will eventually allow us to replace/remove the
+   * reCAPTCHA implementation
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function installReCaptchaExtension(CRM_Queue_TaskContext $ctx) {
+    // Install via direct SQL manipulation. Note that:
+    // (1) This extension has no activation logic.
+    // (2) On new installs, the extension is activated purely via default SQL INSERT.
+    // (3) Caches are flushed at the end of the upgrade.
+    // ($) Over long term, upgrade steps are more reliable in SQL. API/BAO sometimes don't work mid-upgrade.
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'recaptcha',
+      'name' => 'reCAPTCHA',
+      'label' => 'reCAPTCHA',
+      'file' => 'recaptcha',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
+
+    CRM_Core_DAO::executeQuery('
+UPDATE civicrm_navigation
+SET name="Misc (Undelete, PDFs, Limits, Logging, etc.)",label="Misc (Undelete, PDFs, Limits, Logging, etc.)"
+WHERE name="Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)"
+    ');
+
     return TRUE;
   }
 
