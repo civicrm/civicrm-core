@@ -54,7 +54,7 @@
           label: ts('%1 Fields', {1: $scope.getMeta().label}),
           fields: filterFields($scope.getMeta().fields)
         });
-
+        // Add fields for af-join blocks
         _.each(afGui.meta.entities, function(entity, entityName) {
           if (check(ctrl.editor.layout['#children'], {'af-join': entityName})) {
             $scope.fieldList.push({
@@ -69,12 +69,17 @@
         function filterFields(fields) {
           return _.transform(fields, function(fieldList, field) {
             if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
-              fieldList.push({
-                "#tag": "af-field",
-                name: field.name
-              });
+              fieldList.push(fieldDefaults(field));
             }
           }, []);
+        }
+
+        function fieldDefaults(field) {
+          var tag = {
+            "#tag": "af-field",
+            name: field.name
+          };
+          return tag;
         }
       }
 

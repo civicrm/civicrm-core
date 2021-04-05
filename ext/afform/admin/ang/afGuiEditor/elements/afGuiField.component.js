@@ -33,7 +33,7 @@
       };
 
       this.isSearch = function() {
-        return !_.isEmpty($scope.meta.searchDisplays);
+        return ctrl.editor.getFormType() === 'search';
       };
 
       this.canBeRange = function() {

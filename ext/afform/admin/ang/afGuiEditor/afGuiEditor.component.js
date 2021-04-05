@@ -52,7 +52,7 @@
         editor.layout = {'#children': []};
         $scope.entities = {};
 
-        if ($scope.afform.type === 'form') {
+        if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
           editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0]['#children'];
           $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
@@ -63,7 +63,7 @@
           }
         }
 
-        if ($scope.afform.type === 'block') {
+        else if (editor.getFormType() === 'block') {
           editor.layout['#children'] = $scope.afform.layout;
           editor.blockEntity = $scope.afform.join || $scope.afform.block;
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
@@ -73,9 +73,8 @@
           });
         }
 
-        if ($scope.afform.type === 'search') {
+        else if (editor.getFormType() === 'search') {
           editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'af-fieldset': ''})[0]['#children'];
-
         }
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
@@ -84,6 +83,10 @@
           $scope.changesSaved = $scope.changesSaved === 1;
         }, true);
       }
+
+      this.getFormType = function() {
+        return $scope.afform.type;
+      };
 
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
