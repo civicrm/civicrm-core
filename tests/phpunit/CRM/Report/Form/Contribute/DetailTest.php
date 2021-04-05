@@ -253,4 +253,83 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
 
   }
 
+  /**
+   * Make sure the civicrm_alterReportVar hook for contribute detail report work well.
+   */
+  public function testContributeDetailReportWithNewColumnFromCustomTable() {
+    $this->quickCleanup($this->_tablesToTruncate);
+
+    $solParams = [
+      'first_name' => 'Solicitor 1',
+      'last_name' => 'User ' . rand(),
+      'contact_type' => 'Individual',
+    ];
+    $solicitor1Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Solicitor 2';
+    $solicitor2Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Donor';
+    $donorId = $this->individualCreate($solParams);
+
+    $contribParams = [
+      'total_amount' => 150,
+      'contact_id' => $donorId,
+      // TODO: We're getting a "DB Error: already exists" when inserting a line
+      // item, but that's beside the point for this test, so skipping.
+      'skipLineItem' => 1,
+    ];
+    $contribId = $this->contributionCreate($contribParams);
+
+    $config = CRM_Core_Config::singleton();
+    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/fixtures/value_extension_tng55_table.sql");
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_value_extension_tng55 (`entity_id`, `title`) VALUES (%1, 'some_title')", [1 => [$contribId, 'Positive']]);
+
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterReportVar', function ($varType, &$var, &$reportForm) {
+      if ($varType === 'columns') {
+        $var['civicrm_value_extension_tng55'] = [
+          'fields' => [
+            'extension_tng55_title' => [
+              'title' => ts('Extension Title'),
+              'dbAlias' => "civicrm_value_extension_tng55.title",
+            ],
+          ],
+          'filters' => [
+            'extension_tng55_title' => [
+              'title' => ts('Extension Title'),
+              'dbAlias' => "civicrm_value_extension_tng55.title",
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => [],
+            ],
+          ],
+        ];
+      }
+      if ($varType === 'sql') {
+        $from = $var->getVar('_from');
+        $from .= "
+            LEFT JOIN civicrm_value_extension_tng55
+            ON (civicrm_value_extension_tng55.entity_id = contribution_civireport.id)
+        ";
+        $var->setVar('_from', $from);
+      }
+    });
+
+    $input = [
+      'extension_tng55_title_op' => 'nnll',
+      'fields' => [
+        'sort_name' => 1,
+        'contribution_id' => 1,
+        'total_amount' => 1,
+        'extension_tng55_title' => 1,
+      ],
+    ];
+    $params = array_merge([
+      'report_id' => 'contribute/detail',
+    ], $input);
+    $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
+
+    $this->assertCount(1, $rows);
+    $this->assertEquals('some_title', $rows[0]['civicrm_value_extension_tng55_extension_tng55_title']);
+
+  }
+
 }

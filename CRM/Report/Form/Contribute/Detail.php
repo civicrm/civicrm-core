@@ -572,6 +572,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
 
     // we inner join with temp1 to restrict soft contributions to those in temp1 table.
     // no group by here as we want to display as many soft credit rows as actually exist.
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $sql = "{$select} {$this->_from} {$this->_where} $this->_groupBy";
     $this->createTemporaryTable('civireport_contribution_detail_temp2', $sql);
 
