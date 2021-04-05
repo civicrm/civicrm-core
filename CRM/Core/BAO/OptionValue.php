@@ -169,6 +169,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue = new CRM_Core_DAO_OptionValue();
     $optionValue->copyValues($params);
 
+    $isDomainOptionGroup = in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups);
+    if (empty($params['domain_id']) && $isDomainOptionGroup) {
+      $optionValue->domain_id = CRM_Core_Config::domainID();
+    }
+
+    // When setting a default option, unset other options in this group as default
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
 
@@ -182,11 +188,18 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       }
 
       $p = [1 => [$params['option_group_id'], 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $p);
-    }
 
-    if (empty($params['domain_id']) && in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
-      $optionValue->domain_id = CRM_Core_Config::domainID();
+      // Limit update by domain of option
+      $domain = $optionValue->domain_id ?? NULL;
+      if (!$domain && $id && $isDomainOptionGroup) {
+        $domain = CRM_Core_DAO::getFieldValue(__CLASS__, $id, 'domain_id');
+      }
+      if ($domain) {
+        $query .= ' AND domain_id = %2';
+        $p[2] = [$domain, 'Integer'];
+      }
+
+      CRM_Core_DAO::executeQuery($query, $p);
     }
 
     $groupsSupportingDuplicateValues = ['languages'];
