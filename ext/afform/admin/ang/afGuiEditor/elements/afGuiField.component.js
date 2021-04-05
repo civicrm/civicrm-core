@@ -37,10 +37,16 @@
       };
 
       this.canBeRange = function() {
+        // Range search only makes sense for search display forms
         return this.isSearch() &&
-          !ctrl.getDefn().input_attrs.multiple &&
-          _.includes(['Date', 'Timestamp', 'Integer', 'Float'], ctrl.getDefn().data_type) &&
-          _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'));
+          // Hack for postal code which is not stored as a number but can act like one
+          (ctrl.node.name.substr(-11) === 'postal_code' || (
+            // Multiselects cannot use range search
+            !ctrl.getDefn().input_attrs.multiple &&
+            // DataType & inputType must make sense for a range
+            _.includes(['Date', 'Timestamp', 'Integer', 'Float'], ctrl.getDefn().data_type) &&
+            _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'))
+        ));
       };
 
       this.canBeMultiple = function() {
