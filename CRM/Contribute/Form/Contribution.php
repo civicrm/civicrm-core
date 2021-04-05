@@ -910,11 +910,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', [1 => $fields['trxn_id']]);
       }
     }
-    if (!empty($fields['revenue_recognition_date'])
-      && count(array_filter($fields['revenue_recognition_date'])) == 1
-    ) {
-      $errors['revenue_recognition_date'] = ts('Month and Year are required field for Revenue Recognition.');
-    }
     // CRM-16189
     try {
       CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($fields, $self->_id, $self->_priceSet['fields']);
