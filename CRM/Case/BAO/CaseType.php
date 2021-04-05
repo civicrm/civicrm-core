@@ -86,6 +86,18 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
   }
 
+  public static function formatOutputDefinition(&$value, $row) {
+    if ($value) {
+      [$xml] = CRM_Utils_XML::parseString($value);
+      $value = $xml ? self::convertXmlToDefinition($xml) : [];
+    }
+    elseif (!empty($row['id']) || !empty($row['name'])) {
+      $caseTypeName = $row['name'] ?? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $row['id']);
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+      $value = $xml ? self::convertXmlToDefinition($xml) : [];
+    }
+  }
+
   /**
    * Format / convert submitted array to xml for case type definition
    *
@@ -371,12 +383,22 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   public static function &create(&$params) {
     $transaction = new CRM_Core_Transaction();
+    // Computed properties.
+    unset($params['is_forkable']);
+    unset($params['is_forked']);
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'CaseType', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'CaseType', NULL, $params);
+    $action = empty($params['id']) ? 'create' : 'edit';
+
+    CRM_Utils_Hook::pre($action, 'CaseType', $params['id'] ?? NULL, $params);
+
+    // This is an existing case-type.
+    if ($action === 'edit' && isset($params['definition'])
+      // which is not yet forked
+      && !self::isForked($params['id'])
+      // for which new forks are prohibited
+      && !self::isForkable($params['id'])
+    ) {
+      unset($params['definition']);
     }
 
     $caseType = self::add($params);
@@ -386,12 +408,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       return $caseType;
     }
 
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'CaseType', $caseType->id, $case);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'CaseType', $caseType->id, $case);
-    }
+    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case);
+
     $transaction->commit();
     CRM_Case_XMLRepository::singleton(TRUE);
     CRM_Core_OptionGroup::flushAll();

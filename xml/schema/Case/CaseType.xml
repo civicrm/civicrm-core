@@ -60,7 +60,8 @@
     <name>is_active</name>
     <title>Case Type Is Active</title>
     <type>boolean</type>
-    <comment>Is this entry active?</comment>
+    <comment>Is this case type enabled?</comment>
+    <default>1</default>
     <add>4.5</add>
   </field>
   <field>

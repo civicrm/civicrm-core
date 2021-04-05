@@ -43,6 +43,7 @@ class ConformanceTest extends UnitTestCase {
    */
   public function setUp(): void {
     $tablesToTruncate = [
+      'civicrm_case_type',
       'civicrm_custom_group',
       'civicrm_custom_field',
       'civicrm_group',
@@ -71,13 +72,9 @@ class ConformanceTest extends UnitTestCase {
    */
   public function getEntitiesHitech() {
     // Ensure all components are enabled so their entities show up
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviEvent');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviGrant');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviPledge');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviReport');
+    foreach (array_keys(\CRM_Core_Component::getComponents()) as $component) {
+      \CRM_Core_BAO_ConfigSetting::enableComponent($component);
+    }
     return $this->toDataProviderArray(Entity::get(FALSE)->execute()->column('name'));
   }
 
@@ -93,11 +90,13 @@ class ConformanceTest extends UnitTestCase {
   public function getEntitiesLotech() {
     $manual['add'] = [];
     $manual['remove'] = ['CustomValue'];
+    $manual['transform'] = ['CiviCase' => 'Case'];
 
     $scanned = [];
     $srcDir = dirname(__DIR__, 5);
     foreach ((array) glob("$srcDir/Civi/Api4/*.php") as $name) {
-      $scanned[] = preg_replace('/\.php/', '', basename($name));
+      $fileName = basename($name, '.php');
+      $scanned[] = $manual['transform'][$fileName] ?? $fileName;
     }
 
     $names = array_diff(

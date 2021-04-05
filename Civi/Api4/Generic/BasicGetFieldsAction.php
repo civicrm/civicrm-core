@@ -301,6 +301,10 @@ class BasicGetFieldsAction extends BasicGetAction {
         'name' => 'readonly',
         'data_type' => 'Boolean',
       ],
+      [
+        'name' => 'output_formatters',
+        'data_type' => 'Array',
+      ],
     ];
   }
 
