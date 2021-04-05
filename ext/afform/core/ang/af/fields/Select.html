@@ -1,1 +1,5 @@
-<input crm-ui-select="{data: select2Options, multiple: $ctrl.defn.input_attrs.multiple, placeholder: $ctrl.defn.input_attrs.placeholder}" id="{{:: fieldId }}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]" />
+<div class="{{:: $ctrl.defn.search_range ? 'form-inline' : 'form-group' }}">
+  <input class="form-control" id="{{:: fieldId }}" crm-ui-select="{data: select2Options, multiple: $ctrl.defn.input_attrs.multiple, placeholder: $ctrl.defn.input_attrs.placeholder}" ng-model="getSetSelect" ng-model-options="{getterSetter: true}" >
+  <input class="form-control" ng-if=":: $ctrl.defn.search_range && !$ctrl.defn.is_date" id="{{:: fieldId }}2" crm-ui-select="{data: select2Options, placeholder: $ctrl.defn.input_attrs.placeholder2 || $ctrl.defn.input_attrs.placeholder}" ng-model="dataProvider.getFieldData()[$ctrl.fieldName]['<=']" >
+  <div ng-if="$ctrl.defn.search_range && $ctrl.defn.is_date && getSetSelect() === '{}'" class="form-group" ng-include="'~/af/fields/Date.html'"></div>
+</div>

@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Load the results for rendering a SearchDisplay.
@@ -31,7 +32,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    * Array of fields to use for ordering the results
    * @var array
    */
-  protected $sort;
+  protected $sort = [];
 
   /**
    * Should this api call return a page of results or the row_count or the ids
@@ -151,13 +152,24 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Checks if a filter contains a non-empty value
+   *
+   * "Empty" search values are [], '', and NULL.
+   * Also recursively checks arrays to ensure they contain at least one non-empty value.
+   *
+   * @param $value
+   * @return bool
+   */
+  private function hasValue($value) {
+    return $value !== '' && $value !== NULL && (!is_array($value) || array_filter($value, [$this, 'hasValue']));
+  }
+
+  /**
    * Applies supplied filters to the where clause
    */
   private function applyFilters() {
     // Ignore empty strings
-    $filters = array_filter($this->filters, function($value) {
-      return isset($value) && (strlen($value) || !is_string($value));
-    });
+    $filters = array_filter($this->filters, [$this, 'hasValue']);
     if (!$filters) {
       return;
     }
@@ -184,37 +196,42 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param string $fieldName
-   * @param string $value
+   * @param mixed $value
    */
-  private function applyFilter(string $fieldName, string $value) {
-    $field = $this->getField($fieldName);
-
-    // Global setting determines if % wildcard should be added to both sides (default) or only the end of the search term
+  private function applyFilter(string $fieldName, $value) {
+    // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
-    // Not a real field. It must be an aggregated column. Add to HAVING clause.
-    if (!$field) {
-      if ($prefixWithWildcard) {
-        $this->savedSearch['api_params']['having'][] = [$fieldName, 'CONTAINS', $value];
+    $field = $this->getField($fieldName);
+    // If field is not found it must be an aggregated column & belongs in the HAVING clause.
+    $clause = $field ? 'where' : 'having';
+
+    $dataType = $field['data_type'] ?? NULL;
+
+    // Array is either associative `OP => VAL` or sequential `IN (...)`
+    if (is_array($value)) {
+      $value = array_filter($value, [$this, 'hasValue']);
+      // Use IN if array does not contain operators as keys
+      if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
+        $this->savedSearch['api_params'][$clause][] = [$fieldName, 'IN', $value];
       }
       else {
-        $this->savedSearch['api_params']['having'][] = [$fieldName, 'LIKE', $value . '%'];
+        foreach ($value as $operator => $val) {
+          $this->savedSearch['api_params'][$clause][] = [$fieldName, $operator, $val];
+        }
       }
-      return;
     }
-
-    $dataType = $field['data_type'];
-    if (!empty($field['serialize'])) {
-      $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+    elseif (!empty($field['serialize'])) {
+      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'CONTAINS', $value];
     }
     elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
-      $this->savedSearch['api_params']['where'][] = [$fieldName, '=', $value];
+      $this->savedSearch['api_params'][$clause][] = [$fieldName, '=', $value];
     }
     elseif ($prefixWithWildcard) {
-      $this->savedSearch['api_params']['where'][] = [$fieldName, 'CONTAINS', $value];
+      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'CONTAINS', $value];
     }
     else {
-      $this->savedSearch['api_params']['where'][] = [$fieldName, 'LIKE', $value . '%'];
+      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'LIKE', $value . '%'];
     }
   }
 

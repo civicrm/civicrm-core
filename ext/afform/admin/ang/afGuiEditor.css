@@ -281,6 +281,7 @@
 #afGuiEditor .af-gui-layout.af-layout-inline > div {
   display: inline-block;
   width: 300px;
+  vertical-align: top;
 }
 
 #afGuiEditor .af-gui-button {

@@ -76,12 +76,24 @@
         function filterFields(fields, prefix) {
           return _.transform(fields, function(fieldList, field) {
             if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
-              fieldList.push({
-                "#tag": "af-field",
-                name: (prefix ? prefix + '.' : '') + field.name
-              });
+              fieldList.push(fieldDefaults(field, prefix));
             }
           }, []);
+        }
+
+        function fieldDefaults(field, prefix) {
+          var tag = {
+            "#tag": "af-field",
+            name: (prefix ? prefix + '.' : '') + field.name
+          };
+          if (field.input_type === 'Select') {
+            tag.defn = {input_attrs: {multiple: true}};
+          } else if (field.input_type === 'Date') {
+            tag.defn = {input_type: 'Select', search_range: true};
+          } else if (field.options) {
+            tag.defn = {input_type: 'Select', input_attrs: {multiple: true}};
+          }
+          return tag;
         }
       }
 
