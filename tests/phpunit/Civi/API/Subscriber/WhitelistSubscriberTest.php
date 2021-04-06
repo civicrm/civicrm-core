@@ -337,10 +337,6 @@ class WhitelistSubscriberTest extends \CiviUnitTestCase {
     return $c;
   }
 
-  protected function setUp() {
-    parent::setUp();
-  }
-
   /**
    * @param array $apiRequest
    *   Array(entity=>$,action=>$,params=>$,expectedResults=>$).

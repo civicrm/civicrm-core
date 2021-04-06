@@ -6,10 +6,6 @@
  */
 class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * @return array
    */

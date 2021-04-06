@@ -16,13 +16,6 @@
 class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
 
   /**
-   * Set up function.
-   */
-  public function setUp() {
-    parent::setUp();
-  }
-
-  /**
    * Test multi-record custom fields
    */
   public function testMultiRecordFieldList() {

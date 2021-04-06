@@ -8,10 +8,6 @@
  */
 class CRM_Utils_Check_Component_OptionGroupsTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testCheckOptionGroupValues() {
     $optionGroup = $this->callAPISuccess('OptionGroup', 'create', [
       'name' => 'testGroup',
