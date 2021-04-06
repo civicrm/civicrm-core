@@ -128,6 +128,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
       $params = array_merge($defaults, $params);
     }
 
+    $isRecalculatePledgePayment = self::isPaymentsRequireRecalculation($params);
     $transaction = new CRM_Core_Transaction();
 
     $paymentParams = [];
@@ -172,10 +173,10 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     }
 
     // skip payment stuff in edit mode
-    if (empty($params['id']) || self::isPaymentsRequireRecalculation($params)) {
+    if (empty($params['id']) || $isRecalculatePledgePayment) {
 
       // if pledge is pending delete all payments and recreate.
-      if (!empty(empty($params['id']))) {
+      if ($isRecalculatePledgePayment) {
         CRM_Pledge_BAO_PledgePayment::deletePayments($pledge->id);
       }
 
