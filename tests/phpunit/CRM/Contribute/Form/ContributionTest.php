@@ -2046,4 +2046,131 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ];
   }
 
+  /**
+   * Test formRule
+   */
+  public function testContributionFormRule() {
+    $fields = [
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'currency' => 'USD',
+      'total_amount' => '10',
+      'price_set_id' => '',
+      'source' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'cancel_date' => '',
+      'cancel_reason' => '',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'from_email_address' => key(CRM_Core_BAO_Email::getFromEmail()),
+      'receipt_date' => '',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '',
+      'check_number' => '',
+      'soft_credit_contact_id' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+      'soft_credit_amount' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+      'soft_credit_type' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+    ];
+
+    $form = new CRM_Contribute_Form_Contribution();
+    $this->assertSame([], $form->formRule($fields, [], $form));
+  }
+
+  /**
+   * Check that formRule validates you can only have one contribution with a
+   * given trxn_id.
+   */
+  public function testContributionFormRuleDuplicateTrxn() {
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['trxn_id' => '1234']));
+
+    $fields = [
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'currency' => 'USD',
+      'total_amount' => '10',
+      'price_set_id' => '',
+      'source' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'cancel_date' => '',
+      'cancel_reason' => '',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'from_email_address' => key(CRM_Core_BAO_Email::getFromEmail()),
+      'receipt_date' => '',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '1234',
+      'check_number' => '',
+      'soft_credit_contact_id' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+      'soft_credit_amount' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+      'soft_credit_type' => [
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => '',
+        6 => '',
+        7 => '',
+        8 => '',
+        9 => '',
+        10 => '',
+      ],
+    ];
+
+    $form = new CRM_Contribute_Form_Contribution();
+    $this->assertEquals(['trxn_id' => "Transaction ID's must be unique. Transaction '1234' already exists in your database."], $form->formRule($fields, [], $form));
+  }
+
 }

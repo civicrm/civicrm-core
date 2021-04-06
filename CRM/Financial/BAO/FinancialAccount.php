@@ -375,13 +375,13 @@ LIMIT 1";
    * @param int $contributionID
    *   Contribution ID
    *
-   * @param array $priceSetFields
-   *   Array of price fields of a price set.
+   * @param array $orderLineItems
+   *   The line items from the Order.
    *
    * @return bool
    *
    */
-  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $priceSetFields = NULL) {
+  public static function checkFinancialTypeHasDeferred($params, $contributionID = NULL, $orderLineItems = []) {
     if (!Civi::settings()->get('deferred_revenue_enabled')) {
       return FALSE;
     }
@@ -399,16 +399,7 @@ LIMIT 1";
       $financialTypeID = $params['prevContribution']->financial_type_id;
     }
     if (($contributionID || !empty($params['price_set_id'])) && empty($lineItems)) {
-      if (!$contributionID) {
-        CRM_Price_BAO_PriceSet::processAmount($priceSetFields,
-          $params, $items);
-      }
-      else {
-        $items = CRM_Price_BAO_LineItem::getLineItems($contributionID, 'contribution', TRUE, TRUE, TRUE);
-      }
-      if (!empty($items)) {
-        $lineItems[] = $items;
-      }
+      $lineItems[] = $orderLineItems;
     }
     $deferredFinancialType = self::getDeferredFinancialType();
     $isError = FALSE;
