@@ -69,10 +69,9 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       ],
     ]);
 
-    // Bootstrap angular and load exportui app
-    $loader = new Civi\Angular\AngularLoader();
-    $loader->setModules(['exportui']);
-    $loader->load();
+    // Add exportui app
+    Civi::service('angularjs.loader')
+      ->addModules('exportui');
   }
 
   public function buildQuickForm() {

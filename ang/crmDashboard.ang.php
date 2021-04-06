@@ -10,7 +10,7 @@ return [
   'css' => ['css/dashboard.css'],
   'partials' => ['ang/crmDashboard'],
   'partialsCallback' => ['CRM_Contact_Page_DashBoard', 'angularPartials'],
-  'basePages' => ['civicrm/dashboard'],
+  'basePages' => [],
   'requires' => ['crmUi', 'crmUtil', 'ui.sortable', 'dialogService', 'api4'],
   'settingsFactory' => ['CRM_Contact_Page_DashBoard', 'angularSettings'],
   'permissions' => ['administer CiviCRM'],

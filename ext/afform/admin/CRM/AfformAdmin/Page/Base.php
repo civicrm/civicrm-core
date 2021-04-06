@@ -23,10 +23,9 @@ class CRM_AfformAdmin_Page_Base extends CRM_Core_Page {
     CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
 
     // Load angular module
-    $loader = new Civi\Angular\AngularLoader();
-    $loader->setPageName('civicrm/admin/afform');
+    $loader = Civi::service('angularjs.loader');
     $loader->useApp();
-    $loader->load();
+
     parent::run();
   }
 

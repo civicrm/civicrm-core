@@ -78,8 +78,18 @@ class AngularLoader {
   }
 
   /**
-   * Register resources required by Angular.
+   * Calling this method from outside this class is deprecated.
    *
+   * The correct way to use this class is as a service, which will load automatically. E.g.:
+   *
+   * ```
+   * Civi::service('angularjs.loader')
+   *   ->addModules('moduleFoo')
+   *   ->useApp(); // Optional, if Civi's routing is desired (full-page apps only)
+   * ```
+   *
+   * @internal
+   * @deprecated
    * @return AngularLoader
    */
   public function load() {
@@ -88,9 +98,7 @@ class AngularLoader {
 
     if ($this->crmApp !== NULL) {
       $this->addModules($this->crmApp['modules']);
-      $region = \CRM_Core_Region::instance($this->crmApp['region']);
-      $region->update('default', ['disabled' => TRUE]);
-      $region->add(['template' => $this->crmApp['file'], 'weight' => 0]);
+
       $this->res->addSetting([
         'crmApp' => [
           'defaultRoute' => $this->crmApp['defaultRoute'],
@@ -216,6 +224,9 @@ class AngularLoader {
       'file' => 'Civi/Angular/Page/Main.tpl',
     ];
     $this->crmApp = array_merge($defaults, $settings);
+    $region = \CRM_Core_Region::instance($this->crmApp['region']);
+    $region->update('default', ['disabled' => TRUE]);
+    $region->add(['template' => $this->crmApp['file'], 'weight' => 0]);
     return $this;
   }
 
@@ -327,12 +338,26 @@ class AngularLoader {
   }
 
   /**
+   * Replace all previously set modules.
+   *
+   * Use with caution, as it can cause conflicts with other extensions who have added modules.
+   *
    * @param array $modules
    * @return AngularLoader
    */
   public function setModules($modules) {
     $this->modules = $modules;
     return $this;
+  }
+
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function onRegionRender($e) {
+    if ($e->region->_name === $this->region && ($this->modules || $this->crmApp)) {
+      $this->load();
+      $this->res->addScriptFile('civicrm', 'js/crm-angularjs-loader.js', 200, $this->getRegion(), FALSE);
+    }
   }
 
 }
