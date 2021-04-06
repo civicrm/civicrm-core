@@ -700,18 +700,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return array
    */
   public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns): array {
-    if ($contactID) {
-      // @todo resolve contact ID below - see https://github.com/civicrm/civicrm-core/pull/19550
-      // for things to resolve first.
-      $tokens = self::getTokensToResolve($mailContent);
-      $mailContent = self::resolveContactTokens($contactID, $tokens, $mailContent, !$disableSmarty);
-    }
     CRM_Core_Smarty::singleton()->pushScope($smartyAssigns);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['smarty' => !$disableSmarty]);
     $tokenProcessor->addMessage('html', $mailContent['html'], 'text/html');
     $tokenProcessor->addMessage('text', $mailContent['text'], 'text/plain');
     $tokenProcessor->addMessage('subject', $mailContent['subject'], 'text/plain');
-    $tokenProcessor->addRow([]);
+    $tokenProcessor->addRow($contactID ? ['contactId' => $contactID] : []);
     $tokenProcessor->evaluate();
     foreach ($tokenProcessor->getRows() as $row) {
       $mailContent['html'] = $row->render('html');
@@ -719,7 +713,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $row->render('subject');
     }
     CRM_Core_Smarty::singleton()->popScope();
-
     $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
     return $mailContent;
   }
