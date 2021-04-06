@@ -89,6 +89,12 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'title' => ts('Receipts - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDF',
           'result' => FALSE,
+          'title_single_mode' => ts('Send Receipt'),
+          'name' => ts('Send Receipt'),
+          'is_support_standalone' => TRUE,
+          'key' => 'receipt',
+          'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
+          'is_single_mode' => TRUE,
         ],
         self::PDF_THANKYOU => [
           'title' => ts('Thank-you letters - print or email'),
@@ -121,6 +127,35 @@ class CRM_Contribute_Task extends CRM_Core_Task {
     }
 
     return self::$_tasks;
+  }
+
+  /**
+   * Get links appropriate to the context of the row.
+   *
+   * @param $row
+   *
+   * @return array
+   */
+  public static function getContextualLinks($row) {
+    $tasks = self::tasks();
+    foreach ($tasks as $key => $task) {
+      if (empty($task['is_single_mode'])) {
+        unset($tasks[$key]);
+        continue;
+      }
+      if (!empty($task['filters'])) {
+        foreach ($task['filters'] as $filter => $values) {
+          if (!in_array($row[$filter], $values, FALSE)) {
+            unset($tasks[$key]);
+            continue 2;
+          }
+        }
+      }
+      $tasks[$key]['url'] = 'civicrm/contribute/task';
+      $tasks[$key]['qs'] = ['reset' => 1, 'id' => $row['contribution_id'], 'task' => $task['key']];
+      $tasks[$key]['title'] = $task['title_single_mode'] ?? $task['title'];
+    }
+    return $tasks;
   }
 
   /**
