@@ -755,11 +755,45 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'html_type' => 'Text',
       'custom_group_id' => $customGroup['id'],
     ]);
+    $customDateField = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'Test Date Field',
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'date_format' => 'mm/dd/yy',
+      'custom_group_id' => $customGroup['id'],
+    ]);
+
     $this->fixtures['contact_custom_token'] = [
       'id' => $customField['id'],
       'token' => sprintf('{contact.custom_%s}', $customField['id']),
       'name' => sprintf('custom_%s', $customField['id']),
       'value' => 'text ' . substr(sha1(mt_rand()), 0, 7),
+    ];
+
+    $this->fixtures['sched_on_custom_date'] = [
+      'name' => 'sched_on_custom_date',
+      'title' => 'sched_on_custom_date',
+      'body_html' => '<p>Send reminder before 1 hour of custom date field</p>',
+      'body_text' => 'Send reminder on custom date field',
+      'subject' => 'Send reminder on custom date field',
+      'mapping_id' => 6,
+      'entity_value' => 'custom_' . $customDateField['id'],
+      'entity_status' => 2,
+      'entity' => [
+        6,
+        ['custom_' . $customDateField['id']],
+        [1],
+      ],
+      'start_action_offset' => 1,
+      'start_action_unit' => 'hour',
+      'start_action_condition' => 'before',
+      'start_action_date' => 'date_field',
+      'record_activity' => 1,
+      'repetition_frequency_unit' => 'hour',
+      'end_frequency_unit' => 'hour',
+      'end_action' => 'before',
+      'end_date' => 'date_field',
+      'custom_field_name' => 'custom_' . $customDateField['id'],
     ];
 
     $this->_setUp();
@@ -949,6 +983,33 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       }
     }
     $this->mut->clearMessages();
+  }
+
+  /**
+   * Send reminder 1 hour before custom date field
+   */
+  public function testReminderWithCustomDateField(): void {
+    $this->createScheduleFromFixtures('sched_on_custom_date');
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], [$this->fixtures['sched_on_custom_date']['custom_field_name'] => '04/06/2021']));
+    $this->assertCronRuns([
+      [
+        // Before the 24-hour mark, no email
+        'time' => '2021-04-02 04:00:00',
+        'recipients' => [],
+        'subjects' => [],
+      ],
+      [
+        // After the 24-hour mark, an email
+        'time' => '2021-04-05 23:00:00',
+        'recipients' => [['test-member@example.com']],
+        'subjects' => ['Send reminder on custom date field'],
+      ],
+      [
+        // Run cron again; message already sent
+        'time' => '',
+        'recipients' => [],
+      ],
+    ]);
   }
 
   /**
