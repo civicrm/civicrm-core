@@ -316,6 +316,33 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the Membership status renaming after completing the pending pay later Contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testMembershipStatusAfterCompletingPayLaterContributionWithRenamedMembershipStatus() {
+    $this->renameNewMembershipStatus('Fresh');
+    $membership = $this->createContributionAndMembershipOrder();
+    $this->submitPayment(300);
+    $this->callAPISuccessGetSingle('Contribution', ['id' => $this->ids['Contribution'][0]]);
+    $this->callAPISuccessGetSingle('Membership', ['id' => $this->ids['Membership']['order'], 'status_id' => 'Fresh']);
+  }
+
+  /**
+   * @param $membershipStatusName
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function renameNewMembershipStatus($membershipStatusName) {
+    $params = [
+      'name' => 'New',
+      'api.MembershipStatus.create' => ['name' => $membershipStatusName],
+    ];
+    $this->callAPISuccess('MembershipStatus', 'get', $params);
+  }
+
+  /**
    * @param $contributionId
    *
    * @return array|int
