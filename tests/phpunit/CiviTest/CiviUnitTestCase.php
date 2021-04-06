@@ -317,7 +317,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    *  Common setup functions for all unit tests.
    */
-  protected function setUp() {
+  protected function setUp(): void {
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
