@@ -21,11 +21,11 @@
 trait CRM_Contribute_Form_Task_TaskTrait {
 
   /**
-   * Query result object.
+   * Selected IDs for the action.
    *
-   * @var \CRM_Core_DAO
+   * @var array
    */
-  protected $queryBAO;
+  protected $ids;
 
   /**
    * Get the results from the BAO_Query object based search.
@@ -35,34 +35,31 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    * @throws \CRM_Core_Exception
    */
   public function getSearchQueryResults(): CRM_Core_DAO {
-    if (!$this->queryBAO) {
-      $form = $this;
-      $queryParams = $this->getQueryParams();
-      $returnProperties = ['contribution_id' => 1];
-      $sortOrder = $sortCol = NULL;
-      if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
-        $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
-        //Include sort column in select clause.
-        $sortCol = trim(str_replace(['`', 'asc', 'desc'], '', $sortOrder));
-        $returnProperties[$sortCol] = 1;
-      }
-
-      $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
-        CRM_Contact_BAO_Query::MODE_CONTRIBUTE
-      );
-      // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
-      // can we remove? if not why not?
-      if ($this->isQueryIncludesSoftCredits()) {
-        $query->_rowCountClause = ' count(civicrm_contribution.id)';
-        $query->_groupByComponentClause = ' GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ';
-      }
-      else {
-        $query->_distinctComponentClause = ' civicrm_contribution.id';
-        $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
-      }
-      $this->queryBAO = $query->searchQuery(0, 0, $sortOrder);
+    $form = $this;
+    $queryParams = $this->getQueryParams();
+    $returnProperties = ['contribution_id' => 1];
+    $sortOrder = $sortCol = NULL;
+    if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
+      $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
+      //Include sort column in select clause.
+      $sortCol = trim(str_replace(['`', 'asc', 'desc'], '', $sortOrder));
+      $returnProperties[$sortCol] = 1;
     }
-    return $this->queryBAO;
+
+    $query = new CRM_Contact_BAO_Query($queryParams, $returnProperties, NULL, FALSE, FALSE,
+      CRM_Contact_BAO_Query::MODE_CONTRIBUTE
+    );
+    // @todo the function CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled should handle this
+    // can we remove? if not why not?
+    if ($this->isQueryIncludesSoftCredits()) {
+      $query->_rowCountClause = ' count(civicrm_contribution.id)';
+      $query->_groupByComponentClause = ' GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ';
+    }
+    else {
+      $query->_distinctComponentClause = ' civicrm_contribution.id';
+      $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
+    }
+    return $query->searchQuery(0, 0, $sortOrder);
   }
 
   /**
@@ -97,6 +94,48 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    */
   public function isQueryIncludesSoftCredits(): bool {
     return (bool) CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->getQueryParams());
+  }
+
+  /**
+   * Get ids selected for the task.
+   *
+   * @return array|bool
+   * @throws \CRM_Core_Exception
+   */
+  public function getIDs() {
+    if (!$this->ids) {
+      $this->ids = $this->calculateIDS();
+    }
+    return $this->ids;
+  }
+
+  /**
+   * @return array|bool|string[]
+   * @throws \CRM_Core_Exception
+   */
+  protected function calculateIDS() {
+    if ($this->controller->get('id')) {
+      return explode(',', $this->controller->get('id'));
+    }
+    $ids = $this->getSelectedIDs($this->getSearchFormValues());
+    if (!$ids) {
+      $result = $this->getSearchQueryResults();
+      while ($result->fetch()) {
+        $ids[] = $result->contribution_id;
+      }
+    }
+    return $ids;
+  }
+
+  /**
+   * Get the clause to add to queries to hone the results.
+   *
+   * In practice this generally means the query to limit by selected ids.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getComponentClause(): string {
+    return ' civicrm_contribution.id IN ( ' . implode(',', $this->getIDs()) . ' ) ';
   }
 
 }

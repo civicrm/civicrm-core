@@ -25,6 +25,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
    *
    * @param \CRM_Contribute_Form_Task_PDFLetter $form
    * @param array $formValues
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function postProcess(&$form, $formValues = NULL) {
     if (empty($formValues)) {
@@ -79,8 +81,12 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
     $skipDeceased = $form->skipDeceased ?? TRUE;
     $contributionIDs = $form->getVar('_contributionIds');
     if ($form->isQueryIncludesSoftCredits()) {
-      //@todo - comment on what is stored there
-      $contributionIDs = $form->getVar('_contributionContactIds');
+      $contributionIDs = [];
+      $result = $form->getSearchQueryResults();
+      while ($result->fetch()) {
+        $form->_contactIds[$result->contact_id] = $result->contact_id;
+        $contributionIDs["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
+      }
     }
     [$contributions, $contacts] = self::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->isQueryIncludesSoftCredits());
     $html = [];

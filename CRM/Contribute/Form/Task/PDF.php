@@ -35,29 +35,15 @@ class CRM_Contribute_Form_Task_PDF extends CRM_Contribute_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    $id = CRM_Utils_Request::retrieve('id', 'Positive',
-      $this, FALSE
-    );
-
-    if ($id) {
-      $this->_contributionIds = [$id];
-      $this->_componentClause = " civicrm_contribution.id IN ( $id ) ";
-      $this->_single = TRUE;
-      $this->assign('totalSelectedContributions', 1);
-    }
-    else {
-      parent::preProcess();
-    }
-
+    parent::preProcess();
     // check that all the contribution ids have pending status
     $query = "
 SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_status_id != 1
 AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query);
-    if ($count != 0) {
-      CRM_Core_Error::statusBounce("Please select only online contributions with Completed status.");
+    if (CRM_Core_DAO::singleValueQuery($query)) {
+      CRM_Core_Error::statusBounce("Please select only contributions with Completed status.");
     }
 
     $this->assign('single', $this->_single);
