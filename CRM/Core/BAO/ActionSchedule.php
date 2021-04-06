@@ -506,7 +506,7 @@ FROM civicrm_action_schedule cas
         'casMailingJoinType' => ($actionSchedule->limit_to == 0) ? 'LEFT JOIN' : 'INNER JOIN',
         'casMappingId' => $mapping->getId(),
         'casMappingEntity' => $mapping->getEntity(),
-        'casEntityJoinExpr' => 'e.id = reminder.entity_id',
+        'casEntityJoinExpr' => 'e.id = IF(reminder.entity_table = "civicrm_contact", reminder.contact_id, reminder.entity_id)',
       ]);
 
     if ($actionSchedule->limit_to == 0) {
