@@ -6,10 +6,6 @@
  */
 class CRM_Utils_AddressTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testAddressFormat() {
     $contact = $this->callAPISuccess('contact', 'create', [
       'first_name' => 'Micky',

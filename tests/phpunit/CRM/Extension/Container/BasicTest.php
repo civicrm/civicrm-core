@@ -6,14 +6,6 @@
  */
 class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown(): void {
-    parent::tearDown();
-  }
-
   public function testGetKeysEmpty() {
     $basedir = $this->createTempDir('ext-empty-');
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', NULL, NULL);

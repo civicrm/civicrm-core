@@ -13,10 +13,6 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     return new CRM_Mailing_BAO_QueryTestDataProvider();
   }
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function tearDown(): void {
     $tablesToTruncate = [
       'civicrm_mailing_event_bounce',

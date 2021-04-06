@@ -6,10 +6,6 @@
  */
 class CRM_Utils_RestTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testProcessMultiple() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $input = [

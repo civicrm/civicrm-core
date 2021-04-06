@@ -16,10 +16,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
   protected $allowedContactId = 0;
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function tearDown(): void {
     global $dbLocale;
     if ($dbLocale) {

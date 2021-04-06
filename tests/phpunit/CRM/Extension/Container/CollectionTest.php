@@ -15,14 +15,6 @@
  */
 class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown(): void {
-    parent::tearDown();
-  }
-
   public function testGetKeysEmpty() {
     $c = new CRM_Extension_Container_Collection([]);
     $this->assertEquals($c->getKeys(), []);

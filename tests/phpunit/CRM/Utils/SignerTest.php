@@ -15,10 +15,6 @@
  */
 class CRM_Utils_SignerTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testSignValidate() {
     $cases = [];
     $cases[] = [

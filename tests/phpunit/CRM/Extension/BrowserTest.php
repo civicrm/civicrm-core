@@ -6,14 +6,6 @@
  */
 class CRM_Extension_BrowserTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown(): void {
-    parent::tearDown();
-  }
-
   public function testDisabled() {
     $browser = new CRM_Extension_Browser(FALSE, '/index.html', 'file:///itd/oesn/tmat/ter');
     $this->assertEquals(FALSE, $browser->isEnabled());

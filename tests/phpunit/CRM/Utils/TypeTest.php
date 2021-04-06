@@ -8,10 +8,6 @@
  */
 class CRM_Utils_TypeTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * @dataProvider validateDataProvider
    * @param $inputData

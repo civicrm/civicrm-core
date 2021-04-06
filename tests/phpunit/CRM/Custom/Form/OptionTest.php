@@ -6,10 +6,6 @@
  */
 class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   /**
    * Test the `name` field doesn't get changed when editing an existing option.
    */

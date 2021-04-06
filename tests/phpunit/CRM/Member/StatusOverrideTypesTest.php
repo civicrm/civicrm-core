@@ -15,10 +15,6 @@
  */
 class CRM_Member_StatusOverrideTypesTest extends CiviUnitTestCase {
 
-  public function setUp() {
-    parent::setUp();
-  }
-
   public function testIsOverriddenReturnFalseForNoStatusOverrideType() {
     $statusOverrideTypes = new CRM_Member_StatusOverrideTypes();
     $isOverridden = $statusOverrideTypes::isOverridden(CRM_Member_StatusOverrideTypes::NO);
