@@ -1820,4 +1820,83 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals(0, $count);
   }
 
+  /**
+   * Test activity contact is updated when contribution contact is changed
+   */
+  public function testUpdateActivityContactOnContributionContactChange(): void {
+    $contactId_1 = $this->individualCreate();
+    $contactId_2 = $this->individualCreate();
+    $contactId_3 = $this->individualCreate();
+
+    $contributionParams = [
+      'financial_type_id' => 'Donation',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'sequential' => TRUE,
+      'total_amount' => 50,
+    ];
+
+    // Case 1: Only source contact, no target contact
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge(
+      $contributionParams,
+      ['contact_id' => $contactId_1]
+    ))['values'][0];
+
+    $activity = $this->callAPISuccessGetSingle('Activity', ['source_record_id' => $contribution['id']]);
+
+    $activityContactParams = [
+      'activity_id' => $activity['id'],
+      'record_type_id' => 'Activity Source',
+    ];
+
+    $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
+
+    $this->assertEquals($activityContact['contact_id'], $contactId_1, 'Check source contact ID matches the first contact');
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge(
+      $contributionParams,
+      [
+        'id' => $contribution['id'],
+        'contact_id' => $contactId_2,
+      ]
+    ))['values'][0];
+
+    $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
+
+    $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check source contact ID matches the second contact');
+
+    // Case 2: Source and target contact
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge(
+      $contributionParams,
+      [
+        'contact_id' => $contactId_1,
+        'source_contact_id' => $contactId_3,
+      ]
+    ))['values'][0];
+
+    $activity = $this->callAPISuccessGetSingle('Activity', ['source_record_id' => $contribution['id']]);
+
+    $activityContactParams = [
+      'activity_id' => $activity['id'],
+      'record_type_id' => 'Activity Targets',
+    ];
+
+    $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
+
+    $this->assertEquals($activityContact['contact_id'], $contactId_1, 'Check target contact ID matches first contact');
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge(
+      $contributionParams,
+      [
+        'id' => $contribution['id'],
+        'contact_id' => $contactId_2,
+      ]
+    ))['values'][0];
+
+    $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
+
+    $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check target contact ID matches the second contact');
+  }
+
 }
