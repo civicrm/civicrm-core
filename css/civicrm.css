@@ -413,10 +413,13 @@ input.crm-form-entityref {
   margin-bottom: 1em;
 }
 
-.crm-container .crm-section .label {
-  float: left;
-  width: 17%;
-  text-align: right;
+/* todo: See PR#19968 to move towards configurable breakpoints */
+@media (min-width: 480px) {
+  .crm-container .crm-section .label {
+    float: left;
+    width: 17%;
+    text-align: right;
+  }
 }
 
 .crm-container .crm-section .label label{
@@ -427,8 +430,10 @@ input.crm-form-entityref {
   text-align: left;
 }
 
-.crm-container .crm-section .content {
-  margin-left: 19%;
+@media (min-width: 480px) {
+  .crm-container .crm-section .content {
+    margin-left: 19%;
+  }
 }
 
 .crm-container .no-label .content {
