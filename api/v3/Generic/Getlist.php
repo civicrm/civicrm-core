@@ -27,7 +27,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE);
 
   // If the user types an integer into the search
-  $forceIdSearch = empty($request['id']) && !empty($request['input']) && CRM_Utils_Rule::positiveInteger($request['input']);
+  $forceIdSearch = empty($request['id']) && !empty($request['input']) && !empty($meta['id']) && CRM_Utils_Rule::positiveInteger($request['input']);
   // Add an extra page of results for the record with an exact id match
   if ($forceIdSearch) {
     $request['page_num'] = ($request['page_num'] ?? 1) - 1;
@@ -230,7 +230,7 @@ function _civicrm_api3_generic_getlist_output($result, $request, $entity, $field
             }
           }
         }
-      };
+      }
       if (!empty($request['image_field'])) {
         $data['image'] = $row[$request['image_field']] ?? '';
       }

@@ -489,3 +489,62 @@ function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action
     }
   }
 }
+
+/**
+ * Implements hook_civicrm_preProcess().
+ *
+ * Wordpress only: Adds Afforms to the shortcode dialog (when editing pages/posts).
+ */
+function afform_civicrm_preProcess($formName, &$form) {
+  if ($formName === 'CRM_Core_Form_ShortCode') {
+    $form->components['afform'] = [
+      'label' => E::ts('Form Builder'),
+      'select' => [
+        'key' => 'name',
+        'entity' => 'Afform',
+        'select' => ['minimumInputLength' => 0],
+        'api' => [
+          'params' => ['type' => ['IN' => ['form', 'search']]],
+        ],
+      ],
+    ];
+  }
+}
+
+// Wordpress only: Register callback for rendering shortcodes
+if (function_exists('add_filter')) {
+  add_filter('civicrm_shortcode_get_markup', 'afform_shortcode_content', 10, 4);
+}
+
+/**
+ * Wordpress only: Render Afform content for shortcodes.
+ *
+ * @param string $content
+ *   HTML Markup
+ * @param array $atts
+ *   Shortcode attributes.
+ * @param array $args
+ *   Existing shortcode arguments.
+ * @param string $context
+ *   How many shortcodes are present on the page: 'single' or 'multiple'.
+ * @return string
+ *   Modified markup.
+ */
+function afform_shortcode_content($content, $atts, $args, $context) {
+  if ($atts['component'] === 'afform') {
+    $afform = civicrm_api4('Afform', 'get', [
+      'select' => ['directive_name', 'module_name'],
+      'where' => [['name', '=', $atts['name']]],
+    ])->first();
+    if ($afform) {
+      Civi::service('angularjs.loader')->addModules($afform['module_name']);
+      $content = "
+        <div class='crm-container' id='bootstrap-theme'>
+          <crm-angular-js modules='{$afform['module_name']}'>
+            <{$afform['directive_name']}></{$afform['directive_name']}>
+          </crm-angular-js>
+        </div>";
+    }
+  }
+  return $content;
+}
