@@ -101,6 +101,21 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test what happens if you don't set is_active
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUpdateUFGroupActiveMissing($version) {
+    $this->_apiversion = $version;
+    $this->callAPISuccess('uf_group', 'create', [
+      'title' => 'Edited Test Profile',
+      'id' => $this->_ufGroupId,
+    ]);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $this->_ufGroupId]);
+    $this->assertSame($this->_apiversion === 3 ? '1' : TRUE, $result['is_active']);
+  }
+
+  /**
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
@@ -225,6 +240,38 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
     $result = $this->callAPIAndDocument('uf_group', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+  }
+
+  /**
+   * Test creating a profile with an "Add contact to group" group set and
+   * then removing it. It should get removed.
+   * It's complicated by the fact that the parameter name is not the same as
+   * the field name.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUFGroupUnsetAddToGroup($version) {
+    $this->_apiversion = $version;
+
+    // sanity check
+    $this->assertNotEmpty($this->params['add_contact_to_group']);
+
+    $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $ufGroup['id']]);
+    $this->assertEquals($this->params['add_contact_to_group'], $result['add_to_group_id']);
+
+    // now remove it
+    $this->callAPISuccess('uf_group', 'create', [
+      'id' => $ufGroup['id'],
+      'add_contact_to_group' => '',
+    ]);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $ufGroup['id']]);
+    if ($this->_apiversion === 3) {
+      $this->assertFalse(array_key_exists('add_to_group_id', $result));
+    }
+    else {
+      $this->assertNull($result['add_to_group_id']);
+    }
   }
 
 }
