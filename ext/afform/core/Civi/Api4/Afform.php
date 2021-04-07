@@ -158,6 +158,10 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
         ],
         [
+          'name' => 'contact_summary',
+          'data_type' => 'String',
+        ],
+        [
           'name' => 'repeat',
           'data_type' => 'Mixed',
         ],
@@ -172,7 +176,7 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
       ];
-
+      // Calculated fields returned by get action
       if ($self->getAction() === 'get') {
         $fields[] = [
           'name' => 'module_name',

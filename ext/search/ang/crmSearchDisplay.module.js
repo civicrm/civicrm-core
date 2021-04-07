@@ -81,10 +81,10 @@
         return crmApi4('SearchDisplay', 'run', getApiParams(ctrl)).then(function(results) {
           ctrl.results = results;
           ctrl.editing = false;
-          if (ctrl.settings.pager && !ctrl.rowCount) {
-            if (results.length < ctrl.settings.limit) {
+          if (!ctrl.rowCount) {
+            if (!ctrl.settings.limit || results.length < ctrl.settings.limit) {
               ctrl.rowCount = results.length;
-            } else {
+            } else if (ctrl.settings.pager) {
               var params = getApiParams(ctrl, 'row_count');
               crmApi4('SearchDisplay', 'run', params).then(function(result) {
                 ctrl.rowCount = result.count;

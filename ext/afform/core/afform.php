@@ -174,16 +174,94 @@ function afform_civicrm_managed(&$entities) {
 }
 
 /**
- * Implements hook_civicrm_caseTypes().
+ * Implements hook_civicrm_tabset().
  *
- * Generate a list of case-types.
- *
- * Note: This hook only runs in CiviCRM 4.4+.
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
+ * Adds afforms as contact summary tabs.
  */
-function afform_civicrm_caseTypes(&$caseTypes) {
-  _afform_civix_civicrm_caseTypes($caseTypes);
+function afform_civicrm_tabset($tabsetName, &$tabs, $context) {
+  if ($tabsetName !== 'civicrm/contact/view') {
+    return;
+  }
+  $scanner = \Civi::service('afform_scanner');
+  $weight = 111;
+  foreach ($scanner->getMetas() as $afform) {
+    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'tab') {
+      $module = _afform_angular_module_name($afform['name']);
+      $tabs[] = [
+        'id' => $afform['name'],
+        'title' => $afform['title'],
+        'weight' => $weight++,
+        'icon' => 'crm-i fa-list-alt',
+        'is_active' => TRUE,
+        'template' => 'afform/contactSummary/AfformTab.tpl',
+        'module' => $module,
+        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+      ];
+      // If this is the real contact summary page (and not a callback from ContactLayoutEditor), load module.
+      if (empty($context['caller'])) {
+        Civi::service('angularjs.loader')->addModules($module);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_pageRun().
+ *
+ * Adds afforms as contact summary blocks.
+ */
+function afform_civicrm_pageRun(&$page) {
+  if (get_class($page) !== 'CRM_Contact_Page_View_Summary') {
+    return;
+  }
+  $scanner = \Civi::service('afform_scanner');
+  $cid = $page->get('cid');
+  $side = 'left';
+  foreach ($scanner->getMetas() as $afform) {
+    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'block') {
+      $module = _afform_angular_module_name($afform['name']);
+      $block = [
+        'module' => $module,
+        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+      ];
+      $content = CRM_Core_Smarty::singleton()->fetchWith('afform/contactSummary/AfformBlock.tpl', ['contactId' => $cid, 'block' => $block]);
+      CRM_Core_Region::instance("contact-basic-info-$side")->add([
+        'markup' => '<div class="crm-summary-block">' . $content . '</div>',
+        'weight' => 1,
+      ]);
+      Civi::service('angularjs.loader')->addModules($module);
+      $side = $side === 'left' ? 'right' : 'left';
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_contactSummaryBlocks().
+ *
+ * @link https://github.com/civicrm/org.civicrm.contactlayout
+ */
+function afform_civicrm_contactSummaryBlocks(&$blocks) {
+  $scanner = \Civi::service('afform_scanner');
+  foreach ($scanner->getMetas() as $afform) {
+    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'block') {
+      // Provide our own group for this block to visually distinguish it on the contact summary editor palette.
+      $blocks += [
+        'afform' => [
+          'title' => ts('Form Builder'),
+          'icon' => 'fa-list-alt',
+          'blocks' => [],
+        ],
+      ];
+      $blocks['afform']['blocks'][$afform['name']] = [
+        'title' => $afform['title'],
+        'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
+        'module' => _afform_angular_module_name($afform['name']),
+        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
+        'sample' => [],
+        'edit' => 'civicrm/admin/afform#/edit/' . $afform['name'],
+      ];
+    }
+  }
 }
 
 /**
