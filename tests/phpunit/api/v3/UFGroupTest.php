@@ -101,6 +101,22 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test what happens if you don't set is_active
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUpdateUFGroupActiveMissing($version) {
+    $this->_apiversion = $version;
+    $this->callAPISuccess('uf_group', 'create', [
+      'sequential' => 1,
+      'title' => 'Edited Test Profile',
+      'id' => $this->_ufGroupId,
+    ]);
+    $result = $this->callAPISuccess('uf_group', 'getsingle', ['id' => $this->_ufGroupId]);
+    $this->assertSame($this->_apiversion === 3 ? '1' : TRUE, $result['is_active']);
+  }
+
+  /**
    * @param int $version
    * @dataProvider versionThreeAndFour
    */

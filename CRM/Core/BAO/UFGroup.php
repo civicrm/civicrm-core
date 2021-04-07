@@ -1449,7 +1449,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'is_cms_user',
     ];
     foreach ($fields as $field) {
-      $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      $params[$field] = CRM_Utils_Array::value($field, $params, $field === 'is_active');
     }
 
     $params['limit_listings_group_id'] = $params['group'] ?? NULL;
