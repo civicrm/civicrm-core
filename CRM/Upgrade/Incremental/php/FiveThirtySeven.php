@@ -71,8 +71,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
      'civicrm_note', 'note_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'Date attached to the note'");
     $this->addTask('core-issue#2243 - Add created_date to civicrm_note', 'addColumn',
      'civicrm_note', 'created_date', "timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the note was created'");
-
     $this->addTask('core-issue#2243 - Update existing note_date and created_date', 'updateNoteDates');
+    $this->addTask('core-issue#2487 Add / alter defaults for civicrm_contribution_recur', 'updateDBDefaultsForContributionRecur');
   }
 
   //  /**
@@ -107,6 +107,35 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
     CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_group', 'FK_civicrm_group_saved_search_id');
     CRM_Core_DAO::executeQuery('DELETE civicrm_saved_search FROM civicrm_saved_search LEFT JOIN civicrm_group ON civicrm_saved_search.id = civicrm_group.saved_search_id WHERE civicrm_group.id IS NULL AND form_values IS NOT NULL and api_params IS NULL');
     CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_group ADD CONSTRAINT `FK_civicrm_group_saved_search_id` FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search`(`id`) ON DELETE CASCADE', [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  /**
+   * Update DB defaults for contribution recur.
+   *
+   * This adds default values for start_date, create_date, modified_date
+   * and frequency_interval in line with what is in the UI (frequency_unit
+   * already has 'month' as the default.
+   *
+   * The default of 'Pending' for contribution_recur_id will be updated as
+   * appropriate as soon as a contribution is attached to it by BAO code.
+   *
+   * The core code does not rely on the defaults for any of these fields.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function updateDBDefaultsForContributionRecur(CRM_Queue_TaskContext $ctx): bool {
+    $pendingID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
+    CRM_Core_DAO::executeQuery("
+      ALTER TABLE `civicrm_contribution_recur`
+      MODIFY COLUMN `start_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The date the first scheduled recurring contribution occurs.',
+      MODIFY COLUMN `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'When this recurring contribution record was created.',
+      MODIFY COLUMN `modified_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Last updated date for this record. mostly the last time a payment was received',
+      MODIFY COLUMN `contribution_status_id` int(10) unsigned DEFAULT {$pendingID},
+      MODIFY COLUMN `frequency_interval` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'Number of time units for recurrence of payment.';
+    ");
     return TRUE;
   }
 
