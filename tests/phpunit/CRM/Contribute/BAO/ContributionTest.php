@@ -1123,6 +1123,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receipt_date' => '20080522000000',
       'total_amount' => '20,000.00',
       'api.Payment.create' => ['total_amount' => '8,000.00'],
+      'skipCleanMoney' => FALSE,
     ];
 
     $contribution = $this->callAPISuccess('Order', 'create', $params);
