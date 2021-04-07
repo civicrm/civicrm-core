@@ -380,21 +380,18 @@ class CRM_Dedupe_MergeHandler {
    * @throws \CRM_Core_Exception
    */
   public function mergeLocations(): void {
-    $mergeHandler = $this;
-    $locBlocks = $mergeHandler->getLocationBlocksToMerge();
+    $locBlocks = $this->getLocationBlocksToMerge();
     $blocksDAO = [];
-    $migrationInfo = $mergeHandler->getMigrationInfo();
+    $migrationInfo = $this->getMigrationInfo();
 
     // @todo Handle OpenID (not currently in API).
     if (!empty($locBlocks)) {
-      $locationBlocks = CRM_Dedupe_Merger::getLocationBlockInfo();
 
-      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_primary' => 1]);
-      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($mergeHandler->getToKeepID(), ['is_billing' => 1]);
+      $primaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($this->getToKeepID(), ['is_primary' => 1]);
+      $billingBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($this->getToKeepID(), ['is_billing' => 1]);
 
       foreach ($locBlocks as $name => $block) {
         $blocksDAO[$name] = ['delete' => [], 'update' => []];
-        $daoName = 'CRM_Core_DAO_' . $locationBlocks[$name]['label'];
         $changePrimary = FALSE;
         $primaryDAOId = (array_key_exists($name, $primaryBlockIds)) ? array_pop($primaryBlockIds[$name]) : NULL;
         $billingDAOId = (array_key_exists($name, $billingBlockIds)) ? array_pop($billingBlockIds[$name]) : NULL;
@@ -405,7 +402,7 @@ class CRM_Dedupe_MergeHandler {
           if (!$otherBlockId) {
             continue;
           }
-          $otherBlockDAO = $mergeHandler->copyDataToNewBlockDAO($otherBlockId, $name, $blkCount);
+          $otherBlockDAO = $this->copyDataToNewBlockDAO($otherBlockId, $name, $blkCount);
 
           // If we're deliberately setting this as primary then add the flag
           // and remove it from the current primary location (if there is one).
@@ -414,7 +411,7 @@ class CRM_Dedupe_MergeHandler {
           if (!$changePrimary && $set_primary == "1") {
             $otherBlockDAO->is_primary = 1;
             if ($primaryDAOId) {
-              $removePrimaryDAO = $mergeHandler->getDAOForLocationEntity($name);
+              $removePrimaryDAO = $this->getDAOForLocationEntity($name);
               $removePrimaryDAO->id = $primaryDAOId;
               $removePrimaryDAO->is_primary = 0;
               $blocksDAO[$name]['update'][$primaryDAOId] = $removePrimaryDAO;
@@ -433,7 +430,7 @@ class CRM_Dedupe_MergeHandler {
 
           // overwrite - need to delete block which belongs to main-contact.
           if (!empty($mainBlockId) && $values['is_replace']) {
-            $deleteDAO = $mergeHandler->getDAOForLocationEntity($name);
+            $deleteDAO = $this->getDAOForLocationEntity($name);
             $deleteDAO->id = $mainBlockId;
             $deleteDAO->find(TRUE);
 
@@ -449,11 +446,11 @@ class CRM_Dedupe_MergeHandler {
           }
           $blocksDAO[$name]['update'][$otherBlockDAO->id] = $otherBlockDAO;
         }
-        $blocksDAO[$name]['update'] += $mergeHandler->getBlocksToUpdateForDeletedContact($name);
+        $blocksDAO[$name]['update'] += $this->getBlocksToUpdateForDeletedContact($name);
       }
     }
 
-    CRM_Utils_Hook::alterLocationMergeData($blocksDAO, $mergeHandler->getToKeepID(), $mergeHandler->getToRemoveID(), $migrationInfo);
+    CRM_Utils_Hook::alterLocationMergeData($blocksDAO, $this->getToKeepID(), $this->getToRemoveID(), $migrationInfo);
     foreach ($blocksDAO as $blockDAOs) {
       if (!empty($blockDAOs['update'])) {
         foreach ($blockDAOs['update'] as $blockDAO) {
