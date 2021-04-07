@@ -13,6 +13,8 @@
  * Upgrade logic for FiveThirtySeven */
 class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incremental_Base {
 
+  protected static $errorMessage;
+
   /**
    * Compute any messages which should be displayed beforeupgrade.
    *
@@ -47,6 +49,9 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+    if (self::$errorMessage) {
+      $postUpgradeMessage .= self::$errorMessage;
+    }
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
@@ -128,7 +133,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
    */
   public static function updateDBDefaultsForContributionRecur(CRM_Queue_TaskContext $ctx): bool {
     $pendingID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
-    CRM_Core_DAO::executeQuery("
+    try {
+      CRM_Core_DAO::executeQuery("
       ALTER TABLE `civicrm_contribution_recur`
       MODIFY COLUMN `start_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The date the first scheduled recurring contribution occurs.',
       MODIFY COLUMN `create_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'When this recurring contribution record was created.',
@@ -136,6 +142,11 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
       MODIFY COLUMN `contribution_status_id` int(10) unsigned DEFAULT {$pendingID},
       MODIFY COLUMN `frequency_interval` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'Number of time units for recurrence of payment.';
     ");
+    }
+    catch (Exception $e) {
+      self::$errorMessage = 'An error occurred setting the defaults for fields in the civicrm_contribution_recur table. If you have mysql access
+      you should try to set them.';
+    }
     return TRUE;
   }
 
