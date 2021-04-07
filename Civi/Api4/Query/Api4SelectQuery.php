@@ -658,7 +658,7 @@ class Api4SelectQuery {
         return FALSE;
       }
       foreach ([$sideA, $sideB] as $expr) {
-        if ($expr === "$alias.id" || !empty($joinEntityFields["$alias.$expr"]['fk_entity'])) {
+        if ($expr === "$alias.id" || !empty($joinEntityFields[str_replace("$alias.", '', $expr)]['fk_entity'])) {
           return TRUE;
         }
       }
