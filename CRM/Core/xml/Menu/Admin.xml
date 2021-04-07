@@ -428,8 +428,8 @@
   </item>
   <item>
      <path>civicrm/admin/setting/misc</path>
-     <title>Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</title>
-     <desc>Enable undelete/move to trash feature, detailed change logging, ReCAPTCHA to protect forms.</desc>
+     <title>Misc (Undelete, PDFs, Limits, Logging, etc.)</title>
+     <desc>Enable undelete/move to trash feature, detailed change logging.</desc>
      <page_callback>CRM_Admin_Form_Setting_Miscellaneous</page_callback>
      <adminGroup>System Settings</adminGroup>
      <weight>50</weight>

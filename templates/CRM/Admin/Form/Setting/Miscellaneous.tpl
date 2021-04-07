@@ -80,38 +80,5 @@
         </td>
       </tr>
     </table>
-
-    <h3>{ts}reCAPTCHA v2{/ts}</h3>
-    <div class="description">
-      {ts 1='href="https://www.google.com/recaptcha" target="_blank"'}reCAPTCHA is a free service that helps prevent automated abuse of your site. To use it on public-facing CiviCRM forms: sign up at <a %1>Google's reCaptcha site</a>; enter the provided public and private keys here; then enable reCAPTCHA under Advanced Settings in any Profile.{/ts}
-      <br/><strong>{ts}Only the reCAPTCHA v2 checkbox type is supported.{/ts}</strong>
-    </div>
-    <table class="form-layout">
-      <tr class="crm-miscellaneous-form-block-recaptchaPublicKey">
-        <td class="label">{$form.recaptchaPublicKey.label}</td>
-        <td>{$form.recaptchaPublicKey.html}</td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaPrivateKey">
-        <td class="label">{$form.recaptchaPrivateKey.label}</td>
-        <td>{$form.recaptchaPrivateKey.html}</td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaOptions">
-        <td class="label">{$form.recaptchaOptions.label}</td>
-        <td>{$form.recaptchaOptions.html}<br />
-          <span class="description">
-            {ts}You can specify the reCAPTCHA theme options as comma separated data.(eg: theme:'blackglass', lang : 'fr' ).{/ts}
-            <br />
-            {ts 1='href="https://developers.google.com/recaptcha/docs/display#configuration" target="_blank"'}Check the available options at <a %1>Customizing the Look and Feel of reCAPTCHA</a>.{/ts}
-          </span>
-        </td>
-      </tr>
-      <tr class="crm-miscellaneous-form-block-recaptchaPrivateKey">
-        <td class="label">{$form.forceRecaptcha.label}</td>
-        <td>
-          {$form.forceRecaptcha.html}
-          <p class="description">{ts}If enabled, reCAPTCHA will show on all contribution pages.{/ts}</p>
-        </td>
-      </tr>
-    </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
