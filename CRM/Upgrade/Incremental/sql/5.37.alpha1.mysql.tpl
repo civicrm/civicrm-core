@@ -9,3 +9,11 @@ UPDATE civicrm_state_province s
  SET s.abbreviation = 'CMN';
 
 ALTER TABLE `civicrm_case_type` CHANGE `is_active`  `is_active` tinyint DEFAULT 1 COMMENT 'Is this case type enabled?';
+
+-- https://lab.civicrm.org/dev/core/-/issues/2442
+
+SELECT @option_group_id_activity_contacts := id FROM civicrm_option_group WHERE name = 'activity_contacts';
+
+UPDATE civicrm_option_value SET weight = 1 WHERE name = 'Activity Targets' AND option_group_id = @option_group_id_activity_contacts;
+UPDATE civicrm_option_value SET weight = 2 WHERE name = 'Activity Source' AND option_group_id = @option_group_id_activity_contacts;
+UPDATE civicrm_option_value SET weight = 3 WHERE name = 'Activity Assignees' AND option_group_id = @option_group_id_activity_contacts;
