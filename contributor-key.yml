@@ -387,6 +387,9 @@
 
 - github      : don-alejandro-z
 
+- github      : dptarrant
+  name        : Dave T
+
 - github      : dwoods-encircle
   organization: enCircle Solutions Ltd.
   name        : Darren Woods
@@ -467,6 +470,8 @@
   name        : Eli Lisseck
   organization: AGH Strategies
   jira        : elilisseck
+
+- github      : elinw
 
 - github      : Elennio
   name        : Elennio Dec
@@ -685,6 +690,8 @@
 - github      : ivan-compucorp
   name        : Ivan
   organization: CompuCorp
+
+- github      : J0WI
 
 - github      : jaapjansma
   name        : Jaap Jansma
@@ -970,6 +977,8 @@
   organization: National Urban League
 
 - github      : lucky091588
+
+- github      : lunar-debian
 
 - github      : lyyana
   name        : Yuliyana Liyana
@@ -1535,6 +1544,8 @@
 
 - github      : tanyabouman
   name        : Tanya Bouman
+
+- github      : tapashdatta
 
 - github      : TBSliver
   name        : Tom Bloor
