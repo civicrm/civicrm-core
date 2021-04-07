@@ -305,8 +305,8 @@ trait CRM_Admin_Form_SettingTrait {
     foreach (array_keys($this->_settings) as $setting) {
       $this->_defaults[$setting] = civicrm_api3('setting', 'getvalue', ['name' => $setting]);
       $spec = $this->getSettingsMetaData()[$setting];
-      if (!empty($spec['serialize'])) {
-        $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField($this->_defaults[$setting], $spec['serialize']);
+      if (!empty($spec['serialize']) && !is_array($this->_defaults[$setting])) {
+        $this->_defaults[$setting] = CRM_Core_DAO::unSerializeField((string) $this->_defaults[$setting], $spec['serialize']);
       }
       if ($this->getQuickFormType($spec) === 'CheckBoxes') {
         $this->_defaults[$setting] = array_fill_keys($this->_defaults[$setting], 1);
