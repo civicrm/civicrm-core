@@ -90,6 +90,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     }
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->savedSearch['api_params'];
+    $apiParams += ['where' => []];
     $settings = $this->display['settings'];
     $page = NULL;
 
@@ -205,7 +206,23 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
 
     $field = $this->getField($fieldName);
     // If field is not found it must be an aggregated column & belongs in the HAVING clause.
-    $clause = $field ? 'where' : 'having';
+    if (!$field) {
+      $this->savedSearch['api_params']['having'] = $this->savedSearch['api_params']['having'] ?? [];
+      $clause =& $this->savedSearch['api_params']['having'];
+    }
+    // If field belongs to an EXCLUDE join, it should be added as a join condition
+    else {
+      $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
+      foreach ($this->savedSearch['api_params']['join'] ?? [] as $idx => $join) {
+        if (($join[1] ?? 'LEFT') === 'EXCLUDE' && (explode(' AS ', $join[0])[1] ?? '') === $prefix) {
+          $clause =& $this->savedSearch['api_params']['join'][$idx];
+        }
+      }
+    }
+    // Default: add filter to WHERE clause
+    if (!isset($clause)) {
+      $clause =& $this->savedSearch['api_params']['where'];
+    }
 
     $dataType = $field['data_type'] ?? NULL;
 
@@ -214,25 +231,25 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       $value = array_filter($value, [$this, 'hasValue']);
       // Use IN if array does not contain operators as keys
       if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
-        $this->savedSearch['api_params'][$clause][] = [$fieldName, 'IN', $value];
+        $clause[] = [$fieldName, 'IN', $value];
       }
       else {
         foreach ($value as $operator => $val) {
-          $this->savedSearch['api_params'][$clause][] = [$fieldName, $operator, $val];
+          $clause[] = [$fieldName, $operator, $val];
         }
       }
     }
     elseif (!empty($field['serialize'])) {
-      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'CONTAINS', $value];
+      $clause[] = [$fieldName, 'CONTAINS', $value];
     }
     elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
-      $this->savedSearch['api_params'][$clause][] = [$fieldName, '=', $value];
+      $clause[] = [$fieldName, '=', $value];
     }
     elseif ($prefixWithWildcard) {
-      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'CONTAINS', $value];
+      $clause[] = [$fieldName, 'CONTAINS', $value];
     }
     else {
-      $this->savedSearch['api_params'][$clause][] = [$fieldName, 'LIKE', $value . '%'];
+      $clause[] = [$fieldName, 'LIKE', $value . '%'];
     }
   }
 
