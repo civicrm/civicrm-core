@@ -51,7 +51,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     else {
       global $databases;
     }
-    
+
     $drupal_prefix = '';
     if (isset($databases['default']['default']['prefix'])) {
       if (is_array($databases['default']['default']['prefix'])) {
