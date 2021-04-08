@@ -41,7 +41,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-file-excel-o',
         'crmPopup' => [
           'path' => "'civicrm/export/standalone'",
-          'query' => "{entity: {$entity['name']}, id: ids.join(',')}",
+          'query' => "{entity: '{$entity['name']}', id: ids.join(',')}",
         ],
       ];
     }
