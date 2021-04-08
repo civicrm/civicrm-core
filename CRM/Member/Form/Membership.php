@@ -1708,7 +1708,6 @@ DESC limit 1");
     $recurParams['auto_renew'] = TRUE;
     $recurParams['frequency_unit'] = $this->getFrequencyUnit();
     $recurParams['frequency_interval'] = $this->getFrequencyInterval();
-    $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['financial_type_id'] = $this->getFinancialTypeID();
     $recurParams['currency'] = $this->getCurrency();
     $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
