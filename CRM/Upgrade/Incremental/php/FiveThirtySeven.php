@@ -169,7 +169,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
 
     CRM_Core_DAO::executeQuery('
 UPDATE civicrm_navigation
-SET name="Misc (Undelete, PDFs, Limits, Logging, etc.)"
+SET name="misc_admin_settings"
 WHERE name="Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)"
 ');
     CRM_Core_DAO::executeQuery('
