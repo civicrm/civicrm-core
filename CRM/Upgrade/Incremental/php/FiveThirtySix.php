@@ -67,7 +67,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtySix extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_36_alpha1(string $rev): void {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
     $this->addTask('core-issue#2422 - Add created_id to civicrm_saved_search', 'addColumn',
       'civicrm_saved_search', 'created_id', "int(10) unsigned DEFAULT NULL COMMENT 'FK to contact table.'");

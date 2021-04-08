@@ -81,7 +81,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentyNine extends CRM_Upgrade_Incremental
    * @param string $rev
    */
   public function upgrade_5_29_beta1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Make label field non required on price field value', 'priceFieldValueLabelNonRequired');
   }
 

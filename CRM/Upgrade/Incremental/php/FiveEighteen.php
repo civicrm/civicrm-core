@@ -58,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
    * @param string $rev
    */
   public function upgrade_5_18_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
     $this->addTask('Update smart groups to reflect change of unique name for is_override', 'updateSmartGroups', [
       'renameField' => [
         ['old' => 'is_override', 'new' => 'member_is_override'],

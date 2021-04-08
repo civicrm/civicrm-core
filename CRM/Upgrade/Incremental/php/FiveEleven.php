@@ -58,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveEleven extends CRM_Upgrade_Incremental_Bas
    * @param string $rev
    */
   public function upgrade_5_11_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'grant_application_received_date',
@@ -78,6 +78,7 @@ class CRM_Upgrade_Incremental_php_FiveEleven extends CRM_Upgrade_Incremental_Bas
    * @param string $rev
    */
   public function upgrade_5_11_beta1($rev) {
+    // Not used // $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
       $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);
     }
