@@ -70,6 +70,8 @@ class Manager {
     $this->cache->clear();
     $this->modules = NULL;
     $this->changeSets = NULL;
+    // Force-refresh assetBuilder files
+    \Civi::container()->get('asset_builder')->clear(FALSE);
     return $this;
   }
 
