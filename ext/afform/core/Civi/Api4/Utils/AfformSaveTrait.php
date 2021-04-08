@@ -79,7 +79,6 @@ trait AfformSaveTrait {
       \CRM_Core_Menu::store();
       \CRM_Core_BAO_Navigation::resetNavigation();
     }
-    // FIXME if asset-caching is enabled, then flush the asset cache.
 
     $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');
     $item['directive_name'] = _afform_angular_module_name($item['name'], 'dash');
