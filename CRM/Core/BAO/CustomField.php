@@ -1551,6 +1551,13 @@ SELECT id
           $mimeType = $fileDAO->mime_type;
         }
       }
+      elseif (empty($value['name'])) {
+        // Happens when calling the API to update custom fields values, but the filename
+        // is empty, for an existing entity (in a specific case, was from a d7-webform
+        // that was updating a relationship with a File customfield, so $value['id'] was
+        // not empty, but the filename was empty.
+        return;
+      }
       else {
         $fName = $value['name'];
         $mimeType = $value['type'];
