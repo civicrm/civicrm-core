@@ -1027,9 +1027,6 @@ DESC limit 1");
 
     $membershipTypeValues = $this->getMembershipParameters($formValues);
 
-    // Retrieve the name and email of the current user - this will be the FROM for the receipt email
-    [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
-
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
       $params['contribution_contact_id'] = $this->_contributorContactID;
@@ -1059,15 +1056,7 @@ DESC limit 1");
       $params['financial_type_id'] = $this->getFinancialTypeID();
       $params['campaign_id'] = $this->getSubmittedValue('campaign_id');
 
-      if (empty($formValues['source'])) {
-        $params['contribution_source'] = ts('%1 Membership: Offline signup (by %2)', [
-          1 => $this->getSelectedMembershipLabels(),
-          2 => $userName,
-        ]);
-      }
-      else {
-        $params['contribution_source'] = $formValues['source'];
-      }
+      $params['contribution_source'] = $this->getContributionSource();
 
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if (empty($params['is_override']) &&
@@ -1220,9 +1209,7 @@ DESC limit 1");
       $now = CRM_Utils_Time::date('YmdHis');
       $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
       $params['invoice_id'] = $this->getInvoiceID();
-      $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
-        [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
-      );
+      $params['contribution_source'] = $this->getContributionSource();
       $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
       $params['is_test'] = $this->isTest();
@@ -1900,6 +1887,27 @@ DESC limit 1");
       }
     }
     return $membershipTypeValues;
+  }
+
+  /**
+   * Get the value for the contribution source.
+   *
+   * @return string
+   */
+  protected function getContributionSource(): string {
+    [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
+    if ($this->_mode) {
+      return ts('%1 Membership Signup: Credit card or direct debit (by %2)',
+        [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
+      );
+    }
+    if ($this->getSubmittedValue('source')) {
+      return $this->getSubmittedValue('source');
+    }
+    return ts('%1 Membership: Offline signup (by %2)', [
+      1 => $this->getSelectedMembershipLabels(),
+      2 => $userName,
+    ]);
   }
 
 }
