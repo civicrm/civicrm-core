@@ -1724,7 +1724,7 @@ DESC limit 1");
     $recurParams['is_email_receipt'] = (bool) $this->getSubmittedValue('send_receipt');
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
-    $recurParams['trxn_id'] = $params['trxn_id'] ?? $this->getInvoiceID();
+    $recurParams['trxn_id'] = $this->getInvoiceID();
     $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
     return CRM_Contribute_BAO_ContributionRecur::add($recurParams)->id;
   }
