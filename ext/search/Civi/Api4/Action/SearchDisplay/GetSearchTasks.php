@@ -41,7 +41,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-file-excel-o',
         'crmPopup' => [
           'path' => "'civicrm/export/standalone'",
-          'query' => "{entity: '{$entity['name']}', id: ids.join(',')}",
+          'query' => "{reset: 1, entity: '{$entity['name']}', id: ids.join(',')}",
         ],
       ];
     }
@@ -78,7 +78,23 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
             'icon' => $task['icon'] ?? 'fa-gear',
             'crmPopup' => [
               'path' => "'{$task['url']}'",
-              'query' => "{cids: ids.join(',')}",
+              'query' => "{reset: 1, cids: ids.join(',')}",
+            ],
+          ];
+        }
+      }
+    }
+
+    if ($entity['name'] === 'Contribution') {
+      foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
+        if (!empty($task['url'])) {
+          $tasks[] = [
+            'name' => 'contribution.' . $id,
+            'title' => $task['title'],
+            'icon' => $task['icon'] ?? 'fa-gear',
+            'crmPopup' => [
+              'path' => "'{$task['url']}'",
+              'query' => "{id: ids.join(',')}",
             ],
           ];
         }
