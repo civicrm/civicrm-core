@@ -91,8 +91,9 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'result' => FALSE,
           'title_single_mode' => ts('Send Receipt'),
           'name' => ts('Send Receipt'),
-          'is_support_standalone' => TRUE,
+          'url' => 'civicrm/contribute/task?reset=1&task=receipt',
           'key' => 'receipt',
+          'icon' => 'fa-envelope-o',
           'filters' => ['contribution_status_id' => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]],
           'is_single_mode' => TRUE,
         ],
@@ -151,8 +152,8 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           }
         }
       }
-      $tasks[$key]['url'] = 'civicrm/contribute/task';
-      $tasks[$key]['qs'] = ['reset' => 1, 'id' => $row['contribution_id'], 'task' => $task['key']];
+      $tasks[$key]['url'] = $task['url'];
+      $tasks[$key]['qs'] = ['id' => $row['contribution_id']];
       $tasks[$key]['title'] = $task['title_single_mode'] ?? $task['title'];
     }
     return $tasks;
