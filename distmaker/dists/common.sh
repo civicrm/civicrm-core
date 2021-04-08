@@ -129,6 +129,7 @@ function dm_core_exts() {
   echo ext/greenwich
   echo ext/contributioncancelactions
   echo ext/oauth-client
+  echo ext/recaptcha
 }
 
 ## Copy all packages
