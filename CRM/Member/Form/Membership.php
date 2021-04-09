@@ -1410,7 +1410,7 @@ DESC limit 1");
         $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
 
         if (!empty($softParams)) {
-          $membershipParams['soft_credit'] = $softParams;
+          $params['soft_credit'] = $softParams;
         }
         unset($membershipParams['contribution_status_id']);
         $membershipParams['skipLineItem'] = TRUE;
