@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+use CRM_Recaptcha_ExtensionUtil as E;
 
 /**
  *
@@ -78,7 +79,7 @@ class CRM_Utils_ReCAPTCHA {
     $config = CRM_Core_Config::singleton();
     $useSSL = FALSE;
     if (!function_exists('recaptcha_get_html')) {
-      require_once 'recaptcha/recaptchalib.php';
+      require_once E::path('lib/recaptcha/recaptchalib.php');
     }
 
     // Load the Recaptcha api.js over HTTPS
@@ -96,11 +97,11 @@ class CRM_Utils_ReCAPTCHA {
       TRUE
     );
     $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
-    $form->addRule('g-recaptcha-response', ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
+    $form->addRule('g-recaptcha-response', E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
     if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
       $form->setElementError(
         'g-recaptcha-response',
-        ts('Please go back and complete the CAPTCHA at the bottom of this form.')
+        E::ts('Please go back and complete the CAPTCHA at the bottom of this form.')
       );
     }
   }
