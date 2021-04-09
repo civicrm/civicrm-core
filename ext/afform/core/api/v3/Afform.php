@@ -73,6 +73,10 @@ function _civicrm_api3_afform_get_spec(&$fields) {
     'title' => 'Public',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
+  $fields['redirect'] = [
+    'title' => 'Redirect URL',
+    'type' => CRM_Utils_Type::T_STRING,
+  ];
 }
 
 /**
