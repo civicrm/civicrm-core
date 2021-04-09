@@ -116,4 +116,62 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
     );
   }
 
+  /**
+   * Tests the advanced search query by searching on related contacts and case type at the same time.
+   *
+   * Preparation:
+   *   Create a contact Contact A
+   *   Create another contact Contact B
+   *   Create a third contact Contact C
+   *   Create a case of type Housing Support for Contact A
+   *   On the case assign the role Benefit specialist is to Contact B
+   *   Create a second case of type Adult day care referral
+   *   On the case assign the role Benefit specialist is to Contact C
+   *
+   * Searching:
+   *   Go to advanced search
+   *   Click on View contact as related contact
+   *   Select Benefit Specialist as relationship type
+   *   Go to tab cases and select Housing Support as case type
+   *
+   * Expected results
+   *   We expect to find contact B and not C.
+   *
+   * @throws \Exception
+   */
+  public function testAdvancedSearchWithDisplayRelationshipsAndCaseType() {
+    // Preperation
+    $benefitRelationshipTypeId = civicrm_api3('RelationshipType', 'getvalue', ['return' => 'id', 'name_a_b' => 'Benefits Specialist is']);
+    $clientContactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Smith']);
+    $benefitSpecialist1 = $this->individualCreate(['Individual', 'first_name' => 'Alexa', 'last_name' => 'Clarke']);
+    $benefitSpecialist2 = $this->individualCreate(['Individual', 'first_name' => 'Sandra', 'last_name' => 'Johnson']);
+    $housingSupportCase = $this->createCase($clientContactID, NULL, ['case_type_id' => 'housing_support', 'case_type_id' => 1]);
+    $adultDayCareReferralCase = $this->createCase($clientContactID, NULL, ['case_type' => 'adult_day_care_referral', 'case_type_id' => 2]);
+    civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist1, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $housingSupportCase->id]);
+    civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist2, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $adultDayCareReferralCase->id]);
+
+    // Search setup
+    $formValues = ['display_relationship_type' => $benefitRelationshipTypeId . '_b_a', 'case_type_id' => 1];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, []);
+    $isDeleted = in_array(['deleted_contacts', '=', 1, 0, 0], $params);
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      $formValues,
+      $params,
+      NULL,
+      CRM_Core_Action::NONE,
+      NULL,
+      FALSE,
+      'advanced'
+    );
+    $queryObject = $selector->getQueryObject();
+    $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
+    // Run the search
+    $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
+    // Check expected results.
+    $this->assertCount(1, $rows);
+    $this->assertEquals('Alexa', $rows[0]['first_name']);
+    $this->assertEquals('Clarke', $rows[0]['last_name']);
+  }
+
 }
