@@ -36,7 +36,7 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function create($params) {
+  public static function create(array $params): CRM_Financial_DAO_FinancialTrxn {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']);
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], $contributionStatus);
@@ -96,7 +96,7 @@ class CRM_Financial_BAO_Payment {
       self::reverseAllocationsFromPreviousPayment($params, $trxn->id);
     }
     else {
-      list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
+      [$ftIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
 
       foreach ($lineItems as $key => $value) {
         if ($value['allocation'] === (float) 0) {
@@ -185,15 +185,32 @@ class CRM_Financial_BAO_Payment {
 
   /**
    * Function to update contribution's check_number and trxn_id by
-   *  concatenating values from financial trxn's check_number and trxn_id respectively
+   *  concatenating values from financial trxn's check_number and trxn_id
+   * respectively
    *
    * @param array $params
    * @param int $contributionID
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function updateRelatedContribution($params, $contributionID) {
+  public static function updateRelatedContribution(array $params, int $contributionID): void {
     $contributionDAO = new CRM_Contribute_DAO_Contribution();
     $contributionDAO->id = $contributionID;
     $contributionDAO->find(TRUE);
+    if (isset($params['fee_amount'])) {
+      // Update contribution.fee_amount to be be the total of all fees
+      // since the payment is already saved the total here will be right.
+      $payments = civicrm_api3('Payment', 'get', [
+        'contribution_id' => $contributionID,
+        'return' => 'fee_amount',
+      ])['values'];
+      $totalFees = 0;
+      foreach ($payments as $payment) {
+        $totalFees += $payment['fee_amount'] ?? 0;
+      }
+      $contributionDAO->fee_amount = $totalFees;
+      $contributionDAO->net_amount = $contributionDAO->total_amount - $contributionDAO->fee_amount;
+    }
 
     foreach (['trxn_id', 'check_number'] as $fieldName) {
       if (!empty($params[$fieldName])) {
@@ -292,7 +309,7 @@ class CRM_Financial_BAO_Payment {
     );
 
     $contactID = self::getPaymentContactID($contributionID);
-    list($displayName, $email)  = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+    [$displayName, $email]  = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
     $entities['contact'] = ['id' => $contactID, 'display_name' => $displayName, 'email' => $email];
     $contact = civicrm_api3('Contact', 'getsingle', ['id' => $contactID, 'return' => 'email_greeting']);
     $entities['contact']['email_greeting'] = $contact['email_greeting_display'];

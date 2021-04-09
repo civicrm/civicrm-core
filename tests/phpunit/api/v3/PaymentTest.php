@@ -1290,7 +1290,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testPaymentCreateTrxnIdAndDates(): void {
 
     $trxnDate = '2010-01-01 09:00:00';
-    $trxnID = 'aabbccddeeffggh';
+    $trxnID = 'abcd';
     $originalReceiveDate = '2010-02-02 22:22:22';
 
     $contributionID = $this->contributionCreate([
@@ -1298,6 +1298,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount'           => 100,
       'contribution_status_id' => 'Pending',
       'receive_date'           => $originalReceiveDate,
+      'fee_amount' => 0,
     ]);
 
     $this->callAPISuccess('Payment', 'create', [
@@ -1305,10 +1306,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'order_id'     => $contributionID,
       'trxn_date'    => $trxnDate,
       'trxn_id'      => $trxnID,
+      'fee_amount' => .2,
     ]);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
     $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(.2, $contribution['fee_amount']);
+    $this->assertEquals(99.8, $contribution['net_amount']);
 
     $this->assertEquals($trxnID, $contribution['trxn_id'],
       "Contribution trxn_id should have been set to that of the payment.");
