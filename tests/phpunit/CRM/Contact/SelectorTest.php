@@ -32,6 +32,10 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSelectorQuery($dataSet) {
+    $tag = $this->callAPISuccess('Tag', 'create', [
+      'name' => 'Test Tag Name' . uniqid(),
+      'parent_id' => 1,
+    ]);
     if (!empty($dataSet['limitedPermissions'])) {
       CRM_Core_Config::singleton()->userPermissionClass->permissions = [
         'access CiviCRM',
@@ -61,6 +65,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     foreach ($dataSet['expected_query'] as $index => $queryString) {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
+    if (!empty($dataSet['where_contains'])) {
+      $this->assertContains($this->strWrangle(str_replace('@tagid', $tag['id'], $dataSet['where_contains'])), $this->strWrangle($sql[2]));
+    }
     // Ensure that search builder return individual contact as per criteria
     if ($dataSet['context'] === 'builder') {
       $contactID = $this->individualCreate(['first_name' => 'James', 'last_name' => 'Bond']);
@@ -75,6 +82,11 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
         $this->assertEquals($contactID, $rows[0]['source_contact_id']);
       }
       else {
+        $this->callAPISuccess('EntityTag', 'create', [
+          'entity_id' => $contactID,
+          'tag_id' => $tag['id'],
+          'entity_table' => 'civicrm_contact',
+        ]);
         $this->callAPISuccess('Address', 'create', [
           'contact_id' => $contactID,
           'location_type_id' => 'Home',
@@ -99,6 +111,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     if (!empty($dataSet['limitedPermissions'])) {
       $this->cleanUpAfterACLs();
     }
+    $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
   }
 
   /**
@@ -246,6 +259,22 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [],
+        ],
+      ],
+      [
+        [
+          'description' => 'Tag Equals Test',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => [],
+          'form_values' => [['contact_type', '=', 'Individual', 1, 0], ['tag', '=', '1', 1, 0]],
+          'params' => [],
+          'return_properties' => NULL,
+          'context' => 'builder',
+          'action' => CRM_Core_Action::NONE,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+          'expected_query' => [],
+          'where_contains' => 'tag_id IN ( 1,@tagid )',
         ],
       ],
       [
