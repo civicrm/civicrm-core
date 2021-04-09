@@ -1351,6 +1351,7 @@ abstract class CRM_Core_Payment {
     // have an example of that at the mome.
     if ($params['amount'] == 0) {
       $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
       return $result;
     }
 
@@ -1358,6 +1359,7 @@ abstract class CRM_Core_Payment {
       $result = $this->doTransferCheckout($params, $component);
       if (is_array($result) && !isset($result['payment_status_id'])) {
         $result['payment_status_id'] = array_search('Pending', $statuses);
+        $result['payment_status'] = 'Pending';
       }
     }
     else {
@@ -1366,9 +1368,11 @@ abstract class CRM_Core_Payment {
         if (!empty($params['is_recur'])) {
           // See comment block.
           $result['payment_status_id'] = array_search('Pending', $statuses);
+          $result['payment_status'] = 'Pending';
         }
         else {
           $result['payment_status_id'] = array_search('Completed', $statuses);
+          $result['payment_status'] = 'Completed';
         }
       }
     }
