@@ -932,20 +932,42 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $config = CRM_Core_Config::singleton();
-    $loginURL = wp_login_url();
-    return $loginURL;
+    return wp_login_url($destination);
   }
 
   /**
-   * FIXME: Do something.
-   *
    * @param \CRM_Core_Form $form
    *
    * @return NULL|string
    */
   public function getLoginDestination(&$form) {
-    return NULL;
+    $args = NULL;
+
+    $id = $form->get('id');
+    if ($id) {
+      $args .= "&id=$id";
+    }
+    else {
+      $gid = $form->get('gid');
+      if ($gid) {
+        $args .= "&gid=$gid";
+      }
+      else {
+        // Setup Personal Campaign Page link uses pageId
+        $pageId = $form->get('pageId');
+        if ($pageId) {
+          $component = $form->get('component');
+          $args .= "&pageId=$pageId&component=$component&action=add";
+        }
+      }
+    }
+
+    $destination = NULL;
+    if ($args) {
+      // append destination so user is returned to form they came from after login
+      $destination = CRM_Utils_System::url(CRM_Utils_System::currentPath(), 'reset=1' . $args);
+    }
+    return $destination;
   }
 
   /**
