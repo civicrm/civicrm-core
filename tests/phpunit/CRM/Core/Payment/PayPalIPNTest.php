@@ -97,12 +97,18 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test IPN response updates contribution_recur & contribution for first & second contribution.
+   * Test IPN response updates contribution_recur & contribution for first &
+   * second contribution.
    *
-   * The scenario is that a pending contribution exists and the first call will update it to completed.
-   * The second will create a new contribution.
+   * The scenario is that a pending contribution exists and the first call will
+   * update it to completed. The second will create a new contribution.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testIPNPaymentRecurSuccess() {
+  public function testIPNPaymentRecurSuccess(): void {
     $this->setupRecurringPaymentProcessorTransaction([], ['total_amount' => '15.00']);
     $mut = new CiviMailUtils($this, TRUE);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurTransaction());
