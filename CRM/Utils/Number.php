@@ -104,4 +104,20 @@ class CRM_Utils_Number {
     }
   }
 
+  /**
+   * Format a number (float)
+   *
+   * @param float $amount
+   *
+   * @return string
+   */
+  public static function formatNumber($amount) {
+    $config = CRM_Core_Config::singleton();
+    $rep = [
+      ',' => $config->monetaryThousandSeparator,
+      '.' => $config->monetaryDecimalPoint,
+    ];
+    return strtr($amount, $rep);
+  }
+
 }
