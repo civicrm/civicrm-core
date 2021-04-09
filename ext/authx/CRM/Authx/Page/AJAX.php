@@ -12,9 +12,13 @@ class CRM_Authx_Page_AJAX {
   public static function getId() {
     $authxUf = _authx_uf();
 
+    /** @var array $authx */
+    $authx = CRM_Core_Session::singleton()->get('authx');
     $response = [
       'contact_id' => CRM_Core_Session::getLoggedInContactID(),
       'user_id' => $authxUf->getCurrentUserId(),
+      'flow' => $authx['flow'] ?? NULL,
+      'cred' => $authx['credType'] ?? NULL,
     ];
 
     CRM_Utils_JSON::output($response);
