@@ -1097,7 +1097,7 @@ DESC limit 1");
       $params['register_date'] = CRM_Utils_Time::date('YmdHis');
 
       // add all the additional payment params we need
-      $formValues['amount'] = $params['total_amount'];
+      $formValues['amount'] = $this->order->getTotalAmount();
       $formValues['currencyID'] = $this->getCurrency();
       $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
       $formValues['invoiceID'] = $this->getInvoiceID();
