@@ -905,6 +905,43 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test membership with soft credits.
+   */
+  public function testMembershipSoftCredit() {
+    $this->_softIndividualId = $this->individualCreate();
+
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->createLoggedInUser();
+    $params = $this->getBaseSubmitParams();
+    unset($params['auto_renew'], $params['is_recur']);
+    $params['record_contribution'] = TRUE;
+    $params['soft_credit_type_id'] = $this->callAPISuccessGetValue('OptionValue', [
+      'return' => "value",
+      'name' => "Gift",
+      'option_group_id' => "soft_credit_type",
+    ]);
+    $params['soft_credit_contact_id'] = $this->_softIndividualId;
+    $form->_contactID = $this->_individualId;
+    // $form->_mode = 'test';
+    $form->testSubmit($params);
+    // Membership is created on main contact.
+    $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+
+    // Verify is main contribution is created on soft contact.
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->_softIndividualId,
+    ]);
+    $this->assertEquals($contribution['soft_credit'][1]['contact_id'], $this->_individualId);
+
+    // Verify if soft credit is created.
+    $this->callAPISuccessGetSingle('ContributionSoft', [
+      'contact_id' => $this->_individualId,
+      'contribution_id' => $contribution['id'],
+    ]);
+  }
+
+  /**
    * Test the submit function of the membership form.
    *
    * @throws \CRM_Core_Exception
