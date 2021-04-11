@@ -77,8 +77,29 @@ class PropertyBag implements \ArrayAccess {
    * @var bool
    * Temporary, internal variable to help ease transition to PropertyBag.
    * Used by cast() to suppress legacy warnings.
+   * For paymentprocessors that have not converted to propertyBag we need to support "legacy" properties - eg. "is_recur"
+   *   without warnings. Setting this allows us to pass a propertyBag into doPayment() and expect it to "work" with
+   *   existing payment processors.
    */
-  protected $suppressLegacyWarnings = FALSE;
+  protected $suppressLegacyWarnings = TRUE;
+
+  /**
+   * Get the value of the suppressLegacyWarnings parameter
+   * @return bool
+   */
+  public function getSuppressLegacyWarnings() {
+    return $this->suppressLegacyWarnings;
+  }
+
+  /**
+   * Set the suppressLegacyWarnings parameter - useful for unit tests.
+   * Eg. you could set to FALSE for unit tests on a paymentprocessor to capture use of legacy keys in that processor
+   * code.
+   * @param bool $suppressLegacyWarnings
+   */
+  public function setSuppressLegacyWarnings(bool $suppressLegacyWarnings) {
+    $this->suppressLegacyWarnings = $suppressLegacyWarnings;
+  }
 
   /**
    * Get the property bag.
