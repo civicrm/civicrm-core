@@ -528,6 +528,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Temporary function to catch transition to doPaymentPayPalButton()
+   * @deprecated
+   */
+  public function doDirectPayment(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
+    return $this->doPaymentPayPalButton($params);
+  }
+
+  /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
@@ -882,6 +891,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       'pre_approval_parameters' => ['token' => $token],
       'redirect_url' => $siteUrl . "/cgi-bin/webscr?cmd=_express-checkout&token=$token",
     ];
+  }
+
+  /**
+   * Temporary function to catch transition to doPaymentRedirectToPayPal()
+   * @deprecated
+   */
+  public function doTransferCheckout(&$params, $component = 'contribute') {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
+    $this->doPaymentRedirectToPayPal($params);
   }
 
   /**
