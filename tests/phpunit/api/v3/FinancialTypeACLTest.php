@@ -291,8 +291,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
   /**
    * Test that acl contributions can be deleted.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDeleteACLContribution() {
+  public function testDeleteACLContribution(): void {
     $this->enableFinancialACLs();
 
     $this->setPermissions([
@@ -313,7 +315,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->addFinancialAclPermissions([['delete', 'Donation']]);
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
 
-    $this->assertEquals($contribution['count'], 1);
+    $this->assertEquals(1, $contribution['count']);
   }
 
   public function testMembershipTypeACLFinancialTypeACL() {

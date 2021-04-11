@@ -2993,7 +2993,7 @@ SELECT contact_id
         $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
       }
       // Clause for an entity_table/entity_id combo
-      if ($fieldName == 'entity_id' && isset($fields['entity_table'])) {
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
         $relatedClauses = [];
         $relatedEntities = $this->buildOptions('entity_table', 'get');
         foreach ((array) $relatedEntities as $table => $ent) {
@@ -3041,8 +3041,44 @@ SELECT contact_id
   }
 
   /**
+   * Check whether action can be performed on a given record.
+   *
+   * Dispatches to internal BAO function ('static::_checkAccess())` and `hook_civicrm_checkAccess`.
+   *
+   * @param string $action
+   *   APIv4 action name.
+   *   Ex: 'create', 'get', 'delete'
+   * @param array $record
+   *   All (known/loaded) values of individual record being accessed.
+   *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
+   * @param int $userID
+   *   Contact ID of the active user (whose access we must check).
+   * @param bool $granted
+   *   Initial value (usually TRUE, but the API might pass FALSE if gatekeeper permissions fail)
+   *
+   * @return bool
+   */
+  public static function checkAccess(string $action, array $record, $userID = NULL, $granted = TRUE): bool {
+    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName(static::class);
+    // Ensure this function was either called on a BAO class or a DAO that has no BAO
+    if (!$entityName ||
+      (!strpos(static::class, '_BAO_') && CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class) !== static::class)
+    ) {
+      throw new CRM_Core_Exception('Function checkAccess must be called on a BAO class');
+    }
+    $userID = isset($userID) ? (int) $userID : CRM_Core_Session::getLoggedInContactID();
+    // Dispatch to protected function _checkAccess in this BAO
+    if ($granted && method_exists(static::class, '_checkAccess')) {
+      $granted = static::_checkAccess($action, $record, $userID);
+    }
+    // Dispatch to hook
+    CRM_Utils_Hook::checkAccess($entityName, $action, $record, $userID, $granted);
+    return $granted;
+  }
+
+  /**
    * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
-   * and dashes, and contains at least one [a-z] case insenstive.
+   * and dashes, and contains at least one [a-z] case insensitive.
    *
    * @param $database
    *
