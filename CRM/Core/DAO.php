@@ -2960,7 +2960,7 @@ SELECT contact_id
         $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
       }
       // Clause for an entity_table/entity_id combo
-      if ($fieldName == 'entity_id' && isset($fields['entity_table'])) {
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
         $relatedClauses = [];
         $relatedEntities = $this->buildOptions('entity_table', 'get');
         foreach ((array) $relatedEntities as $table => $ent) {
@@ -3008,8 +3008,27 @@ SELECT contact_id
   }
 
   /**
+   * Check whether the given action can be performed on these values.
+   *
+   * The return is the input values array with inaccessible items filtered out.
+   *
+   * @param string $action
+   * @param array $values
+   * @param null $contactID
+   *
+   * @return array
+   */
+  public function checkAccess(string $action, array $values, $contactID = NULL): array {
+    if (is_null($contactID)) {
+      $contactID = CRM_Core_Session::getLoggedInContactID();
+    }
+    CRM_Utils_Hook::checkAccess(CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this)), $action, $contactID, $values);
+    return $values;
+  }
+
+  /**
    * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
-   * and dashes, and contains at least one [a-z] case insenstive.
+   * and dashes, and contains at least one [a-z] case insensitive.
    *
    * @param $database
    *
