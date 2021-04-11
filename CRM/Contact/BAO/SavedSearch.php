@@ -362,6 +362,11 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       }
       $params['modified_id'] = $loggedInContactID;
     }
+
+    // Flush angular caches to refresh search displays
+    if (isset($params['api_params'])) {
+      Civi::container()->get('angular')->clear();
+    }
     return self::writeRecord($params);
   }
 
