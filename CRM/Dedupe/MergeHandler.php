@@ -377,6 +377,7 @@ class CRM_Dedupe_MergeHandler {
    * The use of the new hook is tested, including the fact it is called before contributions are merged, as this
    * is likely to be significant data in merge hooks.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function mergeLocations(): void {
@@ -410,12 +411,6 @@ class CRM_Dedupe_MergeHandler {
           $set_primary = $migrationInfo['location_blocks'][$name][$blkCount]['set_other_primary'] ?? NULL;
           if (!$changePrimary && $set_primary == "1") {
             $otherBlockDAO->is_primary = 1;
-            if ($primaryDAOId) {
-              $removePrimaryDAO = $this->getDAOForLocationEntity($name);
-              $removePrimaryDAO->id = $primaryDAOId;
-              $removePrimaryDAO->is_primary = 0;
-              $blocksDAO[$name]['update'][$primaryDAOId] = $removePrimaryDAO;
-            }
             $changePrimary = TRUE;
           }
           // Otherwise, if main contact already has primary, set it to 0.
@@ -454,12 +449,20 @@ class CRM_Dedupe_MergeHandler {
     foreach ($blocksDAO as $blockDAOs) {
       if (!empty($blockDAOs['update'])) {
         foreach ($blockDAOs['update'] as $blockDAO) {
-          $blockDAO->save();
+          $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($blockDAO));
+          $values = ['checkPermissions' => FALSE];
+          foreach ($blockDAO->fields() as $field) {
+            if (isset($blockDAO->{$field['name']})) {
+              $values['values'][$field['name']] = $blockDAO->{$field['name']};
+            }
+          }
+          civicrm_api4($entity, 'update', $values);
         }
       }
       if (!empty($blockDAOs['delete'])) {
         foreach ($blockDAOs['delete'] as $blockDAO) {
-          $blockDAO->delete();
+          $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($blockDAO));
+          civicrm_api4($entity, 'delete', ['where' => [['id', '=', $blockDAO->id]], 'checkPermissions' => FALSE]);
         }
       }
     }
