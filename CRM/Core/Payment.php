@@ -1298,6 +1298,23 @@ abstract class CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object - but throwing exceptions is preferred)
    */
   protected function doDirectPayment(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
+    return $params;
+  }
+
+  /**
+   * Calling this from outside the payment subsystem is deprecated - use doPayment.
+   * @deprecated
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   * @param string $component
+   *
+   * @return array
+   *   the result in an nice formatted array (or an error object - but throwing exceptions is preferred)
+   */
+  protected function doTransferCheckout(&$params, $component = 'contribute') {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
     return $params;
   }
 
