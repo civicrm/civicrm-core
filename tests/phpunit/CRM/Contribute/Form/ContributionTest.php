@@ -374,7 +374,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmitCreditCardFee() {
     $form = new CRM_Contribute_Form_Contribution();
-    $this->paymentProcessor->setDoDirectPaymentResult(['is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08]);
+    $this->paymentProcessor->setDoDirectPaymentResult(['payment_status_id' => 1, 'is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08]);
     $form->_mode = 'Live';
     $form->testSubmit([
       'total_amount' => 50,

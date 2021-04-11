@@ -98,7 +98,11 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
 
     if (!empty($this->_doDirectPaymentResult)) {
       $result = $this->_doDirectPaymentResult;
-      if (CRM_Utils_Array::value('payment_status_id', $result) === 'failed') {
+      if (empty($result['payment_status_id'])) {
+        $result['payment_status_id'] = array_search('Pending', $statuses);
+        $result['payment_status'] = 'Pending';
+      }
+      if ($result['payment_status_id'] === 'failed') {
         throw new PaymentProcessorException($result['message'] ?? 'failed');
       }
       $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
