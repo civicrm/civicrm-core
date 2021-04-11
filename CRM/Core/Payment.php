@@ -1343,13 +1343,14 @@ abstract class CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
+    $propertyBag = \Civi\Payment\PropertyBag::cast($params);
     $this->_component = $component;
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     // If we have a $0 amount, skip call to processor and set payment_status to Completed.
     // Conceivably a processor might override this - perhaps for setting up a token - but we don't
-    // have an example of that at the mome.
-    if ($params['amount'] == 0) {
+    // have an example of that at the moment.
+    if ($propertyBag->getAmount() == 0) {
       $result['payment_status_id'] = array_search('Completed', $statuses);
       $result['payment_status'] = 'Completed';
       return $result;
