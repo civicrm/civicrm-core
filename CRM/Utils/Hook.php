@@ -2083,6 +2083,24 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Check whether the given contact has access to perform the given action.
+   *
+   * If the contact cannot perform the action the
+   *
+   * @param string $entity
+   * @param string $action
+   * @param array $record
+   * @param int|null $contactID
+   * @param bool $granted
+   */
+  public static function checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {
+    self::singleton()->invoke(['entity', 'action', 'record', 'contactID', 'granted'], $entity, $action, $record,
+      $contactID, $granted, self::$_nullObject,
+      'civicrm_checkAccess'
+    );
+  }
+
+  /**
    * Rotate the cryptographic key used in the database.
    *
    * The purpose of this hook is to visit any encrypted values in the database

@@ -203,7 +203,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getBAOClassName($daoName) {
     $baoName = str_replace('_DAO_', '_BAO_', $daoName);
-    return class_exists($baoName) ? $baoName : $daoName;
+    return $daoName === $baoName || class_exists($baoName) ? $baoName : $daoName;
   }
 
   /**

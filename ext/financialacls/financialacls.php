@@ -287,6 +287,32 @@ function financialacls_civicrm_permission(&$permissions) {
 }
 
 /**
+ * @param string $entity
+ * @param string $action
+ * @param array $record
+ * @param int|null $contactID
+ * @param bool $granted
+ *
+ * @throws \CRM_Core_Exception
+ */
+function financialacls_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+  if ($action === 'delete' && $entity === 'Contribution') {
+    $contributionID = $record['id'];
+    // First check contribution financial type
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'financial_type_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id'));
+    // Now check permissioned line items & permissioned contribution
+    if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType, $contactID) ||
+      !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $contactID)
+    ) {
+      $granted = FALSE;
+    }
+  }
+}
+
+/**
  * Remove unpermitted financial types from field Options in search context.
  *
  * Search context is described as
