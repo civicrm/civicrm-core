@@ -485,12 +485,55 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doPayment(&$params, $component = 'contribute') {
+    $this->_component = $component;
     if ($this->isPayPalType($this::PAYPAL_EXPRESS) || ($this->isPayPalType($this::PAYPAL_PRO) && !empty($params['token']))) {
-      $this->_component = $component;
       return $this->doExpressCheckout($params);
 
     }
-    return parent::doPayment($params, $component);
+
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the mome.
+    if ($params['amount'] == 0) {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
+      return $result;
+    }
+
+    if ($this->_paymentProcessor['billing_mode'] == 4) {
+      $this->doPaymentRedirectToPayPal($params, $component);
+      // redirect calls CiviExit() so execution is stopped
+    }
+    else {
+      $result = $this->doPaymentPayPalButton($params, $component);
+      if (is_array($result) && !isset($result['payment_status_id'])) {
+        if (!empty($params['is_recur'])) {
+          // See comment block.
+          $result['payment_status_id'] = array_search('Pending', $statuses);
+          $result['payment_status'] = 'Pending';
+        }
+        else {
+          $result['payment_status_id'] = array_search('Completed', $statuses);
+          $result['payment_status'] = 'Completed';
+        }
+      }
+    }
+    if (is_a($result, 'CRM_Core_Error')) {
+      CRM_Core_Error::deprecatedFunctionWarning('payment processors should throw exceptions rather than return errors');
+      throw new PaymentProcessorException(CRM_Core_Error::getMessages($result));
+    }
+    return $result;
+  }
+
+  /**
+   * Temporary function to catch transition to doPaymentPayPalButton()
+   * @deprecated
+   */
+  public function doDirectPayment(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
+    return $this->doPaymentPayPalButton($params);
   }
 
   /**
@@ -505,7 +548,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    *   the result in an nice formatted array (or an error object)
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params, $component = 'contribute') {
+  public function doPaymentPayPalButton(&$params, $component = 'contribute') {
     $args = [];
 
     $this->initialize($args, 'DoDirectPayment');
@@ -851,13 +894,21 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Temporary function to catch transition to doPaymentRedirectToPayPal()
+   * @deprecated
+   */
+  public function doTransferCheckout(&$params, $component = 'contribute') {
+    CRM_Core_Error::deprecatedFunctionWarning('doPayment');
+    $this->doPaymentRedirectToPayPal($params);
+  }
+
+  /**
    * @param array $params
    * @param string $component
    *
    * @throws Exception
    */
-  public function doTransferCheckout(&$params, $component = 'contribute') {
-
+  public function doPaymentRedirectToPayPal(&$params, $component = 'contribute') {
     $notifyParameters = ['module' => $component];
     $notifyParameterMap = [
       'contactID' => 'contactID',
