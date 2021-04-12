@@ -25,6 +25,7 @@ class PropertyBag implements \ArrayAccess {
   protected $props = ['default' => []];
 
   protected static $propMap = [
+    'amount'                      => TRUE,
     'billingStreetAddress'        => TRUE,
     'billingSupplementalAddress1' => TRUE,
     'billingSupplementalAddress2' => TRUE,
