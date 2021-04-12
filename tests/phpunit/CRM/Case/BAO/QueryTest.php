@@ -145,7 +145,7 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
     $clientContactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Smith']);
     $benefitSpecialist1 = $this->individualCreate(['Individual', 'first_name' => 'Alexa', 'last_name' => 'Clarke']);
     $benefitSpecialist2 = $this->individualCreate(['Individual', 'first_name' => 'Sandra', 'last_name' => 'Johnson']);
-    $housingSupportCase = $this->createCase($clientContactID, NULL, ['case_type_id' => 'housing_support', 'case_type_id' => 1]);
+    $housingSupportCase = $this->createCase($clientContactID, NULL, ['case_type' => 'housing_support', 'case_type_id' => 1]);
     $adultDayCareReferralCase = $this->createCase($clientContactID, NULL, ['case_type' => 'adult_day_care_referral', 'case_type_id' => 2]);
     civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist1, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $housingSupportCase->id]);
     civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist2, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $adultDayCareReferralCase->id]);
