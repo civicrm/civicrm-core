@@ -109,6 +109,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    */
   public function testSetContactIDLegacyWay() {
     $propertyBag = new PropertyBag();
+    $propertyBag->setSuppressLegacyWarnings(FALSE);
 
     // To prevent E_USER_DEPRECATED errors during phpunit tests we take a copy
     // of the existing error_reporting.
@@ -191,6 +192,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();
+    $propertyBag->setSuppressLegacyWarnings(FALSE);
 
     // Set by array access should cause deprecated error.
     try {
