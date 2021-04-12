@@ -60,7 +60,7 @@ try {
         'option_group_id' => 'afform_type',
         'name' => 'search',
         'value' => 'search',
-        'label' => 'Search Display',
+        'label' => 'Search Form',
         'weight' => 10,
         'icon' => 'fa-search',
       ],

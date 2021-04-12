@@ -19,7 +19,7 @@ class AfformAdminMeta {
     // Pluralize tabs (too bad option groups only store a single label)
     $plurals = [
       'form' => E::ts('Custom Forms'),
-      'search' => E::ts('Search Displays'),
+      'search' => E::ts('Search Forms'),
       'block' => E::ts('Field Blocks'),
       'system' => E::ts('System Forms'),
     ];
