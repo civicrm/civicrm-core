@@ -1164,7 +1164,7 @@ abstract class CRM_Core_Payment {
    * @throws \CRM_Core_Exception
    */
   protected function getAmount($params = []) {
-    return CRM_Utils_Money::format($params['amount'], NULL, NULL, TRUE);
+    return $params['amount'];
   }
 
   /**
