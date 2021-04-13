@@ -24,7 +24,7 @@
 function civicrm_api3_generic_getList($apiRequest) {
   $entity = CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($apiRequest['entity']);
   $request = $apiRequest['params'];
-  $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE);
+  $meta = civicrm_api3_generic_getfields(['action' => 'get'] + $apiRequest, FALSE)['values'];
 
   // If the user types an integer into the search
   $forceIdSearch = empty($request['id']) && !empty($request['input']) && CRM_Utils_Rule::positiveInteger($request['input']);
@@ -40,7 +40,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   // Hey api, would you like to provide default values?
   $fnName = "_civicrm_api3_{$entity}_getlist_defaults";
   $defaults = function_exists($fnName) ? $fnName($request) : [];
-  _civicrm_api3_generic_getList_defaults($entity, $request, $defaults, $meta['values']);
+  _civicrm_api3_generic_getList_defaults($entity, $request, $defaults, $meta);
 
   // Hey api, would you like to format the search params?
   $fnName = "_civicrm_api3_{$entity}_getlist_params";
@@ -78,7 +78,7 @@ function civicrm_api3_generic_getList($apiRequest) {
   // Hey api, would you like to format the output?
   $fnName = "_civicrm_api3_{$entity}_getlist_output";
   $fnName = function_exists($fnName) ? $fnName : '_civicrm_api3_generic_getlist_output';
-  $values = $fnName($result, $request, $entity, $meta['values']);
+  $values = $fnName($result, $request, $entity, $meta);
 
   _civicrm_api3_generic_getlist_postprocess($result, $request, $values);
 
