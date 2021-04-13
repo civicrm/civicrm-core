@@ -1,44 +1,22 @@
-# payflowpro
+# Payflow Pro
 
-![Screenshot](/images/screenshot.png)
-
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+This extension provides an integration with PayPal's Payflow Pro service. It supports one time and recurring payments from CiviCRM.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
 * PHP v7.2+
-* CiviCRM (*FIXME: Version number*)
+* CiviCRM 5.38
 
 ## Installation (Web UI)
 
 Learn more about installing CiviCRM extensions in the [CiviCRM Sysadmin Guide](https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/).
 
-## Installation (CLI, Zip)
-
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-cd <extension-dir>
-cv dl payflowpro@https://github.com/FIXME/payflowpro/archive/master.zip
-```
-
-## Installation (CLI, Git)
-
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
-
-```bash
-git clone https://github.com/FIXME/payflowpro.git
-cv en payflowpro
-```
-
 ## Getting Started
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+After enabling the extension you will need to go to Administer >> System Settings >> Payment Processors and create a Payment Processor that uses Payflow Pro
 
 ## Known Issues
 
-(* FIXME *)
+At Present the extension can create recurring contributions processes in the Payment Processor but does not use the APIs provided to check that subsequent transactions have been processed.
