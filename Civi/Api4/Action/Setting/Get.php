@@ -55,9 +55,9 @@ class Get extends AbstractSettingAction {
         ];
       }
     }
-    foreach ($result as $name => &$setting) {
-      if (isset($setting['value']) && !empty($meta[$name]['serialize'])) {
-        $setting['value'] = \CRM_Core_DAO::unSerializeField($setting['value'], $meta[$name]['serialize']);
+    foreach ($result as &$setting) {
+      if (isset($setting['value']) && !empty($meta[$setting['name']]['serialize'])) {
+        $setting['value'] = \CRM_Core_DAO::unSerializeField($setting['value'], $meta[$setting['name']]['serialize']);
       }
     }
   }

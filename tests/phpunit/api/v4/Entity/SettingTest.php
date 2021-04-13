@@ -50,4 +50,11 @@ class SettingTest extends UnitTestCase {
     $this->assertContains('setting', $message);
   }
 
+  public function testSerailizedSetting() {
+    $settings = \Civi\Api4\Setting::get(FALSE)
+      ->addSelect('contact_edit_options')
+      ->execute();
+    $this->assertTrue(is_array($settings[0]['value']));
+  }
+
 }
