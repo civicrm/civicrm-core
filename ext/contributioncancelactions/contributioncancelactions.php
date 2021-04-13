@@ -27,7 +27,7 @@ function contributioncancelactions_civicrm_post($op, $objectName, $objectId, $ob
     if (in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id),
       ['Cancelled', 'Failed']
     )) {
-      contributioncancelactions_cancel_related_pending_memberships((int) $objectId);
+      contributioncancelactions_cancel_related_pending_memberships((int) $objectId, CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $objectRef->contribution_status_id));
       contributioncancelactions_cancel_related_pending_participant_records((int) $objectId);
     }
   }
@@ -59,10 +59,13 @@ function contributioncancelactions_cancel_related_pending_participant_records($c
  * Find and cancel any pending memberships.
  *
  * @param int $contributionID
+ * @param string $status
+ *   Status of the contribution.
+ *
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
-function contributioncancelactions_cancel_related_pending_memberships($contributionID): void {
+function contributioncancelactions_cancel_related_pending_memberships(int $contributionID, string $status): void {
   $connectedMemberships = (array) LineItem::get(FALSE)->setWhere([
     ['contribution_id', '=', $contributionID],
     ['entity_table', '=', 'civicrm_membership'],
@@ -80,6 +83,6 @@ function contributioncancelactions_cancel_related_pending_memberships($contribut
     return;
   }
   foreach ($connectedMemberships as $membershipID) {
-    civicrm_api3('Membership', 'create', ['status_id' => 'Cancelled', 'id' => $membershipID, 'is_override' => 1, 'status_override_end_date' => 'null']);
+    civicrm_api3('Membership', 'create', ['status_id' => $status === 'Cancelled' ? 'Cancelled' : 'Expired', 'id' => $membershipID, 'is_override' => $status === 'Cancelled', 'status_override_end_date' => 'null']);
   }
 }
