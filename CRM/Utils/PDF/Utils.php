@@ -182,6 +182,8 @@ class CRM_Utils_PDF_Utils {
     // CRM-12165 - Remote file support required for image handling.
     $options = new Options();
     $options->set('isRemoteEnabled', TRUE);
+    $cmsRootPath = \CRM_Core_Config::singleton()->userSystem->cmsRootPath() . '/';
+    $options->set('chroot', $cmsRootPath);
 
     $dompdf = new DOMPDF($options);
     $dompdf->set_paper($paper_size, $orientation);
