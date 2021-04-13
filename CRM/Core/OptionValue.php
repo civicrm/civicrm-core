@@ -390,7 +390,7 @@ class CRM_Core_OptionValue {
    *   Array of option-values
    *
    */
-  public static function getValues($groupParams, &$values, $orderBy = 'weight', $isActive = FALSE) {
+  public static function getValues($groupParams, &$values = [], $orderBy = 'weight', $isActive = FALSE) {
     if (empty($groupParams)) {
       return NULL;
     }
@@ -403,6 +403,8 @@ SELECT
    option_value.description as description,
    option_value.weight      as weight,
    option_value.is_active   as is_active,
+   option_value.icon        as icon,
+   option_value.color       as color,
    option_value.is_default  as is_default";
 
     $from = "
@@ -454,8 +456,11 @@ FROM
         'weight' => $dao->weight,
         'is_active' => $dao->is_active,
         'is_default' => $dao->is_default,
+        'icon' => $dao->icon,
+        'color' => $dao->icon,
       ];
     }
+    return $values;
   }
 
 }

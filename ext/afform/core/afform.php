@@ -241,26 +241,29 @@ function afform_civicrm_pageRun(&$page) {
  * @link https://github.com/civicrm/org.civicrm.contactlayout
  */
 function afform_civicrm_contactSummaryBlocks(&$blocks) {
-  $scanner = \Civi::service('afform_scanner');
-  foreach ($scanner->getMetas() as $afform) {
-    if (!empty($afform['contact_summary']) && $afform['contact_summary'] === 'block') {
-      // Provide our own group for this block to visually distinguish it on the contact summary editor palette.
-      $blocks += [
-        'afform' => [
-          'title' => ts('Form Builder'),
-          'icon' => 'fa-list-alt',
-          'blocks' => [],
-        ],
-      ];
-      $blocks['afform']['blocks'][$afform['name']] = [
-        'title' => $afform['title'],
-        'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
-        'module' => _afform_angular_module_name($afform['name']),
-        'directive' => _afform_angular_module_name($afform['name'], 'dash'),
-        'sample' => [],
-        'edit' => 'civicrm/admin/afform#/edit/' . $afform['name'],
-      ];
-    }
+  $afforms = \Civi\Api4\Afform::get(FALSE)
+    ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label'])
+    ->addWhere('contact_summary', '=', 'block')
+    ->execute();
+  foreach ($afforms as $afform) {
+    // Create a group per afform type
+    $blocks += [
+      "afform_{$afform['type']}" => [
+        'title' => $afform['type:label'],
+        'icon' => $afform['type:icon'],
+        'blocks' => [],
+      ],
+    ];
+    $blocks["afform_{$afform['type']}"]['blocks'][$afform['name']] = [
+      'title' => $afform['title'],
+      'tpl_file' => 'afform/contactSummary/AfformBlock.tpl',
+      'module' => $afform['module_name'],
+      'directive' => $afform['directive_name'],
+      'sample' => [
+        $afform['type:label'],
+      ],
+      'edit' => 'civicrm/admin/afform#/edit/' . $afform['name'],
+    ];
   }
 }
 

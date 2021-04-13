@@ -127,6 +127,7 @@ class Afform extends Generic\AbstractEntity {
         ],
         [
           'name' => 'type',
+          'options' => $self->pseudoconstantOptions('afform_type'),
         ],
         [
           'name' => 'requires',
