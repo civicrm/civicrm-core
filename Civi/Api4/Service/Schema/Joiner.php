@@ -19,7 +19,9 @@
 
 namespace Civi\Api4\Service\Schema;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Query\Api4SelectQuery;
+use Civi\Api4\Utils\CoreUtil;
 
 class Joiner {
   /**
@@ -58,9 +60,14 @@ class Joiner {
     foreach ($fullPath as $link) {
       $target = $link->getTargetTable();
       $alias = $link->getAlias();
-      $bao = \CRM_Core_DAO_AllCoreTables::getBAOClassName(\CRM_Core_DAO_AllCoreTables::getClassForTable($target));
+      $joinEntity = CoreUtil::getApiNameFromTableName($target);
+
+      if ($joinEntity && !$query->checkEntityAccess($joinEntity)) {
+        throw new UnauthorizedException('Cannot join to ' . $joinEntity);
+      }
+
+      $bao = $joinEntity ? CoreUtil::getBAOFromApiName($joinEntity) : NULL;
       $conditions = $link->getConditionsForJoin($baseTable);
-      // Custom fields do not have a bao, and currently do not have field-specific ACLs
       if ($bao) {
         $conditions = array_merge($conditions, $query->getAclClause($alias, $bao, explode('.', $joinPath)));
       }
