@@ -17,6 +17,11 @@ use Civi\Payment\Exception\PaymentProcessorException;
 class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
   /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
    * Constructor
    *
    * @param string $mode
@@ -27,6 +32,20 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     // live or test
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
+  }
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
   }
 
   /*
@@ -107,7 +126,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'EMAIL' => $params['email'],
       'CUSTIP' => urlencode($params['ip_address']),
       'COMMENT1' => urlencode($params['contributionType_accounting_code']),
-      'COMMENT2' => $mode,
+      'COMMENT2' => $this->_mode,
       'INVNUM' => urlencode($params['invoiceID']),
       'ORDERDESC' => urlencode($params['description']),
       'VERBOSITY' => 'MEDIUM',
@@ -300,7 +319,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
          * CiviCRM as part of the transact
          * but not further processing is done. Business rules would need to be defined
          *******************************************************/
-        $params['trxn_id'] = $nvpArray['PNREF'] . $nvpArray['TRXPNREF'];
+        $params['trxn_id'] = ($nvpArray['PNREF'] ?? '') . ($nvpArray['TRXPNREF'] ?? '');
         //'trxn_id' is varchar(255) field. returned value is length 12
         $params['trxn_result_code'] = $nvpArray['AUTHCODE'] . "-Cvv2:" . $nvpArray['CVV2MATCH'] . "-avs:" . $nvpArray['AVSADDR'];
 
@@ -385,11 +404,11 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    */
   public function submit_transaction($submiturl, $payflow_query) {
     // get data ready for API
-    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Guzzle';
     // Here's your custom headers; adjust appropriately for your setup:
     $headers[] = "Content-Type: text/namevalue";
     //or text/xml if using XMLPay.
-    $headers[] = "Content-Length : " . strlen($data);
+    $headers[] = "Content-Length : " . strlen($payflow_query);
     // Length of data to be passed
     // Here the server timeout value is set to 45, but notice
     // below in the cURL section, the timeout
@@ -417,29 +436,18 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     //$headers[] = "X-VPS-VIT-Client-Architecture: x86";
     // Application version
     //$headers[] = "X-VPS-VIT-Integration-Version: 0.01";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $submiturl);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_USERAGENT, $user_agent);
-    curl_setopt($ch, CURLOPT_HEADER, 1);
-    // tells curl to include headers in response
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    // return into a variable
-    curl_setopt($ch, CURLOPT_TIMEOUT, 90);
-    // times out after 90 secs
-    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
-    }
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, Civi::settings()->get('verifySSL'));
-    // this line makes it work under https
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payflow_query);
-    //adding POST data
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, Civi::settings()->get('verifySSL') ? 2 : 0);
-    //verifies ssl certificate
-    curl_setopt($ch, CURLOPT_FORBID_REUSE, TRUE);
-    //forces closure of connection when done
-    curl_setopt($ch, CURLOPT_POST, 1);
-    //data sent as POST
+    $response = $this->getGuzzleClient()->post($submiturl, [
+      'body' => $payflow_query,
+      'headers' => $headers,
+      'curl' => [
+        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
+        CURLOPT_USERAGENT => $user_agent,
+        CURLOPT_RETURNTRANSFER => TRUE,
+        CURLOPT_TIMEOUT => 90,
+        CURLOPT_SSL_VERIFYHOST => Civi::settings()->get('verifySSL') ? 2 : 0,
+        CURLOPT_POST => TRUE,
+      ],
+    ]);
 
     // Try to submit the transaction up to 3 times with 5 second delay.  This can be used
     // in case of network issues.  The idea here is since you are posting via HTTPS there
@@ -448,61 +456,22 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
 
     $i = 1;
     while ($i++ <= 3) {
-      $responseData = curl_exec($ch);
-      $responseHeaders = curl_getinfo($ch);
-      if ($responseHeaders['http_code'] != 200) {
+      $responseData = $response->getBody();
+      $http_code = $response->getStatusCode();
+      if ($http_code != 200) {
         // Let's wait 5 seconds to see if its a temporary network issue.
         sleep(5);
       }
-      elseif ($responseHeaders['http_code'] == 200) {
+      elseif ($http_code == 200) {
         // we got a good response, drop out of loop.
         break;
       }
     }
-    if ($responseHeaders['http_code'] != 200) {
+    if ($http_code != 200) {
       throw new PaymentProcessorException('Error connecting to the Payflow Pro API server.', 9015);
     }
 
-    /*
-     * Transaction submitted -
-     * See if we had a curl error - if so tell 'em and bail out
-     *
-     * NOTE: curl_error does not return a logical value (see its documentation), but
-     *       a string, which is empty when there was no error.
-     */
-    if ((curl_errno($ch) > 0) || (strlen(curl_error($ch)) > 0)) {
-      curl_close($ch);
-      $errorNum = curl_errno($ch);
-      $errorDesc = curl_error($ch);
-
-      //Paranoia - in the unlikley event that 'curl' errno fails
-      if ($errorNum == 0) {
-        $errorNum = 9005;
-      }
-
-      // Paranoia - in the unlikley event that 'curl' error fails
-      if (strlen($errorDesc) == 0) {
-        $errorDesc = "Connection to payment gateway failed";
-      }
-      if ($errorNum = 60) {
-        throw new PaymentProcessorException('Curl error - ' . $errorDesc .
-          ' Try this link for more information http://curl.haxx.se/d
-                                         ocs/sslcerts.html', $errorNum);
-      }
-
-      throw new PaymentProcessorException("Curl error - " . $errorDesc .
-        "  processor response = " . $processorResponse, $errorNum
-      );
-    }
-
-    /*
-     * If null data returned - tell 'em and bail out
-     *
-     * NOTE: You will not necessarily get a string back, if the request failed for
-     *       any reason, the return value will be the boolean false.
-     */
     if (($responseData === FALSE) || (strlen($responseData) == 0)) {
-      curl_close($ch);
       throw new PaymentProcessorException("Error: Connection to payment gateway failed - no data
                                            returned. Gateway url set to $submiturl", 9006);
     }
@@ -511,14 +480,12 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      * If gateway returned no data - tell 'em and bail out
      */
     if (empty($responseData)) {
-      curl_close($ch);
       throw new PaymentProcessorException('Error: No data returned from payment gateway.', 9007);
     }
 
     /*
      * Success so far - close the curl and check the data
      */
-    curl_close($ch);
     return $responseData;
   }
 

@@ -128,6 +128,7 @@ function dm_core_exts() {
   echo ext/authx
   echo ext/greenwich
   echo ext/contributioncancelactions
+  echo ext/payflowpro
   echo ext/oauth-client
   echo ext/recaptcha
 }
