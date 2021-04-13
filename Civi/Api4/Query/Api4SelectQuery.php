@@ -82,6 +82,11 @@ class Api4SelectQuery {
   private $explicitJoins = [];
 
   /**
+   * @var array
+   */
+  private $entityAccess = [];
+
+  /**
    * @param \Civi\Api4\Generic\DAOGetAction $apiGet
    */
   public function __construct($apiGet) {
@@ -99,6 +104,8 @@ class Api4SelectQuery {
 
     $tableName = CoreUtil::getTableName($this->getEntity());
     $this->query = \CRM_Utils_SQL_Select::from($tableName . ' ' . self::MAIN_TABLE_ALIAS);
+
+    $this->entityAccess[$this->getEntity()] = TRUE;
 
     // Add ACLs first to avoid redundant subclauses
     $baoName = CoreUtil::getBAOFromApiName($this->getEntity());
@@ -567,6 +574,25 @@ class Api4SelectQuery {
   }
 
   /**
+   * Check the "gatekeeper" permissions for performing "get" on a given entity.
+   *
+   * @param $entity
+   * @return bool
+   */
+  public function checkEntityAccess($entity) {
+    if (!$this->getCheckPermissions()) {
+      return TRUE;
+    }
+    if (!isset($this->entityAccess[$entity])) {
+      $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
+        'where' => [['name', '=', 'get']],
+        'select' => ['name'],
+      ])->first();
+    }
+    return $this->entityAccess[$entity];
+  }
+
+  /**
    * Join onto other entities as specified by the api call.
    *
    * @throws \API_Exception
@@ -578,6 +604,10 @@ class Api4SelectQuery {
       $entity = array_shift($join);
       // Which might contain an alias. Split on the keyword "AS"
       list($entity, $alias) = array_pad(explode(' AS ', $entity), 2, NULL);
+      // Ensure permissions
+      if (!$this->checkEntityAccess($entity)) {
+        continue;
+      }
       // Ensure alias is a safe string, and supply default if not given
       $alias = $alias ? \CRM_Utils_String::munge($alias, '_', 256) : strtolower($entity);
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
