@@ -50,7 +50,8 @@ class CoreUtil {
    */
   public static function getApiClass($entityName) {
     if (strpos($entityName, 'Custom_') === 0) {
-      return 'Civi\Api4\CustomValue';
+      $groupName = substr($entityName, 7);
+      return self::isCustomEntity($groupName) ? 'Civi\Api4\CustomValue' : NULL;
     }
     // Because "Case" is a reserved php keyword
     $className = 'Civi\Api4\\' . ($entityName === 'Case' ? 'CiviCase' : $entityName);
@@ -80,12 +81,14 @@ class CoreUtil {
    */
   public static function getApiNameFromTableName($tableName) {
     $entityName = AllCoreTables::getBriefName(AllCoreTables::getClassForTable($tableName));
-    if (!$entityName) {
-      $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
-      return $customGroup ? "Custom_$customGroup" : NULL;
+    // Real entities
+    if ($entityName) {
+      // Verify class exists
+      return self::getApiClass($entityName) ? $entityName : NULL;
     }
-    // Verify class exists
-    return self::getApiClass($entityName) ? $entityName : NULL;
+    // Multi-value custom group pseudo-entities
+    $customGroup = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $tableName, 'name', 'table_name');
+    return self::isCustomEntity($customGroup) ? "Custom_$customGroup" : NULL;
   }
 
   /**
@@ -135,6 +138,17 @@ class CoreUtil {
       ];
     }
     return NULL;
+  }
+
+  /**
+   * Checks if a custom group exists and is multivalued
+   *
+   * @param $customGroupName
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private static function isCustomEntity($customGroupName) {
+    return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
   }
 
 }
