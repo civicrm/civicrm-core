@@ -772,6 +772,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       'nickname' => $params['cms_name'],
       'role' => get_option('default_role'),
     ];
+
+    // If there's a password add it, otherwise generate one.
+    if (!empty($params['cms_pass'])) {
+      $user_data['user_pass'] = $params['cms_pass'];
+    }
+    else {
+      $user_data['user_pass'] = wp_generate_password(12, FALSE);;
+    }
+
+    // Assign WordPress User "name" field(s).
     if (isset($params['contactID'])) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($params['contactID']);
       if ($contactType == 'Individual') {
@@ -782,23 +792,54 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           $params['contactID'], 'last_name'
         );
       }
+      if ($contactType == 'Organization') {
+        $user_data['first_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $params['contactID'], 'organization_name'
+        );
+      }
+      if ($contactType == 'Household') {
+        $user_data['first_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
+          $params['contactID'], 'household_name'
+        );
+      }
     }
 
+    /**
+     * Broadcast that CiviCRM is about to create a WordPress User.
+     *
+     * @since 5.37
+     */
+    do_action('civicrm_pre_create_user');
+
+    // Remove the CiviCRM-WordPress listeners.
     $this->hooks_core_remove();
+
+    // Now go ahead and create a WordPress User.
     $uid = wp_insert_user($user_data);
 
-    $creds = [];
-    $creds['user_login'] = $params['cms_name'];
-    $creds['remember'] = TRUE;
-
-    // Call wp_signon if we aren't already logged in
-    // For example, we might be creating a new user from the Contact record.
+    /*
+     * Call wp_signon if we aren't already logged in.
+     * For example, we might be creating a new user from the Contact record.
+     */
     if (!current_user_can('create_users')) {
+      $creds = [];
+      $creds['user_login'] = $params['cms_name'];
+      $creds['remember'] = TRUE;
       wp_signon($creds, FALSE);
     }
 
+    // Fire the new user action. Sends notification email by default.
     do_action('register_new_user', $uid);
+
+    // Restore the CiviCRM-WordPress listeners.
     $this->hooks_core_add();
+
+    /**
+     * Broadcast that CiviCRM has creates a WordPress User.
+     *
+     * @since 5.37
+     */
+    do_action('civicrm_post_create_user');
 
     return $uid;
   }
