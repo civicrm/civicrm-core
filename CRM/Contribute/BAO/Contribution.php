@@ -4771,11 +4771,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'membership_activity_status' => 'Completed',
       ];
 
-      $currentMembership = CRM_Member_BAO_Membership::getContactMembership($membershipParams['contact_id'],
-        $membershipParams['membership_type_id'],
-        $membershipParams['is_test'],
-        $membershipParams['id']
-      );
+      $currentMembership = [];
+      CRM_Member_BAO_Membership::retrieve($membershipParams, $currentMembership);
 
       // CRM-8141 update the membership type with the value recorded in log when membership created/renewed
       // this picks up membership type changes during renewals
@@ -4793,7 +4790,8 @@ LIMIT 1;";
           $membershipParams['membership_type_id'] = $dao->membership_type_id;
         }
       }
-      if (empty($membership['end_date']) || (int) $membership['status_id'] !== CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
+      $pendingMembershipStatusID = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+      if (empty($membership['end_date']) || (int) $membership['status_id'] !== $pendingMembershipStatusID) {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
@@ -4811,7 +4809,16 @@ LIMIT 1;";
         'start_date',
         'end_date',
       ], NULL);
-      if ($currentMembership) {
+      if ($currentMembership && (int) $currentMembership['status_id'] === $pendingMembershipStatusID) {
+        $currentMembership['join_date'] = $currentMembership['join_date'] ?? NULL;
+        $currentMembership['start_date'] = $currentMembership['start_date'] ?? NULL;
+        $currentMembership['end_date'] = $currentMembership['end_date'] ?? NULL;
+
+        $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipParams['membership_type_id'],
+          $currentMembership['join_date'], $currentMembership['start_date'], $currentMembership['end_date']
+        );
+      }
+      else {
         /*
          * Fixed FOR CRM-4433
          * In BAO/Membership.php(renewMembership function), we skip the extend membership date and status
