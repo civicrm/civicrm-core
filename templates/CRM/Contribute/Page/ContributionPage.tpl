@@ -82,6 +82,7 @@
       </table>
 
         {/strip}
+        {include file="CRM/common/pager.tpl" location="bottom"}
       </div>
     {else}
   {if $isSearch eq 1}
