@@ -159,18 +159,24 @@ class CRM_Utils_Money {
   }
 
   /**
-   * Format money for display (just numeric part) according to the current locale.
+   * Format money (or number) for display (just numeric part) according to the current or supplied locale.
    *
-   * This calls the underlying system function but does not handle currency separators.
+   * Note this should not be used in conjunction with any calls to
+   * replaceCurrencySeparators as this function already does that.
    *
-   * It's not totally clear when it changes the $amount value but has historical usage.
-   *
-   * @param $amount
+   * @param string $amount
+   * @param string $locale
+   * @param string $currency
+   * @param int $numberOfPlaces
    *
    * @return string
+   * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  protected static function formatLocaleNumeric($amount) {
-    return self::formatNumericByFormat($amount);
+  protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
+    $money = Money::of($amount, $currency ?? CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
+    $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
+    $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
+    return $money->formatWith($formatter);
   }
 
   /**
