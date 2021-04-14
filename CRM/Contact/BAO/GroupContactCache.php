@@ -578,7 +578,7 @@ ORDER BY   gc.contact_id, g.children
   public static function invalidateGroupContactCache($groupID) {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_group
       SET cache_date = NULL
-      WHERE id = %1 AND saved_search_id IS NOT NULL", [
+      WHERE id = %1 AND (saved_search_id IS NOT NULL OR children IS NOT NULL)", [
         1 => [$groupID, 'Positive'],
       ]);
   }
