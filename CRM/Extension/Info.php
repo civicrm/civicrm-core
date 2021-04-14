@@ -156,7 +156,7 @@ class CRM_Extension_Info {
     // we want them in special format.
     foreach ($info as $attr => $val) {
       if (count($val->children()) == 0) {
-        $this->$attr = (string) $val;
+        $this->$attr = trim((string) $val);
       }
       elseif ($attr === 'urls') {
         $this->urls = [];
