@@ -1853,7 +1853,6 @@ LIKE %1
     return $newObject;
   }
 
-
   /**
    * Method that copies localizable fields from an old entity to a new one.
    *
@@ -1862,6 +1861,9 @@ LIKE %1
    *
    * @param int $entityID
    * @param int $newEntityID
+   * @param array $fieldsToPrefix
+   * @param array $fieldsToSuffix
+   * @param array $fieldsToReplace
    */
   protected function copyLocalizable($entityID, $newEntityID, $fieldsToPrefix, $fieldsToSuffix, $fieldsToReplace) {
     $entity = get_class($this);
@@ -1911,7 +1913,6 @@ LIKE %1
 
     }
   }
-
 
   /**
    * Method that copies custom fields values from an old entity to a new one.
