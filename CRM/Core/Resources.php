@@ -425,8 +425,8 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
     $config = CRM_Core_Config::singleton();
     $vars = [
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
-      'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
-      'otherSearch' => json_encode(ts('Enter search term...')),
+      'contactSearch' => json_encode($config->includeEmailInName ? ts('Search by name/email or id...') : ts('Search by name or id...')),
+      'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
       'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
