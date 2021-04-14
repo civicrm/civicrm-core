@@ -10,7 +10,7 @@
   <component>CiviGrant</component>
   <paths>
     <add>civicrm/grant/add?reset=1&amp;action=add&amp;context=standalone</add>
-    <view>contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
+    <view>civicrm/contact/view/grant?reset=1&amp;action=view&amp;id=[id]&amp;cid=[contact_id]</view>
     <update>civicrm/contact/view/grant?reset=1&amp;action=update&amp;id=[id]&amp;cid=[contact_id]</update>
     <delete>civicrm/contact/view/grant?reset=1&amp;action=delete&amp;id=[id]&amp;cid=[contact_id]</delete>
   </paths>
