@@ -54,7 +54,7 @@ $_authx_settings = function() {
         'class' => 'crm-select2',
       ],
       'default' => ['jwt'],
-      'title' => ts('Acceptable credentials (%s)'),
+      'title' => ts('Acceptable credentials (%1)', [1 => $flow]),
       'help_text' => NULL,
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getCredentialTypes'],
@@ -69,7 +69,7 @@ $_authx_settings = function() {
         'class' => 'crm-select2',
       ],
       'default' => 'optional',
-      'title' => ts('User account requirements (%s)'),
+      'title' => ts('User account requirements (%1)', [1 => $flow]),
       'help_text' => NULL,
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getUserModes'],
