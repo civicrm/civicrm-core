@@ -150,6 +150,8 @@ class Container {
       ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient')->setPublic(TRUE);
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
+    $container->setDefinition('configuration', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
+    $container->setDefinition('ipn', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
 
     $basicCaches = [
       'js_strings' => 'js_strings',

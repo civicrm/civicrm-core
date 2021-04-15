@@ -97,7 +97,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return TRUE;
     }
     catch (CRM_Core_Exception $e) {
-      Civi::log()->debug($e->getMessage());
+      Civi::log('ipn')->debug($e->getMessage());
       echo 'Invalid or missing data';
     }
   }

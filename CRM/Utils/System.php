@@ -1224,7 +1224,7 @@ class CRM_Utils_System {
       // ensure that SSL is enabled on a civicrm url (for cookie reasons etc)
       $url = "https://{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
       // @see https://lab.civicrm.org/dev/core/issues/425 if you're seeing this message.
-      Civi::log()->warning('CiviCRM thinks site is not SSL, redirecting to {url}', ['url' => $url]);
+      Civi::log('configuration')->warning('CiviCRM thinks site is not SSL, redirecting to {url}', ['url' => $url]);
       if (!self::checkURL($url, TRUE)) {
         if ($abort) {
           throw new CRM_Core_Exception('HTTPS is not set up on this machine');

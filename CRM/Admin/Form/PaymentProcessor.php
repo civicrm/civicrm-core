@@ -436,7 +436,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $errors = Civi\Payment\System::singleton()->checkProcessorConfig($processor);
     if ($errors) {
       CRM_Core_Session::setStatus($errors, 'Payment processor configuration invalid', 'error');
-      Civi::log()->error('Payment processor configuration invalid: ' . $errors);
+      Civi::log('configuration')->error('Payment processor configuration invalid: ' . $errors);
       CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
     }
     else {

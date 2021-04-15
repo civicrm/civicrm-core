@@ -84,8 +84,8 @@ class Civi {
   /**
    * @return \CRM_Core_Error_Log
    */
-  public static function log() {
-    return Civi\Core\Container::singleton()->get('psr_log');
+  public static function log($log = 'psr_log') {
+    return Civi\Core\Container::singleton()->get($log);
   }
 
   /**

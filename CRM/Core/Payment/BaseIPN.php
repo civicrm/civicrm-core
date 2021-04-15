@@ -204,7 +204,7 @@ class CRM_Core_Payment_BaseIPN {
       $this->cancelParticipant($participant->id);
     }
 
-    Civi::log()->debug("Setting contribution status to Failed");
+    Civi::log('ipn')->debug("Setting contribution status to Failed");
     return TRUE;
   }
 
@@ -221,7 +221,7 @@ class CRM_Core_Payment_BaseIPN {
   public function pending(&$objects, &$transaction) {
     CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->commit();
-    Civi::log()->debug('Returning since contribution status is Pending');
+    Civi::log('ipn')->debug('Returning since contribution status is Pending');
     echo 'Success: Returning since contribution status is pending<p>';
     return TRUE;
   }
@@ -289,7 +289,7 @@ class CRM_Core_Payment_BaseIPN {
       ])->addWhere('id', '=', $contribution->id)->execute();
     }
 
-    Civi::log()->debug("Setting contribution status to Cancelled");
+    Civi::log('ipn')->debug("Setting contribution status to Cancelled");
     return TRUE;
   }
 
@@ -306,7 +306,7 @@ class CRM_Core_Payment_BaseIPN {
   public function unhandled(&$objects, &$transaction) {
     CRM_Core_Error::deprecatedFunctionWarning('This function will be removed at some point');
     $transaction->rollback();
-    Civi::log()->debug('Returning since contribution status is not handled');
+    Civi::log('ipn')->debug('Returning since contribution status is not handled');
     echo 'Failure: contribution status is not handled<p>';
     return FALSE;
   }
