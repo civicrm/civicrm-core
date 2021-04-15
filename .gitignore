@@ -16,6 +16,7 @@
 !/ext/financialacls
 !/ext/contributioncancelactions
 !/ext/recaptcha
+!/ext/payflowpro
 backdrop/
 bower_components
 CRM/Case/xml/configuration
