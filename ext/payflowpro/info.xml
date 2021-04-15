@@ -16,6 +16,9 @@
   </urls>
   <releaseDate>2021-04-13</releaseDate>
   <version>1.0</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.0</ver>
