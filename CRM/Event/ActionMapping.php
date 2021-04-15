@@ -74,10 +74,10 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    */
   public function getDateFields() {
     return [
-      'start_date' => ts('Event Start Date'),
-      'end_date' => ts('Event End Date'),
-      'registration_start_date' => ts('Registration Start Date'),
-      'registration_end_date' => ts('Registration End Date'),
+      'start_date' => ts('Event Start'),
+      'end_date' => ts('Event End'),
+      'registration_start_date' => ts('Registration Start'),
+      'registration_end_date' => ts('Registration End'),
     ];
   }
 
