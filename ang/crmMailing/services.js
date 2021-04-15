@@ -127,7 +127,7 @@
       },
       // Call MailingGroup.get and merge results into "mailing"
       _loadGroups: function (mailing) {
-        return crmApi('MailingGroup', 'get', {mailing_id: mailing.id})
+        return crmApi('MailingGroup', 'get', {mailing_id: mailing.id, 'options': {'limit':0}})
           .then(function (groupResult) {
             mailing.recipients = {};
             mailing.recipients.groups = {include: [], exclude: [], base: []};
