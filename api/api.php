@@ -63,8 +63,8 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   $indexField = $index && is_string($index) && !CRM_Utils_Rule::integer($index) ? $index : NULL;
   $removeIndexField = FALSE;
 
-  // If index field is not part of the select query, we add it here and remove it below
-  if ($indexField && !empty($params['select']) && is_array($params['select']) && !\Civi\Api4\Utils\SelectUtil::isFieldSelected($indexField, $params['select'])) {
+  // If index field is not part of the select query, we add it here and remove it below (except for oddball "Setting" api)
+  if ($indexField && !empty($params['select']) && is_array($params['select']) && $entity !== 'Setting' && !\Civi\Api4\Utils\SelectUtil::isFieldSelected($indexField, $params['select'])) {
     $params['select'][] = $indexField;
     $removeIndexField = TRUE;
   }
@@ -73,7 +73,8 @@ function civicrm_api4(string $entity, string $action, array $params = [], $index
   if ($index && is_array($index)) {
     $indexCol = reset($index);
     $indexField = key($index);
-    if (property_exists($apiCall, 'select')) {
+    // Index array indicates only 1 or 2 fields need to be selected (except for oddball "Setting" api)
+    if ($entity !== 'Setting' && property_exists($apiCall, 'select')) {
       $apiCall->setSelect([$indexCol]);
       if ($indexField && $indexField != $indexCol) {
         $apiCall->addSelect($indexField);
