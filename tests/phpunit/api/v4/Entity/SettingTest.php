@@ -57,4 +57,25 @@ class SettingTest extends UnitTestCase {
     $this->assertTrue(is_array($settings[0]['value']));
   }
 
+  /**
+   * Ensure settings work with the "index" mode.
+   */
+  public function testSettingsWithIndexParam() {
+    $settings = civicrm_api4('Setting', 'get', [], ['name' => 'value']);
+    $stringValues = FALSE;
+    $arrayValues = FALSE;
+    // With indexing by [name => value], keys should be string and values should be string/array
+    foreach ($settings as $name => $value) {
+      $this->assertTrue(is_string($name) && !is_numeric($name));
+      if (is_string($value)) {
+        $stringValues = TRUE;
+      }
+      elseif (is_array($value)) {
+        $arrayValues = TRUE;
+      }
+    }
+    $this->assertTrue($stringValues);
+    $this->assertTrue($arrayValues);
+  }
+
 }
