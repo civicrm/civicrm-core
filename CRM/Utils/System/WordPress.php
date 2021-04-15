@@ -311,72 +311,63 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $config = CRM_Core_Config::singleton();
     $script = '';
     $separator = '&';
-    $wpPageParam = '';
     $fragment = isset($fragment) ? ('#' . $fragment) : '';
-
     $path = CRM_Utils_String::stripPathChars($path);
     $basepage = FALSE;
 
-    //this means wp function we are trying to use is not available,
-    //so load bootStrap
-    // FIXME: Why bootstrap in url()? Generally want to define 1-2 strategic places to put bootstrap
+    // FIXME: Why bootstrap in url()?
+    // Generally want to define 1-2 strategic places to put bootstrap.
     if (!function_exists('get_option')) {
       $this->loadBootStrap();
     }
 
+    // When on the front-end.
     if ($config->userFrameworkFrontend) {
+
+      // Try and find the "calling" page/post.
       global $post;
-      if (get_option('permalink_structure') != '') {
-        $script = $post ? get_permalink($post->ID) : "";
+      if ($post) {
+        $script = get_permalink($post->ID);
+        if ($config->wpBasePage == $post->post_name) {
+          $basepage = TRUE;
+        }
       }
-      if ($post && $config->wpBasePage == $post->post_name) {
+
+    }
+    else {
+
+      // Get the Base Page URL for building front-end URLs.
+      if ($frontend && !$forceBackend) {
+        $script = $this->getBasePageUrl();
         $basepage = TRUE;
       }
-      // when shortcode is included in page
-      // also make sure we have valid query object
-      // FIXME: $wpPageParam has no effect and is only set on the *basepage*
-      global $wp_query;
-      if (get_option('permalink_structure') == '' && method_exists($wp_query, 'get')) {
-        if (get_query_var('page_id')) {
-          $wpPageParam = "page_id=" . get_query_var('page_id');
-        }
-        elseif (get_query_var('p')) {
-          // when shortcode is inserted in post
-          $wpPageParam = "p=" . get_query_var('p');
-        }
-      }
+
     }
 
+    // Get either the relative Base Page URL or the relative Admin Page URL.
     $base = $this->getBaseUrl($absolute, $frontend, $forceBackend);
 
-    if (!isset($path) && !isset($query)) {
-      // FIXME: This short-circuited codepath is the same as the general one below, except
-      // in that it ignores "permlink_structure" /  $wpPageParam / $script . I don't know
-      // why it's different (and I can only find two obvious use-cases for this codepath,
-      // of which at least one looks gratuitous). A more ambitious person would simply remove
-      // this code.
-      return $base . $fragment;
-    }
-
-    if (!$forceBackend && get_option('permalink_structure') != '' && ($wpPageParam || $script != '')) {
+    // Overwrite base URL if we already have a front-end URL.
+    if (!$forceBackend && $script != '') {
       $base = $script;
     }
 
     $queryParts = [];
+    $admin_request = ((is_admin() && !$frontend) || $forceBackend);
 
     if (
-      // not using clean URLs
+      // If not using Clean URLs.
       !$config->cleanURL
-      // requesting an admin URL
-      || ((is_admin() && !$frontend) || $forceBackend)
-      // is shortcode
+      // Or requesting an admin URL.
+      || $admin_request
+      // Or this is a Shortcode.
       || (!$basepage && $script != '')
     ) {
 
-      // pre-existing logic
-      if (isset($path)) {
+      // Build URL according to pre-existing logic.
+      if (!empty($path)) {
         // Admin URLs still need "page=CiviCRM", front-end URLs do not.
-        if ((is_admin() && !$frontend) || $forceBackend) {
+        if ($admin_request) {
           $queryParts[] = 'page=CiviCRM';
         }
         else {
@@ -384,23 +375,26 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         }
         $queryParts[] = 'q=' . rawurlencode($path);
       }
-      if ($wpPageParam) {
-        $queryParts[] = $wpPageParam;
-      }
       if (!empty($query)) {
         $queryParts[] = $query;
       }
 
-      $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+      // Append our query parts, taking Permlink Structure into account.
+      if (get_option('permalink_structure') == '' && !$admin_request) {
+        $final = $base . $separator . implode($separator, $queryParts) . $fragment;
+      }
+      else {
+        $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+      }
 
     }
     else {
 
-      // clean URLs
-      if (isset($path)) {
+      // Build Clean URL.
+      if (!empty($path)) {
         $base = trailingslashit($base) . str_replace('civicrm/', '', $path) . '/';
       }
-      if (isset($query)) {
+      if (!empty($query)) {
         $query = ltrim($query, '=?&');
         $queryParts[] = $query;
       }
@@ -418,19 +412,18 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * 27-09-2016
-   * CRM-16421 CRM-17633 WIP Changes to support WP in it's own directory
-   * https://wiki.civicrm.org/confluence/display/CRM/WordPress+installed+in+its+own+directory+issues
-   * For now leave hard coded wp-admin references.
-   * TODO: remove wp-admin references and replace with admin_url() in the future.  Look at best way to get path to admin_url
+   * Get either the relative Base Page URL or the relative Admin Page URL.
    *
-   * @param $absolute
-   * @param $frontend
-   * @param $forceBackend
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link beginning with http(s).
+   * @param bool $frontend
+   *   True if this link should be to the CMS front end.
+   * @param bool $forceBackend
+   *   True if this link should be to the CMS back end.
    *
    * @return mixed|null|string
    */
-  private function getBaseUrl($absolute, $frontend, $forceBackend) {
+  public function getBaseUrl($absolute, $frontend, $forceBackend) {
     $config = CRM_Core_Config::singleton();
     if ((is_admin() && !$frontend) || $forceBackend) {
       return Civi::paths()->getUrl('[wp.backend]/.', $absolute ? 'absolute' : 'relative');
@@ -438,6 +431,111 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     else {
       return Civi::paths()->getUrl('[wp.frontend]/.', $absolute ? 'absolute' : 'relative');
     }
+  }
+
+  /**
+   * Get the URL of the WordPress Base Page.
+   *
+   * @return string|bool
+   *   The Base Page URL, or false on failure.
+   */
+  public function getBasePageUrl() {
+    static $basepage_url = '';
+    if ($basepage_url === '') {
+
+      // Get the Base Page config setting.
+      $config = CRM_Core_Config::singleton();
+      $basepage_slug = $config->wpBasePage;
+
+      // Did we get a value?
+      if (!empty($basepage_slug)) {
+
+        // Query for our Base Page.
+        $pages = get_posts([
+          'post_type' => 'page',
+          'name' => strtolower($basepage_slug),
+          'post_status' => 'publish',
+          'posts_per_page' => 1,
+        ]);
+
+        // Find the Base Page object and set the URL.
+        if (!empty($pages) && is_array($pages)) {
+          $basepage = array_pop($pages);
+          if ($basepage instanceof WP_Post) {
+            $basepage_url = get_permalink($basepage->ID);
+          }
+        }
+
+      }
+
+    }
+
+    return $basepage_url;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getNotifyUrl(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $frontend = FALSE,
+    $forceBackend = FALSE,
+    $htmlize = TRUE
+  ) {
+    $config = CRM_Core_Config::singleton();
+    $separator = '&';
+    $fragment = isset($fragment) ? ('#' . $fragment) : '';
+    $path = CRM_Utils_String::stripPathChars($path);
+    $queryParts = [];
+
+    // Get the Base Page URL.
+    $base = $this->getBasePageUrl();
+
+    // If not using Clean URLs.
+    if (!$config->cleanURL) {
+
+      // Build URL according to pre-existing logic.
+      if (!empty($path)) {
+        $queryParts[] = 'civiwp=CiviCRM';
+        $queryParts[] = 'q=' . rawurlencode($path);
+      }
+      if (!empty($query)) {
+        $queryParts[] = $query;
+      }
+
+      // Append our query parts, taking Permlink Structure into account.
+      if (get_option('permalink_structure') == '') {
+        $final = $base . $separator . implode($separator, $queryParts) . $fragment;
+      }
+      else {
+        $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+      }
+
+    }
+    else {
+
+      // Build Clean URL.
+      if (!empty($path)) {
+        $base = trailingslashit($base) . str_replace('civicrm/', '', $path) . '/';
+      }
+      if (!empty($query)) {
+        $query = ltrim($query, '=?&');
+        $queryParts[] = $query;
+      }
+
+      if (!empty($queryParts)) {
+        $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+      }
+      else {
+        $final = $base . $fragment;
+      }
+
+    }
+
+    return $final;
   }
 
   /**

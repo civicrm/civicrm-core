@@ -282,6 +282,43 @@ class CRM_Utils_System {
   }
 
   /**
+   * Return the Notification URL for Payments.
+   *
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param array|string $query
+   *   A query string to append to the link, or an array of key-value pairs.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with a
+   *   URI-scheme such as 'http:'). Useful for links that will be displayed
+   *   outside the site, such as in an RSS feed.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $htmlize
+   *   Whether to encode special html characters such as &.
+   * @param bool $frontend
+   *   This link should be to the CMS front end (applies to WP & Joomla).
+   * @param bool $forceBackend
+   *   This link should be to the CMS back end (applies to WP & Joomla).
+   *
+   * @return string
+   *   The Notification URL.
+   */
+  public static function getNotifyUrl(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $htmlize = TRUE,
+    $frontend = FALSE,
+    $forceBackend = FALSE
+  ) {
+    $config = CRM_Core_Config::singleton();
+    $query = self::makeQueryString($query);
+    return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
+  }
+
+  /**
    * Generates an extern url.
    *
    * @param string $path

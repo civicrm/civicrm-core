@@ -1275,7 +1275,7 @@ abstract class CRM_Core_Payment {
    *   URL to notify outcome of transaction.
    */
   protected function getNotifyUrl() {
-    $url = CRM_Utils_System::url(
+    $url = CRM_Utils_System::getNotifyUrl(
       'civicrm/payment/ipn/' . $this->_paymentProcessor['id'],
       [],
       TRUE,
