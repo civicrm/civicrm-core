@@ -129,6 +129,7 @@ class CRM_Upgrade_Incremental_php_FiveThirtySeven extends CRM_Upgrade_Incrementa
    */
   public static function updateDBDefaultsForContributionRecur(CRM_Queue_TaskContext $ctx): bool {
     $pendingID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Pending');
+    CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution_recur` SET `modified_date` = CURRENT_TIMESTAMP() WHERE `modified_date` IS NULL");
     CRM_Core_DAO::executeQuery("
       ALTER TABLE `civicrm_contribution_recur`
       MODIFY COLUMN `start_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'The date the first scheduled recurring contribution occurs.',
