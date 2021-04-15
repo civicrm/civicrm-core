@@ -1164,6 +1164,10 @@ abstract class CRM_Core_Payment {
    * @throws \CRM_Core_Exception
    */
   protected function getAmount($params = []) {
+    if (!CRM_Utils_Rule::numeric($params['amount'])) {
+      CRM_Core_Error::deprecatedWarning('Passing Amount value that is not numeric is deprecated please report this in gitlab');
+      return filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    }
     return $params['amount'];
   }
 
