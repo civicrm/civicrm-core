@@ -405,7 +405,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
 
         if ($allAccess || $showCreateLinks) {
           $actionMask |= CRM_Core_Action::UPDATE;
-          }
+        }
 
         // check for delete permission.
         if ($allowToDelete) {
