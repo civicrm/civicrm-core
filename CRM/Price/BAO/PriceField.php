@@ -433,13 +433,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
           if ($is_pay_later) {
             $qf->add('text', 'txt-' . $elementName, $label, ['size' => '4']);
           }
-
-          // CRM-6902 - Add "max" option for a price set field
-          if (in_array($opId, $freezeOptions)) {
-            self::freezeIfEnabled($choice[$opId], $customOption[$opId]);
-            // CRM-14696 - Improve display for sold out price set options
-            $choice[$opt['id']] = '<span class="sold-out-option">' . $opt['label'] . '&nbsp;(' . ts('Sold out') . ')</span>';
-          }
         }
         if (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') {
           $choice['-1'] = ts('No thank you');
@@ -467,6 +460,14 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
 
         $element = &$qf->addRadio($elementName, $label, $choice, [], NULL, FALSE, $choiceAttrs);
+        foreach ($element->getElements() as $radioElement) {
+          // CRM-6902 - Add "max" option for a price set field
+          if (in_array($radioElement->getValue(), $freezeOptions)) {
+            self::freezeIfEnabled($radioElement, $customOption[$radioElement->getValue()]);
+            // CRM-14696 - Improve display for sold out price set options
+            $radioElement->setText('<span class="sold-out-option">' . $radioElement->getText() . '&nbsp;(' . ts('Sold out') . ')</span>');
+          }
+        }
 
         // make contribution field required for quick config when membership block is enabled
         if (($field->name == 'membership_amount' || $field->name == 'contribution_amount')
