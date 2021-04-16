@@ -86,7 +86,12 @@ function civicrm_api3_order_create($params) {
       $entityParams = $lineItems['params'] ?? [];
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
         $item = reset($lineItems['line_item']);
-        $entity = str_replace('civicrm_', '', $item['entity_table']);
+        if (!empty($item['membership_type_id'])) {
+          $entity = 'membership';
+        }
+        else {
+          $entity = str_replace('civicrm_', '', $item['entity_table']);
+        }
       }
 
       if ($entityParams) {
@@ -158,6 +163,7 @@ function civicrm_api3_order_create($params) {
         $paymentParams += $entityParams;
       }
       elseif ($entity == 'membership') {
+        $contribution['values'][$contribution['id']]['membership_id'][] = $entityId;
         $paymentParams['isSkipLineItem'] = TRUE;
       }
       civicrm_api3($entity . '_payment', 'create', $paymentParams);
