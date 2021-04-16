@@ -143,7 +143,6 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
         if (!empty($fields["weight_$count"])) {
           $actualThreshold += $fields["weight_$count"];
         }
-        break;
       }
     }
     if (empty($fields['threshold'])) {
