@@ -483,7 +483,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     if ($priceSetDetails[$this->order->getPriceSetID()]['is_quick_config'] && isset($formValues['total_amount'])) {
       // Amount overrides only permitted on quick config.
       // Possibly Order object should enforce this...
-      $this->order->setOverrideTotalAmount($formValues['total_amount']);
+      $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
     }
     $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);
     return $formValues;
