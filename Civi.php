@@ -82,10 +82,16 @@ class Civi {
   }
 
   /**
-   * @return \CRM_Core_Error_Log
+   * Find or create a logger.
+   *
+   * @param string $channel
+   *   Symbolic name (or channel) of the intended log.
+   *   This should correlate to a service "log.{NAME}".
+   *
+   * @return \Psr\Log\LoggerInterface
    */
-  public static function log() {
-    return Civi\Core\Container::singleton()->get('psr_log');
+  public static function log($channel = 'default') {
+    return \Civi\Core\Container::singleton()->get('psr_log_manager')->getLog($channel);
   }
 
   /**
