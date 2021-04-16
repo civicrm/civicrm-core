@@ -338,14 +338,12 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $dummy_mail = new CRM_Mailing_BAO_Mailing();
       $mess = "body_text";
       $dummy_mail->$mess = $str;
+      $str = CRM_Core_BAO_MessageTemplate::renderMessageTemplate(['text' => $str, 'html' => '', 'subject' => ''], TRUE, CRM_Core_Session::getLoggedInContactID(), [])['text'];
       $tokens = $dummy_mail->getTokens();
 
       $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
-      $str = CRM_Utils_Token::replaceDomainTokens($str, $domain, NULL, $tokens['text']);
       $str = CRM_Utils_Token::replaceMailingTokens($str, $mailing, NULL, $tokens['text']);
-      $str = CRM_Utils_Token::replaceOrgTokens($str, $org);
       $str = CRM_Utils_Token::replaceActionTokens($str, $verp, $urls, NULL, $tokens['text']);
-      $str = CRM_Utils_Token::replaceContactTokens($str, $contact, NULL, $tokens['text']);
 
       $unmatched = CRM_Utils_Token::unmatchedTokens($str);
       $contentCheck = CRM_Utils_String::htmlToText($str);
