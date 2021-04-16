@@ -172,6 +172,9 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'permission',
         ],
         [
+          'name' => 'redirect',
+        ],
+        [
           'name' => 'layout',
           'data_type' => 'Array',
         ],

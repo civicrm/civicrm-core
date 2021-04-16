@@ -4,7 +4,7 @@
     bindings: {
       ctrl: '@'
     },
-    controller: function($scope, $routeParams, $timeout, crmApi4, crmStatus) {
+    controller: function($scope, $routeParams, $timeout, crmApi4, crmStatus, $window, $location) {
       var schema = {},
         data = {},
         ctrl = this;
@@ -54,6 +54,18 @@
 
       this.submit = function submit() {
         var submission = crmApi4('Afform', 'submit', {name: ctrl.getFormMeta().name, args: $routeParams, values: data});
+        var metaData = ctrl.getFormMeta();
+        if (metaData.redirect) {
+          submission.then(function() {
+            var url = metaData.redirect;
+            if (url.indexOf('civicrm/') === 0) {
+              url = CRM.url(url);
+            } else if (url.indexOf('/') === 0) {
+              url = $location.protocol() + '://' + $location.host() + url;
+            }
+            $window.location.href = url;
+          });
+        }
         return crmStatus({start: ts('Saving'), success: ts('Saved')}, submission);
       };
     }
