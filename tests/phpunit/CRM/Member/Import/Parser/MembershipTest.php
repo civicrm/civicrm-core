@@ -114,6 +114,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    *  Test Import.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testImport() {
     $this->individualCreate();
@@ -334,9 +335,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test importing to a custom field.
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
-  public function testImportCustomData() {
+  public function testImportCustomData(): void {
     $donaldDuckID = $this->individualCreate(['first_name' => 'Donald', 'last_name' => 'Duck']);
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Membership']);
     $membershipImporter = $this->createImportObject([

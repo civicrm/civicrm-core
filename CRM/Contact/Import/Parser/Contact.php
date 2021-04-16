@@ -8,6 +8,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Contact;
+
 require_once 'CRM/Utils/DeprecatedUtils.php';
 require_once 'api/v3/utils.php';
 
@@ -425,6 +428,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -640,16 +644,20 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     //now we create new contact in update/fill mode also.
     $contactID = NULL;
     if ($createNewContact || ($this->_retCode != CRM_Import_Parser::NO_MATCH && $this->_updateWithId)) {
-
-      //CRM-4430, don't carry if not submitted.
-      foreach (['prefix_id', 'suffix_id', 'gender_id'] as $name) {
-        if (!empty($formatted[$name])) {
-          $options = CRM_Contact_BAO_Contact::buildOptions($name, 'get');
-          if (!isset($options[$formatted[$name]])) {
-            $formatted[$name] = CRM_Utils_Array::key((string) $formatted[$name], $options);
-          }
+      // @todo - there are multiple places where formatting is done that need consolidation.
+      // This handles where the label has been passed in and it has gotten this far.
+      // probably a bunch of hard-coded stuff could be removed to rely on this.
+      $fields = Contact::getFields(FALSE)
+        ->addWhere('options', '=', TRUE)
+        ->setLoadOptions(TRUE)
+        ->execute()->indexBy('name');
+      foreach ($fields as $fieldName => $fieldSpec) {
+        if (!empty($formatted[$fieldName])
+          && empty($fieldSpec['options'][$formatted[$fieldName]])) {
+          $formatted[$fieldName] = array_search($formatted[$fieldName], $fieldSpec['options'], TRUE) ?? $formatted[$fieldName];
         }
       }
+      //CRM-4430, don't carry if not submitted.
       if ($this->_updateWithId && !empty($params['id'])) {
         $contactID = $params['id'];
       }
@@ -1607,8 +1615,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       }
     }
 
-    $contact = CRM_Contact_BAO_Contact::create($data);
-    $cid = $contact->id;
+    $contact = civicrm_api3('Contact', 'create', $data);
+    $cid = $contact['id'];
 
     CRM_Core_Config::setPermitCacheFlushMode(TRUE);
 
