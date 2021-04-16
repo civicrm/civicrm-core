@@ -232,6 +232,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.38.alpha1',
+        'upgrade_descriptor' => ts('Fix Petition Confirmation email having a blank space at the end of url'),
+        'templates' => [
+          ['name' => 'petition_confirmation_needed', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 
