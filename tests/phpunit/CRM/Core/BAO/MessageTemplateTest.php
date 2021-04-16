@@ -164,7 +164,15 @@ Default Domain Name
     $expected .= $this->getExpectedContactOutput($address['id'], $tokenData, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['text']);
-    $this->assertEquals(rtrim(str_replace("\n", ' ', $expected)), $messageContent['subject']);
+    $checksum_position = strpos($messageContent['subject'], 'cs=');
+    $this->assertTrue($checksum_position !== FALSE);
+    $fixedExpected = rtrim(str_replace("\n", ' ', $expected));
+    $this->assertEquals(substr($fixedExpected, 0, $checksum_position), substr($messageContent['subject'], 0, $checksum_position));
+    $returned_parts = explode('_', substr($messageContent['subject'], $checksum_position));
+    $expected_parts = explode('_', substr($fixedExpected, $checksum_position));
+    $this->assertEquals($expected_parts[0], $returned_parts[0]);
+    $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
+    $this->assertEquals($expected_parts[2], $returned_parts[2]);
   }
 
   /**
