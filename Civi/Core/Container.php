@@ -150,6 +150,9 @@ class Container {
       ->setFactory('CRM_Cxn_BAO_Cxn::createRegistrationClient')->setPublic(TRUE);
 
     $container->setDefinition('psr_log', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
+    $container->setDefinition('psr_log_manager', new Definition('Civi\Core\LogManager', []))->setPublic(TRUE);
+    // With the default log-manager, you may overload a channel by defining a service, e.g.
+    // $container->setDefinition('log.ipn', new Definition('CRM_Core_Error_Log', []))->setPublic(TRUE);
 
     $basicCaches = [
       'js_strings' => 'js_strings',
