@@ -677,6 +677,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('User Name is not set in the Administer &raquo; System Settings &raquo; Payment Processors.');
     }
+    if ($this->isPayPalType($this::PAYPAL_STANDARD)) {
+      if (empty($this->_paymentProcessor['url_site'])) {
+        $error[] = ts('Site URL is not set (eg. https://www.paypal.com/ - https://www.sandbox.paypal.com/)');
+      }
+    }
 
     if (!empty($error)) {
       return implode('<p>', $error);
