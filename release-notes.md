@@ -15,6 +15,25 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.36.1
+
+Released April 21, 2021
+
+- **[Synopsis](release-notes/5.36.1.md#synopsis)**
+- **[Security advisories](release-notes/5.36.1.md#security)**
+- **[Bugs resolved](release-notes/5.36.1.md#bugs)**
+- **[Credits](release-notes/5.36.1.md#credits)**
+- **[Feedback](release-notes/5.36.1.md#feedback)**
+
+## CiviCRM 5.35.2
+
+Released April 21, 2021
+
+- **[Synopsis](release-notes/5.35.2.md#synopsis)**
+- **[Security advisories](release-notes/5.35.2.md#security)**
+- **[Credits](release-notes/5.35.2.md#credits)**
+- **[Feedback](release-notes/5.35.2.md#feedback)**
+
 ## CiviCRM 5.36.0
 
 Released April 7, 2021
