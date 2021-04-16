@@ -23,7 +23,7 @@
     }
     query = query || '';
     var frag = path.split('?');
-    var url = tplURL[mode].replace("civicrm-placeholder-url-path", frag[0]);
+    var url = tplURL[mode].replace("civicrm/placeholder-url-path", frag[0]);
 
     if (!query) {
       url = url.replace(/[?&]civicrm-placeholder-url-query=1/, '');
