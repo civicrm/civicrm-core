@@ -64,21 +64,22 @@ class CRM_Extension_ClassLoader {
   public function register() {
     // In pre-installation environments, don't bother with caching.
     if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
-      return $this->buildClassLoader()->register();
+      $this->loader = $this->buildClassLoader();
+      return $this->loader->register();
     }
 
     $file = $this->getCacheFile();
     if (file_exists($file)) {
-      $loader = require $file;
+      $this->loader = require $file;
     }
     else {
-      $loader = $this->buildClassLoader();
-      $ser = serialize($loader);
+      $this->loader = $this->buildClassLoader();
+      $ser = serialize($this->loader);
       file_put_contents($file,
         sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
       );
     }
-    return $loader->register();
+    return $this->loader->register();
   }
 
   /**
@@ -94,22 +95,7 @@ class CRM_Extension_ClassLoader {
       if ($status !== CRM_Extension_Manager::STATUS_INSTALLED) {
         continue;
       }
-      $path = $this->mapper->keyToBasePath($key);
-      $info = $this->mapper->keyToInfo($key);
-      if (!empty($info->classloader)) {
-        foreach ($info->classloader as $mapping) {
-          switch ($mapping['type']) {
-            case 'psr0':
-              $loader->add($mapping['prefix'], CRM_Utils_File::addTrailingSlash($path . '/' . $mapping['path']));
-              break;
-
-            case 'psr4':
-              $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
-              break;
-          }
-          $result[] = $mapping;
-        }
-      }
+      self::loadExtension($loader, $this->mapper->keyToInfo($key), $this->mapper->keyToBasePath($key));
     }
 
     return $loader;
@@ -129,6 +115,47 @@ class CRM_Extension_ClassLoader {
       unlink($file);
     }
     $this->register();
+  }
+
+  /**
+   * Add a newly installed extension to the active classloader.
+   *
+   * NOTE: This is intended for use by CRM/Extension subsystem during installation.
+   *
+   * @param \CRM_Extension_Info $info
+   * @param string $path
+   */
+  public function installExtension(CRM_Extension_Info $info, string $path): void {
+    $file = $this->getCacheFile();
+    if (file_exists($file)) {
+      unlink($file);
+    }
+    if ($this->loader) {
+      self::loadExtension($this->loader, $info, $path);
+    }
+  }
+
+  /**
+   * Read the extension metadata configure a classloader.
+   *
+   * @param \Composer\Autoload\ClassLoader $loader
+   * @param \CRM_Extension_Info $info
+   * @param string $path
+   */
+  private static function loadExtension(\Composer\Autoload\ClassLoader $loader, CRM_Extension_Info $info, string $path): void {
+    if (!empty($info->classloader)) {
+      foreach ($info->classloader as $mapping) {
+        switch ($mapping['type']) {
+          case 'psr0':
+            $loader->add($mapping['prefix'], CRM_Utils_File::addTrailingSlash($path . '/' . $mapping['path']));
+            break;
+
+          case 'psr4':
+            $loader->addPsr4($mapping['prefix'], $path . '/' . $mapping['path']);
+            break;
+        }
+      }
+    }
   }
 
   /**
