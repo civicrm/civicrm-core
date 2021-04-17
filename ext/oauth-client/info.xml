@@ -18,15 +18,17 @@
   <version>1.0</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.33</ver>
+    <ver>5.38</ver>
   </compatibility>
   <requires>
     <ext version="~4.5">org.civicrm.afform</ext>
   </requires>
   <comments>This extension provides a framework for oauth support</comments>
   <classloader>
+    <psr0 prefix="CRM_" path="" />
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
+  <upgrader>CRM_OAuth_Upgrader</upgrader>
   <civix>
     <namespace>CRM/OAuth</namespace>
   </civix>
