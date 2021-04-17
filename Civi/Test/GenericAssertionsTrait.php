@@ -57,6 +57,10 @@ trait GenericAssertionsTrait {
    * @param string $message
    */
   public function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
+    if ($tolerance == 1 && is_int($expected) && is_int($actual)) {
+      //           ^^ loose equality is on purpose
+      throw new \CRM_Core_Exception('assertApproxEquals is a fractions-first thinking function and compares integers with a tolerance of 1 as if they are identical. You want a bigger number, such as 2, or 5.');
+    }
     $diff = abs($actual - $expected);
     if ($message === NULL) {
       $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] diff=[%.3f] tolerance=[%.3f]", $expected, $actual, $diff, $tolerance);
