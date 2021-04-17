@@ -259,10 +259,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'title' => ts('Continue Mailing'),
         ],
         CRM_Core_Action::UPDATE => [
-          'name' => ts('Re-Use'),
+          'name' => ts('Copy'),
           'url' => 'civicrm/mailing/send',
           'qs' => 'mid=%%mid%%&reset=1',
-          'title' => ts('Re-Send Mailing'),
+          'title' => ts('Copy Mailing'),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
