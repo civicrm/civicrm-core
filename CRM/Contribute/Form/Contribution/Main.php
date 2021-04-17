@@ -741,7 +741,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $unitVals = explode(CRM_Core_DAO::VALUE_SEPARATOR, $frUnits);
 
-
     // FIXME: Ideally we should freeze select box if there is only
     // one option but looks there is some problem /w QF freeze.
     //if ( count( $units ) == 1 ) {
@@ -764,7 +763,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
         $unit .= "(s)";
         $form->assign('frequency_unit', $unit);
-      } else {
+      }
+      else {
         $is_recur_label = ts('I want to contribute this amount every %1',
           [1 => $unit]
         );
