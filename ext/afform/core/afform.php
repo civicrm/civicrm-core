@@ -361,10 +361,15 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   }
 
   $moduleName = _afform_angular_module_name($params['name'], 'camel');
+  $formMetaData = (array) civicrm_api4('Afform', 'get', [
+    'checkPermissions' => FALSE,
+    'select' => ['redirect', 'name'],
+    'where' => [['name', '=', $params['name']]],
+  ], 0);
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => $moduleName,
-    'meta' => ['name' => $params['name']],
+    'meta' => $formMetaData,
     'templateUrl' => "~/$moduleName/$moduleName.aff.html",
   ]);
   $mimeType = 'text/javascript';
