@@ -145,14 +145,16 @@
         <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
           <div class="label">&nbsp;</div>
           <div class="content">
-            {$form.is_recur.html} {$form.is_recur.label} {ts}every{/ts}
+            {$form.is_recur.html} {$form.is_recur.label}
             {if $is_recur_interval}
               {$form.frequency_interval.html}
             {/if}
-            {if $one_frequency_unit}
-              {$frequency_unit}
-            {else}
-              {$form.frequency_unit.html}
+            {if !$all_text_recur}
+              {if $one_frequency_unit}
+                {$form.frequency_interval.label}
+              {else}
+                {$form.frequency_unit.html}
+              {/if}
             {/if}
             {if $is_recur_installments}
               <span id="recur_installments_num">
