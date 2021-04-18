@@ -1201,4 +1201,92 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertArrayHasKey($caseId, CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']));
   }
 
+  /**
+   * Test case activity url rewrites.
+   * See also CRM_Core_InvokeTest::testInvokeNonCaseActivity
+   *
+   * Note we don't test the `add` action because it makes no sense for cases
+   * without specifying case/client.
+   *
+   * @todo add variations where we already have the contact/caseid in url
+   * @todo add test where user doesn't have permissions.
+   * @dataProvider invokeActivityProvider
+   * @param array $input
+   * @param array $expected
+   */
+  public function testInvokeCaseActivity(array $input, array $expected) {
+    $loggedInUser = $this->createLoggedInUser();
+    $client_id = $this->individualCreate();
+    $caseObj = $this->createCase($client_id, $loggedInUser);
+    $case_id = $caseObj->id;
+
+    // get arbitrary first activity on case
+    $activity = $this->callAPISuccess('Activity', 'get', [
+      'sequential' => 1,
+      'case_id' => $case_id,
+    ])['values'][0];
+    $_GET['id'] = $_REQUEST['id'] = $activity['id'];
+
+    // set any other url params
+    $_GET['reset'] = $_REQUEST['reset'] = '1';
+    foreach ($input['url_params'] as $param => $value) {
+      $_GET[$param] = $_REQUEST[$param] = $value;
+    }
+
+    $item = CRM_Core_Invoke::getItem([$input['q']]);
+
+    // check the subset we care about
+    $this->assertEquals($expected['item'], array_intersect_key($item, $expected['item']));
+
+    // Check case and client got looked up automatically
+    $this->assertEquals($case_id, CRM_Utils_Request::retrieve('caseid', 'String'));
+    $this->assertEquals($client_id, CRM_Utils_Request::retrieve('cid', 'String'));
+  }
+
+  /**
+   * dataprovider for testInvokeCaseActivity
+   * @return array
+   */
+  public function invokeActivityProvider(): array {
+    // Default - it's slightly different for view action
+    $expectedItem = [
+      'path' => 'civicrm/case/activity',
+      'title' => 'Case Activity',
+      'page_callback' => 'CRM_Case_Form_Activity',
+    ];
+    return [
+      0 => [
+        'input' => [
+          'q' => 'civicrm/activity',
+          'url_params' => ['action' => 'view'],
+        ],
+        'expected' => [
+          'item' => [
+            'path' => 'civicrm/case/activity/view',
+            'title' => 'Activity View',
+            'page_callback' => 'CRM_Case_Form_ActivityView',
+          ],
+        ],
+      ],
+      1 => [
+        'input' => [
+          'q' => 'civicrm/activity',
+          'url_params' => ['action' => 'update'],
+        ],
+        'expected' => [
+          'item' => $expectedItem,
+        ],
+      ],
+      2 => [
+        'input' => [
+          'q' => 'civicrm/activity',
+          'url_params' => ['action' => 'delete'],
+        ],
+        'expected' => [
+          'item' => $expectedItem,
+        ],
+      ],
+    ];
+  }
+
 }

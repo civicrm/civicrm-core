@@ -148,6 +148,10 @@ class CRM_Core_Invoke {
       $item = CRM_Core_Menu::get($path);
     }
 
+    $ev = \Civi\Core\Event\GenericHookEvent::create(['path' => $path, 'item' => $item]);
+    \Civi::dispatcher()->dispatch('civi.invoke.rewrite', $ev);
+    $item = $ev->item;
+
     return $item;
   }
 

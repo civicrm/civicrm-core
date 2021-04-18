@@ -2857,4 +2857,106 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     ];
   }
 
+  /**
+   * Rewrite the url if it's a case activity or doesn't have all the ids.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public static function rewriteUrl(\Civi\Core\Event\GenericHookEvent $e) {
+    if ($e->path == 'civicrm/activity') {
+
+      $activity_id = CRM_Utils_Request::retrieve('id', 'Positive');
+      if (empty($activity_id)) {
+        // no point doing anything if this is a create action or it's missing
+        return;
+      }
+
+      // check if it's a case activity
+      $caseData = NULL;
+      if (CRM_Case_BAO_Case::enabled()) {
+        $caseData = \Civi\Api4\CaseActivity::get(TRUE)
+          ->addSelect('case_id', 'case_contact.contact_id')
+          ->setJoin([['CaseContact AS case_contact', 'INNER', NULL, ['case_id', '=', 'case_contact.case_id']]])
+          ->addWhere('activity_id', '=', $activity_id)
+          ->setLimit(1)
+          ->execute()->first();
+      }
+
+      if (empty($caseData)) {
+        // regular activity - look up source contact if not provided
+        self::rewriteNonCaseActivityUrl($activity_id);
+      }
+      else {
+        // case activity
+        self::rewriteCaseActivityUrl($activity_id, $caseData, $e);
+      }
+    }
+  }
+
+  /**
+   * Helper for rewriteUrl
+   * @param int $activity_id
+   */
+  private static function rewriteNonCaseActivityUrl(int $activity_id) {
+    $contact_id = CRM_Utils_Request::retrieve('cid', 'Positive');
+    // if we already have a contact id, then nothing to do
+    if (empty($contact_id)) {
+      $activityContactData = \Civi\Api4\ActivityContact::get(TRUE)
+        ->addSelect('contact_id')
+        ->addWhere('activity_id', '=', $activity_id)
+        ->addWhere('record_type_id:name', '=', 'Activity Source')
+        ->setLimit(1)
+        ->execute()->first();
+      $contact_id = $activityContactData['contact_id'] ?? NULL;
+      // If we got one, add it to the request. If we didn't just let it proceed as normal.
+      // @todo this part feels awkward - e.g. what the name of the url param for "the contact_id" is should maybe be specified somewhere
+      if (!empty($contact_id)) {
+        $_GET['cid'] = $_REQUEST['cid'] = $contact_id;
+      }
+    }
+  }
+
+  /**
+   * Helper for rewriteUrl
+   * @param int $activity_id
+   * @param array $caseData
+   *   int case_id
+   *   int case_contact.contact_id
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  private static function rewriteCaseActivityUrl(int $activity_id, array $caseData, \Civi\Core\Event\GenericHookEvent $e) {
+    // @todo this first part feels awkward - e.g. what the name of the url param for "the contact_id" is should maybe be specified somewhere
+
+    // If already have a contact id, don't replace it:
+    $contact_id = CRM_Utils_Request::retrieve('cid', 'Positive');
+    if (empty($contact_id)) {
+      $_GET['cid'] = $_REQUEST['cid'] = $caseData['case_contact.contact_id'];
+    }
+    // Ditto case id
+    $case_id = CRM_Utils_Request::retrieve('caseid', 'Positive');
+    if (empty($case_id)) {
+      $_GET['caseid'] = $_REQUEST['caseid'] = $caseData['case_id'];
+    }
+
+    // The rest depends on action.
+    // Note that the ADD action makes no sense for cases if you don't
+    // specify case/client. We wouldn't be here since it would just go to
+    // the regular activity add form unless you specified the case-y url
+    // in the first place.
+    $action = CRM_Utils_Request::retrieve('action', 'String');
+    switch ($action) {
+      case CRM_Core_Action::VIEW:
+        $e->item = CRM_Core_Menu::get('civicrm/case/activity/view');
+        // @todo see above - here it's aid, but for other actions it's id
+        $_GET['aid'] = $_REQUEST['aid'] = $activity_id;
+        unset($_GET['id']);
+        unset($_REQUEST['id']);
+        break;
+
+      default:
+        $e->item = CRM_Core_Menu::get('civicrm/case/activity');
+        break;
+    }
+  }
+
 }
