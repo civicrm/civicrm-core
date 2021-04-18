@@ -196,6 +196,7 @@ function _civicrm_api3_mailing_a_b_fill_winner($winner_id, $final_id) {
     'reply_id',
     'resubscribe_id',
     'unsubscribe_id',
+    'template_type',
   ];
   $f = CRM_Utils_SQL_Select::from('civicrm_mailing')
     ->where('id = #id', ['id' => $winner_id])
