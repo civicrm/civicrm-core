@@ -4040,7 +4040,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testMergeWithBlankLocationData($isReverse) {
+  public function testMergeWithBlankLocationData($isReverse): void {
     $this->createLoggedInUser();
     $this->ids['contact'][0] = $this->callAPISuccess('contact', 'create', $this->_params)['id'];
     $this->ids['contact'][1] = $this->callAPISuccess('contact', 'create', $this->_params)['id'];
