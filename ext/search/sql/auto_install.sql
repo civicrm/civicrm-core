@@ -64,6 +64,6 @@ CREATE TABLE `civicrm_search_display` (
   )
   
 ,          CONSTRAINT FK_civicrm_search_display_saved_search_id FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search`(`id`) ON DELETE CASCADE  
-)    ;
+) ROW_FORMAT=DYNAMIC    ;
 
  
