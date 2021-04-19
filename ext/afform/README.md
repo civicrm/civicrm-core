@@ -1,9 +1,4 @@
-# org.civicrm.afform (Early Proof of Concept)
-
-> You are looking at the `master` branch of a proof-of-concept module.  It
-> may change radically (without full curation of docs, etc).  For previous
-> iterations with more stable/cogent materials, check other branches (e.g.
-> `0.1`).
+# Form builder (afform)
 
 ![Screenshot](docs/sandbox/3-Free-Blocks-Parent.png)
 
@@ -15,19 +10,19 @@ in CiviCRM which:
 3. Allows developers (or administrators/tools) to embed these forms in other CiviCRM-AngularJS apps.
 4. Allows developers to apply change-sets via hook. (*WIP; pending upstream support*)
 
-This extension is a proof-of-concept.  It aims to demonstrate the core model/concept -- however, there are 
+This extension is a proof-of-concept.  It aims to demonstrate the core model/concept -- however, there are
 [known issues and additional components](docs/roadmap.md) to address, and some documentation will be easier to approach
 if you already have a basic understanding of CiviCRM API and AngularJS.  It is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v7.0+
-* CiviCRM v5.22+
+* PHP v7.2+
 
 <!--
 ## Installation (Web UI)
 
-This extension has not yet been published for installation via the web UI.
+This extension ships with core and when it matures will eventually
+be enabled by default on new installs and at some point required.
 
 ## Installation (CLI, Zip)
 
@@ -42,11 +37,10 @@ cv dl org.civicrm.afform@https://github.com/totten/afform/archive/master.zip
 
 ## Installation (CLI, Git)
 
-Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) repo for this extension and
+Sysadmins and developers may enable afform via the UI extensions page or
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://lab.civicrm.org/extensions/afform.git
 cv en afform
 ```
 
