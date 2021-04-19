@@ -8,6 +8,15 @@
             "is_active": 1,
             "is_reserved": 0,
             "weight": 1
-        }
+        },
+      {
+        "id": 2,
+        "name": "adult_day_care_referral",
+        "title": "Adult Day Care Referral",
+        "description": "Arranging adult day care for senior individuals",
+        "is_active": 1,
+        "is_reserved": 0,
+        "weight": 1
+      }
     ]
 }
