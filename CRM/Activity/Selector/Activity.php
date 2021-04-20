@@ -412,15 +412,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
       }
 
-      // CRM-3553
-      $accessMailingReport = FALSE;
-      if (!empty($row['mailingId'])) {
-        $accessMailingReport = TRUE;
-      }
-
       $actionLinks = $this->actionLinks(CRM_Utils_Array::value('activity_type_id', $row),
         CRM_Utils_Array::value('source_record_id', $row),
-        $accessMailingReport,
+        // CRM-3553
+        !empty($row['mailingId']),
         CRM_Utils_Array::value('activity_id', $row),
         $this->_key
       );

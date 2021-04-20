@@ -2620,10 +2620,6 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
 
         // build links
         $activity['links'] = '';
-        $accessMailingReport = FALSE;
-        if (!empty($values['mailingId'])) {
-          $accessMailingReport = TRUE;
-        }
 
         // Get action links.
 
@@ -2682,7 +2678,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           $actionLinks = CRM_Activity_Selector_Activity::actionLinks(
             CRM_Utils_Array::value('activity_type_id', $values),
             CRM_Utils_Array::value('source_record_id', $values),
-            $accessMailingReport,
+            !empty($values['mailingId']),
             CRM_Utils_Array::value('activity_id', $values)
           );
           $actionMask = array_sum(array_keys($actionLinks)) & $mask;
