@@ -753,7 +753,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $form->addRule('installments', ts('Number of installments must be a whole number.'), 'integer');
 
     $is_recur_label = ts('I want to contribute this amount every');
-    $unit_label = ts('Every');
 
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if (count($unitVals) == 1) {
