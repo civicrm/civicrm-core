@@ -245,7 +245,9 @@ class CRM_Core_ManagedEntities {
     $dao->module = $todo['module'];
     $dao->name = $todo['name'];
     $dao->entity_type = $todo['entity'];
-    $dao->entity_id = $result['id'];
+    // A fatal error will result if there is no valid id but if
+    // this is v4 api we might need to access it via ->first().
+    $dao->entity_id = $result['id'] ?? $result->first()['id'];
     $dao->cleanup = $todo['cleanup'] ?? NULL;
     $dao->save();
   }

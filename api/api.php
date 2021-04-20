@@ -16,7 +16,7 @@
  * @param array $params
  *   array to be passed to function
  *
- * @return array|int
+ * @return array|int|Civi\Api4\Generic\Result
  */
 function civicrm_api(string $entity, string $action, array $params) {
   return \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
