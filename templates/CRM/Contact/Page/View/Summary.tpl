@@ -21,6 +21,7 @@
   {if !$summaryPrint}
     <div class="crm-actions-ribbon">
       <ul id="actions">
+        {crmRegion name="contact-actions-ribbon"}
         {assign var='urlParams' value="reset=1"}
         {if $searchKey}
           {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
@@ -99,6 +100,7 @@
             {/crmButton}
           </li>
         {/if}
+        {/crmRegion}
       </ul>
       <div class="clear"></div>
     </div><!-- .crm-actions-ribbon -->
