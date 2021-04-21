@@ -67,6 +67,12 @@ class CRM_Extension_Mapper {
   protected $civicrmUrl;
 
   /**
+   * @var array
+   *   Array(string $extKey => CRM_Extension_Upgrader_Interface $upgrader)
+   */
+  protected $upgraders = [];
+
+  /**
    * @param CRM_Extension_Container_Interface $container
    * @param CRM_Utils_Cache_Interface $cache
    * @param null $cacheKey
@@ -553,6 +559,38 @@ class CRM_Extension_Mapper {
         3 => $remoteExtensionInfo->version,
       ]);
     }
+  }
+
+  /**
+   * @param string $key
+   *   Long name of the extension.
+   *   Ex: 'org.example.myext'
+   *
+   * @return \CRM_Extension_Upgrader_Interface
+   */
+  public function getUpgrader(string $key) {
+    if (!array_key_exists($key, $this->upgraders)) {
+      $this->upgraders[$key] = NULL;
+
+      try {
+        $info = $this->keyToInfo($key);
+      }
+      catch (CRM_Extension_Exception_ParseException $e) {
+        CRM_Core_Session::setStatus(ts('Parse error in extension: %1', [
+          1 => $e->getMessage(),
+        ]), '', 'error');
+        CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
+        return NULL;
+      }
+
+      if (!empty($info->upgrader)) {
+        $class = $info->upgrader;
+        $u = new $class();
+        $u->init(['key' => $key]);
+        $this->upgraders[$key] = $u;
+      }
+    }
+    return $this->upgraders[$key];
   }
 
 }

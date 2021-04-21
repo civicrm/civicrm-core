@@ -50,6 +50,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('test.foo', $info->key);
     $this->assertEquals('foo', $info->file);
     $this->assertEquals('zamboni', $info->typeInfo['extra']);
+    $this->assertEquals(NULL, $info->upgrader);
     $this->assertEquals([], $info->requires);
   }
 
@@ -59,6 +60,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
         <psr4 prefix=\"Civi\\\" path=\"Civi\"/>
         <psr0 prefix=\"CRM_\" path=\"\"/>
       </classloader>
+      <upgrader>CRM_Foo_Upgrader</upgrader>
       <requires><ext>org.civicrm.a</ext><ext>org.civicrm.b</ext></requires>
     </extension>
     ";
@@ -72,6 +74,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertEquals('CRM_', $info->classloader[1]['prefix']);
     $this->assertEquals('', $info->classloader[1]['path']);
     $this->assertEquals('psr0', $info->classloader[1]['type']);
+    $this->assertEquals('CRM_Foo_Upgrader', $info->upgrader);
     $this->assertEquals(['org.civicrm.a', 'org.civicrm.b'], $info->requires);
   }
 

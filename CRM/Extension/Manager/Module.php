@@ -60,6 +60,9 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
     if (function_exists($fnName)) {
       $fnName();
     }
+    if ($info->upgrader) {
+      $this->mapper->getUpgrader($info->key)->notify($hookName);
+    }
   }
 
   /**

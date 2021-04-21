@@ -66,6 +66,13 @@ class CRM_Extension_Info {
   public $maintainer = NULL;
 
   /**
+   * @var string|null
+   *  The name of a class which handles the install/upgrade lifecycle.
+   * @see \CRM_Extension_Upgrader_Interface
+   */
+  public $upgrader = NULL;
+
+  /**
    * Load extension info an XML file.
    *
    * @param $file
@@ -150,6 +157,7 @@ class CRM_Extension_Info {
     $this->type = (string) $info->attributes()->type;
     $this->file = (string) $info->file;
     $this->label = (string) $info->name;
+    $this->upgrader = (string) $info->upgrader;
 
     // Convert first level variables to CRM_Core_Extension properties
     // and deeper into arrays. An exception for URLS section, since
