@@ -29,7 +29,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    */
   public function onPreInstall(CRM_Extension_Info $info) {
-    CRM_Extension_System::singleton()->getClassLoader()->installExtension($info, dirname($this->mapper->keyToPath($info->key)));
+    $this->registerClassloader($info);
     $this->callHook($info, 'install');
     $this->callHook($info, 'enable');
   }
@@ -71,6 +71,7 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    * @return bool
    */
   public function onPreUninstall(CRM_Extension_Info $info) {
+    $this->registerClassloader($info);
     $this->callHook($info, 'uninstall');
     return TRUE;
   }
@@ -92,7 +93,24 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    */
   public function onPreEnable(CRM_Extension_Info $info) {
+    $this->registerClassloader($info);
     $this->callHook($info, 'enable');
+  }
+
+  /**
+   * @param CRM_Extension_Info $info
+   */
+  private function registerClassloader($info) {
+    try {
+      $extPath = dirname($this->mapper->keyToPath($info->key));
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      // This could happen if there was a dirty removal (i.e. deleting ext-code before uninstalling).
+      return;
+    }
+
+    $classloader = CRM_Extension_System::singleton()->getClassLoader();
+    $classloader->installExtension($info, $extPath);
   }
 
 }
