@@ -1,0 +1,11 @@
+<extension key='test.extension.manager.moduleupgtest' type='module'>
+  <file>moduleupgtest</file>
+  <name>test_extension_manager_moduleupgtest</name>
+  <tags>
+    <tag>mock</tag>
+  </tags>
+  <classloader>
+    <psr0 prefix="CRM_" path="" />
+  </classloader>
+  <upgrader>CRM_Moduleupgtest_Upgrader</upgrader>
+</extension>
