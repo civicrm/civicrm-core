@@ -136,11 +136,20 @@ class Admin {
       if (in_array('DAOEntity', $entity['type'], TRUE) && !in_array('EntityBridge', $entity['type'], TRUE)) {
         foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
           if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
-            // The original field will get title instead of label since it represents the id (title usually ends in ID but label does not)
-            $entity['fields'][$index]['label'] = $field['title'];
+            $isCustom = strpos($field['name'], '.');
+            // Custom fields: append "ID" to original field label
+            if ($isCustom) {
+              $entity['fields'][$index]['label'] .= ' ' . E::ts('Contact ID');
+            }
+            // DAO fields: use title instead of label since it represents the id (title usually ends in ID but label does not)
+            else {
+              $entity['fields'][$index]['label'] = $field['title'];
+            }
             // Add the label field from the other entity to this entity's list of fields
             $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
-            $newField['name'] = str_replace('_id', '', $field['name']) . '.' . $schema[$field['fk_entity']]['label_field'];
+            // Due to string manipulation in \Civi\Api4\Service\Schema\SchemaMapBuilder::addJoins()
+            $alias = $isCustom ? $field['name'] : str_replace('_id', '', $field['name']);
+            $newField['name'] = $alias . '.' . $schema[$field['fk_entity']]['label_field'];
             $newField['label'] = $field['label'] . ' ' . $newField['label'];
             array_splice($entity['fields'], $index, 0, [$newField]);
           }

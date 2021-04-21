@@ -105,7 +105,6 @@
             return new RegExp('^' + join.alias + '_\\d\\d').test(path);
           });
           if (!join) {
-            console.warn( 'Join ' + fullNameOrAlias + ' not found.');
             return;
           }
           path = path.replace(join.alias + '_', '');
@@ -138,28 +137,20 @@
         return result;
       }
       function getFieldAndJoin(fieldName, entityName) {
-        var dotSplit = fieldName.split('.'),
-          joinEntity = dotSplit.length > 1 ? dotSplit[0] : null,
-          name = _.last(dotSplit).split(':')[0],
+        var fieldPath = fieldName.split(':')[0],
+          dotSplit = fieldPath.split('.'),
+          name,
           join,
           field;
-        // Custom fields contain a dot in their fieldname
-        // If 3 segments, the first is the joinEntity and the last 2 are the custom field
-        if (dotSplit.length === 3) {
-          name = dotSplit[1] + '.' + name;
-        }
-        // If 2 segments, it's ambiguous whether this is a custom field or joined field. Search the main entity first.
-        if (dotSplit.length === 2) {
-          field = _.find(getEntity(entityName).fields, {name: dotSplit[0] + '.' + name});
-          if (field) {
-            field.baseEntity = entityName;
-            return {field: field};
+        // If 2 or more segments, the first might be the name of a join
+        if (dotSplit.length > 1) {
+          join = getJoin(dotSplit[0]);
+          if (join) {
+            dotSplit.shift();
+            entityName = join.entity;
           }
         }
-        if (joinEntity) {
-          join = getJoin(joinEntity);
-          entityName = getJoin(joinEntity).entity;
-        }
+        name = dotSplit.join('.');
         field = _.find(getEntity(entityName).fields, {name: name});
         if (!field && join && join.bridge) {
           field = _.find(getEntity(join.bridge).fields, {name: name});

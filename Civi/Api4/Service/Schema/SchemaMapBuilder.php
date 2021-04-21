@@ -91,6 +91,7 @@ class SchemaMapBuilder {
     if ($fkClass) {
       $tableName = AllCoreTables::getTableForClass($fkClass);
       $fkKey = $data['FKKeyColumn'] ?? 'id';
+      // Fixme: Clumsy string manipulation to transform e.g. "contact_id" to "contact" - we never should have done this
       $alias = str_replace('_id', '', $field);
       $joinable = new Joinable($tableName, $fkKey, $alias);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
@@ -154,7 +155,7 @@ class SchemaMapBuilder {
     }
     $fieldData = \CRM_Utils_SQL_Select::from('civicrm_custom_field f')
       ->join('custom_group', 'INNER JOIN civicrm_custom_group g ON g.id = f.custom_group_id')
-      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'label', 'column_name', 'option_group_id'])
+      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'f.data_type', 'label', 'column_name', 'option_group_id'])
       ->where('g.extends IN (@entity)', ['@entity' => $customInfo['extends']])
       ->where('g.is_active')
       ->where('f.is_active')
@@ -181,6 +182,11 @@ class SchemaMapBuilder {
       if (!empty($fieldData->is_multiple)) {
         $joinable = new Joinable($baseTable->getName(), $customInfo['column'], AllCoreTables::convertEntityNameToLower($entityName));
         $customTable->addTableLink('entity_id', $joinable);
+      }
+
+      if ($fieldData->data_type === 'ContactReference') {
+        $joinable = new Joinable('civicrm_contact', 'id', $fieldData->name);
+        $customTable->addTableLink($fieldData->column_name, $joinable);
       }
     }
 
