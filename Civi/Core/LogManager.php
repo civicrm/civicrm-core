@@ -39,6 +39,9 @@ class LogManager {
       $c = \Civi::container();
       $svc = "log." . $channel;
       $this->channels[$channel] = $c->has($svc) ? $c->get($svc) : $c->get(self::DEFAULT_LOGGER);
+      if ($channel !== 'default' && method_exists($this->channels[$channel], 'setChannel')) {
+        $this->channels[$channel]->setChannel($channel);
+      }
     }
     return $this->channels[$channel];
   }

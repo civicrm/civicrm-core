@@ -23,6 +23,26 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
   public $map;
 
   /**
+   * The logging channel - this is used as a prefix to distinguish the files.
+   *
+   * @var string
+   */
+  protected $channel;
+
+  /**
+   * Set a prefix for the log file.
+   *
+   * Note this is ignored if the characters are not alphanumeric or _ or -.
+   *
+   * @param string $channel
+   */
+  public function setChannel(string $channel): void {
+    if (CRM_Utils_Rule::alphanumeric($channel)) {
+      $this->channel = $channel;
+    }
+  }
+
+  /**
    * CRM_Core_Error_Log constructor.
    */
   public function __construct() {
@@ -54,7 +74,7 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
       }
       $message .= "\n" . print_r($context, 1);
     }
-    CRM_Core_Error::debug_log_message($message, FALSE, '', $this->map[$level]);
+    CRM_Core_Error::debug_log_message($message, FALSE, $this->channel, $this->map[$level]);
   }
 
 }
