@@ -101,7 +101,16 @@ class CRM_Extension_Manager_Module extends CRM_Extension_Manager_Base {
    * @param CRM_Extension_Info $info
    */
   private function registerClassloader($info) {
-    CRM_Extension_System::singleton()->getClassLoader()->installExtension($info, dirname($this->mapper->keyToPath($info->key)));
+    try {
+      $extPath = dirname($this->mapper->keyToPath($info->key));
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      // This could happen if there was a dirty removal (i.e. deleting ext-code before uninstalling).
+      return;
+    }
+
+    $classloader = CRM_Extension_System::singleton()->getClassLoader();
+    $classloader->installExtension($info, $extPath);
   }
 
 }
