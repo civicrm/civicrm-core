@@ -474,7 +474,7 @@ class CRM_Core_ManagedEntities {
       'params' => $params,
       'result' => $result,
     ]);
-    throw new Exception('API error: ' . $result['error_message']);
+    throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action);
   }
 
 }
