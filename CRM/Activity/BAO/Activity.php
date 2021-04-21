@@ -2628,8 +2628,6 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           // This activity belongs to a case.
           $caseId = current($values['case_id']);
 
-          $activity['subject'] = $values['subject'];
-
           // Get the view and edit (update) links:
           $caseActionLinks =
             $actionLinks = array_intersect_key(
@@ -2676,10 +2674,10 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         else {
           // Non-case activity
           $actionLinks = CRM_Activity_Selector_Activity::actionLinks(
-            CRM_Utils_Array::value('activity_type_id', $values),
-            CRM_Utils_Array::value('source_record_id', $values),
+            $values['activity_type_id'] ?? NULL,
+            $values['source_record_id'] ?? NULL,
             !empty($values['mailingId']),
-            CRM_Utils_Array::value('activity_id', $values)
+            $values['activity_id'] ?? NULL
           );
           $actionMask = array_sum(array_keys($actionLinks)) & $mask;
 
