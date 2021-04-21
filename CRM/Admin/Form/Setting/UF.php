@@ -45,7 +45,13 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     }
 
     // find out if drupal has its database prefixed
-    global $databases;
+    if ($this->_uf == 'Drupal8') {
+      $databases['default'] = Drupal\Core\Database\Database::getConnectionInfo('default');
+    }
+    else {
+      global $databases;
+    }
+
     $drupal_prefix = '';
     if (isset($databases['default']['default']['prefix'])) {
       if (is_array($databases['default']['default']['prefix'])) {
