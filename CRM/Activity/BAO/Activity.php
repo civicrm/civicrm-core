@@ -2499,7 +2499,6 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
       }
 
       $mask = CRM_Core_Action::mask($permissions);
-      $userID = CRM_Core_Session::getLoggedInContactID();
 
       foreach ($activities as $activityId => $values) {
         $activity = ['source_contact_name' => '', 'target_contact_name' => ''];
@@ -2618,84 +2617,24 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         $activity['activity_date_time'] = CRM_Utils_Date::customFormat($values['activity_date_time']);
         $activity['status_id'] = $activityStatus[$values['status_id']];
 
-        // build links
-        $activity['links'] = '';
-
         // Get action links.
-
-        // If this is a case activity, then we hand off to Case's actionLinks instead.
-        if (!empty($values['case_id']) && Civi::settings()->get('civicaseShowCaseActivities')) {
-          // This activity belongs to a case.
-          $caseId = current($values['case_id']);
-
-          // Get the view and edit (update) links:
-          $caseActionLinks =
-            $actionLinks = array_intersect_key(
-              CRM_Case_Selector_Search::actionLinks(),
-              array_fill_keys([CRM_Core_Action::VIEW, CRM_Core_Action::UPDATE], NULL));
-
-          // Create a Manage Case link (using ADVANCED as can't use two VIEW ones)
-          $actionLinks[CRM_Core_Action::ADVANCED] = [
-            "name"  => 'Manage Case',
-            "url"   => 'civicrm/contact/view/case',
-            'qs'    => 'reset=1&id=%%caseid%%&cid=%%cid%%&action=view&context=&selectedChild=case',
-            "title" => ts('Manage Case %1', [1 => $caseId]),
-            'class' => 'no-popup',
-          ];
-
-          $caseLinkValues = [
-            'aid'    => $activityId,
-            'caseid' => $caseId,
-            'cid'    => current(CRM_Case_BAO_Case::getCaseClients($caseId) ?? []),
-            // Unlike other 'context' params, this 'ctx' param is appended raw to the URL.
-            'cxt'    => '',
-          ];
-
-          $caseActivityPermissions = CRM_Core_Action::VIEW | CRM_Core_Action::ADVANCED;
-          // Allow Edit link if:
-          // 1. Activity type is NOT view-only type. CRM-5871
-          // 2. User has edit permission.
-          if (!isset($viewOnlyCaseActivityTypeIDs[$values['activity_type_id']])
-            && CRM_Case_BAO_Case::checkPermission($activityId, 'edit', $values['activity_type_id'], $userID)) {
-            // We're allowed to edit.
-            $caseActivityPermissions |= CRM_Core_Action::UPDATE;
-          }
-
-          $activity['links'] = CRM_Core_Action::formLink($actionLinks,
-            $caseActivityPermissions,
-            $caseLinkValues,
-            ts('more'),
-            FALSE,
-            'activity.tab.row',
-            'Activity',
-            $values['activity_id']
-          );
-        }
-        else {
-          // Non-case activity
-          $actionLinks = CRM_Activity_Selector_Activity::actionLinks(
-            $values['activity_type_id'] ?? NULL,
-            $values['source_record_id'] ?? NULL,
-            !empty($values['mailingId']),
-            $values['activity_id'] ?? NULL
-          );
-          $actionMask = array_sum(array_keys($actionLinks)) & $mask;
-
-          $activity['links'] = CRM_Core_Action::formLink($actionLinks,
-            $actionMask,
-            [
-              'id' => $values['activity_id'],
-              'cid' => $params['contact_id'],
-              'cxt' => $context,
-              'caseid' => NULL,
-            ],
-            ts('more'),
-            FALSE,
-            'activity.tab.row',
-            'Activity',
-            $values['activity_id']
-          );
-        }
+        //
+        // Note that $viewOnlyCaseActivityTypeIDs, while not a super-heavy
+        // calculation, makes some sense to calculate outside the loop above.
+        // We could recalculate it each time inside getActionLinks if we wanted
+        // to avoid passing it along. Or use caching inside getAcionLinks.
+        //   - Ditto $mask.
+        $activity['links'] = self::getActionLinks(
+          $values,
+          $activityId,
+          $params['contact_id'],
+          isset($viewOnlyCaseActivityTypeIDs[$values['activity_type_id']]),
+          $context,
+          $mask,
+          // I think this parameter should be ignored completely for the purpose
+          // of generating a link but am leaving it as-is for now.
+          (bool) Civi::settings()->get('civicaseShowCaseActivities')
+        );
 
         if ($values['is_recurring_activity']) {
           $activity['is_recurring_activity'] = CRM_Core_BAO_RecurringEntity::getPositionAndCount($values['activity_id'], 'civicrm_activity');
@@ -2711,6 +2650,109 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     $activitiesDT['recordsFiltered'] = $params['total'];
 
     return $activitiesDT;
+  }
+
+  /**
+   * Get the right links depending on the activity type and other factors.
+   * @param array $values
+   * @param int $activityId
+   * @param ?int $contactId
+   * @param bool $isViewOnly Is this a special type that shouldn't be edited
+   * @param ?string $context
+   * @param ?int $mask
+   * @param bool $dontBreakCaseActivities Originally this function was
+   *   part of another function that was only used on the contact's activity
+   *   tab and this parameter would only be false when you're not displaying
+   *   case activities anyway and so was effectively never used. And I'm not
+   *   sure why for the purposes of links you would ever want a case activity
+   *   to link to the regular form, so I think this can be removed, but am
+   *   leaving it as-is for now.
+   * @return string HTML string
+   */
+  public static function getActionLinks(
+    array $values,
+    int $activityId,
+    ?int $contactId,
+    bool $isViewOnly,
+    ?string $context,
+    ?int $mask,
+    bool $dontBreakCaseActivities = TRUE): string {
+
+    $linksToReturn = '';
+    // If this is a case activity, then we hand off to Case's actionLinks instead.
+    if (!empty($values['case_id']) && $dontBreakCaseActivities) {
+      // This activity belongs to a case.
+      $caseId = current($values['case_id']);
+
+      // Get the view and edit (update) links:
+      $caseActionLinks =
+        $actionLinks = array_intersect_key(
+          CRM_Case_Selector_Search::actionLinks(),
+          array_fill_keys([CRM_Core_Action::VIEW, CRM_Core_Action::UPDATE], NULL));
+
+      // Create a Manage Case link (using ADVANCED as can't use two VIEW ones)
+      $actionLinks[CRM_Core_Action::ADVANCED] = [
+        "name"  => 'Manage Case',
+        "url"   => 'civicrm/contact/view/case',
+        'qs'    => 'reset=1&id=%%caseid%%&cid=%%cid%%&action=view&context=&selectedChild=case',
+        "title" => ts('Manage Case %1', [1 => $caseId]),
+        'class' => 'no-popup',
+      ];
+
+      $caseLinkValues = [
+        'aid'    => $activityId,
+        'caseid' => $caseId,
+        'cid'    => current(CRM_Case_BAO_Case::getCaseClients($caseId) ?? []),
+        // Unlike other 'context' params, this 'ctx' param is appended raw to the URL.
+        'cxt'    => '',
+      ];
+
+      $caseActivityPermissions = CRM_Core_Action::VIEW | CRM_Core_Action::ADVANCED;
+      // Allow Edit link if:
+      // 1. Activity type is NOT view-only type. CRM-5871
+      // 2. User has edit permission.
+      if (!$isViewOnly
+        && CRM_Case_BAO_Case::checkPermission($activityId, 'edit', $values['activity_type_id'], CRM_Core_Session::getLoggedInContactID())) {
+        // We're allowed to edit.
+        $caseActivityPermissions |= CRM_Core_Action::UPDATE;
+      }
+
+      $linksToReturn = CRM_Core_Action::formLink($actionLinks,
+        $caseActivityPermissions,
+        $caseLinkValues,
+        ts('more'),
+        FALSE,
+        'activity.tab.row',
+        'Activity',
+        $values['activity_id']
+      );
+    }
+    else {
+      // Non-case activity
+      $actionLinks = CRM_Activity_Selector_Activity::actionLinks(
+        $values['activity_type_id'] ?? NULL,
+        $values['source_record_id'] ?? NULL,
+        !empty($values['mailingId']),
+        $values['activity_id'] ?? NULL
+      );
+      $actionMask = array_sum(array_keys($actionLinks)) & $mask;
+
+      $linksToReturn = CRM_Core_Action::formLink($actionLinks,
+        $actionMask,
+        [
+          'id' => $values['activity_id'],
+          'cid' => $contactId,
+          'cxt' => $context,
+          'caseid' => NULL,
+        ],
+        ts('more'),
+        FALSE,
+        'activity.tab.row',
+        'Activity',
+        $values['activity_id']
+      );
+    }
+    return $linksToReturn;
   }
 
   /**
