@@ -68,7 +68,7 @@
   <field>
     <name>data</name>
     <title>Queue item data</title>
-    <type>text</type>
+    <type>longtext</type>
     <comment>Serialized queue data</comment>
     <serialize>PHP</serialize>
   </field>
