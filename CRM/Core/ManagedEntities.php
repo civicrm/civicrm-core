@@ -237,7 +237,7 @@ class CRM_Core_ManagedEntities {
    */
   public function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
-    if ($result['is_error']) {
+    if (!empty($result['is_error'])) {
       $this->onApiError($todo['entity'], 'create', $todo['params'], $result);
     }
 
