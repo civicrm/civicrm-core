@@ -20,6 +20,7 @@
 namespace api\v4;
 
 use api\v4\Traits\TestDataLoaderTrait;
+use Civi\Api4\UFMatch;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -75,6 +76,28 @@ class UnitTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterf
   public function getRowCount($table_name) {
     $sql = "SELECT count(id) FROM $table_name";
     return (int) \CRM_Core_DAO::singleValueQuery($sql);
+  }
+
+  /**
+   * Emulate a logged in user since certain functions use that.
+   * value to store a record in the DB (like activity)
+   * @see https://issues.civicrm.org/jira/browse/CRM-8180
+   *
+   * @return int
+   *   Contact ID of the created user.
+   */
+  public function createLoggedInUser() {
+    $contactID = $this->createEntity(['type' => 'Individual'])['id'];
+    UFMatch::delete(FALSE)->addWhere('uf_id', '=', 6)->execute();
+    UFMatch::create(FALSE)->setValues([
+      'contact_id' => $contactID,
+      'uf_name' => 'superman',
+      'uf_id' => 6,
+    ])->execute();
+
+    $session = \CRM_Core_Session::singleton();
+    $session->set('userID', $contactID);
+    return $contactID;
   }
 
   /**

@@ -26,7 +26,7 @@ use Civi\Api4\CustomGroup;
 /**
  * @group headless
  */
-class CustomJoinTest extends BaseCustomValueTest {
+class CustomContactRefTest extends BaseCustomValueTest {
 
   public function testGetWithJoin() {
 
@@ -68,6 +68,40 @@ class CustomJoinTest extends BaseCustomValueTest {
 
     $this->assertEquals('Favorite', $contact['MyContactRef.FavPerson.first_name']);
     $this->assertEquals('Person', $contact['MyContactRef.FavPerson.last_name']);
+  }
+
+  public function testCurrentUser() {
+    $currentUser = $this->createLoggedInUser();
+
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('name', 'MyContactRef')
+      ->addValue('extends', 'Individual')
+      ->execute()
+      ->first();
+
+    CustomField::create(FALSE)
+      ->addValue('label', 'FavPerson')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Autocomplete-Select')
+      ->addValue('data_type', 'ContactReference')
+      ->execute();
+
+    $contactId = Contact::create(FALSE)
+      ->addValue('first_name', 'Mya')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->addValue('MyContactRef.FavPerson', 'user_contact_id')
+      ->execute()
+      ->first()['id'];
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addSelect('MyContactRef.FavPerson')
+      ->addWhere('id', '=', $contactId)
+      ->execute()
+      ->first();
+
+    $this->assertEquals($currentUser, $contact['MyContactRef.FavPerson']);
   }
 
 }

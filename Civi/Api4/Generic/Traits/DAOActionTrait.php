@@ -185,6 +185,14 @@ trait DAOActionTrait {
           formatCheckBoxField($value, 'custom_' . $field['id'], $this->getEntityName());
         }
 
+        if ($field['data_type'] === 'ContactReference' && !is_numeric($value)) {
+          require_once 'api/v3/utils.php';
+          $value = \_civicrm_api3_resolve_contactID($value);
+          if ('unknown-user' === $value) {
+            throw new \API_Exception("\"{$field['name']}\" \"{$value}\" cannot be resolved to a contact ID", 2002, ['error_field' => $field['name'], "type" => "integer"]);
+          }
+        }
+
         \CRM_Core_BAO_CustomField::formatCustomField(
           $field['id'],
           $customParams,
@@ -223,7 +231,7 @@ trait DAOActionTrait {
     if (!isset($info[$fieldName])) {
       $info = [];
       $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'custom_group.extends')
+        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group.extends')
         ->addWhere('custom_group.name', '=', $groupName)
         ->execute()->indexBy('name');
       foreach ($fields as $name => $field) {

@@ -13,7 +13,7 @@
 
     crmApi4(model.entity, 'getFields', {
       action: 'update',
-      select: ['name', 'label', 'description', 'data_type', 'serialize', 'options'],
+      select: ['name', 'label', 'description', 'data_type', 'serialize', 'options', 'fk_entity'],
       loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
       where: [["readonly", "=", false]],
     }).then(function(fields) {
