@@ -4852,6 +4852,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'suffix_id' => [
         'title' => ts('Contact Suffix'),
       ],
+      'source' => ['title' => ts('Contact Source')],
       'postal_greeting_display' => ['title' => ts('Postal Greeting')],
       'email_greeting_display' => ['title' => ts('Email Greeting')],
       'addressee_display' => ['title' => ts('Addressee')],
