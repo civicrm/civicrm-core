@@ -16,11 +16,11 @@
   CRM.config.resourceBase = {$config->userFrameworkResourceURL|@json_encode};
   {* packageseBase: The URL of `civicrm-packages` assets. Ends with "/". *}
   CRM.config.packagesBase = {capture assign=packagesBase}{crmResURL expr='[civicrm.packages]/'}{/capture}{$packagesBase|@json_encode};
-  CRM.config.lcMessages = {$config->lcMessages|@json_encode};
+  CRM.config.lcMessages = {$lcMessages|@json_encode};
   CRM.config.locale = {$locale|@json_encode};
   CRM.config.cid = {$cid|@json_encode};
-  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$config->dateInputFormat|@json_encode};
-  CRM.config.timeIs24Hr = {if $config->timeInputFormat eq 2}true{else}false{/if};
+  $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$dateInputFormat|@json_encode};
+  CRM.config.timeIs24Hr = {if $timeInputFormat eq 2}true{else}false{/if};
   CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode};
   CRM.config.allowAlertAutodismissal = {$allowAlertAutodismissal|@json_encode};
   CRM.config.resourceCacheCode = {$resourceCacheCode|@json_encode};
@@ -30,7 +30,7 @@
 
   // Initialize CRM.url and CRM.formatMoney
   CRM.url({ldelim}back: '{crmURL p="civicrm/placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm/placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
-  CRM.formatMoney('init', false, {$moneyFormat});
+  CRM.formatMoney('init', false, {$moneyFormat|@json_encode});
 
   // Localize select2
   $.fn.select2.defaults.formatNoMatches = "{ts escape='js'}None found.{/ts}";

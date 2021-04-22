@@ -420,22 +420,18 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
   /**
    * Create dynamic script for localizing js widgets.
    */
-  public static function outputLocalizationJS() {
-    CRM_Core_Page_AJAX::setJsHeaders();
-    $config = CRM_Core_Config::singleton();
-    $vars = [
-      'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
-      'contactSearch' => json_encode($config->includeEmailInName ? ts('Search by name/email or id...') : ts('Search by name or id...')),
+  public static function renderL10nJs(GenericHookEvent $e) {
+    if ($e->asset !== 'crm-l10n.js') {
+      return;
+    }
+    $e->mimeType = 'application/javascript';
+    $params = $e->params;
+    $params += [
+      'contactSearch' => json_encode($params['includeEmailInName'] ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),
       'entityRef' => self::getEntityRefMetadata(),
-      'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
-      'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
-      'resourceCacheCode' => self::singleton()->getCacheCode(),
-      'locale' => CRM_Core_I18n::getLocale(),
-      'cid' => (int) CRM_Core_Session::getLoggedInContactID(),
     ];
-    print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
-    CRM_Utils_System::civiExit();
+    $e->content = CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $params);
   }
 
   /**
