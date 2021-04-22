@@ -231,6 +231,8 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('test');
+
     $key = 'domain';
     if (
       !$knownTokens || empty($knownTokens[$key])
