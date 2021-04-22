@@ -12,7 +12,7 @@
 /ext/greenwich/dist
 /ext/greenwich/extern
 !/ext/oauth-client
-!/ext/search
+!/ext/search_kit
 !/ext/financialacls
 !/ext/contributioncancelactions
 !/ext/recaptcha

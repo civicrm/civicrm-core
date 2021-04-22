@@ -1,14 +1,14 @@
 <?php
 
-require_once 'search.civix.php';
+require_once 'search_kit.civix.php';
 
 /**
  * Implements hook_civicrm_config().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
-function search_civicrm_config(&$config) {
-  _search_civix_civicrm_config($config);
+function search_kit_civicrm_config(&$config) {
+  _search_kit_civix_civicrm_config($config);
   Civi::dispatcher()->addListener('hook_civicrm_alterAngular', ['\Civi\Search\AfformSearchMetadataInjector', 'preprocess'], 1000);
 }
 
@@ -17,8 +17,8 @@ function search_civicrm_config(&$config) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
  */
-function search_civicrm_xmlMenu(&$files) {
-  _search_civix_civicrm_xmlMenu($files);
+function search_kit_civicrm_xmlMenu(&$files) {
+  _search_kit_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -29,8 +29,8 @@ function search_civicrm_xmlMenu(&$files) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
  */
-function search_civicrm_managed(&$entities) {
-  _search_civix_civicrm_managed($entities);
+function search_kit_civicrm_managed(&$entities) {
+  _search_kit_civix_civicrm_managed($entities);
 }
 
 /**
@@ -43,8 +43,8 @@ function search_civicrm_managed(&$entities) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
-function search_civicrm_angularModules(&$angularModules) {
-  _search_civix_civicrm_angularModules($angularModules);
+function search_kit_civicrm_angularModules(&$angularModules) {
+  _search_kit_civix_civicrm_angularModules($angularModules);
 }
 
 /**
@@ -52,8 +52,8 @@ function search_civicrm_angularModules(&$angularModules) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
  */
-function search_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _search_civix_civicrm_alterSettingsFolders($metaDataFolders);
+function search_kit_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _search_kit_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**
@@ -63,21 +63,21 @@ function search_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
-function search_civicrm_entityTypes(&$entityTypes) {
-  _search_civix_civicrm_entityTypes($entityTypes);
+function search_kit_civicrm_entityTypes(&$entityTypes) {
+  _search_kit_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**
  * Implements hook_civicrm_themes().
  */
-function search_civicrm_themes(&$themes) {
-  _search_civix_civicrm_themes($themes);
+function search_kit_civicrm_themes(&$themes) {
+  _search_kit_civix_civicrm_themes($themes);
 }
 
 /**
  * Implements hook_civicrm_pre().
  */
-function search_civicrm_pre($op, $entity, $id, &$params) {
+function search_kit_civicrm_pre($op, $entity, $id, &$params) {
   // Supply default name/label when creating new SearchDisplay
   if ($entity === 'SearchDisplay' && $op === 'create') {
     if (empty($params['label'])) {
