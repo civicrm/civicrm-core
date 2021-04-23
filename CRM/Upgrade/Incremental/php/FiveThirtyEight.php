@@ -63,6 +63,8 @@ class CRM_Upgrade_Incremental_php_FiveThirtyEight extends CRM_Upgrade_Incrementa
   public function upgrade_5_38_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Enable Payflow Pro Payment Processor Extension', 'enablePayflowProExtension');
+    // Refresh extension cache due to renaming search_kit extension
+    CRM_Extension_System::singleton()->getManager()->refresh();
   }
 
   public static function enablePayflowProExtension(CRM_Queue_TaskContext $ctx) {

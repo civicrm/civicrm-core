@@ -15,7 +15,7 @@
  *
  * You should obtain a singleton of this class via
  *
- * $manager = CRM_Extension_Manager::singleton()->getManager();
+ * $manager = CRM_Extension_System::singleton()->getManager();
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<extension key="org.civicrm.search" type="module">
-  <file>search</file>
+<extension key="org.civicrm.search_kit" type="module">
+  <file>search_kit</file>
   <name>Search Kit</name>
   <description>Create searches for a wide variety of CiviCRM entities</description>
   <license>AGPL-3.0</license>
