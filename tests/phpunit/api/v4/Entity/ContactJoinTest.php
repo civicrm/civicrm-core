@@ -46,19 +46,35 @@ class ContactJoinTest extends UnitTestCase {
     return parent::setUpHeadless();
   }
 
-  public function testContactJoin() {
-
+  public function testContactJoinDeprecated() {
     $contact = $this->getReference('test_contact_1');
     $entitiesToTest = ['Address', 'OpenID', 'IM', 'Website', 'Email', 'Phone'];
 
     foreach ($entitiesToTest as $entity) {
       $results = civicrm_api4($entity, 'get', [
         'where' => [['contact_id', '=', $contact['id']]],
+        // Deprecated syntax (new syntax is `contact_id.*` not `contact.*`)
         'select' => ['contact.*_name', 'contact.id'],
       ]);
       foreach ($results as $result) {
         $this->assertEquals($contact['id'], $result['contact.id']);
         $this->assertEquals($contact['display_name'], $result['contact.display_name']);
+      }
+    }
+  }
+
+  public function testContactJoin() {
+    $contact = $this->getReference('test_contact_1');
+    $entitiesToTest = ['Address', 'OpenID', 'IM', 'Website', 'Email', 'Phone'];
+
+    foreach ($entitiesToTest as $entity) {
+      $results = civicrm_api4($entity, 'get', [
+        'where' => [['contact_id', '=', $contact['id']]],
+        'select' => ['contact_id.*_name', 'contact_id.id'],
+      ]);
+      foreach ($results as $result) {
+        $this->assertEquals($contact['id'], $result['contact_id.id']);
+        $this->assertEquals($contact['display_name'], $result['contact_id.display_name']);
       }
     }
   }
