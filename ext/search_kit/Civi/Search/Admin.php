@@ -87,7 +87,6 @@ class Admin {
       ->setChain([
         'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
       ])->execute();
-    $getFields = ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly'];
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
@@ -116,11 +115,15 @@ class Admin {
             'action' => $action,
           ];
         }
-        $entity['fields'] = (array) civicrm_api4($entity['name'], 'getFields', [
-          'select' => $getFields,
+        $getFields = civicrm_api4($entity['name'], 'getFields', [
+          'select' => ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly'],
           'where' => [['name', 'NOT IN', ['api_key', 'hash']]],
           'orderBy' => ['label'],
         ]);
+        foreach ($getFields as $field) {
+          $field['fieldName'] = $field['name'];
+          $entity['fields'][] = $field;
+        }
         $params = $entity['get'][0];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
@@ -131,13 +134,13 @@ class Admin {
       }
     }
     // Add in FK fields for implicit joins
-    // For example, add a `campaign.title` field to the Contribution entity
+    // For example, add a `campaign_id.title` field to the Contribution entity
     foreach ($schema as &$entity) {
       if (in_array('DAOEntity', $entity['type'], TRUE) && !in_array('EntityBridge', $entity['type'], TRUE)) {
         foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
           if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
             $isCustom = strpos($field['name'], '.');
-            // Custom fields: append "ID" to original field label
+            // Custom fields: append "Contact ID" to original field label
             if ($isCustom) {
               $entity['fields'][$index]['label'] .= ' ' . E::ts('Contact ID');
             }
@@ -147,9 +150,7 @@ class Admin {
             }
             // Add the label field from the other entity to this entity's list of fields
             $newField = \CRM_Utils_Array::findAll($schema[$field['fk_entity']]['fields'], ['name' => $schema[$field['fk_entity']]['label_field']])[0];
-            // Due to string manipulation in \Civi\Api4\Service\Schema\SchemaMapBuilder::addJoins()
-            $alias = $isCustom ? $field['name'] : str_replace('_id', '', $field['name']);
-            $newField['name'] = $alias . '.' . $schema[$field['fk_entity']]['label_field'];
+            $newField['name'] = $field['name'] . '.' . $schema[$field['fk_entity']]['label_field'];
             $newField['label'] = $field['label'] . ' ' . $newField['label'];
             array_splice($entity['fields'], $index, 0, [$newField]);
           }

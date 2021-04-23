@@ -113,36 +113,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         $apiParams['limit'] = $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         $apiParams['orderBy'] = $this->getOrderByFromSort();
-
-        // Select the ids of implicitly joined entities (helps with displaying links)
-        foreach ($apiParams['select'] as $fieldName) {
-          if (strstr($fieldName, '.') && !strstr($fieldName, ' AS ') && !strstr($fieldName, ':')) {
-            $idField = substr($fieldName, 0, strrpos($fieldName, '.')) . '_id';
-            $prefix = '';
-            $id = $idField;
-            if (strstr($id, '.')) {
-              [$prefix, $idField] = explode(',', $id);
-              $prefix .= '.';
-            }
-            if (!in_array($idField, $apiParams['select']) && !empty($this->getField($idField)['fk_entity']) && !$this->canAggregate($id, $prefix)) {
-              $apiParams['select'][] = $idField;
-            }
-          }
-        }
-        // Select the ids of explicitly joined entities (helps with displaying links)
-        foreach ($apiParams['join'] ?? [] as $join) {
-          $joinEntity = explode(' AS ', $join[0])[1];
-          $idField = $joinEntity . '.id';
-          if (!in_array($idField, $apiParams['select']) && !$this->canAggregate('id', $joinEntity . '.')) {
-            $apiParams['select'][] = $idField;
-          }
-        }
-        // Select value fields for in-place editing
-        foreach ($settings['columns'] ?? [] as $column) {
-          if (isset($column['editable']['value']) && !in_array($column['editable']['value'], $apiParams['select'])) {
-            $apiParams['select'][] = $column['editable']['value'];
-          }
-        }
+        $this->augmentSelectClause($apiParams);
     }
 
     $this->applyFilters();
@@ -377,6 +348,46 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $this->_afform;
+  }
+
+  /**
+   * Adds additional useful fields to the select clause
+   *
+   * @param array $apiParams
+   */
+  private function augmentSelectClause(&$apiParams): void {
+    $joinAliases = [];
+    // Select the ids of explicitly joined entities (helps with displaying links)
+    foreach ($apiParams['join'] ?? [] as $join) {
+      $joinAliases[] = $joinAlias = explode(' AS ', $join[0])[1];
+      $idFieldName = $joinAlias . '.id';
+      if (!in_array($idFieldName, $apiParams['select']) && !$this->canAggregate('id', $joinAlias . '.')) {
+        $apiParams['select'][] = $idFieldName;
+      }
+    }
+    // Select the ids of implicitly joined entities (helps with displaying links)
+    foreach ($apiParams['select'] as $fieldName) {
+      if (strstr($fieldName, '.') && !strstr($fieldName, ' AS ') && !strstr($fieldName, ':')) {
+        $idFieldName = $fieldNameWithoutPrefix = substr($fieldName, 0, strrpos($fieldName, '.'));
+        $idField = $this->getField($idFieldName);
+        $explicitJoin = '';
+        if (strstr($idFieldName, '.')) {
+          [$prefix, $fieldNameWithoutPrefix] = explode('.', $idFieldName, 2);
+          if (in_array($prefix, $joinAliases, TRUE)) {
+            $explicitJoin = $prefix . '.';
+          }
+        }
+        if (!in_array($idFieldName, $apiParams['select']) && !empty($idField['fk_entity']) && !$this->canAggregate($fieldNameWithoutPrefix, $explicitJoin)) {
+          $apiParams['select'][] = $idFieldName;
+        }
+      }
+    }
+    // Select value fields for in-place editing
+    foreach ($this->display['settings']['columns'] ?? [] as $column) {
+      if (isset($column['editable']['value']) && !in_array($column['editable']['value'], $apiParams['select'])) {
+        $apiParams['select'][] = $column['editable']['value'];
+      }
+    }
   }
 
 }

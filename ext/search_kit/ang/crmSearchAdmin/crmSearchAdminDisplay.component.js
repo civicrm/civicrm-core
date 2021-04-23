@@ -67,9 +67,11 @@
         },
       };
 
+      // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
-        containment: '.crm-search-admin-edit-columns-wrapper'
+        containment: '.crm-search-admin-edit-columns-wrapper',
+        cancel: 'input,textarea,button,select,option,a,label'
       };
 
       this.styles = CRM.crmSearchAdmin.styles;
@@ -137,8 +139,8 @@
         var info = searchMeta.parseExpr(col.key),
           value = col.key.split(':')[0];
         // If field is an implicit join, use the original fk field
-        if (info.field.entity !== info.field.baseEntity) {
-          value = value.substr(0, value.indexOf('.')) + '_id';
+        if (info.field.name !== info.field.fieldName) {
+          value = value.substr(0, value.lastIndexOf('.'));
           info = searchMeta.parseExpr(value);
         }
         col.editable = {
@@ -229,8 +231,8 @@
         _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
           if (!_.includes(fieldName, ' AS ')) {
             var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.entity !== info.field.baseEntity)) {
-              var idField = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
+            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
+              var idField = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.'));
               if (!ctrl.crmSearchAdmin.canAggregate(idField)) {
                 var joinEntity = searchMeta.getEntity(info.field.fk_entity || info.field.entity);
                 _.each((joinEntity || {}).paths, function(path) {
@@ -242,7 +244,7 @@
             }
           }
         });
-        return links;
+        return _.uniq(links, 'path');
       }
 
       this.pickIcon = function(model, key) {

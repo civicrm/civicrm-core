@@ -451,8 +451,8 @@
         _.each(params.select, function(fieldName) {
           if (_.includes(fieldName, '.') && !_.includes(fieldName, ' AS ')) {
             var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.entity !== info.field.baseEntity)) {
-              var idField = fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
+            if (info.field && !info.suffix && !info.fn && (info.field.name !== info.field.fieldName)) {
+              var idField = fieldName.substr(0, fieldName.lastIndexOf('.'));
               if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
                 params.select.push(idField);
               }
@@ -670,7 +670,7 @@
           return value;
         }
         // Output user-facing name/label fields as a link, if possible
-        if (info.field && _.last(info.field.name.split('.')) === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
+        if (info.field && info.field.fieldName === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
           var link = getEntityUrl(row, info);
           if (link) {
             return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
@@ -688,12 +688,13 @@
           // Replace tokens in the path (e.g. [id])
           var tokens = path.match(/\[\w*]/g) || [],
             prefix = info.prefix;
-          // For implicit join fields
-          if (info.field.name.split('.').length > 1) {
-            prefix += info.field.name.split('.')[0] + '_';
-          }
           var replacements = _.transform(tokens, function(replacements, token) {
-            var fieldName = prefix + token.slice(1, token.length - 1);
+            var fieldName = token.slice(1, token.length - 1);
+            // For implicit join fields
+            if (fieldName === 'id' && info.field.name !== info.field.fieldName) {
+              fieldName = info.field.name.substr(0, info.field.name.lastIndexOf('.'));
+            }
+            fieldName = prefix + fieldName;
             if (row[fieldName]) {
               replacements.push(row[fieldName]);
             }
