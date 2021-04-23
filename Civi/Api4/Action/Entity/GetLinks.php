@@ -40,7 +40,9 @@ class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
           'links' => [],
         ];
         foreach ($table->getTableLinks() as $link) {
-          $item['links'][] = $link->toArray();
+          if (!$link->isDeprecated()) {
+            $item['links'][] = $link->toArray();
+          }
         }
         $result[] = $item;
       }

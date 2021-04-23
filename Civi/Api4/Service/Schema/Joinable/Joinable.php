@@ -79,6 +79,11 @@ class Joinable {
   protected $entity;
 
   /**
+   * @var bool
+   */
+  protected $deprecated = FALSE;
+
+  /**
    * @param $targetTable
    * @param $targetColumn
    * @param string|null $alias
@@ -249,6 +254,23 @@ class Joinable {
   public function setJoinType($joinType) {
     $this->joinType = $joinType;
 
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isDeprecated() {
+    return $this->deprecated;
+  }
+
+  /**
+   * @param bool $deprecated
+   *
+   * @return $this
+   */
+  public function setDeprecated(bool $deprecated = TRUE) {
+    $this->deprecated = $deprecated;
     return $this;
   }
 
