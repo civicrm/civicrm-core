@@ -54,9 +54,18 @@
         ctrl.group.push({
           path: path,
           style: link && defaultStyles[link.action] || 'default',
-          text: link ? link.title : '',
+          text: link ? link.title : ts('Link'),
           icon: link && defaultIcons[link.action] || 'fa-external-link'
         });
+      };
+
+      this.onChangeLink = function(item, before, after) {
+        var beforeLink = before && ctrl.getLink(before),
+          beforeTitle = beforeLink ? beforeLink.title : ts('Link'),
+          afterLink = after && ctrl.getLink(after);
+        if (afterLink && (!item.text || beforeTitle === item.text)) {
+          item.text = afterLink.title;
+        }
       };
 
       this.$onInit = function() {

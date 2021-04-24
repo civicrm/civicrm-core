@@ -93,27 +93,12 @@ class Admin {
         // Add paths (but only RUD actions) with translated titles
         foreach ($entity['paths'] as $action => $path) {
           unset($entity['paths'][$action]);
-          switch ($action) {
-            case 'view':
-              $title = E::ts('View %1', [1 => $entity['title']]);
-              break;
-
-            case 'update':
-              $title = E::ts('Edit %1', [1 => $entity['title']]);
-              break;
-
-            case 'delete':
-              $title = E::ts('Delete %1', [1 => $entity['title']]);
-              break;
-
-            default:
-              continue 2;
+          if (in_array($action, ['view', 'update', 'delete'], TRUE)) {
+            $entity['paths'][] = [
+              'path' => $path,
+              'action' => $action,
+            ];
           }
-          $entity['paths'][] = [
-            'path' => $path,
-            'title' => $title,
-            'action' => $action,
-          ];
         }
         $getFields = civicrm_api4($entity['name'], 'getFields', [
           'select' => ['name', 'title', 'label', 'description', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly'],
