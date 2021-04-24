@@ -2,7 +2,7 @@
   "use strict";
 
   angular.module('crmSearchActions').controller('crmSearchActionDelete', function($scope, dialogService) {
-    var ts = $scope.ts = CRM.ts('org.civicrm.search'),
+    var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       model = $scope.model,
       ctrl = this;
 

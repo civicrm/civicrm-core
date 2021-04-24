@@ -50,7 +50,7 @@ $mgd = [
 
 try {
   $search = civicrm_api3('Extension', 'getsingle', [
-    'full_name' => "org.civicrm.search",
+    'full_name' => 'org.civicrm.search_kit',
   ]);
   if ($search['status'] === 'installed') {
     $mgd[] = [

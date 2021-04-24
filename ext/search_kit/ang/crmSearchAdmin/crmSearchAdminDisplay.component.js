@@ -33,7 +33,7 @@
       return html;
     },
     controller: function($scope, $timeout, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.preview = this.stale = false;

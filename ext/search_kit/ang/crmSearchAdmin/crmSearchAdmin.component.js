@@ -7,7 +7,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
     controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
