@@ -60,9 +60,12 @@
       };
 
       this.$onInit = function() {
+        var defaultLinks = _.filter(ctrl.links, function(link) {
+          return !link.join;
+        });
         if (!ctrl.group.length) {
-          if (ctrl.links.length) {
-            _.each(_.pluck(ctrl.links, 'path'), ctrl.addItem);
+          if (defaultLinks.length) {
+            _.each(_.pluck(defaultLinks, 'path'), ctrl.addItem);
           } else {
             ctrl.addItem('civicrm/');
           }

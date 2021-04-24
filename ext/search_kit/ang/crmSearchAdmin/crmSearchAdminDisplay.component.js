@@ -179,7 +179,7 @@
         if (column.link) {
           ctrl.onChangeLink(column, column.link.path, '');
         } else {
-          var defaultLink = ctrl.getLinks()[0];
+          var defaultLink = ctrl.getLinks(column.key)[0];
           column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
           ctrl.onChangeLink(column, null, column.link.path);
         }
@@ -200,11 +200,27 @@
         }
       };
 
-      this.getLinks = function() {
+      this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = buildLinks();
+          ctrl.links = {'*': buildLinks()};
         }
-        return ctrl.links;
+        if (!columnKey) {
+          return ctrl.links['*'];
+        }
+        var expr = ctrl.getExprFromSelect(columnKey),
+          info = searchMeta.parseExpr(expr),
+          joinEntity = '';
+        if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
+          joinEntity = info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
+        } else if (info.prefix) {
+          joinEntity = info.prefix.replace('.', '');
+        }
+        if (!ctrl.links[joinEntity]) {
+          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], function(link) {
+            return joinEntity === (link.join || '');
+          });
+        }
+        return ctrl.links[joinEntity];
       };
 
       // Build a list of all possible links to main entity or join entities
@@ -224,6 +240,7 @@
             if (entityCount[joinEntity.name] > 1) {
               link.title += ' ' + entityCount[joinEntity.name];
             }
+            link.join = joinName[1];
             links.push(link);
           });
         });
@@ -238,6 +255,7 @@
                 _.each((joinEntity || {}).paths, function(path) {
                   var link = _.cloneDeep(path);
                   link.path = link.path.replace(/\[id/g, '[' + idField);
+                  link.join = idField;
                   links.push(link);
                 });
               }
