@@ -10,7 +10,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminTokenSelect.html',
     controller: function ($scope, $element, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.initTokens = function() {

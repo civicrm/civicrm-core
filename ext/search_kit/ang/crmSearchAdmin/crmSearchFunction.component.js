@@ -8,7 +8,7 @@
     },
     templateUrl: '~/crmSearchAdmin/crmSearchFunction.html',
     controller: function($scope, formatForSelect2, searchMeta) {
-      var ts = $scope.ts = CRM.ts('org.civicrm.search'),
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
       this.$onInit = function() {
