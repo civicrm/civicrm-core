@@ -25,12 +25,14 @@
         <td class="label">{$form.entity.label}</td>
         <td>{$form.entity.html}</td>
     </tr>
-
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>OR</strong><br /></td>
+        <td>{$form.absolute_or_relative_date.html}</td>
     </tr>
-
+    <tr class="crm-scheduleReminder-form-block-when" id="absoluteDate">
+        <td class="right"></td>
+        <td colspan="3">{$form.absolute_date.html}</td>
+    </tr>
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
         <td class="right"></td>
         <td colspan="3">{$form.start_action_offset.html}&nbsp;&nbsp;&nbsp;{$form.start_action_unit.html}&nbsp;&nbsp;&nbsp;{$form.start_action_condition.html}&nbsp;&nbsp;&nbsp;{$form.start_action_date.html}</td>
@@ -129,6 +131,24 @@
     <div>
   </fieldset>
   {/if}
+
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    = "absolute_or_relative_date"
+    trigger_value       = 'absolute'
+    target_element_id   = "absoluteDate"
+    target_element_type = "table-row"
+    field_type          = "select"
+    invert              = 0
+}
+
+{include file="CRM/common/showHideByFieldValue.tpl"
+    trigger_field_id    = "absolute_or_relative_date"
+    trigger_value       = 'relative'
+    target_element_id   = "relativeDate"
+    target_element_type = "table-row"
+    field_type          = "select"
+    invert              = 0
+}
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    = "is_repeat"
