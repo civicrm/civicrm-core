@@ -294,7 +294,8 @@
 
         // skip this for test and live modes because financial type is set automatically
         cj("#financial_type_id").val(membershipType['financial_type_id']);
-        var term = cj('#num_terms').val();
+        // Get the number of terms from the form, default to 1 if no num_terms element.
+        var term = cj('#num_terms').val() || 1;
         var taxTerm = {/literal}{$taxTerm|@json_encode}{literal};
         var currency = {/literal}{$currency_symbol|@json_encode}{literal};
         var taxExclusiveAmount = membershipType['total_amount_numeric'] * term;
