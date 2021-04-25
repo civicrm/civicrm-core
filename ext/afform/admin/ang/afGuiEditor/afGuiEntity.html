@@ -56,5 +56,5 @@
 
 <fieldset ng-if="!$ctrl.entity.loading && $ctrl.editor.allowEntityConfig">
   <legend>{{:: ts('Options') }}</legend>
-  <div ng-include="::'~/afGuiEditor/entityConfig/' + $ctrl.entity.type + '.html'"></div>
+  <div ng-include=":: getAdminTpl()"></div>
 </fieldset>
