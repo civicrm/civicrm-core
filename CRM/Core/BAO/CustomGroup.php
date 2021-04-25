@@ -1355,8 +1355,13 @@ ORDER BY civicrm_custom_group.weight,
                 CRM_Utils_Array::formatArrayKeys($value);
                 $checkedValue = $value;
               }
+              // Serialized values from db
+              elseif ($value === '' || strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
+                $checkedValue = CRM_Utils_Array::explodePadded($value);
+              }
+              // Comma-separated values e.g. from a select2 widget during reload on form error
               else {
-                $checkedValue = explode(CRM_Core_DAO::VALUE_SEPARATOR, substr($value, 1, -1));
+                $checkedValue = explode(',', $value);
               }
               foreach ($checkedValue as $val) {
                 if ($val) {
