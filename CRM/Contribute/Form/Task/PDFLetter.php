@@ -159,4 +159,145 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     return $tokens;
   }
 
+  /**
+   * Generate the contribution array from the form, we fill in the contact details and determine any aggregation
+   * around contact_id of contribution_recur_id
+   *
+   * @param string $groupBy
+   * @param array $contributionIDs
+   * @param array $returnProperties
+   * @param bool $skipOnHold
+   * @param bool $skipDeceased
+   * @param array $messageToken
+   * @param string $task
+   * @param string $separator
+   * @param bool $isIncludeSoftCredits
+   *
+   * @return array
+   */
+  public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
+    $contributions = $contacts = [];
+    foreach ($contributionIDs as $item => $contributionId) {
+      $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
+      $contribution['campaign'] = $contribution['contribution_campaign_title'] ?? NULL;
+      $contributions[$contributionId] = $contribution;
+
+      if ($isIncludeSoftCredits) {
+        //@todo find out why this happens & add comments
+        [$contactID] = explode('-', $item);
+        $contactID = (int) $contactID;
+      }
+      else {
+        $contactID = $contribution['contact_id'];
+      }
+      if (!isset($contacts[$contactID])) {
+        $contacts[$contactID] = [];
+        $contacts[$contactID]['contact_aggregate'] = 0;
+        $contacts[$contactID]['combined'] = $contacts[$contactID]['contribution_ids'] = [];
+      }
+
+      $contacts[$contactID]['contact_aggregate'] += $contribution['total_amount'];
+      $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
+
+      $contacts[$contactID]['contribution_ids'][$groupBy][$groupByID][$contributionId] = TRUE;
+      if (!isset($contacts[$contactID]['combined'][$groupBy]) || !isset($contacts[$contactID]['combined'][$groupBy][$groupByID])) {
+        $contacts[$contactID]['combined'][$groupBy][$groupByID] = $contribution;
+        $contacts[$contactID]['aggregates'][$groupBy][$groupByID] = $contribution['total_amount'];
+      }
+      else {
+        $contacts[$contactID]['combined'][$groupBy][$groupByID] = self::combineContributions($contacts[$contactID]['combined'][$groupBy][$groupByID], $contribution, $separator);
+        $contacts[$contactID]['aggregates'][$groupBy][$groupByID] += $contribution['total_amount'];
+      }
+    }
+    // Assign the available contributions before calling tokens so hooks parsing smarty can access it.
+    // Note that in core code you can only use smarty here if enable if for the whole site, incl
+    // CiviMail, with a big performance impact.
+    // Hooks allow more nuanced smarty usage here.
+    CRM_Core_Smarty::singleton()->assign('contributions', $contributions);
+    foreach ($contacts as $contactID => $contact) {
+      [$tokenResolvedContacts] = CRM_Utils_Token::getTokenDetails(['contact_id' => $contactID],
+        $returnProperties,
+        $skipOnHold,
+        $skipDeceased,
+        NULL,
+        $messageToken,
+        $task
+      );
+      $contacts[$contactID] = array_merge($tokenResolvedContacts[$contactID], $contact);
+    }
+    return [$contributions, $contacts];
+  }
+
+  /**
+   * We combine the contributions by adding the contribution to each field with the separator in
+   * between the existing value and the new one. We put the separator there even if empty so it is clear what the
+   * value for previous contributions was
+   *
+   * @param array $existing
+   * @param array $contribution
+   * @param string $separator
+   *
+   * @return array
+   */
+  public static function combineContributions($existing, $contribution, $separator) {
+    foreach ($contribution as $field => $value) {
+      $existing[$field] = isset($existing[$field]) ? $existing[$field] . $separator : '';
+      $existing[$field] .= $value;
+    }
+    return $existing;
+  }
+
+  /**
+   * We are going to retrieve the combined contribution and if smarty mail is enabled we
+   * will also assign an array of contributions for this contact to the smarty template
+   *
+   * @param array $contact
+   * @param array $contributions
+   * @param $groupBy
+   * @param int $groupByID
+   */
+  public static function assignCombinedContributionValues($contact, $contributions, $groupBy, $groupByID) {
+    CRM_Core_Smarty::singleton()->assign('contact_aggregate', $contact['contact_aggregate']);
+    CRM_Core_Smarty::singleton()
+      ->assign('contributions', $contributions);
+    CRM_Core_Smarty::singleton()->assign('contribution_aggregate', $contact['aggregates'][$groupBy][$groupByID]);
+  }
+
+  /**
+   * @param $contact
+   * @param $formValues
+   * @param $contribution
+   * @param $groupBy
+   * @param $contributions
+   * @param $realSeparator
+   * @param $tableSeparators
+   * @param $messageToken
+   * @param $html_message
+   * @param $separator
+   * @param $categories
+   * @param bool $grouped
+   * @param int $groupByID
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function generateHtml(&$contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
+    static $validated = FALSE;
+    $html = NULL;
+
+    $groupedContributions = array_intersect_key($contributions, $contact['contribution_ids'][$groupBy][$groupByID]);
+    CRM_Contribute_Form_Task_PDFLetter::assignCombinedContributionValues($contact, $groupedContributions, $groupBy, $groupByID);
+
+    if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
+      if (!$validated && in_array($realSeparator, $tableSeparators) && !CRM_Contribute_Form_Task_PDFLetterCommon::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
+        $realSeparator = ', ';
+        CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
+      }
+      $validated = TRUE;
+      $html = str_replace($separator, $realSeparator, CRM_Contribute_Form_Task_PDFLetterCommon::resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator, $groupedContributions));
+    }
+
+    return $html;
+  }
+
 }
