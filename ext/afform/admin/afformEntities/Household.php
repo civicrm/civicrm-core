@@ -13,4 +13,5 @@ return [
   'boilerplate' => [
     ['#tag' => 'afblock-name-household'],
   ],
+  'admin_tpl' => '~/afGuiEditor/entityConfig/Contact.html',
 ];

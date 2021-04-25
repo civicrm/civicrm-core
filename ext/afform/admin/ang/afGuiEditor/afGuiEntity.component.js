@@ -26,6 +26,10 @@
         return afGui.meta.entities[getEntityType()];
       };
 
+      $scope.getAdminTpl = function() {
+        return $scope.getMeta().admin_tpl || '~/afGuiEditor/entityConfig/Generic.html';
+      };
+
       $scope.getField = afGui.getField;
 
       $scope.valuesFields = function() {
