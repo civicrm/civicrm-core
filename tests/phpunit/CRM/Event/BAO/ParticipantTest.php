@@ -516,6 +516,15 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
+    // Update from back office even when self-service is disabled
+    $scenarios[] = [
+      'selfSvcEnabled' => 0,
+      'selfSvcHours' => 12,
+      'hoursToEvent' => 16,
+      'participantStatusId' => 1,
+      'isBackOffice' => TRUE,
+      'successExpected' => TRUE,
+    ];
     return $scenarios;
   }
 
