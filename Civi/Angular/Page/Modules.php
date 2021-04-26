@@ -85,7 +85,11 @@ class Modules extends \CRM_Core_Page {
       case 'angular-modules.js':
         $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/javascript';
-        $event->content = $page->digestJs($angular->getResources($moduleNames, 'js', 'path'));
+        $files = array_merge(
+          [\Civi::resources()->getPath('civicrm', 'ang/resetLocationProviderHashPrefix.js')],
+          $angular->getResources($moduleNames, 'js', 'path')
+        );
+        $event->content = $page->digestJs($files);
         break;
 
       case 'angular-modules.css':
