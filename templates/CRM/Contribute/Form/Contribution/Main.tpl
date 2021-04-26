@@ -50,12 +50,6 @@
     {include file="CRM/Contribute/Form/Contribution/PreviewHeader.tpl"}
   {/if}
 
-  {if $displayCaptchaWarning}
-    <div class="messages status no-popup">
-      {ts}To display reCAPTCHA on form you must get an API key from<br /> <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>{/ts}
-    </div>
-  {/if}
-
   {if call_user_func(array('CRM_Core_Permission','check'), 'administer CiviCRM') }
     {capture assign="buttonTitle"}{ts}Configure Contribution Page{/ts}{/capture}
     {crmButton target="_blank" p="civicrm/admin/contribute/settings" q="reset=1&action=update&id=`$contributionPageID`" fb=1 title="$buttonTitle" icon="fa-wrench"}{ts}Configure{/ts}{/crmButton}

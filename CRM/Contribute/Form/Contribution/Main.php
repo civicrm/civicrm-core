@@ -294,9 +294,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       if (!$this->_userID) {
         CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
       }
-      else {
-        $this->displayCaptchaWarning();
-      }
     }
 
     // Build payment processor form
