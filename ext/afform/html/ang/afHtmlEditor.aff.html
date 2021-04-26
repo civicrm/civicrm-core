@@ -64,6 +64,22 @@
         </div>
 
         <div class="clearfix"></div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">{{ts('Submit Actions')}}</div>
+          <div class="panel-body">
+            <ng-form name="submitActions">
+              <div class="form-group" ng-class="{'has-error': !!submitActions.redirect.$error.pattern}">
+                <label class="control-label" for="af_config_redirect">{{ ts('Post-Submit Page') }}</label>
+                <input ng-model="resultForm.redirect" name="redirect" class="form-control" id="af_result_from_redirect" title="{{ ts('Post-Submit Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{ ts('Post-Submit Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}"/>
+                <p class="help-block">{{ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
+              </div>
+            </ng-form>
+          </div>
+        </div>
+
+        <div class="clearfix"></div>
+
       </div>
 
       <div class="col-sm-12 col-md-8">
