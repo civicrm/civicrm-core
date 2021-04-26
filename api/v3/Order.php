@@ -239,6 +239,11 @@ function _civicrm_api3_order_create_spec(&$params) {
     'name' => 'total_amount',
     'title' => 'Total Amount',
   ];
+  $params['skipCleanMoney'] = [
+    'api.default' => TRUE,
+    'title' => 'Do not attempt to convert money values',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
   $params['financial_type_id'] = [
     'name' => 'financial_type_id',
     'title' => 'Financial Type',
