@@ -4147,6 +4147,32 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging a contact that is the target of a contact reference field on another contact.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testMergeMultiContactReferenceCustomFieldTarget() {
+    $this->createCustomGroupWithFieldOfType([], 'contact_reference', NULL, ['serialize' => 1]);
+    $fieldName = $this->getCustomFieldName('contact_reference');
+    $contact1 = $this->individualCreate();
+    $refA = $this->individualCreate();
+    $refB = $this->individualCreate();
+    $contact2 = $this->individualCreate([$fieldName => [$refA, $refB]]);
+    $contact3 = $this->individualCreate([$fieldName => $refA]);
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact1,
+      'to_remove_id' => $refA,
+      'auto_flip' => FALSE,
+    ]);
+    $result2 = $this->callAPISuccessGetValue('Contact', ['id' => $contact2, 'return' => $fieldName]);
+    $this->assertEquals([$contact1, $refB], $result2);
+    $result3 = $this->callAPISuccessGetValue('Contact', ['id' => $contact3, 'return' => $fieldName]);
+    $this->assertEquals([$contact1], $result3);
+  }
+
+  /**
    * Test merging when a multiple record set is in use.
    *
    * @throws \API_Exception
