@@ -8,6 +8,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
 use CRM_Recaptcha_ExtensionUtil as E;
 
 /**
@@ -33,7 +34,7 @@ class CRM_Utils_ReCAPTCHA {
    *
    * @var CRM_Utils_ReCAPTCHA
    */
-  static private $_singleton = NULL;
+  private static $_singleton = NULL;
 
   /**
    * Singleton function used to manage this object.
@@ -51,22 +52,14 @@ class CRM_Utils_ReCAPTCHA {
    * Check if reCaptcha settings is avilable to add on form.
    */
   public static function hasSettingsAvailable() {
-    $config = CRM_Core_Config::singleton();
-    if ($config->recaptchaPublicKey == NULL || $config->recaptchaPublicKey == "") {
-      return FALSE;
-    }
-    return TRUE;
+    return (bool) \Civi::settings()->get('recaptchaPublicKey');
   }
 
   /**
    * Check if reCaptcha has to be added on form forcefully.
    */
   public static function hasToAddForcefully() {
-    $config = CRM_Core_Config::singleton();
-    if (!$config->forceRecaptcha) {
-      return FALSE;
-    }
-    return TRUE;
+    return (bool) \Civi::settings()->get('forceRecaptcha');
   }
 
   /**
@@ -76,8 +69,6 @@ class CRM_Utils_ReCAPTCHA {
    */
   public static function add(&$form) {
     $error = NULL;
-    $config = CRM_Core_Config::singleton();
-    $useSSL = FALSE;
     if (!function_exists('recaptcha_get_html')) {
       require_once E::path('lib/recaptcha/recaptchalib.php');
     }
@@ -85,10 +76,10 @@ class CRM_Utils_ReCAPTCHA {
     // Load the Recaptcha api.js over HTTPS
     $useHTTPS = TRUE;
 
-    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useHTTPS);
+    $html = recaptcha_get_html(\Civi::settings()->get('recaptchaPublicKey'), $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
-    $form->assign('recaptchaOptions', $config->recaptchaOptions);
+    $form->assign('recaptchaOptions', \Civi::settings()->get('recaptchaOptions'));
     $form->add(
       'text',
       'g-recaptcha-response',
