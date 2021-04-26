@@ -487,9 +487,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param int $id
    * @param string $name
-   * @param bool $viewOnly
    */
-  public function buildCustom($id, $name, $viewOnly = FALSE) {
+  public function buildCustom($id, $name) {
     if (!$id) {
       return;
     }
@@ -553,13 +552,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (is_array($fields)) {
       $button = substr($this->controller->getButtonName(), -4);
       foreach ($fields as $key => $field) {
-        if ($viewOnly &&
-          isset($field['data_type']) &&
-          $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
-        ) {
-          // ignore file upload fields
-          continue;
-        }
         //make the field optional if primary participant
         //have been skip the additional participant.
         if ($button == 'skip') {
@@ -576,7 +568,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
 
-    if ($addCaptcha && !$viewOnly) {
+    if ($addCaptcha) {
       CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
   }
