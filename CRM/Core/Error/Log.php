@@ -26,7 +26,14 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
    * CRM_Core_Error_Log constructor.
    */
   public function __construct() {
-    $this->map = [
+    $this->map = self::getMap();
+  }
+
+  /**
+   * @return array
+   */
+  public static function getMap():array {
+    return [
       \Psr\Log\LogLevel::DEBUG => PEAR_LOG_DEBUG,
       \Psr\Log\LogLevel::INFO => PEAR_LOG_INFO,
       \Psr\Log\LogLevel::NOTICE => PEAR_LOG_NOTICE,
