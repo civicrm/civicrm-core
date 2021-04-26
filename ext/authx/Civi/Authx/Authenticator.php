@@ -213,6 +213,7 @@ class Authenticator {
     // Post-login Civi stuff...
 
     $session = \CRM_Core_Session::singleton();
+    $session->set('authx', $tgt->createRedacted());
     $session->set('ufID', $tgt->userId);
     $session->set('userID', $tgt->contactId);
 
@@ -346,6 +347,28 @@ class AuthenticatorTarget {
    */
   public function hasPrincipal(): bool {
     return !empty($this->userId) || !empty($this->contactId);
+  }
+
+  /**
+   * Create a variant of the authentication record which omits any secret values. It may be
+   * useful to examining metadata and outcomes.
+   *
+   * The redacted version may be retained in the (real or fake) session and consulted by more
+   * fine-grained access-controls.
+   *
+   * @return array
+   */
+  public function createRedacted(): array {
+    return [
+      // omit: cred
+      // omit: siteKey
+      'flow' => $this->flow,
+      'credType' => $this->credType,
+      'jwt' => $this->jwt,
+      'useSession' => $this->useSession,
+      'userId' => $this->userId,
+      'contactId' => $this->contactId,
+    ];
   }
 
 }
