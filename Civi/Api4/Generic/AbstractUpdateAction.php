@@ -19,6 +19,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Event\ValidateValuesEvent;
+
 /**
  * Base class for all `Update` api actions
  *
@@ -74,7 +76,12 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
    * @throws \API_Exception
    */
   protected function validateValues() {
-    // Placeholder
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
+    $e = new ValidateValuesEvent($this, [$this->values]);
+    \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
+    if (!empty($e->errors)) {
+      throw $e->toException();
+    }
   }
 
 }

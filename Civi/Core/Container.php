@@ -377,6 +377,13 @@ class Container {
         \Civi::dispatcher()->dispatch($eventName . "::" . $e->{$fieldName}, $e);
       };
     };
+    $aliasMethodEvent = function($eventName, $methodName) {
+      return function($e) use ($eventName, $methodName) {
+        \Civi::dispatcher()->dispatch($eventName . "::" . $e->{$methodName}(), $e);
+      };
+    };
+
+    $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);

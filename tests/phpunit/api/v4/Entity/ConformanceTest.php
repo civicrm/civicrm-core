@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 
 use Civi\Api4\Entity;
 use api\v4\UnitTestCase;
+use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -205,6 +206,13 @@ class ConformanceTest extends UnitTestCase {
    * @return mixed
    */
   protected function checkCreation($entity, $entityClass) {
+    $hookLog = [];
+    $onValidate = function(ValidateValuesEvent $e) use (&$hookLog) {
+      $hookLog[$e->entity][$e->action] = 1 + ($hookLog[$e->entity][$e->action] ?? 0);
+    };
+    \Civi::dispatcher()->addListener('civi.api4.validate', $onValidate);
+    \Civi::dispatcher()->addListener('civi.api4.validate::' . $entity, $onValidate);
+
     $requiredParams = $this->creationParamProvider->getRequired($entity);
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
@@ -216,6 +224,10 @@ class ConformanceTest extends UnitTestCase {
     $id = $createResult['id'];
 
     $this->assertGreaterThanOrEqual(1, $id, "$entity ID not positive");
+
+    $this->assertEquals(2, $hookLog[$entity]['create']);
+    \Civi::dispatcher()->removeListener('civi.api4.validate', $onValidate);
+    \Civi::dispatcher()->removeListener('civi.api4.validate::' . $entity, $onValidate);
 
     return $id;
   }
