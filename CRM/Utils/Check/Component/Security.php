@@ -28,6 +28,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       case 'Joomla':
         return '/media/';
 
+      case 'WordPress':
+        return '/uploads/';
+
       default:
         return '/files/';
     }
