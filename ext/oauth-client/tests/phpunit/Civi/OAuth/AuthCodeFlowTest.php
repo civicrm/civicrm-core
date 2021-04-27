@@ -2,9 +2,6 @@
 
 namespace Civi\OAuth;
 
-/** @noinspection ALL */
-
-use CRM_OAuth_ExtensionUtil as E;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -13,28 +10,24 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface,
-                                                                      TransactionalInterface
-{
+  TransactionalInterface {
 
   use \Civi\Test\ContactTestTrait;
   use \Civi\Test\Api3TestTrait;
 
   private $providers = [];
 
-  public function setUpHeadless()
-  {
+  public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
     // See: https://docs.civicrm.org/dev/en/latest/testing/phpunit/#civitest
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
-  public function setUp(): void
-  {
+  public function setUp(): void {
     parent::setUp();
   }
 
-  public function tearDown(): void
-  {
+  public function tearDown(): void {
     parent::tearDown();
   }
 
@@ -42,8 +35,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $providers = array_merge($providers, $this->providers);
   }
 
-  public function makeDummyProviderThatGetsAToken(): void
-  {
+  public function makeDummyProviderThatGetsAToken(): void {
     $idTokenHeader = ['alg' => 'RS256', 'kid' => '123456789', 'typ' => 'JWT'];
     $idTokenPayload = [
       'iss' => 'https://dummy',
@@ -51,11 +43,11 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       'aud' => 'something',
       'sub' => '987654321',
       'email' => 'test@baz.biff',
-      'email_verified' => true,
+      'email_verified' => TRUE,
       'at_hash' => 'fake hash value',
       'nonce' => '111',
       'iat' => 1619151829,
-      'exp' => 9999999999
+      'exp' => 9999999999,
     ];
     $idToken = base64_encode(json_encode($idTokenHeader))
       . '.' . base64_encode(json_encode($idTokenPayload));
@@ -71,10 +63,10 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
           'refresh_token' => 'example-refresh-token-value',
           'created_at' => time(),
           'expires_in' => 3600,
-          'id_token' => $idToken
+          'id_token' => $idToken,
 
         ]
-      )
+      ),
     ];
 
     $this->providers['dummy'] = [
@@ -86,35 +78,41 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
         'urlAccessToken' => 'https://dummy/token',
         'urlResourceOwnerDetails' => '{{use_id_token}}',
         'scopes' => ['foo'],
-        'cannedResponses' => [$authServerResponse]
+        'cannedResponses' => [$authServerResponse],
       ],
       'contactTemplate' => [
         'values' => [
           'contact_type' => 'Individual',
         ],
         'chain' => [
-          'email' => ['Email', 'create', ['values' => ['contact_id' => '$id', 'email' => '{{token.resource_owner.email}}']]],
+          'email' => [
+            'Email',
+            'create',
+            [
+              'values' => [
+                'contact_id' => '$id',
+                'email' => '{{token.resource_owner.email}}',
+              ],
+            ],
+          ],
         ],
-      ]
+      ],
     ];
 
     require_once 'tests/fixtures/DummyProvider.php';
   }
 
-  public function makeDummyProviderClient(): array
-  {
-    $client = \Civi\Api4\OAuthClient::create(false)->setValues(
+  public function makeDummyProviderClient(): array {
+    return \Civi\Api4\OAuthClient::create(FALSE)->setValues(
       [
         'provider' => 'dummy',
         'guid' => "example-client-guid",
         'secret' => "example-secret",
       ]
     )->execute()->single();
-    return $client;
   }
 
-  public function testFetchAndStoreSysToken()
-  {
+  public function testFetchAndStoreSysToken() {
     $this->makeDummyProviderThatGetsAToken();
     $client = $this->makeDummyProviderClient();
 
@@ -126,7 +124,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       [
         'client' => $client,
         'scope' => 'foo',
-        'tag' => null,
+        'tag' => NULL,
         'storage' => 'OAuthSysToken',
         'grant_type' => 'authorization_code',
         'cred' => ['code' => 'example-auth-code'],
@@ -146,12 +144,13 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
         'aud' => 'something',
         'sub' => '987654321',
         'email' => 'test@baz.biff',
-        'email_verified' => true,
+        'email_verified' => TRUE,
         'at_hash' => 'fake hash value',
         'nonce' => '111',
         'iat' => 1619151829,
-        'exp' => 9999999999
+        'exp' => 9999999999,
       ],
       $tokenRecord['resource_owner']);
   }
+
 }
