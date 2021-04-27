@@ -505,7 +505,7 @@ class CRM_Utils_Date {
    *   date/datetime in MySQL format
    */
   public static function isoToMysql($iso) {
-    if (CRM_Utils_System::isNull($iso)) {
+    if (empty($iso)) {
       return NULL;
     }
     $dropArray = ['-' => '', ':' => '', ' ' => ''];
