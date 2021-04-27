@@ -150,7 +150,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->getName());
-    $form = $this;
     [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = [];
@@ -196,18 +195,18 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $groupBy = $formValues['group_by'];
 
     // skip some contacts ?
-    $skipOnHold = $form->skipOnHold ?? FALSE;
-    $skipDeceased = $form->skipDeceased ?? TRUE;
-    $contributionIDs = $form->getVar('_contributionIds');
-    if ($form->isQueryIncludesSoftCredits()) {
+    $skipOnHold = $this->skipOnHold ?? FALSE;
+    $skipDeceased = $this->skipDeceased ?? TRUE;
+    $contributionIDs = $this->getVar('_contributionIds');
+    if ($this->isQueryIncludesSoftCredits()) {
       $contributionIDs = [];
-      $result = $form->getSearchQueryResults();
+      $result = $this->getSearchQueryResults();
       while ($result->fetch()) {
-        $form->_contactIds[$result->contact_id] = $result->contact_id;
+        $this->_contactIds[$result->contact_id] = $result->contact_id;
         $contributionIDs["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
       }
     }
-    [$contributions, $contacts] = CRM_Contribute_Form_Task_PDFLetter::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->isQueryIncludesSoftCredits());
+    [$contributions, $contacts] = $this->buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $this->isQueryIncludesSoftCredits());
     $html = [];
     $contactHtml = $emailedHtml = [];
     foreach ($contributions as $contributionId => $contribution) {
@@ -221,10 +220,10 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       }
 
       if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-        $html[$contributionId] = CRM_Contribute_Form_Task_PDFLetter::generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID);
+        $html[$contributionId] = $this->generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID);
         $contactHtml[$contact['contact_id']][] = $html[$contributionId];
         if (!empty($formValues['email_options'])) {
-          if (CRM_Contribute_Form_Task_PDFLetter::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
+          if ($this->emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
             $emailed++;
             if (!stristr($formValues['email_options'], 'both')) {
               $emailedHtml[$contributionId] = TRUE;
@@ -249,7 +248,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     }
 
     $contactIds = array_keys($contacts);
-    CRM_Contact_Form_Task_PDFLetterCommon::createActivities($form, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+    CRM_Contact_Form_Task_PDFLetterCommon::createActivities($this, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
     $html = array_diff_key($html, $emailedHtml);
 
     if (!empty($formValues['is_unit_test'])) {
@@ -268,7 +267,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       }
     }
 
-    $form->postProcessHook();
+    $this->postProcessHook();
 
     if ($emailed) {
       $updateStatus = ts('Receipts have been emailed to %1 contributions.', [1 => $emailed]);
@@ -317,7 +316,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @return array
    */
-  public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
+  public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
       $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
@@ -423,7 +422,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function generateHtml(&$contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
+  public function generateHtml(&$contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID) {
     static $validated = FALSE;
     $html = NULL;
 
@@ -454,7 +453,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @return bool
    */
-  public static function emailLetter($contact, $html, $is_pdf, $format = [], $params = []) {
+  public function emailLetter($contact, $html, $is_pdf, $format = [], $params = []) {
     try {
       if (empty($contact['email'])) {
         return FALSE;
