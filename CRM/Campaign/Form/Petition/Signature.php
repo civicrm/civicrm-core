@@ -544,9 +544,8 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
    *
    * @param int $id
    * @param string $name
-   * @param bool $viewOnly
    */
-  public function buildCustom($id, $name, $viewOnly = FALSE) {
+  public function buildCustom($id, $name) {
     if ($id) {
       $session = CRM_Core_Session::singleton();
       $this->assign("petition", $this->petition);
@@ -570,14 +569,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
 
         $addCaptcha = FALSE;
         foreach ($fields as $key => $field) {
-          if ($viewOnly &&
-            isset($field['data_type']) &&
-            $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
-          ) {
-            // ignore file upload fields
-            continue;
-          }
-
           // if state or country in the profile, create map
           list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
 
@@ -589,7 +580,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
           }
         }
 
-        if ($addCaptcha && !$viewOnly) {
+        if ($addCaptcha) {
           CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
         }
       }
