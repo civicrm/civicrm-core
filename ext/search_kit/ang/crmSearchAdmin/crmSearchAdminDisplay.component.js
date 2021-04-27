@@ -67,9 +67,11 @@
         },
       };
 
+      // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
-        containment: '.crm-search-admin-edit-columns-wrapper'
+        containment: '.crm-search-admin-edit-columns-wrapper',
+        cancel: 'input,textarea,button,select,option,a,label'
       };
 
       this.styles = CRM.crmSearchAdmin.styles;
@@ -137,8 +139,8 @@
         var info = searchMeta.parseExpr(col.key),
           value = col.key.split(':')[0];
         // If field is an implicit join, use the original fk field
-        if (info.field.entity !== info.field.baseEntity) {
-          value = value.substr(0, value.indexOf('.')) + '_id';
+        if (info.field.name !== info.field.fieldName) {
+          value = value.substr(0, value.lastIndexOf('.'));
           info = searchMeta.parseExpr(value);
         }
         col.editable = {
@@ -177,7 +179,7 @@
         if (column.link) {
           ctrl.onChangeLink(column, column.link.path, '');
         } else {
-          var defaultLink = ctrl.getLinks()[0];
+          var defaultLink = ctrl.getLinks(column.key)[0];
           column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
           ctrl.onChangeLink(column, null, column.link.path);
         }
@@ -198,30 +200,62 @@
         }
       };
 
-      this.getLinks = function() {
+      this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = buildLinks();
+          ctrl.links = {'*': buildLinks()};
         }
-        return ctrl.links;
+        if (!columnKey) {
+          return ctrl.links['*'];
+        }
+        var expr = ctrl.getExprFromSelect(columnKey),
+          info = searchMeta.parseExpr(expr),
+          joinEntity = '';
+        if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
+          joinEntity = info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
+        } else if (info.prefix) {
+          joinEntity = info.prefix.replace('.', '');
+        }
+        if (!ctrl.links[joinEntity]) {
+          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], function(link) {
+            return joinEntity === (link.join || '');
+          });
+        }
+        return ctrl.links[joinEntity];
       };
 
       // Build a list of all possible links to main entity or join entities
       function buildLinks() {
+        function addTitle(link, entityName) {
+          switch (link.action) {
+            case 'view':
+              link.title = ts('View %1', {1: entityName});
+              break;
+
+            case 'update':
+              link.title = ts('Edit %1', {1: entityName});
+              break;
+
+            case 'delete':
+              link.title = ts('Delete %1', {1: entityName});
+              break;
+          }
+        }
+
         // Links to main entity
-        var links = _.cloneDeep(searchMeta.getEntity(ctrl.savedSearch.api_entity).paths || []),
-          entityCount = {};
-        entityCount[ctrl.savedSearch.api_entity] = 1;
+        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
+          links = _.cloneDeep(mainEntity.paths || []);
+        _.each(links, function(link) {
+          addTitle(link, mainEntity.title);
+        });
         // Links to explicitly joined entities
-        _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinName = join[0].split(' AS '),
-            joinEntity = searchMeta.getEntity(joinName[0]);
-          entityCount[joinEntity.name] = (entityCount[joinEntity.name] || 0) + 1;
+        _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
+          var join = searchMeta.getJoin(joinClause[0]),
+            joinEntity = searchMeta.getEntity(join.entity);
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + joinName[1] + '.');
-            if (entityCount[joinEntity.name] > 1) {
-              link.title += ' ' + entityCount[joinEntity.name];
-            }
+            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+            link.join = join.alias;
+            addTitle(link, join.label);
             links.push(link);
           });
         });
@@ -229,20 +263,24 @@
         _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
           if (!_.includes(fieldName, ' AS ')) {
             var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.entity !== info.field.baseEntity)) {
-              var idField = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')) + '_id';
-              if (!ctrl.crmSearchAdmin.canAggregate(idField)) {
-                var joinEntity = searchMeta.getEntity(info.field.fk_entity || info.field.entity);
+            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
+              var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
+                idField = searchMeta.parseExpr(idFieldName).field;
+              if (!ctrl.crmSearchAdmin.canAggregate(idFieldName)) {
+                var joinEntity = searchMeta.getEntity(idField.fk_entity),
+                  label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
                 _.each((joinEntity || {}).paths, function(path) {
                   var link = _.cloneDeep(path);
-                  link.path = link.path.replace(/\[id/g, '[' + idField);
+                  link.path = link.path.replace(/\[id/g, '[' + idFieldName);
+                  link.join = idFieldName;
+                  addTitle(link, label);
                   links.push(link);
                 });
               }
             }
           }
         });
-        return links;
+        return _.uniq(links, 'path');
       }
 
       this.pickIcon = function(model, key) {

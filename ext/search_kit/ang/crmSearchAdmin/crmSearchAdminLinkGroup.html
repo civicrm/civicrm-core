@@ -31,7 +31,7 @@
         <input type="text" class="form-control" ng-model="item.text">
       </td>
       <td class="form-inline">
-        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links"></crm-search-admin-link-select>
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, before, after)"></crm-search-admin-link-select>
       </td>
       <td>
         <div class="btn-group">
