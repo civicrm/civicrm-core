@@ -28,7 +28,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
   }
 
   /**
-   * Basic sanity check - create, read, and delete a client.
+   * Generate the URL to request an authorization code from a provider.
    */
   public function testAuthorizationCode(): void {
     $usePerms = function($ps) {
