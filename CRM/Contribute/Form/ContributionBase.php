@@ -756,17 +756,10 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         if ($addCaptcha && !$viewOnly) {
-          $this->enableCaptchaOnForm();
+          CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
         }
       }
     }
-  }
-
-  /**
-   * Enable ReCAPTCHA on Contribution form
-   */
-  protected function enableCaptchaOnForm() {
-    CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
   }
 
   /**
@@ -824,17 +817,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
       $this->assign('paymentFields', $paymentFields);
 
-    }
-  }
-
-  /**
-   * Display ReCAPTCHA warning on Contribution form
-   */
-  protected function displayCaptchaWarning() {
-    if (CRM_Core_Permission::check("administer CiviCRM")) {
-      if (!CRM_Utils_ReCAPTCHA::hasSettingsAvailable()) {
-        $this->assign('displayCaptchaWarning', TRUE);
-      }
     }
   }
 

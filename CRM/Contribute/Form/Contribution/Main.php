@@ -292,10 +292,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     if (count($this->_paymentProcessors) >= 1 && !$this->get_template_vars("isCaptcha") && $this->hasToAddForcefully()) {
       if (!$this->_userID) {
-        $this->enableCaptchaOnForm();
-      }
-      else {
-        $this->displayCaptchaWarning();
+        CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
       }
     }
 
