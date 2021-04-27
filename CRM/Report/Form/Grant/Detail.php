@@ -245,6 +245,9 @@ HERESQL;
         }
         $entryFound = TRUE;
       }
+
+      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
+
       if (!$entryFound) {
         break;
       }
