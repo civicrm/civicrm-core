@@ -668,15 +668,22 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (!isset(\Civi::$statics[__CLASS__]['logger_file' . $prefix])) {
       $config = CRM_Core_Config::singleton();
 
-      $prefixString = $prefix ? ($prefix . '.') : '';
+      $filePat = CRM_Utils_Constant::value('CIVICRM_LOG_FILE', 'CiviCRM.{{LEGACY_CHANNEL}}{{LEGACY_HASH}}log');
+      $hash = self::generateLogFileHash($config);
 
-      if (CRM_Utils_Constant::value('CIVICRM_LOG_HASH', TRUE)) {
-        $hash = self::generateLogFileHash($config) . '.';
-      }
-      else {
-        $hash = '';
-      }
-      $fileName = $config->configAndLogDir . 'CiviCRM.' . $prefixString . $hash . 'log';
+      // Before Civi::log($channel) was standardized and expanded, a handful of ext's used CRM_Core_Error::debug_log_mesage(...$prefix...).
+      // On legacy configurations, any unrecognized channels are consolidated into the standard log.
+      $legacyChannels = '/^(sql_log|org\.civicrm\.volunteer|com\.skvare\.membershipextra|GoCardless|iparl|mailchimp|mautic|senators-members-import)/';
+
+      $relFile = strtr($filePat, [
+        '{{CHANNEL}}' => $prefix ? $prefix : 'default',
+        '{{HASH}}' => $hash,
+        '{{LEGACY_CHANNEL}}' => preg_match($legacyChannels, $prefix) ? ($prefix . '.') : '',
+        '{{LEGACY_HASH}}' => CRM_Utils_Constant::value('CIVICRM_LOG_HASH', TRUE) ? ($hash . '.') : '',
+        '{{YYYY_MM_DD}}' => date('Y_m_d'),
+        '{{YYYY-MM-DD}}' => date('Y-m-d'),
+      ]);
+      $fileName = $relFile[0] === '[' ? Civi::paths()->getPath($relFile) : CRM_Utils_File::absoluteDirectory($relFile, $config->configAndLogDir);
 
       // Roll log file monthly or if greater than our threshold.
       // Size-based rotation introduced in response to filesize limits on

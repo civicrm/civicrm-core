@@ -518,9 +518,37 @@ if (CIVICRM_UF === 'UnitTests') {
 }
 
 /**
+ * Define the naming convention for log files.
+ *
+ * By default, paths are relative to the standard CiviCRM log dir. However, an absolute path may be used.
+ *
+ * The following variables are accepted:
+ *   - {{HASH}}: A unique/hard-to-guess code which identifies the deployment. Use this to mitigate the risk that logs could be leaked by a misconfigured web-server.
+ *   - {{CHANNEL}}: The name of the log-channel. If channel is blank, use "default".
+ *   - {{LEGACY_CHANNEL}}: (Backward compat) The name of the log-channel followed by ".". If channel is blank, then "".
+ *   - {{LEGACY_HASH}}: (Backward compat) Depending on "CIVICRM_LOG_HASH", this is either an empty-string or HASH-plus-".".
+ *   - {{YYYY-MM-DD}}: The current date (eg "2021-01-02")
+ */
+if (!defined('CIVICRM_LOG_FILE'))  {
+     define('CIVICRM_LOG_FILE', 'CiviCRM.{{CHANNEL}}.{{HASH}}.log');                // Default on new deployments
+//   define('CIVICRM_LOG_FILE', 'CiviCRM.{{LEGACY_CHANNEL}}{{LEGACY_HASH}}log');    // Default on old/existing deployments
+//   define('CIVICRM_LOG_FILE', 'CiviCRM.{{HASH}}.log');                            // Consolidate logs in one per-site/uniquely-named file.
+//   define('CIVICRM_LOG_FILE', '/var/log/php/CiviCRM.log');                        // Consolidate logs in one file.
+//   define('CIVICRM_LOG_FILE', '[civicrm.log]/{{HASH}}/{{CHANNEL}}/{{YYYY-MM-DD}}.log');
+//   define('CIVICRM_LOG_FILE', '[cms.root]/../var/log/civicrm-{{CHANNEL}}-{{YYYY-MM-DD}}.log');
+//   define('CIVICRM_LOG_FILE', '/var/log/civicrm/{{HASH}}/{{CHANNEL}}-{{YYYY-MM-DD}}.log');
+//   define('CIVICRM_LOG_FILE', '/tmp/civicrm-{{HASH}}-{{CHANNEL}}-{{YYYY-MM-DD}}.log');
+//   define('CIVICRM_LOG_FILE', getenv('CIVICRM_LOG_FILE') ?: 'CiviCRM.{{HASH}}.log');
+}
+
+/**
+ * (Deprecated; superceded by CIVICRM_LOG_FILE)
+ *
  * Whether to include the hash in config log filenames. Defaults to TRUE.
  * Disable only if you have configured the logfiles to be outside the docroot
  * using the civicrm.log path setting.
+ *
+ * This is only relevant on older deployments that lack CIVICRM_LOG_FILE.
  *
  */
 // if (!defined('CIVICRM_LOG_HASH'))  {
