@@ -171,20 +171,16 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Add the schedules reminders in the db.
+   * Add the scheduled reminders in the db.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   Unused variable.
+   *   An assoc array of name/value pairs.
    *
    * @return CRM_Core_DAO_ActionSchedule
+   * @throws \CRM_Core_Exception
    */
-  public static function add(&$params, $ids = []) {
-    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
-    $actionSchedule->copyValues($params);
-
-    return $actionSchedule->save();
+  public static function add(array $params): CRM_Core_DAO_ActionSchedule {
+    return self::writeRecord($params);
   }
 
   /**
@@ -209,10 +205,7 @@ FROM civicrm_action_schedule cas
     $actionSchedule->copyValues($params);
 
     if ($actionSchedule->find(TRUE)) {
-      $ids['actionSchedule'] = $actionSchedule->id;
-
       CRM_Core_DAO::storeValues($actionSchedule, $values);
-
       return $actionSchedule;
     }
     return NULL;
