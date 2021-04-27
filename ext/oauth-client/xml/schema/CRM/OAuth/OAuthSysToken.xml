@@ -149,7 +149,7 @@
   <field>
     <name>created_date</name>
     <type>timestamp</type>
-    <comment>When the client was created.</comment>
+    <comment>When the token was created.</comment>
     <required>false</required>
     <default>CURRENT_TIMESTAMP</default>
     <add>5.32</add>
@@ -157,7 +157,7 @@
   <field>
     <name>modified_date</name>
     <type>timestamp</type>
-    <comment>When the client was created or modified.</comment>
+    <comment>When the token was created or modified.</comment>
     <required>false</required>
     <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <add>5.32</add>
