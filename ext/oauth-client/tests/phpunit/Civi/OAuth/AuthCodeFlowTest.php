@@ -9,8 +9,10 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface,
-  TransactionalInterface {
+class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
+    HeadlessInterface,
+    HookInterface,
+    TransactionalInterface {
 
   use \Civi\Test\ContactTestTrait;
   use \Civi\Test\Api3TestTrait;
