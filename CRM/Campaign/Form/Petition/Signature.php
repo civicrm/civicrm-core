@@ -74,7 +74,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
   public $_activityProfileFields;
 
   /**
-   * The id of the survey (petition) we are proceessing
+   * The id of the survey (petition) we are processing
    *
    * @var int
    */

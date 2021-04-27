@@ -30,21 +30,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   const LOCATION_BLOCKS = 1;
 
   /**
-   * The id of the event we are proceessing.
+   * The id of the event we are processing.
    *
    * @var int
    */
   public $_eventId;
 
   /**
-   * The array of ids of all the participant we are proceessing.
+   * The array of ids of all the participant we are processing.
    *
    * @var int
    */
   protected $_participantIDS = NULL;
 
   /**
-   * The id of the participant we are proceessing.
+   * The id of the participant we are processing.
    *
    * @var int
    */
@@ -108,7 +108,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_fields;
 
   /**
-   * The billing location id for this contribiution page.
+   * The billing location id for this contribution page.
    *
    * @var int
    */
@@ -138,8 +138,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @var bool
    *
    */
-
-
   public $_isEventFull;
 
   public $_lineItem;
@@ -210,7 +208,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
-    $config = CRM_Core_Config::singleton();
 
     if (!$this->_values) {
       // create redirect URL to send folks back to event info page is registration not available
@@ -299,7 +296,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // get the profile ids
       $ufJoinParams = [
         'entity_table' => 'civicrm_event',
-        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
+        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         'module' => 'CiviEvent',
         'entity_id' => $this->_eventId,
       ];
@@ -309,14 +306,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // set profiles for additional participants
       if ($this->_values['event']['is_multiple_registrations']) {
-        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
+        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         $ufJoinParams['module'] = 'CiviEvent_Additional';
 
         list($this->_values['additional_custom_pre_id'],
           $this->_values['additional_custom_post_id'], $preActive, $postActive
           ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
-        // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
+        // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
         // set same profile for additional contacts.
         if ($this->_values['custom_pre_id'] && !$this->_values['additional_custom_pre_id']) {
           $this->_values['additional_custom_pre_id'] = $this->_values['custom_pre_id'];
@@ -467,9 +464,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
     }
 
-    // get the email that the confirmation would have been sent to
-    $session = CRM_Core_Session::singleton();
-
     // assign is_email_confirm to templates
     if (isset($this->_values['event']['is_email_confirm'])) {
       $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm']);
@@ -493,97 +487,89 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param int $id
    * @param string $name
-   * @param bool $viewOnly
    */
-  public function buildCustom($id, $name, $viewOnly = FALSE) {
-    if ($id) {
-      $button = substr($this->controller->getButtonName(), -4);
-      $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-      $session = CRM_Core_Session::singleton();
-      $contactID = $session->get('userID');
+  public function buildCustom($id, $name) {
+    if (!$id) {
+      return;
+    }
 
-      // we don't allow conflicting fields to be
-      // configured via profile
-      $fieldsToIgnore = [
-        'participant_fee_amount' => 1,
-        'participant_fee_level' => 1,
-      ];
-      if ($contactID) {
-        //FIX CRM-9653
-        if (is_array($id)) {
-          $fields = [];
-          foreach ($id as $profileID) {
-            $field = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::ADD,
-              NULL, NULL, FALSE, NULL,
-              FALSE, NULL, CRM_Core_Permission::CREATE,
-              'field_name', TRUE
-            );
-            $fields = array_merge($fields, $field);
-          }
-        }
-        else {
-          if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $contactID)) {
-            $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD,
-              NULL, NULL, FALSE, NULL,
-              FALSE, NULL, CRM_Core_Permission::CREATE,
-              'field_name', TRUE
-            );
-          }
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+
+    // we don't allow conflicting fields to be
+    // configured via profile
+    $fieldsToIgnore = [
+      'participant_fee_amount' => 1,
+      'participant_fee_level' => 1,
+    ];
+    if ($contactID) {
+      //FIX CRM-9653
+      if (is_array($id)) {
+        $fields = [];
+        foreach ($id as $profileID) {
+          $field = CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, CRM_Core_Action::ADD,
+            NULL, NULL, FALSE, NULL,
+            FALSE, NULL, CRM_Core_Permission::CREATE,
+            'field_name', TRUE
+          );
+          $fields = array_merge($fields, $field);
         }
       }
       else {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD,
-          NULL, NULL, FALSE, NULL,
-          FALSE, NULL, CRM_Core_Permission::CREATE,
-          'field_name', TRUE
-        );
-      }
-
-      if (array_intersect_key($fields, $fieldsToIgnore)) {
-        $fields = array_diff_key($fields, $fieldsToIgnore);
-        CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
-      }
-      $addCaptcha = FALSE;
-
-      if (!empty($this->_fields)) {
-        $fields = @array_diff_assoc($fields, $this->_fields);
-      }
-
-      if (empty($this->_params[0]['additional_participants']) &&
-        is_null($cid)
-      ) {
-        CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
-      }
-      $this->assign($name, $fields);
-      if (is_array($fields)) {
-        foreach ($fields as $key => $field) {
-          if ($viewOnly &&
-            isset($field['data_type']) &&
-            $field['data_type'] == 'File' || ($viewOnly && $field['name'] == 'image_URL')
-          ) {
-            // ignore file upload fields
-            continue;
-          }
-          //make the field optional if primary participant
-          //have been skip the additional participant.
-          if ($button == 'skip') {
-            $field['is_required'] = FALSE;
-          }
-          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-          elseif ($field['add_captcha'] && !$contactID) {
-            // only add captcha for first page
-            $addCaptcha = TRUE;
-          }
-          list($prefixName, $index) = CRM_Utils_System::explode('-', $key, 2);
-          CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
-
-          $this->_fields[$key] = $field;
+        if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $contactID)) {
+          $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD,
+            NULL, NULL, FALSE, NULL,
+            FALSE, NULL, CRM_Core_Permission::CREATE,
+            'field_name', TRUE
+          );
         }
       }
+    }
+    else {
+      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD,
+        NULL, NULL, FALSE, NULL,
+        FALSE, NULL, CRM_Core_Permission::CREATE,
+        'field_name', TRUE
+      );
+    }
 
-      if ($addCaptcha && !$viewOnly) {
-        CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
+    if (array_intersect_key($fields, $fieldsToIgnore)) {
+      $fields = array_diff_key($fields, $fieldsToIgnore);
+      CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
+    }
+    $addCaptcha = FALSE;
+
+    if (!empty($this->_fields)) {
+      $fields = @array_diff_assoc($fields, $this->_fields);
+    }
+
+    if (empty($this->_params[0]['additional_participants']) &&
+      is_null($cid)
+    ) {
+      CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
+    }
+    $this->assign($name, $fields);
+    if (is_array($fields)) {
+      $button = substr($this->controller->getButtonName(), -4);
+      foreach ($fields as $key => $field) {
+        //make the field optional if primary participant
+        //have been skip the additional participant.
+        if ($button == 'skip') {
+          $field['is_required'] = FALSE;
+        }
+        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
+        elseif ($field['add_captcha'] && !$contactID) {
+          // only add captcha for first page
+          $addCaptcha = TRUE;
+        }
+        CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
+
+        $this->_fields[$key] = $field;
       }
+    }
+
+    if ($addCaptcha) {
+      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
   }
 
