@@ -90,8 +90,8 @@ CREATE TABLE `civicrm_oauth_systoken` (
      `resource_owner` text    COMMENT 'Cached details describing the resource owner',
      `error` text    COMMENT 'List of scopes addressed by this token',
      `raw` text    COMMENT 'The token response data, per AccessToken::jsonSerialize',
-     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the client was created.',
-     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the client was created or modified.' 
+     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the token was created.',
+     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the token was created or modified.' 
 ,
         PRIMARY KEY (`id`)
  
