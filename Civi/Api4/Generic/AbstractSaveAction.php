@@ -20,6 +20,8 @@
 namespace Civi\Api4\Generic;
 
 use Civi\Api4\Event\ValidateValuesEvent;
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Create or update one or more $ENTITIES.
@@ -93,6 +95,7 @@ abstract class AbstractSaveAction extends AbstractAction {
 
   /**
    * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateValues() {
     // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
@@ -105,6 +108,16 @@ abstract class AbstractSaveAction extends AbstractAction {
     if ($unmatched) {
       throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
     }
+
+    if ($this->checkPermissions) {
+      foreach ($this->records as $record) {
+        $action = empty($record[$this->idField]) ? 'create' : 'update';
+        if (!CoreUtil::checkAccess($this->getEntityName(), $action, $record)) {
+          throw new UnauthorizedException("ACL check failed");
+        }
+      }
+    }
+
     $e = new ValidateValuesEvent($this, $this->records, new \CRM_Utils_LazyArray(function() {
       $existingIds = array_column($this->records, $this->idField);
       $existing = civicrm_api4($this->getEntityName(), 'get', [

@@ -260,7 +260,7 @@ class BasicActionsTest extends UnitTestCase {
 
   public function testEmptyAndNullOperators() {
     $records = [
-      [],
+      ['id' => NULL],
       ['color' => '', 'weight' => 0],
       ['color' => 'yellow', 'weight' => 100000000000],
     ];

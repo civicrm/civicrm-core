@@ -20,6 +20,8 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Update one or more $ENTITY with new values.
@@ -60,7 +62,11 @@ class BasicUpdateAction extends AbstractUpdateAction {
     $this->formatWriteValues($this->values);
     $this->validateValues();
     foreach ($this->getBatchRecords() as $item) {
-      $result[] = $this->writeRecord($this->values + $item);
+      $record = $this->values + $item;
+      if ($this->checkPermissions && !CoreUtil::checkAccess($this->getEntityName(), $this->getActionName(), $record)) {
+        throw new UnauthorizedException("ACL check failed");
+      }
+      $result[] = $this->writeRecord($record);
     }
   }
 
