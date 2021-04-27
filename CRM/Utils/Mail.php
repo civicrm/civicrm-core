@@ -166,7 +166,7 @@ class CRM_Utils_Mail {
    * @return bool
    *   TRUE if a mail was sent, else FALSE.
    */
-  public static function send(&$params) {
+  public static function send(array &$params): bool {
     $defaultReturnPath = CRM_Core_BAO_MailSettings::defaultReturnPath();
     $includeMessageId = CRM_Core_BAO_MailSettings::includeMessageId();
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
@@ -260,7 +260,7 @@ class CRM_Utils_Mail {
     }
 
     if (!empty($attachments)) {
-      foreach ($attachments as $fileID => $attach) {
+      foreach ($attachments as $attach) {
         $msg->addAttachment(
           $attach['fullPath'],
           $attach['mime_type'],
@@ -277,7 +277,6 @@ class CRM_Utils_Mail {
     $headers = $msg->headers($headers);
 
     $to = [$params['toEmail']];
-    $result = NULL;
     $mailer = \Civi::service('pear_mail');
 
     // CRM-3795, CRM-7355, CRM-7557, CRM-9058, CRM-9887, CRM-12883, CRM-19173 and others ...

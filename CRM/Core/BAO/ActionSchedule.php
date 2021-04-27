@@ -594,7 +594,7 @@ FROM civicrm_action_schedule cas
    * @return array
    *   List of error messages.
    */
-  protected static function sendReminderEmail($tokenRow, $schedule, $toContactID) {
+  protected static function sendReminderEmail($tokenRow, $schedule, $toContactID): array {
     $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($toContactID, TRUE);
     if (!$toEmail) {
       return ["email_missing" => "Couldn't find recipient's email address."];
@@ -617,20 +617,20 @@ FROM civicrm_action_schedule cas
       'entity_id' => $schedule->id,
     ];
 
-    if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] == 'Text' ||
-      $tokenRow->context['contact']['preferred_mail_format'] == 'Both'
+    if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] === 'Text' ||
+      $tokenRow->context['contact']['preferred_mail_format'] === 'Both'
     ) {
       // render the &amp; entities in text mode, so that the links work
       $mailParams['text'] = str_replace('&amp;', '&', $body_text);
     }
-    if ($body_html && ($tokenRow->context['contact']['preferred_mail_format'] == 'HTML' ||
-        $tokenRow->context['contact']['preferred_mail_format'] == 'Both'
+    if ($body_html && ($tokenRow->context['contact']['preferred_mail_format'] === 'HTML' ||
+        $tokenRow->context['contact']['preferred_mail_format'] === 'Both'
       )
     ) {
       $mailParams['html'] = $body_html;
     }
     $result = CRM_Utils_Mail::send($mailParams);
-    if (!$result || is_a($result, 'PEAR_Error')) {
+    if (!$result) {
       return ['email_fail' => 'Failed to send message'];
     }
 
