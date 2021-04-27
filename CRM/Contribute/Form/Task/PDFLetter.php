@@ -94,7 +94,12 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     // Build common form elements
-    CRM_Contribute_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    // use contact form as a base
+    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+
+    // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
+    $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
+    CRM_Core_Form_Task_PDFLetterCommon::buildQuickForm($this);
 
     // specific need for contributions
     $this->add('static', 'more_options_header', NULL, ts('Thank-you Letter Options'));
@@ -145,7 +150,143 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->getName());
-    CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this, $formValues);
+    $form = $this;
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    $isPDF = FALSE;
+    $emailParams = [];
+    if (!empty($formValues['email_options'])) {
+      $returnProperties['email'] = $returnProperties['on_hold'] = $returnProperties['is_deceased'] = $returnProperties['do_not_email'] = 1;
+      $emailParams = [
+        'subject' => $formValues['subject'] ?? NULL,
+        'from' => $formValues['from_email_address'] ?? NULL,
+      ];
+
+      $emailParams['from'] = CRM_Utils_Mail::formatFromAddress($emailParams['from']);
+
+      // We need display_name for emailLetter() so add to returnProperties here
+      $returnProperties['display_name'] = 1;
+      if (stristr($formValues['email_options'], 'pdfemail')) {
+        $isPDF = TRUE;
+      }
+    }
+    // update dates ?
+    $receipt_update = $formValues['receipt_update'] ?? FALSE;
+    $thankyou_update = $formValues['thankyou_update'] ?? FALSE;
+    $nowDate = date('YmdHis');
+    $receipts = $thanks = $emailed = 0;
+    $updateStatus = '';
+    $task = 'CRM_Contribution_Form_Task_PDFLetterCommon';
+    $realSeparator = ', ';
+    $tableSeparators = [
+      'td' => '</td><td>',
+      'tr' => '</td></tr><tr><td>',
+    ];
+    //the original thinking was mutliple options - but we are going with only 2 (comma & td) for now in case
+    // there are security (& UI) issues we need to think through
+    if (isset($formValues['group_by_separator'])) {
+      if (in_array($formValues['group_by_separator'], ['td', 'tr'])) {
+        $realSeparator = $tableSeparators[$formValues['group_by_separator']];
+      }
+      elseif ($formValues['group_by_separator'] == 'br') {
+        $realSeparator = "<br />";
+      }
+    }
+    // a placeholder in case the separator is common in the string - e.g ', '
+    $separator = '****~~~~';
+    $groupBy = $formValues['group_by'];
+
+    // skip some contacts ?
+    $skipOnHold = $form->skipOnHold ?? FALSE;
+    $skipDeceased = $form->skipDeceased ?? TRUE;
+    $contributionIDs = $form->getVar('_contributionIds');
+    if ($form->isQueryIncludesSoftCredits()) {
+      $contributionIDs = [];
+      $result = $form->getSearchQueryResults();
+      while ($result->fetch()) {
+        $form->_contactIds[$result->contact_id] = $result->contact_id;
+        $contributionIDs["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
+      }
+    }
+    [$contributions, $contacts] = CRM_Contribute_Form_Task_PDFLetter::buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $form->isQueryIncludesSoftCredits());
+    $html = [];
+    $contactHtml = $emailedHtml = [];
+    foreach ($contributions as $contributionId => $contribution) {
+      $contact = &$contacts[$contribution['contact_id']];
+      $grouped = FALSE;
+      $groupByID = 0;
+      if ($groupBy) {
+        $groupByID = empty($contribution[$groupBy]) ? 0 : $contribution[$groupBy];
+        $contribution = $contact['combined'][$groupBy][$groupByID];
+        $grouped = TRUE;
+      }
+
+      if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
+        $html[$contributionId] = CRM_Contribute_Form_Task_PDFLetter::generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID);
+        $contactHtml[$contact['contact_id']][] = $html[$contributionId];
+        if (!empty($formValues['email_options'])) {
+          if (CRM_Contribute_Form_Task_PDFLetter::emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
+            $emailed++;
+            if (!stristr($formValues['email_options'], 'both')) {
+              $emailedHtml[$contributionId] = TRUE;
+            }
+          }
+        }
+        $contact['is_sent'][$groupBy][$groupByID] = TRUE;
+      }
+      // Update receipt/thankyou dates
+      $contributionParams = ['id' => $contributionId];
+      if ($receipt_update) {
+        $contributionParams['receipt_date'] = $nowDate;
+      }
+      if ($thankyou_update) {
+        $contributionParams['thankyou_date'] = $nowDate;
+      }
+      if ($receipt_update || $thankyou_update) {
+        civicrm_api3('Contribution', 'create', $contributionParams);
+        $receipts = ($receipt_update ? $receipts + 1 : $receipts);
+        $thanks = ($thankyou_update ? $thanks + 1 : $thanks);
+      }
+    }
+
+    $contactIds = array_keys($contacts);
+    CRM_Contact_Form_Task_PDFLetterCommon::createActivities($form, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+    $html = array_diff_key($html, $emailedHtml);
+
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
+    }
+
+    //CRM-19761
+    if (!empty($html)) {
+      $type = $formValues['document_type'];
+
+      if ($type === 'pdf') {
+        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      }
+      else {
+        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      }
+    }
+
+    $form->postProcessHook();
+
+    if ($emailed) {
+      $updateStatus = ts('Receipts have been emailed to %1 contributions.', [1 => $emailed]);
+    }
+    if ($receipts) {
+      $updateStatus = ts('Receipt date has been updated for %1 contributions.', [1 => $receipts]);
+    }
+    if ($thanks) {
+      $updateStatus .= ' ' . ts('Thank-you date has been updated for %1 contributions.', [1 => $thanks]);
+    }
+
+    if ($updateStatus) {
+      CRM_Core_Session::setStatus($updateStatus);
+    }
+    if (!empty($html)) {
+      // ie. we have only sent emails - lets no show a white screen
+      CRM_Utils_System::civiExit();
+    }
   }
 
   /**
@@ -290,7 +431,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     CRM_Contribute_Form_Task_PDFLetter::assignCombinedContributionValues($contact, $groupedContributions, $groupBy, $groupByID);
 
     if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
-      if (!$validated && in_array($realSeparator, $tableSeparators) && !CRM_Contribute_Form_Task_PDFLetterCommon::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
+      if (!$validated && in_array($realSeparator, $tableSeparators) && !CRM_Contribute_Form_Task_PDFLetter::isValidHTMLWithTableSeparator($messageToken, $html_message)) {
         $realSeparator = ', ';
         CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
       }
@@ -373,6 +514,30 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $within = preg_match_all($pattern, $textToSearch);
     $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch);
     return ($within == $total);
+  }
+
+  /**
+   * Check whether any of the tokens exist in the html outside a table cell.
+   * If they do the table cell separator is not supported (return false)
+   * At this stage we are only anticipating contributions passed in this way but
+   * it would be easy to add others
+   * @param $tokens
+   * @param $html
+   *
+   * @return bool
+   */
+  public static function isValidHTMLWithTableSeparator($tokens, $html) {
+    $relevantEntities = ['contribution'];
+    foreach ($relevantEntities as $entity) {
+      if (isset($tokens[$entity]) && is_array($tokens[$entity])) {
+        foreach ($tokens[$entity] as $token) {
+          if (!CRM_Contribute_Form_Task_PDFLetter::isHtmlTokenInTableCell($token, $entity, $html)) {
+            return FALSE;
+          }
+        }
+      }
+    }
+    return TRUE;
   }
 
 }

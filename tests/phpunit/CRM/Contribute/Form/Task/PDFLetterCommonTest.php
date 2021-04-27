@@ -209,13 +209,13 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
       $contributionId = $contribution['id'];
       /* @var $form CRM_Contribute_Form_Task_PDFLetter */
-      $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
+      $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
       $format = Civi::settings()->get('dateformatFull');
       $date = CRM_Utils_Date::getToday();
       $displayDate = CRM_Utils_Date::customFormat($date, $format);
 
-      $html = CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($form, $formValues);
+      $html = $form->postProcess();
       $expectedValues = [
         'Hello Anthony',
         '$ 100.00',
@@ -282,10 +282,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $contributionIDs[] = $contribution['id'];
 
     /* @var \CRM_Contribute_Form_Task_PDFLetter $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
+    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds($contributionIDs);
 
-    $html = CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($form, $formValues);
+    $html = $form->postProcess();
     $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
   <tbody>
   <tr>
