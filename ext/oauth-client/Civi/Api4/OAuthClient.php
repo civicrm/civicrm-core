@@ -1,4 +1,5 @@
 <?php
+
 namespace Civi\Api4;
 
 use Civi\Api4\Action\OAuthClient\Create;
@@ -27,9 +28,10 @@ class OAuthClient extends Generic\DAOEntity {
    * Initiate the "Authorization Code" workflow.
    *
    * @param bool $checkPermissions
+   *
    * @return \Civi\Api4\Action\OAuthClient\AuthorizationCode
    */
-  public static function authorizationCode($checkPermissions = TRUE) {
+  public static function authorizationCode($checkPermissions = TRUE): Action\OAuthClient\AuthorizationCode {
     $action = new \Civi\Api4\Action\OAuthClient\AuthorizationCode(static::class, __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
   }
@@ -38,9 +40,10 @@ class OAuthClient extends Generic\DAOEntity {
    * Request access with client credentials
    *
    * @param bool $checkPermissions
+   *
    * @return \Civi\Api4\Action\OAuthClient\ClientCredential
    */
-  public static function clientCredential($checkPermissions = TRUE) {
+  public static function clientCredential($checkPermissions = TRUE): Action\OAuthClient\ClientCredential {
     $action = new \Civi\Api4\Action\OAuthClient\ClientCredential(static::class, __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
   }
@@ -49,17 +52,25 @@ class OAuthClient extends Generic\DAOEntity {
    * Request access with a username and password.
    *
    * @param bool $checkPermissions
+   *
    * @return \Civi\Api4\Action\OAuthClient\UserPassword
    */
-  public static function userPassword($checkPermissions = TRUE) {
+  public static function userPassword($checkPermissions = TRUE): Action\OAuthClient\UserPassword {
     $action = new \Civi\Api4\Action\OAuthClient\UserPassword(static::class, __FUNCTION__);
     return $action->setCheckPermissions($checkPermissions);
   }
 
-  public static function permissions() {
+  public static function permissions(): array {
     return [
       'meta' => ['access CiviCRM'],
       'default' => ['manage OAuth client'],
+      'get' => [
+        [
+          'manage OAuth client',
+          'manage my OAuth contact tokens',
+          'manage all OAuth contact tokens',
+        ],
+      ],
     ];
   }
 

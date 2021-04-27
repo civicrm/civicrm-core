@@ -29,9 +29,7 @@
 
 SET FOREIGN_KEY_CHECKS=0;
 
-DROP TABLE IF EXISTS `civicrm_oauth_systoken`;
 DROP TABLE IF EXISTS `civicrm_oauth_contact_token`;
-DROP TABLE IF EXISTS `civicrm_oauth_client`;
 
 SET FOREIGN_KEY_CHECKS=1;
 -- /*******************************************************
@@ -39,35 +37,6 @@ SET FOREIGN_KEY_CHECKS=1;
 -- * Create new tables
 -- *
 -- *******************************************************/
-
--- /*******************************************************
--- *
--- * civicrm_oauth_client
--- *
--- *******************************************************/
-CREATE TABLE `civicrm_oauth_client` (
-
-
-     `id` int unsigned  AUTO_INCREMENT  COMMENT 'Internal Client ID',
-     `provider` varchar(128) NOT NULL   COMMENT 'Provider',
-     `guid` varchar(128) NOT NULL   COMMENT 'Client ID',
-     `secret` text    COMMENT 'Client Secret',
-     `options` text    COMMENT 'Extra override options for the service (JSON)',
-     `is_active` tinyint NOT NULL  DEFAULT 1 COMMENT 'Is the client currently enabled?',
-     `created_date` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the client was created.',
-     `modified_date` timestamp NOT NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the client was created or modified.'
-,
-        PRIMARY KEY (`id`)
-
-    ,     INDEX `UI_provider`(
-        provider
-  )
-  ,     INDEX `UI_guid`(
-        guid
-  )
-
-
-)  ENGINE=InnoDB  ;
 
 -- /*******************************************************
 -- *
@@ -102,37 +71,3 @@ CREATE TABLE `civicrm_oauth_contact_token` (
 
 ,          CONSTRAINT FK_civicrm_oauth_contact_token_client_id FOREIGN KEY (`client_id`) REFERENCES `civicrm_oauth_client`(`id`) ON DELETE CASCADE,          CONSTRAINT FK_civicrm_oauth_contact_token_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
 )  ENGINE=InnoDB  ;
-
--- /*******************************************************
--- *
--- * civicrm_oauth_systoken
--- *
--- *******************************************************/
-CREATE TABLE `civicrm_oauth_systoken` (
-
-
-     `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Token ID',
-     `tag` varchar(128)    COMMENT 'The tag specifies how this token will be used.',
-     `client_id` int unsigned    COMMENT 'Client ID',
-     `grant_type` varchar(31)    COMMENT 'Ex: authorization_code',
-     `scopes` text    COMMENT 'List of scopes addressed by this token',
-     `token_type` varchar(128)    COMMENT 'Ex: Bearer or MAC',
-     `access_token` text    COMMENT 'Token to present when accessing resources',
-     `expires` int unsigned   DEFAULT 0 COMMENT 'Expiration time for the access_token (seconds since epoch)',
-     `refresh_token` text    COMMENT 'Token to present when refreshing the access_token',
-     `resource_owner_name` varchar(128)    COMMENT 'Identifier for the resource owner. Structure varies by service.',
-     `resource_owner` text    COMMENT 'Cached details describing the resource owner',
-     `error` text    COMMENT 'List of scopes addressed by this token',
-     `raw` text    COMMENT 'The token response data, per AccessToken::jsonSerialize',
-     `created_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP COMMENT 'When the token was created.',
-     `modified_date` timestamp NULL  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'When the token was created or modified.'
-,
-        PRIMARY KEY (`id`)
-
-    ,     INDEX `UI_tag`(
-        tag
-  )
-
-,          CONSTRAINT FK_civicrm_oauth_systoken_client_id FOREIGN KEY (`client_id`) REFERENCES `civicrm_oauth_client`(`id`) ON DELETE CASCADE
-)  ENGINE=InnoDB  ;
-

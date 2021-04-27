@@ -55,9 +55,9 @@
     <comment>Client Secret</comment>
     <add>5.32</add>
     <!-- Would prefer this be write-only for std admin, and read-write with special/elevated perm -->
-    <!--<permission>-->
-      <!--<or>manage OAuth client secrets</or>-->
-    <!--</permission>-->
+    <permission>
+      manage OAuth client
+    </permission>
   </field>
 
   <field>
@@ -67,6 +67,9 @@
     <!-- Ex: urlAuthorize, urlAccessToken, urlResourceOwnerDetails, scopes -->
     <serialize>JSON</serialize>
     <add>5.32</add>
+    <permission>
+      manage OAuth client
+    </permission>
   </field>
 
   <!-- Lifecycle -->

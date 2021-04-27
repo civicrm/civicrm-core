@@ -28,6 +28,18 @@ class CRM_OAuth_Upgrader extends CRM_OAuth_Upgrader_Base {
   }
 
   /**
+   * Add support for OAuthContactToken
+   *
+   * @return bool TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_0001(): bool {
+    $this->ctx->log->info('Applying update 0001');
+    $this->executeSqlFile('sql/upgrade_0001.sql');
+    return TRUE;
+  }
+
+  /**
    * Example: Run an external SQL script when the module is installed.
    *
    * public function install() {
