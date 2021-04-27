@@ -19,6 +19,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\API\Request;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -149,6 +150,42 @@ class CoreUtil {
    */
   private static function isCustomEntity($customGroupName) {
     return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
+  }
+
+  /**
+   * Check if current user is authorized to perform specified action on a given entity.
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @param array $record
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkAccess(string $entityName, string $actionName, array $record) {
+    $action = Request::create($entityName, $actionName, ['version' => 4]);
+    // This checks gatekeeper permissions
+    $granted = $action->isAuthorized();
+    // For get actions, just run a get and ACLs will be applied to the query.
+    // It's a cheap trick and not as efficient as not running the query at all,
+    // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
+    if (is_a($action, '\Civi\Api4\Generic\DAOGetAction')) {
+      $granted = $granted && $action->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
+    }
+    else {
+      $baoName = self::getBAOFromApiName($entityName);
+      // If entity has a BAO, run the BAO::checkAccess function, which will call the hook
+      if ($baoName && strpos($baoName, '_BAO_')) {
+        $baoName::checkAccess($actionName, $record, NULL, $granted);
+      }
+      // Otherwise, call the hook directly
+      else {
+        \CRM_Utils_Hook::checkAccess($entityName, $actionName, $record, NULL, $granted);
+      }
+    }
+    return $granted;
   }
 
 }

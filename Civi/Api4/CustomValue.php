@@ -123,6 +123,13 @@ class CustomValue {
   }
 
   /**
+   * @return \Civi\Api4\Generic\CheckAccessAction
+   */
+  public static function checkAccess($customGroup) {
+    return new Generic\CheckAccessAction("Custom_$customGroup", __FUNCTION__);
+  }
+
+  /**
    * @see \Civi\Api4\Generic\AbstractEntity::permissions()
    * @return array
    */

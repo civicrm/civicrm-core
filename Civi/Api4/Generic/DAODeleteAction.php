@@ -19,6 +19,9 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Delete one or more $ENTITIES.
  *
@@ -53,6 +56,9 @@ class DAODeleteAction extends AbstractBatchAction {
 
     if ($this->getCheckPermissions()) {
       foreach (array_keys($items) as $key) {
+        if (!CoreUtil::checkAccess($this->getEntityName(), $this->getActionName(), $items[$key])) {
+          throw new UnauthorizedException("ACL check failed");
+        }
         $items[$key]['check_permissions'] = TRUE;
         $this->checkContactPermissions($baoName, $items[$key]);
       }
