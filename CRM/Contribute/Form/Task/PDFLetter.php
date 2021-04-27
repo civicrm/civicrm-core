@@ -144,7 +144,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this);
+    $formValues = $this->controller->exportValues($this->getName());
+    CRM_Contribute_Form_Task_PDFLetterCommon::postProcess($this, $formValues);
   }
 
   /**
@@ -298,6 +299,80 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     }
 
     return $html;
+  }
+
+  /**
+   * Send pdf by email.
+   *
+   * @param array $contact
+   * @param string $html
+   *
+   * @param $is_pdf
+   * @param array $format
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function emailLetter($contact, $html, $is_pdf, $format = [], $params = []) {
+    try {
+      if (empty($contact['email'])) {
+        return FALSE;
+      }
+      $mustBeEmpty = ['do_not_email', 'is_deceased', 'on_hold'];
+      foreach ($mustBeEmpty as $emptyField) {
+        if (!empty($contact[$emptyField])) {
+          return FALSE;
+        }
+      }
+
+      $defaults = [
+        'toName' => $contact['display_name'],
+        'toEmail' => $contact['email'],
+        'text' => '',
+        'html' => $html,
+      ];
+      if (empty($params['from'])) {
+        $emails = CRM_Core_BAO_Email::getFromEmail();
+        $emails = array_keys($emails);
+        $defaults['from'] = array_pop($emails);
+      }
+      else {
+        $defaults['from'] = $params['from'];
+      }
+      if (!empty($params['subject'])) {
+        $defaults['subject'] = $params['subject'];
+      }
+      else {
+        $defaults['subject'] = ts('Thank you for your contribution/s');
+      }
+      if ($is_pdf) {
+        $defaults['html'] = ts('Please see attached');
+        $defaults['attachments'] = [CRM_Utils_Mail::appendPDF('ThankYou.pdf', $html, $format)];
+      }
+      $params = array_merge($defaults);
+      return CRM_Utils_Mail::send($params);
+    }
+    catch (CRM_Core_Exception $e) {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Check that the token only appears in a table cell. The '</td><td>' separator cannot otherwise work
+   * Calculate the number of times it appears IN the cell & the number of times it appears - should be the same!
+   *
+   * @param string $token
+   * @param string $entity
+   * @param string $textToSearch
+   *
+   * @return bool
+   */
+  public static function isHtmlTokenInTableCell($token, $entity, $textToSearch) {
+    $tokenToMatch = $entity . '\.' . $token;
+    $pattern = '|<td(?![\w-])((?!</td>).)*\{' . $tokenToMatch . '\}.*?</td>|si';
+    $within = preg_match_all($pattern, $textToSearch);
+    $total = preg_match_all("|{" . $tokenToMatch . "}|", $textToSearch);
+    return ($within == $total);
   }
 
 }

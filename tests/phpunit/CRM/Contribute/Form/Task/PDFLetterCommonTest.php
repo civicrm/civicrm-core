@@ -435,7 +435,7 @@ value=$contact_aggregate+$contribution.total_amount}
    */
   public function testIsHtmlTokenInTableCell($token, $entity, $textToSearch, $expected) {
     $this->assertEquals($expected,
-      CRM_Contribute_Form_Task_PDFLetterCommon::isHtmlTokenInTableCell($token, $entity, $textToSearch)
+      CRM_Contribute_Form_Task_PDFLetter::isHtmlTokenInTableCell($token, $entity, $textToSearch)
     );
   }
 
