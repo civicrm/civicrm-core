@@ -30,21 +30,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   const LOCATION_BLOCKS = 1;
 
   /**
-   * The id of the event we are proceessing.
+   * The id of the event we are processing.
    *
    * @var int
    */
   public $_eventId;
 
   /**
-   * The array of ids of all the participant we are proceessing.
+   * The array of ids of all the participant we are processing.
    *
    * @var int
    */
   protected $_participantIDS = NULL;
 
   /**
-   * The id of the participant we are proceessing.
+   * The id of the participant we are processing.
    *
    * @var int
    */
@@ -108,7 +108,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_fields;
 
   /**
-   * The billing location id for this contribiution page.
+   * The billing location id for this contribution page.
    *
    * @var int
    */
@@ -138,8 +138,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @var bool
    *
    */
-
-
   public $_isEventFull;
 
   public $_lineItem;
@@ -210,7 +208,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
-    $config = CRM_Core_Config::singleton();
 
     if (!$this->_values) {
       // create redirect URL to send folks back to event info page is registration not available
@@ -299,7 +296,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // get the profile ids
       $ufJoinParams = [
         'entity_table' => 'civicrm_event',
-        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
+        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         'module' => 'CiviEvent',
         'entity_id' => $this->_eventId,
       ];
@@ -309,14 +306,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // set profiles for additional participants
       if ($this->_values['event']['is_multiple_registrations']) {
-        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
+        // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         $ufJoinParams['module'] = 'CiviEvent_Additional';
 
         list($this->_values['additional_custom_pre_id'],
           $this->_values['additional_custom_post_id'], $preActive, $postActive
           ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
-        // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
+        // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
         // set same profile for additional contacts.
         if ($this->_values['custom_pre_id'] && !$this->_values['additional_custom_pre_id']) {
           $this->_values['additional_custom_pre_id'] = $this->_values['custom_pre_id'];
@@ -466,9 +463,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $params))
       );
     }
-
-    // get the email that the confirmation would have been sent to
-    $session = CRM_Core_Session::singleton();
 
     // assign is_email_confirm to templates
     if (isset($this->_values['event']['is_email_confirm'])) {
