@@ -138,4 +138,13 @@ trait CRM_Contribute_Form_Task_TaskTrait {
     return ' civicrm_contribution.id IN ( ' . implode(',', $this->getIDs()) . ' ) ';
   }
 
+  /**
+   * Is only one entity being processed?
+   *
+   * @return false
+   */
+  public function isSingle() {
+    return $this->_single ?? FALSE;
+  }
+
 }
