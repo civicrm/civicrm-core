@@ -397,6 +397,7 @@ class Container {
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
 
     $dispatcher->addListener('hook_civicrm_triggerInfo', ['\CRM_Contact_BAO_RelationshipCache', 'onHookTriggerInfo']);
+    $dispatcher->addListener('civi.api4.validate', $aliasEvent('civi.api4.validate', 'entity'), 100);
     $dispatcher->addListener('civi.dao.postInsert', ['\CRM_Core_BAO_RecurringEntity', 'triggerInsert']);
     $dispatcher->addListener('civi.dao.postUpdate', ['\CRM_Core_BAO_RecurringEntity', 'triggerUpdate']);
     $dispatcher->addListener('civi.dao.postDelete', ['\CRM_Core_BAO_RecurringEntity', 'triggerDelete']);

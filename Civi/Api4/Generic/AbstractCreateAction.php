@@ -19,6 +19,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Event\ValidateValuesEvent;
+
 /**
  * Base class for all `Create` api actions.
  *
@@ -59,9 +61,15 @@ abstract class AbstractCreateAction extends AbstractAction {
    * @throws \API_Exception
    */
   protected function validateValues() {
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
     $unmatched = $this->checkRequiredFields($this->getValues());
     if ($unmatched) {
       throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
+    }
+    $e = new ValidateValuesEvent($this, [$this->getValues()]);
+    \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
+    if (!empty($e->errors)) {
+      throw $e->toException();
     }
   }
 
