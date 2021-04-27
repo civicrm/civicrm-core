@@ -48,9 +48,9 @@ class PhpseclibCipherSuite implements CipherSuiteInterface {
     }
     elseif (class_exists('Crypt_AES')) {
       // phpseclib v1
-      $this->ciphers['aes-cbc'] = new \Crypt_AES(\Crypt_AES::MODE_CBC);
+      $this->ciphers['aes-cbc'] = new \Crypt_AES(CRYPT_MODE_CBC);
       $this->ciphers['aes-cbc']->setKeyLength(256);
-      $this->ciphers['aes-ctr'] = new \Crypt_AES(\Crypt_AES::MODE_CTR);
+      $this->ciphers['aes-ctr'] = new \Crypt_AES(CRYPT_MODE_CBC);
       $this->ciphers['aes-ctr']->setKeyLength(256);
     }
     else {
