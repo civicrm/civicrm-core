@@ -4,6 +4,8 @@ namespace Civi\Core;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
+use Civi\Core\Event\GenericHookEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class CiviEventDispatcher
@@ -15,7 +17,9 @@ use Symfony\Component\EventDispatcher\Event;
  *
  * @see \CRM_Utils_Hook
  */
-class CiviEventDispatcher extends EventDispatcher {
+class CiviEventDispatcher implements EventDispatcherInterface {
+
+  private $dispatcher;
 
   const DEFAULT_HOOK_PRIORITY = -100;
 
@@ -62,6 +66,20 @@ class CiviEventDispatcher extends EventDispatcher {
   }
 
   /**
+   * Constructor
+   */
+  public function __construct() {
+    $this->dispatcher = new EventDispatcher();
+  }
+
+  /**
+   * Get Event Dispatcher
+   */
+  public function getDispatcher() {
+    return $this->dispatcher;
+  }
+
+  /**
    * Adds a service as event listener.
    *
    * This provides partial backwards compatibility with ContainerAwareEventDispatcher.
@@ -94,6 +112,9 @@ class CiviEventDispatcher extends EventDispatcher {
    */
   public function dispatch($eventName, Event $event = NULL) {
     // Dispatch policies add systemic overhead and (normally) should not be evaluated. JNZ.
+    if (is_null($event)) {
+      $event = new GenericHookEvent();
+    }
     if ($this->dispatchPolicyRegex !== NULL) {
       switch ($mode = $this->checkDispatchPolicy($eventName)) {
         case 'run':
@@ -126,7 +147,10 @@ class CiviEventDispatcher extends EventDispatcher {
       }
     }
     $this->bindPatterns($eventName);
-    return parent::dispatch($eventName, $event);
+    if (is_subclass_of('Symfony\Component\EventDispatcher\EventDispatcherInterface', 'Symfony\Contracts\EventDispatcher\EventDispatcherInterface')) {
+      return $this->dispatcher->dispatch($event, $eventName);
+    }
+    return $this->dispatcher->dispatch($eventName, $event);
   }
 
   /**
@@ -134,7 +158,42 @@ class CiviEventDispatcher extends EventDispatcher {
    */
   public function getListeners($eventName = NULL) {
     $this->bindPatterns($eventName);
-    return parent::getListeners($eventName);
+    return $this->dispatcher->getListeners($eventName);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addListener($eventName, $listener, $priority = 0) {
+    return $this->dispatcher->addListener($eventName, $listener, $priority);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeListener($eventName, $listener) {
+    return $this->dispatcher->removeListener($eventName, $listener);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addSubscriber($subscriber) {
+    return $this->dispatcher->addSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeSubscriber($subscriber) {
+    return $this->dispatcher->removeSubscriber($subscriber);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getListenerPriority($eventName, $listener) {
+    return $this->dispatcher->getListenerPriority($eventName, $listener);
   }
 
   /**
@@ -143,7 +202,7 @@ class CiviEventDispatcher extends EventDispatcher {
   public function hasListeners($eventName = NULL) {
     // All hook_* events have default listeners, so hasListeners(NULL) is a truism.
     return ($eventName === NULL || $this->isHookEvent($eventName))
-      ? TRUE : parent::hasListeners($eventName);
+      ? TRUE : $this->dispatcher->hasListeners($eventName);
   }
 
   /**
@@ -208,7 +267,7 @@ class CiviEventDispatcher extends EventDispatcher {
         // WISHLIST: For native extensions (and possibly D6/D7/D8/BD), enumerate
         // the listeners and list them one-by-one. This would make it easier to
         // inspect via "cv debug:event-dispatcher".
-        $this->addListener($eventName, [
+        $this->dispatcher->addListener($eventName, [
           '\Civi\Core\CiviEventDispatcher',
           'delegateToUF',
         ], self::DEFAULT_HOOK_PRIORITY);
