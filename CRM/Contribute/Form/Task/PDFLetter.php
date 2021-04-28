@@ -417,7 +417,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
       }
       $validated = TRUE;
-      $html = str_replace($separator, $realSeparator, CRM_Contribute_Form_Task_PDFLetterCommon::resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator, $groupedContributions));
+      $html = str_replace($separator, $realSeparator, $this->resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator, $groupedContributions));
     }
 
     return $html;
@@ -519,6 +519,32 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       }
     }
     return TRUE;
+  }
+
+  /**
+   *
+   * @param string $html_message
+   * @param array $contact
+   * @param array $contribution
+   * @param array $messageToken
+   * @param bool $grouped
+   *   Does this letter represent more than one contribution.
+   * @param string $separator
+   *   What is the preferred letter separator.
+   * @param array $contributions
+   *
+   * @return string
+   */
+  protected function resolveTokens(string $html_message, $contact, $contribution, $messageToken, $grouped, $separator, $contributions): string {
+    if ($grouped) {
+      $tokenHtml = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $html_message, $contributions, $messageToken);
+    }
+    else {
+      // no change to normal behaviour to avoid risk of breakage
+      $tokenHtml = CRM_Utils_Token::replaceContributionTokens($html_message, $contribution, TRUE, $messageToken);
+    }
+    $useSmarty = (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY);
+    return CRM_Core_BAO_MessageTemplate::renderMessageTemplate(['text' => '', 'html' => $tokenHtml, 'subject' => ''], !$useSmarty, $contact['contact_id'], ['contact' => $contact])['html'];
   }
 
 }

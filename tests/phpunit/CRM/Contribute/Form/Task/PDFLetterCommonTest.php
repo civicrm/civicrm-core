@@ -304,7 +304,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     <td></td>
   </tr>
   <!--
-    -->
+  -->
   <tr>
     <td><strong>Total</strong></td>
     <td><strong>$ 100.00</strong></td>
@@ -322,7 +322,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     <th>Source</th>
   </tr>
   <!--
-    -->
+   -->
   <tr>
     <td>25 December 2016</td>
     <td>$ 10.00</td>
@@ -354,7 +354,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->assertEquals($html[2], $activities['values'][1]['details']);
     // Checking it is not called multiple times.
     // once for each contact create + once for the activities.
-    $this->assertEquals(3, $this->hookTokensCalled);
+    // & once for the token processor, for now.
+    // By calling the cached function we can get this down to 1
+    $this->assertEquals(4, $this->hookTokensCalled);
     $this->mut->checkAllMailLog($html);
 
   }

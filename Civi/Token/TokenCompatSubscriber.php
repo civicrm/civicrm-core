@@ -37,14 +37,11 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * @throws TokenException
    */
   public function onEvaluate(TokenValueEvent $e) {
-    // For reasons unknown, replaceHookTokens requires a pre-computed list of
-    // hook *categories* (aka entities aka namespaces). We'll cache
-    // this in the TokenProcessor's context.
+    // For reasons unknown, replaceHookTokens used to require a pre-computed list of
+    // hook *categories* (aka entities aka namespaces). We cache
+    // this in the TokenProcessor's context but can likely remove it now.
 
-    $hookTokens = [];
-    \CRM_Utils_Hook::tokens($hookTokens);
-    $categories = array_keys($hookTokens);
-    $e->getTokenProcessor()->context['hookTokenCategories'] = $categories;
+    $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
 
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
     $returnProperties = array_fill_keys($messageTokens['contact'] ?? [], 1);
