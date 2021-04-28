@@ -47,6 +47,11 @@ return [
     'class' => 'CRM_Core_DAO_SystemLog',
     'table' => 'civicrm_system_log',
   ],
+  'CRM_Core_DAO_Translation' => [
+    'name' => 'Translation',
+    'class' => 'CRM_Core_DAO_Translation',
+    'table' => 'civicrm_translation',
+  ],
   'CRM_Core_DAO_Worldregion' => [
     'name' => 'Worldregion',
     'class' => 'CRM_Core_DAO_Worldregion',

@@ -37,6 +37,7 @@
   <xi:include href="StateProvince.xml"        parse="xml" />
   <xi:include href="SystemLog.xml"            parse="xml" />
   <xi:include href="Tag.xml"                  parse="xml" />
+  <xi:include href="Translation.xml"          parse="xml" />
   <xi:include href="UFGroup.xml"              parse="xml" />
   <xi:include href="UFField.xml"              parse="xml" />
   <xi:include href="UFMatch.xml"              parse="xml" />
