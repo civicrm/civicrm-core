@@ -406,6 +406,7 @@ function civicrm_api3_contribution_sendconfirmation($params) {
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
   CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $params['id']);
+  return [];
 }
 
 /**
