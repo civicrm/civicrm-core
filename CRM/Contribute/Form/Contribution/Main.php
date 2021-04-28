@@ -290,7 +290,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->buildComponentForm($this->_id, $this);
     }
 
-    if (count($this->_paymentProcessors) >= 1 && !$this->get_template_vars("isCaptcha") && \Civi::settings()->get('forceRecaptcha')) {
+    if (!$this->get_template_vars("isCaptcha") && \Civi::settings()->get('forceRecaptcha')) {
       if (!$this->_userID) {
         CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
       }
