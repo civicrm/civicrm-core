@@ -1627,6 +1627,10 @@
   name        : Allen Shaw
   organization: Joinery
   jira        : allenshaw
+  
+- github      : ufundo
+  jira        : ufundo
+  name        : Benjamin W
 
 - github      : universalhandle
   name        : Frank J. Gómez
