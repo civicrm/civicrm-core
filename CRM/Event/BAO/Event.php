@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
+  const tz_fields = ['start_date', 'end_date', 'registration_start_date', 'registration_end_date'];
 
   /**
    * Fetch object based on array of properties.
@@ -2432,6 +2433,28 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
       'icon' => 'fa-link',
     ];
     return $return;
+  }
+
+  public static function setTimezones(CRM_Event_DAO_Event $event) {
+    // Pre-process time zoned fields into the PHP time zone, which should be the same as the database, to save as timestamp.
+    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
+
+    foreach (self::tz_fields as $field) {
+      if(!empty($event->{$field})) {
+        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, NULL, $timezone_event);
+      }
+    }
+  }
+
+  public static function resetTimezones(CRM_Event_DAO_Event $event) {
+    // Process time zoned fields into their own time zone
+    $timezone_event = ($event->event_tz ?: (!empty($event->id) ? CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $event->id, 'event_tz') : NULL));
+
+    foreach (self::tz_fields as $field) {
+      if (!empty($event->{$field})) {
+        $event->{$field} = CRM_Utils_Date::convertTimeZone($event->{$field}, $timezone_event);
+      }
+    }
   }
 
 }
