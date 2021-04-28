@@ -2722,17 +2722,20 @@ SELECT contact_id
   public function getFieldSpec($fieldName) {
     $fields = $this->fields();
 
-    // Support "unique names" as well as sql names
-    $fieldKey = $fieldName;
-    if (empty($fields[$fieldKey])) {
-      $fieldKeys = $this->fieldKeys();
-      $fieldKey = $fieldKeys[$fieldName] ?? NULL;
+    // Naturally, fields have 1-2 names (eg 'description'/'description'
+    // or 'event_description'/'description'). Use either.
+
+    if (isset($fields[$fieldName])) {
+      return $fields[$fieldName];
     }
-    // If neither worked then this field doesn't exist. Return false.
-    if (empty($fields[$fieldKey])) {
-      return FALSE;
+
+    foreach ($fields as $field) {
+      if ($field['name'] === $fieldName) {
+        return $field;
+      }
     }
-    return $fields[$fieldKey];
+
+    return FALSE;
   }
 
   /**
