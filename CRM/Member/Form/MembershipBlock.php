@@ -174,7 +174,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
     //$this->add('select', 'member_price_set_id', ts('Membership Price Set'), (['' => ts('- none -')] + $price));
 
     $this->addField('member_price_set_id', [
-      'entity' => 'PriceSet',
+      'entity' => 'PriceField',
       'name' => 'price_set_id',
       'options' => $price,
     ]);
