@@ -114,11 +114,11 @@ class CustomValue {
   /**
    * @param string $customGroup
    * @param bool $checkPermissions
-   * @return Action\CustomValue\GetActions
+   * @return Action\GetActions
    * @throws \API_Exception
    */
   public static function getActions($customGroup = NULL, $checkPermissions = TRUE) {
-    return (new Action\CustomValue\GetActions($customGroup, __FUNCTION__))
+    return (new Action\GetActions("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
