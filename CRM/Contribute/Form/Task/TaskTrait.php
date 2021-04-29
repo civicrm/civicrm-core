@@ -144,7 +144,7 @@ trait CRM_Contribute_Form_Task_TaskTrait {
    * @return false
    */
   public function isSingle() {
-    return $this->_single ?? FALSE;
+    return count($this->getIDs()) === 1;
   }
 
 }
