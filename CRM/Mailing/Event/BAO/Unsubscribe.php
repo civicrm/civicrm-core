@@ -306,7 +306,7 @@ WHERE  email = %2
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
-
+    throw new CRM_Core_Exception('is this hit');
     $jobObject = new CRM_Mailing_BAO_MailingJob();
     $jobTable = $jobObject->getTableName();
     $mailingObject = new CRM_Mailing_DAO_Mailing();
