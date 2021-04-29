@@ -190,6 +190,7 @@ SELECT acl.*
    * @return bool
    */
   public static function check($str, $contactID) {
+    \CRM_Core_Error::deprecatedWarning(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated.');
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
 

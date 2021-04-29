@@ -40,6 +40,7 @@ class CRM_ACL_API {
    *   true if yes, else false
    */
   public static function check($str, $contactID = NULL) {
+    \CRM_Core_Error::deprecatedWarning(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated.');
     if ($contactID == NULL) {
       $contactID = CRM_Core_Session::getLoggedInContactID();
     }
