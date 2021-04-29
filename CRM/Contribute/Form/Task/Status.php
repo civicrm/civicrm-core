@@ -66,12 +66,14 @@ AND    {$this->_componentClause}";
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     $this->add('checkbox', 'is_email_receipt', ts('Send e-mail receipt'));
     $this->setDefaults(['is_email_receipt' => 1]);
 
-    $contribIDs = implode(',', $this->_contributionIds);
+    $contribIDs = implode(',', $this->getIDs());
     $query = "
 SELECT c.id            as contact_id,
        co.id           as contribution_id,

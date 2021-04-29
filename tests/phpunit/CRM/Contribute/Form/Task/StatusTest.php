@@ -26,8 +26,12 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
 
   /**
    * Test update pending contribution with sending a confirmation mail.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
    */
-  public function testUpdatePendingContributionWithSendingEmail() {
+  public function testUpdatePendingContributionWithSendingEmail(): void {
     $this->_individualId = $this->individualCreate();
     $form = new CRM_Contribute_Form_Task_Status();
 
