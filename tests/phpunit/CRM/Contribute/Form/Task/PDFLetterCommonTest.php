@@ -18,6 +18,8 @@
  */
 class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   protected $_individualId;
 
   protected $_docTypes;
@@ -42,12 +44,15 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(['civicrm_uf_match']);
+    $this->quickCleanup(['civicrm_uf_match', 'civicrm_campaign'], TRUE);
     CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
   }
 
   /**
@@ -246,6 +251,124 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $html = $e->errorData['html'];
     }
     $this->assertStringContainsString('Mr. Anthony Anderson II', $html);
+  }
+
+  /**
+   * Test all contribution tokens.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testAllContributionTokens(): void {
+    $this->createLoggedInUser();
+    $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Contribution']);
+    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one']);
+    $tokens = $this->getAllContributionTokens();
+    $formValues = [
+      'document_type' => 'pdf',
+      'html_message' => '',
+    ];
+    foreach (array_keys($this->getAllContributionTokens()) as $token) {
+      $formValues['html_message'] .= "$token : {contribution.$token}\n";
+    }
+    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
+    $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign']], $tokens))]);
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $html = $e->errorData['html'];
+    }
+    $this->assertEquals('
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style>@page { margin: 0.75in 0.75in 0.75in 0.75in; }</style>
+    <style type="text/css">@import url(' . CRM_Core_Config::singleton()->userFrameworkResourceURL . 'css/print.css);</style>
+' . "    \n" . '  </head>
+  <body>
+    <div id="crm-container">
+contribution_id : 1
+total_amount : € 9,999.99
+fee_amount : € 1,111.11
+net_amount : € 7,777.78
+non_deductible_amount : € 2,222.22
+receive_date : July 20th, 2018 12:00 AM
+payment_instrument : Check
+trxn_id : 1234
+invoice_id : 568
+currency : EUR
+cancel_date : 2019-12-30 00:00:00
+cancel_reason : Contribution Cancel Reason
+receipt_date : October 30th, 2019 12:00 AM
+thankyou_date : 2019-11-30 00:00:00
+contribution_source : Contribution Source
+amount_level : Amount Level
+contribution_status_id : 2
+check_number : 6789
+campaign : Big one
+' . $this->getCustomFieldName('text') . ' : Bobsled
+' . $this->getCustomFieldName('select_string') . ' : Red
+' . $this->getCustomFieldName('select_date') . ' : 01/20/2021 12:00AM
+' . $this->getCustomFieldName('int') . ' : 999
+' . $this->getCustomFieldName('link') . ' : <a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+' . $this->getCustomFieldName('country') . ' : New Zealand
+' . $this->getCustomFieldName('multi_country') . ' : France, Canada
+' . $this->getCustomFieldName('contact_reference') . ' : Mr. Spider Man II
+' . $this->getCustomFieldName('state') . ' : Queensland
+' . $this->getCustomFieldName('multi_state') . ' : Victoria, New South Wales
+' . $this->getCustomFieldName('boolean') . ' : Yes
+' . $this->getCustomFieldName('checkbox') . ' : Purple
+    </div>
+  </body>
+</html>', $html);
+  }
+
+  /**
+   * Get all the tokens available to contributions.
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getAllContributionTokens(): array {
+    return [
+      'contribution_id' => '',
+      'total_amount' => '9999.99',
+      'fee_amount' => '1111.11',
+      'net_amount' => '7777.78',
+      'non_deductible_amount' => '2222.22',
+      'receive_date' => '2018-07-20',
+      'payment_instrument' => 'Check',
+      'trxn_id' => '1234',
+      'invoice_id' => '568',
+      'currency' => 'EUR',
+      'cancel_date' => '2019-12-30',
+      'cancel_reason' => 'Contribution Cancel Reason',
+      'receipt_date' => '2019-10-30',
+      'thankyou_date' => '2019-11-30',
+      'contribution_source' => 'Contribution Source',
+      'amount_level' => 'Amount Level',
+      'contribution_status_id' => 'Pending',
+      'check_number' => '6789',
+      'campaign' => 'Big one',
+      $this->getCustomFieldName('text') => 'Bobsled',
+      $this->getCustomFieldName('select_string') => 'R',
+      $this->getCustomFieldName('select_date') => '2021-01-20',
+      $this->getCustomFieldName('int') => 999,
+      $this->getCustomFieldName('link') => 'http://civicrm.org',
+      $this->getCustomFieldName('country') => 'New Zealand',
+      $this->getCustomFieldName('multi_country') => ['France', 'Canada'],
+      $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
+      $this->getCustomFieldName('state') => 'Queensland',
+      $this->getCustomFieldName('multi_state') => ['Victoria', 'New South Wales'],
+      $this->getCustomFieldName('boolean') => TRUE,
+      $this->getCustomFieldName('checkbox') => 'P',
+      $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
+
+    ];
   }
 
   /**
@@ -537,15 +660,13 @@ value=$contact_aggregate+$contribution.total_amount}
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function createContribution() {
-    $contributionParams = [
+  protected function createContribution($contributionParams = []) {
+    $contributionParams = array_merge([
       'contact_id' => $this->individualCreate(),
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
-    ];
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $contributionId = $contribution['id'];
-    return $contributionId;
+    ], $contributionParams);
+    return $this->callAPISuccess('Contribution', 'create', $contributionParams)['id'];
   }
 
 }

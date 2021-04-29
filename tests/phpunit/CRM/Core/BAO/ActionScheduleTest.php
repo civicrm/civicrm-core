@@ -795,8 +795,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => 'date_field',
       'custom_field_name' => 'custom_' . $customDateField['id'],
     ];
-
-    $this->_setUp();
   }
 
   /**
@@ -805,12 +803,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function tearDown(): void {
-    parent::tearDown();
-    $this->mut->clearMessages();
-    $this->mut->stop();
-    unset($this->mut);
     $this->quickCleanup([
       'civicrm_action_schedule',
       'civicrm_action_log',
@@ -820,7 +816,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'civicrm_event',
       'civicrm_email',
     ], TRUE);
-    $this->_tearDown();
+    $this->deleteTestObjects();
+    parent::tearDown();
   }
 
   /**
@@ -1742,7 +1739,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testContactCreatedNoAnniversary(): void {
     $contact = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
-    $this->_testObjects['CRM_Contact_DAO_Contact'][] = $contact['id'];
     $this->createScheduleFromFixtures('sched_contact_created_yesterday');
     $this->assertCronRuns([
       [
@@ -2208,26 +2204,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    *
    * (DAO_Name => array(int)) List of items to garbage-collect during tearDown
    */
-  private $_testObjects;
-
-  /**
-   * Sets up the fixture, for example, opens a network connection.
-   *
-   * This method is called before a test is executed.
-   */
-  protected function _setUp(): void {
-    $this->_testObjects = [];
-  }
-
-  /**
-   * Tears down the fixture, for example, closes a network connection.
-   *
-   * This method is called after a test is executed.
-   */
-  protected function _tearDown(): void {
-    parent::tearDown();
-    $this->deleteTestObjects();
-  }
+  private $_testObjects = [];
 
   /**
    * This is a wrapper for CRM_Core_DAO::createTestObject which tracks

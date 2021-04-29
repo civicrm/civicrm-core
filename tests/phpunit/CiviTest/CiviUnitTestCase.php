@@ -494,6 +494,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
@@ -526,6 +527,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->unsetExtensionSystem();
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
     $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
+    // Ensure the destruct runs by unsetting it. Also, unsetting
+    // classes frees memory as they are not otherwise unset until the
+    // very end.
+    unset($this->mut);
   }
 
   /**
