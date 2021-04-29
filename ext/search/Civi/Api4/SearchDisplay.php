@@ -29,4 +29,10 @@ class SearchDisplay extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  public static function permissions() {
+    $permissions = parent::permissions();
+    $permissions['run'] = [];
+    return $permissions;
+  }
+
 }
