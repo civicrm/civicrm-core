@@ -1094,6 +1094,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['case_contact'] = $permissions['case'];
+    $permissions['case_activity'] = $permissions['case'];
 
     $permissions['case_type'] = [
       'default' => ['administer CiviCase'],
