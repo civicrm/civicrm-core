@@ -28,11 +28,21 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
   protected $domainId;
 
   protected function getRecords() {
-    // TODO: Waiting for filter handling to get fixed in core
-    // $names = $this->_itemsToGet('name');
-    // $filter = $names ? ['name' => $names] : [];
-    $filter = [];
-    return \Civi\Core\SettingsMetadata::getMetadata($filter, $this->domainId, $this->loadOptions);
+    $names = $this->_itemsToGet('name');
+    $filter = $names ? ['name' => $names] : [];
+    $settings = \Civi\Core\SettingsMetadata::getMetadata($filter, $this->domainId, $this->loadOptions);
+    foreach ($settings as $index => $setting) {
+      // Unserialize default value
+      if (!empty($setting['serialize']) && !empty($setting['default']) && is_string($setting['default'])) {
+        $setting['default'] = \CRM_Core_DAO::unSerializeField($setting['default'], $setting['serialize']);
+      }
+      if (!isset($setting['options'])) {
+        $setting['options'] = !empty($setting['pseudoconstant']);
+      }
+      // Filter out deprecated properties
+      $settings[$index] = array_intersect_key($setting, array_column($this->fields(), NULL, 'name'));
+    }
+    return $settings;
   }
 
   public function fields() {
@@ -58,20 +68,8 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
         'data_type' => 'String',
       ],
       [
-        'name' => 'pseudoconstant',
-        'data_type' => 'String',
-      ],
-      [
         'name' => 'options',
         'data_type' => 'Array',
-      ],
-      [
-        'name' => 'group_name',
-        'data_type' => 'String',
-      ],
-      [
-        'name' => 'group',
-        'data_type' => 'String',
       ],
       [
         'name' => 'html_type',

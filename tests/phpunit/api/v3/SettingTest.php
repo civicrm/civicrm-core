@@ -111,11 +111,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
 
   /**
    * Test that getfields will filter on group.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
    */
-  public function testGetFieldsGroupFilters($version) {
-    $this->_apiversion = $version;
+  public function testGetFieldsGroupFilters() {
+    $this->_apiversion = 3;
     $params = ['filters' => ['group' => 'multisite']];
     $result = $this->callAPISuccess('setting', 'getfields', $params);
     $this->assertArrayNotHasKey('customCSSURL', $result['values']);
@@ -363,11 +361,11 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterSettingsFolders', [$this, 'setExtensionMetadata']);
     $data = NULL;
     Civi::cache('settings')->flush();
-    $fields = $this->callAPISuccess('setting', 'getfields', ['filters' => ['group_name' => 'Test Settings']]);
+    $fields = $this->callAPISuccess('setting', 'getfields');
     $this->assertArrayHasKey('test_key', $fields['values']);
     $this->callAPISuccess('setting', 'create', ['test_key' => 'keyset']);
     $this->assertEquals('keyset', Civi::settings()->get('test_key'));
-    $result = $this->callAPISuccess('setting', 'getvalue', ['name' => 'test_key', 'group' => 'Test Settings']);
+    $result = $this->callAPISuccess('setting', 'getvalue', ['name' => 'test_key']);
     $this->assertEquals('keyset', $result);
   }
 
