@@ -56,13 +56,6 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
-   * Check if reCaptcha has to be added on form forcefully.
-   */
-  public static function hasToAddForcefully() {
-    return (bool) \Civi::settings()->get('forceRecaptcha');
-  }
-
-  /**
    * Add element to form.
    *
    * @param CRM_Core_Form $form
