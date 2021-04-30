@@ -177,7 +177,7 @@ trait CRM_Admin_Form_SettingTrait {
 
         //Load input as readonly whose values are overridden in civicrm.settings.php.
         if (Civi::settings()->getMandatory($setting) !== NULL) {
-          $props['html_attributes']['readonly'] = TRUE;
+          $props['html_attributes']['disabled'] = TRUE;
           $this->includesReadOnlyFields = TRUE;
         }
 
