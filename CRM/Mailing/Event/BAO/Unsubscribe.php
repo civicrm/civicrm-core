@@ -110,25 +110,21 @@ WHERE  email = %2
    * @return array|null
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
    *
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {
+  public static function unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE): ?array {
     // First make sure there's a matching queue event.
 
     $q = CRM_Mailing_Event_BAO_Queue::verify($job_id, $queue_id, $hash);
-    $success = NULL;
     if (!$q) {
-      return $success;
+      return NULL;
     }
 
     $contact_id = $q->contact_id;
 
-    $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
+    $mailing_id = (int) civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
-
-    $groupObject = new CRM_Contact_BAO_Group();
-
-    $mailingObject = new CRM_Mailing_BAO_Mailing();
 
     // We need a mailing id that points to the mailing that defined the recipients.
     // This is usually just the passed-in mailing_id, however in the case of AB
@@ -174,7 +170,7 @@ WHERE  email = %2
     while ($do->fetch()) {
       // @todo this is should be a temporary measure until we stop storing the translated table name in the database
       if (substr($do->entity_table, 0, 13) === 'civicrm_group') {
-        if ($do->group_type == 'Base') {
+        if ($do->group_type === 'Base') {
           $base_groups[$do->entity_id] = NULL;
         }
         else {
@@ -269,10 +265,10 @@ WHERE  email = %2
       $notremoved = FALSE;
       if ($group_name) {
         if (in_array($group_id, $baseGroupIds)) {
-          list($total, $removed, $notremoved) = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email', 'Removed');
+          [$total, $removed, $notremoved] = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email', 'Removed');
         }
         else {
-          list($total, $removed, $notremoved) = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contacts, $group_id, 'Email');
+          [$total, $removed, $notremoved] = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($contacts, $group_id, 'Email');
         }
       }
       if ($notremoved) {
@@ -306,7 +302,6 @@ WHERE  email = %2
   public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
-
     $jobObject = new CRM_Mailing_BAO_MailingJob();
     $jobTable = $jobObject->getTableName();
     $mailingObject = new CRM_Mailing_DAO_Mailing();
@@ -319,7 +314,7 @@ WHERE  email = %2
     $queue = $queueObject->getTableName();
 
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $dao = new CRM_Mailing_BAO_Mailing();
     $dao->query("   SELECT * FROM $mailingTable
@@ -367,7 +362,7 @@ WHERE  email = %2
       }
     }
 
-    list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
+    [$addresses, $urls] = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash, $eq->email);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
