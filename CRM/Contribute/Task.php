@@ -101,6 +101,11 @@ class CRM_Contribute_Task extends CRM_Core_Task {
           'title' => ts('Thank-you letters - print or email'),
           'class' => 'CRM_Contribute_Form_Task_PDFLetter',
           'result' => FALSE,
+          'url' => 'civicrm/contribute/task?reset=1&task=letter',
+          'key' => 'letter',
+          'name' => ts('Send Letter'),
+          'is_single_mode' => TRUE,
+          'title_single_mode' => ts('Thank-you letter - print or email'),
         ],
         self::PDF_INVOICE => [
           'title' => ts('Invoices - print or email'),
