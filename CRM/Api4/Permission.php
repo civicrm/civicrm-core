@@ -25,7 +25,7 @@ class CRM_Api4_Permission {
     $config = CRM_Core_Config::singleton();
     $urlPath = explode('/', $_GET[$config->userFrameworkURLVar]);
     $permissions = [
-      ['access CiviCRM', 'access Ajax API'],
+      ['access CiviCRM', 'access AJAX API'],
     ];
     if (!empty($urlPath[3])) {
       $entity = $urlPath[3];
