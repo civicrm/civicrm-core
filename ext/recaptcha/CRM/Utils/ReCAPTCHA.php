@@ -62,31 +62,33 @@ class CRM_Utils_ReCAPTCHA {
    */
   public static function add(&$form) {
     $error = NULL;
+
+    // If statement has been altered so that we do not need to check !$this->get_template_vars("isCaptcha") in CRM/Contribute/Form/Contribution/Main.php
     if (!function_exists('recaptcha_get_html')) {
       require_once E::path('lib/recaptcha/recaptchalib.php');
-    }
 
-    // Load the Recaptcha api.js over HTTPS
-    $useHTTPS = TRUE;
+      // Load the Recaptcha api.js over HTTPS
+      $useHTTPS = TRUE;
 
-    $html = recaptcha_get_html(\Civi::settings()->get('recaptchaPublicKey'), $error, $useHTTPS);
+      $html = recaptcha_get_html(\Civi::settings()->get('recaptchaPublicKey'), $error, $useHTTPS);
 
-    $form->assign('recaptchaHTML', $html);
-    $form->assign('recaptchaOptions', \Civi::settings()->get('recaptchaOptions'));
-    $form->add(
-      'text',
-      'g-recaptcha-response',
-      'reCaptcha',
-      NULL,
-      TRUE
-    );
-    $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
-    $form->addRule('g-recaptcha-response', E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
-    if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
-      $form->setElementError(
+      $form->assign('recaptchaHTML', $html);
+      $form->assign('recaptchaOptions', \Civi::settings()->get('recaptchaOptions'));
+      $form->add(
+        'text',
         'g-recaptcha-response',
-        E::ts('Please go back and complete the CAPTCHA at the bottom of this form.')
+        'reCaptcha',
+        NULL,
+        TRUE
       );
+      $form->registerRule('recaptcha', 'callback', 'validate', 'CRM_Utils_ReCAPTCHA');
+      $form->addRule('g-recaptcha-response', E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'), 'recaptcha');
+      if ($form->isSubmitted() && empty($form->_submitValues['g-recaptcha-response'])) {
+        $form->setElementError(
+          'g-recaptcha-response',
+          E::ts('Please go back and complete the CAPTCHA at the bottom of this form.')
+        );
+      }
     }
   }
 
