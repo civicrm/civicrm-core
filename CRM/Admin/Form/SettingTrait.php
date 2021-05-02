@@ -44,11 +44,27 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
+   * Fields defined as read only.
+   *
+   * @var array
+   */
+  protected $readOnlyFields = [];
+
+  /**
+   * Have read only fields been defined on the form.
+   *
+   * @return bool
+   */
+  protected function hasReadOnlyFields(): bool {
+    return !empty($this->readOnlyFields);
+  }
+
+  /**
    * Get the metadata relating to the settings on the form, ordered by the keys in $this->_settings.
    *
    * @return array
    */
-  protected function getSettingsMetaData() {
+  protected function getSettingsMetaData(): array {
     if (empty($this->settingsMetadata)) {
       $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE);
       // This array_merge re-orders to the key order of $this->_settings.
@@ -178,7 +194,7 @@ trait CRM_Admin_Form_SettingTrait {
         //Load input as readonly whose values are overridden in civicrm.settings.php.
         if (Civi::settings()->getMandatory($setting) !== NULL) {
           $props['html_attributes']['readonly'] = TRUE;
-          $this->includesReadOnlyFields = TRUE;
+          $this->readOnlyFields[] = $setting;
         }
 
         $add = 'add' . $quickFormType;
@@ -253,6 +269,11 @@ trait CRM_Admin_Form_SettingTrait {
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
     $this->assign('fields', $this->getSettingsOrderedByWeight());
+    // @todo look at sharing the code below in the settings trait.
+    if ($this->hasReadOnlyFields()) {
+      $this->freeze($this->readOnlyFields);
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
+    }
   }
 
   /**
