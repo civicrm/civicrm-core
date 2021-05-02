@@ -209,6 +209,10 @@
 - github      : borisson
   name        : Joris Vercammen
 
+- github      : braders
+  name        : Bradley Taylor
+  organization: BrightMinded Ltd
+
 - name        : Brian McFee
   jira        : brian
 
@@ -1119,6 +1123,9 @@
   organization: Lueck Data Systems
   jira        : mdlueck
 
+- github      : mflandorfer
+  organization: Greenpeace CEE
+
 - github      : mlutfy
   name        : Mathieu Lutfy
   organization: Coop SymbioTIC
@@ -1359,6 +1366,10 @@
 
 - name        : Lutz Frommberger
   jira        : re-quest
+
+- github      : rgilman
+  name        : Robert Gilman
+  organization: Context Institute
 
 - github      : robbrandt
   name        : Rob Brandt
