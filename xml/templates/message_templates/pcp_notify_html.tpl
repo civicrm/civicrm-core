@@ -9,7 +9,7 @@
 {capture assign=headerStyle}colspan="2" style="text-align: left; padding: 4px; border-bottom: 1px solid #999; background-color: #eee;"{/capture}
 {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
 {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
-{capture assign=pcpURL     }{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcpId`" h=0 a=1}{/capture}
+{capture assign=pcpURL     }{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcpId`" h=0 a=1 fe=1}{/capture}
 
 <center>
   <table id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left; width:100%; max-width:700px; padding:0; margin:0; border:0px;">

@@ -48,7 +48,7 @@
   <tr>
    <td>
     {if $contribution_page_id}
-     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contribution_page_id`&cid=`$contact.contact_id`&pledgeId=`$pledge_id`&cs=`$checksumValue`" a=true h=0}{/capture}
+     {capture assign=contributionUrl}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contribution_page_id`&cid=`$contact.contact_id`&pledgeId=`$pledge_id`&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
      <p><a href="{$contributionUrl}">{ts}Go to a web page where you can make your payment online{/ts}</a></p>
     {else}
      <p>{ts}Please mail your payment to{/ts}: {$domain.address}</p>
