@@ -202,7 +202,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults['total_amount'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
       $this->_memType,
       'minimum_fee'
-    ));
+    ) ?? 0);
 
     $defaults['record_contribution'] = 0;
     $defaults['num_terms'] = 1;
@@ -276,7 +276,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
         //CRM-16950
         $taxAmount = NULL;
-        $totalAmount = $values['minimum_fee'] ?? NULL;
+        $totalAmount = $values['minimum_fee'] ?? 0;
         // @todo - feels a bug - we use taxRate from the form default rather than from the specified type?!?
         if ($this->getTaxRateForFinancialType($values['financial_type_id'])) {
           $taxAmount = ($taxRate / 100) * CRM_Utils_Array::value('minimum_fee', $values);
