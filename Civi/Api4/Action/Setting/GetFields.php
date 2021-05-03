@@ -31,6 +31,7 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
     $names = $this->_itemsToGet('name');
     $filter = $names ? ['name' => $names] : [];
     $settings = \Civi\Core\SettingsMetadata::getMetadata($filter, $this->domainId, $this->loadOptions);
+    $getReadonly = $this->_isFieldSelected('readonly');
     foreach ($settings as $index => $setting) {
       // Unserialize default value
       if (!empty($setting['serialize']) && !empty($setting['default']) && is_string($setting['default'])) {
@@ -38,6 +39,9 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
       }
       if (!isset($setting['options'])) {
         $setting['options'] = !empty($setting['pseudoconstant']);
+      }
+      if ($getReadonly) {
+        $setting['readonly'] = \Civi::settings()->getMandatory($setting['name']) !== NULL;
       }
       // Filter out deprecated properties
       $settings[$index] = array_intersect_key($setting, array_column($this->fields(), NULL, 'name'));
@@ -86,6 +90,11 @@ class GetFields extends \Civi\Api4\Generic\BasicGetFieldsAction {
       [
         'name' => 'data_type',
         'data_type' => 'Integer',
+      ],
+      [
+        'name' => 'readonly',
+        'data_type' => 'Boolean',
+        'description' => 'True if value is set in code and cannot be overridden.',
       ],
     ];
   }
