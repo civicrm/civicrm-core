@@ -95,6 +95,21 @@ trait CRMTraits_ACL_PermissionTrait {
   }
 
   /**
+   * Results after the allowedContact are returned.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   *
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int $contactID
+   * @param string $where
+   */
+  public function aclWhereGreaterThan($type, &$tables, &$whereTables, &$contactID, &$where) {
+    $where = " contact_a.id > " . $this->allowedContactId;
+  }
+
+  /**
    * Set up a core ACL.
    *
    * It is recommended that this helper function is accessed through a scenario function.
