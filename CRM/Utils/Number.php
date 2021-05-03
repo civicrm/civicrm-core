@@ -104,4 +104,23 @@ class CRM_Utils_Number {
     }
   }
 
+  /**
+   * Format number for display according to the current or supplied locale.
+   *
+   * Note this should not be used in conjunction with any calls to
+   * replaceCurrencySeparators as this function already does that.
+   *
+   * @param string $amount
+   * @param string $locale
+   *
+   * @return string
+   * @throws \Brick\Money\Exception\UnknownCurrencyException
+   */
+  public static function formatLocaleNumeric(string $amount, $locale = NULL): string {
+    $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
+    $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
+    $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);
+    return $formatter->format($amount);
+  }
+
 }
