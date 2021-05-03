@@ -48,6 +48,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * @return array
    */
   public static function recurLinks(int $recurID, $context = 'contribution') {
+    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
     $links = [
       CRM_Core_Action::VIEW => [
         'name' => ts('View'),
@@ -55,20 +56,26 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/contributionrecur',
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
       ],
-      CRM_Core_Action::UPDATE => [
+    ];
+    if (
+      (CRM_Core_Permission::check('edit contributions') || $context !== 'contribution') &&
+      ($paymentProcessorObj->supports('ChangeSubscriptionAmount')
+        || $paymentProcessorObj->supports('EditRecurringContribution')
+      )) {
+      $links[CRM_Core_Action::UPDATE] = [
         'name' => ts('Edit'),
         'title' => ts('Edit Recurring Payment'),
         'url' => 'civicrm/contribute/updaterecur',
         'qs' => "reset=1&action=update&crid=%%crid%%&cid=%%cid%%&context={$context}",
-      ],
-      CRM_Core_Action::DISABLE => [
-        'name' => ts('Cancel'),
-        'title' => ts('Cancel'),
-        'ref' => 'crm-enable-disable',
-      ],
+      ];
+    }
+
+    $links[CRM_Core_Action::DISABLE] = [
+      'name' => ts('Cancel'),
+      'title' => ts('Cancel'),
+      'ref' => 'crm-enable-disable',
     ];
 
-    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
     if ($paymentProcessorObj->supports('cancelRecurring')) {
       unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
       $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
@@ -84,14 +91,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       ];
     }
 
-    if (
-    (!CRM_Core_Permission::check('edit contributions') && $context === 'contribution') ||
-    (!$paymentProcessorObj->supports('ChangeSubscriptionAmount')
-      && !$paymentProcessorObj->supports('EditRecurringContribution')
-    )) {
-      unset($links[CRM_Core_Action::UPDATE]);
-    }
-
     return $links;
   }
 
@@ -102,10 +101,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   public function browse() {
     // add annual contribution
     $annual = [];
-    list($annual['count'],
-      $annual['amount'],
-      $annual['avg']
-      ) = CRM_Contribute_BAO_Contribution::annual($this->_contactId);
+    [$annual['count'], $annual['amount'], $annual['avg']] = CRM_Contribute_BAO_Contribution::annual($this->_contactId);
     $this->assign('annual', $annual);
 
     $controller = new CRM_Core_Controller_Simple(
@@ -164,8 +160,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    * Get all the recurring contribution information and assign to the template
    */
   private function addRecurringContributionsBlock() {
-    list($activeContributions, $activeContributionsCount) = $this->getActiveRecurringContributions();
-    list($inactiveRecurringContributions, $inactiveContributionsCount) = $this->getInactiveRecurringContributions();
+    [$activeContributions, $activeContributionsCount] = $this->getActiveRecurringContributions();
+    [$inactiveRecurringContributions, $inactiveContributionsCount] = $this->getInactiveRecurringContributions();
 
     if (!empty($activeContributions) || !empty($inactiveRecurringContributions)) {
       // assign vars to templates
