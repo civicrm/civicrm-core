@@ -142,6 +142,45 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Return the Notification URL for Payments.
+   *
+   * The default is to pass the params through to `url()`. However the WordPress
+   * CMS class overrides this method because Notification URLs must always target
+   * the Base Page to avoid IPN failures when Forms are embedded in pages that
+   * require authentication.
+   *
+   * @param string $path
+   *   The path being linked to, such as "civicrm/add".
+   * @param string $query
+   *   A query string to append to the link.
+   * @param bool $absolute
+   *   Whether to force the output to be an absolute link (beginning with http).
+   *   Useful for links that will be displayed outside the site, such as in an RSS feed.
+   * @param string $fragment
+   *   A fragment identifier (named anchor) to append to the link.
+   * @param bool $frontend
+   *   This link should be to the CMS front end (applies to WP & Joomla).
+   * @param bool $forceBackend
+   *   This link should be to the CMS back end (applies to WP & Joomla).
+   * @param bool $htmlize
+   *   Whether to encode special html characters such as &.
+   *
+   * @return string
+   *   The Notification URL.
+   */
+  public function getNotifyUrl(
+    $path = NULL,
+    $query = NULL,
+    $absolute = FALSE,
+    $fragment = NULL,
+    $frontend = FALSE,
+    $forceBackend = FALSE,
+    $htmlize = TRUE
+  ) {
+    return $this->url($path, $query, $absolute, $fragment, $frontend, $forceBackend, $htmlize);
+  }
+
+  /**
    * Authenticate the user against the CMS db.
    *
    * @param string $name
