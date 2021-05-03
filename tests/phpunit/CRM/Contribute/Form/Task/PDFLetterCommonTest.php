@@ -190,8 +190,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPostProcess(): void {
-    $this->createLoggedInUser();
-    $this->_individualId = $this->individualCreate();
+    $this->createLoggedInUser();;
     foreach (['docx', 'odt'] as $docType) {
       $formValues = [
         'is_unit_test' => TRUE,
@@ -202,13 +201,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         ],
       ];
 
-      $contributionParams = [
-        'contact_id' => $this->_individualId,
-        'total_amount' => 100,
-        'financial_type_id' => 'Donation',
-      ];
-      $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-      $contributionId = $contribution['id'];
+      $contributionId = $this->createContribution();
       /* @var $form CRM_Contribute_Form_Task_PDFLetter */
       $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
       $form->setContributionIds([$contributionId]);
@@ -229,6 +222,30 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         $this->assertTrue(strpos($html[$contributionId], $val) !== 0);
       }
     }
+  }
+
+  /**
+   * Test that no notice or errors occur if no contribution tokens are requested.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testNoContributionTokens(): void {
+    $this->createLoggedInUser();
+    $formValues = [
+      'html_message' => '{contact.display_name}',
+      'document_type' => 'pdf',
+    ];
+    /* @var $form CRM_Contribute_Form_Task_PDFLetter */
+    $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
+    $form->setContributionIds([$this->createContribution()]);
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $html = $e->errorData['html'];
+    }
+    $this->assertStringContainsString('Mr. Anthony Anderson II', $html);
   }
 
   /**
@@ -513,6 +530,22 @@ value=$contact_aggregate+$contribution.total_amount}
     foreach ($entities as $entityID) {
       $_SESSION['_' . $form->controller->_name . '_container']['values']['Search']['mark_x_' . $entityID] = TRUE;
     }
+  }
+
+  /**
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function createContribution() {
+    $contributionParams = [
+      'contact_id' => $this->individualCreate(),
+      'total_amount' => 100,
+      'financial_type_id' => 'Donation',
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $contributionId = $contribution['id'];
+    return $contributionId;
   }
 
 }

@@ -129,6 +129,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
    * Process the form after the input has been submitted and validated.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->getName());
@@ -174,12 +176,12 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     }
     // a placeholder in case the separator is common in the string - e.g ', '
     $separator = '****~~~~';
-    $groupBy = $formValues['group_by'];
+    $groupBy = $this->getSubmittedValue('group_by');
 
     // skip some contacts ?
     $skipOnHold = $this->skipOnHold ?? FALSE;
     $skipDeceased = $this->skipDeceased ?? TRUE;
-    $contributionIDs = $this->getVar('_contributionIds');
+    $contributionIDs = $this->getIDs();
     if ($this->isQueryIncludesSoftCredits()) {
       $contributionIDs = [];
       $result = $this->getSearchQueryResults();
@@ -239,7 +241,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     //CRM-19761
     if (!empty($html)) {
-      $type = $formValues['document_type'];
+      $type = $this->getSubmittedValue('document_type');
 
       if ($type === 'pdf') {
         CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
