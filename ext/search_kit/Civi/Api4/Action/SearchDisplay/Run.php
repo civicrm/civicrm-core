@@ -90,6 +90,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     }
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->savedSearch['api_params'];
+    $apiParams['checkPermissions'] = $this->checkPermissions;
     $apiParams += ['where' => []];
     $settings = $this->display['settings'];
     $page = NULL;
