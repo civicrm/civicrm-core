@@ -60,10 +60,12 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
 
     $page = new CRM_Contribute_Page_UserDashboard();
     $page->run();
-    $expected = '<span><a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=1&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=1&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Cancel\' >Cancel</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=1&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
+    $expected = '<span><a href="https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=sunil._1183377782_biz_api1.webaccess.co.in" class="action-item crm-hover-button no-popup" title=\'Cancel\' >Cancel</a>'
+      . '<a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=1&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a>'
+      . '</span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=1&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=1&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
     $this->assertEquals(
       $expected,
-      $this->getActionHtml()
+      $this->getDashboardActionHtml()
     );
   }
 
@@ -114,6 +116,16 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
   protected function getActionHtml(): string {
     return CRM_Core_Smarty::singleton()
       ->get_template_vars()['activeRecurRows'][1]['action'];
+  }
+
+  /**
+   * Get the html assigned as actions.
+   *
+   * @return string
+   */
+  protected function getDashboardActionHtml(): string {
+    return CRM_Core_Smarty::singleton()
+      ->get_template_vars()['recurRows'][1]['action'];
   }
 
 }

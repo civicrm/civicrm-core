@@ -563,7 +563,7 @@ class CRM_Core_Session {
     if (!is_numeric($session->get('userID'))) {
       return NULL;
     }
-    return $session->get('userID');
+    return (int) $session->get('userID');
   }
 
   /**
