@@ -6,7 +6,7 @@
  */
 class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
 
   /**
    * @return array

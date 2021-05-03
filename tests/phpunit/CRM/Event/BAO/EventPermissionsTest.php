@@ -15,7 +15,7 @@
  */
 class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
 
   public function setUp(): void {
     parent::setUp();
