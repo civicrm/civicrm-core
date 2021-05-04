@@ -29,6 +29,7 @@
     <required>true</required>
     <comment>Foreign key to the activity Campaign.</comment>
     <html>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
     <add>3.3</add>

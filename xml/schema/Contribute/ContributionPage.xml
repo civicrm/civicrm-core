@@ -440,6 +440,7 @@
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>
     <html>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
     <add>3.4</add>

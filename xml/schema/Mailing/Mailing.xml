@@ -460,7 +460,7 @@
     <comment>The campaign for which this mailing has been initiated.</comment>
     <add>3.4</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
   </field>
