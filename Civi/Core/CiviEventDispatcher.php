@@ -80,13 +80,7 @@ class CiviEventDispatcher extends EventDispatcher {
       throw new \InvalidArgumentException('Expected an array("service", "method") argument');
     }
 
-    $this->addListener($eventName, function($event) use ($callback) {
-      static $svc;
-      if ($svc === NULL) {
-        $svc = \Civi::container()->get($callback[0]);
-      }
-      return call_user_func([$svc, $callback[1]], $event);
-    }, $priority);
+    $this->addListener($eventName, new \Civi\Core\Event\ServiceListener($callback), $priority);
   }
 
   /**
