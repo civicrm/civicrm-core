@@ -266,6 +266,7 @@
     <import>true</import>
     <comment>The campaign for which this participant has been registered.</comment>
     <html>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
     <add>3.4</add>

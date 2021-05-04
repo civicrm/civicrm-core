@@ -424,7 +424,7 @@
     <comment>The campaign for which this contribution has been triggered.</comment>
     <add>4.1</add>
     <html>
-      <type>Select</type>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
   </field>

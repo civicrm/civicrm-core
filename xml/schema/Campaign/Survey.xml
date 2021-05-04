@@ -43,6 +43,7 @@
     <default>NULL</default>
     <comment>Foreign key to the Campaign.</comment>
     <html>
+      <type>EntityRef</type>
       <label>Campaign</label>
     </html>
     <add>3.3</add>
