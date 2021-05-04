@@ -179,6 +179,10 @@
         return $scope.afform;
       };
 
+      this.getEntities = function(filter) {
+        return filter ? _.filter($scope.entities, filter) : _.toArray($scope.entities);
+      };
+
       this.toggleContactSummary = function() {
         if ($scope.afform.contact_summary) {
           $scope.afform.contact_summary = false;

@@ -100,7 +100,7 @@
         };
       };
 
-      // Getter/Setter function for fields of type select.
+      // Getter/Setter function for fields of type select or entityRef.
       $scope.getSetSelect = function(val) {
         var currentVal = $scope.dataProvider.getFieldData()[ctrl.fieldName];
         // Setter

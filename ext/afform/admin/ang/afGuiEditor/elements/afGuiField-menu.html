@@ -2,7 +2,7 @@
   <div href ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown">
     <label>{{:: ts('Type:') }}</label>
     <select class="form-control" ng-model="getSet('input_type')" ng-model-options="{getterSetter: true}" title="{{:: ts('Field type') }}">
-      <option ng-repeat="(type, label) in meta.inputType" value="{{ type }}" ng-if="inputTypeCanBe(type)">{{ label }}</option>
+      <option ng-repeat="type in $ctrl.inputTypes" value="{{ type.name }}">{{ type.label }}</option>
     </select>
   </div>
 </li>
