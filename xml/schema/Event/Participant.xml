@@ -260,6 +260,7 @@
   </field>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <uniqueName>participant_campaign_id</uniqueName>
     <type>int unsigned</type>
     <title>Campaign ID</title>

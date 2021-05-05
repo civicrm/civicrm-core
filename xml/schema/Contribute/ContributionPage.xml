@@ -436,6 +436,7 @@
   </field>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <title>Campaign ID</title>
     <type>int unsigned</type>
     <comment>The campaign for which we are collecting contributions with this page.</comment>

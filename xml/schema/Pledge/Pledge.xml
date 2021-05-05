@@ -329,6 +329,7 @@
   </field>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <uniqueName>pledge_campaign_id</uniqueName>
     <type>int unsigned</type>
     <title>Campaign ID</title>
