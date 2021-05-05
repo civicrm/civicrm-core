@@ -318,6 +318,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'readonly',
         'data_type' => 'Boolean',
+        'description' => 'True for auto-increment, calculated, or otherwise non-editable fields.',
       ],
       [
         'name' => 'output_formatters',

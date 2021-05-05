@@ -35,7 +35,7 @@ class SettingsMetadata {
    *
    * @param array $filters
    * @param int $domainID
-   * @param bool $loadOptions
+   * @param bool|array $loadOptions
    *
    * @return array
    *   the following information as appropriate for each setting
@@ -70,7 +70,7 @@ class SettingsMetadata {
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
     if ($loadOptions) {
-      self::loadOptions($settingsMetadata);
+      self::fillOptions($settingsMetadata, $loadOptions);
     }
 
     return $settingsMetadata;
@@ -98,7 +98,7 @@ class SettingsMetadata {
   /**
    * Load up settings metadata from files.
    *
-   * @param array $metaDataFolder
+   * @param string $metaDataFolder
    *
    * @return array
    */
@@ -141,22 +141,35 @@ class SettingsMetadata {
    * Retrieve options from settings metadata
    *
    * @param array $settingSpec
+   * @param bool|array $optionsFormat
+   *   TRUE for a flat array; otherwise an array of keys to return
    */
-  protected static function loadOptions(&$settingSpec) {
+  protected static function fillOptions(&$settingSpec, $optionsFormat) {
     foreach ($settingSpec as &$spec) {
       if (empty($spec['pseudoconstant'])) {
         continue;
       }
       $pseudoconstant = $spec['pseudoconstant'];
+      $spec['options'] = [];
       // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
       // but it's tightly coupled to DAO/field. However, if you really need to support
       // more pseudoconstant types, then probably best to refactor it. For now, KISS.
-      if (!empty($pseudoconstant['callback'])) {
-        $spec['options'] = Resolver::singleton()->call($pseudoconstant['callback'], []);
-      }
-      elseif (!empty($pseudoconstant['optionGroupName'])) {
+      if (!empty($pseudoconstant['optionGroupName'])) {
         $keyColumn = \CRM_Utils_Array::value('keyColumn', $pseudoconstant, 'value');
-        $spec['options'] = \CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+        if (is_array($optionsFormat)) {
+          $optionValues = \CRM_Core_OptionValue::getValues(['name' => $pseudoconstant['optionGroupName']]);
+          foreach ($optionValues as $option) {
+            $option['id'] = $option['value'];
+            $spec['options'][] = $option;
+          }
+        }
+        else {
+          $spec['options'] = \CRM_Core_OptionGroup::values($pseudoconstant['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+        }
+        continue;
+      }
+      if (!empty($pseudoconstant['callback'])) {
+        $options = Resolver::singleton()->call($pseudoconstant['callback'], []);
       }
       if (!empty($pseudoconstant['table'])) {
         $params = [
@@ -164,7 +177,19 @@ class SettingsMetadata {
           'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
           'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
         ];
-        $spec['options'] = \CRM_Core_PseudoConstant::renderOptionsFromTablePseudoconstant($pseudoconstant, $params, ($spec['localize_context'] ?? NULL), 'get');
+        $options = \CRM_Core_PseudoConstant::renderOptionsFromTablePseudoconstant($pseudoconstant, $params, ($spec['localize_context'] ?? NULL), 'get');
+      }
+      if (is_array($optionsFormat)) {
+        foreach ($options as $key => $value) {
+          $spec['options'][] = [
+            'id' => $key,
+            'name' => $value,
+            'label' => $value,
+          ];
+        }
+      }
+      else {
+        $spec['options'] = $options;
       }
     }
   }
