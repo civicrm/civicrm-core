@@ -178,7 +178,7 @@ class CoreUtil {
       $baoName = self::getBAOFromApiName($entityName);
       // If entity has a BAO, run the BAO::checkAccess function, which will call the hook
       if ($baoName && strpos($baoName, '_BAO_')) {
-        $baoName::checkAccess($actionName, $record, NULL, $granted);
+        $granted = $baoName::checkAccess($actionName, $record, NULL, $granted);
       }
       // Otherwise, call the hook directly
       else {

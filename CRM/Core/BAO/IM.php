@@ -19,6 +19,7 @@
  * This class contain function for IM handling
  */
 class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create or update IM record.
