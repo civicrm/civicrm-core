@@ -275,7 +275,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date']);
     }
     else {
-      $formatted['thankyou_date'] = NULL;
+      $formatted['thankyou_date'] = 'null';
     }
 
     if (!empty($params['is_email_receipt'])) {

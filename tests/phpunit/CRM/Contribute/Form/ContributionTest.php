@@ -1873,7 +1873,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
           'creditnote_id' => NULL,
           'campaign_id' => NULL,
           'contribution_page_id' => NULL,
-          'thankyou_date' => NULL,
+          'thankyou_date' => 'null',
           'custom' => [],
         ],
       ],
