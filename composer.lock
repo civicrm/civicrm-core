@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ceca2b33b97c4834e26b202ade5a9290",
+    "content-hash": "0e39d59009c3d153d1aaa107a411f319",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -24,6 +24,11 @@
                 "dflydev/apache-mime-types": "^1.0"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "MimeTyper\\": "src/"
@@ -40,12 +45,7 @@
                 }
             ],
             "description": "PHP mime type and extension mapping library: compatible with Symfony, powered by jshttp/mime-db",
-            "time": "2018-09-27T09:45:05+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Update gitignore to ensure that sites that manage via git don't miss out on the important db.json file": "https://patch-diff.githubusercontent.com/raw/adrienrn/php-mimetyper/pull/15.patch"
-                }
-            }
+            "time": "2018-09-27T09:45:05+00:00"
         },
         {
             "name": "brick/math",
@@ -647,6 +647,11 @@
                 "shasum": ""
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "phpQuery/"
@@ -670,12 +675,7 @@
             ],
             "description": "phpQuery is a server-side, chainable, CSS3 selector driven Document Object Model (DOM) API based on jQuery JavaScript Library",
             "homepage": "http://code.google.com/p/phpquery/",
-            "time": "2013-03-21T12:39:33+00:00",
-            "extra": {
-                "patches_applied": {
-                    "PHP7.4 Fix for array access using {} instead of []": "https://raw.githubusercontent.com/civicrm/civicrm-core/fe45bdfc4f3e3d3deb27e3d853cdbc7f616620a9/tools/scripts/composer/patches/php74_array_access_fix_phpquery.patch"
-                }
-            }
+            "time": "2013-03-21T12:39:33+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -1382,6 +1382,11 @@
                 "pear/pear-core-minimal": "*"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "DB": "./"
@@ -1417,29 +1422,24 @@
                 }
             ],
             "description": "More info available on: http://pear.php.net/package/DB",
-            "time": "2020-04-19T19:45:59+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
-                }
-            }
+            "time": "2020-04-19T19:45:59+00:00"
         },
         {
             "name": "pear/log",
-            "version": "1.13.2",
+            "version": "1.13.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Log.git",
-                "reference": "d8cde3dba893a36ec561bf6188fdc39f4221c4d3"
+                "reference": "21af0be11669194d72d88b5ee9d5f176dc75d9a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Log/zipball/d8cde3dba893a36ec561bf6188fdc39f4221c4d3",
-                "reference": "d8cde3dba893a36ec561bf6188fdc39f4221c4d3",
+                "url": "https://api.github.com/repos/pear/Log/zipball/21af0be11669194d72d88b5ee9d5f176dc75d9a3",
+                "reference": "21af0be11669194d72d88b5ee9d5f176dc75d9a3",
                 "shasum": ""
             },
             "require": {
-                "pear/pear_exception": "1.0.1",
+                "pear/pear_exception": "1.0.1 || 1.0.2",
                 "php": ">5.2"
             },
             "require-dev": {
@@ -1452,7 +1452,10 @@
             "autoload": {
                 "psr-0": {
                     "Log": "./"
-                }
+                },
+                "exclude-from-classmap": [
+                    "/examples/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "include-path": [
@@ -1475,7 +1478,11 @@
                 "log",
                 "logging"
             ],
-            "time": "2020-06-02T00:04:03+00:00"
+            "support": {
+                "issues": "https://github.com/pear/Log/issues",
+                "source": "https://github.com/pear/Log"
+            },
+            "time": "2021-05-04T23:51:30+00:00"
         },
         {
             "name": "pear/mail",
@@ -1502,6 +1509,11 @@
                 "pear/net_smtp": "Install optionally via your project's composer.json"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Mail": "./"
@@ -1533,12 +1545,7 @@
             ],
             "description": "Class that provides multiple interfaces for sending emails.",
             "homepage": "http://pear.php.net/package/Mail",
-            "time": "2017-04-11T17:27:29+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Apply CiviCRM Customisations for CRM-1367 and CRM-5946": "https://raw.githubusercontent.com/civicrm/civicrm-core/36319938a5bf26c1e7e2110a26a65db6a5979268/tools/scripts/composer/patches/pear-mail.patch"
-                }
-            }
+            "time": "2017-04-11T17:27:29+00:00"
         },
         {
             "name": "pear/mail_mime",
@@ -1558,6 +1565,11 @@
                 "pear/pear-core-minimal": "*"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Mail": "./"
@@ -1584,12 +1596,7 @@
             ],
             "description": "Mail_Mime provides classes to create MIME messages",
             "homepage": "http://pear.php.net/package/Mail_Mime",
-            "time": "2020-06-27T08:35:27+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://raw.githubusercontent.com/civicrm/civicrm-core/74e25f27bb3be32519657539afe8a285c6c99a08/tools/scripts/composer/patches/mail_mime_crm_3133.patch"
-                }
-            }
+            "time": "2020-06-27T08:35:27+00:00"
         },
         {
             "name": "pear/net_smtp",
@@ -1617,6 +1624,11 @@
                 "pear/auth_sasl": "Install optionally via your project's composer.json"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "Net": "./"
@@ -1649,12 +1661,7 @@
                 "mail",
                 "smtp"
             ],
-            "time": "2019-11-30T23:40:31+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Add in CiviCRM custom error message for CRM-8744": "https://raw.githubusercontent.com/civicrm/civicrm-core/a6a0ff13d2a155ad962529595dceaef728116f96/tools/scripts/composer/patches/net-smtp-patch.patch"
-                }
-            }
+            "time": "2019-11-30T23:40:31+00:00"
         },
         {
             "name": "pear/net_socket",
@@ -1956,6 +1963,11 @@
                 "squizlabs/php_codesniffer": "2.*"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "PhpOffice\\Common\\": "src/Common/"
@@ -1982,12 +1994,7 @@
                 "office",
                 "php"
             ],
-            "time": "2018-07-13T14:12:34+00:00",
-            "extra": {
-                "patches_applied": {
-                    "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
-                }
-            }
+            "time": "2018-07-13T14:12:34+00:00"
         },
         {
             "name": "phpoffice/phpword",
@@ -3970,6 +3977,11 @@
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
+            "extra": {
+                "patches_applied": {
+                    "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
+                }
+            },
             "autoload": {
                 "classmap": [
                     "src"
@@ -4022,12 +4034,7 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
-            "time": "2020-06-13T12:38:26+00:00",
-            "extra": {
-                "patches_applied": {
-                    "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
-                }
-            }
+            "time": "2020-06-13T12:38:26+00:00"
         }
     ],
     "packages-dev": [],
@@ -4047,5 +4054,5 @@
     "platform-overrides": {
         "php": "7.2"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }
