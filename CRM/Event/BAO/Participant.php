@@ -1898,7 +1898,7 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
       $eventTitle = $dao->title;
       $eventId = $dao->event_id;
     }
-    if (!$details['allow_selfcancelxfer']) {
+    if (!$details['allow_selfcancelxfer'] && !$isBackOffice) {
       $details['eligible'] = FALSE;
       $details['ineligible_message'] = ts('This event registration can not be transferred or cancelled. Contact the event organizer if you have questions.');
       return $details;
