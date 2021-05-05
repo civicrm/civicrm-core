@@ -136,10 +136,6 @@ trait DAOActionTrait {
         $item['contact_id'] = $entityId;
       }
 
-      if ($this->getCheckPermissions()) {
-        $this->checkContactPermissions($baoName, $item);
-      }
-
       if ($this->getEntityName() === 'Address') {
         $createResult = $baoName::$method($item, $this->fixAddress);
       }
@@ -257,28 +253,6 @@ trait DAOActionTrait {
       \Civi::cache('metadata')->set($cacheKey, $info);
     }
     return isset($info[$fieldName]) ? ['suffix' => $suffix] + $info[$fieldName] : NULL;
-  }
-
-  /**
-   * Check edit/delete permissions for contacts and related entities.
-   *
-   * @param string $baoName
-   * @param array $item
-   *
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  protected function checkContactPermissions($baoName, $item) {
-    if ($baoName === 'CRM_Contact_BAO_Contact' && !empty($item['id'])) {
-      $permission = $this->getActionName() === 'delete' ? \CRM_Core_Permission::DELETE : \CRM_Core_Permission::EDIT;
-      if (!\CRM_Contact_BAO_Contact_Permission::allow($item['id'], $permission)) {
-        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
-      }
-    }
-    else {
-      // Fixme: decouple from v3
-      require_once 'api/v3/utils.php';
-      _civicrm_api3_check_edit_permissions($baoName, $item);
-    }
   }
 
 }

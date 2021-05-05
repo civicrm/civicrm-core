@@ -19,6 +19,7 @@
  * This class contains functions for email handling.
  */
 class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create email address.

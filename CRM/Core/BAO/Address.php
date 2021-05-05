@@ -19,6 +19,7 @@
  * This is class to handle address related functions.
  */
 class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Takes an associative array and creates a address.

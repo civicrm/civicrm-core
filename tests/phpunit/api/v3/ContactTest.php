@@ -3211,7 +3211,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $config->userPermissionClass->permissions = ['access CiviCRM'];
     $result = $this->callAPIFailure('contact', 'update', $params);
-    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+    if ($version == 3) {
+      $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+    }
+    else {
+      $this->assertEquals('ACL check failed', $result['error_message']);
+    }
 
     $config->userPermissionClass->permissions = [
       'access CiviCRM',

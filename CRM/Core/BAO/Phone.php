@@ -19,6 +19,7 @@
  * Class contains functions for phone.
  */
 class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create phone object - note that the create function calls 'add' but

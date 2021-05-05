@@ -19,6 +19,7 @@
  * This class contains function for Open Id
  */
 class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
+  use CRM_Contact_AccessTrait;
 
   /**
    * Create or update OpenID record.

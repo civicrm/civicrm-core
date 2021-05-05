@@ -3728,4 +3728,30 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
     ];
   }
 
+  /**
+   * @param string $action
+   * @param array $record
+   * @param $userID
+   */
+  public static function _checkAccess(string $action, array $record, $userID) {
+    switch ($action) {
+      case 'create':
+        return CRM_Core_Permission::check('add contacts', $userID);
+
+      case 'get':
+        $actionType = CRM_Core_Permission::VIEW;
+        break;
+
+      case 'delete':
+        $actionType = CRM_Core_Permission::DELETE;
+        break;
+
+      default:
+        $actionType = CRM_Core_Permission::EDIT;
+        break;
+    }
+
+    return CRM_Contact_BAO_Contact_Permission::allow($record['id'], $actionType, $userID);
+  }
+
 }
