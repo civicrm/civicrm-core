@@ -677,6 +677,10 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $membership->membership_type_id
     ));
     $this->assign('customValues', $customValues);
+
+    $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
+    $this->assign('mem_status', $membership_status);
+    $this->assign('mem_join_date', CRM_Utils_Date::formatDateOnlyLong($membership->join_date));
     $this->assign('mem_start_date', CRM_Utils_Date::formatDateOnlyLong($membership->start_date));
     $this->assign('mem_end_date', CRM_Utils_Date::formatDateOnlyLong($membership->end_date));
     if ($this->_mode) {
