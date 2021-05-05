@@ -301,10 +301,17 @@ class CRM_Core_ManagedEntities {
    * inactive.
    *
    * @param CRM_Core_DAO_Managed $dao
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function disableEntity($dao) {
-    // FIXME: if ($dao->entity_type supports is_active) {
-    if (TRUE) {
+  public function disableEntity($dao): void {
+    $actions = civicrm_api3($dao->entity_type, 'getactions', [])['values'];
+    $supportsDisable = FALSE;
+    if (in_array('create', $actions, TRUE) && in_array('getfields', $actions)) {
+      $fields = civicrm_api3($dao->entity_type, 'getfields', ['action' => 'create'])['values'];
+      $supportsDisable = array_key_exists('is_active', $fields);
+    }
+    if ($supportsDisable) {
       // FIXME cascading for payproc types?
       $params = [
         'version' => 3,
