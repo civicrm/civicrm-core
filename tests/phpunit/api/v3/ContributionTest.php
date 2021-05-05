@@ -23,6 +23,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Profile_ProfileTrait;
   use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Financial_OrderTrait;
+  use CRMTraits_Financial_TaxTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -2235,40 +2236,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19126 Add test to verify when complete transaction is called tax amount is not changed.
+   * CRM-19126 Add test to verify when complete transaction is called tax
+   * amount is not changed.
    *
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
+   * @throws \CRM_Core_Exception
    */
-  public function testCheckTaxAmount($thousandSeparator) {
+  public function testCheckTaxAmount(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $contact = $this->createLoggedInUser();
-    $financialType = $this->callAPISuccess('financial_type', 'create', [
-      'name' => 'Test taxable financial Type',
-      'is_reserved' => 0,
-      'is_active' => 1,
-    ]);
-    $financialAccount = $this->callAPISuccess('financial_account', 'create', [
-      'name' => 'Test Tax financial account ',
-      'contact_id' => $contact,
-      'financial_account_type_id' => 2,
-      'is_tax' => 1,
-      'tax_rate' => 5.00,
-      'is_reserved' => 0,
-      'is_active' => 1,
-      'is_default' => 0,
-    ]);
-    $financialTypeId = $financialType['id'];
-    $financialAccountId = $financialAccount['id'];
-    $financialAccountParams = [
-      'entity_table' => 'civicrm_financial_type',
-      'entity_id' => $financialTypeId,
-      'account_relationship' => 10,
-      'financial_account_id' => $financialAccountId,
-    ];
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialAccountParams);
+    $this->createFinancialTypeWithSalesTax();
+    $financialTypeId = $this->ids['FinancialType']['taxable'];
 
     $params = array_merge($this->_params, ['contribution_status_id' => 2, 'financial_type_id' => $financialTypeId]);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
@@ -2521,7 +2501,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionMembershipRenewCompletedContribution() {
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    [$originalContribution, $membership] = $this->setUpAutoRenewMembership();
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
@@ -2600,7 +2580,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     if (in_array($contributionStatus['name'], ['Completed', 'In Progress', 'Partially paid'])) {
       return;
     }
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    [$originalContribution, $membership] = $this->setUpAutoRenewMembership();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
@@ -4455,7 +4435,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-20008 Tests repeattransaction creates pending membership.
    */
   public function testRepeatTransactionMembershipCreatePendingContribution() {
-    list($originalContribution, $membership) = $this->setUpAutoRenewMembership();
+    [$originalContribution, $membership] = $this->setUpAutoRenewMembership();
     $this->callAPISuccess('membership', 'create', [
       'id' => $membership['id'],
       'end_date' => 'yesterday',
