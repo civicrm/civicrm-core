@@ -230,6 +230,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       //retrieve event information
       $params = ['id' => $this->_eventId];
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
+
+      self::setOutputTimeZone($this->_values['event'], $this->_values['event']['event_tz']);
+
       // check for is_monetary status
       $isMonetary = $this->_values['event']['is_monetary'] ?? NULL;
       // check for ability to add contributions of type
@@ -1654,6 +1657,26 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     return CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $this->getEventID(),
       FALSE, NULL, FALSE, TRUE
     );
+  }
+
+  /**
+   * Changes timezone-enabled fields to the correct zone for output and add local
+   * & UTC variants
+   *
+   * @param array $params
+   * @param $to_tz
+   *
+   * @return null;
+   */
+  public static function setOutputTimeZone(array &$params, $to_tz = NULL) {
+    $to_tz = $to_tz ?? (params['event_tz'] ?? NULL);
+    foreach(CRM_Event_BAO_Event::tz_fields as $field) {
+      if(!empty($params[$field])) {
+        $params[$field . '_utc'] = CRM_Utils_Date::convertTimeZone($params[$field], 'UTC');
+        $params[$field . '_local'] = $params[$field];
+        $params[$field] = CRM_Utils_Date::convertTimeZone($params[$field], $to_tz);
+      }
+    }
   }
 
 }

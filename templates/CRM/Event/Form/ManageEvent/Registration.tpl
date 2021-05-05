@@ -54,9 +54,10 @@
     <td>{$form.registration_link_text.html} {help id="id-link_text"}</td>
   </tr>
   {if !$isTemplate}
+    <div class="description">{ts 1=$event_tz}{/ts}</td>
     <tr class="crm-event-manage-registration-form-block-event_tz">
-      <td scope="row" class="label" width="20%">{ts}Event Time Zone{/ts}</label></td>
-      <td><output id="event-tz">{$event_tz}</output></td>
+      <td scope="row" class="label" width="20%"></td>
+      <td><div class="description">{ts 1=$event_tz}Registration start and end dates must be specified in the Event's timezone, %1{/ts}</td>
     </tr>
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
       <td scope="row" class="label" width="20%">{$form.registration_start_date.label}</td>
