@@ -238,9 +238,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->add('text', 'registration_link_text', ts('Registration Link Text'));
 
     if (!$this->_isTemplate) {
-      $this->_tz = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'event_tz') ?? CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+      $this->_tz = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'event_tz');
       $tz = CRM_Core_SelectValues::timezone()[$this->_tz];
-      $this->assign('event_tz', $tz);
+      $this->assign('event_tz', CRM_Core_SelectValues::timezone()[$tz] ?? '<span class="error-message">' . ts('%1 No timezone set', [1 => '<i class="crm-i fa-warning"></i>']) . '</span>');
       $this->add('datepicker', 'registration_start_date', ts('Registration Start Date'), [], FALSE, ['time' => TRUE]);
       $this->add('datepicker', 'registration_end_date', ts('Registration End Date'), [], FALSE, ['time' => TRUE]);
     }
