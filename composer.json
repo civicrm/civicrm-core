@@ -260,6 +260,10 @@
       "smartmenus": {
         "url": "https://github.com/vadikom/smartmenus/archive/1.1.0.zip",
         "ignore": [".gitignore", "Gruntfile.js"]
+      },
+      "sms-counter": {
+        "url": "https://github.com/danxexe/sms-counter/archive/master.zip",
+        "ignore": ["examples"]
       }
     },
     "patches": {

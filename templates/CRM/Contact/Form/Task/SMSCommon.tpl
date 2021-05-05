@@ -9,12 +9,14 @@
 *}
 {*common template for compose sms*}
 
+{crmScript file=bower_components/sms-counter/sms_counter.min.js region=html-header}
+
 <div class="crm-accordion-wrapper crm-plaint_text_sms-accordion ">
 <div class="crm-accordion-header">
   {$form.sms_text_message.label}
   </div><!-- /.crm-accordion-header -->
  <div class="crm-accordion-body">
- <div id='char-count-message'></div>
+ <div><span id="char-count-message"></span> <span id="char-count-help">{help id="id-count-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}</span></div>
    <div class="helpIcon" id="helptext">
      <input class="crm-token-selector big" data-field="sms_text_message" />
      {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/SMS.hlp"}
@@ -38,13 +40,16 @@
    <div class="content">{$form.SMSsaveTemplateName.html|crmAddClass:huge}</div>
 </div>
 
+{capture assign="char_count_message"}
+{ts}You can insert up to %1 characters. You have entered %2 characters, requiring %3 segments.{/ts}
+{/capture}
+
 {literal}
 <script type="text/javascript">
-
 {/literal}{if $max_sms_length}{literal}
 maxCharInfoDisplay();
 
-cj('#sms_text_message').bind({
+CRM.$('#sms_text_message').bind({
   change: function() {
    maxLengthMessage();
   },
@@ -55,10 +60,10 @@ cj('#sms_text_message').bind({
 
 function maxLengthMessage()
 {
-   var len = cj('#sms_text_message').val().length;
+   var len = CRM.$('#sms_text_message').val().length;
    var maxLength = {/literal}{$max_sms_length}{literal};
    if (len > maxLength) {
-      cj('#sms_text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of 160 characters{/ts}'{literal});
+      CRM.$('#sms_text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of {$max_sms_length} characters{/ts}'{literal});
       return false;
    }
 return true;
@@ -66,14 +71,16 @@ return true;
 
 function maxCharInfoDisplay(){
    var maxLength = {/literal}{$max_sms_length}{literal};
-   var enteredCharLength = cj('#sms_text_message').val().length;
-   var count = enteredCharLength;
+   var enteredText = SmsCounter.count(CRM.$('#sms_text_message').val());
+   var count = enteredText.length;
+   var segments = enteredText.messages;
 
    if( count < 0 ) {
-      cj('#sms_text_message').val(cj('#sms_text_message').val().substring(0, maxLength));
+      CRM.$('#sms_text_message').val(CRM.$('#sms_text_message').val().substring(0, maxLength));
       count = 0;
    }
-   cj('#char-count-message').text( "You can insert up to " + maxLength + " characters. You have entered " + count + " characters." );
+   var message = "{/literal}{$char_count_message}{literal}"
+   CRM.$('#char-count-message').text(message.replace('%1', maxLength).replace('%2', count).replace('%3', segments));
 }
 {/literal}{/if}{literal}
 
