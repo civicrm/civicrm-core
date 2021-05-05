@@ -62,9 +62,13 @@ class CRM_Utils_ReCAPTCHA {
    */
   public static function add(&$form) {
     $error = NULL;
-    if (!function_exists('recaptcha_get_html')) {
-      require_once E::path('lib/recaptcha/recaptchalib.php');
+
+    // If we already added reCAPTCHA then don't add it again.
+    // The `recaptcha_get_html` function only exists once recaptchalib.php has been included via this function.
+    if (function_exists('recaptcha_get_html')) {
+      return;
     }
+    require_once E::path('lib/recaptcha/recaptchalib.php');
 
     // Load the Recaptcha api.js over HTTPS
     $useHTTPS = TRUE;
