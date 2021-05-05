@@ -245,7 +245,7 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
     ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label'])
     ->addWhere('contact_summary', '=', 'block')
     ->execute();
-  foreach ($afforms as $afform) {
+  foreach ($afforms as $index => $afform) {
     // Create a group per afform type
     $blocks += [
       "afform_{$afform['type']}" => [
@@ -263,6 +263,7 @@ function afform_civicrm_contactSummaryBlocks(&$blocks) {
         $afform['type:label'],
       ],
       'edit' => 'civicrm/admin/afform#/edit/' . $afform['name'],
+      'system_default' => [0, $index % 2],
     ];
   }
 }
