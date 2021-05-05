@@ -62,6 +62,34 @@ class CiviEventDispatcher extends EventDispatcher {
   }
 
   /**
+   * Adds a series of event listeners from a subscriber object.
+   *
+   * This is particularly useful if you want to register the subscriber without
+   * materializing the subscriber object.
+   *
+   * @param string $subscriber
+   *   Service ID of the subscriber.
+   * @param array $events
+   *   List of events/methods/priorities.
+   * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface::getSubscribedEvents()
+   */
+  public function addSubscriberServiceMap(string $subscriber, array $events) {
+    foreach ($events as $eventName => $params) {
+      if (\is_string($params)) {
+        $this->addListenerService($eventName, [$subscriber, $params]);
+      }
+      elseif (\is_string($params[0])) {
+        $this->addListenerService($eventName, [$subscriber, $params[0]], isset($params[1]) ? $params[1] : 0);
+      }
+      else {
+        foreach ($params as $listener) {
+          $this->addListenerService($eventName, [$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+        }
+      }
+    }
+  }
+
+  /**
    * Adds a service as event listener.
    *
    * This provides partial backwards compatibility with ContainerAwareEventDispatcher.
@@ -80,13 +108,7 @@ class CiviEventDispatcher extends EventDispatcher {
       throw new \InvalidArgumentException('Expected an array("service", "method") argument');
     }
 
-    $this->addListener($eventName, function($event) use ($callback) {
-      static $svc;
-      if ($svc === NULL) {
-        $svc = \Civi::container()->get($callback[0]);
-      }
-      return call_user_func([$svc, $callback[1]], $event);
-    }, $priority);
+    $this->addListener($eventName, new \Civi\Core\Event\ServiceListener($callback), $priority);
   }
 
   /**
