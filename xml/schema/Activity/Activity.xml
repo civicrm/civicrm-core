@@ -349,6 +349,7 @@
   </index>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <uniqueName>activity_campaign_id</uniqueName>
     <type>int unsigned</type>
     <title>Campaign ID</title>

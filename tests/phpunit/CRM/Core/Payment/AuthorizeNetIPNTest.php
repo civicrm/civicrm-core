@@ -149,6 +149,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurSuccess() {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     $this->setupRecurringPaymentProcessorTransaction();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();

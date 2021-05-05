@@ -96,6 +96,11 @@ class SpecGatherer {
       if (array_key_exists('contactType', $DAOField) && !empty($values['contact_type']) && $DAOField['contactType'] != $values['contact_type']) {
         continue;
       }
+      if (!empty($DAOField['component']) &&
+        !in_array($DAOField['component'], \Civi::settings()->get('enable_components'), TRUE)
+      ) {
+        continue;
+      }
       if ($action !== 'create' || isset($DAOField['default'])) {
         $DAOField['required'] = FALSE;
       }

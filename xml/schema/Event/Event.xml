@@ -787,6 +787,7 @@
   </field>
   <field>
     <name>campaign_id</name>
+    <component>CiviCampaign</component>
     <type>int unsigned</type>
     <title>Campaign ID</title>
     <comment>The campaign for which this event has been created.</comment>
