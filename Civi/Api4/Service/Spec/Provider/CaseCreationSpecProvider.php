@@ -59,6 +59,16 @@ class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
     $duration->setInputType('Number');
     $duration->setDescription('Open Case activity duration (minutes).');
     $spec->addFieldSpec($duration);
+
+    $defaultStatus = \CRM_Core_DAO::singleValueQuery('SELECT value FROM civicrm_option_value
+      WHERE is_default
+        AND domain_id = ' . \CRM_Core_BAO_Domain::getDomain()->id . '
+        AND option_group_id = (SELECT id FROM civicrm_option_group WHERE name = "case_status")
+      LIMIT 1');
+    if ($defaultStatus) {
+      $status = $spec->getFieldByName('status_id');
+      $status->setDefaultValue((int) $defaultStatus);
+    }
   }
 
   /**

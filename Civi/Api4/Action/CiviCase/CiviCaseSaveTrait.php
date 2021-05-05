@@ -28,7 +28,7 @@ trait CiviCaseSaveTrait {
    * @param array $cases
    * @return array
    */
-  protected function writeObjects($cases) {
+  protected function writeObjects(&$cases) {
     $cases = array_values($cases);
     $result = parent::writeObjects($cases);
 

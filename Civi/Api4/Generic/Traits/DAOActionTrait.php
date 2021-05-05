@@ -103,7 +103,7 @@ trait DAOActionTrait {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function writeObjects($items) {
+  protected function writeObjects(&$items) {
     $baoName = $this->getBaoName();
 
     // Some BAOs are weird and don't support a straightforward "create" method.
@@ -118,7 +118,7 @@ trait DAOActionTrait {
 
     $result = [];
 
-    foreach ($items as $item) {
+    foreach ($items as &$item) {
       $entityId = $item['id'] ?? NULL;
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);

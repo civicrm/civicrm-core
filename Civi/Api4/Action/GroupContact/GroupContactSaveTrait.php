@@ -46,7 +46,7 @@ trait GroupContactSaveTrait {
   /**
    * @inheritDoc
    */
-  protected function writeObjects($items) {
+  protected function writeObjects(&$items) {
     foreach ($items as &$item) {
       $item['method'] = $this->method;
       $item['tracking'] = $this->tracking;
