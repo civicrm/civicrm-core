@@ -1176,7 +1176,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       // To minimize storage requirements, only one copy of any file attachments uploaded to CiviCRM is kept,
       // even when multiple contacts will receive separate emails from CiviCRM.
       if (!empty($attachmentFileIds)) {
-        $attachments = array_merge_recursive($attachments, $attachmentFileIds);
+        $attachments = array_replace_recursive($attachments, $attachmentFileIds);
       }
 
       // Create email activity.

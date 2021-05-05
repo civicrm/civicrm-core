@@ -1629,6 +1629,86 @@ $textValue
   }
 
   /**
+   * Same as testSendEmailWillReplaceTokensUniquelyForEachContact but with
+   * 3 recipients and an attachment.
+   */
+  public function testSendEmailWillReplaceTokensUniquelyForEachContact3() {
+    $contactId1 = $this->individualCreate(['last_name' => 'Red']);
+    $contactId2 = $this->individualCreate(['last_name' => 'Pink']);
+    $contactId3 = $this->individualCreate(['last_name' => 'Ochre']);
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $this->createLoggedInUser();
+    $session = CRM_Core_Session::singleton();
+    $loggedInUser = $session->get('userID');
+    $contact = $this->callAPISuccess('Contact', 'get', ['sequential' => 1, 'id' => ['IN' => [$contactId1, $contactId2, $contactId3]]]);
+
+    // Create a campaign.
+    $result = $this->callAPISuccess('Campaign', 'create', [
+      'version' => $this->_apiversion,
+      'title' => __FUNCTION__ . ' campaign',
+    ]);
+    $campaign_id = $result['id'];
+
+    // Add contact tokens in subject, html , text.
+    $subject = __FUNCTION__ . ' subject' . '{contact.display_name}';
+    $html = __FUNCTION__ . ' html' . '{contact.display_name}';
+    $text = __FUNCTION__ . ' text' . '{contact.display_name}';
+    $userID = $loggedInUser;
+
+    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+    $fileName = "test_email_create.txt";
+    $fileUri = "{$filepath}/{$fileName}";
+    // Create a file.
+    CRM_Utils_File::createFakeFile($filepath, 'aaaaaa', $fileName);
+    $attachments = [
+      'attachFile_1' =>
+      [
+        'uri' => $fileUri,
+        'type' => 'text/plain',
+        'location' => $fileUri,
+      ],
+    ];
+
+    CRM_Activity_BAO_Activity::sendEmail(
+      $contact['values'],
+      $subject,
+      $text,
+      $html,
+      $contact['values'][0]['email'],
+      $userID,
+      $from = __FUNCTION__ . '@example.com',
+      $attachments,
+      $cc = NULL,
+      $bcc = NULL,
+      $contactIds = array_column($contact['values'], 'id'),
+      $additionalDetails = NULL,
+      NULL,
+      $campaign_id
+    );
+    $result = $this->callAPISuccess('activity', 'get', ['campaign_id' => $campaign_id]);
+    // An activity created for each of the two contacts
+    $this->assertEquals(3, $result['count']);
+    $id = 0;
+    foreach ($result['values'] as $activity) {
+      $htmlValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $html);
+      $textValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $text);
+      $subjectValue = str_replace('{contact.display_name}', $contact['values'][$id]['display_name'], $subject);
+      $details = "-ALTERNATIVE ITEM 0-
+$htmlValue
+-ALTERNATIVE ITEM 1-
+$textValue
+-ALTERNATIVE END-
+";
+      $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+      $this->assertEquals($activity['subject'], $subjectValue, 'Activity subject does not match.');
+      $id++;
+    }
+
+    unlink($fileUri);
+  }
+
+  /**
    * Checks that attachments are not duplicated for activities.
    */
   public function testSendEmailDoesNotDuplicateAttachmentFileIdsForActivitiesCreated() {
