@@ -7,7 +7,7 @@ return [
     'ang/afCore/*/*.js',
   ],
   'css' => ['ang/afCore.css'],
-  'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model', 'ngRoute'],
+  'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model'],
   'partials' => ['ang/afCore'],
   'settings' => [],
   'basePages' => [],

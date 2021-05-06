@@ -4,7 +4,7 @@
     bindings: {
       ctrl: '@'
     },
-    controller: function($scope, $routeParams, $timeout, crmApi4, crmStatus, $window, $location) {
+    controller: function($scope, $timeout, crmApi4, crmStatus, $window, $location) {
       var schema = {},
         data = {},
         ctrl = this;
@@ -35,14 +35,15 @@
         return $scope.$parent.meta;
       };
       this.loadData = function() {
-        var toLoad = 0;
+        var toLoad = 0,
+          args = $scope.$parent.routeParams || {};
         _.each(schema, function(entity, entityName) {
-          if ($routeParams[entityName] || entity.autofill) {
+          if (args[entityName] || entity.autofill) {
             toLoad++;
           }
         });
         if (toLoad) {
-          crmApi4('Afform', 'prefill', {name: ctrl.getFormMeta().name, args: $routeParams})
+          crmApi4('Afform', 'prefill', {name: ctrl.getFormMeta().name, args: args})
             .then(function(result) {
               _.each(result, function(item) {
                 data[item.name] = data[item.name] || {};
@@ -53,7 +54,7 @@
       };
 
       this.submit = function submit() {
-        var submission = crmApi4('Afform', 'submit', {name: ctrl.getFormMeta().name, args: $routeParams, values: data});
+        var submission = crmApi4('Afform', 'submit', {name: ctrl.getFormMeta().name, args: $scope.$parent.routeParams || {}, values: data});
         var metaData = ctrl.getFormMeta();
         if (metaData.redirect) {
           submission.then(function() {
