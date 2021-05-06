@@ -221,4 +221,32 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     return $clauses;
   }
 
+  /**
+   * Special checkAccess function for multi-record custom pseudo-entities
+   *
+   * @param string $action
+   * @param array $record
+   * @param null $userID
+   * @param bool $granted
+   * @param string $groupName
+   * @return bool
+   */
+  public static function checkAccess(string $action, array $record, $userID = NULL, $granted = TRUE, $groupName = NULL): bool {
+    if (!$groupName) {
+      // $groupName is required but the function signature has to match the parent.
+      throw new CRM_Core_Exception('Missing required $groupName in CustomValue::checkAccess');
+    }
+    // Currently, multi-record custom data always extends Contacts
+    $cid = $record['entity_id'] ?? NULL;
+    if (!$cid) {
+      $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'table_name', 'name');
+      $cid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
+    }
+    $granted = CRM_Contact_BAO_Contact::checkAccess(CRM_Core_Permission::EDIT, ['id' => $cid], $userID, $granted);
+
+    // Dispatch to hook
+    CRM_Utils_Hook::checkAccess("Custom_$groupName", $action, $record, $userID, $granted);
+    return $granted;
+  }
+
 }
