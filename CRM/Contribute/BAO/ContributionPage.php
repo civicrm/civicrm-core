@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 
 /**
  * This class contains Contribution Page related functions.
@@ -286,14 +287,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       $template = CRM_Core_Smarty::singleton();
 
       if (!array_key_exists('related_contact', $values)) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
+        [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID, FALSE, CRM_Core_BAO_LocationType::getBilling());
       }
       // get primary location email if no email exist( for billing location).
       if (!$email) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+        [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       }
       if (empty($displayName)) {
-        list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
+        [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
       }
 
       //for display profile need to get individual contact id,
@@ -510,12 +511,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    *   TxnType.
    *   Contribution page id.
    * @param object $recur
-   *   Object of recurring contribution table.
-   * @param bool|object $autoRenewMembership is it a auto renew membership.
    *
    * @throws \API_Exception
    */
-  public static function recurringNotify($contributionID, $type, $recur, $autoRenewMembership = FALSE): void {
+  public static function recurringNotify($contributionID, $type, $recur): void {
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionID)
       ->setSelect([
@@ -531,6 +530,11 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'contribution_page.bcc_receipt',
       ])
       ->execute()->first();
+
+    $isMembership = !empty(LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addSelect('id')->execute()->first());
 
     if ($contribution['contribution_recur.is_email_receipt'] || $contribution['contribution_page.is_email_receipt']) {
       if ($contribution['contribution_page.receipt_from_email']) {
@@ -558,7 +562,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           'displayName' => $displayName,
           'receipt_from_name' => $receiptFromName,
           'receipt_from_email' => $receiptFromEmail,
-          'auto_renew_membership' => $autoRenewMembership,
+          'auto_renew_membership' => $isMembership,
         ],
         'from' => $receiptFrom,
         'toName' => $displayName,

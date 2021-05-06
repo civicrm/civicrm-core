@@ -562,8 +562,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       CRM_Contribute_BAO_ContributionPage::recurringNotify(
         $ids['contribution'],
         $isFirstOrLastRecurringPayment,
-        $recur,
-        $autoRenewMembership
+        $recur
       );
     }
   }
