@@ -24,7 +24,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    * Scheduled Reminder ID.
    * @var int
    */
-  public $_id = NULL;
+  public $_id;
 
   public $_freqUnits;
 
@@ -40,19 +40,22 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * @param mixed $compId
    */
-  public function setComponentID($compId) {
+  public function setComponentID($compId): void {
     $this->_compId = $compId;
   }
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function buildQuickForm() {
+  public function buildQuickForm(): void {
     parent::buildQuickForm();
     $this->_mappingID = $mappingID = NULL;
     $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
     $this->setContext();
-    $isEvent = $this->getContext() == 'event';
+    $isEvent = $this->getContext() === 'event';
 
     if ($isEvent) {
       $this->setComponentID(CRM_Utils_Request::retrieve('compId', 'Integer', $this));
@@ -295,8 +298,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
    *
    * @return array|bool
    *   True if no errors, else array of errors
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule(array $fields, $files, $self) {
     $errors = [];
     if ((array_key_exists(1, $fields['entity']) && $fields['entity'][1][0] === 0) ||
       (array_key_exists(2, $fields['entity']) && $fields['entity'][2][0] == 0)
@@ -306,17 +312,17 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $mode = CRM_Utils_Array::value('mode', $fields, FALSE);
     if (!empty($fields['is_active']) &&
-      CRM_Utils_System::isNull($fields['subject']) && (!$mode || $mode != 'SMS')
+      CRM_Utils_System::isNull($fields['subject']) && (!$mode || $mode !== 'SMS')
     ) {
       $errors['subject'] = ts('Subject is a required field.');
     }
     if (!empty($fields['is_active']) &&
-      CRM_Utils_System::isNull(trim(strip_tags($fields['html_message']))) && (!$mode || $mode != 'SMS')
+      CRM_Utils_System::isNull(trim(strip_tags($fields['html_message']))) && (!$mode || $mode !== 'SMS')
     ) {
       $errors['html_message'] = ts('The HTML message is a required field.');
     }
 
-    if (!empty($mode) && ($mode == 'SMS' || $mode == 'User_Preference') && !empty($fields['is_active']) &&
+    if (!empty($mode) && ($mode === 'SMS' || $mode === 'User_Preference') && !empty($fields['is_active']) &&
      CRM_Utils_System::isNull(trim(strip_tags($fields['sms_text_message'])))
     ) {
       $errors['sms_text_message'] = ts('The SMS message is a required field.');
@@ -428,7 +434,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       // delete reminder
       CRM_Core_BAO_ActionSchedule::del($this->_id);
       CRM_Core_Session::setStatus(ts('Selected Reminder has been deleted.'), ts('Record Deleted'), 'success');
-      if ($this->getContext() == 'event' && $this->getComponentID()) {
+      if ($this->getContext() === 'event' && $this->getComponentID()) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder',
           "reset=1&action=browse&id=" . $this->getComponentID() . "&component=" . $this->getContext() . "&setTab=1"
         );
@@ -459,7 +465,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         );
       }
 
-      if ($this->getContext() == 'event' && $this->getComponentID()) {
+      if ($this->getContext() === 'event' && $this->getComponentID()) {
         $url = CRM_Utils_System::url('civicrm/event/manage/reminder', "reset=1&action=browse&id=" . $this->getComponentID() . "&component=" . $this->getContext() . "&setTab=1");
         $session = CRM_Core_Session::singleton();
         $session->pushUserContext($url);
@@ -471,7 +477,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * @param array $values
    *   The submitted form values.
+   *
    * @return CRM_Core_DAO_ActionSchedule
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function parseActionSchedule($values) {
     $params = [];
@@ -513,7 +522,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params['absolute_date'] = 'null';
     }
     foreach ($moreKeys as $mkey) {
-      if ($params['absolute_date'] != 'null' && CRM_Utils_String::startsWith($mkey, 'start_action')) {
+      if ($params['absolute_date'] !== 'null' && CRM_Utils_String::startsWith($mkey, 'start_action')) {
         $params[$mkey] = 'null';
         continue;
       }
@@ -524,11 +533,11 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $params['sms_body_text'] = $values['sms_text_message'] ?? NULL;
     $params['body_html'] = $values['html_message'] ?? NULL;
 
-    if (CRM_Utils_Array::value('recipient', $values) == 'manual') {
+    if (CRM_Utils_Array::value('recipient', $values) === 'manual') {
       $params['recipient_manual'] = $values['recipient_manual_id'] ?? NULL;
       $params['group_id'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
-    elseif (CRM_Utils_Array::value('recipient', $values) == 'group') {
+    elseif (CRM_Utils_Array::value('recipient', $values) === 'group') {
       $params['group_id'] = $values['group_id'];
       $params['recipient_manual'] = $params['recipient'] = $params['recipient_listing'] = 'null';
     }
@@ -585,10 +594,10 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     $modePrefixes = ['Mail' => NULL, 'SMS' => 'SMS'];
 
-    if ($params['mode'] == 'Email' || empty($params['sms_provider_id'])) {
+    if ($params['mode'] === 'Email' || empty($params['sms_provider_id'])) {
       unset($modePrefixes['SMS']);
     }
-    elseif ($params['mode'] == 'SMS') {
+    elseif ($params['mode'] === 'SMS') {
       unset($modePrefixes['Mail']);
     }
 
@@ -614,7 +623,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
       if (!empty($composeParams[$prefix . 'updateTemplate'])) {
         $templateParams = ['is_active' => TRUE];
-        if ($prefix == 'SMS') {
+        if ($prefix === 'SMS') {
           $templateParams += [
             'msg_text' => $params['sms_body_text'],
             'is_sms' => TRUE,
@@ -634,7 +643,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
       if (!empty($composeParams[$prefix . 'saveTemplate'])) {
         $templateParams = ['is_active' => TRUE];
-        if ($prefix == 'SMS') {
+        if ($prefix === 'SMS') {
           $templateParams += [
             'msg_text' => $params['sms_body_text'],
             'is_sms' => TRUE,
@@ -652,7 +661,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
 
-      if ($prefix == 'SMS') {
+      if ($prefix === 'SMS') {
         if (isset($msgTemplate->id)) {
           $params['sms_template_id'] = $msgTemplate->id;
         }
