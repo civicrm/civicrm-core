@@ -175,9 +175,13 @@ class CoreUtil {
       $granted = $granted && $action->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
     }
     else {
-      $baoName = self::getBAOFromApiName($entityName);
       // If entity has a BAO, run the BAO::checkAccess function, which will call the hook
-      if ($baoName && strpos($baoName, '_BAO_')) {
+      $baoName = self::getBAOFromApiName($entityName);
+      // CustomValue also requires the name of the group
+      if ($baoName === 'CRM_Core_BAO_CustomValue') {
+        $granted = \CRM_Core_BAO_CustomValue::checkAccess($actionName, $record, NULL, $granted, substr($entityName, 7));
+      }
+      elseif ($baoName) {
         $granted = $baoName::checkAccess($actionName, $record, NULL, $granted);
       }
       // Otherwise, call the hook directly
