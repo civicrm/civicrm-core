@@ -33,6 +33,17 @@ class AfformSubmitEvent extends AfformBaseEvent {
   public $entityValues;
 
   /**
+   * @var array
+   *   List of Submitted Entities and their matching ids
+   *   $entityIds['Individual1'] = 1;
+   */
+  public $entityIds;
+
+  public $entityWeights;
+
+  public $entityMapping;
+
+  /**
    * AfformSubmitEvent constructor.
    *
    * @param array $afform
@@ -40,11 +51,17 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
    * @param array $entityDefns
    * @param array $entityValues
+   * @param array $entityIds
+   * @param array $entityWeights
+   * @param array $entityMapping
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $entityDefns, array $entityValues) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $entityDefns, array $entityValues, array $entityIds, array $entityWeights, array $entityMapping) {
     parent::__construct($afform, $formDataModel, $apiRequest);
     $this->entityDefns = $entityDefns;
     $this->entityValues = $entityValues;
+    $this->entityIds = $entityIds;
+    $this->entityWeights = $entityWeights;
+    $this->entityMapping = $entityMapping;
   }
 
   /**
