@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -17,6 +19,8 @@
  * @group headless
  */
 class api_v3_OrderTest extends CiviUnitTestCase {
+
+  use CRMTraits_Financial_TaxTrait;
 
   protected $_individualId;
 
@@ -594,7 +598,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that a contribution can be added in pending mode with a chained payment.
+   * Test that a contribution can be added in pending mode with a chained
+   * payment.
    *
    * We have just deprecated creating an order with a status other than
    * pending. It makes sense to support adding a payment straight away by
@@ -605,6 +610,77 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   public function testCreateWithChainedPayment(): void {
     $contributionID = $this->callAPISuccess('Order', 'create', ['contact_id' => $this->_individualId, 'total_amount' => 5, 'financial_type_id' => 2, 'contribution_status_id' => 'Pending', 'api.Payment.create' => ['total_amount' => 5]])['id'];
     $this->assertEquals('Completed', $this->callAPISuccessGetValue('Contribution', ['id' => $contributionID, 'return' => 'contribution_status']));
+  }
+
+  /**
+   * Test creating an order with a mixture of taxable & non-taxable.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public function testOrderWithMixedTax(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax('woo', [], ['tax_rate' => 19.3791]);
+    $membershipTypeID = $this->membershipTypeCreate();
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Order', 'create', [
+      'contact_id' => $contactID,
+      'financial_type_id' => $this->ids['FinancialType']['woo'],
+      'payment_instrument_id' => 4,
+      'trxn_id' => 'WooCommerce Order - 1859',
+      'invoice_id' => '1859_woocommerce',
+      'receive_date' => '2021-05-05 23:24:02',
+      'contribution_status_id' => 'Pending',
+      'total_amount' => 109.69,
+      'source' => 'Shop',
+      'note' => 'Fundraiser Dinner Ticket x 1, Student Membership x 1',
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'price_field_id' => 1,
+              'unit_price' => 50.00,
+              'qty' => 1,
+              'line_total' => 50.00,
+              'tax_amount' => 9.69,
+              'label' => 'Fundraiser Dinner Ticket',
+              'financial_type_id' => $this->ids['FinancialType']['woo'],
+            ],
+          ],
+        ],
+        [
+          'line_item' => [
+            [
+              'price_field_id' => 1,
+              'unit_price' => 50.00,
+              'qty' => 1,
+              'line_total' => 50.00,
+              'tax_amount' => 0.00,
+              'label' => 'Student Membership',
+              'financial_type_id' => 2,
+              'entity_table' => 'civicrm_membership',
+              'membership_type_id' => $membershipTypeID,
+            ],
+          ],
+          'params' => [
+            'membership_type_id' => $membershipTypeID,
+            'source' => 'Shop',
+            'contact_id' => $contactID,
+            'skipStatusCal' => 1,
+            'status_id' => 'Pending',
+          ],
+        ],
+      ],
+      'tax_amount' => 9.69,
+    ]);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('trxn_id', '=', 'WooCommerce Order - 1859')
+      ->setSelect(['tax_amount', 'total_amount'])->execute()->first();
+
+    $this->assertEquals('9.69', $contribution['tax_amount']);
+    $this->assertEquals('109.69', $contribution['total_amount']);
   }
 
 }
