@@ -138,16 +138,10 @@
     <add>3.2</add>
 
   </field>
-  <index>
-    <name>index_entity</name>
-    <fieldName>entity_table</fieldName>
-    <fieldName>entity_id</fieldName>
-    <add>1.7</add>
-  </index>
-  <index>
+   <index>
     <name>UI_line_item_value</name>
-    <fieldName>entity_table</fieldName>
     <fieldName>entity_id</fieldName>
+    <fieldName>entity_table</fieldName>
     <fieldName>contribution_id</fieldName>
     <fieldName>price_field_value_id</fieldName>
     <fieldName>price_field_id</fieldName>

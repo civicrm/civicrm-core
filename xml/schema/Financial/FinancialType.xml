@@ -97,10 +97,4 @@
       <label>Enabled?</label>
     </html>
   </field>
-  <index>
-    <name>UI_id</name>
-    <fieldName>id</fieldName>
-    <unique>true</unique>
-    <add>4.3</add>
-  </index>
 </table>
