@@ -305,13 +305,8 @@ class CRM_Core_ManagedEntities {
    * @throws \CiviCRM_API3_Exception
    */
   public function disableEntity($dao): void {
-    $actions = civicrm_api3($dao->entity_type, 'getactions', [])['values'];
-    $supportsDisable = FALSE;
-    if (in_array('create', $actions, TRUE) && in_array('getfields', $actions)) {
-      $fields = civicrm_api3($dao->entity_type, 'getfields', ['action' => 'create'])['values'];
-      $supportsDisable = array_key_exists('is_active', $fields);
-    }
-    if ($supportsDisable) {
+    $entity_type = $dao->entity_type;
+    if ($this->isActivationSupported($entity_type)) {
       // FIXME cascading for payproc types?
       $params = [
         'version' => 3,
@@ -484,6 +479,25 @@ class CRM_Core_ManagedEntities {
       'result' => $result,
     ]);
     throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action);
+  }
+
+  /**
+   * Determine if an entity supports APIv3-based activation/de-activation.
+   * @param string $entity_type
+   *
+   * @return bool
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function isActivationSupported(string $entity_type): bool {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$entity_type])) {
+      $actions = civicrm_api3($entity_type, 'getactions', [])['values'];
+      Civi::$statics[__CLASS__][__FUNCTION__][$entity_type] = FALSE;
+      if (in_array('create', $actions, TRUE) && in_array('getfields', $actions)) {
+        $fields = civicrm_api3($entity_type, 'getfields', ['action' => 'create'])['values'];
+        Civi::$statics[__CLASS__][__FUNCTION__][$entity_type] = array_key_exists('is_active', $fields);
+      }
+    }
+    return Civi::$statics[__CLASS__][__FUNCTION__][$entity_type];
   }
 
 }
