@@ -84,10 +84,17 @@ class Submit extends AbstractProcessor {
       $values = self::filterEmptyJoins($joinEntityName, $join);
       // FIXME: Replace/delete should only be done to known contacts
       if ($values) {
-        $api4($joinEntityName, 'replace', [
-          'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
-          'records' => $values,
-        ]);
+        foreach ($values as $value) {
+          if (array_key_exists('id', $value)) {
+            $api4($joinEntityName, 'replace', [
+              'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
+              'records' => [$value],
+            ]);
+          } else {
+            $value['contact_id'] = $entityId;
+            $api4($joinEntityName, 'create', [ 'values' => $value ]);
+          }
+        }
       }
       else {
         try {
