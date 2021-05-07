@@ -155,6 +155,8 @@ class AngularLoader {
     $headOffset = 0;
     $config = \CRM_Core_Config::singleton();
     if ($config->debug) {
+      // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\Page\Modules::buildAngularModules()`.
+      $res->addScriptFile('civicrm', 'ang/resetLocationProviderHashPrefix.js', 101, $this->getRegion(), FALSE);
       foreach ($moduleNames as $moduleName) {
         foreach ($this->angular->getResources($moduleName, 'css', 'cacheUrl') as $url) {
           $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
