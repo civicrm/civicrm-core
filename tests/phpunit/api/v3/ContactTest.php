@@ -85,22 +85,19 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // truncate a few tables
     $tablesToTruncate = [
       'civicrm_email',
-      'civicrm_contribution',
-      'civicrm_line_item',
       'civicrm_website',
       'civicrm_relationship',
       'civicrm_uf_match',
       'civicrm_phone',
       'civicrm_address',
       'civicrm_acl_contact_cache',
-      'civicrm_activity_contact',
-      'civicrm_activity',
       'civicrm_group',
       'civicrm_group_contact',
       'civicrm_group_contact_cache',
       'civicrm_saved_search',
       'civicrm_prevnext_cache',
     ];
+    $this->quickCleanUpFinancialEntities();
 
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
