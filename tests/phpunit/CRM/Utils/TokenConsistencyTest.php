@@ -588,6 +588,7 @@ participant.must_wait :
 event.title :Annual CiviCRM meet
 event.start_date :October 21st, 2008
 event.end_date :October 23rd, 2008
+event.event_tz:label :America/New York
 event.event_type_id:label :Conference
 event.summary :If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
 event.contact_email :event@example.com
@@ -874,6 +875,7 @@ December 21st, 2007
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
+      '{event.event_tz:label}' => 'Event Time Zone',
       '{event.event_type_id:label}' => 'Event Type',
       '{event.summary}' => 'Event Summary',
       '{event.contact_email}' => 'Event Contact Email',
@@ -934,6 +936,7 @@ December 21st, 2007
       'description' => 'event description',
       $this->getCustomFieldName('text') => 'my field',
       'loc_block_id' => $locationBlockID,
+      'event_tz' => 'America/New_York',
     ])['id'];
     // Create an unrelated participant record so that the ids don't match.
     // this prevents things working just because the id 'happens to be valid'
