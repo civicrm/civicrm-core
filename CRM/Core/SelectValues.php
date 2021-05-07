@@ -542,6 +542,7 @@ class CRM_Core_SelectValues {
     return [
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
+      '{event.event_tz}' => ts('Event Timezone'),
       '{event.start_date}' => ts('Event Start Date'),
       '{event.end_date}' => ts('Event End Date'),
       '{event.event_type}' => ts('Event Type'),

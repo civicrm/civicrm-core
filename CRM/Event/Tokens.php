@@ -33,6 +33,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'event_type' => ts('Event Type'),
         'title' => ts('Event Title'),
         'event_id' => ts('Event ID'),
+        'event_tz' => ts('Event Timezone'),
         'start_date' => ts('Event Start Date'),
         'end_date' => ts('Event End Date'),
         'summary' => ts('Event Summary'),
@@ -70,7 +71,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
 
     // FIXME: seems too broad.
     $e->query->select('e.*');
-    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
+    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.event_tz, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
     $e->query->join('participant_stuff', "
 !casMailingJoinType civicrm_event ev ON e.event_id = ev.id
 !casMailingJoinType civicrm_option_group og ON og.name = 'event_type'
@@ -107,7 +108,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
     }
     elseif (in_array($field, ['start_date', 'end_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
+      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat(\CRM_Utils_date::convertTimeZone($actionSearchResult->$field, $actionSearchResult->event_tz)));
     }
     elseif ($field == 'balance') {
       if ($actionSearchResult->entityTable == 'civicrm_contact') {
