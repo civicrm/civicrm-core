@@ -264,7 +264,10 @@ class CRM_Core_ManagedEntities {
     $doUpdate = ($policy == 'always');
 
     if ($doUpdate) {
-      $defaults = ['id' => $dao->entity_id, 'is_active' => 1];
+      $defaults = ['id' => $dao->entity_id];
+      if ($this->isActivationSupported($dao->entity_type)) {
+        $defaults['is_active'] = 1;
+      }
       $params = array_merge($defaults, $todo['params']);
 
       $manager = CRM_Extension_System::singleton()->getManager();
