@@ -1,0 +1,58 @@
+{
+  "CaseType": [
+    {
+      "name": "test_case_type",
+      "title": "Test Case Type",
+      "definition": {
+        "activityTypes": [
+          {
+            "name": "Open Case",
+            "max_instances": "1"
+          },
+          {
+            "name": "Follow up"
+          }
+        ],
+        "activitySets": [
+          {
+            "name": "standard_timeline",
+            "label": "Standard Timeline",
+            "timeline": 1,
+            "activityTypes": [
+              {
+                "name": "Open Case",
+                "status": "Completed"
+              },
+              {
+                "name": "Follow up",
+                "reference_activity": "Open Case",
+                "reference_offset": "3",
+                "reference_select": "newest"
+              }
+            ]
+          }
+        ],
+        "timelineActivityTypes": [
+          {
+            "name": "Open Case",
+            "status": "Completed"
+          },
+          {
+            "name": "Follow up",
+            "reference_activity": "Open Case",
+            "reference_offset": "3",
+            "reference_select": "newest"
+          }
+        ],
+        "caseRoles": [
+          {
+            "name": "Parent of",
+            "creator": "1",
+            "manager": "1"
+          }
+        ]
+      },
+      "@ref": "test_case_type_1"
+    }
+  ]
+}

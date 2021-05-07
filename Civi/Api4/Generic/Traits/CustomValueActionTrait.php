@@ -51,7 +51,7 @@ trait CustomValueActionTrait {
   /**
    * @inheritDoc
    */
-  protected function writeObjects($items) {
+  protected function writeObjects(&$items) {
     $fields = $this->entityFields();
     foreach ($items as $idx => $item) {
       FormattingUtil::formatWriteParams($item, $fields);

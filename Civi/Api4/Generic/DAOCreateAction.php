@@ -36,10 +36,9 @@ class DAOCreateAction extends AbstractCreateAction {
     $this->validateValues();
     $params = $this->values;
     $this->fillDefaults($params);
+    $items = [$params];
 
-    $resultArray = $this->writeObjects([$params]);
-
-    $result->exchangeArray($resultArray);
+    $result->exchangeArray($this->writeObjects($items));
   }
 
   /**

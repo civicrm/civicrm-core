@@ -60,7 +60,8 @@ class DAOUpdateAction extends AbstractUpdateAction {
     // Update a single record by ID unless select requires more than id
     if ($this->getSelect() === ['id'] && count($this->where) === 1 && $this->where[0][0] === 'id' && $this->where[0][1] === '=' && !empty($this->where[0][2])) {
       $this->values['id'] = $this->where[0][2];
-      $result->exchangeArray($this->writeObjects([$this->values]));
+      $items = [$this->values];
+      $result->exchangeArray($this->writeObjects($items));
       return;
     }
 

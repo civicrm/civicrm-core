@@ -54,7 +54,7 @@ trait AddressSaveTrait {
   /**
    * @inheritDoc
    */
-  protected function writeObjects($items) {
+  protected function writeObjects(&$items) {
     foreach ($items as &$item) {
       if ($this->streetParsing && !empty($item['street_address'])) {
         $item = array_merge($item, \CRM_Core_BAO_Address::parseStreetAddress($item['street_address']));
