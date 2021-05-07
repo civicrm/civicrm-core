@@ -86,6 +86,7 @@ class Modules extends \CRM_Core_Page {
         $moduleNames = $page->parseModuleNames($event->params['modules'] ?? NULL, $angular);
         $event->mimeType = 'application/javascript';
         $files = array_merge(
+          // FIXME: The `resetLocationProviderHashPrefix.js` has to stay in sync with `\Civi\Angular\AngularLoader::load()`.
           [\Civi::resources()->getPath('civicrm', 'ang/resetLocationProviderHashPrefix.js')],
           $angular->getResources($moduleNames, 'js', 'path')
         );
