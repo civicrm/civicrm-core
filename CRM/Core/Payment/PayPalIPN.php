@@ -346,8 +346,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           CRM_Contribute_BAO_ContributionPage::recurringNotify(
             $ids['contribution'],
             $this->getFirstOrLastInSeriesStatus(),
-            $contributionRecur,
-            !empty($ids['membership'])
+            $contributionRecur
           );
         }
         return;
