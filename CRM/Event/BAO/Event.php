@@ -780,6 +780,7 @@ SELECT
   civicrm_email.email as email,
   civicrm_event.title as title,
   civicrm_event.summary as summary,
+  civicrm_event.event_tz as event_tz,
   civicrm_event.start_date as start,
   civicrm_event.end_date as end,
   civicrm_event.description as description,
@@ -851,6 +852,7 @@ WHERE civicrm_event.is_active = 1
         $info['event_id'] = $dao->event_id;
         $info['summary'] = $dao->summary;
         $info['description'] = $dao->description;
+        $info['tz'] = $dao->event_tz ?? CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
         $info['start_date'] = $dao->start;
         $info['end_date'] = $dao->end;
         $info['contact_email'] = $dao->email;

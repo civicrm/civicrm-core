@@ -24,15 +24,15 @@ CATEGORIES:{$event.event_type|crmICalText}
 {/if}
 CALSCALE:GREGORIAN
 {if $event.start_date}
-DTSTAMP;TZID={$timezone}:{$event.start_date|crmICalDate}
-DTSTART;TZID={$timezone}:{$event.start_date|crmICalDate}
+DTSTAMP;TZID={$event.tz|default:$timezone}:{$event.start_date|crmICalDate}
+DTSTART;TZID={$event.tz|default:$timezone}:{$event.start_date|crmICalDate}
 {else}
 DTSTAMP;TZID={$timezone}:{$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'|crmICalDate}
 {/if}
 {if $event.end_date}
-DTEND;TZID={$timezone}:{$event.end_date|crmICalDate}
+DTEND;TZID={$event.tz|default:$timezone}:{$event.end_date|crmICalDate}
 {else}
-DTEND;TZID={$timezone}:{$event.start_date|crmICalDate}
+DTEND;TZID={$event.tz|default:$timezone}:{$event.start_date|crmICalDate}
 {/if}
 {if $event.is_show_location EQ 1 && $event.location}
 LOCATION:{$event.location|crmICalText}
