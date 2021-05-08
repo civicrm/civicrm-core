@@ -228,9 +228,6 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ]);
       $this->assertGreaterThan(0, $results['count']);
     }
-    if ($version == 4) {
-      $this->markTestIncomplete('Skipping entity_id related perms in api4 for now.');
-    }
     $newTag = civicrm_api3('Tag', 'create', [
       'name' => 'Foo123',
     ]);

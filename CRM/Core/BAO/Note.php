@@ -19,6 +19,7 @@
  * BAO object for crm_note table.
  */
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
+  use CRM_Core_DynamicFKAccessTrait;
 
   /**
    * Const the max number of notes we display at any given time.
