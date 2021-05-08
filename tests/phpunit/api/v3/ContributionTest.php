@@ -132,7 +132,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetContribution() {
+  public function testGetContribution(): void {
     $this->enableTaxAndInvoicing();
     $p = [
       'contact_id' => $this->_individualId,
@@ -161,19 +161,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contributions['count']);
     $contribution = $contributions['values'][$contributions['id']];
     $this->assertEquals($contribution['contact_id'], $this->_individualId);
-    // Note there was an assertion converting financial_type_id to 'Donation' which wasn't working.
-    // Passing back a string rather than an id seems like an error/cruft.
-    // If it is to be introduced we should discuss.
-    $this->assertEquals($contribution['financial_type_id'], 1);
-    $this->assertEquals($contribution['total_amount'], 100.00);
-    $this->assertEquals($contribution['non_deductible_amount'], 10.00);
+    $this->assertEquals(1, $contribution['financial_type_id']);
+    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertEquals(10.00, $contribution['non_deductible_amount']);
     $this->assertEquals($contribution['fee_amount'], 5.00);
-    $this->assertEquals($contribution['net_amount'], 95.00);
-    $this->assertEquals($contribution['trxn_id'], 23456);
-    $this->assertEquals($contribution['invoice_id'], 78910);
-    $this->assertEquals($contribution['invoice_number'], 'INV_' . $contributions['id']);
-    $this->assertEquals($contribution['contribution_source'], 'SSF');
-    $this->assertEquals($contribution['contribution_status'], 'Completed');
+    $this->assertEquals(95.00, $contribution['net_amount']);
+    $this->assertEquals(23456, $contribution['trxn_id']);
+    $this->assertEquals(78910, $contribution['invoice_id']);
+    $this->assertRegExp('/INV_\d+/', $contribution['invoice_number']);
+    $this->assertEquals('SSF', $contribution['contribution_source']);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
