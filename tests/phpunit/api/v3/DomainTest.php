@@ -100,8 +100,10 @@ class api_v3_DomainTest extends CiviUnitTestCase {
 
   /**
    * Test get function with current domain.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetCurrentDomain() {
+  public function testGetCurrentDomain(): void {
     $params = ['current_domain' => 1];
     $result = $this->callAPISuccess('domain', 'get', $params);
 

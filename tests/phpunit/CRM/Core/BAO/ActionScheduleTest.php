@@ -1753,7 +1753,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       [
         // The next day, send an email.
         'time' => date('Y-m-d H:i:s', strtotime($contact['values'][$contact['id']]['created_date'] . ' +1 day')),
-        'recipients' => [['test-birth_day@example.com']],
+        'recipients' => [['test-birth_day@example.com'], ['fixme.domainemail@example.org'], ['domainemail2@example.org']],
       ],
     ]);
   }
@@ -1777,7 +1777,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       [
         // On the eve of 3 years after they were modified, send an email.
         'time' => date('Y-m-d H:i:s', strtotime($modifiedDate . ' +3 years -1 day')),
-        'recipients' => [['test-birth_day@example.com']],
+        'recipients' => [['test-birth_day@example.com'], ['fixme.domainemail@example.org'], ['domainemail2@example.org']],
       ],
     ]);
   }

@@ -108,6 +108,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Clean up after each test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -125,6 +126,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       }
     }
     $this->restoreUFGroupOne();
+    parent::tearDown();
   }
 
   /**

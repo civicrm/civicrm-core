@@ -23,11 +23,15 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp(): void {
     parent::setUp();
-    $this->useTransaction(TRUE);
+    $this->useTransaction();
 
-    $entityParams = ['contact_id' => 1];
+    $entityParams = ['contact_id' => $this->individualCreate()];
 
     $this->_entity = 'EntityBatch';
     $this->_entityID = $this->contributionCreate($entityParams);

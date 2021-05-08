@@ -3261,7 +3261,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
       'H Bobby, Bobby :: bob@h.com',
-      'Second Domain',
+      'Second Domain :: domainemail2@example.org',
       $this->callAPISuccessGetValue('Contact', ['id' => $loggedInContactID, 'return' => 'last_name']) . ', Logged In :: anthony_anderson@civicrm.org',
     ];
     $this->assertEquals(6, $result['count']);
@@ -3309,7 +3309,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'A Bobby, Bobby :: bob@bobby.com',
       'Bob, Bob :: bob@bob.com',
       'C Bobby, Bobby',
-      'Second Domain',
+      'Second Domain :: domainemail2@example.org',
       $this->callAPISuccessGetValue('Contact', ['id' => $loggedInContactID, 'return' => 'last_name']) . ', Logged In :: anthony_anderson@civicrm.org',
     ];
     foreach ($expectedData as $index => $value) {
