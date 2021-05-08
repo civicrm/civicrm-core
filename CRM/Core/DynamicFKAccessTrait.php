@@ -16,9 +16,9 @@
  */
 
 /**
- * Trait shared with entities attached to the contact record.
+ * Trait for with entities with an entity_table + entity_id dynamic FK.
  */
-trait CRM_Contact_AccessTrait {
+trait CRM_Core_DynamicFKAccessTrait {
 
   /**
    * @param string $action
@@ -26,16 +26,18 @@ trait CRM_Contact_AccessTrait {
    * @param $userID
    */
   public static function _checkAccess(string $action, array $record, $userID) {
-    $cid = $record['contact_id'] ?? NULL;
-    if (!$cid && !empty($record['id'])) {
-      $cid = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');
+    $eid = $record['entity_id'] ?? NULL;
+    $table = $record['entity_table'] ?? NULL;
+    if (!$eid && !empty($record['id'])) {
+      $eid = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'entity_id');
     }
-    if (!$cid) {
-      // With no contact id this must be part of an event locblock
-      return in_array(__CLASS__, ['CRM_Core_BAO_Phone', 'CRM_Core_BAO_Email', 'CRM_Core_BAO_Address']) &&
-        CRM_Core_Permission::check('edit all events', $userID);
+    if ($eid && !$table && !empty($record['id'])) {
+      $table = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'entity_table');
     }
-    return CRM_Contact_BAO_Contact::checkAccess(CRM_Core_Permission::EDIT, ['id' => $cid], $userID);
+    if ($eid && $table) {
+      $bao = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
+      return $bao::checkAccess(CRM_Core_Permission::EDIT, ['id' => $eid], $userID);
+    }
   }
 
 }
