@@ -206,12 +206,6 @@
      <title>Confirm dates</title>
   </item>
   <item>
-    <path>civicrm/ajax/l10n-js</path>
-    <page_callback>CRM_Core_Resources::outputLocalizationJS</page_callback>
-    <access_callback>1</access_callback>
-    <is_public>true</is_public>
-  </item>
-  <item>
     <path>civicrm/shortcode</path>
     <page_callback>CRM_Core_Form_ShortCode</page_callback>
     <access_arguments>access CiviCRM</access_arguments>

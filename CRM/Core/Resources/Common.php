@@ -176,7 +176,8 @@ class CRM_Core_Resources_Common {
    * @return array
    */
   protected static function coreResourceList($region) {
-    $config = CRM_Core_Config::singleton();
+    $settings = Civi::settings();
+    $contactID = (int) CRM_Core_Session::getLoggedInContactID();
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
@@ -204,13 +205,21 @@ class CRM_Core_Resources_Common {
     ];
 
     // Dynamic localization script
-    $items[] = Civi::resources()->addCacheCode(
-      CRM_Utils_System::url('civicrm/ajax/l10n-js/' . CRM_Core_I18n::getLocale(),
-        ['cid' => CRM_Core_Session::getLoggedInContactID()], FALSE, NULL, FALSE)
-    );
+    $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', [
+      'cid' => $contactID,
+      'includeEmailInName' => (bool) $settings->get('includeEmailInName'),
+      'ajaxPopupsEnabled' => (bool) $settings->get('ajaxPopupsEnabled'),
+      'allowAlertAutodismissal' => (bool) $settings->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => Civi::resources()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'lcMessages' => $settings->get('lcMessages'),
+      'dateInputFormat' => $settings->get('dateInputFormat'),
+      'timeInputFormat' => $settings->get('timeInputFormat'),
+      'moneyFormat' => CRM_Utils_Money::format(1234.56),
+    ]);
 
     // add wysiwyg editor
-    $editor = Civi::settings()->get('editor_id');
+    $editor = $settings->get('editor_id');
     if ($editor == "CKEditor") {
       CRM_Admin_Form_CKEditorConfig::setConfigDefault();
       $items[] = [
@@ -227,17 +236,15 @@ class CRM_Core_Resources_Common {
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
     }
 
-    $contactID = CRM_Core_Session::getLoggedInContactID();
-
     // Menubar
     $position = 'none';
     if (
-      $contactID && !$config->userFrameworkFrontend
+      $contactID && !CRM_Core_Config::singleton()->userFrameworkFrontend
       && CRM_Core_Permission::check('access CiviCRM')
       && !@constant('CIVICRM_DISABLE_DEFAULT_MENU')
       && !CRM_Core_Config::isUpgradeMode()
     ) {
-      $position = Civi::settings()->get('menubar_position') ?: 'over-cms-menu';
+      $position = $settings->get('menubar_position') ?: 'over-cms-menu';
     }
     if ($position !== 'none') {
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
@@ -245,7 +252,7 @@ class CRM_Core_Resources_Common {
       $items[] = 'js/crm.menubar.js';
       // @see CRM_Core_Resources::renderMenubarStylesheet
       $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
-        'menubarColor' => Civi::settings()->get('menubar_color'),
+        'menubarColor' => $settings->get('menubar_color'),
         'height' => 40,
         'breakpoint' => 768,
       ]);
@@ -260,12 +267,13 @@ class CRM_Core_Resources_Common {
     }
 
     // JS for multilingual installations
-    if (!empty($config->languageLimit) && count($config->languageLimit) > 1 && CRM_Core_Permission::check('translate CiviCRM')) {
+    $languageLimit = $settings->get('languageLimit');
+    if (is_array($languageLimit) && count($languageLimit) > 1 && CRM_Core_Permission::check('translate CiviCRM')) {
       $items[] = "js/crm.multilingual.js";
     }
 
     // Enable administrators to edit option lists in a dialog
-    if (CRM_Core_Permission::check('administer CiviCRM') && Civi::settings()->get('ajaxPopupsEnabled')) {
+    if (CRM_Core_Permission::check('administer CiviCRM') && $settings->get('ajaxPopupsEnabled')) {
       $items[] = "js/crm.optionEdit.js";
     }
 

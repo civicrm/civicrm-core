@@ -126,9 +126,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
       CRM_Core_Session::setStatus($e->getMessage(), ts('Save Failed'), 'error');
     }
 
-    // Update any settings stored in dynamic js
-    CRM_Core_Resources::singleton()->resetCacheCode();
-
     CRM_Core_Session::setStatus(ts('Your changes have been saved.'), ts('Saved'), 'success');
   }
 
