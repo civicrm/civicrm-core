@@ -94,6 +94,7 @@ class CRM_Api4_Services {
           if ($serviceClass->isInstantiable()) {
             $definition = $container->register(str_replace('\\', '_', $serviceName), $serviceName);
             $definition->addTag($tag);
+            $definition->setPublic(TRUE);
           }
         }
         $container->addResource($resource);
