@@ -453,14 +453,30 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create default domain contacts for the two domains added during test class.
    * database population.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function createDomainContacts() {
-    $this->organizationCreate();
-    $this->organizationCreate(['organization_name' => 'Second Domain']);
+  public function createDomainContacts(): void {
+    $this->organizationCreate(['api.Email.create' => ['email' => 'fixme.domainemail@example.org']]);
+    $this->organizationCreate([
+      'organization_name' => 'Second Domain',
+      'api.Email.create' => ['email' => 'domainemail2@example.org'],
+      'api.Address.create' => [
+        'street_address' => '15 Main St',
+        'location_type_id' => 1,
+        'city' => 'Collinsville',
+        'country_id' => 1228,
+        'state_province_id' => 1003,
+        'postal_code' => 6022,
+      ],
+    ]);
   }
 
   /**
    *  Common teardown functions for all unit tests.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;
@@ -484,7 +500,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       \Civi\Core\Transaction\Manager::singleton(TRUE);
 
-      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match'];
+      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match', 'civicrm_email', 'civicrm_address'];
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }
