@@ -1070,7 +1070,7 @@ class InstallRequirements {
       }
       else {
         $versionDetails = mysqli_query($this->conn, 'SELECT version() as version')->fetch_assoc();
-        if (version_compare($versionDetails['version'], $min) == -1) {
+        if (version_compare($versionDetails['version'], $version) == -1) {
           $testDetails[2] .= "{$majorHas}.{$minorHas}.";
           $this->error($testDetails);
         }
