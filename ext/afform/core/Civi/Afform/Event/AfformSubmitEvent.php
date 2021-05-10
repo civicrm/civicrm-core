@@ -20,17 +20,22 @@ class AfformSubmitEvent extends AfformBaseEvent {
 
   /**
    * @var array
-   *   List of definitions of the entities.
-   *   $entityDefns['spouse'] = ['type' => 'Individual'];
+   *   Values to be saved for this entity
+   *
    */
-  public $entityDefns;
+  public $values;
 
   /**
-   * @var array
-   *   List of submitted entities to save.
-   *   $entityValues['Contact']['spouse'] = ['first_name' => 'Optimus Prime'];
+   * @var string
+   *   entityType
    */
-  public $entityValues;
+  public $entityType;
+
+  /**
+   * @var string
+   *   entityName e.g. Individual1, Activity1,
+   */
+  public $entityName;
 
   /**
    * @var array
@@ -39,39 +44,23 @@ class AfformSubmitEvent extends AfformBaseEvent {
    */
   public $entityIds;
 
-  public $entityWeights;
-
-  public $entityMapping;
-
   /**
    * AfformSubmitEvent constructor.
    *
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
-   * @param array $entityDefns
-   * @param array $entityValues
+   * @param array $values
+   * @param string $entityType
+   * @param string $entityName
    * @param array $entityIds
-   * @param array $entityWeights
-   * @param array $entityMapping
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $entityDefns, array $entityValues, array $entityIds, array $entityWeights, array $entityMapping) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $values, string $entityType, string $entityName, array $entityIds) {
     parent::__construct($afform, $formDataModel, $apiRequest);
-    $this->entityDefns = $entityDefns;
-    $this->entityValues = $entityValues;
+    $this->values = $values;
+    $this->entityType = $entityType;
+    $this->entityName = $entityName;
     $this->entityIds = $entityIds;
-    $this->entityWeights = $entityWeights;
-    $this->entityMapping = $entityMapping;
-  }
-
-  /**
-   * List of entity types which need processing.
-   *
-   * @return array
-   *   Ex: ['Contact', 'Activity']
-   */
-  public function getTypes() {
-    return array_keys($this->entityValues);
   }
 
 }

@@ -61,4 +61,65 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
     $this->assertEquals($expected, $actual);
   }
 
+
+  public function formEntityWeightExampls() {
+    $exs = [];
+    $exs[] = [
+      [
+        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
+        'Activity1' => ['type' => 'Activity', ['fields' => ['source_contact_id']]],
+      ],
+      [
+        'Contact' => ['Individual1' => ['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Activity' => ['Activity1' => ['fields' => ['source_contact_id' => 'Individual1']]],
+      ],
+      [
+        'Individual1' => 1,
+        'Activity1' => 2,
+      ],
+    ];
+    $exs[] = [
+      [
+        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
+        'Event1' => ['type' => 'Event', ['fields' => ['created_id']]],
+        'LocBlock1' => ['type' => 'LocBlock', ['fields' => ['event_id']]],
+      ],
+      [
+        'Contact' => ['Individual1' => ['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Event' => ['Event1' => ['fields' => ['created_id' => 'Individual1']]],
+        'LocBlock' => ['LocBlock1' => ['fields' => ['event_id' => 'Event1']]],
+      ],
+      [
+        'Individual1' => 1,
+        'Event1' => 2,
+        'LocBlock1' => 3,
+      ],
+    ];
+    $exs[] = [
+      [
+        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name']]],
+        'LocBlock1' => ['type' => 'LocBlock', ['fields' => ['event_id']]],
+        'Event1' => ['type' => 'Event', ['fields' => ['created_id']]],
+      ],
+      [
+        'Contact' => ['Individual1' => ['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'LocBlock' => ['LocBlock1' => ['fields' => ['event_id' => 'Event1']]],
+        'Event' => ['Event1' => ['fields' => ['created_id' => 'Individual1']]],
+      ],
+      [
+        'Individual1' => 1,
+        'Event1' => 2,
+        'LocBlock1' => 3,
+      ],
+    ];
+    return $exs;
+  }
+
+  /**
+   * @dataProvider formEntityWeightExampls
+   */
+  public function testEntityWeights($formEntities, $entityValues, $expectedWeights) {
+    $this->assertEquals($expectedWeights, CRM_Afform_Utils::getEntityWeights($formEntities, $entityValues));
+  }
+
 }
