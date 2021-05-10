@@ -393,15 +393,13 @@ class CRM_Core_Permission_Base {
    * in all enabled CiviCRM module extensions.
    *
    * @param bool $descriptions
-   * @param array $permissions
    *
    * @return array
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
-  public function getAllModulePermissions($descriptions = FALSE, &$permissions): array {
-    $newPermissions = [];
-    CRM_Utils_Hook::permission($newPermissions, $permissions);
-    $permissions = array_merge($permissions, $newPermissions);
+  public function getAllModulePermissions($descriptions = FALSE): array {
+    $permissions = [];
+    CRM_Utils_Hook::permission($permissions);
 
     if ($descriptions) {
       foreach ($permissions as $permission => $label) {
