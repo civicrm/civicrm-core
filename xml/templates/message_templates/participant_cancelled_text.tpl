@@ -8,7 +8,7 @@
 
 ===========================================================
 {$event.event_title}
-{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"shortdate" == $event.event_start_date|crmDate:"shortdate"}{$event.event_end_date|crmDate:"Time"}{else}{$event.event_end_date|crmDate}{/if}{/if}
+{$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|crmDate:"shortdate" == $event.event_start_date|crmDate:"shortdate"}{$event.event_end_date|crmDate:"Time"}{else}{$event.event_end_date|crmDate}{/if}{/if} {$event.event_tz}
 
 {ts}Participant Role{/ts}: {participant.role_id:label}
 

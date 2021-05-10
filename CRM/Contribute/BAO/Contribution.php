@@ -2561,6 +2561,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
       CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
 
+      CRM_Event_BAO_Event::setOutputTimeZone($values['event']);
+
       //get location details
       $locationParams = [
         'entity_id' => $this->_relatedObjects['participant']->event_id,
@@ -4723,6 +4725,9 @@ LIMIT 1;";
     $values = ['event' => []];
 
     CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
+
+    CRM_Event_BAO_Event::setOutputTimeZone($values['event']);
+
     // add custom fields for event
     $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $eventID);
 
