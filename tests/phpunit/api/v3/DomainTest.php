@@ -76,7 +76,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    * Takes no params.
    * Testing mainly for format.
    */
-  public function testGet() {
+  public function testGet(): void {
 
     $params = ['sequential' => 1];
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
