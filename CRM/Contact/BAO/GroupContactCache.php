@@ -119,7 +119,7 @@ AND (
    *
    * if not, regenerate, else return
    *
-   * @param int|array $groupIDs groupIDs of group that we are checking against
+   * @param array|null $groupIDs groupIDs of group that we are checking against
    *                           if empty, all groups are checked
    * @param int $limit
    *   Limits the number of groups we evaluate.
@@ -128,50 +128,17 @@ AND (
    *   TRUE if we did not regenerate, FALSE if we did
    */
   public static function loadAll($groupIDs = NULL, $limit = 0) {
-    // ensure that all the smart groups are loaded
-    // this function is expensive and should be sparingly used if groupIDs is empty
-    if (empty($groupIDs)) {
-      $groupIDClause = NULL;
-    }
-    else {
-      if (!is_array($groupIDs)) {
-        $groupIDs = [$groupIDs];
-      }
-
-      // note escapeString is a must here and we can't send the imploded value as second argument to
-      // the executeQuery(), since that would put single quote around the string and such a string
-      // of comma separated integers would not work.
-      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
-
-      $groupIDClause = "g.id IN ({$groupIDString})";
+    if ($groupIDs) {
+      // Passing a single value is deprecated.
+      $groupIDs = (array) $groupIDs;
     }
 
-    $query = self::groupRefreshedClause($groupIDClause);
+    $processGroupIDs = self::getGroupsNeedingRefreshing($groupIDs, $limit);
 
-    $limitClause = $orderClause = NULL;
-    if ($limit > 0) {
-      $limitClause = " LIMIT 0, $limit";
-      $orderClause = " ORDER BY g.cache_date";
-    }
-    // We ignore hidden groups and disabled groups
-    $query .= "
-        $orderClause
-        $limitClause
-";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $processGroupIDs = [];
-    while ($dao->fetch()) {
-      $processGroupIDs[] = $dao->id;
-    }
-
-    if (empty($processGroupIDs)) {
-      return TRUE;
-    }
-    else {
+    if (!empty($processGroupIDs)) {
       self::add($processGroupIDs);
-      return FALSE;
     }
+    return TRUE;
   }
 
   /**
@@ -761,6 +728,45 @@ AND  civicrm_group_contact.group_id = $groupID ";
         CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) VALUES $str");
       }
     }
+  }
+
+  /**
+   * @param array|null $groupIDs
+   * @param int $limit
+   *
+   * @return array
+   */
+  protected static function getGroupsNeedingRefreshing(?array $groupIDs, int $limit): array {
+    $groupIDClause = NULL;
+    // ensure that all the smart groups are loaded
+    // this function is expensive and should be sparingly used if groupIDs is empty
+    if (!empty($groupIDs)) {
+      // note escapeString is a must here and we can't send the imploded value as second argument to
+      // the executeQuery(), since that would put single quote around the string and such a string
+      // of comma separated integers would not work.
+      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
+      $groupIDClause = "g.id IN ({$groupIDString})";
+    }
+
+    $query = self::groupRefreshedClause($groupIDClause);
+
+    $limitClause = $orderClause = NULL;
+    if ($limit > 0) {
+      $limitClause = " LIMIT 0, $limit";
+      $orderClause = " ORDER BY g.cache_date";
+    }
+    // We ignore hidden groups and disabled groups
+    $query .= "
+        $orderClause
+        $limitClause
+";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $processGroupIDs = [];
+    while ($dao->fetch()) {
+      $processGroupIDs[] = $dao->id;
+    }
+    return $processGroupIDs;
   }
 
 }
