@@ -90,6 +90,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'civicrm_event',
     ];
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**
