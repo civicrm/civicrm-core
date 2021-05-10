@@ -90,9 +90,10 @@ class Submit extends AbstractProcessor {
               'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
               'records' => [$value],
             ]);
-          } else {
+          }
+          else {
             $value['contact_id'] = $entityId;
-            $api4($joinEntityName, 'create', [ 'values' => $value ]);
+            $api4($joinEntityName, 'create', ['values' => $value]);
           }
         }
       }
