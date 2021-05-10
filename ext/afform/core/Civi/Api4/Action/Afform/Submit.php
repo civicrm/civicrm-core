@@ -54,7 +54,7 @@ class Submit extends AbstractProcessor {
       $api4 = $event->formDataModel->getSecureApi4($entityName);
       foreach ($contacts as $contact) {
         $saved = $api4('Contact', 'save', ['records' => [$contact['fields']]])->first();
-        self::saveJoins($api4, 'Contact', $saved['id'], $contact['joins'] ?? []);
+        self::saveJoins('Contact', $saved['id'], $contact['joins'] ?? []);
       }
     }
     unset($event->entityValues['Contact']);
@@ -72,26 +72,33 @@ class Submit extends AbstractProcessor {
         $api4 = $event->formDataModel->getSecureApi4($entityName);
         foreach ($records as $record) {
           $saved = $api4($entityType, 'save', ['records' => [$record['fields']]])->first();
-          self::saveJoins($api4, $entityType, $saved['id'], $record['joins'] ?? []);
+          self::saveJoins($entityType, $saved['id'], $record['joins'] ?? []);
         }
       }
       unset($event->entityValues[$entityType]);
     }
   }
 
-  protected static function saveJoins($api4, $mainEntityName, $entityId, $joins) {
+  protected static function saveJoins($mainEntityName, $entityId, $joins) {
     foreach ($joins as $joinEntityName => $join) {
       $values = self::filterEmptyJoins($joinEntityName, $join);
-      // FIXME: Replace/delete should only be done to known contacts
+      // TODO: REPLACE works for creating or updating contacts, but different logic would be needed if
+      // the contact was being auto-updated via a dedupe rule; in that case we would not want to
+      // delete any existing records.
       if ($values) {
-        $api4($joinEntityName, 'replace', [
+        civicrm_api4($joinEntityName, 'replace', [
+          // Disable permission checks because the main entity has already been vetted
+          'checkPermissions' => FALSE,
           'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
           'records' => $values,
         ]);
       }
+      // REPLACE doesn't work if there are no records, have to use DELETE
       else {
         try {
-          $api4($joinEntityName, 'delete', [
+          civicrm_api4($joinEntityName, 'delete', [
+            // Disable permission checks because the main entity has already been vetted
+            'checkPermissions' => FALSE,
             'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
           ]);
         }
