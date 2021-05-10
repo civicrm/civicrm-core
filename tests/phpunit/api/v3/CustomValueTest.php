@@ -21,6 +21,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public $DBResetRequired = FALSE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function _populateOptionAndCustomGroup($type = NULL) {
     $dataValues = [
       'integer' => [1, 2, 3],
@@ -49,7 +52,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         );
         $this->optionGroup[$dataType]['id'] = $result['id'];
       }
-      elseif ($dataType == 'contact') {
+      elseif ($dataType === 'contact') {
         for ($i = 0; $i < 3; $i++) {
           $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com']);
           $this->optionGroup[$dataType]['values'][$i] = $result['id'];
@@ -73,7 +76,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
     // cleanup created option group for each custom-set before running next test
     if (!empty($this->optionGroup)) {
-      foreach ($this->optionGroup as $type => $value) {
+      foreach ($this->optionGroup as $value) {
         if (!empty($value['id'])) {
           $count = $this->callAPISuccess('OptionGroup', 'get', ['id' => $value['id']]);
           if ((bool) $count['count']) {
@@ -82,6 +85,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         }
       }
     }
+    parent::tearDown();
   }
 
   public function testCreateCustomValue() {
@@ -560,7 +564,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * ['return' => 'custom_1,custom_2']
    */
   public function testGetCustomValueReturnMultipleApiExplorer() {
-    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $result = $this->callAPISuccess('CustomValue', 'get', [
       'return' => implode(',', array_keys($customFieldValues)),
       'entity_id' => $cid,
@@ -573,7 +577,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * ['return => ['custom_1', 'custom_2']]
    */
   public function testGetCustomValueReturnMultipleArray() {
-    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $result = $this->callAPISuccess('CustomValue', 'get', [
       'return' => array_keys($customFieldValues),
       'entity_id' => $cid,
@@ -586,7 +590,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * [['return.custom_1' => '1'], ['return.custom_2' => '1']]
    */
   public function testGetCustomValueReturnMultipleList() {
-    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     $returnArray = [];
     foreach ($customFieldValues as $field => $value) {
       $returnArray["return.{$field}"] = 1;
@@ -600,9 +604,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    * the custom text for display.
    */
   public function testGetDisplayValue() {
-    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    [$cid, $customFieldValues] = $this->_testGetCustomValueMultiple();
     foreach ($customFieldValues as $field => $value) {
-      list(, $customFieldID) = explode("_", $field);
+      [, $customFieldID] = explode("_", $field);
       $result = $this->callAPISuccess('CustomValue', 'getdisplayvalue', [
         'entity_id' => $cid,
         'custom_field_id' => $customFieldID,
