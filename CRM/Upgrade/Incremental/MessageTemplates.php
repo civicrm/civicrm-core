@@ -249,6 +249,26 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'pledge_reminder', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.40.alpha1',
+        'upgrade_descriptor' => ts('Add time zone to Event dates'),
+        'templates' => [
+          ['name' => 'event_online_receipt', 'type' => 'html'],
+          ['name' => 'event_online_receipt', 'type' => 'text'],
+          ['name' => 'event_offline_receipt', 'type' => 'html'],
+          ['name' => 'event_offline_receipt', 'type' => 'text'],
+          ['name' => 'participant_cancelled', 'type' => 'html'],
+          ['name' => 'participant_cancelled', 'type' => 'text'],
+          ['name' => 'participant_confirm', 'type' => 'html'],
+          ['name' => 'participant_confirm', 'type' => 'text'],
+          ['name' => 'participant_expired', 'type' => 'html'],
+          ['name' => 'participant_expired', 'type' => 'text'],
+          ['name' => 'participant_transferred', 'type' => 'html'],
+          ['name' => 'participant_transferred', 'type' => 'text'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'html'],
+          ['name' => 'payment_or_refund_notification', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 
