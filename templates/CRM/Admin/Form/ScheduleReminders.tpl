@@ -106,7 +106,11 @@
          </tr>
          <tr class="crm-scheduleReminder-form-block-subject">
             <td class="label">{$form.subject.label}</td>
-            <td>{$form.subject.html}</td>
+            <td>
+              {$form.subject.html|crmAddClass:huge}
+              <input class="crm-token-selector big" data-field="subject" />
+              {help id="id-token-subject" tplFile=$tplFile isAdmin=$isAdmin file="CRM/Contact/Form/Task/Email.hlp"}
+            </td>
          </tr>
        </table>
        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
