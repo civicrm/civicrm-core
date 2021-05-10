@@ -2025,16 +2025,12 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $newPermissions
    *   Array to be filled with permissions.
-   * @param array $permissions
-   *   Already calculated permissions. These can be altered. Notably an
-   *   extension might want to add it's permissions to 'implied' or to
-   *   remove some permissions.
    *
    * @return null
    *   The return value is ignored
    */
-  public static function permission(&$newPermissions, &$permissions) {
-    return self::singleton()->invoke(['permissions', 'all_permissions'], $newPermissions, $permissions,
+  public static function permission(&$newPermissions) {
+    return self::singleton()->invoke(['permissions'], $newPermissions, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_permission'
     );
