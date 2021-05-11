@@ -52,7 +52,7 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
     $totalitems = civicrm_api3('Exception', "getcount", $params);
     $params           = [
       'total' => $totalitems,
-      'rowCount' => CRM_Utils_Pager::ROWCOUNT,
+      'rowCount' => Civi::settings()->get('default_pager_size'),
       'status' => ts('Dedupe Exceptions %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',

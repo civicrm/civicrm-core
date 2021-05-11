@@ -248,7 +248,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
       $params['rowCount'] = $this->_limit;
     }
     else {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
+      $params['rowCount'] = Civi::settings()->get('default_pager_size');
     }
 
     $params['buttonTop'] = 'PagerTopButton';

@@ -175,7 +175,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   public function getPagerParams($action, &$params) {
     $params['csvString'] = NULL;
     $params['status'] = ts('Respondents') . ' %%StatusMessage%%';
-    $params['rowCount'] = ($this->_limit) ? $this->_limit : CRM_Utils_Pager::ROWCOUNT;
+    $params['rowCount'] = ($this->_limit) ? $this->_limit : Civi::settings()->get('default_pager_size');
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';
   }

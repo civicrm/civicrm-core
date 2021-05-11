@@ -32,7 +32,13 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Constants for static parameters of the pager
    */
-  const ROWCOUNT = 50, PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+  const PAGE_ID = 'crmPID', PAGE_ID_TOP = 'crmPID', PAGE_ID_BOTTOM = 'crmPID_B', PAGE_ROWCOUNT = 'crmRowCount';
+
+  /**
+   * Deprecated constants that might still be used by extensions but no longer by core
+   * @deprecated
+   */
+  const ROWCOUNT = 50;
 
   /**
    * The output of the pager. This is a name/value array with various keys
@@ -198,13 +204,13 @@ class CRM_Utils_Pager extends Pager_Sliding {
   /**
    * Get the number of rows to display from either a GET / POST variable
    *
-   * @param int $defaultPageRowCount
+   * @param int|null $defaultPageRowCount
    *   The default value if not set.
    *
    * @return int
    *   the rowCount value to use
    */
-  public function getPageRowCount($defaultPageRowCount = self::ROWCOUNT) {
+  public function getPageRowCount($defaultPageRowCount = NULL) {
     // POST has higher priority than GET vars
     if (isset($_POST[self::PAGE_ROWCOUNT])) {
       $rowCount = max((int ) @$_POST[self::PAGE_ROWCOUNT], 1);
@@ -213,7 +219,12 @@ class CRM_Utils_Pager extends Pager_Sliding {
       $rowCount = max((int ) @$_GET[self::PAGE_ROWCOUNT], 1);
     }
     else {
-      $rowCount = $defaultPageRowCount;
+      if (empty($defaultPageRowCount)) {
+        $rowcount = Civi::settings()->get('default_pager_size');
+      }
+      else {
+        $rowCount = $defaultPageRowCount;
+      }
     }
     return $rowCount;
   }

@@ -228,4 +228,24 @@ return [
     'description' => ts("Which fields can be searched on in the menubar quicksearch box? Don't see your custom field here? Make sure it is marked as Searchable."),
     'help_text' => NULL,
   ],
+  'default_pager_size' => [
+    'group_name' => 'Search Preferences',
+    'group' => 'Search Preferences',
+    'name' => 'default_pager_size',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 2,
+      'maxlength' => 3,
+    ],
+    'default' => 50,
+    'add' => '5.39',
+    'title' => ts('Default Search Pager size'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('What is the default number of records to show on a search'),
+    'help_text' => NULL,
+  ],
+
 ];
