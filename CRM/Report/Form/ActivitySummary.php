@@ -502,9 +502,10 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   /**
    * Set pager.
    *
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     $this->_rowsFound = $this->totalRows;
     parent::setPager($rowCount);
   }

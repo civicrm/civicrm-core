@@ -477,20 +477,22 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
    * Override to set limit to 10.
    *
-   * @param int $rowCount
+   * @param int|null $rowCount
    *
    * @return array
    */
-  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     return parent::limit($rowCount);
   }
 
   /**
    * Override to set pager with limit is 10.
    *
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     parent::setPager($rowCount);
   }
 
