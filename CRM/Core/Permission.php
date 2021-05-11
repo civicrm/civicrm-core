@@ -591,7 +591,7 @@ class CRM_Core_Permission {
     $permissions = self::getCoreAndComponentPermissions($all);
 
     // Add any permissions defined in hook_civicrm_permission implementations.
-    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE, $permissions);
+    $module_permissions = CRM_Core_Config::singleton()->userPermissionClass->getAllModulePermissions(TRUE);
     $permissions = array_merge($permissions, $module_permissions);
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
