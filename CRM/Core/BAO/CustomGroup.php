@@ -1251,6 +1251,23 @@ ORDER BY civicrm_custom_group.weight,
   }
 
   /**
+   * Delete a record from supplied params.
+   * API3 calls deleteGroup() which removes the related civicrm_value_X table.
+   * This function does the same for API4.
+   *
+   * @param array $record
+   *   'id' is required.
+   * @return CRM_Core_DAO
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecord(array $record) {
+    $table = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'table_name');
+    $result = parent::deleteRecord($record);
+    CRM_Core_BAO_SchemaHandler::dropTable($table);
+    return $result;
+  }
+
+  /**
    * Set defaults.
    *
    * @param array $groupTree

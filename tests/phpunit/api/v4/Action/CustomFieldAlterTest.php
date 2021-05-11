@@ -162,6 +162,17 @@ class CustomFieldAlterTest extends BaseCustomValueTest {
         ->execute();
     }
 
+    // Check that custom table exists and is then removed when group is deleted
+    $this->assertNotNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
+
+    CustomField::delete(FALSE)
+      ->addWhere('custom_group_id', '=', $customGroup['id'])
+      ->execute();
+    CustomGroup::delete(FALSE)
+      ->addWhere('id', '=', $customGroup['id'])
+      ->execute();
+    // The table should be gone
+    $this->assertNull(\CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE '{$customGroup['table_name']}';"));
   }
 
 }
