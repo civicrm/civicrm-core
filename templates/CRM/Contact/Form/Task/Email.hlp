@@ -7,6 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{capture assign=tokentext}{ts}Find out more about CiviCRM Tokens{/ts}{/capture}
 {htxt id="id-from_email-title"}
   {ts}From Address{/ts}
 {/htxt}
@@ -40,6 +41,7 @@
 {/htxt}
 {htxt id="id-token-subject"}
 <p>{ts}Use a token in the Subject when you are sending mail to a number of recipients and want to include their name and / or other values from their contact record automatically in the subject line.{/ts}</p>
+<p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
 {htxt id="id-token-text-title"}
@@ -57,6 +59,7 @@
 <p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
+<p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
 {htxt id="id-token-html-title"}
@@ -82,6 +85,7 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 <p>{ts}Custom tokens (based on custom data) can be added for organizations as well. These tokens will not be displayed in the list of available tokens, but can be added manually. The format is {literal}{contact.custom_12}{/literal} – where 12 is the ID of the custom data field. To find the custom data field ID,
 go Administer > Customize Data & Screens > Custom Fields and click ‘edit’ on the field you want to use. Look at the URL. The last part of the URL will
 be an equal sign and a number (=12). The number (12 in this example) is the id of that custom field.{/ts}</p>
+<p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
 
 {htxt id="id-message-text-title"}
@@ -90,4 +94,5 @@ be an equal sign and a number (=12). The number (12 in this example) is the id o
 {htxt id="id-message-text"}
 <p>{ts}You can send your email as a simple text-only message, as an HTML formatted message, or both. Text-only messages are sufficient for most email communication - and some recipients may prefer not to receive HTML formatted messages.{/ts}</p>
 <p>{ts}HTML messages have more visual impact, allow you to include images, and may be more readable if you are including links to website pages. However, different email programs may interpret HTML formats differently - so use this option cautiously unless you have a template format that has been tested with different web and desktop email programs.{/ts}</p>
+<p>{docURL page="user/common-workflows/tokens-and-mail-merge" text=$tokentext}</p>
 {/htxt}
