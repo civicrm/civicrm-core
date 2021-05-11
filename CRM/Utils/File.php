@@ -624,38 +624,6 @@ HTACCESS;
 
   /**
    * @param $directory
-   *
-   * @return string
-   * @deprecated
-   *   Computation of a relative path requires some base.
-   *   This implementation is problematic because it relies on an
-   *   implicit base which was constructed problematically.
-   */
-  public static function relativeDirectory($directory) {
-    // Do nothing on windows
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      return $directory;
-    }
-
-    // check if directory is relative, if so return immediately
-    if (!self::isAbsolute($directory)) {
-      return $directory;
-    }
-
-    // make everything relative from the baseFilePath
-    $basePath = self::baseFilePath();
-    // check if basePath is a substr of $directory, if so
-    // return rest of string
-    if (substr($directory, 0, strlen($basePath)) == $basePath) {
-      return substr($directory, strlen($basePath));
-    }
-
-    // return the original value
-    return $directory;
-  }
-
-  /**
-   * @param $directory
    * @param string $basePath
    *   The base path when evaluating relative paths. Should include trailing slash.
    *
