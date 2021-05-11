@@ -24,7 +24,6 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
   use CRM_Admin_Form_SettingTrait;
 
   protected $_settings = [];
-  protected $includesReadOnlyFields = FALSE;
   public $_defaults = [];
 
   /**
@@ -56,11 +55,6 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->addFieldsDefinedInSettingsMetadata();
-
-    // @todo look at sharing the code below in the settings trait.
-    if ($this->includesReadOnlyFields) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
-    }
 
     // @todo - do we still like this redirect?
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
