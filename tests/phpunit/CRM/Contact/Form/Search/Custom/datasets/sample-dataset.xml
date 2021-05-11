@@ -69,24 +69,4 @@
         state_province_id="1031"
         is_primary="1"
     />
-    <civicrm_option_group
-       id="25"
-       name="custom_search"
-       description="Custom Search"
-       is_reserved="0"
-       is_active="1"
-    />
-    <civicrm_option_value
-       id="213"
-       option_group_id="25"
-       label="CRM_Contact_Form_Search_Custom_Sample"
-       value="1"
-       name="CRM_Contact_Form_Search_Custom_Sample"
-       filter="0"
-       weight="1"
-       description="Household Name and State"
-       is_optgroup="0"
-       is_reserved="0"
-       is_active="1"
-    />
-</dataset>
+ </dataset>

@@ -184,7 +184,6 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
    * @param bool $justIDs
    *
    * @return string
-   * @throws \Exception
    */
   public function all(
     $offset = 0, $rowcount = 0, $sort = NULL,

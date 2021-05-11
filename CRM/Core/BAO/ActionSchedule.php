@@ -356,7 +356,7 @@ FROM civicrm_action_schedule cas
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function processQueue($now = NULL, $params = []) {
+  public static function processQueue($now = NULL, $params = []): void {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
     $mappings = CRM_Core_BAO_ActionSchedule::getMappings();

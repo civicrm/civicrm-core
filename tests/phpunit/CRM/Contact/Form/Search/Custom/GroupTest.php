@@ -28,69 +28,52 @@
  */
 
 /**
- *  Include parent class definition
- */
-
-
-/**
- *  Include class under test
- */
-
-/**
- *  Include form definitions
- */
-
-/**
- *  Include DAO to do queries
- */
-
-/**
- *  Include dataProvider for tests
- */
-
-/**
- *  Test contact custom search functions
+ * Test contact custom search functions
  *
  * @package CiviCRM
  * @group headless
  */
 class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
-  protected $_tablesToTruncate = [
-    'civicrm_group_contact',
-    'civicrm_group',
-    'civicrm_saved_search',
-    'civicrm_entity_tag',
-    'civicrm_tag',
-    'civicrm_contact',
-    'civicrm_option_value',
-    'civicrm_option_group',
-  ];
+
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function tearDown(): void {
+    $this->quickCleanup([
+      'civicrm_group_contact',
+      'civicrm_group',
+      'civicrm_saved_search',
+      'civicrm_entity_tag',
+      'civicrm_tag',
+    ]);
+    parent::tearDown();
+  }
 
   /**
    * @return CRM_Contact_Form_Search_Custom_GroupTestDataProvider
    */
-  public function dataProvider() {
+  public function dataProvider(): CRM_Contact_Form_Search_Custom_GroupTestDataProvider {
     return new CRM_Contact_Form_Search_Custom_GroupTestDataProvider();
   }
 
   /**
-   *  Test CRM_Contact_Form_Search_Custom_Group::count()
+   * Test CRM_Contact_Form_Search_Custom_Group::count().
+   *
    * @dataProvider dataProvider
-   * @param $fv
-   * @param $count
-   * @param $ids
-   * @param $full
-   * @throws \Exception
+   *
+   * @param array $fv
+   * @param int $count
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCount($fv, $count, $ids, $full) {
-    $this->quickCleanup($this->_tablesToTruncate);
-
-    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
+  public function testCount(array $fv, int $count): void {
+    $this->loadXMLDataSet(__DIR__ . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
 
     $sql = $obj->all();
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::executeQuery($sql);
 
     /**
      * echo "Count: $count, OBJ: ", $obj->count( ) . "\n";
@@ -110,14 +93,12 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    * @param $full
    * @throws \Exception
    */
-  public function testAll($fv, $count, $ids, $full) {
-    // Truncate affected tables
-    $this->quickCleanup($this->_tablesToTruncate);
-    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
+  public function testAll($fv, $count, $ids, $full): void {
+    $this->loadXMLDataSet(__DIR__ . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->all();
-    $this->assertTrue(is_string($sql));
+    $this->assertIsString($sql);
     $dao = CRM_Core_DAO::executeQuery($sql);
     $all = [];
     while ($dao->fetch()) {
@@ -141,10 +122,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testContactIDs($fv, $count, $ids, $full) {
-    // Truncate affected tables
-    $this->quickCleanup($this->_tablesToTruncate);
-
-    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
+    $this->loadXMLDataSet(__DIR__ . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->contactIDs();
@@ -163,29 +141,22 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  Test CRM_Contact_Form_Search_Custom_Group::columns()
    *  It returns an array of translated name => keys
    */
-  public function testColumns() {
+  public function testColumns(): void {
     $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $columns = $obj->columns();
-    $this->assertTrue(is_array($columns));
+    $this->assertIsArray($columns);
     foreach ($columns as $key => $value) {
-      $this->assertTrue(is_string($key));
-      $this->assertTrue(is_string($value));
+      $this->assertIsString($key);
+      $this->assertIsString($value);
     }
-  }
-
-  /**
-   *  Test CRM_Contact_Form_Search_Custom_Group::from()
-   * @todo write this test
-   */
-  public function SKIPPED_testFrom() {
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::summary()
    *  It returns NULL
    */
-  public function testSummary() {
+  public function testSummary(): void {
     $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $this->assertNull($obj->summary());
@@ -195,20 +166,18 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  Test CRM_Contact_Form_Search_Custom_Group::templateFile()
    *  Returns the path to the file as a string
    */
-  public function testTemplateFile() {
+  public function testTemplateFile(): void {
     $formValues = [];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
     $fileName = $obj->templateFile();
-    $this->assertTrue(is_string($fileName));
-    //FIXME: we would need to search the include path to do the following
-    //$this->assertTrue( file_exists( $fileName ) );
+    $this->assertIsString($fileName);
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::where( )
    *  With no arguments it returns '(1)'
    */
-  public function testWhereNoArgs() {
+  public function testWhereNoArgs(): void {
     $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
@@ -221,30 +190,26 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
    *  Test CRM_Contact_Form_Search_Custom_Group::where( )
    *  With false argument it returns '(1)'
    */
-  public function testWhereFalse() {
+  public function testWhereFalse(): void {
     $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
     ];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1) ', $obj->where(FALSE),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals(' (1) ', $obj->where(FALSE));
   }
 
   /**
    *  Test CRM_Contact_Form_Search_Custom_Group::where( )
    *  With true argument it returns list of contact IDs
    */
-  public function testWhereTrue() {
+  public function testWhereTrue(): void {
     $formValues = [
       CRM_Core_Form::CB_PREFIX . '17' => TRUE,
       CRM_Core_Form::CB_PREFIX . '23' => TRUE,
     ];
     $obj = new CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1)  AND contact_a.id IN ( 17, 23 )', $obj->where(TRUE),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals(' (1)  AND contact_a.id IN ( 17, 23 )', $obj->where(TRUE));
   }
 
 }
