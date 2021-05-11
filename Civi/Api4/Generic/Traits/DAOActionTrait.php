@@ -106,15 +106,16 @@ trait DAOActionTrait {
   protected function writeObjects(&$items) {
     $baoName = $this->getBaoName();
 
-    // Some BAOs are weird and don't support a straightforward "create" method.
-    $oddballs = [
+    // TODO: Opt-in more entities to use the new writeRecords BAO method.
+    $functionNames = [
       'Address' => 'add',
+      'CustomField' => 'writeRecords',
       'EntityTag' => 'add',
       'GroupContact' => 'add',
     ];
-    $method = $oddballs[$this->getEntityName()] ?? 'create';
-    if (!method_exists($baoName, $method)) {
-      $method = method_exists($baoName, 'add') ? 'add' : FALSE;
+    $method = $functionNames[$this->getEntityName()] ?? NULL;
+    if (!isset($method)) {
+      $method = method_exists($baoName, 'create') ? 'create' : (method_exists($baoName, 'add') ? 'add' : 'writeRecords');
     }
 
     $result = [];
@@ -124,8 +125,8 @@ trait DAOActionTrait {
       FormattingUtil::formatWriteParams($item, $this->entityFields());
       $this->formatCustomParams($item, $entityId);
 
-      // Skip to writeRecords if not using legacy method
-      if (!$method) {
+      // Skip individual processing if using writeRecords
+      if ($method === 'writeRecords') {
         continue;
       }
       $item['check_permissions'] = $this->getCheckPermissions();
@@ -156,7 +157,7 @@ trait DAOActionTrait {
 
     // Use bulk `writeRecords` method if the BAO doesn't have a create or add method
     // TODO: reverse this from opt-in to opt-out and default to using `writeRecords` for all BAOs
-    if (!$method) {
+    if ($method === 'writeRecords') {
       $items = array_values($items);
       foreach ($baoName::writeRecords($items) as $i => $createResult) {
         $result[] = $this->baoToArray($createResult, $items[$i]);
