@@ -429,24 +429,4 @@
         contact_id="28"
         status="Added"
     />
-    <civicrm_option_group
-       id="24"
-       name="custom_search"
-       description="Custom Search"
-       is_reserved="0"
-       is_active="1"
-    />
-    <civicrm_option_value
-       id="153"
-       option_group_id="24"
-       label="CRM_Contact_Form_Search_Custom_Group"
-       value="4"
-       name="CRM_Contact_Form_Search_Custom_Group"
-       filter="0"
-       weight="4"
-       description="Include / Exclude Contacts in a Group / Tag"
-       is_optgroup="0"
-       is_reserved="0"
-       is_active="1"
-    />
 </dataset>

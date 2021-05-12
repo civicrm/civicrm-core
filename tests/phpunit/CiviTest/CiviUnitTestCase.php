@@ -26,7 +26,9 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\OptionGroup;
 use Civi\Payment\System;
+use Civi\Api4\OptionValue;
 use League\Csv\Reader;
 
 /**
@@ -455,6 +457,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * database population.
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public function createDomainContacts(): void {
     $this->organizationCreate(['api.Email.create' => ['email' => 'fixme.domainemail@example.org']]);
@@ -470,6 +473,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'postal_code' => 6022,
       ],
     ]);
+    OptionValue::replace(FALSE)->addWhere(
+      'option_group_id:name', '=', 'from_email_address'
+    )->setDefaults([
+      'is_default' => 1,
+      'name' => '"FIXME" <info@EXAMPLE.ORG>',
+      'label' => '"FIXME" <info@EXAMPLE.ORG>',
+    ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
   }
 
   /**
@@ -514,6 +524,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * CHeck that all tests that have created payments have created them with the right financial entities.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   protected function assertPostConditions() {
@@ -522,6 +533,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($this->isLocationTypesOnPostAssert) {
       $this->assertLocationValidity();
     }
+    $this->assertCount(1, OptionGroup::get(FALSE)
+      ->addWhere('name', '=', 'from_email_address')
+      ->execute());
     if (!$this->isValidateFinancialsOnPostAssert) {
       return;
     }

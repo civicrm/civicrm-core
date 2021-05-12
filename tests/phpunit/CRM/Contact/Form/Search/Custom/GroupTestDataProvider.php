@@ -54,6 +54,8 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     [
       'fv' => ['excludeGroups' => ['3']],
       'id' => [
+        1,
+        2,
         '9',
         '10',
         '11',
@@ -127,6 +129,8 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     [
       'fv' => ['excludeTags' => ['7']],
       'id' => [
+        1,
+        2,
         '9',
         '10',
         '13',
@@ -253,6 +257,8 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
         'excludeGroups' => ['5'],
       ],
       'id' => [
+        1,
+        2,
         '9',
         '11',
         '17',
@@ -266,6 +272,8 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     [
       'fv' => ['includeGroups' => ['6']],
       'id' => [
+        1,
+        2,
         '9',
         '10',
         '11',
@@ -315,10 +323,6 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     ],
   ];
 
-  public function _construct() {
-    $this->i = 0;
-  }
-
   public function rewind() {
     $this->i = 0;
   }
@@ -330,12 +334,22 @@ class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
     $count = count($this->dataset[$this->i]['id']);
     $ids = $this->dataset[$this->i]['id'];
     $full = [];
-    foreach ($this->dataset[$this->i]['id'] as $key => $value) {
-      $full[] = [
-        'contact_id' => $value,
-        'contact_type' => 'Individual',
-        'sort_name' => "Test Contact $value",
-      ];
+    foreach ($this->dataset[$this->i]['id'] as $value) {
+      if ($value < 3) {
+        // One of the domain contacts...
+        $full[] = [
+          'contact_id' => $value,
+          'contact_type' => 'Organization',
+          'sort_name' => $value === 1 ? 'Unit Test Organization' : 'Second Domain',
+        ];
+      }
+      else {
+        $full[] = [
+          'contact_id' => $value,
+          'contact_type' => 'Individual',
+          'sort_name' => "Test Contact $value",
+        ];
+      }
     }
     return [$this->dataset[$this->i]['fv'], $count, $ids, $full];
   }
