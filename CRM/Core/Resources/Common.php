@@ -97,7 +97,7 @@ class CRM_Core_Resources_Common {
     $config = CRM_Core_Config::singleton();
     if (!empty($config->customCSSURL)) {
       $customCSSURL = Civi::resources()->addCacheCode($config->customCSSURL);
-      $bundle->addStyleUrl($customCSSURL, 99);
+      $bundle->addStyleUrl($customCSSURL, ['weight' => 99, 'name' => 'civicrm:css/custom.css']);
     }
     if (!Civi::settings()->get('disable_core_css')) {
       $bundle->addStyleFile('civicrm', 'css/civicrm.css', -99);
