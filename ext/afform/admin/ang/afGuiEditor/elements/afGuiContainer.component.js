@@ -43,6 +43,8 @@
         connectWith: '[ui-sortable]',
         cancel: 'input,textarea,button,select,option,a,.dropdown-menu',
         placeholder: 'af-gui-dropzone',
+        tolerance: 'pointer',
+        scrollSpeed: 8,
         containment: '#afGuiEditor-canvas-body'
       };
 

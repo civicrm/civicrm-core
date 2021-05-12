@@ -1,14 +1,11 @@
 #afGuiEditor #afGuiEditor-palette {
   margin-right: 5px;
+  height: 100%;
 }
 
 #afGuiEditor #afGuiEditor-canvas {
   margin-left: 5px;
-}
-
-#afGuiEditor .panel-body {
-  padding: 5px 12px;
-  position: relative;
+  height: 100%;
 }
 
 #afGuiEditor fieldset legend {
@@ -26,13 +23,39 @@
   margin-bottom: 10px;
 }
 
-#afGuiEditor #afGuiEditor-palette-tabs li {
+#afGuiEditor .panel {
+  height: 100%;
+}
+#afGuiEditor .panel-heading {
+  height: 44px;
+  padding: 10px;
+}
+#afGuiEditor .panel-heading ul.nav-tabs {
+  border-bottom: 0 none;
+}
+#afGuiEditor .panel-heading ul.nav-tabs li {
   top: 1px;
 }
-
-#afGuiEditor #afGuiEditor-palette-tabs li > a {
-  padding: 10px 15px;
+#afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
+  white-space: nowrap;
+  overflow: hidden;
+}
+#afGuiEditor .panel-heading ul.nav-tabs li.active {
+  max-width: 50%;
+}
+#afGuiEditor .panel-heading ul.nav-tabs li > a {
+  padding: 5px 3px 5px 8px;
+  height: 33px;
   font-size: 12px;
+  margin: 0;
+}
+
+#afGuiEditor .panel-body {
+  padding: 5px 12px;
+  position: relative;
+  height: calc(100% - 44px);
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
 #afGuiEditor .af-gui-columns {
@@ -49,7 +72,7 @@
 }
 
 #afGuiEditor .crm-editable-enabled,
-#afGuiEditor-palette-tabs > li > a > span {
+#afGuiEditor .panel-heading ul.nav-tabs li > a > span {
   display: inline-block;
   padding: 0 4px !important;
   border: 2px solid transparent !important;
@@ -112,7 +135,7 @@
   left: 0;
   padding-left: 15px;
 }
-#afGuiEditor:not(.af-gui-dragging) #afGuiEditor-canvas:hover .af-gui-bar {
+#afGuiEditor:not(.af-gui-dragging *) #afGuiEditor-canvas:hover .af-gui-bar {
   opacity: 1;
   transition: opacity .2s;
 }
@@ -120,6 +143,16 @@
   background-color: #d7e6ff;
   opacity: 1;
   transition: opacity .1s;
+}
+
+/* Disable menu while dragging */
+body.af-gui-dragging #civicrm-menu {
+  pointer-events: none;
+}
+/* Disable scrollbars while dragging */
+body.af-gui-dragging {
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 #afGuiEditor .af-gui-bar .btn.active {
@@ -143,6 +176,8 @@
   padding: 22px 3px 3px;
   min-height: 40px;
   display: block;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 #afGuiEditor af-gui-markup,
@@ -160,10 +195,12 @@
 
 #afGuiEditor .af-gui-container-type-fieldset {
   box-shadow: 0 0 5px #bbbbbb;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 #afGuiEditor .af-gui-container:hover,
-#afGuiEditor.af-gui-dragging .af-gui-container {
+.af-gui-dragging #afGuiEditor .af-gui-container {
   border: 2px dashed #757575;
 }
 #afGuiEditor .af-gui-container.af-gui-dragtarget {
@@ -215,6 +252,20 @@
 #afGuiEditor [ui-sortable] {
   min-height: 60px;
   margin-top: 10px;
+}
+
+#afGuiEditor .ui-sortable-helper {
+  height: 20px !important;
+  opacity: .5;
+  overflow: visible;
+}
+#afGuiEditor .ui-sortable-helper > * {
+  background-color: #d5d5d5;
+}
+#afGuiEditor .ui-sortable-helper .af-gui-palette-item {
+  height: 30px;
+  width: 300px;
+  border: 2px dashed #0071bd;
 }
 
 #afGuiEditor .af-gui-entity-palette-select-list {
