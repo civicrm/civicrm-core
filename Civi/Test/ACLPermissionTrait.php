@@ -9,12 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Test;
+
 /**
- * Trait ACL_Permission_Trait.
+ * Trait Civi\Test\ACLPermissionTrait.
  *
  * Trait for working with ACLs in tests
  */
-trait CRMTraits_ACL_PermissionTrait {
+trait ACLPermissionTrait {
 
   /**
    * ContactID of allowed Contact
@@ -128,7 +130,7 @@ trait CRMTraits_ACL_PermissionTrait {
 
     $permittedRoleID = ($groupAllowedAccess === 'Everyone') ? 0 : $groupAllowedAccess;
     if ($permittedRoleID !== 0) {
-      throw new CRM_Core_Exception('only handling everyone group as yet');
+      throw new \CRM_Core_Exception('only handling everyone group as yet');
     }
 
     foreach ($permissionedEntities as $permissionedEntityID) {
@@ -160,7 +162,7 @@ trait CRMTraits_ACL_PermissionTrait {
     $this->scenarioIDs['Contact']['permitted_contact'] = $this->individualCreate();
     $result = $this->callAPISuccess('GroupContact', 'create', ['group_id' => $this->scenarioIDs['Group']['permitted_group'], 'contact_id' => $this->scenarioIDs['Contact']['permitted_contact'], 'status' => 'Added']);
     $this->scenarioIDs['Contact']['non_permitted_contact'] = $this->individualCreate();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $this->setupCoreACLPermittedAcl([$this->scenarioIDs['Group']['permitted_group']]);
   }
 
@@ -180,7 +182,7 @@ trait CRMTraits_ACL_PermissionTrait {
     $this->quickCleanup(['civicrm_acl_cache', 'civicrm_acl_contact_cache']);
     $this->scenarioIDs['Event']['permitted_event'] = $this->eventCreate()['id'];
     $this->scenarioIDs['Contact']['permitted_contact'] = $this->individualCreate();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view event info'];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view event info'];
     $this->setupCoreACLPermittedAcl([$this->scenarioIDs['Event']['permitted_event']], 'Everyone', 'View', 'Event');
   }
 
@@ -188,10 +190,10 @@ trait CRMTraits_ACL_PermissionTrait {
    * Clean up places where permissions get cached.
    */
   protected function cleanupCachedPermissions() {
-    if (isset(Civi::$statics['CRM_Contact_BAO_Contact_Permission'])) {
-      unset(Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
+    if (isset(\Civi::$statics['CRM_Contact_BAO_Contact_Permission'])) {
+      unset(\Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
     }
-    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
+    \CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
   }
 
 }

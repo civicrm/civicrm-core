@@ -23,7 +23,7 @@ use Civi\Api4\CustomValue;
  */
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
 
   public $DBResetRequired = FALSE;
   protected $_entity;

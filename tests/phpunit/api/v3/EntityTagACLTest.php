@@ -26,7 +26,7 @@
  */
 class api_v3_EntityTagACLTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
 
   /**
    * API Version in use.

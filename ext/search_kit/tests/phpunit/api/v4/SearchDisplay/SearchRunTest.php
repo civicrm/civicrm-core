@@ -8,14 +8,11 @@ use Civi\Api4\UFMatch;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
-// FIXME: This shouldn't be needed but the core classLoader doesn't seem present when this file loads
-require_once 'tests/phpunit/CRMTraits/ACL/PermissionTrait.php';
-
 /**
  * @group headless
  */
 class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
-  use \CRMTraits_ACL_PermissionTrait;
+  use \Civi\Test\ACLPermissionTrait;
 
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().

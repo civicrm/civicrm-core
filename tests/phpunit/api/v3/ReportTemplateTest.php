@@ -18,7 +18,7 @@
  */
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
-  use CRMTraits_ACL_PermissionTrait;
+  use Civi\Test\ACLPermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;
   use CRMTraits_Custom_CustomDataTrait;
 
