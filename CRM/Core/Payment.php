@@ -1166,9 +1166,9 @@ abstract class CRM_Core_Payment {
   protected function getAmount($params = []) {
     if (!CRM_Utils_Rule::numeric($params['amount'])) {
       CRM_Core_Error::deprecatedWarning('Passing Amount value that is not numeric is deprecated please report this in gitlab');
-      return CRM_Utils_Money::formatLocaleNumericRoundedByPrecision(filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION), 2);
+      return CRM_Utils_Money::formatUSLocaleNumericRounded(filter_var($params['amount'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION), 2);
     }
-    return CRM_Utils_Money::formatLocaleNumericRoundedByPrecision($params['amount'], 2);
+    return CRM_Utils_Money::formatUSLocaleNumericRounded($params['amount'], 2);
   }
 
   /**
