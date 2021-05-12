@@ -69,17 +69,22 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $element = $this->add('text', 'name', ts('Full Name'), ['class' => 'huge']);
     $element->freeze();
     $this->add('text', 'cms_name', ts('Username'), ['class' => 'huge']);
-    $this->addRule('cms_name', 'Username is required', 'required');
+    $this->addRule('cms_name', ts('Username is required'), 'required');
 
-    if (!$config->userSystem->isUserRegistrationPermitted()) {
+    // For WordPress only, comply with how WordPress sets passwords via magic link
+    // For other CMS, output the password fields
+    if ($config->userFramework !== 'WordPress' || ($config->userFramework === 'WordPress' && !$config->userSystem->isUserRegistrationPermitted())) {
       $this->add('password', 'cms_pass', ts('Password'), ['class' => 'huge']);
       $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), ['class' => 'huge']);
-      $this->addRule('cms_pass', 'Password is required', 'required');
-      $this->addRule(['cms_pass', 'cms_confirm_pass'], 'ERROR: Password mismatch', 'compare');
+      $this->addRule('cms_pass', ts('Password is required'), 'required');
+      $this->addRule([
+        'cms_pass',
+        'cms_confirm_pass',
+      ], ts('Password mismatch'), 'compare');
     }
 
-    $this->add('text', 'email', ts('Email:'), ['class' => 'huge'])->freeze();
-    $this->addRule('email', 'Email is required', 'required');
+    $this->add('text', 'email', ts('Email'), ['class' => 'huge'])->freeze();
+    $this->addRule('email', ts('Email is required'), 'required');
     $this->add('hidden', 'contactID');
 
     //add a rule to check username uniqueness
