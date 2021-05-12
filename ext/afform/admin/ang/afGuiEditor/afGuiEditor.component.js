@@ -238,13 +238,13 @@
             $target = $(sort.droptarget[0]),
             $item = $(ui.item[0]);
           // Fields cannot be dropped outside their own entity
-          if ($item.is('[af-gui-field]') || $item.has('[af-gui-field]').length) {
+          if ($item.find('af-gui-field').length) {
             if ($source.closest('[data-entity]').attr('data-entity') !== $target.closest('[data-entity]').attr('data-entity')) {
               return sort.cancel();
             }
           }
           // Entity-fieldsets cannot be dropped into other entity-fieldsets
-          if ((sort.model['af-fieldset'] || $item.has('.af-gui-fieldset').length) && $target.closest('.af-gui-fieldset').length) {
+          if ((sort.model['af-fieldset'] || $item.find('.af-gui-fieldset').length) && $target.closest('.af-gui-fieldset').length) {
             return sort.cancel();
           }
         }
