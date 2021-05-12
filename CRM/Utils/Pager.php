@@ -220,7 +220,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
     }
     else {
       if (empty($defaultPageRowCount)) {
-        $rowcount = Civi::settings()->get('default_pager_size');
+        $rowCount = Civi::settings()->get('default_pager_size');
       }
       else {
         $rowCount = $defaultPageRowCount;
