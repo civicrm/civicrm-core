@@ -175,11 +175,11 @@ body.af-gui-dragging {
   position: relative;
   padding: 22px 3px 3px;
   min-height: 40px;
-  display: block;
   margin-bottom: 10px;
   margin-top: 10px;
 }
 
+#afGuiEditor af-gui-container,
 #afGuiEditor af-gui-markup,
 #afGuiEditor af-gui-field,
 #afGuiEditor af-gui-edit-options {

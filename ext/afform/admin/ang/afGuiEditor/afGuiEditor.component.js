@@ -151,6 +151,9 @@
           delete $scope.entities[type + num].loading;
           if (selectTab) {
             editor.selectEntity(type + num);
+            $timeout(function() {
+              editor.scrollToEntity(type + num);
+            });
           }
           $timeout(editor.adjustTabWidths);
         }
@@ -186,6 +189,18 @@
 
       this.getSelectedEntityName = function() {
         return $scope.selectedEntityName;
+      };
+
+      // Scroll an entity's first fieldset into view of the canvas
+      this.scrollToEntity = function(entityName) {
+        var $canvas = $('#afGuiEditor-canvas-body'),
+          $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first(),
+          // Scrolltop value needed to place entity's fieldset at top of canvas
+          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top),
+          // Maximum possible scrollTop (height minus contents height, adjusting for padding)
+          maxScroll = $('#afGuiEditor-canvas-body > *').height() - $canvas.height() + 20;
+        // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
+        $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
       };
 
       this.getAfform = function() {
