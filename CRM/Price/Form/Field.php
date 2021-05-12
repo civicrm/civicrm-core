@@ -337,7 +337,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     $this->addRule('options_per_line', ts('must be a numeric value'), 'numeric');
 
     $this->add('textarea', 'help_pre', ts('Pre Field Help'),
-      CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'help_post')
+      CRM_Core_DAO::getAttribute('CRM_Price_DAO_PriceField', 'help_pre')
     );
 
     // help post, mask, attributes, javascript ?
