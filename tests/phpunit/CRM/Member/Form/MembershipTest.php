@@ -705,7 +705,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
     $params = [
-      'cid' => $this->_individualId,
+      'contact_id' => $this->_individualId,
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',

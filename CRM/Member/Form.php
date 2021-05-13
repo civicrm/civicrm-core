@@ -353,6 +353,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * Get the contact id for the contribution.
+   *
+   * @return int
+   */
+  protected function getMembershipContactID(): int {
+    // It's not clear that $this->_contactID *could* be set outside
+    // tests when contact_id is not submitted - so this fallback
+    // is precautionary in order to be similar to past behaviour.
+    return (int) ($this->getSubmittedValue('contact_id') ?: $this->_contactID);
+  }
+
+  /**
    * Set variables in a way that can be accessed from different places.
    *
    * This is part of refactoring for unit testability on the submit function.

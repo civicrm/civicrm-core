@@ -344,20 +344,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     // Record contribution for this membership and create a MembershipPayment
     // @todo deprecate this.
-    if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
+    if (!empty($params['contribution_status_id'])) {
       $memInfo = array_merge($params, ['membership_id' => $membership->id]);
       $params['contribution'] = self::recordMembershipContribution($memInfo);
-    }
-
-    // Add/update MembershipPayment record for this membership if it is a related contribution
-    // @todo remove this - called from one remaining place in CRM_Member_Form_Membership
-    if (!empty($params['relate_contribution_id'])) {
-      $membershipPaymentParams = [
-        'membership_id' => $membership->id,
-        'membership_type_id' => $membership->membership_type_id,
-        'contribution_id' => $params['relate_contribution_id'],
-      ];
-      civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
     }
 
     // If the membership has no associated contribution then we ensure
