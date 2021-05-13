@@ -75,11 +75,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if (self::fieldExists($joinEntityName, 'entity_id')) {
       $params[] = ['entity_id', '=', $mainEntityId];
       if (self::fieldExists($joinEntityName, 'entity_table')) {
-        $params[] = ['entity_table', '=', 'civicrm_' . _civicrm_api_get_entity_name_from_camel($mainEntityName)];
+        $params[] = ['entity_table', '=', 'civicrm_' . \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityName)];
       }
     }
     else {
-      $mainEntityField = _civicrm_api_get_entity_name_from_camel($mainEntityName) . '_id';
+      $mainEntityField = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityName) . '_id';
       $params[] = [$mainEntityField, '=', $mainEntityId];
     }
     return $params;
