@@ -147,17 +147,10 @@ class CRM_Report_Form_Contact_Summary extends CRM_Report_Form {
   }
 
   public function postProcess() {
-
     $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-
     $sql = $this->buildQuery(TRUE);
-
-    $rows = $graphRows = [];
+    $rows = [];
     $this->buildRows($sql, $rows);
-
     $this->formatDisplay($rows);
     $this->doTemplateAssignment($rows);
     $this->endPostProcess($rows);
