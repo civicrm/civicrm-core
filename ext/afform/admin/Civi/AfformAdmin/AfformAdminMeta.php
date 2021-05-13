@@ -51,14 +51,16 @@ class AfformAdminMeta {
   }
 
   /**
-   * @param $entityName
-   * @return array
+   * Get info about an api entity, with special handling for contact types
+   * @param string $entityName
+   * @return array|null
    */
-  public static function getApiEntity($entityName) {
-    if (in_array($entityName, ['Individual', 'Household', 'Organization'])) {
-      $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
+  public static function getApiEntity(string $entityName) {
+    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
+    if (isset($contactTypes[$entityName])) {
       return [
         'entity' => 'Contact',
+        'contact_type' => $entityName,
         'label' => $contactTypes[$entityName]['label'],
       ];
     }
@@ -66,6 +68,10 @@ class AfformAdminMeta {
       ->addWhere('name', '=', $entityName)
       ->addSelect('title', 'icon')
       ->execute()->first();
+    if (!$info) {
+      // Disabled contact type or nonexistent api entity
+      return NULL;
+    }
     return [
       'entity' => $entityName,
       'label' => $info['title'],
@@ -127,21 +133,15 @@ class AfformAdminMeta {
       if (is_dir($dir)) {
         // Scan for entities
         foreach (glob($dir . 'afformEntities/*.php') as $file) {
-          $entity = include $file;
-          $afformEntity = basename($file, '.php');
-          // Contact pseudo-entities (Individual, Organization, Household) get special treatment,
-          // notably their fields are pre-loaded since they are both commonly-used and nonstandard
-          if (!empty($entity['contact_type'])) {
-            // Skip disabled contact types
-            if (!isset($contactTypes[$entity['contact_type']])) {
-              continue;
-            }
-            $entity['label'] = $contactTypes[$entity['contact_type']]['label'];
+          $entityInfo = include $file;
+          $entityName = basename($file, '.php');
+          $apiInfo = self::getApiEntity($entityInfo['entity'] ?? $entityName);
+          // Skip disabled contact types & entities from disabled components/extensions
+          if (!$apiInfo) {
+            continue;
           }
-          elseif (empty($entity['label']) || empty($entity['icon'])) {
-            $entity += self::getApiEntity($entity['entity']);
-          }
-          $data['entities'][$afformEntity] = $entity;
+          $entityInfo += $apiInfo;
+          $data['entities'][$entityName] = $entityInfo;
         }
         // Scan for input types
         foreach (glob($dir . 'ang/afGuiEditor/inputType/*.html') as $file) {
