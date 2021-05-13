@@ -92,4 +92,26 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Enforce the creation of an associated financial account when a financial
+   * type is created through the api.
+   * @dataProvider versionThreeAndFour
+   */
+  public function testAssociatedFinancialAccountGetsCreated($apiVersion) {
+    $this->callAPISuccess('FinancialType', 'create', [
+      'version' => $apiVersion,
+      'name' => 'Lottery Tickets',
+      'is_deductible' => FALSE,
+      'is_reserved' => FALSE,
+      'is_active' => TRUE,
+    ]);
+    // There should be an account (as opposed to type) with the same name that gets autocreated.
+    $result = $this->callAPISuccess('FinancialAccount', 'getsingle', [
+      'version' => $apiVersion,
+      'name' => 'Lottery Tickets',
+    ]);
+    $this->assertNotEmpty($result['id'], 'Financial account with same name as type did not get created.');
+    $this->assertEquals('INC', $result['account_type_code'], 'Financial account created is not an income account.');
+  }
+
 }
