@@ -4189,7 +4189,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * Moving it out of the BaseIPN class is just the first step.
    *
    * @param array $input
-   * @param array $ids
+   * @param int $recurringContributionID
    * @param int|null $contributionID
    * @param bool $isPostPaymentCreate
    *   Is this being called from the payment.create api. If so the api has taken care of financial entities.
@@ -4201,15 +4201,8 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function completeOrder($input, $ids, $contributionID, $isPostPaymentCreate = FALSE) {
+  public static function completeOrder($input, $recurringContributionID, $contributionID, $isPostPaymentCreate = FALSE) {
     $transaction = new CRM_Core_Transaction();
-    // @todo see if we even need this - it's used further down to create an activity
-    // but the BAO layer should create that - we just need to add a test to cover it & can
-    // maybe remove $ids altogether.
-    $recurringContributionID = $ids['contributionRecur'];
-
-    // Unset ids just to make it clear it's not used again.
-    unset($ids);
 
     $inputContributionWhiteList = [
       'fee_amount',

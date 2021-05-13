@@ -421,11 +421,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function completeTransaction($input, $ids, $objects) {
     CRM_Core_Error::deprecatedFunctionWarning('Use Payment.create api');
-    CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'related_contact' => $ids['related_contact'] ?? NULL,
-      'participant' => !empty($objects['participant']) ? $objects['participant']->id : NULL,
-      'contributionRecur' => !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL,
-    ], $objects['contribution']->id ?? NULL);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, !empty($objects['contributionRecur']) ? $objects['contributionRecur']->id : NULL, $objects['contribution']->id ?? NULL);
   }
 
   /**

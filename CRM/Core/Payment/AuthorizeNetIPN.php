@@ -170,10 +170,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, [
-      'participant' => NULL,
-      'contributionRecur' => $recur->id,
-    ], $contribution->id ?? NULL);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $contribution->id ?? NULL);
     return $isFirstOrLastRecurringPayment;
   }
 
