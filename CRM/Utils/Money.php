@@ -188,7 +188,7 @@ class CRM_Utils_Money {
    *
    * @return string
    */
-  protected static function formatUSLocaleNumericRounded($amount, int $numberOfPlaces): string {
+  public static function formatUSLocaleNumericRounded($amount, int $numberOfPlaces): string {
     if (!extension_loaded('intl') || !is_numeric($amount)) {
       // @todo - we should not attempt to format non-numeric strings. For now
       // these will not fail but will give notices on php 7.4
