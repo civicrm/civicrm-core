@@ -345,6 +345,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // Record contribution for this membership and create a MembershipPayment
     // @todo deprecate this.
     if (!empty($params['contribution_status_id'])) {
+      CRM_Core_Error::deprecatedWarning('Use the order api');
       $memInfo = array_merge($params, ['membership_id' => $membership->id]);
       $params['contribution'] = self::recordMembershipContribution($memInfo);
     }
