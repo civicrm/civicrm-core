@@ -26,6 +26,24 @@ Released June 2, 2021
 - **[Credits](release-notes/5.38.0.md#credits)**
 - **[Feedback](release-notes/5.38.0.md#feedback)**
 
+## CiviCRM 5.37.2
+
+Released May 12, 2021
+
+- **[Synopsis](release-notes/5.37.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.37.2.md#bugs)**
+- **[Credits](release-notes/5.37.2.md#credits)**
+- **[Feedback](release-notes/5.37.2.md#feedback)**
+
+## CiviCRM 5.37.1
+
+Released May 11, 2021
+
+- **[Synopsis](release-notes/5.37.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.37.1.md#bugs)**
+- **[Credits](release-notes/5.37.1.md#credits)**
+- **[Feedback](release-notes/5.37.1.md#feedback)**
+
 ## CiviCRM 5.37.0
 
 Released May 5, 2021
