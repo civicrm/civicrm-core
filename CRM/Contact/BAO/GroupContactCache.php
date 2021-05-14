@@ -726,6 +726,43 @@ AND  civicrm_group_contact.group_id = $groupID ";
   }
 
   /**
+   * Populate a temporary table with group ids and contact ids.
+   *
+   * Do not call this outside of core tested code - it WILL change.
+   *
+   * @param array[int] $groupIDs
+   * @param string $temporaryTable
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function populateTemporaryTableWithContactsInGroups(array $groupIDs, string $temporaryTable): void {
+    $groups = civicrm_api3('Group', 'get', [
+      'is_active' => 1,
+      'id' => ['IN' => $groupIDs],
+      'saved_search_id' => ['>' => 0],
+      'return' => 'id',
+    ]);
+    $smartGroups = array_keys($groups['values']);
+
+    $query = "
+       SELECT DISTINCT group_contact.contact_id as contact_id
+       FROM civicrm_group_contact group_contact
+       WHERE group_contact.group_id IN (" . implode(', ', $groupIDs) . ")
+       AND group_contact.status = 'Added' ";
+
+    if (!empty($smartGroups)) {
+      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
+      $smartGroups = implode(',', $smartGroups);
+      $query .= "
+        UNION DISTINCT
+        SELECT smartgroup_contact.contact_id as contact_id
+        FROM civicrm_group_contact_cache smartgroup_contact
+        WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+    }
+    CRM_Core_DAO::executeQuery('INSERT INTO ' . $temporaryTable . ' ' . $query);
+  }
+
+  /**
    * @param array|null $groupIDs
    * @param int $limit
    *
