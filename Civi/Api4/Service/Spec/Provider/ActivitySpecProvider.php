@@ -32,21 +32,29 @@ class ActivitySpecProvider implements Generic\SpecProviderInterface {
 
     $field = new FieldSpec('source_contact_id', 'Activity', 'Integer');
     $field->setTitle(ts('Source Contact'));
+    $field->setLabel(ts('Added by'));
     $field->setDescription(ts('Contact who created this activity.'));
     $field->setRequired($action === 'create');
     $field->setFkEntity('Contact');
+    $field->setInputType('EntityRef');
     $spec->addFieldSpec($field);
 
     $field = new FieldSpec('target_contact_id', 'Activity', 'Array');
     $field->setTitle(ts('Target Contacts'));
+    $field->setLabel(ts('With Contact(s)'));
     $field->setDescription(ts('Contact(s) involved in this activity.'));
     $field->setFkEntity('Contact');
+    $field->setInputType('EntityRef');
+    $field->setInputAttrs(['multiple' => TRUE]);
     $spec->addFieldSpec($field);
 
     $field = new FieldSpec('assignee_contact_id', 'Activity', 'Array');
     $field->setTitle(ts('Assignee Contacts'));
+    $field->setLabel(ts('Assigned to'));
     $field->setDescription(ts('Contact(s) assigned to this activity.'));
     $field->setFkEntity('Contact');
+    $field->setInputType('EntityRef');
+    $field->setInputAttrs(['multiple' => TRUE]);
     $spec->addFieldSpec($field);
   }
 

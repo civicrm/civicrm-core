@@ -127,6 +127,14 @@ class AfformAdminMeta {
 
     $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
 
+    // Call getFields on getFields to get input type labels
+    $inputTypeLabels = \Civi\Api4\Contact::getFields()
+      ->setLoadOptions(TRUE)
+      ->setAction('getFields')
+      ->addWhere('name', '=', 'input_type')
+      ->execute()
+      ->column('options')[0];
+
     // Scan all extensions for entities & input types
     foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
       $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
@@ -143,10 +151,13 @@ class AfformAdminMeta {
           $entityInfo += $apiInfo;
           $data['entities'][$entityName] = $entityInfo;
         }
-        // Scan for input types
+        // Scan for input types, use label from getFields if available
         foreach (glob($dir . 'ang/afGuiEditor/inputType/*.html') as $file) {
           $name = basename($file, '.html');
-          $data['inputType'][$name] = $name;
+          $data['inputType'][] = [
+            'name' => $name,
+            'label' => $inputTypeLabels[$name] ?? E::ts($name),
+          ];
         }
       }
     }

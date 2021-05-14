@@ -3,12 +3,15 @@
   "use strict";
 
   // Cribbed from the Api4 Explorer
-  angular.module('afGuiEditor').directive('afGuiFieldValue', function() {
+  angular.module('afGuiEditor').directive('afGuiFieldValue', function(afGui) {
     return {
       scope: {
         field: '=afGuiFieldValue'
       },
-      require: 'ngModel',
+      require: {
+        ngModel: 'ngModel',
+        editor: '^^afGuiEditor'
+      },
       link: function (scope, element, attrs, ctrl) {
         var ts = scope.ts = CRM.ts('org.civicrm.afform_admin'),
           multi;
@@ -25,7 +28,8 @@
         }
 
         function makeWidget(field) {
-          var $el = $(element),
+          var options,
+            $el = $(element),
             inputType = field.input_type,
             dataType = field.data_type;
           multi = field.serialize || dataType === 'Array';
@@ -34,9 +38,14 @@
           }
           else if (field.fk_entity || field.options || dataType === 'Boolean') {
             if (field.fk_entity) {
-              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}});
+              // Static options for choosing current user or other entities on the form
+              options = field.fk_entity === 'Contact' ? ['user_contact_id'] : [];
+              _.each(ctrl.editor.getEntities({type: field.fk_entity}), function(entity) {
+                 options.push({id: entity.name, label: entity.label, icon: afGui.meta.entities[entity.type].icon});
+              });
+              $el.crmEntityRef({entity: field.fk_entity, select: {multiple: multi}, static: options});
             } else if (field.options) {
-              var options = _.transform(field.options, function(options, val) {
+              options = _.transform(field.options, function(options, val) {
                 options.push({id: val.id, text: val.label});
               }, []);
               $el.select2({data: options, multiple: multi});
@@ -72,13 +81,13 @@
         };
 
         // Copied from ng-list
-        ctrl.$parsers.push(parseList);
-        ctrl.$formatters.push(function(value) {
+        ctrl.ngModel.$parsers.push(parseList);
+        ctrl.ngModel.$formatters.push(function(value) {
           return _.isArray(value) ? value.join(', ') : value;
         });
 
         // Copied from ng-list
-        ctrl.$isEmpty = function(value) {
+        ctrl.ngModel.$isEmpty = function(value) {
           return !value || !value.length;
         };
 

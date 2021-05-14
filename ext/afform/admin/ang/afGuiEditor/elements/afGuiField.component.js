@@ -21,6 +21,7 @@
         {id: '1', label: ts('Yes')},
         {id: '0', label: ts('No')}
       ],
+        entityRefOptions = [],
         singleElement = [''],
         // When search-by-range is enabled the second element gets a suffix for some properties like "placeholder2"
         rangeElements = ['', '2'],
@@ -29,7 +30,29 @@
         relativeDatesWithoutPickRange = relativeDatesWithPickRange.slice(1);
 
       this.$onInit = function() {
-        $scope.meta = afGui.meta;
+        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputType), function(inputTypes, type) {
+          if (inputTypeCanBe(type.name)) {
+            // Change labels for EntityRef fields
+            if (ctrl.getDefn().input_type === 'EntityRef') {
+              var entity = ctrl.getFkEntity();
+              if (entity && type.name === 'EntityRef') {
+                type.label = ts('Autocomplete %1', {1: entity.label});
+              }
+              if (entity && type.name === 'Number') {
+                type.label = ts('%1 ID', {1: entity.label});
+              }
+              if (entity && type.name === 'Select') {
+                type.label = ts('Select Form %1', {1: entity.label});
+              }
+            }
+            inputTypes.push(type);
+          }
+        });
+      };
+
+      this.getFkEntity = function() {
+        var fkEntity = ctrl.getDefn().fk_entity;
+        return ctrl.editor.meta.entities[fkEntity];
       };
 
       this.isSearch = function() {
@@ -52,7 +75,7 @@
       this.canBeMultiple = function() {
         return this.isSearch() &&
           !_.includes(['Date', 'Timestamp'], ctrl.getDefn().data_type) &&
-          $scope.getProp('input_type') === 'Select';
+          _.includes(['Select', 'EntityRef'], $scope.getProp('input_type'));
       };
 
       this.getRangeElements = function(type) {
@@ -92,6 +115,17 @@
         if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
           return $scope.getProp('search_range') ? relativeDatesWithPickRange : relativeDatesWithoutPickRange;
         }
+        if (ctrl.getDefn().input_type === 'EntityRef') {
+          // Build a list of all entities in this form that can be referenced by this field.
+          var newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), function(entity) {
+            return {id: entity.name, label: entity.label};
+          }, []);
+          // Store it in a stable variable for the sake of ng-repeat
+          if (!angular.equals(newOptions, entityRefOptions)) {
+            entityRefOptions = newOptions;
+          }
+          return entityRefOptions;
+        }
         return ctrl.getDefn().options || ($scope.getProp('input_type') === 'CheckBox' ? null : yesNo);
       };
 
@@ -104,15 +138,18 @@
         $('#afGuiEditor').addClass('af-gui-editing-content');
       };
 
-      $scope.inputTypeCanBe = function(type) {
+      function inputTypeCanBe(type) {
         var defn = ctrl.getDefn();
+        if (defn.input_type === type) {
+          return true;
+        }
         switch (type) {
           case 'CheckBox':
           case 'Radio':
             return defn.options || defn.data_type === 'Boolean';
 
           case 'Select':
-            return defn.options || defn.data_type === 'Boolean' || (defn.input_type === 'Date' && ctrl.isSearch());
+            return defn.options || defn.data_type === 'Boolean' || defn.input_type === 'EntityRef' || (defn.input_type === 'Date' && ctrl.isSearch());
 
           case 'Date':
             return defn.input_type === 'Date';
@@ -121,13 +158,16 @@
           case 'RichTextEditor':
             return (defn.data_type === 'Text' || defn.data_type === 'String');
 
-          case 'ChainSelect':
-            return defn.input_type === 'ChainSelect';
+          case 'Text':
+            return !(defn.options || defn.input_type === 'Date' || defn.input_type === 'EntityRef' || defn.data_type === 'Boolean');
+
+          case 'Number':
+            return !(defn.options || defn.data_type === 'Boolean');
 
           default:
-            return true;
+            return false;
         }
-      };
+      }
 
       // Returns a value from either the local field defn or the base defn
       $scope.getProp = function(propName) {

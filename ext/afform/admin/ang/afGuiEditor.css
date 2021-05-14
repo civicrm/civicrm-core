@@ -288,9 +288,9 @@
   padding-left: 15px;
 }
 
-#afGuiEditor .af-gui-button > .btn.disabled {
-  cursor: default !important;
-  color: white !important;
+#afGuiEditor #afGuiEditor-canvas-body .btn[disabled] {
+  cursor: default;
+  color: white;
 }
 #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
   border-color: #f4f4f4 !important;

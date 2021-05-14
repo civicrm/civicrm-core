@@ -91,7 +91,7 @@ class AfformMetadataInjector {
     $params = [
       'action' => $action,
       'where' => [['name', '=', $fieldName]],
-      'select' => ['label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options'],
+      'select' => ['label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity'],
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
@@ -123,6 +123,15 @@ class AfformMetadataInjector {
       // Default placeholder for select inputs
       if ($inputType === 'Select') {
         $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
+      }
+      elseif ($inputType === 'EntityRef') {
+        $info = civicrm_api4('Entity', 'get', [
+          'where' => [['name', '=', $fieldInfo['fk_entity']]],
+          'checkPermissions' => FALSE,
+          'select' => ['title', 'title_plural'],
+        ], 0);
+        $label = empty($fieldInfo['input_attrs']['multiple']) ? $info['title'] : $info['title_plural'];
+        $fieldInfo['input_attrs']['placeholder'] = E::ts('Select %1', [1 => $label]);
       }
 
       if ($fieldInfo['input_type'] === 'Date') {

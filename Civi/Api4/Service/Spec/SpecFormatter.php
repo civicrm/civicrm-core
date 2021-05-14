@@ -150,7 +150,7 @@ class SpecFormatter {
       'Link' => 'Url',
     ];
     $inputType = $map[$inputType] ?? $inputType;
-    if ($inputType == 'Select' && !empty($data['serialize'])) {
+    if (in_array($inputType, ['Select', 'EntityRef'], TRUE) && !empty($data['serialize'])) {
       $inputAttrs['multiple'] = TRUE;
     }
     if ($inputType == 'Date' && !empty($inputAttrs['formatType'])) {
