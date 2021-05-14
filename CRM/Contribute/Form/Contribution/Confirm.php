@@ -1709,7 +1709,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
           $customFieldsFormatted,
           $numTerms, $membershipID, $pending,
-          $contributionRecurID, $membershipSource, $isPayLater, $memParams, [], $membershipContribution,
+          $contributionRecurID, $membershipSource, $isPayLater, $memParams, $membershipContribution,
           $membershipLineItems
         );
 
