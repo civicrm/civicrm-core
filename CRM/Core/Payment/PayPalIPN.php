@@ -180,15 +180,11 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    $this->single($input, [
-      'participant' => NULL,
-      'contributionRecur' => $recur->id,
-    ], $contribution, TRUE);
+    $this->single($input, $contribution, TRUE);
   }
 
   /**
    * @param array $input
-   * @param array $ids
    * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $recur
    *
@@ -196,7 +192,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function single($input, $ids, $contribution, $recur = FALSE) {
+  public function single($input, $contribution, $recur = FALSE) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if ($contribution->invoice_id != $input['invoice']) {
@@ -374,10 +370,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         Civi::log()->debug('Returning since contribution status is not handled');
         return;
       }
-      $this->single($input, [
-        'participant' => $ids['participant'] ?? NULL,
-        'contributionRecur' => $this->getContributionRecurID(),
-      ], $contribution);
+      $this->single($input, $contribution);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage() . ' input {input}', ['input' => $input]);
