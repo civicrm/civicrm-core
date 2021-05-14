@@ -39,6 +39,9 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
   /**
    * Check to see if we have cache entries for this group.
    *
+   * @deprecated at least just call loadAll & don't use this to check
+   * if your param is empty.
+   *
    * If not, regenerate, else return.
    *
    * @param array $groupIDs
@@ -738,16 +741,18 @@ AND  civicrm_group_contact.group_id = $groupID ";
    * @param array[int] $groupIDs
    * @param string $temporaryTable
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public static function populateTemporaryTableWithContactsInGroups(array $groupIDs, string $temporaryTable): void {
-    $groups = civicrm_api3('Group', 'get', [
-      'is_active' => 1,
-      'id' => ['IN' => $groupIDs],
-      'saved_search_id' => ['>' => 0],
-      'return' => 'id',
-    ]);
-    $smartGroups = array_keys($groups['values']);
+    $smartGroups = Group::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('is_active', '=', 1)
+      ->addWhere('id', 'IN', $groupIDs)
+      ->addClause('OR', ['saved_search_id', 'IS NOT EMPTY'], ['children', 'IS NOT EMPTY'])
+      ->execute()->column('id');
+    $groupsToRefresh = self::getGroupsNeedingRefreshing($smartGroups, 0);
 
     $query = "
        SELECT DISTINCT group_contact.contact_id as contact_id, group_id
@@ -756,13 +761,21 @@ AND  civicrm_group_contact.group_id = $groupID ";
        AND group_contact.status = 'Added' ";
 
     if (!empty($smartGroups)) {
-      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
+      foreach ($groupsToRefresh as $id) {
+        // @todo - we could load these all at once & directly into this temp table
+        // by calling self::buildGroupContactTempTable($groupsToRefresh, $groupContactsTempTable);
+        // However we need to manage the smart group population from our temp table.
+        // Also - it's dumb that the id is not the parameter.
+        $group = new CRM_Contact_BAO_Group();
+        $group->id = $id;
+        self::load($group);
+      }
       $smartGroups = implode(',', $smartGroups);
       $query .= "
         UNION DISTINCT
-        SELECT smartgroup_contact.contact_id as contact_id, group_id
-        FROM civicrm_group_contact_cache smartgroup_contact
-        WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
+        SELECT smart_group_contact.contact_id as contact_id, group_id
+        FROM civicrm_group_contact_cache smart_group_contact
+        WHERE smart_group_contact.group_id IN ({$smartGroups}) ";
     }
     CRM_Core_DAO::executeQuery('INSERT INTO ' . $temporaryTable . ' ' . $query);
   }

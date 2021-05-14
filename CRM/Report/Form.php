@@ -657,7 +657,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('mode', 'instance');
     }
     elseif (!$this->noController) {
-      list($optionValueID, $optionValue) = CRM_Report_Utils_Report::getValueIDFromUrl();
+      [$optionValueID, $optionValue] = CRM_Report_Utils_Report::getValueIDFromUrl();
       $instanceCount = CRM_Report_Utils_Report::getInstanceCount($optionValue);
       if (($instanceCount > 0) && $optionValueID) {
         $this->assign('instanceUrl',
@@ -3745,6 +3745,8 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    *
    * This function is called by both the api (tests) and the UI.
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function buildGroupTempTable(): void {
