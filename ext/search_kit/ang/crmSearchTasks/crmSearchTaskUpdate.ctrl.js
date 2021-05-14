@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').controller('crmSearchActionUpdate', function ($scope, $timeout, crmApi4, dialogService) {
+  angular.module('crmSearchTasks').controller('crmSearchTaskUpdate', function ($scope, $timeout, crmApi4, dialogService) {
     var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
       model = $scope.model,
       ctrl = this;
@@ -68,7 +68,7 @@
     };
 
     this.cancel = function() {
-      dialogService.cancel('crmSearchAction');
+      dialogService.cancel('crmSearchTask');
     };
 
     this.save = function() {
@@ -80,12 +80,12 @@
 
     this.onSuccess = function() {
       CRM.alert(ts('Successfully updated %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
-      dialogService.close('crmSearchAction');
+      dialogService.close('crmSearchTask');
     };
 
     this.onError = function() {
       CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
-      dialogService.close('crmSearchAction');
+      dialogService.close('crmSearchTask');
     };
 
   });

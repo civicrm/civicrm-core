@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').component('crmSearchInput', {
+  angular.module('crmSearchTasks').component('crmSearchInput', {
     bindings: {
       field: '<',
       'op': '<',
@@ -9,7 +9,7 @@
       'optionKey': '<'
     },
     require: {ngModel: 'ngModel'},
-    templateUrl: '~/crmSearchActions/crmSearchInput/crmSearchInput.html',
+    templateUrl: '~/crmSearchTasks/crmSearchInput/crmSearchInput.html',
     controller: function($scope) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;

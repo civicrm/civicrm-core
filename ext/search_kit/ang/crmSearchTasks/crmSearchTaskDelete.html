@@ -1,8 +1,8 @@
 <div id="bootstrap-theme">
-  <form ng-controller="crmSearchActionDelete as $ctrl">
+  <form ng-controller="crmSearchTaskDelete as $ctrl">
     <p><strong>{{:: ts('Are you sure you want to delete %1 %2?', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
     <hr />
-    <div ng-if="$ctrl.run" class="crm-search-action-progress">
+    <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5>{{:: ts('Deleting %1 %2...', {1: model.ids.length, 2: $ctrl.entityTitle}) }}</h5>
       <crm-search-batch-runner entity="model.entity" action="Delete" params="$ctrl.run" ids="model.ids" success="$ctrl.onSuccess()" error="$ctrl.onError()" ></crm-search-batch-runner>
     </div>
@@ -17,4 +17,5 @@
         {{:: ts('Delete %1', {1: $ctrl.entityTitle}) }}
       </button>
     </div>
+  </form>
 </div>
