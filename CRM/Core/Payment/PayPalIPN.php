@@ -236,8 +236,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $component = $this->retrieve('module', 'String');
       $input['component'] = $component;
 
-      $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
-      $contributionID = $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+      $ids['contact'] = $this->getContactID();
+      $contributionID = $ids['contribution'] = $this->getContributionID();
       $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
 
       $this->getInput($input);
@@ -291,7 +291,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
       }
       $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $ids['contribution'];
+      $contribution->id = $this->getContributionID();
       if (!$contribution->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
@@ -301,7 +301,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contact = new CRM_Contact_BAO_Contact();
       $contact->id = $contribution->contact_id;
       $contact->find(TRUE);
-      if ($contact->id != $ids['contact']) {
+      if ($contact->id != $this->getContactID()) {
         // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
         CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
         echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
@@ -511,6 +511,28 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
   protected function getContributionRecurID(): ?int {
     $id = $this->retrieve('contributionRecurID', 'Integer', FALSE);
     return $id ? (int) $id : NULL;
+  }
+
+  /**
+   * Get Contribution ID.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionID(): int {
+    return (int) $this->retrieve('contributionID', 'Integer', TRUE);
+  }
+
+  /**
+   * Get contact id from parameters.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactID(): int {
+    return (int) $this->retrieve('contactID', 'Integer', TRUE);
   }
 
 }
