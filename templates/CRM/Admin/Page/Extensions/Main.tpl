@@ -27,7 +27,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
               {/if}
           </td>
           <td class="crm-extensions-label">{$row.statusLabel} {if $row.upgradable}<br/>({ts}Outdated{/ts}){/if}</td>
-          <td class="crm-extensions-label">{$row.version|escape} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
+          <td class="crm-extensions-label">{$row.version|escape}</td>
           <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
