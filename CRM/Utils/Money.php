@@ -168,14 +168,19 @@ class CRM_Utils_Money {
    * @param string $locale
    * @param string $currency
    * @param int $numberOfPlaces
+   * @param bool $useCiviCRMThousandSeparator
    *
    * @return string
    * @throws \Brick\Money\Exception\UnknownCurrencyException
    */
-  protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2): string {
+  protected static function formatLocaleNumeric(string $amount, $locale = NULL, $currency = NULL, $numberOfPlaces = 2, $useCiviCRMThousandSeparator = FALSE): string {
     $money = Money::of($amount, $currency ?? CRM_Core_Config::singleton()->defaultCurrency, new CustomContext($numberOfPlaces), RoundingMode::HALF_UP);
     $formatter = new \NumberFormatter($locale ?? CRM_Core_I18n::getLocale(), NumberFormatter::DECIMAL);
     $formatter->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $numberOfPlaces);
+    if ($useCiviCRMThousandSeparator) {
+      $formatter->setSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryDecimalPoint);
+      $formatter->setSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, CRM_Core_Config::singleton()->monetaryThousandSeparator);
+    }
     return $money->formatWith($formatter);
   }
 
@@ -246,8 +251,7 @@ class CRM_Utils_Money {
    *   Formatted amount.
    */
   public static function formatLocaleNumericRoundedByPrecision($amount, $precision) {
-    $amount = self::formatUSLocaleNumericRounded($amount, $precision);
-    return self::replaceCurrencySeparators($amount);
+    return self::formatLocaleNumeric($amount, NULL, NULL, $precision, TRUE);
   }
 
   /**
@@ -260,14 +264,14 @@ class CRM_Utils_Money {
    *
    * @param string $amount
    * @param int $precision
+   * @param string $locale
    *
    * @return string
    *   Formatted amount.
    */
-  public static function formatLocaleNumericRoundedByOptionalPrecision($amount, $precision) {
+  public static function formatLocaleNumericRoundedByOptionalPrecision($amount, $precision, $locale = NULL) {
     $decimalPlaces = self::getDecimalPlacesForAmount((string) $amount);
-    $amount = self::formatUSLocaleNumericRounded($amount, $precision > $decimalPlaces ? $decimalPlaces : $precision);
-    return self::replaceCurrencySeparators($amount);
+    return self::formatLocaleNumeric($amount, $locale, NULL, $precision > $decimalPlaces ? $decimalPlaces : $precision, TRUE);
   }
 
   /**
