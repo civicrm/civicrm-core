@@ -21,7 +21,7 @@
   </compatibility>
   <comments>This extension is still in beta. Click on the chat link above to discuss development, report problems or ask questions.</comments>
   <classloader>
-    <psr0 prefix="CRM_" path="" />
+    <psr0 prefix="CRM_" path=""/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <upgrader>CRM_Search_Upgrader</upgrader>

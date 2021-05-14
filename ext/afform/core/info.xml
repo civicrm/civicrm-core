@@ -28,6 +28,6 @@
     <namespace>CRM/Afform</namespace>
   </civix>
   <classloader>
-    <psr4 prefix="Civi\" path="Civi" />
+    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
 </extension>

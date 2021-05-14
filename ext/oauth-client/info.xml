@@ -25,7 +25,7 @@
   </requires>
   <comments>This extension provides a framework for oauth support</comments>
   <classloader>
-    <psr0 prefix="CRM_" path="" />
+    <psr0 prefix="CRM_" path=""/>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <upgrader>CRM_OAuth_Upgrader</upgrader>
