@@ -110,14 +110,28 @@
               {/if}
             {else}
               {if $frequency_interval > 1}
-                <p>
-                  <strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2s.{/ts}</strong>
-                </p>
+                {if $frequency_unit eq 'day'}
+                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 days.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'week'}
+                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 weeks.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'month'}
+                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 months.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'year'}
+                  <p><strong>{ts 1=$frequency_interval}I want to contribute this amount every %1 years.{/ts}</strong></p>
+                {/if}
               {else}
-                <p><strong>{ts 1=$frequency_unit }I want to contribute this amount every %1.{/ts}</strong></p>
+                {if $frequency_unit eq 'day'}
+                  <p><strong>{ts}I want to contribute this amount every day.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'week'}
+                  <p><strong>{ts}I want to contribute this amount processed every week.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'month'}
+                  <p><strong>{ts}I want to contribute this amount processed every month.{/ts}</strong></p>
+                {elseif $frequency_unit eq 'year'}
+                  <p><strong>{ts}I want to contribute this amount processed every year.{/ts}</strong></p>
+                {/if}
               {/if}
             {/if}
-              <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
+            <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
             {/crmRegion}
           {/if}
         {/if}
