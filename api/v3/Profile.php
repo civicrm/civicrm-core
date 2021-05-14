@@ -533,6 +533,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
     $hardCodedEntityFields = [
       'state_province' => 'state_province_id',
       'country' => 'country_id',
+      'county' => 'county_id',
       'participant_status' => 'status_id',
       'gender' => 'gender_id',
       'financial_type' => 'financial_type_id',
