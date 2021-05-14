@@ -3744,39 +3744,17 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * Create a table of the contact ids included by the group filter.
    *
    * This function is called by both the api (tests) and the UI.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function buildGroupTempTable() {
+  public function buildGroupTempTable(): void {
     if (!empty($this->groupTempTable) || empty($this->_params['gid_value']) || $this->groupFilterNotOptimised) {
       return;
     }
+    $this->groupTempTable = $this->createTemporaryTable('groups', 'contact_id INT, group_id INT', TRUE);
     $filteredGroups = (array) $this->_params['gid_value'];
-
-    $groups = civicrm_api3('Group', 'get', [
-      'is_active' => 1,
-      'id' => ['IN' => $filteredGroups],
-      'saved_search_id' => ['>' => 0],
-      'return' => 'id',
-    ]);
-    $smartGroups = array_keys($groups['values']);
-
-    $query = "
-       SELECT DISTINCT group_contact.contact_id as id
-       FROM civicrm_group_contact group_contact
-       WHERE group_contact.group_id IN (" . implode(', ', $filteredGroups) . ")
-       AND group_contact.status = 'Added' ";
-
-    if (!empty($smartGroups)) {
-      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
-      $smartGroups = implode(',', $smartGroups);
-      $query .= "
-        UNION DISTINCT
-        SELECT smartgroup_contact.contact_id as id
-        FROM civicrm_group_contact_cache smartgroup_contact
-        WHERE smartgroup_contact.group_id IN ({$smartGroups}) ";
-    }
-
-    $this->groupTempTable = $this->createTemporaryTable('rptgrp', $query);
-    CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX i_id(id)");
+    CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups($filteredGroups, $this->groupTempTable);
+    CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX contact_id(contact_id)");
   }
 
   /**
@@ -5193,12 +5171,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if ($this->groupTempTable) {
       if ($this->_params['gid_op'] == 'in') {
         $this->_from = " FROM $this->groupTempTable group_temp_table INNER JOIN $baseTable $tableAlias
-        ON group_temp_table.id = $tableAlias.{$field} ";
+        ON group_temp_table.contact_id = $tableAlias.{$field} ";
       }
       else {
         $this->_from .= "
           LEFT JOIN $this->groupTempTable group_temp_table
-          ON $tableAlias.{$field} = group_temp_table.id ";
+          ON $tableAlias.{$field} = group_temp_table.contact_id ";
       }
     }
   }

@@ -546,7 +546,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithSmartGroupFilter($template) {
+  public function testContributionSummaryWithSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -805,7 +805,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContributionSummaryWithSingleContactsInTwoGroups() {
-    list($groupID1, $individualID) = $this->setUpPopulatedGroup(TRUE);
+    [$groupID1, $individualID] = $this->setUpPopulatedGroup(TRUE);
     // create second group and add the individual to it.
     $groupID2 = $this->groupCreate(['name' => 'test_group', 'title' => 'test_title']);
     $this->callAPISuccess('GroupContact', 'create', [
