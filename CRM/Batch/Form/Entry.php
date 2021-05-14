@@ -830,7 +830,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = $value['source'] ?? NULL;
-          [$membership] = self::legacyProcessMembership(
+          $membership = self::legacyProcessMembership(
             $value['contact_id'], $value['membership_type_id'], FALSE,
             //$numTerms should be default to 1.
             NULL, NULL, $value['custom'], 1, NULL, FALSE,
@@ -1038,20 +1038,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param $isPayLater
    * @param array $memParams
    * @param array $formDates
-   * @param null|CRM_Contribute_BAO_Contribution $contribution
-   * @param array $lineItems
    *
-   * @return array
+   * @return CRM_Member_BAO_Membership
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $formDates = [], $contribution = NULL, $lineItems = []) {
-    $renewalMode = $updateStatusId = FALSE;
+  public static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $formDates = []): CRM_Member_BAO_Membership {
+    $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
     $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
-    $dates = [];
     $ids = [];
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
@@ -1060,7 +1058,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $is_test, $membershipID, TRUE
     );
     if ($currentMembership) {
-      $renewalMode = TRUE;
 
       // Do NOT do anything.
       //1. membership with status : PENDING/CANCELLED (CRM-2395)
@@ -1073,11 +1070,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $memParams = array_merge([
           'id' => $currentMembership['id'],
-          'contribution' => $contribution,
           'status_id' => $currentMembership['status_id'],
           'start_date' => $currentMembership['start_date'],
           'end_date' => $currentMembership['end_date'],
-          'line_item' => $lineItems,
           'join_date' => $currentMembership['join_date'],
           'membership_type_id' => $membershipTypeID,
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
@@ -1087,8 +1082,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $memParams['contribution_recur_id'] = $contributionRecurID;
         }
 
-        $membership = CRM_Member_BAO_Membership::create($memParams);
-        return [$membership, $renewalMode, $dates];
+        return CRM_Member_BAO_Membership::create($memParams);
       }
 
       // Check and fix the membership if it is STALE
@@ -1237,11 +1231,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     $params['modified_id'] = $modifiedID ?? $contactID;
 
-    $memParams['contribution'] = $contribution;
     $memParams['custom'] = $customFieldsFormatted;
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
-    $memParams['line_item'] = $lineItems;
     // @todo stop passing $ids (membership and userId may be set by this point)
     $membership = CRM_Member_BAO_Membership::create($memParams, $ids);
 
@@ -1249,7 +1241,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
     $membership->find(TRUE);
 
-    return [$membership, $renewalMode, $dates];
+    return $membership;
   }
 
 }
