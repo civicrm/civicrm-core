@@ -27,7 +27,13 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
               {/if}
           </td>
           <td class="crm-extensions-label">{$row.statusLabel} {if $row.upgradable}<br/>({ts}Outdated{/ts}){/if}</td>
-          <td class="crm-extensions-label">{$row.version|escape}</td>
+          <td class="crm-extensions-label">{$row.version|escape}
+            {if ($row.develStage and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
+              <span class="crm-extensions-stage">{icon icon="fa-flask"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}</span>
+              {else}
+              <span class="crm-extensions-stage">{icon icon="fa-check-circle"}{/icon}</span>
+            {/if}
+          </td>
           <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>

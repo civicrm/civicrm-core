@@ -44,6 +44,18 @@
   text-align: center;
 }
 
+#crm-container .crm-extensions-stage {
+  float: right;
+}
+
+#crm-container .crm-extensions-stage > .fa-flask {
+  color: #eba12d;
+}
+
+#crm-container .crm-extensions-stage > .fa-check-circle {
+  color: #00994D;
+}
+
 @media screen and (min-width: 480px) {
   #crm-container .admin-section-items {
     column-count: 2;
