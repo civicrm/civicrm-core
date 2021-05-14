@@ -74,6 +74,15 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
+foreach (findCoreInfoXml() as $infoXml) {
+  updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
+    foreach ($dom->getElementsByTagName('version') as $tag) {
+      /** @var \DOMNode $tag */
+      $tag->textContent = $newVersion;
+    }
+  });
+}
+
 if ($doCommit) {
   $files = array_filter(
     ['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile],
@@ -102,6 +111,24 @@ function updateFile($file, $callback) {
   $content = file_get_contents($file);
   $content = $callback($content);
   file_put_contents($file, $content);
+}
+
+/**
+ * Update the content of an XML file
+ *
+ * @param string $file
+ * @param callable $callback
+ *   Function(DOMDocument $dom)
+ */
+function updateXmlFile($file, $callback) {
+  updateFile($file, function ($content) use ($callback) {
+    $dom = new DomDocument();
+    $dom->loadXML($content);
+    $dom->preserveWhiteSpace = FALSE;
+    $dom->formatOutput = TRUE;
+    $callback($dom);
+    return $dom->saveXML();
+  });
 }
 
 /**
@@ -208,4 +235,24 @@ function parseArgs($argv) {
   }
 
   return $parsed;
+}
+
+/**
+ * @return array
+ *   Ex: ['ext/afform/html/info.xml', 'ext/search_kit/info.xml']
+ */
+function findCoreInfoXml() {
+  $lines = explode("\n", file_get_contents('distmaker/core-ext.txt'));
+  $exts = preg_grep(";^#;", $lines, PREG_GREP_INVERT);
+  $exts = preg_grep(';[a-z-A-Z];', $exts);
+
+  $infoXmls = [];
+  foreach ($exts as $coreExtDir) {
+    $infoXmls = array_merge($infoXmls, (array) glob("ext/$coreExtDir/*/info.xml"));
+    if (file_exists("ext/$coreExtDir/info.xml")) {
+      $infoXmls[] = "ext/$coreExtDir/info.xml";
+    }
+  }
+
+  return $infoXmls;
 }
