@@ -4451,7 +4451,6 @@ civicrm_relationship.start_date > {$today}
 
       if (empty(self::$_defaultReturnProperties[$mode])) {
         self::$_defaultReturnProperties[$mode] = [
-          'home_URL' => 1,
           'image_URL' => 1,
           'legal_identifier' => 1,
           'external_identifier' => 1,
