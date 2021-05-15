@@ -1917,8 +1917,8 @@ LEFT JOIN civicrm_price_set_entity cpe ON cpe.entity_id = cp.event_id LEFT JOIN 
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
     $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Member Dues'");
     $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
-    $sql = "INSERT INTO civicrm_contribution (contact_id,financial_type_id,payment_instrument_id, receive_date, total_amount, currency, source, contribution_status_id)
-SELECT  cm.contact_id, $financialTypeID, $paymentInstrumentID, now(), cmt.minimum_fee, 'USD', CONCAT(cmt.name, ' Membership: Offline signup'), 1 FROM `civicrm_membership` cm
+    $sql = "INSERT INTO civicrm_contribution (contact_id,financial_type_id,payment_instrument_id, receive_date, total_amount, currency, source, contribution_status_id, trxn_id)
+SELECT  cm.contact_id, $financialTypeID, $paymentInstrumentID, now(), cmt.minimum_fee, 'USD', CONCAT(cmt.name, ' Membership: Offline signup'), 1, SUBSTRING(MD5(RAND()) FROM 1 FOR 16) FROM `civicrm_membership` cm
 LEFT JOIN civicrm_membership_type cmt ON cmt.id = cm.membership_type_id;";
 
     $this->_query($sql);
@@ -1957,8 +1957,8 @@ AND    a.details = 'Membership Payment'
     $maxContribution = CRM_Core_DAO::singleValueQuery("select max(id) from civicrm_contribution");
     $financialTypeID = CRM_Core_DAO::singleValueQuery("select id from civicrm_financial_type where name = 'Event Fee'");
     $paymentInstrumentID = CRM_Core_DAO::singleValueQuery("select value from civicrm_option_value where name = 'Credit Card' AND option_group_id = (SELECT id from civicrm_option_group where name = 'payment_instrument')");
-    $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
-SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
+    $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id, trxn_id)
+SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1,  SUBSTRING(MD5(RAND()) FROM 1 FOR 16) FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
 group by `contact_id`, `fee_amount`, `title`;";
 

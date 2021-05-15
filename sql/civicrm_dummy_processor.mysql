@@ -12,3 +12,5 @@ INSERT INTO `civicrm_entity_financial_account` (`entity_table`, `entity_id`, `ac
 UPDATE  `civicrm_contribution_page` SET payment_processor = @dp;
 
 UPDATE  `civicrm_event` SET payment_processor = @dp;
+
+UPDATE `civicrm_financial_trxn` SET payment_processor_id = @dp WHERE trxn_id IS NOT NULL;
