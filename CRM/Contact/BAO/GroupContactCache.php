@@ -19,8 +19,6 @@ use Civi\Api4\Query\SqlExpression;
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
-  public static $_alreadyLoaded = [];
-
   /**
    * Get a list of caching modes.
    *
@@ -237,7 +235,6 @@ WHERE  id IN ( $groupIDs )
     CRM_Core_DAO::executeQuery($query, $params);
     // also update the cache_date for these groups
     CRM_Core_DAO::executeQuery($update, $params);
-    unset(self::$_alreadyLoaded[$groupID]);
 
     $transaction->commit();
   }
@@ -364,7 +361,7 @@ WHERE  id IN ( $groupIDs )
    * @param object $group
    *   The smart group that needs to be loaded.
    * @param bool $force
-   *   Should we force a search through.
+   *   deprecated parameter = Should we force a search through.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
@@ -372,26 +369,25 @@ WHERE  id IN ( $groupIDs )
    */
   public static function load($group, $force = FALSE) {
     $groupID = (int) $group->id;
-    if (array_key_exists($groupID, self::$_alreadyLoaded) && !$force) {
-      return;
+    if ($force) {
+      CRM_Core_Error::deprecatedWarning('use invalidate group contact cache first.');
+      self::invalidateGroupContactCache($group->id);
     }
-
-    self::$_alreadyLoaded[$groupID] = 1;
 
     // FIXME: some other process could have actually done the work before we got here,
     // Ensure that work needs to be done before continuing
-    if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
+    if (!self::shouldGroupBeRefreshed($groupID, TRUE)) {
       return;
     }
+
+    // grab a lock so other processes don't compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
 
     $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
       ->setCategory('gccache')
       ->setMemory();
     self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
     $tempTable = $groupContactsTempTable->getName();
-
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
 
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we don't know if the other process

@@ -270,9 +270,27 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * contact 8 : smart 5 (base)
    *
    * here 'contact 1 : static 0 (inc)' identified as static group $groupIDs[0]
-   *  that has 'contact 1' identified as $contactIDs[0] and Included in the mailing recipient list
+   *  that has 'contact 1' identified as $contactIDs[0] and Included in the
+   * mailing recipient list
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  public function testgetRecipientsEmailGroupIncludeExclude() {
+  public function testGetRecipientsEmailGroupIncludeExclude(): void {
+    // Create contacts
+    $contactIDs = [
+      $this->individualCreate(['last_name' => 'smart5'], 0),
+      $this->individualCreate([], 1),
+      $this->individualCreate([], 2),
+      $this->individualCreate([], 3),
+      $this->individualCreate(['last_name' => 'smart3'], 4),
+      $this->individualCreate(['last_name' => 'smart3'], 5),
+      $this->individualCreate(['last_name' => 'smart4'], 6),
+      $this->individualCreate(['last_name' => 'smart4'], 7),
+      $this->individualCreate(['last_name' => 'smart5'], 8),
+    ];
+
     // Set up groups; 3 standard, 4 smart
     $groupIDs = [];
     for ($i = 0; $i < 7; $i++) {
@@ -290,19 +308,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
         ], $params);
       }
     }
-
-    // Create contacts
-    $contactIDs = [
-      $this->individualCreate(['last_name' => 'smart5'], 0),
-      $this->individualCreate([], 1),
-      $this->individualCreate([], 2),
-      $this->individualCreate([], 3),
-      $this->individualCreate(['last_name' => 'smart3'], 4),
-      $this->individualCreate(['last_name' => 'smart3'], 5),
-      $this->individualCreate(['last_name' => 'smart4'], 6),
-      $this->individualCreate(['last_name' => 'smart4'], 7),
-      $this->individualCreate(['last_name' => 'smart5'], 8),
-    ];
 
     // Add contacts to static groups
     $this->callAPISuccess('GroupContact', 'Create', [
@@ -331,7 +336,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       $group = new CRM_Contact_DAO_Group();
       $group->id = $groupIDs[$i];
       $group->find(TRUE);
-      CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+      CRM_Contact_BAO_GroupContactCache::load($group);
     }
 
     // Check that we can include static groups in the mailing.

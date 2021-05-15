@@ -561,8 +561,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $group = CRM_Contact_BAO_Group::createSmartGroup($groupParams);
 
     // Ensure the smart group is created.
-    $this->assertTrue(is_int($group->id), "Smart group created successfully.");
-    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    $this->assertIsInt($group->id, "Smart group created successfully.");
+    CRM_Contact_BAO_GroupContactCache::load($group);
 
     // Ensure it is populating the cache when loaded.
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
@@ -629,7 +629,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
 
     // Do it again, but this time don't clear group contact cache. Instead,
     // set it to expire.
-    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    CRM_Contact_BAO_GroupContactCache::load($group);
     $params['name'] = 'smartGroupCacheTimeout';
     $timeout = civicrm_api3('Setting', 'getvalue', $params);
     $timeout = intval($timeout) * 60;

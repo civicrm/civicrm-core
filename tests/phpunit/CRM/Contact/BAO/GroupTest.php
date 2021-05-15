@@ -225,7 +225,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       $group->id = $groupID;
       $group->find(TRUE);
 
-      CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+      CRM_Contact_BAO_GroupContactCache::load($group);
     }
   }
 

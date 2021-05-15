@@ -543,7 +543,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // the group & could generate invalid sql if a bug were introduced.
     $groupParams = ['title' => 'postal codes', 'formValues' => $params, 'is_active' => 1];
     $group = CRM_Contact_BAO_Group::createSmartGroup($groupParams);
-    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+    CRM_Contact_BAO_GroupContactCache::load($group);
   }
 
   /**
