@@ -101,8 +101,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
    */
   public $_ruleGroupID = NULL;
 
-  public $_isAddCaptcha = FALSE;
-
   protected $_isPermissionedChecksum = FALSE;
 
   /**
@@ -281,12 +279,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
    * @return array
    */
   public function getUFGroupIDs() {
-    if (empty($this->_profileIds)) {
-      $dao = new CRM_Core_DAO_UFGroup();
-      $dao->id = $this->_gid;
-      $this->_profileIds = (array) $dao;
-    }
-    return $this->_profileIds;
+    return [$this->_gid];
   }
 
   /**
@@ -374,13 +367,12 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->_isContactActivityProfile = CRM_Core_BAO_UFField::checkContactActivityProfileType($this->_gid);
 
-    //get values for ufGroupName, captcha and dupe update.
+    //get values for ufGroupName and dupe update.
     if ($this->_gid) {
       $dao = new CRM_Core_DAO_UFGroup();
       $dao->id = $this->_gid;
       if ($dao->find(TRUE)) {
         $this->_isUpdateDupe = $dao->is_update_dupe;
-        $this->_isAddCaptcha = $dao->add_captcha;
         $this->_ufGroup = (array) $dao;
       }
 
@@ -837,7 +829,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     $this->assign('anonUser', $anonUser);
 
-    $addCaptcha = [];
     $emailPresent = FALSE;
 
     // add the form elements
@@ -863,27 +854,13 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $addToGroupId = $field['add_to_group_id'];
       }
 
-      //build array for captcha
-      if ($field['add_captcha']) {
-        $addCaptcha[$field['group_id']] = $field['add_captcha'];
-      }
-
       if (($name == 'email-Primary') || ($name == 'email-' . ($primaryLocationType ?? ""))) {
         $emailPresent = TRUE;
         $this->_mail = $name;
       }
     }
 
-    // add captcha only for create mode.
     if ($this->_mode == self::MODE_CREATE) {
-      // suppress captcha for logged in users only
-      if ($this->_currentUserID) {
-        $this->_isAddCaptcha = FALSE;
-      }
-      elseif (!$this->_isAddCaptcha && !empty($addCaptcha)) {
-        $this->_isAddCaptcha = TRUE;
-      }
-
       if ($this->_gid) {
         $dao = new CRM_Core_DAO_UFGroup();
         $dao->id = $this->_gid;
@@ -895,14 +872,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
           }
         }
       }
-    }
-    else {
-      $this->_isAddCaptcha = FALSE;
-    }
-
-    //finally add captcha to form.
-    if ($this->_isAddCaptcha) {
-      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
 
     if ($this->_mode != self::MODE_SEARCH) {

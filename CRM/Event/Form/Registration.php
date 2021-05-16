@@ -533,7 +533,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $fields = array_diff_key($fields, $fieldsToIgnore);
       CRM_Core_Session::setStatus(ts('Some of the profile fields cannot be configured for this page.'));
     }
-    $addCaptcha = FALSE;
 
     if (!empty($this->_fields)) {
       $fields = @array_diff_assoc($fields, $this->_fields);
@@ -553,19 +552,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         if ($button == 'skip') {
           $field['is_required'] = FALSE;
         }
-        // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-        elseif ($field['add_captcha'] && !$contactID) {
-          // only add captcha for first page
-          $addCaptcha = TRUE;
-        }
         CRM_Core_BAO_UFGroup::buildProfile($this, $field, CRM_Profile_Form::MODE_CREATE, $contactID, TRUE);
 
         $this->_fields[$key] = $field;
       }
-    }
-
-    if ($addCaptcha) {
-      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
   }
 
