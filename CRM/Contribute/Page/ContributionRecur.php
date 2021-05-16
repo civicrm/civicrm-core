@@ -99,7 +99,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
    */
   public function run() {
     $this->preProcess();
-
+    $this->assign('hasAccessCiviContributePermission', CRM_Core_Permission::check('access CiviContribute'));
     if ($this->isViewContext()) {
       $this->view();
     }
