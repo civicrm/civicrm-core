@@ -820,15 +820,10 @@ HERESQL;
   }
 
   public function postProcess() {
-
     $this->beginPostProcess();
-
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = $this->_contactSelected = [];
+    $rows = $this->_contactSelected = [];
     $this->buildRows($sql, $rows);
     foreach ($rows as $key => $val) {
       $rows[$key]['contactID'] = $val['civicrm_contact_id'];
