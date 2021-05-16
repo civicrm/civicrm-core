@@ -35,6 +35,24 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    */
   public $_single;
 
+  /**
+   * Get the active UFGroups (profiles) on this form
+   * Many forms load one or more UFGroups (profiles).
+   * This provides a standard function to retrieve the IDs of those profiles from the form
+   * so that you can implement things such as "is is_captcha field set on any of the active profiles on this form?"
+   *
+   * NOT SUPPORTED FOR USE OUTSIDE CORE EXTENSIONS - Added for reCAPTCHA core extension.
+   *
+   * @return array
+   */
+  public function getUFGroupIDs() {
+    $ufGroupIDs = [];
+    if (!empty($this->_pageId)) {
+      $ufGroupIDs[] = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    }
+    return $ufGroupIDs;
+  }
+
   public function preProcess() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
@@ -117,21 +135,21 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
    * @return void
    */
   public function buildQuickForm() {
-    $id = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
-    if (CRM_PCP_BAO_PCP::checkEmailProfile($id)) {
+    $ufGroupID = CRM_PCP_BAO_PCP::getSupporterProfileId($this->_pageId, $this->_component);
+    if (CRM_PCP_BAO_PCP::checkEmailProfile($ufGroupID)) {
       $this->assign('profileDisplay', TRUE);
     }
     $fields = NULL;
     if ($this->_contactID) {
-      if (CRM_Core_BAO_UFGroup::filterUFGroups($id, $this->_contactID)) {
-        $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
+      if (CRM_Core_BAO_UFGroup::filterUFGroups($ufGroupID, $this->_contactID)) {
+        $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::ADD);
       }
       $this->addFormRule(['CRM_PCP_Form_PCPAccount', 'formRule'], $this);
     }
     else {
-      CRM_Core_BAO_CMSUser::buildForm($this, $id, TRUE);
+      CRM_Core_BAO_CMSUser::buildForm($this, $ufGroupID, TRUE);
 
-      $fields = CRM_Core_BAO_UFGroup::getFields($id, FALSE, CRM_Core_Action::ADD);
+      $fields = CRM_Core_BAO_UFGroup::getFields($ufGroupID, FALSE, CRM_Core_Action::ADD);
     }
 
     if ($fields) {
