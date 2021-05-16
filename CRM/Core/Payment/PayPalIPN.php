@@ -290,34 +290,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           );
         }
       }
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $this->getContributionID();
-      if (!$contribution->find(TRUE)) {
-        throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
-      }
-
-      // make sure contact exists and is valid
-      // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contribution->contact_id;
-      $contact->find(TRUE);
-      if ($contact->id != $this->getContactID()) {
-        // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-        CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-        echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-        $ids['contact'] = $contribution->contact_id;
-      }
-
-      // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
-      if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
-        // We don't need to worry if about removing contribution page id as it will be set later in
-        //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
-        unset($ids['contributionPage']);
-      }
-      $ids['paymentProcessor'] = $paymentProcessorID;
-      if (!$contribution->loadRelatedObjects($input, $ids)) {
-        return;
-      }
+      $contribution = $this->getContribution();
 
       $input['payment_processor_id'] = $paymentProcessorID;
 
@@ -533,6 +506,24 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    */
   protected function getContactID(): int {
     return (int) $this->retrieve('contactID', 'Integer', TRUE);
+  }
+
+  /**
+   * Get the contribution object.
+   *
+   * @return \CRM_Contribute_BAO_Contribution
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContribution(): CRM_Contribute_BAO_Contribution {
+    $contribution = new CRM_Contribute_BAO_Contribution();
+    $contribution->id = $this->getContributionID();
+    if (!$contribution->find(TRUE)) {
+      throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: "]);
+    }
+    if ($contribution->contact_id !== $this->getContactID()) {
+      CRM_Core_Error::debug_log_message("Contact ID in IPN not found but contact_id found in contribution.");
+    }
+    return $contribution;
   }
 
 }
