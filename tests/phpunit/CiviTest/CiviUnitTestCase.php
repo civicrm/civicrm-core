@@ -158,11 +158,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
    *
-   * $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereHookAllResults'));
+   * $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
    *
    * @var \CRM_Utils_Hook_UnitTests
    */
-  public $hookClass = NULL;
+  public $hookClass;
 
   /**
    * @var array
