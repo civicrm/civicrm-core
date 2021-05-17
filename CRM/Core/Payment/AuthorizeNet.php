@@ -103,15 +103,29 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Submit a payment using Advanced Integration Method.
    *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
+   * @param array|\Civi\Payment\PropertyBag $params
+   *
+   * @param string $component
    *
    * @return array
-   *   the result in a nice formatted array (or an error object)
+   *   Result array (containing at least the key payment_status_id)
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $propertyBag = \Civi\Payment\PropertyBag::cast($params);
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the moment.
+    if ($propertyBag->getAmount() == 0) {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
+      return $result;
+    }
+
     if (!defined('CURLOPT_SSLCERT')) {
       // Note that guzzle doesn't necessarily require CURL, although it prefers it. But we should leave this error
       // here unless someone suggests it is not required since it's likely helpful.
@@ -136,6 +150,8 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
       $this->doRecurPayment();
+      $params['payment_status_id'] = array_search('Pending', $statuses);
+      $params['payment_status'] = 'Pending';
       return $params;
     }
 
@@ -179,10 +195,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     switch ($response_fields[0]) {
       case self::AUTH_REVIEW:
         $params['payment_status_id'] = array_search('Pending', $contributionStatus);
+        $params['payment_status'] = 'Pending';
         break;
 
       case self::AUTH_ERROR:
-        $params['payment_status_id'] = array_search('Failed', $contributionStatus);
         $errormsg = $response_fields[2] . ' ' . $response_fields[3];
         throw new PaymentProcessorException($errormsg, $response_fields[1]);
 
@@ -193,10 +209,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
       default:
         // Success
         $params['trxn_id'] = !empty($response_fields[6]) ? $response_fields[6] : $this->getTestTrxnID();
+        $params['payment_status_id'] = array_search('Completed', $statuses);
+        $params['payment_status'] = 'Completed';
         break;
     }
-
-    // TODO: include authorization code?
 
     return $params;
   }
