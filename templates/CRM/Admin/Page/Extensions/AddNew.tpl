@@ -24,7 +24,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
           </td>
-          <td class="crm-extensions-label">{$row.version} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
+          <td class="crm-extensions-version">{$row.version|escape}</td>
           <td class="crm-extensions-description">{$row.type|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>

@@ -26,8 +26,14 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
                 <div class="crm-extensions-upgrade">{$remoteExtensionRows[$extKey].upgradelink}</div>
               {/if}
           </td>
-          <td class="crm-extensions-label">{$row.statusLabel} {if $row.upgradable}<br/>({ts}Outdated{/ts}){/if}</td>
-          <td class="crm-extensions-label">{$row.version|escape} {if $row.upgradable}<br/>({$row.upgradeVersion}){/if}</td>
+          <td class="crm-extensions-status">{$row.statusLabel} {if $row.upgradable}<br/>({ts}Outdated{/ts}){/if}</td>
+          <td class="crm-extensions-version">{$row.version|escape}
+            {if ($row.develStage and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
+              {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
+            {else}
+              {icon icon="fa-check-circle crm-extensions-stage"}{ts}This is a stable release version.{/ts}{/icon}
+            {/if}
+          </td>
           <td class="crm-extensions-description">{$row.type|escape|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
