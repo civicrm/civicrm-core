@@ -144,8 +144,11 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     // CRM-7119: set preferred_language to default if unset
     if (empty($defaults['preferred_language'])) {
-      $config = CRM_Core_Config::singleton();
-      $defaults['preferred_language'] = $config->lcMessages;
+      if ($form->_action == CRM_Core_Action::ADD) {
+        if (($defContactLanguage = CRM_Core_I18n::getContactDefaultLanguage()) != FALSE) {
+          $defaults['preferred_language'] = $defContactLanguage;
+        }
+      }
     }
 
     if (empty($defaults['communication_style_id'])) {
