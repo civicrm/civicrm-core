@@ -58,14 +58,29 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
    *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
+   * @param array|PropertyBag $params
+   *
+   * @param string $component
    *
    * @return array
-   *   the result in an nice formatted array (or an error object)
-   * @abstract
+   *   Result array (containing at least the key payment_status_id)
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $propertyBag = \Civi\Payment\PropertyBag::cast($params);
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the moment.
+    if ($propertyBag->getAmount() == 0) {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
+      return $result;
+    }
+
     if (!defined('CURLOPT_SSLCERT')) {
       throw new PaymentProcessorException(ts('Payflow Pro requires curl with SSL support'));
     }
@@ -328,6 +343,8 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
           $params['recur_trxn_id'] = $nvpArray['PROFILEID'];
           //'trxn_id' is varchar(255) field. returned value is length 12
         }
+        $params['payment_status_id'] = array_search('Completed', $statuses);
+        $params['payment_status'] = 'Completed';
         return $params;
 
       case 1:
