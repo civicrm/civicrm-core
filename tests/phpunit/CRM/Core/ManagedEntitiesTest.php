@@ -91,6 +91,18 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
         'parameters' => '',
       ],
     ];
+    $this->fixtures['com.example.one-Contact'] = [
+      'module' => 'com.example.one',
+      'name' => 'Contact',
+      'entity' => 'Contact',
+      'params' => [
+        'version' => 3,
+        'first_name' => 'Daffy',
+        'last_name' => 'Duck',
+        'contact_type' => 'Individual',
+        'update' => 'never',
+      ],
+    ];
 
     $this->apiKernel = \Civi::service('civi_api_kernel');
     $this->adhocProvider = new \Civi\API\Provider\AdhocProvider(3, 'CustomSearch');
@@ -373,13 +385,15 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   /**
    * Setup an active module with an entity -- then disable and re-enable the
    * module
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testDeactivateReactivateModule() {
+  public function testDeactivateReactivateModule(): void {
     $manager = CRM_Extension_System::singleton()->getManager();
-
-    // create first managed entity ('foo')
-    $decls = [];
-    $decls[] = $this->fixtures['com.example.one-foo'];
+    // Register the hook so we can check there is no effort to de-activate contact.
+    $this->hookClass->setHook('civicrm_pre', [$this, 'preHook']);
+    // create first managed entities ('foo' & Contact)
+    $decls = [$this->fixtures['com.example.one-foo'], $this->fixtures['com.example.one-Contact']];
     // Mock the contextual process info that would be added by CRM_Extension_Manager::install
     $manager->setProcessesForTesting(['com.example.one' => ['install']]);
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
@@ -482,6 +496,20 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // Reset context.
     $manager->setProcessesForTesting([]);
+  }
+
+  /**
+   * Pre hook to test contact is not called on disable.
+   *
+   * @param string $op
+   * @param string $objectName
+   * @param int|null $id
+   * @param array $params
+   */
+  public function preHook($op, $objectName, $id, $params): void {
+    if ($op === 'edit' && $objectName === 'Individual') {
+      $this->assertArrayNotHasKey('is_active', $params);
+    }
   }
 
   /**
