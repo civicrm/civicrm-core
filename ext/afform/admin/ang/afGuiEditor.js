@@ -190,10 +190,10 @@
         $(this).removeClass('af-gui-dragtarget');
       })
       .on('sortstart', '#afGuiEditor', function() {
-        $('#afGuiEditor').addClass('af-gui-dragging');
+        $('body').addClass('af-gui-dragging');
       })
       .on('sortstop', function() {
-        $('.af-gui-dragging').removeClass('af-gui-dragging');
+        $('body').removeClass('af-gui-dragging');
         $('.af-gui-dragtarget').removeClass('af-gui-dragtarget');
       });
   });

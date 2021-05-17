@@ -26,13 +26,24 @@
       $scope.saving = false;
       $scope.selectedEntityName = null;
       this.meta = afGui.meta;
-      var editor = this;
+      var editor = this,
+        sortableOptions = {};
 
       this.$onInit = function() {
         // Load the current form plus blocks & fields
         afGui.resetMeta();
         afGui.addMeta(this.data);
         initializeForm();
+
+        $timeout(fixEditorHeight);
+        $timeout(editor.adjustTabWidths);
+        $(window)
+          .on('resize.afGuiEditor', fixEditorHeight)
+          .on('resize.afGuiEditor', editor.adjustTabWidths);
+      };
+
+      this.$onDestroy = function() {
+        $(window).off('.afGuiEditor');
       };
 
       // Initialize the current form
@@ -140,7 +151,11 @@
           delete $scope.entities[type + num].loading;
           if (selectTab) {
             editor.selectEntity(type + num);
+            $timeout(function() {
+              editor.scrollToEntity(type + num);
+            });
           }
+          $timeout(editor.adjustTabWidths);
         }
 
         if (meta.fields) {
@@ -165,6 +180,7 @@
 
       this.selectEntity = function(entityName) {
         $scope.selectedEntityName = entityName;
+        $timeout(editor.adjustTabWidths);
       };
 
       this.getEntity = function(entityName) {
@@ -173,6 +189,18 @@
 
       this.getSelectedEntityName = function() {
         return $scope.selectedEntityName;
+      };
+
+      // Scroll an entity's first fieldset into view of the canvas
+      this.scrollToEntity = function(entityName) {
+        var $canvas = $('#afGuiEditor-canvas-body'),
+          $entity = $('.af-gui-container-type-fieldset[data-entity="' + entityName + '"]').first(),
+          // Scrolltop value needed to place entity's fieldset at top of canvas
+          scrollValue = $canvas.scrollTop() + ($entity.offset().top - $canvas.offset().top),
+          // Maximum possible scrollTop (height minus contents height, adjusting for padding)
+          maxScroll = $('#afGuiEditor-canvas-body > *').height() - $canvas.height() + 20;
+        // Exceeding the maximum scrollTop breaks the animation so keep it under the limit
+        $canvas.animate({scrollTop: scrollValue > maxScroll ? maxScroll : scrollValue}, 500);
       };
 
       this.getAfform = function() {
@@ -232,6 +260,24 @@
         return options;
       }
 
+      // Options for ui-sortable in field palette
+      this.getSortableOptions = function(entityName) {
+        if (!sortableOptions[entityName + '']) {
+          sortableOptions[entityName + ''] = {
+            helper: 'clone',
+            appendTo: '#afGuiEditor-canvas-body > af-gui-container',
+            containment: '#afGuiEditor-canvas-body',
+            update: editor.onDrop,
+            items: '> div:not(.disabled)',
+            connectWith: '#afGuiEditor-canvas ' + (entityName ? '[data-entity="' + entityName + '"] > ' : '') + '[ui-sortable]',
+            placeholder: 'af-gui-dropzone',
+            tolerance: 'pointer',
+            scrollSpeed: 8
+          };
+        }
+        return sortableOptions[entityName + ''];
+      };
+
       // Validates that a drag-n-drop action is allowed
       this.onDrop = function(event, ui) {
         var sort = ui.item.sortable;
@@ -278,6 +324,27 @@
           });
         }
       });
+
+      // Force editor panels to a fixed height, to avoid palette scrolling offscreen
+      function fixEditorHeight() {
+        var height = $(window).height() - $('#afGuiEditor').offset().top;
+        $('#afGuiEditor').height(Math.floor(height));
+      }
+
+      // Compress tabs on small screens
+      this.adjustTabWidths = function() {
+        $('#afGuiEditor .panel-heading ul.nav-tabs li.active').css('max-width', '');
+        $('#afGuiEditor .panel-heading ul.nav-tabs').each(function() {
+          var remainingSpace = Math.floor($(this).width()) - 1,
+            inactiveTabs = $(this).children('li.fluid-width-tab').not('.active');
+          $(this).children('.active,:not(.fluid-width-tab)').each(function() {
+            remainingSpace -= $(this).width();
+          });
+          if (inactiveTabs.length) {
+            inactiveTabs.css('max-width', Math.floor(remainingSpace / inactiveTabs.length) + 'px');
+          }
+        });
+      };
     }
   });
 

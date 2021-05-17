@@ -21,11 +21,13 @@
     <ul class="nav nav-tabs">
       <li role="presentation" ng-class="{active: canvasTab === 'layout'}">
         <a href ng-click="canvasTab = 'layout'">
+          <i class="crm-i fa-list-alt"></i>
           <span>{{:: ts('Form Layout') }}</span>
         </a>
       </li>
       <li role="presentation" ng-class="{active: canvasTab === 'markup'}">
         <a href ng-click="canvasTab = 'markup'; updateLayoutHtml()">
+          <i class="crm-i fa-code"></i>
           <span>{{:: ts('Markup') }}</span>
         </a>
       </li>

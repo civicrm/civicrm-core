@@ -22,26 +22,26 @@
     <div class="af-gui-entity-palette-select-list">
       <div ng-if="elementList.length">
         <label>{{:: ts('Elements') }}</label>
-        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="elementList">
+        <div ui-sortable="$ctrl.editor.getSortableOptions()" ui-sortable-update="buildPaletteLists" ng-model="elementList">
           <div ng-repeat="element in elementList" >
-            {{:: elementTitles[$index] }}
+            <div class="af-gui-palette-item">{{:: elementTitles[$index] }}</div>
           </div>
         </div>
       </div>
       <div ng-if="blockList.length">
         <label>{{:: ts('Blocks') }}</label>
-        <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=\'' + $ctrl.entity.name + '\'] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="blockList">
+        <div ui-sortable="$ctrl.editor.getSortableOptions($ctrl.entity.name)" ui-sortable-update="buildPaletteLists" ng-model="blockList">
           <div ng-repeat="block in blockList" ng-class="{disabled: blockInUse(block)}">
-            {{:: blockTitles[$index] }}
+            <div class="af-gui-palette-item">{{:: blockTitles[$index] }}</div>
           </div>
         </div>
       </div>
       <div ng-repeat="fieldGroup in fieldList">
         <div ng-if="fieldGroup.fields.length">
           <label>{{ fieldGroup.label }}</label>
-          <div ui-sortable="{update: buildPaletteLists, items: '&gt; div:not(.disabled)', connectWith: '[data-entity=\'' + fieldGroup.entityName + '\'] &gt; [ui-sortable]', placeholder: 'af-gui-dropzone'}" ui-sortable-update="$ctrl.editor.onDrop" ng-model="fieldGroup.fields">
+          <div ui-sortable="$ctrl.editor.getSortableOptions(fieldGroup.entityName)" ui-sortable-update="buildPaletteLists" ng-model="fieldGroup.fields">
             <div ng-repeat="field in fieldGroup.fields" ng-class="{disabled: fieldInUse(field.name)}">
-              {{:: getField(fieldGroup.entityType, field.name).label }}
+              <div class="af-gui-palette-item">{{:: getField(fieldGroup.entityType, field.name).label }}</div>
             </div>
           </div>
         </div>

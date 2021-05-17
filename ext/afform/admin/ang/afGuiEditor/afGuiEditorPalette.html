@@ -1,27 +1,31 @@
 <div id="afGuiEditor-palette-config" class="panel panel-default">
-    <ul id="afGuiEditor-palette-tabs" class="panel-heading nav nav-tabs">
-      <li role="presentation" ng-class="{active: selectedEntityName === null}">
+  <div class="panel-heading">
+    <ul id="afGuiEditor-palette-tabs" class="nav nav-tabs">
+      <li role="presentation" class="fluid-width-tab" ng-class="{active: selectedEntityName === null}" title="{{:: ts('Form Settings') }}">
         <a href ng-click="editor.selectEntity(null)">
+          <i class="crm-i fa-gear"></i>
           <span>{{:: ts('Form Settings') }}</span>
         </a>
       </li>
-      <li role="presentation" ng-repeat="entity in entities" ng-class="{active: selectedEntityName === entity.name}">
-        <a href ng-click="editor.selectEntity(entity.name)">
-          <span ng-if="!entity.loading && editor.allowEntityConfig" crm-ui-editable ng-model="entity.label">{{ entity.label }}</span>
-          <span ng-if="!entity.loading && !editor.allowEntityConfig">{{ entity.label }}</span>
+      <li role="presentation" ng-repeat="entity in entities" class="fluid-width-tab" ng-class="{active: selectedEntityName === entity.name}" title="{{ entity.label }}">
+        <a href ng-click="editor.selectEntity(entity.name); editor.scrollToEntity(entity.name);">
+          <i class="crm-i {{:: editor.meta.entities[entity.type].icon }}"></i>
+          <span ng-if="!entity.loading && editor.allowEntityConfig && selectedEntityName === entity.name" crm-ui-editable ng-model="entity.label" ng-change="editor.adjustTabWidths()">{{ entity.label }}</span>
+          <span ng-if="!entity.loading && !(editor.allowEntityConfig && selectedEntityName === entity.name)">{{ entity.label }}</span>
           <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>
         </a>
       </li>
-      <li role="presentation" ng-repeat="(key, searchDisplay) in editor.meta.searchDisplays" ng-class="{active: selectedEntityName === key}">
+      <li role="presentation" ng-repeat="(key, searchDisplay) in editor.meta.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ searchDisplay.label }}">
         <a href ng-click="editor.selectEntity(key)">
+          <i class="crm-i {{:: searchDisplay['type:icon'] }}"></i>
           <span>{{ searchDisplay.label }}</span>
         </a>
       </li>
-      <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig">
-        <a href class="dropdown-toggle" data-toggle="dropdown" title="{{ ts('Add Entity') }}">
-          <span><i class="crm-i fa-plus"></i></span>
+      <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}">
+        <a href class="dropdown-toggle" data-toggle="dropdown">
+          <i class="crm-i fa-plus"></i>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu dropdown-menu-right">
           <li ng-repeat="(entityName, entity) in editor.meta.entities" ng-if="entity.defaults">
             <a href ng-click="editor.addEntity(entityName, true)">
               <i class="crm-i {{:: entity.icon }}"></i>
@@ -31,6 +35,7 @@
         </ul>
       </li>
     </ul>
+  </div>
   <div class="panel-body" ng-include="'~/afGuiEditor/config-form.html'" ng-if="selectedEntityName === null"></div>
   <div class="panel-body" ng-repeat="entity in entities" ng-if="selectedEntityName === entity.name">
     <af-gui-entity entity="entity"></af-gui-entity>
