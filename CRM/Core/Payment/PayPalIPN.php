@@ -232,31 +232,18 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function main() {
     try {
-      $ids = $input = [];
+      $input = [];
       $component = $this->retrieve('module', 'String');
       $input['component'] = $component;
 
-      $ids['contact'] = $this->getContactID();
-      $contributionID = $ids['contribution'] = $this->getContributionID();
+      $contributionID = $this->getContributionID();
       $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
 
       $this->getInput($input);
 
-      if ($component === 'event') {
-        $ids['event'] = $this->retrieve('eventID', 'Integer', TRUE);
-        $ids['participant'] = $this->retrieve('participantID', 'Integer', TRUE);
-      }
-      else {
-        // get the optional ids
-        $ids['membership'] = $membershipID;
-        $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
-        $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
-        $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
-      }
-
       $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $this->getContributionRecurID());
 
-      Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
+      Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $this->getContactID() . '; trxn_id: ' . $input['trxn_id'] . ').');
 
       // Debugging related to possible missing membership linkage
       if ($this->getContributionRecurID() && $this->retrieve('membershipID', 'Integer', FALSE)) {
