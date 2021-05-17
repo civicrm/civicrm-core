@@ -526,11 +526,14 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Returns list of FK relationships.
    *
-   *
    * @return CRM_Core_Reference_Basic[]
    */
   public static function getReferenceColumns() {
-    return [];
+    if (!isset(Civi::$statics[static::class]['links'])) {
+      Civi::$statics[static::class]['links'] = static::createReferenceColumns(static::class);
+      CRM_Core_DAO_AllCoreTables::invoke(static::class, 'links_callback', Civi::$statics[static::class]['links']);
+    }
+    return Civi::$statics[static::class]['links'];
   }
 
   /**
