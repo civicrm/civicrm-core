@@ -85,6 +85,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   static protected $_dbName;
 
   /**
+   * API version in use.
+   *
+   * @var int
+   */
+  protected $_apiversion = 3;
+
+  /**
    * Track tables we have modified during a test.
    *
    * @var array

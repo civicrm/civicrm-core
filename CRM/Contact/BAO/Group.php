@@ -472,7 +472,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       // update group contact cache for all parent groups
       $parentIds = CRM_Contact_BAO_GroupNesting::getParentGroupIds($group->id);
       foreach ($parentIds as $parentId) {
-        CRM_Contact_BAO_GroupContactCache::add($parentId);
+        CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($parentId);
       }
     }
 
@@ -486,7 +486,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     }
 
     self::flushCaches();
-    CRM_Contact_BAO_GroupContactCache::add($group->id);
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Group', $group->id, $group);

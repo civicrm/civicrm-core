@@ -149,7 +149,6 @@ AND (
 
     foreach ($groupIDs as $groupID) {
       // first delete the current cache
-      self::clearGroupContactCache($groupID);
       $params = [['group', 'IN', [$groupID], 0, 0]];
       // the below call updates the cache table as a byproduct of the query
       CRM_Contact_BAO_Query::apiQuery($params, ['contact_id'], NULL, NULL, 0, 0, FALSE);
