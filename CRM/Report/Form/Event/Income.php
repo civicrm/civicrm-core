@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Event_Income extends CRM_Report_Form {
-  const ROW_COUNT_LIMIT = 2;
 
   protected $_summary = NULL;
   protected $_noFields = TRUE;
@@ -27,7 +26,6 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-
     $this->_columns = [
       'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
@@ -43,6 +41,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     ];
 
     parent::__construct();
+    $this->setRowCount(2);
   }
 
   public function preProcess() {
@@ -225,27 +224,29 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   /**
    * @inheritDoc
    */
-  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     parent::limit($rowCount);
 
     // Modify limit.
     $pageId = $this->get(CRM_Utils_Pager::PAGE_ID);
 
     //if pageId is greater than last page then display last page.
-    if ((($pageId * self::ROW_COUNT_LIMIT) - 1) > $this->_rowsFound) {
-      $pageId = ceil((float) $this->_rowsFound / (float) self::ROW_COUNT_LIMIT);
+    if ((($pageId * $rowCount) - 1) > $this->_rowsFound) {
+      $pageId = ceil((float) $this->_rowsFound / (float) $rowCount);
       $this->set(CRM_Utils_Pager::PAGE_ID, $pageId);
     }
-    $this->_limit = ($pageId - 1) * self::ROW_COUNT_LIMIT;
+    $this->_limit = ($pageId - 1) * $rowCount;
   }
 
   /**
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     $params = [
       'total' => $this->_rowsFound,
-      'rowCount' => self::ROW_COUNT_LIMIT,
+      'rowCount' => $rowCount,
       'status' => ts('Records %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',
@@ -297,7 +298,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $numRows = $this->_limit;
 
       if (CRM_Utils_Array::value('id_op', $this->_params, 'in') == 'in' || $noSelection) {
-        while ($count < self::ROW_COUNT_LIMIT) {
+        while ($count < $rowCount) {
           if (!isset($this->_params['id_value'][$numRows])) {
             break;
           }

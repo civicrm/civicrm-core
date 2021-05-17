@@ -13,6 +13,9 @@
  * Class CRM_Report_Form
  */
 class CRM_Report_Form extends CRM_Core_Form {
+  /**
+   * Deprecated constant, Reports should be updated to use the getRowCount function.
+   */
   const ROW_COUNT_LIMIT = 50;
 
   /**
@@ -36,6 +39,12 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var int
    */
   protected $_id;
+
+  /**
+   * The Number of rows to display on screen
+   * @var int
+   */
+  protected $_rowCount;
 
   /**
    * The id of the report template
@@ -519,10 +528,28 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $optimisedForOnlyFullGroupBy = TRUE;
 
   /**
+   * Get the number of rows to show
+   * @return int
+   */
+  public function getRowCount(): int {
+    return $this->_rowCount;
+  }
+
+  /**
+   * set the number of rows to show
+   * @param $rowCount int
+   */
+  public function setRowCount($rowCount): void {
+    $this->_rowCount = $rowCount;
+  }
+
+  /**
    * Class constructor.
    */
   public function __construct() {
     parent::__construct();
+
+    $this->setRowCount(\Civi::settings()->get('default_pager_size'));
 
     $this->addClass('crm-report-form');
 
@@ -2409,7 +2436,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
 
     $this->moveSummaryColumnsToTheRightHandSide();
 
-    if ($this->_limit && count($rows) >= self::ROW_COUNT_LIMIT) {
+    if ($this->_limit && count($rows) >= $this->getRowCount()) {
       return FALSE;
     }
 
@@ -3576,11 +3603,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * Set limit.
    *
-   * @param int $rowCount
+   * @param int|null $rowCount
    *
    * @return array
    */
-  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     // lets do the pager if in html mode
     $this->_limit = NULL;
 
@@ -3628,9 +3656,10 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
   /**
    * Set pager.
    *
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     // CRM-14115, over-ride row count if rowCount is specified in URL
     if ($this->_dashBoardRowCount) {
       $rowCount = $this->_dashBoardRowCount;

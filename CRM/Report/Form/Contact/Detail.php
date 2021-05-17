@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
-  const ROW_COUNT_LIMIT = 10;
 
   protected $_summary = NULL;
 
@@ -364,6 +363,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
+    $this->setRowCount(10);
   }
 
   public function preProcess() {
@@ -805,17 +805,19 @@ HERESQL;
 
   /**
    * Override to set limit is 10
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function limit($rowCount = self::ROW_COUNT_LIMIT) {
+  public function limit($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     parent::limit($rowCount);
   }
 
   /**
    * Override to set pager with limit is 10
-   * @param int $rowCount
+   * @param int|null $rowCount
    */
-  public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
+  public function setPager($rowCount = NULL) {
+    $rowCount = $rowCount ?? $this->getRowCount();
     parent::setPager($rowCount);
   }
 
