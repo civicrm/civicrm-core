@@ -153,11 +153,13 @@ class PropertyBag implements \ArrayAccess {
     }
     catch (InvalidArgumentException $e) {
 
-      CRM_Core_Error::deprecatedFunctionWarning(
-        "proper getCustomProperty('$offset') for non-core properties. "
-        . $e->getMessage(),
-        "PropertyBag array access to get '$offset'"
-      );
+      if (!$this->getSuppressLegacyWarnings()) {
+        CRM_Core_Error::deprecatedFunctionWarning(
+          "proper getCustomProperty('$offset') for non-core properties. "
+          . $e->getMessage(),
+          "PropertyBag array access to get '$offset'"
+        );
+      }
 
       try {
         return $this->getCustomProperty($offset, 'default');
@@ -172,10 +174,12 @@ class PropertyBag implements \ArrayAccess {
       }
     }
 
-    CRM_Core_Error::deprecatedFunctionWarning(
-      "get" . ucfirst($offset) . "()",
-      "PropertyBag array access for core property '$offset'"
-    );
+    if (!$this->getSuppressLegacyWarnings()) {
+      CRM_Core_Error::deprecatedFunctionWarning(
+        "get" . ucfirst($offset) . "()",
+        "PropertyBag array access for core property '$offset'"
+      );
+    }
     return $this->get($prop, 'default');
   }
 
@@ -265,7 +269,7 @@ class PropertyBag implements \ArrayAccess {
       throw new \InvalidArgumentException("Unknown property '$prop'.");
     }
     // Remaining case is legacy name that's been translated.
-    if (!$this->suppressLegacyWarnings) {
+    if (!$this->getSuppressLegacyWarnings()) {
       CRM_Core_Error::deprecatedFunctionWarning("Canonical property name '$newName'", "Legacy property name '$prop'");
     }
 
@@ -341,13 +345,14 @@ class PropertyBag implements \ArrayAccess {
     // Suppress legacy warnings for merging an array of data as this
     // suits our migration plan at this moment. Future behaviour may differ.
     // @see https://github.com/civicrm/civicrm-core/pull/17643
-    $this->suppressLegacyWarnings = TRUE;
+    $suppressLegacyWarnings = $this->getSuppressLegacyWarnings();
+    $this->setSuppressLegacyWarnings(TRUE);
     foreach ($data as $key => $value) {
       if ($value !== NULL && $value !== '') {
         $this->offsetSet($key, $value);
       }
     }
-    $this->suppressLegacyWarnings = FALSE;
+    $this->setSuppressLegacyWarnings($suppressLegacyWarnings);
   }
 
   /**
