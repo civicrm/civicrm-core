@@ -261,6 +261,17 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    * @return null
    */
   public function edit() {
+    // We're trying to edit existing memberships or create a new one so we'll first check that a membership
+    // type is configured and active, if we don't do this we instead show a permissions error and status bounce.
+    $membershipTypes = \Civi\Api4\MembershipType::get(TRUE)
+      ->addWhere('is_active', '=', TRUE)
+      // we only need one, more is great but a single result lets us proceed!
+      ->setLimit(1)
+      ->execute();
+    if (empty($membershipTypes)) {
+      CRM_Core_Error::statusBounce(ts('You do not appear to have any active membership types configured, please add an active membership type and try again.'));
+    }
+
     // set https for offline cc transaction
     $mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
     if ($mode == 'test' || $mode == 'live') {
