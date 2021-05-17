@@ -888,7 +888,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * @param array $record
    *
-   * @return $this
+   * @return static
    * @throws \CRM_Core_Exception
    */
   public static function writeRecord(array $record): CRM_Core_DAO {
@@ -909,11 +909,26 @@ class CRM_Core_DAO extends DB_DataObject {
   }
 
   /**
+   * Bulk save multiple records
+   *
+   * @param array[] $records
+   * @return static[]
+   * @throws CRM_Core_Exception
+   */
+  public static function writeRecords(array $records) {
+    $results = [];
+    foreach ($records as $record) {
+      $results[] = static::writeRecord($record);
+    }
+    return $results;
+  }
+
+  /**
    * Delete a record from supplied params.
    *
    * @param array $record
    *   'id' is required.
-   * @return CRM_Core_DAO
+   * @return static
    * @throws CRM_Core_Exception
    */
   public static function deleteRecord(array $record) {
@@ -935,6 +950,21 @@ class CRM_Core_DAO extends DB_DataObject {
     CRM_Utils_Hook::post('delete', $entityName, $record['id'], $instance);
 
     return $instance;
+  }
+
+  /**
+   * Bulk delete multiple records.
+   *
+   * @param array[] $records
+   * @return static[]
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecords(array $records) {
+    $results = [];
+    foreach ($records as $record) {
+      $results[] = static::deleteRecord($record);
+    }
+    return $results;
   }
 
   /**

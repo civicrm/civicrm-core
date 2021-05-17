@@ -71,9 +71,8 @@ class DAODeleteAction extends AbstractBatchAction {
       }
     }
     else {
-      foreach ($items as $item) {
-        $baoName::deleteRecord($item);
-        $ids[] = ['id' => $item['id']];
+      foreach ($baoName::deleteRecords($items) as $instance) {
+        $ids[] = ['id' => $instance->id];
       }
     }
     return $ids;
