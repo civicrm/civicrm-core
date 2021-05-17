@@ -52,7 +52,7 @@
     <type>varchar</type>
     <title>Custom Field Name</title>
     <length>64</length>
-    <comment>Variable name/programmatic handle for this group.</comment>
+    <comment>Variable name/programmatic handle for this field.</comment>
     <add>3.3</add>
   </field>
   <field>
