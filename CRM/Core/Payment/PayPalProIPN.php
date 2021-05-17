@@ -263,7 +263,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
           $input['contribution_status_id'] = $contributionStatuses['Completed'];
           $input['invoice_id'] = md5(uniqid(rand(), TRUE));
           $input['original_contribution_id'] = $ids['contribution'];
-          $input['contribution_recur_id'] = $ids['contributionRecur'];
+          $input['contribution_recur_id'] = $this->getContributionRecurID();
 
           civicrm_api3('Contribution', 'repeattransaction', $input);
           return;
@@ -307,15 +307,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
     $contribution->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
-    $this->single($input, [
-      'participant' => $ids['participant'] ?? NULL,
-      'contributionRecur' => $recur->id ?? NULL,
-    ], $contribution, TRUE, $first);
+    $this->single($input, $contribution, TRUE, $first);
   }
 
   /**
    * @param array $input
-   * @param array $ids
    * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $recur
    * @param bool $first
@@ -326,7 +322,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function single($input, $ids, $contribution, $recur = FALSE, $first = FALSE) {
+  public function single($input, $contribution, $recur = FALSE, $first = FALSE) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if ((!$recur) || ($recur && $first)) {
@@ -385,7 +381,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $ids['contributionRecur'] ?? NULL, $contribution->id ?? NULL);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $this->getContributionRecurID(), $contribution->id ?? NULL);
   }
 
   /**
@@ -454,7 +450,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         $ids['onbehalf_dupe_alert'] = self::retrieve('onBehalfDupeAlert', 'Integer', 'GET', FALSE);
       }
 
-      if (!$ids['membership'] && $ids['contributionRecur']) {
+      if (!$ids['membership'] && $this->getContributionRecurID()) {
         $sql = "
     SELECT m.id
       FROM civicrm_membership m
@@ -463,7 +459,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
      LIMIT 1";
         $sqlParams = [
           1 => [$ids['contribution'], 'Integer'],
-          2 => [$ids['contributionRecur'], 'Integer'],
+          2 => [$this->getContributionRecurID(), 'Integer'],
         ];
         if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
           $ids['membership'] = $membershipId;
@@ -519,10 +515,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         return;
       }
 
-      $this->single($input, [
-        'participant' => $ids['participant'] ?? NULL,
-        'contributionRecur' => $ids['contributionRecur'] ?? NULL,
-      ], $contribution, FALSE, FALSE);
+      $this->single($input, $contribution, FALSE, FALSE);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage() . ' input {input}', ['input' => $input]);
