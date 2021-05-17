@@ -41,14 +41,29 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    * This function sends request and receives response from
    * PayJunction payment process
    *
-   * @param array $params
-   *   Assoc array of input parameters for this transaction.
+   * @param array|PropertyBag $params
+   *
+   * @param string $component
    *
    * @return array
-   *   the result in an nice formatted array (or an error object)
+   *   Result array (containing at least the key payment_status_id)
+   *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doDirectPayment(&$params) {
+  public function doPayment(&$params, $component = 'contribute') {
+    $propertyBag = \Civi\Payment\PropertyBag::cast($params);
+    $this->_component = $component;
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
+
+    // If we have a $0 amount, skip call to processor and set payment_status to Completed.
+    // Conceivably a processor might override this - perhaps for setting up a token - but we don't
+    // have an example of that at the moment.
+    if ($propertyBag->getAmount() == 0) {
+      $result['payment_status_id'] = array_search('Completed', $statuses);
+      $result['payment_status'] = 'Completed';
+      return $result;
+    }
+
     $logon = $this->_paymentProcessor['user_name'];
     $password = $this->_paymentProcessor['password'];
     $url_site = $this->_paymentProcessor['url_site'];
@@ -151,6 +166,8 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
     // Success
     $params['trxn_result_code'] = $pjpgResponse['dc_response_code'];
     $params['trxn_id'] = $pjpgResponse['dc_transaction_id'];
+    $params['payment_status_id'] = array_search('Completed', $statuses);
+    $params['payment_status'] = 'Completed';
 
     return $params;
   }
