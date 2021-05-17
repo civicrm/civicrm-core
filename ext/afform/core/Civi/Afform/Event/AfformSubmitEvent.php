@@ -55,12 +55,36 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param string $entityName
    * @param array $entityIds
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $values, string $entityType, string $entityName, array $entityIds) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $values, string $entityType, string $entityName, array &$entityIds) {
     parent::__construct($afform, $formDataModel, $apiRequest);
     $this->values = $values;
     $this->entityType = $entityType;
     $this->entityName = $entityName;
     $this->entityIds = $entityIds;
+  }
+
+  /**
+   * Set the entity type associated with this event
+   * @param string $entityType
+   */
+  public function setEntityType(string $entityType): void {
+    $this->entityType = $entityType;
+  }
+
+  /**
+   * Set the values associated with this event
+   * @param array $values
+   */
+  public function setValues(array $values): void {
+    $this->values = $values;
+  }
+
+  /**
+   * Set the entity name associated with this event
+   * @param string $entityName
+   */
+  public function setEntityName(string $entityName): void {
+    $this->entityName = $entityName;
   }
 
 }

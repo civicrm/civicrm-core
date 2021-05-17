@@ -20,9 +20,10 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
-    $entityValues = $entityIds = [];
+    $entityValues = $entityIds = $entityMapping = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityIds[$entityName] = NULL;
+      $entityMapping[$entityName] = $entity['type'];
       foreach ($this->values[$entityName] ?? [] as $values) {
         $entityValues[$entity['type']][$entityName][] = $values + ['fields' => []];
         // Predetermined values override submitted values
@@ -33,13 +34,27 @@ class Submit extends AbstractProcessor {
         }
       }
     }
-    $entityWeights = \CRM_Afform_Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
+    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
+    $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, [], '', '', $entityIds);
     foreach ($entityWeights as $entity => $weight) {
-      $values = $entityValues[$entityMapping[$entity]][$entity];
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $values, $entityMapping[$entity], $entity, $entityIds);
-      \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
+      $eValues = $entityValues[$entityMapping[$entity]][$entity];
+      // Replace Entity reference fields that reference other form based entities with their created ids.
+      foreach ($eValues as $key => $record) {
+        foreach ($record as $k => $v) {
+          foreach ($v as $field => $value) {
+            if (array_key_exists($value, $event->entityIds) && !empty($event->entityIds[$value])) {
+              $eValues[$key][$k][$field] = $event->entityIds[$value];
+            }
+          }
+        }
+        $event->setValues($eValues[$key]);
+        $event->setEntityName($entity);
+        $event->setEntityType($entityMapping[$entity]);
+        \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
+      }
+      unset($entityValues[$entityMapping[$entity]][$entity]);
     }
-    foreach ($event->entityValues as $entityType => $entities) {
+    foreach ($entityValues as $entityType => $entities) {
       if (!empty($entities)) {
         throw new \API_Exception(sprintf("Failed to process entities (type=%s; name=%s)", $entityType, implode(',', array_keys($entities))));
       }
@@ -76,15 +91,9 @@ class Submit extends AbstractProcessor {
     }
     $entityName = $event->entityName;
     $api4 = $event->formDataModel->getSecureApi4($event->entityName);
-    // Replace Entity reference fields that reference other form based entities with their created ids.
-    foreach ($record['fields'] as $field => $value) {
-      if (array_key_exists($value, $event->entityIds) && !empty($event->entityIds[$value])) {
-        $record['fields'][$field] = $event->entityIds[$value];
-      }
-    }
-    $saved = $api4($entityType, 'save', ['records' => [$event->values['fields']]])->first();
+    $saved = $api4($event->entityType, 'save', ['records' => [$event->values['fields']]])->first();
     $event->entityIds[$entityName] = $saved['id'];
-    self::saveJoins($entityType, $saved['id'], $event->values['joins'] ?? []);
+    self::saveJoins($event->entityType, $saved['id'], $event->values['joins'] ?? []);
   }
 
   protected static function saveJoins($mainEntityName, $entityId, $joins) {

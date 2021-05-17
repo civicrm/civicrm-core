@@ -10,29 +10,33 @@
  +--------------------------------------------------------------------+
  */
 
+namespace Civi\Afform;
+
 /**
  *
- * @package CRM
+ * @package Civi\Afform
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Afform_Utils {
+class Utils {
 
-  public static function getEntityWeights($formEntities,  $entityValues) {
+  public static function getEntityWeights($formEntities, $entityValues) {
     $entityWeights = $entityMapping = $entitiesToBeProcessed = [];
     foreach ($formEntities as $entityName => $entity) {
       $entityWeights[$entityName] = 1;
       $entityMapping[$entityName] = $entity['type'];
-      foreach ($entityValues[$entity['type']][$entityName] as $index => $vals) {
-        foreach ($vals as $field => $value) {
-          if (array_key_exists($value, $entityWeights)) {
-            $entityWeights[$entityName] = max((int) $entityWeights[$entityName], (int) ($entityWeights[$value] + 1));
-          }
-          else {
-            if (!array_key_exists($value, $entitiesToBeProcessed)) {
-              $entitiesToBeProcessed[$value] = [$entityName];
+      foreach ($entityValues[$entity['type']][$entityName] as $record) {
+        foreach ($record as $index => $vals) {
+          foreach ($vals as $field => $value) {
+            if (array_key_exists($value, $entityWeights)) {
+              $entityWeights[$entityName] = max((int) $entityWeights[$entityName], (int) ($entityWeights[$value] + 1));
             }
             else {
-              $entitiesToBeProcessed[$value][] = $entityName;
+              if (!array_key_exists($value, $entitiesToBeProcessed)) {
+                $entitiesToBeProcessed[$value] = [$entityName];
+              }
+              else {
+                $entitiesToBeProcessed[$value][] = $entityName;
+              }
             }
           }
         }
