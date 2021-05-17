@@ -480,7 +480,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config->keyDisable = TRUE;
 
     $isTestMembership = 0;
-    [$MembershipRenew] = CRM_Member_BAO_Membership::processMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::legacyProcessMembership(
       $contactId,
       $this->_membershipTypeID,
       $isTestMembership,
@@ -549,7 +549,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'Database checked on membership log record.'
     );
 
-    [$MembershipRenew] = CRM_Member_BAO_Membership::processMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::legacyProcessMembership(
       $contactId,
       $this->_membershipTypeID,
       FALSE,
