@@ -185,7 +185,7 @@ if (!CRM.vars) CRM.vars = {};
 
   // Workaround for https://github.com/ivaynberg/select2/issues/1246
   $.ui.dialog.prototype._allowInteraction = function(e) {
-    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog, #civicrm-menu').length;
+    return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .cke_dialog, .ck-balloon-panel, #civicrm-menu').length;
   };
 
   // Implements jQuery hook.prop
