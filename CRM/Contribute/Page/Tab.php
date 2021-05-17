@@ -95,6 +95,87 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
   }
 
   /**
+   * Get the recur links to return for self service.
+   *
+   * These are the links to present to a logged in user wishing
+   * to service their own
+   *
+   * @param int $recurID
+   *
+   * @return array|array[]
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function selfServiceRecurLinks(int $recurID): array {
+    $links = [];
+    $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
+    if ($paymentProcessorObj->supports('cancelRecurring')
+      && $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'cancel')
+    ) {
+      $url = $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'cancel');
+      $links[CRM_Core_Action::DISABLE] = [
+        'url' => $url,
+        'name' => ts('Cancel'),
+        'title' => ts('Cancel'),
+        // Only display on-site links in a popup.
+        'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+      ];
+    }
+
+    if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')
+      && $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'billing')
+    ) {
+      $url = $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'billing');
+      $links[CRM_Core_Action::RENEW] = [
+        'name' => ts('Change Billing Details'),
+        'title' => ts('Change Billing Details'),
+        'url' => $url,
+        // Only display on-site links in a popup.
+        'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+      ];
+    }
+
+    if (($paymentProcessorObj->supports('ChangeSubscriptionAmount')
+    || $paymentProcessorObj->supports('EditRecurringContribution'))
+    && $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'update')
+    ) {
+      $url = $paymentProcessorObj->subscriptionURL($recurID, 'recur', 'update');
+      $links[CRM_Core_Action::UPDATE] = [
+        'name' => ts('Edit'),
+        'title' => ts('Edit Recurring Payment'),
+        'url' => $url,
+        // Only display on-site links in a popup.
+        'class' => (stripos($url, 'http') !== FALSE) ? 'no-popup' : '',
+      ];
+    }
+    return $links;
+  }
+
+  /**
+   * Get recurring links appropriate to viewing a user dashboard.
+   *
+   * A contact should be able to see links appropriate to them (e.g
+   * payment processor cancel page) if viewing their own dashboard and
+   * links appropriate to the contact they are viewing, if they have
+   * permission, if viewing another user.
+   *
+   * @param int $recurID
+   * @param int $contactID
+   *
+   * @return array|array[]
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function dashboardRecurLinks(int $recurID, int $contactID): array {
+    $links = [];
+    if ($contactID && $contactID === CRM_Core_Session::getLoggedInContactID()) {
+      $links = self::selfServiceRecurLinks($recurID);
+    }
+    $links += self::recurLinks($recurID, 'dashboard');
+    return $links;
+  }
+
+  /**
    * called when action is browse.
    *
    */

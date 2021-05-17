@@ -125,7 +125,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
       }
 
       $recurringContribution['action'] = CRM_Core_Action::formLink(
-        CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution'),
+        CRM_Contribute_Page_Tab::recurLinks($recurID),
         $action,
         [
           'cid' => $this->contactID,
