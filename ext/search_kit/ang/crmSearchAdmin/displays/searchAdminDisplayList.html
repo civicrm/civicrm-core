@@ -12,12 +12,20 @@
         {{ symbol.label }}
       </option>
     </select>
-  <div class="form-inline">
   </div>
-    <label for="crm-search-admin-display-limit">{{:: ts('Results to display (0 for no limit):') }}</label>
-    <input id="crm-search-admin-display-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
+  <div class="form-inline">
     <div class="checkbox-inline form-control">
-      <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> <span>{{:: ts('Use Pager') }}</span></label>
+      <label>
+        <input type="checkbox" ng-checked="$ctrl.display.settings.limit" ng-click="$ctrl.parent.toggleLimit()">
+        <span>{{:: ts('Limit Results') }}</span>
+      </label>
+      <input id="crm-search-admin-display-limit" ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
+    </div>
+    <div class="checkbox-inline form-control">
+      <label ng-class="{disabled: !$ctrl.display.settings.limit}">
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager" ng-disabled="!$ctrl.display.settings.limit">
+        <span>{{:: ts('Use Pager') }}</span>
+      </label>
     </div>
   </div>
 </fieldset>

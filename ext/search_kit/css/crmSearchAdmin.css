@@ -134,6 +134,12 @@
 #bootstrap-theme.crm-search input[type=number] {
   width: 90px;
 }
+/* For display.settings.limit field */
+#bootstrap-theme.crm-search .checkbox-inline.form-control input[type=number] {
+  position: relative;
+  top: -5px;
+  right: -9px;
+}
 
 #bootstrap-theme.crm-search .api4-add-where-group-menu {
   min-width: 80px;
