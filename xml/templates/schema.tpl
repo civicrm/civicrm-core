@@ -10,7 +10,7 @@
 -- {$generated}
 -- {$database.comment}
 
-{include file="drop.tpl"}
+{include file="drop.tpl" no_license=TRUE}
 
 -- /*******************************************************
 -- *
