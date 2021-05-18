@@ -7,7 +7,7 @@
 <li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
   <a href ng-click="selectTab('group')" ng-disabled="!$ctrl.groupExists">
     <i class="crm-i fa-users"></i>
-    {{:: ts('Smart Group:') }} {{ $ctrl.savedSearch.groups[0].title }}
+    {{:: ts('Smart Group') }} {{ $ctrl.savedSearch.groups[0].title }}
   </a>
   <button type="button" class="btn-xs btn-danger-outline crm-search-delete-display" ng-click="$ctrl.removeGroup()" title="{{ $ctrl.groupExists ? ts('Delete') : ts('Undelete') }}">
     <i class="crm-i fa-{{ $ctrl.groupExists ? 'trash' : 'undo' }}"></i>
@@ -33,7 +33,7 @@
         {{:: ts('Smart Group') }}
       </a>
     </li>
-    <li class="dropdown-header">{{ ts('Display:') }}</li>
+    <li class="dropdown-header">{{ ts('Display') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
       <a href ng-click="$ctrl.addDisplay(type.id)">
         <i class="crm-i {{:: type.icon }}"></i>

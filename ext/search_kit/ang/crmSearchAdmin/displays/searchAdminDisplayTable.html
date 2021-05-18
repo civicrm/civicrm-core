@@ -31,14 +31,14 @@
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
       <div class="form-inline crm-search-admin-flex-row">
-        <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header:') }}</label>
+        <label for="crm-search-admin-edit-col-{{ $index }}">{{:: ts('Header') }}</label>
         <input id="crm-search-admin-edit-col-{{ $index }}" class="form-control crm-flex-1" type="text" ng-model="col.label" >
         <button type="button" class="btn-xs" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
           <i class="crm-i fa-ban"></i>
         </button>
       </div>
       <div class="form-inline">
-        <label>{{:: ts('Alignment:') }}</label>
+        <label>{{:: ts('Alignment') }}</label>
         <select ng-model="col.alignment" class="form-control">
           <option value="">{{:: ts('Left') }}</option>
           <option value="text-center">{{:: ts('Center') }}</option>
