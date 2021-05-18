@@ -3735,7 +3735,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @return bool
    * @see CRM_Core_DAO::checkAccess
    */
-  public static function _checkAccess(string $action, array $record, $userID) {
+  public static function _checkAccess(string $action, array $record, $userID): bool {
     switch ($action) {
       case 'create':
         return CRM_Core_Permission::check('add contacts', $userID);

@@ -27,7 +27,7 @@ trait CRM_Core_DynamicFKAccessTrait {
    * @return bool
    * @see CRM_Core_DAO::checkAccess
    */
-  public static function _checkAccess(string $action, array $record, $userID) {
+  public static function _checkAccess(string $action, array $record, $userID): bool {
     $eid = $record['entity_id'] ?? NULL;
     $table = $record['entity_table'] ?? NULL;
     if (!$eid && !empty($record['id'])) {
@@ -40,6 +40,7 @@ trait CRM_Core_DynamicFKAccessTrait {
       $bao = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
       return $bao::checkAccess(CRM_Core_Permission::EDIT, ['id' => $eid], $userID);
     }
+    return TRUE;
   }
 
 }
