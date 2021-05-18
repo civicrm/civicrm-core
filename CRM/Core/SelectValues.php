@@ -587,7 +587,7 @@ class CRM_Core_SelectValues {
       //'{contribution.address_id}' => ts('Address ID'),
       '{contribution.check_number}' => ts('Check Number'),
       '{contribution.campaign}' => ts('Contribution Campaign'),
-    ], CRM_Utils_Token::getCustomFieldTokens('contribution', TRUE));
+    ], CRM_Utils_Token::getCustomFieldTokens('Contribution', TRUE));
   }
 
   /**
