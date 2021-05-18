@@ -21,6 +21,8 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   // TODO Native implementation
   use CRM_Utils_Cache_NaiveHasTrait;
 
+  use CRM_Utils_Cache_SerializationTrait;
+
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
 
@@ -74,7 +76,7 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
 
     $ttl = CRM_Utils_Date::convertCacheTtl($ttl, $this->_timeout);
     $expires = time() + $ttl;
-    if (!apc_store($this->_prefix . $key, ['e' => $expires, 'v' => $value], $ttl)) {
+    if (!apc_store($this->_prefix . $key, ['e' => $expires, 's' => $this->serialize($value)], $ttl)) {
       return FALSE;
     }
     return TRUE;
@@ -90,7 +92,10 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
     CRM_Utils_Cache::assertValidKey($key);
     $result = apc_fetch($this->_prefix . $key, $success);
     if ($success && isset($result['e']) && $result['e'] > time()) {
-      return $this->reobjectify($result['v']);
+      // Old format: 'v' is a reference to the cached value
+      // New format: 's' is a serialized representation of the value
+      // Supporting both formats should avoid upgrade oddities.
+      return isset($result['s']) ? $this->unserialize($result['s']) : $this->reobjectify($result['v']);
     }
     return $default;
   }

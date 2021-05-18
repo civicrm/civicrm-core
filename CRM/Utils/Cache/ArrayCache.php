@@ -24,6 +24,8 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
   // TODO Native implementation
   use CRM_Utils_Cache_NaiveHasTrait;
 
+  use CRM_Utils_Cache_SerializationTrait;
+
   const DEFAULT_TIMEOUT = 3600;
 
   /**
@@ -56,7 +58,7 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
    */
   public function set($key, $value, $ttl = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
-    $this->_cache[$key] = $this->reobjectify($value);
+    $this->_cache[$key] = $this->serialize($value);
     $this->_expires[$key] = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TIMEOUT);
     return TRUE;
   }
@@ -74,7 +76,7 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
       return $default;
     }
     if (array_key_exists($key, $this->_cache)) {
-      return $this->reobjectify($this->_cache[$key]);
+      return $this->unserialize($this->_cache[$key]);
     }
     return $default;
   }
@@ -101,20 +103,6 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
 
   public function clear() {
     return $this->flush();
-  }
-
-  private function reobjectify($value) {
-    if (is_object($value)) {
-      return unserialize(serialize($value));
-    }
-    if (is_array($value)) {
-      foreach ($value as $p) {
-        if (is_object($p)) {
-          return unserialize(serialize($value));
-        }
-      }
-    }
-    return $value;
   }
 
   /**

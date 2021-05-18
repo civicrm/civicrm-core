@@ -201,7 +201,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @return string
    */
   public static function encode($mixed) {
-    return base64_encode(serialize($mixed));
+    return base64_encode($mixed);
   }
 
   /**
@@ -214,10 +214,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     // Upgrade support -- old records (serialize) always have this punctuation,
     // and new records (base64) never do.
     if (strpos($string, ':') !== FALSE || strpos($string, ';') !== FALSE) {
-      return unserialize($string);
+      return $string;
     }
     else {
-      return unserialize(base64_decode($string));
+      return base64_decode($string);
     }
   }
 

@@ -19,6 +19,8 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
   // TODO Consider native implementation.
   use CRM_Utils_Cache_NaiveMultipleTrait;
 
+  use CRM_Utils_Cache_SerializationTrait;
+
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
   const DEFAULT_TIMEOUT = 3600;
@@ -125,7 +127,7 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, $this->_timeout);
 
     $key = $this->cleanKey($key);
-    if (!$this->_cache->set($key, serialize($value), $expires)) {
+    if (!$this->_cache->set($key, $this->serialize($value), $expires)) {
       if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
         throw new CRM_Utils_Cache_CacheException("Memcached::set($key) failed: " . $this->_cache->getResultMessage());
       }
@@ -151,7 +153,7 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     $result = $this->_cache->get($key);
     switch ($this->_cache->getResultCode()) {
       case Memcached::RES_SUCCESS:
-        return unserialize($result);
+        return $this->unserialize($result);
 
       case Memcached::RES_NOTFOUND:
         return $default;

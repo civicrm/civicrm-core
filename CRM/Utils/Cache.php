@@ -160,9 +160,11 @@ class CRM_Utils_Cache {
    *      If this is a short-lived process in which TTL's don't matter, you might
    *      use 'fast' mode. It sacrifices some PSR-16 compliance and cache-coherency
    *      protections to improve performance.
+   *   - withCrypto: string|null, the name of a crypto-key/tag to use for encrypting values.
    * @return CRM_Utils_Cache_Interface
    * @throws CRM_Core_Exception
    * @see Civi::cache()
+   * @see \Civi\Crypto\CryptoRegistry
    */
   public static function create($params = []) {
     $types = (array) $params['type'];
@@ -171,6 +173,29 @@ class CRM_Utils_Cache {
       $params['name'] = self::cleanKey($params['name']);
     }
 
+    $applyCrypto = function ($cache) use ($params) {
+      if (!isset($params['withCrypto'])) {
+        return $cache;
+      }
+
+      if (!is_callable([$cache, 'useSerializer'])) {
+        throw new CRM_Core_Exception(sprintf("Cache based on %s is not compatible with encryption.", get_class($cache)));
+      }
+
+      $tag = $params['withCrypto'];
+      if ($tag !== NULL && $tag !== FALSE) {
+        $cache->useSerializer(
+          function($data) use ($tag) {
+            return Civi::service('crypto.token')->encrypt(serialize($data), $tag);
+          },
+          function($data) use ($tag) {
+            return unserialize(Civi::service('crypto.token')->decrypt($data, $tag));
+          }
+        );
+      }
+      return $cache;
+    };
+
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
@@ -178,7 +203,7 @@ class CRM_Utils_Cache {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
             $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
-            $cache = new $dbCacheClass($settings);
+            $cache = $applyCrypto(new $dbCacheClass($settings));
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
             }
@@ -188,16 +213,16 @@ class CRM_Utils_Cache {
 
         case 'SqlGroup':
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
-            return new CRM_Utils_Cache_SqlGroup([
+            return $applyCrypto(new CRM_Utils_Cache_SqlGroup([
               'group' => $params['name'],
               'prefetch' => $params['prefetch'] ?? FALSE,
-            ]);
+            ]));
           }
           break;
 
         case 'Arraycache':
         case 'ArrayCache':
-          return new CRM_Utils_Cache_ArrayCache([]);
+          return $applyCrypto(new CRM_Utils_Cache_ArrayCache([]));
 
       }
     }
