@@ -37,15 +37,31 @@
   <table>
     <thead>
     <tr>
-      <th>{{:: ts('Title') }}</th>
-      <th>{{:: ts('Name') }}</th>
-      <th>{{:: ts('Page') }}</th>
-      <th>{{:: ts('Placement') }}</th>
+      <th ng-click="$ctrl.sortBy('title')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'title'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'title'"></i>
+        {{:: ts('Title') }}
+      </th>
+      <th ng-click="$ctrl.sortBy('name')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'name'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'name'"></i>
+        {{:: ts('Name') }}
+      </th>
+      <th ng-click="$ctrl.sortBy('server_route')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'server_route'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'server_route'"></i>
+        {{:: ts('Page') }}
+      </th>
+      <th ng-click="$ctrl.sortBy('placement.length')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'placement.length'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'"></i>
+        {{:: ts('Placement') }}
+      </th>
       <th></th>
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="afform in $ctrl.afforms[$ctrl.tab] | filter:$ctrl.searchAfformList">
+    <tr ng-repeat="afform in $ctrl.afforms[$ctrl.tab] | filter:$ctrl.searchAfformList | orderBy:$ctrl.sortField:$ctrl.sortDir">
       <td>{{ afform.title }}</td>
       <td>
         <code>{{ afform.name }}</code>

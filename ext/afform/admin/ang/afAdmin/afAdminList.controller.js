@@ -4,6 +4,8 @@
   angular.module('afAdmin').controller('afAdminList', function($scope, afforms, crmApi4, crmStatus) {
     var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
       ctrl = $scope.$ctrl = this;
+    this.sortField = 'title';
+    this.sortDir = false;
 
     $scope.crmUrl = CRM.url;
 
@@ -33,6 +35,12 @@
       afforms[afform.type] = afforms[afform.type] || [];
       afforms[afform.type].push(afform);
     }, {});
+
+    // Change sort field/direction when clicking a column header
+    this.sortBy = function(col) {
+      ctrl.sortDir = ctrl.sortField === col ? !ctrl.sortDir : false;
+      ctrl.sortField = col;
+    };
 
     $scope.$bindToRoute({
       expr: '$ctrl.tab',
