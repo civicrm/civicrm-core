@@ -1852,7 +1852,7 @@ class CRM_Utils_Token {
    */
   public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {
     $customTokens = [];
-    $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
+    $tokenName = $usedForTokenWidget ? '{' . strtolower($entity) . '.custom_%d}' : 'custom_%d';
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
       $customTokens[sprintf($tokenName, $id)] = $info['label'];
     }
