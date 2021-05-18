@@ -27,13 +27,6 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
    */
   protected $b;
 
-  protected function tearDown(): void {
-    if (function_exists('timecop_return')) {
-      timecop_return();
-    }
-    parent::tearDown();
-  }
-
   public function createSimpleCache($maxTimeouts = [86400]) {
     return new CRM_Utils_Cache_Tiered([
       $this->a = CRM_Utils_Cache::create([
@@ -170,7 +163,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertApproxEquals(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertApproxEquals($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
-    function_exists('timecop_return') ? timecop_travel(time() + self::TOLERANCE) : sleep(self::TOLERANCE);
+    sleep(self::TOLERANCE);
 
     $this->assertEquals('bar', $this->cache->get('foo'));
     $this->assertApproxEquals($start + 100 + self::TOLERANCE, $this->a->getExpires('foo'), self::TOLERANCE);
