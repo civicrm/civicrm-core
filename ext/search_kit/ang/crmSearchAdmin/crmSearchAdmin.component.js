@@ -13,7 +13,7 @@
       this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
 
       this.selectedRows = [];
-      this.limit = CRM.cache.get('searchPageSize', 30);
+      this.limit = CRM.crmSearchAdmin.defaultPagerSize;
       this.page = 1;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
       // After a search this.results is an object of result arrays keyed by page,
@@ -569,8 +569,6 @@
       $scope.onChangeLimit = function() {
         // Refresh only if search has already been run
         if (ctrl.autoSearch || ctrl.results) {
-          // Save page size in localStorage
-          CRM.cache.set('searchPageSize', ctrl.limit);
           ctrl.refreshAll();
         }
       };
