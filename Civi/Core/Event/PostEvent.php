@@ -18,17 +18,6 @@ namespace Civi\Core\Event;
 class PostEvent extends GenericHookEvent {
 
   /**
-   * This adapter automatically emits a narrower event.
-   *
-   * For example, `hook_civicrm_pre(Contact, ...)` will also dispatch `hook_civicrm_pre::Contact`.
-   *
-   * @param \Civi\Core\Event\PostEvent $event
-   */
-  public static function dispatchSubevent(PostEvent $event) {
-    \Civi::dispatcher()->dispatch("hook_civicrm_post::" . $event->entity, $event);
-  }
-
-  /**
    * One of: 'create'|'edit'|'delete'
    *
    * @var string

@@ -18,17 +18,6 @@ namespace Civi\Core\Event;
 class PreEvent extends GenericHookEvent {
 
   /**
-   * This adapter automatically emits a narrower event.
-   *
-   * For example, `hook_civicrm_pre(Contact, ...)` will also dispatch `hook_civicrm_pre::Contact`.
-   *
-   * @param \Civi\Core\Event\PreEvent $event
-   */
-  public static function dispatchSubevent(PreEvent $event) {
-    \Civi::dispatcher()->dispatch("hook_civicrm_pre::" . $event->entity, $event);
-  }
-
-  /**
    * One of: 'create'|'edit'|'delete'
    *
    * @var string
