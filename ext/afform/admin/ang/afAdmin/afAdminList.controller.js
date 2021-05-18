@@ -22,6 +22,14 @@
 
     this.afforms = _.transform(afforms, function(afforms, afform) {
       afform.type = afform.type || 'system';
+      // Aggregate a couple fields for the "Placement" column
+      afform.placement = [];
+      if (afform.is_dashlet) {
+        afform.placement.push(ts('Dashboard'));
+      }
+      if (afform['contact_summary:label']) {
+        afform.placement.push(afform['contact_summary:label']);
+      }
       afforms[afform.type] = afforms[afform.type] || [];
       afforms[afform.type].push(afform);
     }, {});

@@ -161,6 +161,10 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'contact_summary',
           'data_type' => 'String',
+          'options' => [
+            'block' => ts('Contact Summary Block'),
+            'tab' => ts('Contact Summary Tab'),
+          ],
         ],
         [
           'name' => 'repeat',
