@@ -32,6 +32,7 @@ class Admin {
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
+      'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'afformEnabled' => $extensions->isActiveModule('afform'),
       'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
     ];

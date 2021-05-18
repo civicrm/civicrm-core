@@ -18,7 +18,7 @@
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
-            limit: 20,
+            limit: CRM.crmSearchAdmin.defaultPagerSize,
             pager: true
           };
         }

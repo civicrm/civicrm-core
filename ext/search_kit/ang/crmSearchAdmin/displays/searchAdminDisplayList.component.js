@@ -34,7 +34,7 @@
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
             style: 'ul',
-            limit: 20,
+            limit: CRM.crmSearchAdmin.defaultPagerSize,
             pager: true
           };
         }
