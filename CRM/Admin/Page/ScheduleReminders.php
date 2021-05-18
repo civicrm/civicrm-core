@@ -126,27 +126,25 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
     // Get list of configured reminders
     $reminderList = CRM_Core_BAO_ActionSchedule::getList();
 
-    if (is_array($reminderList)) {
-      // Add action links to each of the reminders
-      foreach ($reminderList as & $format) {
-        $action = array_sum(array_keys($this->links()));
-        if ($format['is_active']) {
-          $action -= CRM_Core_Action::ENABLE;
-        }
-        else {
-          $action -= CRM_Core_Action::DISABLE;
-        }
-        $format['action'] = CRM_Core_Action::formLink(
-          self::links(),
-          $action,
-          ['id' => $format['id']],
-          ts('more'),
-          FALSE,
-          'actionSchedule.manage.action',
-          'ActionSchedule',
-          $format['id']
-        );
+    // Add action links to each of the reminders
+    foreach ($reminderList as & $format) {
+      $action = array_sum(array_keys($this->links()));
+      if ($format['is_active']) {
+        $action -= CRM_Core_Action::ENABLE;
       }
+      else {
+        $action -= CRM_Core_Action::DISABLE;
+      }
+      $format['action'] = CRM_Core_Action::formLink(
+        self::links(),
+        $action,
+        ['id' => $format['id']],
+        ts('more'),
+        FALSE,
+        'actionSchedule.manage.action',
+        'ActionSchedule',
+        $format['id']
+      );
     }
 
     $this->assign('rows', $reminderList);

@@ -102,9 +102,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of Scheduled Reminders.
    *
-   * @param bool $namesOnly
-   *   Return simple list of names.
-   *
    * @param \Civi\ActionSchedule\Mapping|null $filterMapping
    *   Filter by the schedule's mapping type.
    * @param int $filterValue
@@ -114,7 +111,8 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    *   (reference)   reminder list
    * @throws \CRM_Core_Exception
    */
-  public static function &getList($namesOnly = FALSE, $filterMapping = NULL, $filterValue = NULL) {
+  public static function getList($filterMapping = NULL, $filterValue = NULL): array {
+    $list = [];
     $query = "
 SELECT
        title,

@@ -35,32 +35,30 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
       'id' => ($this->_isTemplate ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
     ]));
-    $reminderList = CRM_Core_BAO_ActionSchedule::getList(FALSE, $mapping, $this->_id);
-    if ($reminderList && is_array($reminderList)) {
-      // Add action links to each of the reminders
-      foreach ($reminderList as & $format) {
-        $action = CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE;
-        if ($format['is_active']) {
-          $action += CRM_Core_Action::DISABLE;
-        }
-        else {
-          $action += CRM_Core_Action::ENABLE;
-        }
-        $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
-        $links = $scheduleReminder->links();
-        $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&compId={$this->_id}";
-        $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&compId={$this->_id}";
-        $format['action'] = CRM_Core_Action::formLink(
-          $links,
-          $action,
-          ['id' => $format['id']],
-          ts('more'),
-          FALSE,
-          'actionSchedule.manage.action',
-          'ActionSchedule',
-          $this->_id
-        );
+    $reminderList = CRM_Core_BAO_ActionSchedule::getList($mapping, $this->_id);
+    // Add action links to each of the reminders
+    foreach ($reminderList as & $format) {
+      $action = CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE;
+      if ($format['is_active']) {
+        $action += CRM_Core_Action::DISABLE;
       }
+      else {
+        $action += CRM_Core_Action::ENABLE;
+      }
+      $scheduleReminder = new CRM_Admin_Page_ScheduleReminders();
+      $links = $scheduleReminder->links();
+      $links[CRM_Core_Action::DELETE]['qs'] .= "&context=event&compId={$this->_id}";
+      $links[CRM_Core_Action::UPDATE]['qs'] .= "&context=event&compId={$this->_id}";
+      $format['action'] = CRM_Core_Action::formLink(
+        $links,
+        $action,
+        ['id' => $format['id']],
+        ts('more'),
+        FALSE,
+        'actionSchedule.manage.action',
+        'ActionSchedule',
+        $this->_id
+      );
     }
 
     $this->assign('rows', $reminderList);
