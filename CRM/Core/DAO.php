@@ -3043,14 +3043,16 @@ SELECT contact_id
   /**
    * Check whether action can be performed on a given record.
    *
-   * Dispatches to internal BAO function + hook_civicrm_checkAccess
+   * Dispatches to internal BAO function ('static::_checkAccess())` and `hook_civicrm_checkAccess`.
    *
    * @param string $action
-   *   Corresponds to APIv4 action names
+   *   APIv4 action name.
+   *   Ex: 'create', 'get', 'delete'
    * @param array $record
-   *   Array of all known values for the record
+   *   All (known/loaded) values of individual record being accessed.
+   *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
    * @param int $userID
-   *   User id
+   *   Contact ID of the active user (whose access we must check).
    * @param bool $granted
    *   Initial value (usually TRUE, but the API might pass FALSE if gatekeeper permissions fail)
    *

@@ -2088,9 +2088,16 @@ abstract class CRM_Utils_Hook {
    * If the contact cannot perform the action the
    *
    * @param string $entity
+   *   APIv4 entity name.
+   *   Ex: 'Contact', 'Email', 'Event'
    * @param string $action
+   *   APIv4 action name.
+   *   Ex: 'create', 'get', 'delete'
    * @param array $record
+   *   All (known/loaded) values of individual record being accessed.
+   *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
    * @param int|null $contactID
+   *   Contact ID of the active user (whose access we must check).
    * @param bool $granted
    */
   public static function checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {

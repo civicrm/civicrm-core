@@ -23,7 +23,9 @@ trait CRM_Core_DynamicFKAccessTrait {
   /**
    * @param string $action
    * @param array $record
-   * @param $userID
+   * @param int|NULL $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
    */
   public static function _checkAccess(string $action, array $record, $userID) {
     $eid = $record['entity_id'] ?? NULL;

@@ -23,7 +23,9 @@ trait CRM_Contact_AccessTrait {
   /**
    * @param string $action
    * @param array $record
-   * @param $userID
+   * @param int|NULL $userID
+   * @return bool
+   * @see CRM_Core_DAO::checkAccess
    */
   public static function _checkAccess(string $action, array $record, $userID) {
     $cid = $record['contact_id'] ?? NULL;
