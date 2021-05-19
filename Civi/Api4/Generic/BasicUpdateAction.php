@@ -58,6 +58,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
    */
   public function _run(Result $result) {
     $this->formatWriteValues($this->values);
+    $this->validateValues();
     foreach ($this->getBatchRecords() as $item) {
       $result[] = $this->writeRecord($this->values + $item);
     }

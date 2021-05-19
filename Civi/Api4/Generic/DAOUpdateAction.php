@@ -61,6 +61,7 @@ class DAOUpdateAction extends AbstractUpdateAction {
     if ($this->getSelect() === ['id'] && count($this->where) === 1 && $this->where[0][0] === 'id' && $this->where[0][1] === '=' && !empty($this->where[0][2])) {
       $this->values['id'] = $this->where[0][2];
       $items = [$this->values];
+      $this->validateValues();
       $result->exchangeArray($this->writeObjects($items));
       return;
     }
@@ -71,6 +72,7 @@ class DAOUpdateAction extends AbstractUpdateAction {
       $item = $this->values + $item;
     }
 
+    $this->validateValues();
     $result->exchangeArray($this->writeObjects($items));
   }
 
