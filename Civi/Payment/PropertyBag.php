@@ -184,13 +184,16 @@ class PropertyBag implements \ArrayAccess {
       }
     }
 
+    // These lines are here (and not in try block) because the catch must only
+    // catch the case when the prop is custom.
+    $getter = 'get' . ucfirst($prop);
     if (!$this->getSuppressLegacyWarnings()) {
       CRM_Core_Error::deprecatedFunctionWarning(
         "get" . ucfirst($offset) . "()",
         "PropertyBag array access for core property '$offset'"
       );
     }
-    return $this->get($prop, 'default');
+    return $this->$getter('default');
   }
 
   /**
@@ -753,6 +756,9 @@ class PropertyBag implements \ArrayAccess {
    * @return string
    */
   public function getDescription($label = 'default') {
+    if (!$this->has('description')) {
+      return '';
+    }
     return $this->get('description', $label);
   }
 
@@ -840,6 +846,9 @@ class PropertyBag implements \ArrayAccess {
    * @return string|null
    */
   public function getInvoiceID($label = 'default') {
+    if (!$this->has('invoiceID')) {
+      $this->set('invoiceID', $label, md5(uniqid(mt_rand(), TRUE)));
+    }
     return $this->get('invoiceID', $label);
   }
 
