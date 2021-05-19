@@ -72,4 +72,16 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
     $this->assertEquals('page-header', $bundle->get('cheese')['region']);
   }
 
+  /**
+   * Test creation of coreStyles bundle
+   */
+  public function testCoreStylesBundle() {
+    $config = CRM_Core_Config::singleton();
+    $config->customCSSURL = "http://example.com/css/custom.css";
+    $bundle = CRM_Core_Resources_Common::createStyleBundle('coreStyles');
+    $this->assertEquals('civicrm:css/civicrm.css', $bundle->get('civicrm:css/civicrm.css')['name']);
+    $this->assertEquals('civicrm:css/crm-i.css', $bundle->get('civicrm:css/crm-i.css')['name']);
+    $this->assertEquals('civicrm:css/custom.css', $bundle->get('civicrm:css/custom.css')['name']);
+  }
+
 }
