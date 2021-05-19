@@ -77,10 +77,7 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
       $this->add('password', 'cms_pass', ts('Password'), ['class' => 'huge']);
       $this->add('password', 'cms_confirm_pass', ts('Confirm Password'), ['class' => 'huge']);
       $this->addRule('cms_pass', ts('Password is required'), 'required');
-      $this->addRule([
-        'cms_pass',
-        'cms_confirm_pass',
-      ], ts('Password mismatch'), 'compare');
+      $this->addFormRule(['CRM_Contact_Form_Task_Useradd', 'passwordMatch']);
     }
 
     $this->add('text', 'email', ts('Email'), ['class' => 'huge'])->freeze();
@@ -138,6 +135,20 @@ class CRM_Contact_Form_Task_Useradd extends CRM_Core_Form {
     $config->userSystem->checkUserNameEmailExists($check_params, $errors);
 
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Validation Rule.
+   *
+   * @param array $params
+   *
+   * @return array|bool
+   */
+  public static function passwordMatch($params) {
+    if ($params['cms_pass'] !== $params['cms_confirm_pass']) {
+      return ['cms_pass' => ts('Password mismatch')];
+    }
+    return TRUE;
   }
 
 }
