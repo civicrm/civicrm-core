@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions')
+  angular.module('crmSearchTasks')
     .directive('crmMultiSelectDate', function () {
       return {
         restrict: 'A',

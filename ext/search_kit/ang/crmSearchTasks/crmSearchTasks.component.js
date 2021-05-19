@@ -1,13 +1,13 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').component('crmSearchActions', {
+  angular.module('crmSearchTasks').component('crmSearchTasks', {
     bindings: {
       entity: '<',
       refresh: '&',
       ids: '<'
     },
-    templateUrl: '~/crmSearchActions/crmSearchActions.html',
+    templateUrl: '~/crmSearchTasks/crmSearchTasks.html',
     controller: function($scope, crmApi4, dialogService) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
@@ -58,7 +58,7 @@
             autoOpen: false,
             title: action.title
           });
-          dialogService.open('crmSearchAction', action.uiDialog.templateUrl, data, options)
+          dialogService.open('crmSearchTask', action.uiDialog.templateUrl, data, options)
             .then(ctrl.refresh);
         }
       };

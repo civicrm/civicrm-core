@@ -2,7 +2,7 @@
   "use strict";
 
   // Declare module
-  angular.module('crmSearchActions', CRM.angRequires('crmSearchActions'))
+  angular.module('crmSearchTasks', CRM.angRequires('crmSearchTasks'))
 
     // Reformat an array of objects for compatibility with select2
     // Todo this probably belongs in core

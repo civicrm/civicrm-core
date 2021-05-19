@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').component('crmSearchBatchRunner', {
+  angular.module('crmSearchTasks').component('crmSearchBatchRunner', {
     bindings: {
       entity: '<',
       action: '@',
@@ -10,7 +10,7 @@
       success: '&',
       error: '&'
     },
-    templateUrl: '~/crmSearchActions/crmSearchBatchRunner.html',
+    templateUrl: '~/crmSearchTasks/crmSearchBatchRunner.html',
     controller: function($scope, $timeout, $interval, crmApi4) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,

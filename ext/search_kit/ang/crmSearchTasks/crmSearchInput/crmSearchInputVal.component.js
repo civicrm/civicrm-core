@@ -1,7 +1,7 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchActions').component('crmSearchInputVal', {
+  angular.module('crmSearchTasks').component('crmSearchInputVal', {
     bindings: {
       field: '<',
       'multi': '<',
@@ -15,7 +15,7 @@
 
       this.$onInit = function() {
         var rendered = false;
-        ctrl.dateRanges = CRM.crmSearchActions.dateRanges;
+        ctrl.dateRanges = CRM.crmSearchTasks.dateRanges;
         ctrl.entity = ctrl.field.fk_entity || ctrl.field.entity;
 
         this.ngModel.$render = function() {
@@ -87,30 +87,30 @@
       this.getTemplate = function() {
 
         if (ctrl.field.input_type === 'Date') {
-          return '~/crmSearchActions/crmSearchInput/date.html';
+          return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
         if (ctrl.field.data_type === 'Boolean') {
-          return '~/crmSearchActions/crmSearchInput/boolean.html';
+          return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
         if (ctrl.field.options) {
-          return '~/crmSearchActions/crmSearchInput/select.html';
+          return '~/crmSearchTasks/crmSearchInput/select.html';
         }
 
         if (ctrl.field.fk_entity || ctrl.field.name === 'id') {
-          return '~/crmSearchActions/crmSearchInput/entityRef.html';
+          return '~/crmSearchTasks/crmSearchInput/entityRef.html';
         }
 
         if (ctrl.field.data_type === 'Integer') {
-          return '~/crmSearchActions/crmSearchInput/integer.html';
+          return '~/crmSearchTasks/crmSearchInput/integer.html';
         }
 
         if (ctrl.field.data_type === 'Float') {
-          return '~/crmSearchActions/crmSearchInput/float.html';
+          return '~/crmSearchTasks/crmSearchInput/float.html';
         }
 
-        return '~/crmSearchActions/crmSearchInput/text.html';
+        return '~/crmSearchTasks/crmSearchInput/text.html';
       };
 
       this.getFieldOptions = function() {
