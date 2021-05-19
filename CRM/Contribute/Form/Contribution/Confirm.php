@@ -1704,7 +1704,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $pending = FALSE;
         }
 
-        [$membership, $renewalMode, $dates] = CRM_Contribute_Form_Contribution_Confirm::legacyProcessMembership(
+        [$membership, $renewalMode, $dates] = self::legacyProcessMembership(
           $contactID, $memType, $isTest,
           date('YmdHis'), $membershipParams['cms_contactID'] ?? NULL,
           $customFieldsFormatted,
@@ -2887,6 +2887,34 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Temporary function to allow unit tests to access function being refactored away.
+   *
+   * @param int $contactID
+   * @param int $membershipTypeID
+   * @param int $membershipID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function unitTestAccessTolegacyProcessMembership($contactID, $membershipTypeID, $membershipID = NULL) {
+    return self::legacyProcessMembership(
+      $contactID,
+      $membershipTypeID,
+      0,
+      NULL,
+      NULL,
+      NULL,
+      1,
+      $membershipID,
+      NULL,
+      NULL,
+      FALSE,
+      NULL
+    );
+  }
+
+  /**
    * Interim function for processing memberships - this is being refactored out of existence.
    *
    * @param int $contactID
@@ -2909,7 +2937,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $contribution = NULL, $lineItems = []) {
+  protected static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $contribution = NULL, $lineItems = []) {
     $renewalMode = $updateStatusId = FALSE;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
