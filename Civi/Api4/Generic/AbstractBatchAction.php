@@ -54,9 +54,23 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
   }
 
   /**
+   * Get a list of records for this batch.
+   *
    * @return array
    */
   protected function getBatchRecords() {
+    return (array) $this->getBatchAction()->execute();
+  }
+
+  /**
+   * Get a query which resolves the list of records for this batch.
+   *
+   * This is similar to `getBatchRecords()`, but you may further refine the
+   * API call (e.g. selecting different fields or data-pages) before executing.
+   *
+   * @return \Civi\Api4\Generic\AbstractGetAction
+   */
+  protected function getBatchAction() {
     $params = [
       'checkPermissions' => $this->checkPermissions,
       'where' => $this->where,
@@ -67,8 +81,7 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
     if (empty($this->reload)) {
       $params['select'] = $this->select;
     }
-
-    return (array) civicrm_api4($this->getEntityName(), 'get', $params);
+    return \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4] + $params);
   }
 
   /**
