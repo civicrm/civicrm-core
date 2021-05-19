@@ -267,15 +267,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
           Civi::log()->debug('PayPalIPN: Will attempt to compensate');
           $input['membership_id'] = $this->retrieve('membershipID', 'Integer', FALSE);
         }
-        if ($this->getContributionRecurID()) {
-          $recurLinks = civicrm_api3('ContributionRecur', 'get', [
-            'membership_id' => $membershipID,
-            'contribution_recur_id' => $this->getContributionRecurID(),
-          ]);
-          Civi::log()->debug('PayPalIPN: Membership should be  linked to  contribution recur  record ' . $this->getContributionRecurID()
-            . ' ' . $recurLinks['count'] . 'links found'
-          );
-        }
       }
       $contribution = $this->getContribution();
 
