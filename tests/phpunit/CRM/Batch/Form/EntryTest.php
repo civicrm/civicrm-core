@@ -39,14 +39,14 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    *
    * @var string
    */
-  protected $_membershipTypeName = NULL;
+  protected $_membershipTypeName;
 
   /**
    * Membership type id used in test function.
    *
    * @var string
    */
-  protected $_membershipTypeID = NULL;
+  protected $_membershipTypeID;
 
   /**
    * Contact id used in test function.
@@ -75,6 +75,10 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
    */
   protected $_contactID4 = NULL;
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function setUp(): void {
     parent::setUp();
 
@@ -120,7 +124,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'sequential' => 1,
       'visibility' => 'Public',
     ];
-    $membershipType2 = $this->callAPISuccess('membership_type', 'create', $params);
+    $membershipType2 = $this->callAPISuccess('MembershipType', 'create', $params);
     $this->_membershipTypeID2 = $membershipType2['id'];
 
     $this->_membershipStatusID = $this->membershipStatusCreate('test status');
