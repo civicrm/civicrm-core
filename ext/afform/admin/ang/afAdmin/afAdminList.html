@@ -37,22 +37,22 @@
   <table>
     <thead>
     <tr>
-      <th ng-click="$ctrl.sortBy('title')">
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('title')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'title'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'title'"></i>
         {{:: ts('Title') }}
       </th>
-      <th ng-click="$ctrl.sortBy('name')">
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('name')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'name'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'name'"></i>
         {{:: ts('Name') }}
       </th>
-      <th ng-click="$ctrl.sortBy('server_route')">
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('server_route')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'server_route'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'server_route'"></i>
         {{:: ts('Page') }}
       </th>
-      <th ng-click="$ctrl.sortBy('placement.length')">
+      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('placement.length')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'placement.length'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'"></i>
         {{:: ts('Placement') }}

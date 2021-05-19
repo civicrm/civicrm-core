@@ -1,4 +1,4 @@
-<div id="bootstrap-theme" class="crm-search">
+<div id="bootstrap-theme" class="crm-search crm-search-admin-list">
   <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
   <div class="form-inline">
     <label for="search-list-filter">{{:: ts('Filter') }}</label>
@@ -11,22 +11,22 @@
   <table>
     <thead>
       <tr>
-        <th ng-click="$ctrl.sortBy('label')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('label')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'label'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'label'"></i>
           {{:: ts('Label') }}
         </th>
-        <th ng-click="$ctrl.sortBy('entity_title')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('entity_title')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'entity_title'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'entity_title'"></i>
           {{:: ts('For') }}
         </th>
-        <th ng-click="$ctrl.sortBy('display_name.length')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('display_name.length')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'display_name.length'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'display_name.length'"></i>
           {{:: ts('Displays') }}
         </th>
-        <th ng-click="$ctrl.sortBy('groups[0]')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('groups[0]')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'groups[0]'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'groups[0]'"></i>
           {{:: ts('Smart Group') }}
@@ -36,12 +36,12 @@
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'afform_count'"></i>
           {{:: ts('Forms') }}
         </th>
-        <th ng-click="$ctrl.sortBy('created_date')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('created_date')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'created_date'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'created_date'"></i>
           {{:: ts('Created') }}
         </th>
-        <th ng-click="$ctrl.sortBy('modified_date')">
+        <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('modified_date')">
           <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'modified_date'"></i>
           <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'modified_date'"></i>
           {{:: ts('Last Modified') }}

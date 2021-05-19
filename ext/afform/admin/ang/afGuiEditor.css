@@ -1,3 +1,14 @@
+#bootstrap-theme.afadmin-list th[ng-click] {
+  cursor: pointer;
+}
+#bootstrap-theme.afadmin-list th i.fa-sort-desc,
+#bootstrap-theme.afadmin-list th i.fa-sort-asc {
+  color: #1a5a82;
+}
+#bootstrap-theme.afadmin-list th:not(:hover) i.fa-sort {
+  opacity: .5;
+}
+
 #afGuiEditor #afGuiEditor-palette {
   margin-right: 5px;
   height: 100%;
