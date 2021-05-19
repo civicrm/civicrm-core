@@ -70,4 +70,11 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
     return $this;
   }
 
+  /**
+   * @throws \API_Exception
+   */
+  protected function validateValues() {
+    // Placeholder
+  }
+
 }
