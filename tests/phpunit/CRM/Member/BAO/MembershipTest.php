@@ -479,21 +479,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
 
-    $isTestMembership = 0;
-    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::legacyProcessMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
       $contactId,
-      $this->_membershipTypeID,
-      $isTestMembership,
-      NULL,
-      NULL,
-      NULL,
-      1,
-      FALSE,
-      NULL,
-      NULL,
-      FALSE,
-      NULL
-    );
+      $this->_membershipTypeID);
     $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
@@ -549,19 +537,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'Database checked on membership log record.'
     );
 
-    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::legacyProcessMembership(
+    [$MembershipRenew] = CRM_Contribute_Form_Contribution_Confirm::unitTestAccessTolegacyProcessMembership(
       $contactId,
       $this->_membershipTypeID,
-      FALSE,
-      FALSE,
-      NULL,
-      NULL,
-      NULL,
-      1,
-      NULL,
-      NULL,
-      NULL,
-      FALSE
+      1
     );
 
     $this->assertDBNotNull('CRM_Member_BAO_MembershipLog',
