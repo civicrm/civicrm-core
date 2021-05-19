@@ -68,11 +68,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     $this->_setParam('apiLogin', $paymentProcessor['user_name']);
     $this->_setParam('paymentKey', $paymentProcessor['password']);
     $this->_setParam('paymentType', 'AIM');
-    $this->_setParam('md5Hash', $paymentProcessor['signature'] ?? NULL);
-
-    $this->_setParam('timestamp', time());
-    srand(time());
-    $this->_setParam('sequence', rand(1, 1000));
   }
 
   /**
@@ -172,7 +167,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     // Authorize.Net will not refuse duplicates, so we should check if the user already submitted this transaction
-    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], CRM_Utils_Array::value('contributionID', $params))) {
+    if ($this->checkDupe($authorizeNetFields['x_invoice_num'], $params['contributionID'] ?? NULL)) {
       throw new PaymentProcessorException('It appears that this transaction is a duplicate.  Have you already submitted the form once?  If so there may have been a connection problem.  Check your email for a receipt from Authorize.net.  If you do not receive a receipt within 2 hours you can try your transaction again.  If you continue to have problems please contact the site administrator.', 9004);
     }
 
@@ -387,56 +382,6 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     return $fields;
-  }
-
-  /**
-   * Generate HMAC_MD5
-   *
-   * @param string $key
-   * @param string $data
-   *
-   * @return string
-   *   the HMAC_MD5 encoding string
-   */
-  public function hmac($key, $data) {
-    if (function_exists('mhash')) {
-      // Use PHP mhash extension
-      return (bin2hex(mhash(MHASH_MD5, $data, $key)));
-    }
-    else {
-      // RFC 2104 HMAC implementation for php.
-      // Creates an md5 HMAC.
-      // Eliminates the need to install mhash to compute a HMAC
-      // Hacked by Lance Rushing
-      // byte length for md5
-      $b = 64;
-      if (strlen($key) > $b) {
-        $key = pack("H*", md5($key));
-      }
-      $key = str_pad($key, $b, chr(0x00));
-      $ipad = str_pad('', $b, chr(0x36));
-      $opad = str_pad('', $b, chr(0x5c));
-      $k_ipad = $key ^ $ipad;
-      $k_opad = $key ^ $opad;
-      return md5($k_opad . pack("H*", md5($k_ipad . $data)));
-    }
-  }
-
-  /**
-   * Calculate and return the transaction fingerprint.
-   *
-   * @return string
-   *   fingerprint
-   */
-  public function CalculateFP() {
-    $x_tran_key = $this->_getParam('paymentKey');
-    $loginid = $this->_getParam('apiLogin');
-    $sequence = $this->_getParam('sequence');
-    $timestamp = $this->_getParam('timestamp');
-    $amount = $this->_getParam('amount');
-    $currency = $this->_getParam('currencyID');
-    $transaction = "$loginid^$sequence^$timestamp^$amount^$currency";
-    return $this->hmac($x_tran_key, $transaction);
   }
 
   /**
