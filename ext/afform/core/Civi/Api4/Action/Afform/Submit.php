@@ -20,10 +20,16 @@ class Submit extends AbstractProcessor {
   protected $values;
 
   protected function processForm() {
-    $entityValues = $entityIds = $entityMapping = [];
+    $entityValues = $entityIds = $entityMapping = $entityRefFields = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $entityIds[$entityName] = NULL;
       $entityMapping[$entityName] = $entity['type'];
+      $entityFields = \civicrm_api4($entity['type'], 'getFields', ['checkPermissions' => FALSE]);
+      foreach ($entityFields as $field) {
+        if ($field['input_type'] === 'EntityRef') {
+          $entityRefFields[] = $field['name'];
+        }
+      }
       foreach ($this->values[$entityName] ?? [] as $values) {
         $entityValues[$entity['type']][$entityName][] = $values + ['fields' => []];
         // Predetermined values override submitted values
@@ -42,7 +48,7 @@ class Submit extends AbstractProcessor {
       foreach ($eValues as $key => $record) {
         foreach ($record as $k => $v) {
           foreach ($v as $field => $value) {
-            if (array_key_exists($value, $event->entityIds) && !empty($event->entityIds[$value])) {
+            if (array_key_exists($value, $event->entityIds) && !empty($event->entityIds[$value]) && in_array($field, $entityRefFields, TRUE)) {
               $eValues[$key][$k][$field] = $event->entityIds[$value];
             }
           }

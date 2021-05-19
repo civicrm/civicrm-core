@@ -125,7 +125,48 @@ EOHTML;
     $this->assertEquals('Register A site', $contact['source']);
     // Check that the contact and the activity were correctly linked up as per the form.
     $this->callAPISuccess('ActivityContact', 'get', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
+  }
 
+  public function testCheckEntityReferenceFieldsReplacement(): void {
+    $this->useValues([
+      'layout' => self::$layouts['registerSite'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
+
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => 'Test Register Individual1',
+            'last_name' => 'site',
+            'source' => 'test source',
+          ],
+        ],
+      ],
+      'Activity1' => [
+        [
+          'fields' => [
+            'subject' => 'Test Register Site Form Submission Individual1',
+          ],
+        ],
+      ],
+    ];
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setArgs([])
+      ->setValues($values)
+      ->execute();
+    // Check that Activity was submitted correctly.
+    $activity = \Civi\Api4\Activity::get()->setCheckPermissions(FALSE)->execute()->first();
+    $this->assertEquals('Test Register Site Form Submission', $activity['subject']);
+    $contact = \Civi\Api4\Contact::get()->addWhere('first_name', '=', 'Test Register')->execute()->first();
+    $this->assertEquals('site', $contact['last_name']);
+    // Check that the data overrides form submsision
+    $this->assertEquals('Register A site Individual1', $contact['source']);
+    // Check that the contact and the activity were correctly linked up as per the form.
+    $this->callAPISuccess('ActivityContact', 'get', ['contact_id' => $contact['id'], 'activity_id' => $activity['id']]);
   }
 
   public function testAboutMeForbidden(): void {
