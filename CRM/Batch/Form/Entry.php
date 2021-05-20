@@ -830,11 +830,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = $value['source'] ?? NULL;
-          $membership = self::legacyProcessMembership(
-            $value['contact_id'], $value['membership_type_id'], FALSE,
-            //$numTerms should be default to 1.
-            NULL, NULL, $value['custom'], 1, NULL, FALSE,
-            NULL, $membershipSource, $isPayLater, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
+          $membership = $this->legacyProcessMembership(
+            $value['contact_id'], $value['membership_type_id'],
+            $value['custom'], $membershipSource, $isPayLater, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
           );
 
           // make contribution entry
@@ -1026,14 +1024,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   /**
    * @param int $contactID
    * @param int $membershipTypeID
-   * @param bool $is_test
-   * @param string $changeToday
-   * @param int $modifiedID
    * @param $customFieldsFormatted
-   * @param $numRenewTerms
-   * @param int $membershipID
-   * @param $pending
-   * @param int $contributionRecurID
    * @param $membershipSource
    * @param $isPayLater
    * @param array $memParams
@@ -1044,8 +1035,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function legacyProcessMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $memParams = [], $formDates = []): CRM_Member_BAO_Membership {
+  protected function legacyProcessMembership($contactID, $membershipTypeID, $customFieldsFormatted, $membershipSource, $isPayLater, $memParams = [], $formDates = []): CRM_Member_BAO_Membership {
     $updateStatusId = FALSE;
+    $changeToday = NULL;
+    $is_test = FALSE;
+    $modifiedID = NULL;
+    $numRenewTerms = 1;
+    $membershipID = NULL;
+    $pending = FALSE;
+    $contributionRecurID = NULL;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
     $statusFormat = '%Y-%m-%d';
