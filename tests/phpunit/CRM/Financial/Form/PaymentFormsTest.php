@@ -60,7 +60,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
     ];
     $genericParams = [
       'credit_card_number' => 4111111111111111,
-      'processor_id' => $processors[0],
+      'payment_processor_id' => $processors[0],
       'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => '1',
