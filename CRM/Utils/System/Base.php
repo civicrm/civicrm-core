@@ -1057,4 +1057,12 @@ abstract class CRM_Utils_System_Base {
   public function invalidateRouteCache() {
   }
 
+  /**
+   * Should the admin be able to set the password when creating a user
+   * or does the CMS want it a different way.
+   */
+  public function showPasswordFieldWhenAdminCreatesUser() {
+    return TRUE;
+  }
+
 }

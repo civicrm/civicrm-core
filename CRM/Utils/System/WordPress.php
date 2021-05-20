@@ -1462,4 +1462,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     add_action('profile_update', [$civicrm->users, 'update_user']);
   }
 
+  /**
+   * Depending on configuration, either let the admin enter the password
+   * when creating a user or let the user do it via email link.
+   */
+  public function showPasswordFieldWhenAdminCreatesUser() {
+    return !$this->isUserRegistrationPermitted();
+  }
+
 }
