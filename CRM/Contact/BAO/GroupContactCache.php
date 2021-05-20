@@ -9,7 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\API\Request;
 use Civi\Api4\Group;
+use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
 
 /**
@@ -24,11 +26,10 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    *
    * @return array
    */
-  public static function getModes() {
+  public static function getModes(): array {
     return [
       // Flush expired caches in response to user actions.
       'opportunistic' => ts('Opportunistic Flush'),
-
       // Flush expired caches via background cron jobs.
       'deterministic' => ts('Cron Flush'),
     ];
@@ -45,7 +46,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return bool
    *   TRUE if we did not regenerate, FALSE if we did
    */
-  public static function check($groupIDs) {
+  public static function check($groupIDs): bool {
     if (empty($groupIDs)) {
       return TRUE;
     }
@@ -215,7 +216,7 @@ WHERE  id IN ( $groupIDs )
    * @param int $groupID
    *
    */
-  public static function clearGroupContactCache($groupID) {
+  public static function clearGroupContactCache($groupID): void {
     $transaction = new CRM_Core_Transaction();
     $query = "
     DELETE  g
@@ -306,8 +307,8 @@ WHERE  id IN ( $groupIDs )
    * caches on demand. The user session will be forced to wait so it is less
    * ideal.
    */
-  public static function opportunisticCacheFlush() {
-    if (Civi::settings()->get('smart_group_cache_refresh_mode') == 'opportunistic') {
+  public static function opportunisticCacheFlush(): void {
+    if (Civi::settings()->get('smart_group_cache_refresh_mode') === 'opportunistic') {
       self::flushCaches();
     }
   }
@@ -331,10 +332,11 @@ WHERE  id IN ( $groupIDs )
    * Remove one or more contacts from the smart group cache.
    *
    * @param int|array $cid
-   * @param int $groupId
+   * @param null $groupId
    *
    * @return bool
    *   TRUE if successful.
+   * @throws \CRM_Core_Exception
    */
   public static function removeContact($cid, $groupId = NULL) {
     $cids = [];
@@ -509,7 +511,7 @@ ORDER BY   gc.contact_id, g.children
    *
    * @return string
    */
-  public static function getCacheInvalidDateTime() {
+  public static function getCacheInvalidDateTime(): string {
     return date('YmdHis', strtotime("-" . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
@@ -517,7 +519,7 @@ ORDER BY   gc.contact_id, g.children
    * Invalidates the smart group cache for a particular group
    * @param int $groupID - Group to invalidate
    */
-  public static function invalidateGroupContactCache($groupID) {
+  public static function invalidateGroupContactCache($groupID): void {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_group
       SET cache_date = NULL
       WHERE id = %1 AND (saved_search_id IS NOT NULL OR children IS NOT NULL)", [
@@ -541,8 +543,9 @@ ORDER BY   gc.contact_id, g.children
     if (empty($apiParams['having'])) {
       $apiParams['select'] = array_slice($apiParams['select'], 0, 1);
     }
-    $api = \Civi\API\Request::create($savedSearch['api_entity'], 'get', $apiParams);
-    $query = new \Civi\Api4\Query\Api4SelectQuery($api);
+    /* @var $api \Civi\Api4\Generic\DAOGetAction */
+    $api = Request::create($savedSearch['api_entity'], 'get', $apiParams);
+    $query = new Api4SelectQuery($api);
     $query->forceSelectId = FALSE;
     $query->getQuery()->having("$idField $excludeClause");
     $sql = $query->getSql();
@@ -642,7 +645,6 @@ ORDER BY   gc.contact_id, g.children
       ->setSelect(['saved_search_id', 'children'])->execute()->first();
     $groupID = (int) $group['id'];
 
-    $customClass = NULL;
     if ($group['saved_search_id']) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($group['saved_search_id']);
 
