@@ -216,7 +216,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * Process recurring contributions.
    *
    * @param array $input
-   * @param array $ids
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
    * @param \CRM_Contribute_BAO_Contribution $contribution
    * @param bool $first
@@ -226,7 +225,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function recur($input, $ids, $recur, $contribution, $first) {
+  public function recur($input, $recur, $contribution, $first) {
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalProIPN: Could not find txn_type in input request.');
       echo 'Failure: Invalid parameters<p>';
@@ -545,7 +544,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         if ($contribution->contribution_status_id == $completedStatusId) {
           $first = FALSE;
         }
-        $this->recur($input, $ids, $contributionRecur, $contribution, $first);
+        $this->recur($input, $contributionRecur, $contribution, $first);
         return;
       }
 
@@ -685,7 +684,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $contribution->loadRelatedObjects($input, $ids);
     $objects = array_merge($objects, $contribution->_relatedObjects);
 
-    $this->recur($input, $ids, $this->getContributionRecurObject(), $objects['contribution'], $isFirst);
+    $this->recur($input, $this->getContributionRecurObject(), $objects['contribution'], $isFirst);
   }
 
   /**
