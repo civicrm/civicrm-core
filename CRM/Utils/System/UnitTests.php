@@ -27,6 +27,32 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $this->supports_form_extensions = FALSE;
   }
 
+  public function initialize() {
+    parent::initialize();
+    $test = $GLOBALS['CIVICRM_TEST_CASE'] ?? NULL;
+    if ($test && $test instanceof \Civi\Test\HeadlessInterface) {
+      if ($test instanceof \Civi\Test\HookInterface) {
+        $this->registerTestListeners($test);
+      }
+      if ($test instanceof \Symfony\Component\EventDispatcher\EventSubscriberInterface) {
+        \Civi::dispatcher()->addSubscriber($test);
+      }
+    }
+  }
+
+  protected function registerTestListeners($test) {
+    foreach (get_class_methods(get_class($test)) as $func) {
+      if (preg_match('/^on_/', $func)) {
+        $event = substr($func, 3);
+        $event = str_replace('___', '::', $event);
+        if (preg_match('/^civi_/', $event)) {
+          $event = str_replace('_', '.', $event);
+        }
+        \Civi::dispatcher()->addListener($event, [$test, $func]);
+      }
+    }
+  }
+
   /**
    * @param string $name
    * @param string $value

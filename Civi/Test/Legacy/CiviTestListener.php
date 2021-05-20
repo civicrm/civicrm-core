@@ -41,6 +41,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
   public function startTest(\PHPUnit_Framework_Test $test) {
     if ($this->isCiviTest($test)) {
       error_reporting(E_ALL);
+      $GLOBALS['CIVICRM_TEST_CASE'] = $test;
     }
 
     if ($test instanceof \Civi\Test\HeadlessInterface) {
@@ -71,6 +72,7 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     }
     \CRM_Utils_Time::resetTime();
     if ($this->isCiviTest($test)) {
+      unset($GLOBALS['CIVICRM_TEST_CASE']);
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
     }
