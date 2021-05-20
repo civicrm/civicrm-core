@@ -1731,10 +1731,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     //$this->assertEquals(12, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
   }
 
-  public static function setUpBeforeClass() {
-    // put stuff here that should happen before all tests in this unit
-  }
-
   /**
    * Create a payment processor instance.
    *

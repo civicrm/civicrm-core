@@ -32,7 +32,7 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
   /**
    * In the first test, we make make testDummy1. He exists.
    */
-  public function testDummy1() {
+  public function testDummy1(): void {
     $this->assertTrue(is_numeric(self::$contactIds['testDummy1']) && self::$contactIds['testDummy1'] > 0);
 
     // Still inside transaction. Data exists.
@@ -45,7 +45,7 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
    * We previously made testDummy1, but he's been lost (rolled-back).
    * However, testDummy2 now exists.
    */
-  public function testDummy2() {
+  public function testDummy2(): void {
     $this->assertTrue(is_numeric(self::$contactIds['testDummy1']) && self::$contactIds['testDummy1'] > 0);
     $this->assertTrue(is_numeric(self::$contactIds['testDummy2']) && self::$contactIds['testDummy2'] > 0);
 
@@ -66,7 +66,7 @@ class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements He
    *
    * @throws \Exception
    */
-  public static function tearDownAfterClass() {
+  public static function tearDownAfterClass(): void {
     if (!is_numeric(self::$contactIds['testDummy1'])) {
       throw new \Exception("Uh oh! The static \$contactIds does not include testDummy1! Did the test fail to execute?");
     }

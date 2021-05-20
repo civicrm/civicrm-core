@@ -316,7 +316,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     return TRUE;
   }
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     static::_populateDB(TRUE);
 
     // also set this global hack

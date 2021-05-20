@@ -8,7 +8,7 @@ class api_v4_AfformRoutingTest extends \PHPUnit\Framework\TestCase implements \C
 
   protected $formName = 'mockPage';
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     \Civi\Test::e2e()
       ->install(['org.civicrm.afform', 'org.civicrm.afform-mock'])
       ->apply();

@@ -18,7 +18,7 @@ abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCac
 
   const MAX_KEY = 255;
 
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
     CRM_Core_Config::singleton(1, 1);
     CRM_Utils_System::loadBootStrap(array(
       'name' => $GLOBALS['_CV']['ADMIN_USER'],
