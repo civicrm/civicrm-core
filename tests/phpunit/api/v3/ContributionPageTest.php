@@ -1866,7 +1866,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Ensure total_amount are the same if they're both given.
     $total_amount = $rawParams['total_amount'] ?? NULL;
     $amount = $rawParams['amount'] ?? NULL;
-    if (!empty($total_amount) && !empty($amount) && $total_amount !== $amount) {
+    if (!empty($total_amount) && !empty($amount) && round($total_amount, 2) !== round($amount, 2)) {
       throw new CRM_Core_Exception("total_amount '$total_amount' and amount '$amount' differ.");
     }
 

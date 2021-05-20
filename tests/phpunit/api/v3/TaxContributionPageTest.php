@@ -392,8 +392,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals('300.00', $lineItems);
-    $this->assertEquals('300.00', $this->_getFinancialTrxnAmount($contribution['id']));
-    $this->assertEquals('300.00', $this->_getFinancialItemAmount($contribution['id']));
+    $this->assertEquals('320.00', $this->_getFinancialTrxnAmount($contribution['id']));
+    $this->assertEquals('320.00', $this->_getFinancialItemAmount($contribution['id']));
   }
 
   /**

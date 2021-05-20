@@ -30,11 +30,15 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   /**
    * Test the the submit function on the event participant submit function.
    *
-   * Test is to establish existing behaviour prior to code cleanup. It turns out the existing
-   * code ONLY cancels the contribution as well as the participant record if is_pay_later is true
-   * AND the source is 'Online Event Registration'.
+   * Test is to establish existing behaviour prior to code cleanup. It turns
+   * out the existing code ONLY cancels the contribution as well as the
+   * participant record if is_pay_later is true AND the source is 'Online Event
+   * Registration'.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitCancel() {
+  public function testSubmitCancel(): void {
     $this->createEventOrder(['source' => 'Online Event Registration', 'is_pay_later' => 1]);
     $participantCancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
 

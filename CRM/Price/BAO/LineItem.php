@@ -52,11 +52,8 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         $params['unit_price'] = 0;
       }
     }
-
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-    if (isset($params['financial_type_id'], $params['line_total'], $taxRates[$params['financial_type_id']])) {
-      $taxRate = $taxRates[$params['financial_type_id']];
-      $params['tax_amount'] = ($taxRate / 100) * $params['line_total'];
+    if (isset($params['financial_type_id'], $params['line_total'])) {
+      $params['tax_amount'] = self::getTaxAmountForLineItem($params);
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
@@ -493,7 +490,7 @@ WHERE li.contribution_id = %1";
       $totalAmount = $params['total_amount'] ?? 0;
       $financialType = $params['financial_type_id'] ?? NULL;
       foreach ($priceSetDetails as $values) {
-        if ($entityTable == 'membership') {
+        if ($entityTable === 'membership') {
           if ($isRelatedID != $values['membership_type_id']) {
             continue;
           }
@@ -502,7 +499,7 @@ WHERE li.contribution_id = %1";
           }
           $financialType = $values['financial_type_id'];
         }
-        $params['line_item'][$values['setID']][$values['priceFieldID']] = [
+        $lineItem = [
           'price_field_id' => $values['priceFieldID'],
           'price_field_value_id' => $values['priceFieldValueID'],
           'label' => $values['label'],
@@ -512,6 +509,8 @@ WHERE li.contribution_id = %1";
           'financial_type_id' => $financialType,
           'membership_type_id' => $values['membership_type_id'],
         ];
+        $lineItem['tax_amount'] = self::getTaxAmountForLineItem($lineItem);
+        $params['line_item'][$values['setID']][$values['priceFieldID']] = $lineItem;
         break;
       }
     }
@@ -1069,6 +1068,19 @@ WHERE li.contribution_id = %1";
       ];
     }
     return Civi::$statics[__CLASS__]['price_fields'][$priceFieldID];
+  }
+
+  /**
+   * Get the tax rate for the given line item.
+   *
+   * @param array $params
+   *
+   * @return float
+   */
+  protected static function getTaxAmountForLineItem(array $params): float {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    $taxRate = $taxRates[$params['financial_type_id']] ?? 0;
+    return ($taxRate / 100) * $params['line_total'];
   }
 
   /**

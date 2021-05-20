@@ -918,6 +918,10 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @param string $thousandSeparator
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
    * @dataProvider getThousandSeparators
    */
   public function testSubmitUpdate(string $thousandSeparator): void {
