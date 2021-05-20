@@ -546,7 +546,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithSmartGroupFilter($template) {
+  public function testContributionSummaryWithSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
@@ -804,8 +804,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithSingleContactsInTwoGroups() {
-    list($groupID1, $individualID) = $this->setUpPopulatedGroup(TRUE);
+  public function testContributionSummaryWithSingleContactsInTwoGroups(): void {
+    [$groupID1, $individualID] = $this->setUpPopulatedGroup(TRUE);
     // create second group and add the individual to it.
     $groupID2 = $this->groupCreate(['name' => 'test_group', 'title' => 'test_title']);
     $this->callAPISuccess('GroupContact', 'create', [
@@ -828,7 +828,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryWithTwoGroupsWithIntersection() {
+  public function testContributionSummaryWithTwoGroupsWithIntersection(): void {
     $groups = $this->setUpIntersectingGroups();
 
     $rows = $this->callAPISuccess('report_template', 'getrows', [
@@ -845,7 +845,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testContributionSummaryDateFields() {
+  public function testContributionSummaryDateFields(): void {
     $sql = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/summary',
       'thankyou_date_relative' => '0',
@@ -884,7 +884,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  public function setUpPopulatedSmartGroup() {
+  public function setUpPopulatedSmartGroup(): int {
     $household1ID = $this->householdCreate();
     $individual1ID = $this->individualCreate();
     $householdID = $this->householdCreate();
