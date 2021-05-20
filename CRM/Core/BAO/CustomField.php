@@ -121,6 +121,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @throws \CiviCRM_API3_Exception
    */
   public static function bulkSave($bulkParams, $defaults = []) {
+    CRM_Core_Error::deprecatedFunctionWarning(__CLASS__ . '::writeRecords');
     foreach ($bulkParams as $index => $fieldParams) {
       $bulkParams[$index] = array_merge($defaults, $fieldParams);
     }
