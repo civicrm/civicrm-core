@@ -62,7 +62,7 @@
     "zetacomponents/mail": "1.9.*",
     "marcj/topsort": "~1.1",
     "phpoffice/phpword": "^0.15.0",
-    "pear/validate_finance_creditcard": "dev-master",
+    "pear/validate_finance_creditcard": "0.7.0",
     "civicrm/civicrm-cxn-rpc": "~0.20.12.01 || ~0.19.01.10",
     "pear/auth_sasl": "1.1.0",
     "pear/net_smtp": "1.9.*",

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e39d59009c3d153d1aaa107a411f319",
+    "content-hash": "9a4f82d5c0a69e422d5be01e7ccfe79f",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1817,16 +1817,16 @@
         },
         {
             "name": "pear/validate_finance_creditcard",
-            "version": "dev-master",
+            "version": "0.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Validate_Finance_CreditCard.git",
-                "reference": "a74da657d7a6f24b7e669294b32812e9a947519f"
+                "reference": "f138fb80b2305c1fe7ca33216b895b868396f1e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/a74da657d7a6f24b7e669294b32812e9a947519f",
-                "reference": "a74da657d7a6f24b7e669294b32812e9a947519f",
+                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/f138fb80b2305c1fe7ca33216b895b868396f1e9",
+                "reference": "f138fb80b2305c1fe7ca33216b895b868396f1e9",
                 "shasum": ""
             },
             "require": {
@@ -1857,7 +1857,11 @@
                 }
             ],
             "description": "Validation class for credit cards.",
-            "time": "2016-09-12T08:01:21+00:00"
+            "support": {
+                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Validate_Finance_CreditCard",
+                "source": "https://github.com/pear/Validate_Finance_CreditCard"
+            },
+            "time": "2021-05-19T22:03:15+00:00"
         },
         {
             "name": "phenx/php-font-lib",
@@ -4040,9 +4044,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "pear/validate_finance_creditcard": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
