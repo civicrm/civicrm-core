@@ -66,7 +66,9 @@ abstract class AbstractCreateAction extends AbstractAction {
     if ($unmatched) {
       throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
     }
-    $e = new ValidateValuesEvent($this, [$this->getValues()]);
+    $e = new ValidateValuesEvent($this, [$this->getValues()], new \CRM_Utils_LazyArray(function () {
+      return [['old' => NULL, 'new' => $this->getValues()]];
+    }));
     \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
     if (!empty($e->errors)) {
       throw $e->toException();
