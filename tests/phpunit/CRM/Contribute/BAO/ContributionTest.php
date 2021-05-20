@@ -1163,7 +1163,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    */
   public function testCreateProportionalEntry($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
-    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    [$contribution, $financialAccount] = $this->createContributionWithTax();
     $params = [
       'total_amount' => 55,
       'to_financial_account_id' => $financialAccount->financial_account_id,
@@ -1197,11 +1197,13 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    * @dataProvider getThousandSeparators
    */
-  public function testCreateProportionalEntryZeroAmount($thousandSeparator) {
+  public function testCreateProportionalEntryZeroAmount(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    list($contribution, $financialAccount) = $this->createContributionWithTax(['total_amount' => 0]);
+    [$contribution, $financialAccount] = $this->createContributionWithTax(['total_amount' => 0]);
     $params = [
       'total_amount' => 0,
       'to_financial_account_id' => $financialAccount->financial_account_id,
@@ -1233,8 +1235,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Test for function getLastFinancialItemIds().
    */
   public function testgetLastFinancialItemIds() {
-    list($contribution, $financialAccount) = $this->createContributionWithTax();
-    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
+    [$contribution, $financialAccount] = $this->createContributionWithTax();
+    [$ftIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
     $this->assertEquals(count($ftIds), 1, 'Invalid count.');
     $this->assertEquals(count($taxItems), 1, 'Invalid count.');
     foreach ($taxItems as $value) {
@@ -1252,7 +1254,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * saved un-rounded).
    */
   public function testCreateProportionalFinancialEntriesViaPaymentCreate() {
-    list($contribution, $financialAccount) = $this->createContributionWithTax([], FALSE);
+    [$contribution, $financialAccount] = $this->createContributionWithTax([], FALSE);
     $params = [
       'total_amount' => 50,
       'to_financial_account_id' => $financialAccount->financial_account_id,
@@ -1279,7 +1281,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * Test to check if amount is proportionally asigned for PI change.
    */
   public function testProportionallyAssignedForPIChange() {
-    list($contribution, $financialAccount) = $this->createContributionWithTax();
+    [$contribution, $financialAccount] = $this->createContributionWithTax();
     $params = [
       'id' => $contribution['id'],
       'payment_instrument_id' => 3,
