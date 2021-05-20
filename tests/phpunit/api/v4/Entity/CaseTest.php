@@ -27,7 +27,7 @@ use api\v4\UnitTestCase;
  */
 class CaseTest extends UnitTestCase {
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->loadDataSet('CaseType');

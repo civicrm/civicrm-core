@@ -534,7 +534,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  protected function assertPostConditions() {
+  protected function assertPostConditions(): void {
     // Reset to version 3 as not all (e.g payments) work on v4
     $this->_apiversion = 3;
     if ($this->isLocationTypesOnPostAssert) {

@@ -28,7 +28,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function assertPostConditions() {
+  protected function assertPostConditions(): void {
     $this->validateAllPayments();
     $this->validateAllContributions();
   }

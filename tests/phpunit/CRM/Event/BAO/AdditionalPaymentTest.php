@@ -53,7 +53,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function assertPostConditions() {
+  protected function assertPostConditions(): void {
     $this->validateAllPayments();
     $this->validateAllContributions();
   }
