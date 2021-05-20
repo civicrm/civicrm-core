@@ -23,6 +23,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    * Prepare for test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -56,8 +57,9 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateLineItemWithTax($version) {
+  public function testCreateLineItemWithTax($version): void {
     $this->_apiversion = $version;
     $this->enableSalesTaxOnFinancialType('Donation');
     $this->params['financial_type_id'] = 'Donation';
@@ -70,13 +72,15 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   /**
    * Enable tax for the given financial type.
    *
+   * @param string $type
+   *
+   * @throws \CRM_Core_Exception
    * @todo move to a trait, share.
    *
    * @dataProvider versionThreeAndFour
    *
-   * @param string $type
    */
-  public function enableSalesTaxOnFinancialType($type) {
+  public function enableSalesTaxOnFinancialType($type): void {
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $type));
   }
@@ -90,11 +94,28 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testCreateLineItem($version) {
+  public function testCreateLineItem(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__)['values'];
     $this->assertCount(1, $result);
     $this->getAndCheck($this->params, key($result), $this->_entity);
+  }
+
+  /**
+   * Test zero is valid for amount fields.
+   *
+   * https://github.com/civicrm/civicrm-core/pull/20342
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateLineItemZero(int $version): void {
+    $this->_apiversion = $version;
+    $this->callAPISuccess('LineItem', 'create', array_merge($this->params, ['unit_price' => 0, 'line_total' => 0]));
+    $this->callAPISuccess('LineItem', 'create', array_merge($this->params, ['unit_price' => 0.0, 'line_total' => 0.0]));
   }
 
   /**
@@ -104,7 +125,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @dataProvider versionThreeAndFour
    */
-  public function testGetBasicLineItem($version) {
+  public function testGetBasicLineItem($version): void {
     $this->_apiversion = $version;
     $getParams = [
       'entity_table' => 'civicrm_contribution',
@@ -122,7 +143,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDeleteLineItem($version) {
+  public function testDeleteLineItem($version): void {
     $this->_apiversion = $version;
     $getParams = [
       'entity_table' => 'civicrm_contribution',
@@ -139,7 +160,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testGetFieldsLineItem() {
+  public function testGetFieldsLineItem(): void {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertEquals(1, $result['values']['entity_id']['api.required']);
   }
