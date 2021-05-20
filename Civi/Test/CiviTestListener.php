@@ -51,6 +51,7 @@ else {
     public function startTest(\PHPUnit\Framework\Test $test) {
       if ($this->isCiviTest($test)) {
         error_reporting(E_ALL);
+        $GLOBALS['CIVICRM_TEST_CASE'] = $test;
       }
 
       if ($test instanceof HeadlessInterface) {
@@ -82,6 +83,7 @@ else {
       }
       \CRM_Utils_Time::resetTime();
       if ($this->isCiviTest($test)) {
+        unset($GLOBALS['CIVICRM_TEST_CASE']);
         error_reporting(E_ALL & ~E_NOTICE);
         $this->errorScope = NULL;
       }
