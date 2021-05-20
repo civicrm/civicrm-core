@@ -1657,7 +1657,7 @@ WHERE     ct.id = cp.financial_type_id AND
       case 'Text':
         $firstOption = reset($field['options']);
         $params["price_{$id}"] = [$firstOption['id'] => $params["price_{$id}"]];
-        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
+        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
         $optionValueId = key($field['options']);
 
         if (CRM_Utils_Array::value('name', $field['options'][$optionValueId]) === 'contribution_amount') {
@@ -1691,7 +1691,7 @@ WHERE     ct.id = cp.financial_type_id AND
         $amount_override = NULL;
 
         if ($priceSetID && count(self::filterPriceFieldsFromParams($priceSetID, $params)) === 1) {
-          $amount_override = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
+          $amount_override = CRM_Utils_Array::value('total_amount', $params);
         }
         CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {
@@ -1706,7 +1706,7 @@ WHERE     ct.id = cp.financial_type_id AND
         $params["price_{$id}"] = [$params["price_{$id}"] => 1];
         $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
-        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
+        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
         if (!empty($field['options'][$optionValueId]['tax_rate'])) {
           $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
         }
@@ -1714,7 +1714,7 @@ WHERE     ct.id = cp.financial_type_id AND
 
       case 'CheckBox':
 
-        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
+        CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem);
         foreach ($params["price_{$id}"] as $optionId => $option) {
           if (!empty($field['options'][$optionId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);

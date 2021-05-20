@@ -3629,9 +3629,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
-        if (empty($params['partial_payment_total']) && empty($params['partial_amount_to_pay'])) {
-          self::$_trxnIDs[] = $financialTxn->id;
-        }
+        self::$_trxnIDs[] = $financialTxn->id;
       }
     }
     // record line items and financial items

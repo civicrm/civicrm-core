@@ -1312,7 +1312,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             );
           }
 
-          // CRM-13964 partial_payment_total
+          // CRM-13964 partial payment
           if ($amountOwed > $params['total_amount']) {
             // the owed amount
             $contributionParams['total_amount'] = $amountOwed;
