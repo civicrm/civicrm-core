@@ -15,8 +15,6 @@
  * @group headless
  */
 class api_v3_EntityBatchTest extends CiviUnitTestCase {
-
-  protected $_apiversion = 3;
   protected $params;
   protected $id;
   protected $_entity;
@@ -34,34 +32,41 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
     $entityParams = ['contact_id' => $this->individualCreate()];
 
     $this->_entity = 'EntityBatch';
-    $this->_entityID = $this->contributionCreate($entityParams);
-    $this->_batchID = $this->batchCreate();
     $this->params = [
-      'entity_id' => $this->_entityID,
-      'batch_id' => $this->_batchID,
+      'entity_id' => $this->contributionCreate($entityParams),
+      'batch_id' => $this->batchCreate(),
       'entity_table' => 'civicrm_financial_trxn',
     ];
   }
 
-  public function testCreateEntityBatch() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateEntityBatch(): void {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
-  public function testGetEntityBatch() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetEntityBatch(): void {
+    $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
-  public function testDeleteEntityBatch() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testDeleteEntityBatch(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = ['id' => $result['id']];
-    $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
