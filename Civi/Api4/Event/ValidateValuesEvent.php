@@ -71,6 +71,24 @@ class ValidateValuesEvent extends GenericHookEvent {
   public $records;
 
   /**
+   * Detailed, side-by-side comparison of old and new values.
+   *
+   * This requires loading the list of old values from the database. Consequently,
+   * reading `$diffs` is more expensive than reading `$records`, so you should only use it if
+   * really necessary.
+   *
+   * The list of $diffs may be important if you are enforcing a rule that involves
+   * multiple fields. (Ex: "Validate that the state_id and country_id match.")
+   *
+   * When possible, $records and $diffs will have the same number of items (with corresponding
+   * keys). However, in the case of a batch `update()`, the list of diffs will be longer.
+   *
+   * @var array|\CRM_Utils_LazyArray
+   *   Each item is a record of the form ['old' => $fieldValues, 'new' => $fieldValues]
+   */
+  public $diffs;
+
+  /**
    * List of error messages.
    *
    * @var array
@@ -85,10 +103,13 @@ class ValidateValuesEvent extends GenericHookEvent {
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array|\CRM_Utils_LazyArray $records
    *   List of updates (akin to SaveAction::$records).
+   * @param array|\CRM_Utils_LazyArray $diffs
+   *   List of differences (comparing old values and new values).
    */
-  public function __construct($apiRequest, $records) {
+  public function __construct($apiRequest, $records, $diffs) {
     $this->setApiRequest($apiRequest);
     $this->records = $records;
+    $this->diffs = $diffs;
     $this->errors = [];
   }
 

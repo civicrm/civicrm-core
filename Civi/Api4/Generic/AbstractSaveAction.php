@@ -105,7 +105,20 @@ abstract class AbstractSaveAction extends AbstractAction {
     if ($unmatched) {
       throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
     }
-    $e = new ValidateValuesEvent($this, $this->records);
+    $e = new ValidateValuesEvent($this, $this->records, new \CRM_Utils_LazyArray(function() {
+      $existingIds = array_column($this->records, $this->idField);
+      $existing = civicrm_api4($this->getEntityName(), 'get', [
+        'checkPermissions' => $this->checkPermissions,
+        'where' => [[$this->idField, 'IN', $existingIds]],
+      ], $this->idField);
+
+      $result = [];
+      foreach ($this->records as $k => $new) {
+        $old = isset($new[$this->idField]) ? $existing[$new[$this->idField]] : NULL;
+        $result[$k] = ['old' => $old, 'new' => $new];
+      }
+      return $result;
+    }));
     \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
     if (!empty($e->errors)) {
       throw $e->toException();
