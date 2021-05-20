@@ -31,13 +31,13 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     $this->setUpPayflowProcessor();
     $this->processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['PayflowPro']);
     parent::setUp();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     $this->callAPISuccess('PaymentProcessor', 'delete', ['id' => $this->ids['PaymentProcessor']['PayflowPro']]);
     parent::tearDown();
   }
@@ -45,7 +45,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   /**
    * Test making a once off payment
    */
-  public function testSinglePayment() {
+  public function testSinglePayment(): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 20.00;
@@ -71,7 +71,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   /**
    * Test making a recurring payment
    */
-  public function testRecuringPayment() {
+  public function testRecuringPayment(): void {
     $this->setupMockHandler(NULL, FALSE, TRUE);
     $params = $this->getBillingParams();
     $params['amount'] = 20.00;
@@ -100,7 +100,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   /**
    * Test making a failed once off payment
    */
-  public function testErrorSinglePayment() {
+  public function testErrorSinglePayment(): void {
     $this->setupMockHandler(NULL, TRUE);
     $params = $this->getBillingParams();
     $params['amount'] = 2220.00;
@@ -158,7 +158,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
     ];
   }
 
-  public function setUpPayflowProcessor() {
+  public function setUpPayflowProcessor(): void {
     $paymentProcessorType = $this->callAPISuccess('PaymentProcessorType', 'get', ['name' => 'PayflowPro']);
     $this->callAPISuccess('PaymentProcessorType', 'create', ['id' => $paymentProcessorType['id'], 'is_active' => 1]);
     $params = [
@@ -202,7 +202,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    *
    * @throws \CiviCRM_API3_Exception
    */
-  protected function setupMockHandler($id = NULL, $error = FALSE, $recurring = FALSE) {
+  protected function setupMockHandler($id = NULL, $error = FALSE, $recurring = FALSE): void {
     if ($id) {
       $this->processor = Civi\Payment\System::singleton()->getById($id);
     }
@@ -219,19 +219,19 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    *
    * @return array
    */
-  public function getExpectedSinglePaymentResponses() {
+  public function getExpectedSinglePaymentResponses(): array {
     return [
       'RESULT=0&PNREF=A80N0E942869&RESPMSG=Approved&AUTHCODE=028703&AVSADDR=Y&AVSZIP=Y&CVV2MATCH=Y&HOSTCODE=000&RESPTEXT=AP&PROCAVS=Y&PROCCVV2=M&IAVS=N',
     ];
   }
 
-  public function getExpectedRecurringPaymentResponses() {
+  public function getExpectedRecurringPaymentResponses(): array {
     return [
       'RESULT=0&RPREF=R3V53AE13D76&PROFILEID=RT0000000003&RESPMSG=Approved&TRXRESULT=0&TRXPNREF=A40N0DAB30B0&TRXRESPMSG=Approved&AUTHCODE=008917&AVSADDR=Y&AVSZIP=Y&CVV2MATCH=Y&HOSTCODE=000&RESPTEXT=AP&PROCAVS=Y&PROCCVV2=M&IAVS=N',
     ];
   }
 
-  public function getExpectedSinglePaymentErrorResponses() {
+  public function getExpectedSinglePaymentErrorResponses(): array {
     return [
       'RESULT=12&PNREF=A80N0E94337E&RESPMSG=Declined&AVSADDR=Y&AVSZIP=Y&CVV2MATCH=Y&HOSTCODE=005&RESPTEXT=DECLINE&PROCAVS=Y&PROCCVV2=M&IAVS=N',
     ];
@@ -242,13 +242,13 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    *
    * @return array
    */
-  public function getExpectedSinglePaymentRequests() {
+  public function getExpectedSinglePaymentRequests(): array {
     return [
       'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=S&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[5]=20.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS',
     ];
   }
 
-  public function getExpectedRecuringPaymentRequests() {
+  public function getExpectedRecuringPaymentRequests(): array {
     return [
       'USER[4]=test&VENDOR[4]=test&PARTNER[6]=PayPal&PWD[8]=test1234&TENDER[1]=C&TRXTYPE[1]=R&ACCT[16]=4111111111111111&CVV2[3]=123&EXPDATE[4]=1022&ACCTTYPE[4]=Visa&AMT[5]=20.00&CURRENCY[3]=AUD&FIRSTNAME[4]=John&LASTNAME[8]=O\'Connor&STREET[16]=8 Hobbitton Road&CITY[9]=The+Shire&STATE[3]=NSW&ZIP[4]=5010&COUNTRY[3]=AUS&EMAIL[24]=unittesteway@civicrm.org&CUSTIP[9]=127.0.0.1&COMMENT1[4]=4200&COMMENT2[4]=live&INVNUM[3]=xyz&ORDERDESC[17]=Test+Contribution&VERBOSITY[6]=MEDIUM&BILLTOCOUNTRY[3]=AUS&OPTIONALTRX[1]=S&OPTIONALTRXAMT[5]=20.00&ACTION[1]=A&PROFILENAME[19]=RegularContribution&TERM[2]=12&START[8]=' . date('mdY', mktime(0, 0, 0, date("m") + 1, date("d"), date("Y"))) . '&PAYPERIOD[4]=MONT',
     ];

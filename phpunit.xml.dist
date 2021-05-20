@@ -9,6 +9,7 @@
          stderr="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
+         cacheResult="false"
 >
   <testsuites>
     <testsuite name="api_v3_AllTests">
