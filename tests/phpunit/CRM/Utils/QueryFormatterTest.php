@@ -43,7 +43,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     }
   }
 
-  public static function tearDownAfterClass() {
+  public static function tearDownAfterClass(): void {
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_fts_example');
     parent::tearDownAfterClass();
   }

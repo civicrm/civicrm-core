@@ -22,14 +22,6 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       ->apply();
   }
 
-  public function setUp() {
-    parent::setUp();
-  }
-
-  public function tearDown() {
-    parent::tearDown();
-  }
-
   /**
    * Test running a searchDisplay with various filters.
    */
