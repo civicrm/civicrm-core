@@ -691,30 +691,38 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * Update the record with PK $id in the import database table.
    *
+   * @deprecated - call setImportStatus directly as the parameters are simpler,
+   *
    * @param int $id
    * @param array $params
    */
-  public function updateImportRecord($id, &$params) {
-    $statusFieldName = $this->_statusFieldName;
-    $primaryKeyName = $this->_primaryKeyName;
+  public function updateImportRecord($id, $params): void {
+    $this->setImportStatus((int) $id, $params[$this->_statusFieldName] ?? '', $params["{$this->_statusFieldName}Msg"] ?? '');
+  }
 
-    if ($statusFieldName && $primaryKeyName) {
-      $dao = new CRM_Core_DAO();
-      $db = $dao->getDatabaseConnection();
-
-      $query = "UPDATE $this->_tableName
-                      SET    $statusFieldName = ?,
-                             ${statusFieldName}Msg = ?
-                      WHERE  $primaryKeyName = ?";
-      $args = [
-        $params[$statusFieldName],
-        CRM_Utils_Array::value("${statusFieldName}Msg", $params),
-        $id,
-      ];
-
-      //print "Running query: $query<br/>With arguments: ".$params[$statusFieldName].", ".$params["${statusFieldName}Msg"].", $id<br/>";
-
-      $db->query($query, $args);
+  /**
+   * Set the import status for the given record.
+   *
+   * If this is a sql import then the sql table will be used and the update
+   * will not happen as the relevant fields don't exist in the table - hence
+   * the checks that statusField & primary key are set.
+   *
+   * @param int $id
+   * @param string $status
+   * @param string $message
+   */
+  public function setImportStatus(int $id, string $status, string $message): void {
+    if ($this->_statusFieldName && $this->_primaryKeyName) {
+      CRM_Core_DAO::executeQuery("
+        UPDATE $this->_tableName
+        SET $this->_statusFieldName = %1,
+          {$this->_statusFieldName}Msg = %2
+        WHERE  $this->_primaryKeyName = %3
+      ", [
+        1 => [$status, 'String'],
+        2 => [$message, 'String'],
+        3 => [$id, 'Integer'],
+      ]);
     }
   }
 
