@@ -144,6 +144,7 @@
     <html>
       <label>Created By</label>
     </html>
+    <readonly>true</readonly>
     <add>5.36</add>
   </field>
   <foreignKey>
@@ -185,6 +186,7 @@
     <comment>When the search was created.</comment>
     <required>true</required>
     <default>CURRENT_TIMESTAMP</default>
+    <readonly>true</readonly>
     <add>5.36</add>
   </field>
   <field>

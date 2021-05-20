@@ -1,3 +1,14 @@
+#bootstrap-theme.crm-search-admin-list th[ng-click] {
+  cursor: pointer;
+}
+#bootstrap-theme.crm-search-admin-list th i.fa-sort-desc,
+#bootstrap-theme.crm-search-admin-list th i.fa-sort-asc {
+  color: #1a5a82;
+}
+#bootstrap-theme.crm-search-admin-list th:not(:hover) i.fa-sort {
+  opacity: .5;
+}
+
 #bootstrap-theme .crm-search-criteria-column {
   min-width: 500px;
 }
@@ -133,6 +144,12 @@
 
 #bootstrap-theme.crm-search input[type=number] {
   width: 90px;
+}
+/* For display.settings.limit field */
+#bootstrap-theme.crm-search .checkbox-inline.form-control input[type=number] {
+  position: relative;
+  top: -5px;
+  right: -9px;
 }
 
 #bootstrap-theme.crm-search .api4-add-where-group-menu {

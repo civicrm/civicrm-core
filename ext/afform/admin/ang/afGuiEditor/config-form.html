@@ -2,7 +2,7 @@
 
   <div class="form-group">
     <label for="af_config_form_title">
-      {{:: ts('Title:') }} <span class="crm-marker">*</span>
+      {{:: ts('Title') }} <span class="crm-marker">*</span>
     </label>
     <p class="help-block">{{:: ts('Public title (usually displayed at the top of the form).') }}</p>
     <input ng-model="afform.title" class="form-control" id="af_config_form_title" required title="{{:: ts('Required') }}" />
@@ -10,7 +10,7 @@
 
   <div class="form-group">
     <label for="af_config_form_description">
-      {{:: ts('Description:') }}
+      {{:: ts('Description') }}
     </label>
     <textarea ng-model="afform.description" class="form-control" id="af_config_form_description"></textarea>
     <p class="help-block">{{:: ts("Internal note about the form's purpose (not displayed on form).") }}</p>
@@ -19,7 +19,7 @@
 
   <div class="form-group">
     <label for="af_config_form_permission">
-      {{:: ts('Permission:') }}
+      {{:: ts('Permission') }}
     </label>
     <input ng-model="afform.permission" class="form-control" id="af_config_form_permission" crm-ui-select="{data: editor.meta.permissions}" />
     <p class="help-block">{{:: ts('What permission is required to use this form?') }}</p>
@@ -30,7 +30,7 @@
 
     <div class="form-group" ng-class="{'has-error': !!config_form.server_route.$error.pattern}">
       <label for="af_config_form_server_route">
-        {{:: ts('Page:') }}
+        {{:: ts('Page') }}
       </label>
       <input ng-model="afform.server_route" name="server_route" class="form-control" id="af_config_form_server_route" pattern="^civicrm\/[-0-9a-zA-Z\/_]+$" onfocus="this.value = this.value || 'civicrm/'" onblur="if (this.value === 'civicrm/') this.value = ''" title="{{:: ts('Path must begin with &quot;civicrm/&quot;') }}">
       <p class="help-block">{{:: ts('Expose the form as a standalone webpage. (Example: "civicrm/my-form")') }}</p>
@@ -46,7 +46,7 @@
     <div class="form-group" ng-if="!!afform.server_route">
       <label>
         <input type="checkbox" ng-model="afform.is_token">
-        {{:: ts('Provide email token') }}
+        {{:: ts('Provide Email Token') }}
       </label>
       <p class="help-block">{{:: ts('Allows CiviMail authors to easily link to this page') }}</p>
     </div>
@@ -54,7 +54,7 @@
     <div class="form-group">
       <label>
         <input type="checkbox" ng-model="afform.is_dashlet">
-        {{:: ts('Add to dashboard') }}
+        {{:: ts('Add to Dashboard') }}
       </label>
       <p class="help-block">{{:: ts('Allow CiviCRM users to add the form to their home dashboard.') }}</p>
     </div>
@@ -63,7 +63,7 @@
       <div class="form-inline">
         <label>
           <input type="checkbox" ng-checked="afform.contact_summary" ng-click="editor.toggleContactSummary()">
-          {{:: ts('Add to contact summary page') }}
+          {{:: ts('Add to Contact Summary Page') }}
         </label>
         <select class="form-control" ng-model="afform.contact_summary" ng-if="afform.contact_summary">
           <option value="block">{{:: ts('As Block') }}</option>

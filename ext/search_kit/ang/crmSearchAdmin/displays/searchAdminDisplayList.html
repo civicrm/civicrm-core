@@ -1,23 +1,31 @@
 <fieldset ng-include="'~/crmSearchAdmin/crmSearchAdminDisplaySort.html'"></fieldset>
 <fieldset>
   <div class="form-inline">
-    <label for="crm-search-admin-display-style">{{:: ts('Style:') }}</label>
+    <label for="crm-search-admin-display-style">{{:: ts('Style') }}</label>
     <select id="crm-search-admin-display-style" class="form-control" ng-model="$ctrl.display.settings.style" ng-change="$ctrl.display.settings.symbol = ''">
       <option value="ul">{{:: ts('Bullets') }}</option>
       <option value="ol">{{:: ts('Numbers') }}</option>
     </select>
-    <label for="crm-search-admin-display-symbol">{{:: ts('Symbol:') }}</label>
+    <label for="crm-search-admin-display-symbol">{{:: ts('Symbol') }}</label>
     <select id="crm-search-admin-display-symbol" class="form-control" ng-model="$ctrl.display.settings.symbol">
       <option ng-repeat="symbol in $ctrl.symbols[$ctrl.display.settings.style]" value="{{ symbol.char }}">
         {{ symbol.label }}
       </option>
     </select>
-  <div class="form-inline">
   </div>
-    <label for="crm-search-admin-display-limit">{{:: ts('Results to display (0 for no limit):') }}</label>
-    <input id="crm-search-admin-display-limit" type="number" min="0" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
+  <div class="form-inline">
     <div class="checkbox-inline form-control">
-      <label><input type="checkbox" ng-model="$ctrl.display.settings.pager"> <span>{{:: ts('Use Pager') }}</span></label>
+      <label>
+        <input type="checkbox" ng-checked="$ctrl.display.settings.limit" ng-click="$ctrl.parent.toggleLimit()">
+        <span>{{:: ts('Limit Results') }}</span>
+      </label>
+      <input id="crm-search-admin-display-limit" ng-if="$ctrl.display.settings.limit" type="number" min="1" step="1" class="form-control" ng-model="$ctrl.display.settings.limit">
+    </div>
+    <div class="checkbox-inline form-control">
+      <label ng-class="{disabled: !$ctrl.display.settings.limit}">
+        <input type="checkbox" ng-model="$ctrl.display.settings.pager" ng-disabled="!$ctrl.display.settings.limit">
+        <span>{{:: ts('Use Pager') }}</span>
+      </label>
     </div>
   </div>
 </fieldset>
@@ -30,7 +38,7 @@
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
       <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
-        <label><input type="checkbox" ng-model="col.break"> {{:: ts('Display on new line') }}</label>
+        <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
         <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
           <i class="crm-i fa-ban"></i>
         </button>
@@ -38,7 +46,7 @@
       <div class="form-inline crm-search-admin-flex-row">
         <label>
           <input type="checkbox" ng-checked="col.label" ng-click="col.label = col.label ? null : $ctrl.parent.getColLabel(col)" >
-          {{ col.label ? ts('Label:') : ts('Label') }}
+          {{:: ts('Label') }}
         </label>
         <input ng-if="col.label" class="form-control crm-flex-1" type="text" ng-model="col.label" ng-model-options="{updateOn: 'blur'}">
         <crm-search-admin-token-select ng-if="col.label" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="label"></crm-search-admin-token-select>
