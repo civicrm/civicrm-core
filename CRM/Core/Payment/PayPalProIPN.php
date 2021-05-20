@@ -51,7 +51,12 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    */
   protected $contributionRecurObject;
 
-
+  /**
+   * Contribution object.
+   *
+   * @var \CRM_Contribute_BAO_Contribution
+   */
+  protected $contributionObject;
   /**
    * Contribution ID.
    *
@@ -462,7 +467,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       $this->_component = $input['component'] = self::getValue('m');
       $input['invoice'] = self::getValue('i', TRUE);
       // get the contribution and contact ids from the GET params
-      $ids['contact'] = self::getValue('c', TRUE);
+      $ids['contact'] = $this->getContactID();
       $ids['contribution'] = $this->getContributionID();
 
       $this->getInput($input);
@@ -503,14 +508,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       if (!$paymentProcessorID) {
         $paymentProcessorID = self::getPayPalPaymentProcessorID();
       }
-
-      // Check if the contribution exists
-      // make sure contribution exists and is valid
-      $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $ids['contribution'];
-      if (!$contribution->find(TRUE)) {
-        throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
-      }
+      $contribution = $this->getContributionObject();
 
       // make sure contact exists and is valid
       // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
@@ -664,12 +662,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
     // Check if the contribution exists
     // make sure contribution exists and is valid
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $this->getContributionID();
-    if (!$contribution->find(TRUE)) {
-      throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
-    }
-
+    $contribution = $this->getContributionObject();
     $objects['contribution'] = &$contribution;
 
     // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
@@ -718,6 +711,34 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       return $this->contributionRecurObject = $contributionRecur;
     }
     return $this->contributionRecurObject;
+  }
+
+  /**
+   * @return \CRM_Contribute_BAO_Contribution
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionObject(): CRM_Contribute_BAO_Contribution {
+    if (!$this->contributionObject) {
+      // Check if the contribution exists
+      // make sure contribution exists and is valid
+      $contribution = new CRM_Contribute_BAO_Contribution();
+      $contribution->id = $this->getContributionID();
+      if (!$contribution->find(TRUE)) {
+        throw new CRM_Core_Exception('Failure: Could not find contribution record');
+      }
+      $this->contributionObject = $contribution;
+    }
+    return $this->contributionObject;
+  }
+
+  /**
+   * Get the relevant contact ID.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContactID(): int {
+    return $this->getValue('c', TRUE);
   }
 
 }
