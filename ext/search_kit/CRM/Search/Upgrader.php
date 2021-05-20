@@ -18,6 +18,7 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
       ->addValue('icon', 'crm-i fa-search-plus')
       ->addValue('has_separator', 2)
       ->addValue('weight', 99)
+      ->addValue('permission', 'administer CiviCRM data')
       ->execute();
   }
 
@@ -130,6 +131,16 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
           ->execute();
       }
     }
+    return TRUE;
+  }
+
+  /**
+   * Upgrade 1004 - fix menu permission.
+   * @return bool
+   */
+  public function upgrade_1004() {
+    $this->ctx->log->info('Applying update 1000 - fix menu permission.');
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_navigation SET permission = 'administer CiviCRM data' WHERE url = 'civicrm/admin/search'");
     return TRUE;
   }
 
