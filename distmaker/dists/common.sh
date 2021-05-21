@@ -110,8 +110,8 @@ function dm_install_coreext() {
   shift
 
   for relext in "$@" ; do
-    [ ! -d "$to/$relext" ] && mkdir -p "$to/$relext"
-    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/$relext/./" "$to/$relext/./"
+    [ ! -d "$to/ext/$relext" ] && mkdir -p "$to/ext/$relext"
+    ${DM_RSYNC:-rsync} -avC $excludes_rsync --include=core "$repo/ext/$relext/./" "$to/ext/$relext/./"
   done
 }
 
