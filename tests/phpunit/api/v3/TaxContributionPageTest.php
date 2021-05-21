@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialTrxn;
+
 /**
  * Class api_v3_TaxContributionPageTest
  * @group headless
@@ -186,9 +188,10 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @dataProvider getThousandSeparators
    *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionOnline(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
@@ -272,6 +275,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPayLaterOnline(): void {
@@ -307,9 +311,11 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    * @dataProvider getThousandSeparators
    *
-   * @throws \CRM_Core_Exception
    */
   public function testCreateContributionPendingOnline(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
@@ -336,7 +342,9 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals('SSF', $contribution['source']);
     $this->assertEquals(20, $contribution['tax_amount']);
     $this->assertEquals(2, $contribution['contribution_status_id']);
-    $this->_checkFinancialRecords($contribution, 'pending');
+    $trxn = $this->getFinancialTransactionsForContribution($contribution['id']);
+    $this->assertCount(0, $trxn, 'No Trxn to be created until IPN callback');
+
     $this->setCurrencySeparators($thousandSeparator);
   }
 
@@ -421,20 +429,15 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
   /**
    * @param array $params
    * @param string $context
+   *
+   * @throws \API_Exception
    */
   public function _checkFinancialRecords($params, $context): void {
-    $entityParams = [
-      'entity_id' => $params['id'],
-      'entity_table' => 'civicrm_contribution',
-    ];
-    if ($context === 'pending') {
-      $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
-      $this->assertNull($trxn, 'No Trxn to be created until IPN callback');
-      return;
-    }
-    $trxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
+    $contributionID = $params['id'];
+    $trxn = $this->getFinancialTransactionsForContribution($contributionID);
+
     $trxnParams = [
-      'id' => $trxn['financial_trxn_id'],
+      'id' => $trxn->first()['financial_trxn_id'],
     ];
     if ($context !== 'online' && $context !== 'payLater') {
       $compareParams = [
@@ -459,7 +462,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, $compareParams);
     $entityParams = [
-      'financial_trxn_id' => $trxn['financial_trxn_id'],
+      'financial_trxn_id' => $trxn->first()['financial_trxn_id'],
       'entity_table' => 'civicrm_financial_item',
     ];
     $entityTrxn = current(CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams));
@@ -516,6 +519,20 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'invoice_id' => 'abc',
     ]);
     $this->callAPISuccess('contribution', 'delete', ['id' => $contributionID]);
+  }
+
+  /**
+   * @param $contributionID
+   *
+   * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getFinancialTransactionsForContribution($contributionID): \Civi\Api4\Generic\Result {
+    return EntityFinancialTrxn::get()
+      ->addWhere('id', '=', $contributionID)
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addSelect('*')->execute();
   }
 
 }

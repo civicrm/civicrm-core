@@ -183,7 +183,13 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   }
 
   /**
-   * Retrive entity financial trxn details.
+   * Retrieve entity financial trxn details.
+   *
+   * @deprecated - only called by tests - to be replaced with
+   * $trxn = (array) EntityFinancialTrxn::get()
+   *  ->addWhere('id', '=', $contributionID)
+   *  ->addWhere('entity_table', '=', 'civicrm_contribution')
+   *  ->addSelect('*')->execute();
    *
    * @param array $params
    *   an assoc array of name/value pairs.
