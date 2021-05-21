@@ -27,6 +27,7 @@
  */
 
 use Civi\Api4\OptionGroup;
+use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
 use League\Csv\Reader;
@@ -3845,6 +3846,27 @@ WHERE a1.is_primary = 0
     $currentModes = array_merge($currentModes, array_fill_keys($modes, 1));
     CRM_Core_DAO::executeQuery("SET GLOBAL sql_mode = '" . implode(',', array_keys($currentModes)) . "'");
     CRM_Core_DAO::executeQuery("SET sql_mode = '" . implode(',', array_keys($currentModes)) . "'");
+  }
+
+  /**
+   * Delete any extraneous relationship types.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function deleteNonDefaultRelationshipTypes(): void {
+    RelationshipType::delete(FALSE)->addWhere('name_a_b', 'NOT IN', [
+      'Child of',
+      'Spouse of',
+      'Partner of',
+      'Sibling of',
+      'Employee of',
+      'Volunteer for',
+      'Head of Household for',
+      'Household Member of',
+      'Case Coordinator is',
+      'Supervised by',
+    ])->execute();
   }
 
 }
