@@ -277,6 +277,23 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
+   * Get a list of all extant BAO classes.
+   *
+   * @return array
+   *   Ex: ['Contact' => 'CRM_Contact_BAO_Contact']
+   */
+  public static function getBaoClasses() {
+    $r = [];
+    foreach (\CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoClass) {
+      $baoClass = str_replace('_DAO_', '_BAO_', $daoClass);
+      if (class_exists($baoClass)) {
+        $r[$entity] = $baoClass;
+      }
+    }
+    return $r;
+  }
+
+  /**
    * Get the classname for the table.
    *
    * @param string $tableName

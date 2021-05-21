@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Event\EventScanner;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -336,6 +337,16 @@ class Container {
         "CRM_{$comp}_Tokens",
         []
       ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    }
+
+    $dispatcherDefn = $container->getDefinition('dispatcher');
+    foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {
+      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
+      if ($listenerMap) {
+        $file = (new \ReflectionClass($baoClass))->getFileName();
+        $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
+        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
+      }
     }
 
     \CRM_Api4_Services::hook_container($container);
