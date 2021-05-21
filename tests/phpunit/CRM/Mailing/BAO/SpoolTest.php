@@ -57,14 +57,14 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
     CRM_Utils_Mail::send($params);
 
     $mail = $this->_mut->getMostRecentEmail('raw');
-    $this->assertContains("Subject: $subject", $mail);
-    $this->assertContains(self::$bodytext, $mail);
+    $this->assertStringContainsString("Subject: $subject", $mail);
+    $this->assertStringContainsString(self::$bodytext, $mail);
 
     $mail = $this->_mut->getMostRecentEmail('ezc');
 
     $this->assertEquals($subject, $mail->subject);
-    $this->assertContains($contact_params_1['email'], $mail->from->email, 'From address incorrect.');
-    $this->assertContains($contact_params_2['email'], $mail->to[0]->email, 'Recipient incorrect.');
+    $this->assertStringContainsString($contact_params_1['email'], $mail->from->email, 'From address incorrect.');
+    $this->assertStringContainsString($contact_params_2['email'], $mail->to[0]->email, 'Recipient incorrect.');
 
     $context = new ezcMailPartWalkContext([get_class($this), 'mailWalkCallback']);
     $mail->walkParts($context, $mail);

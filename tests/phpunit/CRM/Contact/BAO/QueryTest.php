@@ -445,39 +445,39 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testSearchBuilderActivityType() {
     $queryObj = new CRM_Contact_BAO_Query([['activity_type', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity Type = Email', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_type_id', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity Type ID = Email', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_status', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_status_id', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_engagement_level', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.engagement_level = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.engagement_level = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Engagement Index = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_id', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Activity ID = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_campaign_id', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.campaign_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.campaign_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Campaign ID = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_priority_id', '=', '3', 1, 0]]);
-    $this->assertContains('WHERE  (  ( civicrm_activity.priority_id = 3 )', $queryObj->getSearchSQL());
+    $this->assertStringContainsString('WHERE  (  ( civicrm_activity.priority_id = 3 )', $queryObj->getSearchSQL());
     $this->assertEquals('Priority = Low', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_subject', '=', '3', 1, 0]]);
-    $this->assertContains("WHERE  (  ( civicrm_activity.subject = '3' )", $queryObj->getSearchSQL());
+    $this->assertStringContainsString("WHERE  (  ( civicrm_activity.subject = '3' )", $queryObj->getSearchSQL());
     $this->assertEquals("Subject = '3'", $queryObj->_qill[1][0]);
   }
 
@@ -834,7 +834,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       ],
     ];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
-    $this->assertContains('INNER JOIN civicrm_tmp_e', $sql, 'Query appears to use temporary table of compiled relationships?', TRUE);
+    $this->assertStringContainsStringIgnoringCase('INNER JOIN civicrm_tmp_e', $sql, 'Query appears to use temporary table of compiled relationships?');
   }
 
   /**
@@ -845,7 +845,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   public function testRelationshipPermissionClause() {
     $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
-    $this->assertContains('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
+    $this->assertStringContainsString('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
   }
 
   /**

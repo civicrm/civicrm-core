@@ -358,8 +358,8 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
     $create_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_test_drop_column');
     while ($create_table->fetch()) {
-      $this->assertNotContains('col1', $create_table->Create_Table);
-      $this->assertContains('col2', $create_table->Create_Table);
+      $this->assertStringNotContainsString('col1', $create_table->Create_Table);
+      $this->assertStringContainsString('col2', $create_table->Create_Table);
     }
 
     // drop col2
@@ -368,7 +368,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
     $create_table = CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_test_drop_column');
     while ($create_table->fetch()) {
-      $this->assertNotContains('col2', $create_table->Create_Table);
+      $this->assertStringNotContainsString('col2', $create_table->Create_Table);
     }
   }
 

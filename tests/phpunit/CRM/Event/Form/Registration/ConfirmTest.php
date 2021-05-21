@@ -299,19 +299,19 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
     $mailSent = $mut->getAllMessages();
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
-    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[0]);
-    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]);
+    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[0]);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]);
 
     $this->callAPISuccess('Payment', 'create', ['total_amount' => 100, 'payment_type_id' => 'Cash', 'contribution_id' => $contribution['id']]);
     $mailSent = $mut->getAllMessages();
     $this->assertCount(6, $mailSent);
 
-    $this->assertContains('participant_status:::Registered', $mailSent[3]);
-    $this->assertContains('Dear Participant2', $mailSent[3]);
+    $this->assertStringContainsString('participant_status:::Registered', $mailSent[3]);
+    $this->assertStringContainsString('Dear Participant2', $mailSent[3]);
 
-    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
-    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
-    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[5]);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
+    $this->assertStringContainsString('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
+    $this->assertStringContainsString('contactID:::' . $contribution['contact_id'], $mailSent[5]);
     $this->revertTemplateToReservedTemplate('event_online_receipt', 'text');
   }
 

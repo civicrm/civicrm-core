@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertContains('USD, USD * $ 60.00, $ 70.00 * January 1st, 2021  1:21 PM, February 1st, 2021  2:21 AM', $e->errorData['html']);
+      $this->assertStringContainsString('USD, USD * $ 60.00, $ 70.00 * January 1st, 2021  1:21 PM, February 1st, 2021  2:21 AM', $e->errorData['html']);
     }
   }
 

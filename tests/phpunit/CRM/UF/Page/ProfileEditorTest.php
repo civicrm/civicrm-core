@@ -53,10 +53,9 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
 
   /**
    * Tries to load up the profile schema for a model where there is no corresponding set of fields avaliable.
-   *
-   * @expectedException \CRM_Core_Exception
    */
   public function testGetSchemaWithHooksWithInvalidModel() {
+    $this->expectException(CRM_Core_Exception::class);
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterUFFields', [$this, 'hook_civicrm_alterUFFIelds']);
     $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'GrantModel', 'PledgeModel']);
   }

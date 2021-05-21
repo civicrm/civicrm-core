@@ -153,8 +153,8 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $log_table = CRM_Core_DAO::executeQuery("SHOW TRIGGERS WHERE `Trigger` LIKE 'civicrm_value_contact_{$customGroup['custom_group_id']}_after_insert%'");
 
     while ($log_table->fetch()) {
-      $this->assertContains('UPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;', $log_table->Statement, "Contact modification update should be in the trigger :\n" . $log_table->Statement);
-      $this->assertNotContains('civicrm_mailing', $log_table->Statement, 'Contact field should not update mailing table');
+      $this->assertStringContainsString('UPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;', $log_table->Statement, "Contact modification update should be in the trigger :\n" . $log_table->Statement);
+      $this->assertStringNotContainsString('civicrm_mailing', $log_table->Statement, 'Contact field should not update mailing table');
       $this->assertEquals(1, substr_count($log_table->Statement, 'SET modified_date'), 'Modified date should only be updated on one table (here it is contact)');
     }
   }
@@ -224,7 +224,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       $this->assertEquals('civicrm_group', $trigger['table'][0]);
       if ($trigger['event'][0] == 'UPDATE') {
         // civicrm_group.cache_date should be an exception, i.e. not logged
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
           "IFNULL(OLD.`cache_date`,'') <> IFNULL(NEW.`cache_date`,'')",
           $trigger['sql']
         );

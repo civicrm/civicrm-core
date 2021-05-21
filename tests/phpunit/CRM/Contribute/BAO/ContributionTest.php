@@ -305,9 +305,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->createLoggedInUserWithFinancialACL();
     $permittedFinancialType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
-    $this->assertContains('SUM(total_amount) as amount,', $sql);
-    $this->assertContains('WHERE b.contact_id IN (1,2,3)', $sql);
-    $this->assertContains('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
+    $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
+    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.financial_type_id IN (' . $permittedFinancialType . ')', $sql);
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
@@ -337,9 +337,9 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
    */
   public function testAnnualQueryWithFinancialACLsDisabled() {
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
-    $this->assertContains('SUM(total_amount) as amount,', $sql);
-    $this->assertContains('WHERE b.contact_id IN (1,2,3)', $sql);
-    $this->assertNotContains('b.financial_type_id', $sql);
+    $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
+    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringNotContainsString('b.financial_type_id', $sql);
     //$this->assertNotContains('line_item', $sql);
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
@@ -351,10 +351,10 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function testAnnualQueryWithFinancialHook() {
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'aclIdNoZero']);
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
-    $this->assertContains('SUM(total_amount) as amount,', $sql);
-    $this->assertContains('WHERE b.contact_id IN (1,2,3)', $sql);
-    $this->assertContains('b.id NOT IN (0)', $sql);
-    $this->assertNotContains('b.financial_type_id', $sql);
+    $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
+    $this->assertStringContainsString('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertStringContainsString('b.id NOT IN (0)', $sql);
+    $this->assertStringNotContainsString('b.financial_type_id', $sql);
     CRM_Core_DAO::executeQuery($sql);
   }
 

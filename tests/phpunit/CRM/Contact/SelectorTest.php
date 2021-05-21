@@ -66,7 +66,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
     if (!empty($dataSet['where_contains'])) {
-      $this->assertContains($this->strWrangle(str_replace('@tagid', $tag['id'], $dataSet['where_contains'])), $this->strWrangle($sql[2]));
+      $this->assertStringContainsString($this->strWrangle(str_replace('@tagid', $tag['id'], $dataSet['where_contains'])), $this->strWrangle($sql[2]));
     }
     // Ensure that search builder return individual contact as per criteria
     if ($dataSet['context'] === 'builder') {
@@ -175,7 +175,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     //Check if email column contains (On Hold) string.
     foreach ($rows[$contactID] as $key => $value) {
       if (strpos($key, 'email') !== FALSE) {
-        $this->assertContains("(On Hold)", (string) $value);
+        $this->assertStringContainsString("(On Hold)", (string) $value);
       }
     }
   }

@@ -64,8 +64,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     );
 
     $this->assertEquals('[case #' . $tplParams['idHash'] . '] Test 123', $subject);
-    $this->assertContains('Your Case Role', $message);
-    $this->assertContains('Case ID : 1234', $message);
+    $this->assertStringContainsString('Your Case Role', $message);
+    $this->assertStringContainsString('Case ID : 1234', $message);
   }
 
   /**

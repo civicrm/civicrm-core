@@ -1397,7 +1397,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       $form->preProcess();
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertContains("A payment processor configured for this page might be disabled (contact the site administrator for assistance).", $e->getMessage());
+      $this->assertStringContainsString("A payment processor configured for this page might be disabled (contact the site administrator for assistance).", $e->getMessage());
       return;
     }
     $this->fail('Exception was expected');
@@ -1776,7 +1776,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     // The page contents load later by ajax, so there's just the surrounding
     // html available now, but we can check at least one thing while we're here.
-    $this->assertContains("mainTabContainer", $contents);
+    $this->assertStringContainsString("mainTabContainer", $contents);
   }
 
   /**

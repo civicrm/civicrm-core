@@ -376,7 +376,7 @@ ENDBODY;
 
     // This kind of suffers from the same problem as the old webtests. It's
     // a bit brittle and tied to the UI.
-    $this->assertContains("Hi,<br />\n<br />\nWassup!?!?<br />\n<br />\nLet's check if the output when viewing the form has legible line breaks in the output.<br />\n<br />\nThanks!", $output);
+    $this->assertStringContainsString("Hi,<br />\n<br />\nWassup!?!?<br />\n<br />\nLet's check if the output when viewing the form has legible line breaks in the output.<br />\n<br />\nThanks!", $output);
 
     // Put label back
     $this->callAPISuccess('OptionValue', 'create', [
