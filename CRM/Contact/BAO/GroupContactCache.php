@@ -383,13 +383,6 @@ WHERE  id IN ( $groupIDs )
 
     // grab a lock so other processes don't compete and do the same query
     $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
-
-    $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
-      ->setCategory('gccache')
-      ->setMemory();
-    self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
-    $tempTable = $groupContactsTempTable->getName();
-
     if (!$lock->isAcquired()) {
       // this can cause inconsistent results since we don't know if the other process
       // will fill up the cache before our calling routine needs it.
@@ -397,6 +390,12 @@ WHERE  id IN ( $groupIDs )
       // its a "lets return and hope for the best"
       return;
     }
+
+    $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
+      ->setCategory('gccache')
+      ->setMemory();
+    self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
+    $tempTable = $groupContactsTempTable->getName();
 
     // Don't call clearGroupContactCache as we don't want to clear the cache dates
     // The will get updated by updateCacheTime() below and not clearing the dates reduces
