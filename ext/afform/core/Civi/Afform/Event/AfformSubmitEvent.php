@@ -8,29 +8,45 @@ use Civi\Api4\Action\Afform\Submit;
  * Class AfformSubmitEvent
  * @package Civi\Afform\Event
  *
- * Handle submission of an "<af-form>".
- * Listeners ought to take any recognized items from `entityValues`, handle
- * them, and remove them.
+ * Handle submission of an "<af-form>" entity.
  *
- * NOTE: I'm on the fence about whether to expose the arrays or more targeted
- * methods. For the moment, this is only expected to be used internally,
- * so KISS.
+ * The default handler of this event is `Submit::processGenericEntity`
+ * If special processing for an entity type is desired, add a new listener with a higher priority
+ * than 0, and either manipulate the $records and allow the default listener to perform the save,
+ * or fully process the save and cancel event propagation to bypass `processGenericEntity`.
  */
 class AfformSubmitEvent extends AfformBaseEvent {
 
   /**
+   * One or more records to be saved for this entity.
+   * (because of `<af-repeat>` all entities are treated as if they may be multi)
    * @var array
-   *   List of definitions of the entities.
-   *   $entityDefns['spouse'] = ['type' => 'Individual'];
    */
-  public $entityDefns;
+  public $records;
 
   /**
-   * @var array
-   *   List of submitted entities to save.
-   *   $entityValues['Contact']['spouse'] = ['first_name' => 'Optimus Prime'];
+   * @var string
+   *   entityType
    */
-  public $entityValues;
+  private $entityType;
+
+  /**
+   * @var string
+   *   entityName e.g. Individual1, Activity1,
+   */
+  private $entityName;
+
+  /**
+   * Ids of each saved entity.
+   *
+   * Each key in the array corresponds to the name of an entity,
+   * and the value is an array of ids
+   * (because of `<af-repeat>` all entities are treated as if they may be multi)
+   * E.g. $entityIds['Individual1'] = [1];
+   *
+   * @var array
+   */
+  private $entityIds;
 
   /**
    * AfformSubmitEvent constructor.
@@ -38,23 +54,51 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
-   * @param array $entityDefns
-   * @param array $entityValues
+   * @param array $values
+   * @param string $entityType
+   * @param string $entityName
+   * @param array $entityIds
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, $entityDefns, array $entityValues) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, &$values, string $entityType, string $entityName, array &$entityIds) {
     parent::__construct($afform, $formDataModel, $apiRequest);
-    $this->entityDefns = $entityDefns;
-    $this->entityValues = $entityValues;
+    $this->records =& $values;
+    $this->entityType = $entityType;
+    $this->entityName = $entityName;
+    $this->entityIds =& $entityIds;
   }
 
   /**
-   * List of entity types which need processing.
-   *
-   * @return array
-   *   Ex: ['Contact', 'Activity']
+   * Get the entity type associated with this event
+   * @return string
    */
-  public function getTypes() {
-    return array_keys($this->entityValues);
+  public function getEntityType(): string {
+    return $this->entityType;
+  }
+
+  /**
+   * Get the entity name associated with this event
+   * @return string
+   */
+  public function getEntityName(): string {
+    return $this->entityName;
+  }
+
+  /**
+   * @return callable
+   *   API4-style
+   */
+  public function getSecureApi4() {
+    return $this->getFormDataModel()->getSecureApi4($this->entityName);
+  }
+
+  /**
+   * @param $index
+   * @param $entityId
+   * @return $this
+   */
+  public function setEntityId($index, $entityId) {
+    $this->entityIds[$this->entityName][$index] = $entityId;
+    return $this;
   }
 
 }

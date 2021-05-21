@@ -19,25 +19,42 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
+  /**
+   * Ids of each saved entity.
+   *
+   * Each key in the array corresponds to the name of an entity,
+   * and the value is an array of ids
+   * (because of `<af-repeat>` all entities are treated as if they may be multi)
+   * E.g. $entityIds['Individual1'] = [1];
+   *
+   * @var array
+   */
+  private $entityIds = [];
+
   protected function processForm() {
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      $this->entityIds[$entityName] = [];
+      $entityValues[$entityName] = [];
+
+      // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
       foreach ($this->values[$entityName] ?? [] as $values) {
-        $entityValues[$entity['type']][$entityName][] = $values + ['fields' => []];
-        // Predetermined values override submitted values
-        if (!empty($entity['data'])) {
-          foreach ($entityValues[$entity['type']][$entityName] as $index => $vals) {
-            $entityValues[$entity['type']][$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
-          }
+        $values['fields'] = $values['fields'] ?? [];
+        $entityValues[$entityName][] = $values;
+      }
+      // Predetermined values override submitted values
+      if (!empty($entity['data'])) {
+        foreach ($entityValues[$entityName] as $index => $vals) {
+          $entityValues[$entityName][$index]['fields'] = $entity['data'] + $vals['fields'];
         }
       }
     }
-    $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $this->_formDataModel->getEntities(), $entityValues);
-    \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
-    foreach ($event->entityValues as $entityType => $entities) {
-      if (!empty($entities)) {
-        throw new \API_Exception(sprintf("Failed to process entities (type=%s; name=%s)", $entityType, implode(',', array_keys($entities))));
-      }
+    $entityWeights = \Civi\Afform\Utils::getEntityWeights($this->_formDataModel->getEntities(), $entityValues);
+    foreach ($entityWeights as $entityName) {
+      $entityType = $this->_formDataModel->getEntity($entityName)['type'];
+      $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
+      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->entityIds);
+      \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     }
 
     // What should I return?
@@ -45,19 +62,30 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * @param \Civi\Afform\Event\AfformSubmitEvent $event
-   * @throws \API_Exception
-   * @see afform_civicrm_config
+   * Replace Entity reference fields with the id of the referenced entity.
+   * @param string $entityName
+   * @param $records
    */
-  public static function processContacts(AfformSubmitEvent $event) {
-    foreach ($event->entityValues['Contact'] ?? [] as $entityName => $contacts) {
-      $api4 = $event->formDataModel->getSecureApi4($entityName);
-      foreach ($contacts as $contact) {
-        $saved = $api4('Contact', 'save', ['records' => [$contact['fields']]])->first();
-        self::saveJoins('Contact', $saved['id'], $contact['joins'] ?? []);
+  private function replaceReferences($entityName, $records) {
+    $entityNames = array_diff(array_keys($this->entityIds), [$entityName]);
+    $entityType = $this->_formDataModel->getEntity($entityName)['type'];
+    foreach ($records as $key => $record) {
+      foreach ($record['fields'] as $field => $value) {
+        if (array_intersect($entityNames, (array) $value) && $this->getEntityField($entityType, $field)['input_type'] === 'EntityRef') {
+          if (is_array($value)) {
+            foreach ($value as $i => $val) {
+              if (in_array($val, $entityNames, TRUE)) {
+                $records[$key]['fields'][$field][$i] = $this->entityIds[$val][0];
+              }
+            }
+          }
+          else {
+            $records[$key]['fields'][$field] = $this->entityIds[$value][0];
+          }
+        }
       }
     }
-    unset($event->entityValues['Contact']);
+    return $records;
   }
 
   /**
@@ -66,19 +94,23 @@ class Submit extends AbstractProcessor {
    * @see afform_civicrm_config
    */
   public static function processGenericEntity(AfformSubmitEvent $event) {
-    foreach ($event->entityValues as $entityType => $entities) {
-      // Each record is an array of one or more items (can be > 1 if af-repeat is used)
-      foreach ($entities as $entityName => $records) {
-        $api4 = $event->formDataModel->getSecureApi4($entityName);
-        foreach ($records as $record) {
-          $saved = $api4($entityType, 'save', ['records' => [$record['fields']]])->first();
-          self::saveJoins($entityType, $saved['id'], $record['joins'] ?? []);
-        }
-      }
-      unset($event->entityValues[$entityType]);
+    $api4 = $event->getSecureApi4();
+    foreach ($event->records as $index => $record) {
+      $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
+      $event->setEntityId($index, $saved['id']);
+      self::saveJoins($event->getEntityType(), $saved['id'], $record['joins'] ?? []);
     }
   }
 
+  /**
+   * This saves joins (sub-entities) such as Email, Address, Phone, etc.
+   *
+   * @param $mainEntityName
+   * @param $entityId
+   * @param $joins
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
   protected static function saveJoins($mainEntityName, $entityId, $joins) {
     foreach ($joins as $joinEntityName => $join) {
       $values = self::filterEmptyJoins($joinEntityName, $join);
@@ -136,6 +168,22 @@ class Submit extends AbstractProcessor {
           return (bool) array_filter($item);
       }
     });
+  }
+
+  /**
+   * @return array
+   */
+  public function getValues():array {
+    return $this->values;
+  }
+
+  /**
+   * @param array $values
+   * @return $this
+   */
+  public function setValues(array $values) {
+    $this->values = $values;
+    return $this;
   }
 
 }

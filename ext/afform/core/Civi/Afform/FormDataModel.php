@@ -161,11 +161,18 @@ class FormDataModel {
   }
 
   /**
-   * @return array
+   * @return array[]
    *   Ex: $entities['spouse']['type'] = 'Contact';
    */
   public function getEntities() {
     return $this->entities;
+  }
+
+  /**
+   * @return array
+   */
+  public function getEntity($entityName) {
+    return $this->entities[$entityName] ?? NULL;
   }
 
 }

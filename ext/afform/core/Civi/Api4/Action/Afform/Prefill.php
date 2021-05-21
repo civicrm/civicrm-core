@@ -48,7 +48,7 @@ class Prefill extends AbstractProcessor {
           'where' => self::getJoinWhereClause($entity['type'], $joinEntity, $item['id']),
           'limit' => !empty($join['af-repeat']) ? $join['max'] ?? 0 : 1,
           'select' => array_keys($join['fields']),
-          'orderBy' => self::fieldExists($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
+          'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
         ]);
       }
       $this->_data[$entity['name']][] = $data;

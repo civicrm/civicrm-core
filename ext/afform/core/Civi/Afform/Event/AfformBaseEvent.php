@@ -3,23 +3,23 @@ namespace Civi\Afform\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class AfformBaseEvent extends Event {
+abstract class AfformBaseEvent extends Event {
 
   /**
    * @var array
    *   The main 'Afform' record/configuration.
    */
-  public $afform;
+  private $afform;
 
   /**
    * @var \Civi\Afform\FormDataModel
    */
-  public $formDataModel;
+  private $formDataModel;
 
   /**
    * @var \Civi\Api4\Generic\AbstractAction
    */
-  public $apiRequest;
+  private $apiRequest;
 
   /**
    * AfformBaseEvent constructor.
@@ -31,6 +31,17 @@ class AfformBaseEvent extends Event {
     $this->afform = $afform;
     $this->formDataModel = $formDataModel;
     $this->apiRequest = $apiRequest;
+  }
+
+  public function getAfform(): array {
+    return $this->afform;
+  }
+
+  /**
+   * @return \Civi\Afform\FormDataModel
+   */
+  public function getFormDataModel(): \Civi\Afform\FormDataModel {
+    return $this->formDataModel;
   }
 
   /**
