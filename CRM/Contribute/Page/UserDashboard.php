@@ -48,7 +48,10 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
-      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
+      $row['balance_amount'] = CRM_Contribute_BAO_Contribution::getContributionBalance($row['contribution_id']);
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id']);
+
+      if (in_array($contributionStatus, ['Pending', 'Partially paid'])) {
         $row['buttons']['pay'] = [
           'class' => 'button',
           'label' => ts('Pay Now'),
