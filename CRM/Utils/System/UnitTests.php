@@ -27,6 +27,15 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     $this->supports_form_extensions = FALSE;
   }
 
+  public function initialize() {
+    parent::initialize();
+    $test = $GLOBALS['CIVICRM_TEST_CASE'] ?? NULL;
+    if ($test && $test instanceof \Civi\Test\HeadlessInterface) {
+      $listenerMap = \Civi\Core\Event\EventScanner::findListeners($test);
+      \Civi::dispatcher()->addListenerMap($test, $listenerMap);
+    }
+  }
+
   /**
    * @param string $name
    * @param string $value
