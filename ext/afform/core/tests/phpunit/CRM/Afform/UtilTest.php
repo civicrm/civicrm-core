@@ -18,7 +18,6 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
-      ->install(version_compare(CRM_Utils_System::version(), '5.19.alpha1', '<') ? ['org.civicrm.api4'] : [])
       ->apply();
   }
 
@@ -69,12 +68,12 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
         'Activity1' => ['type' => 'Activity', ['fields' => ['source_contact_id']]],
       ],
       [
-        'Contact' => ['Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]]],
-        'Activity' => ['Activity1' => [['fields' => ['source_contact_id' => 'Individual1']]]],
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Activity1' => [['fields' => ['source_contact_id' => 'Individual1']]],
       ],
       [
-        'Individual1' => 1,
-        'Activity1' => 2,
+        'Individual1',
+        'Activity1',
       ],
     ];
     $exs[] = [
@@ -84,14 +83,14 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
         'LocBlock1' => ['type' => 'LocBlock', ['fields' => ['event_id']]],
       ],
       [
-        'Contact' => ['Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]]],
-        'Event' => ['Event1' => [['fields' => ['created_id' => 'Individual1']]]],
-        'LocBlock' => ['LocBlock1' => [['fields' => ['event_id' => 'Event1']]]],
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Event1' => [['fields' => ['created_id' => 'Individual1']]],
+        'LocBlock1' => [['fields' => ['event_id' => 'Event1']]],
       ],
       [
-        'Individual1' => 1,
-        'Event1' => 2,
-        'LocBlock1' => 3,
+        'Individual1',
+        'Event1',
+        'LocBlock1',
       ],
     ];
     $exs[] = [
@@ -101,14 +100,37 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
         'Event1' => ['type' => 'Event', ['fields' => ['created_id']]],
       ],
       [
-        'Contact' => ['Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]]],
-        'LocBlock' => ['LocBlock1' => [['fields' => ['event_id' => 'Event1']]]],
-        'Event' => ['Event1' => [['fields' => ['created_id' => 'Individual1']]]],
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'LocBlock1' => [['fields' => ['event_id' => 'Event1']]],
+        'Event1' => [['fields' => ['created_id' => 'Individual1']]],
       ],
       [
-        'Individual1' => 1,
-        'Event1' => 2,
-        'LocBlock1' => 3,
+        'Individual1',
+        'Event1',
+        'LocBlock1',
+      ],
+    ];
+    $exs[] = [
+      [
+        'Activity1' => ['type' => 'Activity', ['fields' => ['source_contact_id']]],
+        'Individual1' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name', 'employer_id']]],
+        'Individual2' => ['type' => 'Contact', ['fields' => ['first_name', 'last_name', 'employer_id']]],
+        'Organization1' => ['type' => 'Contact', ['fields' => ['organization_name']]],
+      ],
+      [
+        'Activity1' => [['fields' => ['source_contact_id' => 'Individual1', 'target_contact_id' => ['Individual2']]]],
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact', 'employer_id' => 'Organization1']]],
+        'Individual2' => [
+          ['fields' => ['first_name' => 'Test2', 'last_name' => 'Contact']],
+          ['fields' => ['first_name' => 'Test3', 'last_name' => 'Contact', 'employer_id' => 'Organization1']],
+        ],
+        'Organization1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+      ],
+      [
+        'Organization1',
+        'Individual1',
+        'Individual2',
+        'Activity1',
       ],
     ];
     return $exs;

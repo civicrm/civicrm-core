@@ -22,7 +22,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Arguments present when loading the form
    * @var array
    */
-  protected $args;
+  protected $args = [];
 
   protected $_afform;
 
@@ -72,9 +72,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected static function getJoinWhereClause($mainEntityName, $joinEntityName, $mainEntityId) {
     $params = [];
-    if (self::fieldExists($joinEntityName, 'entity_id')) {
+    if (self::getEntityField($joinEntityName, 'entity_id')) {
       $params[] = ['entity_id', '=', $mainEntityId];
-      if (self::fieldExists($joinEntityName, 'entity_table')) {
+      if (self::getEntityField($joinEntityName, 'entity_table')) {
         $params[] = ['entity_table', '=', 'civicrm_' . \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityName)];
       }
     }
@@ -86,24 +86,54 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Check if a field exists for a given entity
+   * Get field definition for a given entity
    *
    * @param $entityName
    * @param $fieldName
-   * @return bool
+   * @return array|null
    * @throws \API_Exception
    */
-  public static function fieldExists($entityName, $fieldName) {
-    if (empty(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {
+  public static function getEntityField($entityName, $fieldName) {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__][$entityName])) {
       $fields = civicrm_api4($entityName, 'getFields', [
         'checkPermissions' => FALSE,
         'action' => 'create',
-        'select' => ['name'],
-        'includeCustom' => FALSE,
       ]);
-      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $fields->column('name');
+      \Civi::$statics[__CLASS__][__FUNCTION__][$entityName] = $fields->indexBy('name');
     }
-    return in_array($fieldName, \Civi::$statics[__CLASS__][__FUNCTION__][$entityName]);
+    return \Civi::$statics[__CLASS__][__FUNCTION__][$entityName][$fieldName] ?? NULL;
+  }
+
+  /**
+   * @return array
+   */
+  public function getArgs():array {
+    return $this->args;
+  }
+
+  /**
+   * @param array $args
+   * @return $this
+   */
+  public function setArgs(array $args) {
+    $this->args = $args;
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getName():string {
+    return $this->name;
+  }
+
+  /**
+   * @param string $name
+   * @return $this
+   */
+  public function setName(string $name) {
+    $this->name = $name;
+    return $this;
   }
 
 }

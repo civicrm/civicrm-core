@@ -19,38 +19,34 @@ namespace Civi\Afform;
  */
 class Utils {
 
+  /**
+   * Sorts entities according to references to each other
+   *
+   * Returns a list of entity names in order of when they should be processed,
+   * so that an entity being referenced is saved before the entity referencing it.
+   *
+   * @param $formEntities
+   * @param $entityValues
+   * @return string[]
+   */
   public static function getEntityWeights($formEntities, $entityValues) {
-    $entityWeights = $entityMapping = $entitiesToBeProcessed = [];
+    $sorter = new \MJS\TopSort\Implementations\FixedArraySort();
+
     foreach ($formEntities as $entityName => $entity) {
-      $entityWeights[$entityName] = 1;
-      $entityMapping[$entityName] = $entity['type'];
-      foreach ($entityValues[$entity['type']][$entityName] as $record) {
-        foreach ($record as $index => $vals) {
-          foreach ($vals as $field => $value) {
-            if (array_key_exists($value, $entityWeights)) {
-              $entityWeights[$entityName] = max((int) $entityWeights[$entityName], (int) ($entityWeights[$value] + 1));
-            }
-            else {
-              if (!array_key_exists($value, $entitiesToBeProcessed)) {
-                $entitiesToBeProcessed[$value] = [$entityName];
-              }
-              else {
-                $entitiesToBeProcessed[$value][] = $entityName;
-              }
+      $references = [];
+      foreach ($entityValues[$entityName] as $record) {
+        foreach ($record['fields'] as $fieldName => $fieldValue) {
+          foreach ((array) $fieldValue as $value) {
+            if (array_key_exists($value, $formEntities) && $value !== $entityName) {
+              $references[$value] = $value;
             }
           }
         }
       }
-      // If any other entities have been processed that relied on this entity lets now alter their weights based on this entity's weight.
-      if (array_key_exists($entityName, $entitiesToBeProcessed)) {
-        foreach ($entitiesToBeProcessed[$entityName] as $dependentEntity) {
-          $entityWeights[$dependentEntity] = max((int) $entityWeights[$dependentEntity], (int) ($entityWeights[$entityName] + 1));
-        }
-      }
+      $sorter->add($entityName, $references);
     }
-    // Numerically sort the weights now that we have them set
-    asort($entityWeights);
-    return $entityWeights;
+    // Return the list of entities ordered by weight
+    return $sorter->sort();
   }
 
 }
