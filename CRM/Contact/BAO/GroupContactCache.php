@@ -375,48 +375,57 @@ WHERE  id IN ( $groupIDs )
       self::invalidateGroupContactCache($group->id);
     }
 
-    // FIXME: some other process could have actually done the work before we got here,
-    // Ensure that work needs to be done before continuing
-    if (!self::shouldGroupBeRefreshed($groupID, TRUE)) {
-      return;
-    }
-
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
-    if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we don't know if the other process
-      // will fill up the cache before our calling routine needs it.
-      // however this routine does not return the status either, so basically
-      // its a "lets return and hope for the best"
-      return;
-    }
-
-    $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
-      ->setCategory('gccache')
-      ->setMemory();
-    self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
-    $tempTable = $groupContactsTempTable->getName();
-
-    // Don't call clearGroupContactCache as we don't want to clear the cache dates
-    // The will get updated by updateCacheTime() below and not clearing the dates reduces
-    // the chance that loadAll() will try and rebuild at the same time.
-    $clearCacheQuery = "
+    $locks = self::getLocksForRefreshableGroupsTo([$groupID]);
+    foreach ($locks as $groupID => $lock) {
+      $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('gccache')
+        ->setMemory();
+      self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
+      $tempTable = $groupContactsTempTable->getName();
+      // Don't call clearGroupContactCache as we don't want to clear the cache dates
+      // The will get updated by updateCacheTime() below and not clearing the dates reduces
+      // the chance that loadAll() will try and rebuild at the same time.
+      $clearCacheQuery = "
     DELETE  g
       FROM  civicrm_group_contact_cache g
       WHERE  g.group_id = %1 ";
-    $params = [
-      1 => [$groupID, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
+      $params = [
+        1 => [$groupID, 'Integer'],
+      ];
+      CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
 
-    CRM_Core_DAO::executeQuery(
-      "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
+      CRM_Core_DAO::executeQuery(
+        "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT contact_id, group_id FROM $tempTable
       ");
-    $groupContactsTempTable->drop();
-    self::updateCacheTime([$groupID], TRUE);
+      $groupContactsTempTable->drop();
+      self::updateCacheTime([$groupID], TRUE);
+      $lock->release();
+    }
+  }
 
-    $lock->release();
+  /**
+   * Get an array of locks for all the refreshable groups in the array.
+   *
+   * The groups are refreshable if both the following conditions are met:
+   * 1) the cache date in the database is null or stale
+   * 2) a mysql lock can be aquired for the group.
+   *
+   * @param array $groupIDs
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getLocksForRefreshableGroupsTo(array $groupIDs): array {
+    $locks = [];
+    $groupIDs = self::getGroupsNeedingRefreshing($groupIDs);
+    foreach ($groupIDs as $groupID) {
+      $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
+      if ($lock->isAcquired()) {
+        $locks[$groupID] = $lock;
+      }
+    }
+    return $locks;
   }
 
   /**
@@ -769,7 +778,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
    *
    * @return array
    */
-  protected static function getGroupsNeedingRefreshing(?array $groupIDs, int $limit): array {
+  protected static function getGroupsNeedingRefreshing(?array $groupIDs, int $limit = 0): array {
     $groupIDClause = NULL;
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
@@ -781,7 +790,7 @@ AND  civicrm_group_contact.group_id = $groupID ";
       $groupIDClause = "g.id IN ({$groupIDString})";
     }
 
-    $query = self::groupRefreshedClause($groupIDClause);
+    $query = self::groupRefreshedClause($groupIDClause, !empty($groupIDs));
 
     $limitClause = $orderClause = NULL;
     if ($limit > 0) {
