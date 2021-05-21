@@ -873,16 +873,18 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   /**
    * Set up a smart group for testing.
    *
-   * The smart group includes all Households by filter. In addition an individual
-   * is created and hard-added and an individual is created that is not added.
+   * The smart group includes all Households by filter. In addition an
+   * individual is created and hard-added and an individual is created that is
+   * not added.
    *
    * One household is hard-added as well as being in the filter.
    *
-   * This gives us a range of scenarios for testing contacts are included only once
-   * whenever they are hard-added or in the criteria.
+   * This gives us a range of scenarios for testing contacts are included only
+   * once whenever they are hard-added or in the criteria.
    *
    * @return int
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUpPopulatedSmartGroup(): int {
     $household1ID = $this->householdCreate();
@@ -912,7 +914,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupID);
     return $groupID;
   }
 
@@ -951,7 +953,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     }
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupID);
 
     if ($returnAddedContact) {
       return [$groupID, $individualID];

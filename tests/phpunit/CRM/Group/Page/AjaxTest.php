@@ -596,8 +596,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertTrue($found, 'Smart group shows up on Manage Group page.');
     $this->assertTrue($right_count, 'Smart group displays proper count when cache is loaded.');
 
-    // Purge the group contact cache.
-    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($group->id);
+    // Invalidate the group contact cache.
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
 
     // Load the Manage Group page code.
     $_GET = $this->_params;
@@ -612,32 +612,24 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $count_is_unknown = FALSE;
     foreach ($groups['data'] as $returned_group) {
       if ($returned_group['group_id'] == $group->id) {
-        if ($returned_group['count'] == ts('unknown')) {
+        if ($returned_group['count'] === ts('unknown')) {
           $count_is_unknown = TRUE;
         }
       }
     }
     $this->assertTrue($count_is_unknown, 'Smart group shows up as unknown when cache is expired.');
 
-    // Ensure we did not populate the cache.
-    $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
-    $params = [1 => [$group->id, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    $test = 'Group contact cache should not be populated on Manage Groups ' .
-      'when cache_date is null';
-    $this->assertEquals($dao->N, 0, $test);
-
     // Do it again, but this time don't clear group contact cache. Instead,
     // set it to expire.
     CRM_Contact_BAO_GroupContactCache::load($group);
     $params['name'] = 'smartGroupCacheTimeout';
     $timeout = civicrm_api3('Setting', 'getvalue', $params);
-    $timeout = intval($timeout) * 60;
+    $timeout = (int) $timeout * 60;
     // Reset the cache_date to $timeout seconds ago minus another 60
     // seconds for good measure.
     $cache_date = date('YmdHis', time() - $timeout - 60);
 
-    $sql = "UPDATE civicrm_group SET cache_date = %1 WHERE id = %2";
+    $sql = 'UPDATE civicrm_group SET cache_date = %1 WHERE id = %2';
     $update_params = [
       1 => [$cache_date, 'Timestamp'],
       2 => [$group->id, 'Integer'],

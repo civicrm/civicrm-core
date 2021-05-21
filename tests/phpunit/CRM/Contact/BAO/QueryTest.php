@@ -987,7 +987,7 @@ civicrm_relationship.is_active = 1 AND
     $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $householdID, 'status' => 'Added']);
 
     // Refresh the cache for test purposes. It would be better to alter to alter the GroupContact add function to add contacts to the cache.
-    CRM_Contact_BAO_GroupContactCache::clearGroupContactCache($groupID);
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupID);
 
     $sql = CRM_Contact_BAO_Query::getQuery(
       [['group', 'IN', [$groupID], 0, 0]],
