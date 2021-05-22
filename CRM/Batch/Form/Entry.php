@@ -714,17 +714,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           unset($value['membership_status']);
         }
 
-        if (empty($customFields)) {
-          // membership type custom data
-          $customFields = CRM_Core_BAO_CustomField::getFields('Membership', FALSE, FALSE, $membershipTypeId);
-
-          $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-            CRM_Core_BAO_CustomField::getFields('Membership',
-              FALSE, FALSE, NULL, NULL, TRUE
-            )
-          );
-        }
-
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
           $key,
