@@ -3099,7 +3099,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = ['access CiviCRM'];
     $result = $this->callAPIFailure('contact', 'create', $params);
-    $this->assertContains('failed', $result['error_message'], 'lacking permissions should not be enough to create a contact');
+    $this->assertStringContainsString('failed', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = ['access CiviCRM', 'add contacts', 'import contacts'];
     $this->callAPISuccess('contact', 'create', $params);

@@ -289,10 +289,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $baseurl = CRM_Utils_System::baseCMSURL();
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
-    $this->assertContains("This is $displayName", $previewResult['values']['body_text']);
-    $this->assertContains("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertContains('<a href="' . $baseurl . 'index.php?q=civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=">Forward this email with no protocol</a>', $previewResult['values']['body_html']);
-    $this->assertNotContains("http://http://", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
+    $this->assertStringContainsString('<a href="' . $baseurl . 'index.php?q=civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=">Forward this email with no protocol</a>', $previewResult['values']['body_html']);
+    $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
   public function testMailerPreviewUnknownContact() {
@@ -308,8 +308,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // for the current behavior (i.e. returning blanks).
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello ", $previewResult['values']['subject']);
-    $this->assertContains("This is .", $previewResult['values']['body_text']);
-    $this->assertContains("<p>This is .</p>", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("This is .", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("<p>This is .</p>", $previewResult['values']['body_html']);
   }
 
   public function testMailerPreviewRecipients() {
@@ -846,7 +846,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $cloneId = $clone['id'];
 
     $this->assertNotEquals($createId, $cloneId, 'Create and clone should return different records');
-    $this->assertInternalType('numeric', $cloneId);
+    $this->assertIsNumeric($cloneId);
 
     $this->assertNotEmpty($clone['values'][$cloneId]['subject']);
     $this->assertEquals($params['subject'], $clone['values'][$cloneId]['subject'], "Cloned subject should match");
@@ -961,7 +961,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
   public function createDraftMailing($params = []) {
     $createParams = array_merge($this->_params, $params);
     $createResult = $this->callAPISuccess('mailing', 'create', $createParams, __FUNCTION__, __FILE__);
-    $this->assertInternalType('numeric', $createResult['id']);
+    $this->assertIsNumeric($createResult['id']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
       1 => [$createResult['id'], 'Integer'],
     ]);
@@ -992,13 +992,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $this->assertTrue($dao->fetch());
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
-    $this->assertContains('https://civicrm.org', $url);
+    $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
-    $this->assertContains('https://civicrm.org', $url);
+    $this->assertStringContainsString('https://civicrm.org', $url);
 
     // Ensure that Google CSS link is not tracked.
     $sql = "SELECT id FROM civicrm_mailing_trackable_url where url = 'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700'";
@@ -1028,13 +1028,13 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     $this->assertTrue($dao->fetch());
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
-    $this->assertContains($unicodeURL, $url);
+    $this->assertStringContainsString($unicodeURL, $url);
 
     // Now delete the event queue hashes and see if the tracking still works.
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_mailing_event_queue');
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
-    $this->assertContains($unicodeURL, $url);
+    $this->assertStringContainsString($unicodeURL, $url);
   }
 
   /**

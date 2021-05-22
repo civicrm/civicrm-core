@@ -33,7 +33,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // (php should throw its own warnings about this because of the signature)
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID('123');
-    $this->assertInternalType('int', $propertyBag->getContactID());
+    $this->assertIsInt($propertyBag->getContactID());
     $this->assertEquals(123, $propertyBag->getContactID());
 
     // Test we can have different labels
@@ -70,7 +70,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       throw $e;
     }
     $got = $propertyBag->getAmount();
-    $this->assertInternalType('string', $got);
+    $this->assertIsString($got);
     $this->assertEquals($expect, $got);
   }
 
@@ -96,10 +96,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   /**
    * Test we cannot set an invalid contact ID.
-   *
-   * @expectedException \InvalidArgumentException
    */
   public function testSetContactIDFailsIfInvalid() {
+    $this->expectException(\InvalidArgumentException::class);
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(0);
   }
@@ -225,11 +224,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   /**
    * Test we can't set a custom prop that we know about.
-   *
-   * @expectedException \InvalidArgumentException
-   * @expectedExceptionMessage Attempted to set 'contactID' via setCustomProperty - must use using its setter.
    */
   public function testSetCustomPropFails() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage('Attempted to set \'contactID\' via setCustomProperty - must use using its setter.');
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('contactID', 123);
   }
@@ -238,11 +236,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * Test we get NULL for custom prop that was not set.
    *
    * This is only for backward compatibility/ease of transition. One day it would be nice to throw an exception instead.
-   *
-   * @expectedException \BadMethodCallException
-   * @expectedExceptionMessage Property 'aCustomProp' has not been set.
    */
   public function testGetCustomPropFails() {
+    $this->expectException(\BadMethodCallException::class);
+    $this->expectExceptionMessage('Property \'aCustomProp\' has not been set.');
     $propertyBag = new PropertyBag();
     // Tricky test. We need to ignore deprecation errors, we're testing deprecated behaviour,
     // but we need to listen out for a different exception.

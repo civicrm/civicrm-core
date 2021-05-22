@@ -58,13 +58,13 @@ class RequestTest extends \CiviUnitTestCase {
 
   /**
    * @dataProvider invalidEntityActionPairs
-   * @expectedException \Civi\API\Exception\NotImplementedException
    * @param $inEntity
    * @param $inAction
    * @param $inVersion
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function testCreateRequest_InvalidEntityAction($inEntity, $inAction, $inVersion) {
+    $this->expectException(\Civi\API\Exception\NotImplementedException::class);
     Request::create($inEntity, $inAction, ['version' => $inVersion], NULL);
   }
 

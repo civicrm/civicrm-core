@@ -43,7 +43,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
-    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
+    $this->assertStringContainsString('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
@@ -155,7 +155,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = [];
     $result = $this->callAPIFailure('PaymentProcessorType', 'create', $params);
-    $this->assertContains('name, title, class_name, billing_mode', $result['error_message']);
+    $this->assertStringContainsString('name, title, class_name, billing_mode', $result['error_message']);
   }
 
   /**
