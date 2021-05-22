@@ -62,7 +62,7 @@ class PermissionCheckTest extends UnitTestCase {
     catch (UnauthorizedException $e) {
       $err = $e->getMessage();
     }
-    $this->assertContains('Authorization failed', $err);
+    $this->assertStringContainsString('Authorization failed', $err);
   }
 
   /**

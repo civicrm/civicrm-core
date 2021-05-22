@@ -108,7 +108,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     catch (\Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertContains('key', $error);
+    $this->assertStringContainsString('key', $error);
   }
 
   public function testGetApiKeyViaJoin() {
@@ -179,7 +179,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertContains('key', $error);
+    $this->assertStringContainsString('key', $error);
 
     // Assert key is still the same
     $this->assertEquals($result['api_key'], $key);
@@ -225,7 +225,7 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
       $error = $e->getMessage();
     }
 
-    $this->assertContains('key', $error);
+    $this->assertStringContainsString('key', $error);
 
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $contact['id'])

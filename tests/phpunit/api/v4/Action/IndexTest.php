@@ -48,7 +48,7 @@ class IndexTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertContains('not found', $error);
+    $this->assertStringContainsString('not found', $error);
   }
 
   public function testBadIndexString() {
@@ -59,7 +59,7 @@ class IndexTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertContains('not found', $error);
+    $this->assertStringContainsString('not found', $error);
   }
 
   public function testIndexWithSelect() {

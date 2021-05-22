@@ -80,7 +80,7 @@ class SqlExpressionTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $msg = $e->getMessage();
     }
-    $this->assertContains('alias', $msg);
+    $this->assertStringContainsString('alias', $msg);
     try {
       Contact::get()
         ->addSelect('55 AS sort_name')
@@ -89,7 +89,7 @@ class SqlExpressionTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $msg = $e->getMessage();
     }
-    $this->assertContains('existing field name', $msg);
+    $this->assertStringContainsString('existing field name', $msg);
     Contact::get()
       ->addSelect('55 AS ok_alias')
       ->execute();

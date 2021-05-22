@@ -47,7 +47,7 @@ class ParticipantTest extends UnitTestCase {
     $whereDescription = 'Criteria for selecting Participants';
 
     $this->assertEquals(TRUE, $getParams['checkPermissions']['default']);
-    $this->assertContains($whereDescription, $getParams['where']['description']);
+    $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 
   public function testGet() {
