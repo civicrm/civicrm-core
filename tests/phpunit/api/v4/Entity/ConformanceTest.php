@@ -173,7 +173,8 @@ class ConformanceTest extends UnitTestCase {
     $errMsg = sprintf('%s is missing required ID field', $entity);
     $subset = ['data_type' => 'Integer'];
 
-    $this->assertArraySubset($subset, $fields['id'], $errMsg);
+    $this->assertArrayHasKey('data_type', $fields['id'], $errMsg);
+    $this->assertEquals('Integer', $fields['id']['data_type']);
   }
 
   /**
@@ -228,7 +229,7 @@ class ConformanceTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
-    $this->assertContains('id', $exceptionThrown);
+    $this->assertStringContainsString('id', $exceptionThrown);
   }
 
   /**
@@ -278,7 +279,7 @@ class ConformanceTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
-    $this->assertContains('required', $exceptionThrown);
+    $this->assertStringContainsString('required', $exceptionThrown);
   }
 
   /**
@@ -294,8 +295,8 @@ class ConformanceTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $exceptionThrown = $e->getMessage();
     }
-    $this->assertContains('debug', $exceptionThrown);
-    $this->assertContains('type', $exceptionThrown);
+    $this->assertStringContainsString('debug', $exceptionThrown);
+    $this->assertStringContainsString('type', $exceptionThrown);
   }
 
   /**

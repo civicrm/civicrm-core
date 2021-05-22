@@ -81,7 +81,7 @@ class SqlExpressionParserTest extends UnitTestCase {
       }
     }
     catch (\API_Exception $e) {
-      $this->assertContains('Illegal', $e->getMessage());
+      $this->assertStringContainsString('Illegal', $e->getMessage());
     }
   }
 

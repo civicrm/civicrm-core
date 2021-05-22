@@ -47,7 +47,7 @@ class SettingTest extends UnitTestCase {
     catch (\API_Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertContains('setting', $message);
+    $this->assertStringContainsString('setting', $message);
   }
 
   public function testSerailizedSetting() {

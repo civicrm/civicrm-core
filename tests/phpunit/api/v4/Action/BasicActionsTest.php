@@ -371,7 +371,7 @@ class BasicActionsTest extends UnitTestCase {
     }
     catch (\API_Exception $createError) {
     }
-    $this->assertContains('Illegal expression', $createError->getMessage());
+    $this->assertStringContainsString('Illegal expression', $createError->getMessage());
   }
 
 }
