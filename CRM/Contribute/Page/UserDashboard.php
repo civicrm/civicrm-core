@@ -48,7 +48,9 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
-      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
+      $row['balance_amount'] = CRM_Contribute_BAO_Contribution::getContributionBalance($row['contribution_id']);
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id']);
+      if (in_array($contributionStatus, ['Pending', 'Partially paid'])) {
         $row['buttons']['pay'] = [
           'class' => 'button',
           'label' => ts('Pay Now'),
@@ -98,7 +100,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       $values['recur_status'] = $recurStatus[$values['contribution_status_id']];
       $recurRow[$values['id']] = $values;
 
-      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard')));
+      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $recur->contact_id)));
 
       $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur->id, 'recur');
       $hideUpdate = $details->membership_id & $details->auto_renew;
@@ -107,7 +109,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         $action -= CRM_Core_Action::UPDATE;
       }
 
-      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
+      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $this->_contactId),
         $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
