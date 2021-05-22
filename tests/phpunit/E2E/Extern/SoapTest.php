@@ -47,20 +47,18 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
 
   /**
    * Send a request with bad credentials.
-   *
-   * @expectedException SoapFault
    */
   public function testAuthenticationBadPassword() {
+    $this->expectException(SoapFault::class);
     $client = $this->createClient();
     $client->authenticate($this->adminUser, mt_rand());
   }
 
   /**
    * Send a request with bad credentials.
-   *
-   * @expectedException SoapFault
    */
   public function testAuthenticationBadKey() {
+    $this->expectException(SoapFault::class);
     $client = $this->createClient();
     $key = $client->authenticate($this->adminUser, $this->adminPass);
     $client->get_contact(mt_rand(), []);

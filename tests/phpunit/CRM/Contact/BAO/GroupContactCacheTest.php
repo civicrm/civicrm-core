@@ -449,7 +449,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     );
     $key = $query->getGroupCacheTableKeys()[0];
     $expectedWhere = "civicrm_group_contact_cache_{$key}.group_id IN (\"{$group->id}\", \"{$group2->id}\")";
-    $this->assertContains($expectedWhere, $query->_whereClause);
+    $this->assertStringContainsString($expectedWhere, $query->_whereClause);
     $this->_assertContactIds($query, "group_id IN ({$group->id}, {$group2->id})");
 
     $params = [['group', 'NOT IN', [$group->id], 1, 0]];

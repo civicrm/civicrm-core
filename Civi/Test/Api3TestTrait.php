@@ -81,7 +81,7 @@ trait Api3TestTrait {
       $prefix .= ': ';
     }
     if ($expectedError && !empty($apiResult['is_error'])) {
-      $this->assertContains($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
+      $this->assertStringContainsString($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
     $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
     $this->assertNotEmpty($apiResult['error_message']);

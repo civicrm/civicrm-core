@@ -182,10 +182,10 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
 
     $form = CRM_Core_Smarty::singleton()->get_template_vars('form');
     $group_id_field_html = $form['group_id']['html'];
-    $this->assertNotContains('* ' . $publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains('* ' . $adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
-    $this->assertNotContains($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString('* ' . $publicSmartGroupTitle, $group_id_field_html, "Group '$publicSmartGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString($publicStdGroupTitle, $group_id_field_html, "Group '$publicStdGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString('* ' . $adminSmartGroupTitle, $group_id_field_html, "Group '$adminSmartGroupTitle' should not be in listed available groups, but is.");
+    $this->assertStringNotContainsString($adminStdGroupTitle, $group_id_field_html, "Group '$adminStdGroupTitle' should not be in listed available groups, but is.");
   }
 
 }

@@ -78,11 +78,11 @@ class CRM_Mailing_BAO_SpoolTest extends CiviUnitTestCase {
     if ($mailPart instanceof ezcMailText) {
       switch ($mailPart->subType) {
         case 'plain':
-          self::assertContains(self::$bodytext, $mailPart->generateBody());
+          self::assertStringContainsString(self::$bodytext, $mailPart->generateBody());
           break;
 
         case 'html':
-          self::assertContains(self::$bodytext . '</p>', $mailPart->generateBody());
+          self::assertStringContainsString(self::$bodytext . '</p>', $mailPart->generateBody());
           break;
       }
     }
