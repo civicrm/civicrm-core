@@ -36,7 +36,7 @@ class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
     // as webtests. Mostly what we're doing in this test is checking that it
     // doesn't generate any E_NOTICES/WARNINGS or other errors. But let's do
     // one check.
-    $this->assertContains('<label for="case_id">', $contents);
+    $this->assertStringContainsString('<label for="case_id">', $contents);
   }
 
 }

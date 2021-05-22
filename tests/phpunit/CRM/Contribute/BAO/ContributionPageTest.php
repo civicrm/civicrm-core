@@ -47,7 +47,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $contributionpage = CRM_Contribute_BAO_ContributionPage::create($params);
 
     $this->assertNotNull($contributionpage->id);
-    $this->assertType('int', $contributionpage->id);
+    $this->assertIsInt($contributionpage->id);
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionpage->id]);
   }
 

@@ -188,12 +188,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertArrayHasKey('membership_type_id', $rc);
 
     $params['membership_type_id'] = [1 => 3];
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertArrayHasKey('join_date', $rc);
   }
 
@@ -217,7 +217,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertisArray($rc);
     $this->assertTrue(array_key_exists('start_date', $rc));
   }
 
@@ -239,7 +239,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = CRM_Member_Form_Membership::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertTrue(array_key_exists('end_date', $rc));
   }
 
@@ -259,7 +259,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = $obj::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertTrue(array_key_exists('start_date', $rc));
   }
 
@@ -281,7 +281,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = $obj::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertTrue(array_key_exists('status_id', $rc));
   }
 
@@ -301,7 +301,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $obj = new CRM_Member_Form_Membership();
     $rc = $obj::formRule($params, $files, $obj);
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertTrue(array_key_exists('status_id', $rc));
   }
 
@@ -329,7 +329,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $files = [];
     $membershipForm = new CRM_Member_Form_Membership();
     $validationResponse = CRM_Member_Form_Membership::formRule($params, $files, $membershipForm);
-    $this->assertType('array', $validationResponse);
+    $this->assertIsArray($validationResponse);
     $this->assertEquals('Please enter the Membership override end date.', $validationResponse['status_override_end_date']);
   }
 
@@ -351,7 +351,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $rc = $obj::formRule($params, $files, $obj);
 
     // Should have found no valid membership status.
-    $this->assertType('array', $rc);
+    $this->assertIsArray($rc);
     $this->assertTrue(array_key_exists('_qf_default', $rc));
   }
 

@@ -83,7 +83,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
 
     foreach ($this->_contactIds as $contactID) {
       // ensure that the address printed in the mailing labe is always primary if 'location_type_id' - none (as Primary) is chosen
-      $this->assertContains($addresses[$contactID]['primary']['street_address'], $rows[$contactID][0]);
+      $this->assertStringContainsString($addresses[$contactID]['primary']['street_address'], $rows[$contactID][0]);
     }
 
     // restore setting

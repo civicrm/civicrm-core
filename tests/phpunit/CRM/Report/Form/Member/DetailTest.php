@@ -80,10 +80,10 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
     $this->assertCount(2, $results);
     foreach ($results as $result) {
       if ($result['civicrm_contact_id'] == $indContactID1) {
-        $this->assertNotContains('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
+        $this->assertStringNotContainsString('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
       }
       if ($result['civicrm_contact_id'] == $indContactID2) {
-        $this->assertContains('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
+        $this->assertStringContainsString('(ended)', $result['civicrm_contribution_recur_autorenew_status_id']);
       }
     }
 

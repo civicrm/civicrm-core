@@ -39,7 +39,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
     // Check some basic fields
     foreach ($data as $line) {
-      $this->assertContains("\n" . $line[1] . "\n", $output[0]);
+      $this->assertStringContainsString("\n" . $line[1] . "\n", $output[0]);
     }
   }
 

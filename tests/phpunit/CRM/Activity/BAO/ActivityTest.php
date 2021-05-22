@@ -510,7 +510,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->checkArrayEquals($expectedFilters, $activityFilter);
     // This should include activities of type Meeting only.
     foreach ($activities['data'] as $value) {
-      $this->assertContains('Meeting', $value['activity_type']);
+      $this->assertStringContainsString('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
 
@@ -525,7 +525,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
-      $this->assertNotContains('Meeting', $value['activity_type']);
+      $this->assertStringNotContainsString('Meeting', $value['activity_type']);
     }
   }
 
@@ -1299,14 +1299,13 @@ $text
   }
 
   /**
-   * @expectedException CRM_Core_Exception
-   * @expectedExceptionMessage You do not have the 'send SMS' permission
    */
   public function testSendSMSWithoutPermission() {
     $dummy = NULL;
     $session = CRM_Core_Session::singleton();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
-
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have the \'send SMS\' permission');
     CRM_Activity_BAO_Activity::sendSMS(
       $dummy,
       $dummy,

@@ -117,12 +117,12 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $siteKey = mt_rand();
     $apiKey = mt_rand();
     $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
-    $this->assertContains('extern/rest.php', $restUrl);
-    $this->assertContains('?', $restUrl);
-    $this->assertContains('entity=Contact', $restUrl);
-    $this->assertContains('action=get', $restUrl);
-    $this->assertContains("key=$siteKey", $restUrl);
-    $this->assertContains("api_key=$apiKey", $restUrl);
+    $this->assertStringContainsString('extern/rest.php', $restUrl);
+    $this->assertStringContainsString('?', $restUrl);
+    $this->assertStringContainsString('entity=Contact', $restUrl);
+    $this->assertStringContainsString('action=get', $restUrl);
+    $this->assertStringContainsString("key=$siteKey", $restUrl);
+    $this->assertStringContainsString("api_key=$apiKey", $restUrl);
   }
 
   /**
@@ -136,8 +136,8 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   public function testAlterExternUrlHook($path, $expected) {
     Civi::dispatcher()->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
     $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
-    $this->assertContains('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
-    $this->assertContains($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
+    $this->assertStringContainsString('path/altered/by/hook', $externUrl, 'Hook failed to alter URL path');
+    $this->assertStringContainsString($expected['query'] . '&thisWas=alteredByHook', $externUrl, 'Hook failed to alter URL query');
   }
 
   /**

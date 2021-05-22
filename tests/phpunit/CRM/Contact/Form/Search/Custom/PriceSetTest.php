@@ -67,7 +67,7 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends CiviUnitTestCase {
     $form = new CRM_Contact_Form_Search_Custom_PriceSet($formValues);
     $sql = $form->all();
     // Assert that we have created a standard temp table
-    $this->assertContains('civicrm_tmp_e_priceset', $sql);
+    $this->assertStringContainsString('civicrm_tmp_e_priceset', $sql);
     // Check that the temp table has been populated.
     $result = CRM_Core_DAO::executeQuery($sql)->fetchAll();
     $this->assertTrue(!empty($result));

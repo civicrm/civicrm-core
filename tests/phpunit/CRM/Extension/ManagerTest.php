@@ -25,10 +25,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
 
   /**
    * Install an extension with an invalid type name.
-   *
-   * @expectedException CRM_Extension_Exception
    */
   public function testInstallInvalidType() {
+    $this->expectException(CRM_Extension_Exception::class);
     $testingTypeManager = $this->getMockBuilder('CRM_Extension_Manager_Interface')->getMock();
     $testingTypeManager->expects($this->never())
       ->method('onPreInstall');

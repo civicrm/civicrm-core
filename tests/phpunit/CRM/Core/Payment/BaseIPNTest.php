@@ -126,9 +126,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $values = [];
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
-    $this->assertInternalType('array', $msg, 'Message returned as an array in line');
+    $this->assertIsArray($msg, 'Message returned as an array in line');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('Membership Type: General', $msg['body']);
   }
 
   /**
@@ -143,7 +143,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('Membership Type: General', $msg['body']);
 
     $this->ids['contact'] = $this->_contactId = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, ['invoice_id' => 'abc']));
@@ -156,7 +156,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Dr. Donald Duck II', $msg['to']);
-    $this->assertContains('Membership Type: Fowl', $msg['body']);
+    $this->assertStringContainsString('Membership Type: Fowl', $msg['body']);
   }
 
   /**
@@ -167,9 +167,9 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
-    $this->assertInternalType('array', $msg, 'Message not returned as an array');
+    $this->assertIsArray($msg, 'Message not returned as an array');
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('Membership Type: General', $msg['body']);
+    $this->assertStringContainsString('Membership Type: General', $msg['body']);
   }
 
   /**
@@ -181,8 +181,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $contribution->loadRelatedObjects($this->input, $this->ids);
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
-    $this->assertContains('registration has been received and your status has been updated to Attended.', $msg['body']);
-    $this->assertContains('Annual CiviCRM meet', $msg['html']);
+    $this->assertStringContainsString('registration has been received and your status has been updated to Attended.', $msg['body']);
+    $this->assertStringContainsString('Annual CiviCRM meet', $msg['html']);
   }
 
   /**
@@ -193,7 +193,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
     $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
-    $this->assertContains('Thank you for your registration', $msg['body']);
+    $this->assertStringContainsString('Thank you for your registration', $msg['body']);
   }
 
   /**
@@ -243,7 +243,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input, $this->ids, $values);
-    $this->assertContains('Contribution Information', $msg['html']);
+    $this->assertStringContainsString('Contribution Information', $msg['html']);
   }
 
   public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {

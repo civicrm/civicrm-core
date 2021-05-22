@@ -39,7 +39,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params);
     $sql = $queryObj->getSearchSQL(0, 0, $sort . ' asc');
     if ($isUseKeySort) {
-      $this->assertContains('field(', $sql);
+      $this->assertStringContainsString('field(', $sql);
     }
     try {
       $resultDAO = CRM_Core_DAO::executeQuery($sql);

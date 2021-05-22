@@ -47,7 +47,7 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     $files = [];
 
     $validationResult = $form->formRule($params, $files, $form);
-    $this->assertType('array', $validationResult);
+    $this->assertIsArray($validationResult);
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 
@@ -74,7 +74,7 @@ class CRM_Price_Form_OptionTest extends CiviUnitTestCase {
     $files = [];
 
     $validationResult = $form->formRule($params, $files, $form);
-    $this->assertType('array', $validationResult);
+    $this->assertIsArray($validationResult);
     $this->assertTrue(array_key_exists('visibility_id', $validationResult));
   }
 

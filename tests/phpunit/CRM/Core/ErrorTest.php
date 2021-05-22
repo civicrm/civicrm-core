@@ -104,7 +104,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     // The 5 here is a bit arbitrary - on my local the date part is 15 chars (Mar 29 05:29:16) - but we are just checking that
     // there are chars for the date at the start.
     $this->assertTrue(strpos($fileContents, '[info] Mary had a little lamb') > 10);
-    $this->assertContains('[info] Little lamb', $fileContents);
+    $this->assertStringContainsString('[info] Little lamb', $fileContents);
   }
 
 }

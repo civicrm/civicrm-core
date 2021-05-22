@@ -457,7 +457,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     // The last pledge payment is 8.37 because 12*8.33 = 99.96
     // So CiviCRM automatically creates a larger final pledge to catch the missing cents.
     $last_pp_idx = count($pledgePayments['values']) - 1;
-    $this->assertEquals(8.37, $pledgePayments['values'][$last_pp_idx]['scheduled_amount'], '', 0.01);
+    $this->assertEqualsWithDelta(8.37, $pledgePayments['values'][$last_pp_idx]['scheduled_amount'], 0.01);
 
     // Does all sorts of shenanigans if the amount was not the expected amount,
     // and this is what we really want to test in this function.

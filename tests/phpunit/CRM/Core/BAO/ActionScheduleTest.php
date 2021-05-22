@@ -1095,7 +1095,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ->addWhere('source_record_id', '=', $activity->id)
       ->execute();
     foreach ($activities as $activityDetails) {
-      $this->assertContains($activity->subject, $activityDetails['details']);
+      $this->assertStringContainsString($activity->subject, $activityDetails['details']);
     }
   }
 

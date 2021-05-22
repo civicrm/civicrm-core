@@ -84,7 +84,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $expected = array_values($expected);
     foreach ($expected as $key => $dateVal) {
       foreach ($tokens as $text => $token) {
-        $this->assertContains($dateVal[$token], $testHTML[$key]);
+        $this->assertStringContainsString($dateVal[$token], $testHTML[$key]);
       }
     }
   }

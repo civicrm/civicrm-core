@@ -226,7 +226,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     ];
     $sortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
     foreach ($sortedExpectedContactNames as $key => $name) {
-      $this->assertContains($name, $sortedActualContactNames[$key]);
+      $this->assertStringContainsString($name, $sortedActualContactNames[$key]);
     }
   }
 

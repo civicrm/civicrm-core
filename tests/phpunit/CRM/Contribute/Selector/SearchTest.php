@@ -24,7 +24,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 
     list($select, $from, $where, $having) = $searchSelector->getQuery()->query();
-    self::assertContains('civicrm_contribution_soft.amount', $select);
+    $this->assertStringContainsString('civicrm_contribution_soft.amount', $select);
   }
 
   /**
@@ -35,7 +35,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 
     list($select, $from, $where, $having) = $searchSelector->getQuery()->query();
-    self::assertNotContains('civicrm_contribution_soft.amount', $select);
+    $this->assertStringNotContainsString('civicrm_contribution_soft.amount', $select);
   }
 
 }

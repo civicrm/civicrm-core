@@ -122,7 +122,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $activity = Activity::get(FALSE)->setSelect(['details'])->execute()->first();
     $bccUrl1 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $bcc1], TRUE);
     $bccUrl2 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $bcc2], TRUE);
-    $this->assertContains("bcc : <a href='" . $bccUrl1 . "'>Mr. Anthony Anderson II</a>, <a href='" . $bccUrl2 . "'>Mr. Anthony Anderson II</a>", $activity['details']);
+    $this->assertStringContainsString("bcc : <a href='" . $bccUrl1 . "'>Mr. Anthony Anderson II</a>, <a href='" . $bccUrl2 . "'>Mr. Anthony Anderson II</a>", $activity['details']);
     $this->assertEquals([
       [
         'text' => '27 messages were sent successfully. ',

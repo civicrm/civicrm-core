@@ -68,7 +68,7 @@ trait CRMTraits_Page_PageTestTrait {
     unset($this->smartyVariables['config']);
     unset($this->smartyVariables['session']);
     foreach ($expectedStrings as $expectedString) {
-      $this->assertContains($expectedString, $this->pageContent, print_r($this->contributions, TRUE) . print_r($this->smartyVariables, TRUE));
+      $this->assertStringContainsString($expectedString, $this->pageContent, print_r($this->contributions, TRUE) . print_r($this->smartyVariables, TRUE));
     }
   }
 
