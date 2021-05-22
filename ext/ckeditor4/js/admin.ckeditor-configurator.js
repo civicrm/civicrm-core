@@ -126,7 +126,7 @@
         }
       });
 
-    $.getJSON(CRM.config.resourceBase + 'js/wysiwyg/ck-options.json', null, initOptions);
+    $.getJSON(CRM.config.resourceBase + 'ext/ckeditor4/js/ck-options.json', null, initOptions);
   });
 
 })(CRM.$, CRM._);

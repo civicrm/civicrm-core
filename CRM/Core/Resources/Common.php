@@ -218,18 +218,6 @@ class CRM_Core_Resources_Common {
       'moneyFormat' => CRM_Utils_Money::format(1234.56),
     ]);
 
-    // add wysiwyg editor
-    $editor = $settings->get('editor_id');
-    if ($editor == "CKEditor") {
-      CRM_Admin_Form_CKEditorConfig::setConfigDefault();
-      $items[] = [
-        'config' => [
-          'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
-          'CKEditorCustomConfig' => CRM_Admin_Form_CKEditorConfig::getConfigUrl(),
-        ],
-      ];
-    }
-
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
       $items[] = "packages/jquery/plugins/jquery.tableHeader.js";

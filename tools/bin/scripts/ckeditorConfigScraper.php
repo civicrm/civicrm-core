@@ -18,6 +18,6 @@ foreach ($matches[1] as $i => $name) {
 }
 if ($output) {
   $location = str_replace('tools/bin/scripts', '', __DIR__);
-  file_put_contents($location . '/js/wysiwyg/ck-options.json', json_encode($output, JSON_PRETTY_PRINT));
+  file_put_contents($location . '/ext/ckeditor4/js/ck-options.json', json_encode($output, JSON_PRETTY_PRINT));
 }
 print "\nTotal: " . count($output) . "\n";

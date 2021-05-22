@@ -56,6 +56,8 @@ class CRM_Upgrade_Incremental_php_FiveForty extends CRM_Upgrade_Incremental_Base
     $this->addTask('Add membership_num_terms column to civicrm_line_item', 'addColumn',
       'civicrm_line_item', 'membership_num_terms', "int unsigned DEFAULT NULL COMMENT 'Number of terms for this membership (only supported in Order->Payment flow). If the field is NULL it means unknown and it will be assumed to be 1 during payment.create if entity_table is civicrm_membership'"
     );
+    $this->addTask('Enable new CKEditor 4 Extension', 'installCkeditor4Extension');
+    $this->addTask('Update CKeditor label to indicate it is version 4', 'updateCkeditorOptionLabel');
   }
 
   /**
@@ -96,6 +98,46 @@ class CRM_Upgrade_Incremental_php_FiveForty extends CRM_Upgrade_Incremental_Base
             ON DELETE CASCADE;
       ", [], TRUE, NULL, FALSE, FALSE);
     }
+
+    return TRUE;
+  }
+
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function updateCkeditorOptionLabel(CRM_Queue_TaskContext $ctx) {
+    civicrm_api3('OptionValue', 'get', [
+      'name' => 'CKEditor',
+      'option_group_id' => 'wysiwyg_editor',
+      'api.OptionValue.create' => [
+        'label' => ts('CKEditor 4'),
+        'id' => "\$value.id",
+      ],
+    ]);
+    return TRUE;
+  }
+
+  /**
+   * Install CKEditor4 extension.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function installCkeditor4Extension(CRM_Queue_TaskContext $ctx) {
+    $insert = CRM_Utils_SQL_Insert::into('civicrm_extension')->row([
+      'type' => 'module',
+      'full_name' => 'ckeditor4',
+      'name' => 'CKEditor4',
+      'label' => 'CKEditor4',
+      'file' => 'ckeditor4',
+      'schema_version' => NULL,
+      'is_active' => 1,
+    ]);
+    CRM_Core_DAO::executeQuery($insert->usingReplace()->toSQL());
 
     return TRUE;
   }
