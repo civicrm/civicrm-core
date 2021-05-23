@@ -97,7 +97,7 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @return $this
    */
   public function setEntityId($index, $entityId) {
-    $this->entityIds[$this->entityName][$index] = $entityId;
+    $this->entityIds[$this->entityName][$index]['id'] = $entityId;
     return $this;
   }
 

@@ -9,7 +9,7 @@
       </li>
       <li role="presentation" ng-repeat="entity in entities" class="fluid-width-tab" ng-class="{active: selectedEntityName === entity.name}" title="{{ entity.label }}">
         <a href ng-click="editor.selectEntity(entity.name); editor.scrollToEntity(entity.name);">
-          <i class="crm-i {{:: editor.meta.entities[entity.type].icon }}"></i>
+          <i class="crm-i {{:: editor.getEntityDefn(entity).icon }}"></i>
           <span ng-if="!entity.loading && editor.allowEntityConfig && selectedEntityName === entity.name" crm-ui-editable ng-model="entity.label" ng-change="editor.adjustTabWidths()">{{ entity.label }}</span>
           <span ng-if="!entity.loading && !(editor.allowEntityConfig && selectedEntityName === entity.name)">{{ entity.label }}</span>
           <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner"></i>

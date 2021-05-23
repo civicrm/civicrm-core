@@ -20,9 +20,8 @@
     controllerAs: 'editor',
     controller: function($scope, crmApi4, afGui, $parse, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
-      $scope.crmUrl = CRM.url;
 
-      $scope.afform = null;
+      this.afform = null;
       $scope.saving = false;
       $scope.selectedEntityName = null;
       this.meta = afGui.meta;
@@ -48,15 +47,15 @@
 
       // Initialize the current form
       function initializeForm() {
-        $scope.afform = editor.data.definition;
-        if (!$scope.afform) {
+        editor.afform = editor.data.definition;
+        if (!editor.afform) {
           alert('Error: unknown form');
         }
         if (editor.mode === 'clone') {
-          delete $scope.afform.name;
-          delete $scope.afform.server_route;
-          $scope.afform.is_dashlet = false;
-          $scope.afform.title += ' ' + ts('(copy)');
+          delete editor.afform.name;
+          delete editor.afform.server_route;
+          editor.afform.is_dashlet = false;
+          editor.afform.title += ' ' + ts('(copy)');
         }
         $scope.canvasTab = 'layout';
         $scope.layoutHtml = '';
@@ -65,7 +64,7 @@
 
         if (editor.getFormType() === 'form') {
           editor.allowEntityConfig = true;
-          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'#tag': 'af-form'})[0]['#children'];
+          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'#tag': 'af-form'})[0]['#children'];
           $scope.entities = _.mapValues(afGui.findRecursive(editor.layout['#children'], {'#tag': 'af-entity'}, 'name'), backfillEntityDefaults);
 
           if (editor.mode === 'create') {
@@ -75,8 +74,8 @@
         }
 
         else if (editor.getFormType() === 'block') {
-          editor.layout['#children'] = $scope.afform.layout;
-          editor.blockEntity = $scope.afform.join || $scope.afform.block;
+          editor.layout['#children'] = editor.afform.layout;
+          editor.blockEntity = editor.afform.join || editor.afform.block;
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
@@ -85,7 +84,7 @@
         }
 
         else if (editor.getFormType() === 'search') {
-          editor.layout['#children'] = afGui.findRecursive($scope.afform.layout, {'af-fieldset': ''})[0]['#children'];
+          editor.layout['#children'] = afGui.findRecursive(editor.afform.layout, {'af-fieldset': ''})[0]['#children'];
           editor.searchDisplay = afGui.findRecursive(editor.layout['#children'], function(item) {
             return item['#tag'] && item['#tag'].indexOf('crm-search-display-') === 0;
           })[0];
@@ -94,18 +93,18 @@
 
         // Set changesSaved to true on initial load, false thereafter whenever changes are made to the model
         $scope.changesSaved = editor.mode === 'edit' ? 1 : false;
-        $scope.$watch('afform', function () {
+        $scope.$watch('editor.afform', function () {
           $scope.changesSaved = $scope.changesSaved === 1;
         }, true);
       }
 
       this.getFormType = function() {
-        return $scope.afform.type;
+        return editor.afform.type;
       };
 
       $scope.updateLayoutHtml = function() {
         $scope.layoutHtml = '...Loading...';
-        crmApi4('Afform', 'convert', {layout: $scope.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
+        crmApi4('Afform', 'convert', {layout: editor.afform.layout, from: 'deep', to: 'html', formatWhitespace: true})
           .then(function(r){
             $scope.layoutHtml = r[0].layout || '(Error)';
           })
@@ -161,6 +160,7 @@
         if (meta.fields) {
           addToCanvas();
         } else {
+          $timeout(editor.adjustTabWidths);
           crmApi4('Afform', 'loadAdminData', {
             definition: {type: 'form'},
             entity: type
@@ -191,6 +191,13 @@
         return $scope.selectedEntityName;
       };
 
+      this.getEntityDefn = function(entity) {
+        if (entity.type === 'Contact' && entity.data.contact_type) {
+          return editor.meta.entities[entity.data.contact_type];
+        }
+        return editor.meta.entities[entity.type];
+      };
+
       // Scroll an entity's first fieldset into view of the canvas
       this.scrollToEntity = function(entityName) {
         var $canvas = $('#afGuiEditor-canvas-body'),
@@ -204,7 +211,7 @@
       };
 
       this.getAfform = function() {
-        return $scope.afform;
+        return editor.afform;
       };
 
       this.getEntities = function(filter) {
@@ -212,14 +219,14 @@
       };
 
       this.toggleContactSummary = function() {
-        if ($scope.afform.contact_summary) {
-          $scope.afform.contact_summary = false;
-          if ($scope.afform.type === 'search') {
+        if (editor.afform.contact_summary) {
+          editor.afform.contact_summary = false;
+          if (editor.afform.type === 'search') {
             delete editor.searchDisplay.filters;
           }
         } else {
-          $scope.afform.contact_summary = 'block';
-          if ($scope.afform.type === 'search') {
+          editor.afform.contact_summary = 'block';
+          if (editor.afform.type === 'search') {
             editor.searchDisplay.filters = editor.searchFilters[0].key;
           }
         }
@@ -259,6 +266,12 @@
         }
         return options;
       }
+
+      this.getLink = function() {
+        if (editor.afform.server_route) {
+          return CRM.url(editor.afform.server_route, null, editor.afform.is_public ? 'front' : 'back');
+        }
+      };
 
       // Options for ui-sortable in field palette
       this.getSortableOptions = function(entityName) {
@@ -301,21 +314,21 @@
       };
 
       $scope.save = function() {
-        var afform = JSON.parse(angular.toJson($scope.afform));
+        var afform = JSON.parse(angular.toJson(editor.afform));
         // This might be set to undefined by validation
         afform.server_route = afform.server_route || '';
         $scope.saving = $scope.changesSaved = true;
         crmApi4('Afform', 'save', {formatWhitespace: true, records: [afform]})
           .then(function (data) {
             $scope.saving = false;
-            $scope.afform.name = data[0].name;
+            editor.afform.name = data[0].name;
             if (editor.mode !== 'edit') {
               $location.url('/edit/' + data[0].name);
             }
           });
       };
 
-      $scope.$watch('afform.title', function(newTitle, oldTitle) {
+      $scope.$watch('editor.afform.title', function(newTitle, oldTitle) {
         if (typeof oldTitle === 'string') {
           _.each($scope.entities, function(entity) {
             if (entity.data && entity.data.source === oldTitle) {

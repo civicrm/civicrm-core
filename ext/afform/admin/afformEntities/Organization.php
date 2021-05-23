@@ -4,8 +4,7 @@ return [
     data: {
       contact_type: 'Organization',
       source: afform.title
-    },
-    'url-autofill': '1'
+    }
   }",
   'icon' => 'fa-building',
   'boilerplate' => [

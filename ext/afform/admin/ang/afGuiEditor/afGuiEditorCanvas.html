@@ -2,14 +2,14 @@
   <div class="panel-heading">
 
     <div class="form-inline pull-right">
-      <div class="form-group" ng-if="changesSaved && !saving && afform.server_route">
-        <a target="_blank" href="{{ crmUrl(afform.server_route) }}">
+      <div class="form-group" ng-if="changesSaved && !saving && editor.afform.server_route">
+        <a target="_blank" href="{{ editor.getLink() }}">
           <i class="crm-i fa-external-link"></i>
           {{:: ts('View Page') }}
         </a>
       </div>
       <div class="btn-group btn-group-md">
-        <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !afform.title" ng-click="save()">
+        <button type="submit" class="btn" ng-class="{'btn-primary': !changesSaved && !saving, 'btn-warning': saving, 'btn-success': changesSaved}" ng-disabled="changesSaved || saving || !editor.afform.title" ng-click="save()">
           <i class="crm-i" ng-class="{'fa-check': !saving, 'fa-spin fa-spinner': saving}"></i>
           <span ng-if="changesSaved && !saving">{{:: ts('Saved') }}</span>
           <span ng-if="!changesSaved && !saving">{{:: ts('Save') }}</span>

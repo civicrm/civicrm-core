@@ -11,7 +11,7 @@
           // Load data for lists
           afforms: function(crmApi4) {
             return crmApi4('Afform', 'get', {
-              select: ['name', 'title', 'type', 'server_route', 'has_local', 'has_base', 'is_dashlet', 'contact_summary:label']
+              select: ['name', 'title', 'type', 'server_route', 'is_public', 'has_local', 'has_base', 'is_dashlet', 'contact_summary:label']
             });
           }
         }
