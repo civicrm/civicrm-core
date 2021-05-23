@@ -538,7 +538,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $activityParams['target_contact_id'] = ($activityParams['source_contact_id'] === (int) $contribution->contact_id) ? [] : [$contribution->contact_id];
       }
       else {
-        list($sourceContactId, $targetContactId) = self::getActivitySourceAndTarget($activityParams['id']);
+        [$sourceContactId, $targetContactId] = self::getActivitySourceAndTarget($activityParams['id']);
 
         if (empty($targetContactId) && $sourceContactId != $contribution->contact_id) {
           // If no target contact exists and the source contact is not equal to
@@ -973,12 +973,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
     $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
 
-    if ((($previousContributionStatus == 'Partially paid' && $currentContributionStatus == 'Completed')
-        || ($previousContributionStatus == 'Pending refund' && $currentContributionStatus == 'Completed')
+    if ((($previousContributionStatus === 'Partially paid' && $currentContributionStatus === 'Completed')
+        || ($previousContributionStatus === 'Pending refund' && $currentContributionStatus === 'Completed')
         // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
         // why it is here or where it is handled instead.
-        || ($previousContributionStatus == 'Pending' && $params['prevContribution']->is_pay_later == TRUE
-          && $currentContributionStatus == 'Partially paid'))
+        || ($previousContributionStatus === 'Pending' && $params['prevContribution']->is_pay_later == TRUE
+          && $currentContributionStatus === 'Partially paid'))
     ) {
       return FALSE;
     }
@@ -987,13 +987,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
     }
-    elseif (($previousContributionStatus == 'Pending'
-        && $params['prevContribution']->is_pay_later) || $previousContributionStatus == 'In Progress'
+    elseif (($previousContributionStatus === 'Pending'
+        && $params['prevContribution']->is_pay_later) || $previousContributionStatus === 'In Progress'
     ) {
       $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
       $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
 
-      if ($currentContributionStatus == 'Cancelled') {
+      if ($currentContributionStatus === 'Cancelled') {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['trxnParams']['to_financial_account_id'] = $arAccountId;
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
@@ -1004,14 +1004,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       }
     }
 
-    if (($previousContributionStatus == 'Pending'
-        || $previousContributionStatus == 'In Progress')
-      && ($currentContributionStatus == 'Completed')
+    if (($previousContributionStatus === 'Pending'
+        || $previousContributionStatus === 'In Progress')
+      && ($currentContributionStatus === 'Completed')
     ) {
       if (empty($params['line_item'])) {
         //CRM-15296
         //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
-        // when creating recurring membership payment - there are 2 lines to comment out in contributonPageTest if fixed
+        // when creating recurring membership payment - there are 2 lines to comment out in contributionPageTest if fixed
         // & this can be removed
         return FALSE;
       }
@@ -1133,9 +1133,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
       $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
-      if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
+      if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context === 'changeFinancialType')) {
         $taxAmount = (float) $lineItemDetails['tax_amount'];
-        if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
+        if ($context === 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
           // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
           $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
         }
@@ -1258,7 +1258,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'currency' => $resultDAO->currency,
         'action' => $paymentEditLink,
       ];
-      if ($paidByName == 'Check') {
+      if ($paidByName === 'Check') {
         $val['check_number'] = $resultDAO->check_number;
       }
       $rows[] = $val;
@@ -1561,7 +1561,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $input = [];
 
     if ($trxn_id) {
-      $clause[] = "trxn_id = %1";
+      $clause[] = 'trxn_id = %1';
       $input[1] = [$trxn_id, 'String'];
     }
 
@@ -1632,10 +1632,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $contributionFields = array_merge($contributionFields, CRM_Financial_DAO_FinancialType::export());
 
     foreach ($contributionFields as $key => $var) {
-      if ($key == 'contribution_contact_id') {
+      if ($key === 'contribution_contact_id') {
         continue;
       }
-      elseif ($key == 'contribution_campaign_id') {
+      elseif ($key === 'contribution_campaign_id') {
         $var['title'] = ts('Campaign');
       }
       $fields[$key] = $var;
@@ -1922,7 +1922,7 @@ LEFT JOIN civicrm_option_value contribution_status ON (civicrm_contribution.cont
    *   address id
    */
   public static function createAddress($params, $billingLocationTypeID) {
-    list($hasBillingField, $addressParams) = self::getBillingAddressParams($params, $billingLocationTypeID);
+    [$hasBillingField, $addressParams] = self::getBillingAddressParams($params, $billingLocationTypeID);
     if ($hasBillingField) {
       $address = CRM_Core_BAO_Address::add($addressParams, FALSE);
       return $address->id;
@@ -1991,14 +1991,14 @@ WHERE      $condition
       return $contributionId;
     }
 
-    if ($componentName == 'Event') {
+    if ($componentName === 'Event') {
       $idName = 'participant_id';
       $componentTable = 'civicrm_participant';
       $paymentTable = 'civicrm_participant_payment';
       $source = ts('Online Event Registration');
     }
 
-    if ($componentName == 'Membership') {
+    if ($componentName === 'Membership') {
       $idName = 'membership_id';
       $componentTable = 'civicrm_membership';
       $paymentTable = 'civicrm_membership_payment';
@@ -2080,7 +2080,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $componentDetails['contact_id'] = $contactId;
       $componentDetails['component'] = $componentName;
 
-      if ($componentName == 'event') {
+      if ($componentName === 'event') {
         $componentDetails['participant'] = $componentId;
       }
       else {
@@ -2253,7 +2253,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
             $membership->save();
 
             //updating the membership log
-            $membershipLog = [];
             $membershipLog = $formattedParams;
             $logStartDate = CRM_Utils_Date::customFormat($dates['log_start_date'] ?? NULL, $format);
             $logStartDate = ($logStartDate) ? CRM_Utils_Date::isoToMysql($logStartDate) : $formattedParams['start_date'];
@@ -2820,7 +2819,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     // todo remove strtolower - check consistency
-    if (strtolower($this->_component) == 'event') {
+    if (strtolower($this->_component) === 'event') {
       $eventParams = ['id' => $this->_relatedObjects['participant']->event_id];
       $values['event'] = [];
 
@@ -2839,9 +2838,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'module' => 'CiviEvent',
       ];
 
-      list($custom_pre_id,
-        $custom_post_ids
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      [$custom_pre_id, $custom_post_ids] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       $values['custom_pre_id'] = $custom_pre_id;
       $values['custom_post_id'] = $custom_post_ids;
@@ -2902,7 +2899,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             $template->assign('mem_end_date', $membership->end_date);
             $membership_status = CRM_Member_PseudoConstant::membershipStatus($membership->status_id, NULL, 'label');
             $template->assign('mem_status', $membership_status);
-            if ($membership_status == 'Pending' && $membership->is_pay_later == 1) {
+            if ($membership_status === 'Pending' && $membership->is_pay_later == 1) {
               $values['is_pay_later'] = 1;
             }
             // Pass amount to floatval as string '0.00' is considered a
@@ -4317,7 +4314,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // set receipt from e-mail and name in value
     if (!$returnMessageText) {
-      list($values['receipt_from_name'], $values['receipt_from_email']) = self::generateFromEmailAndName($input, $contribution);
+      [$values['receipt_from_name'], $values['receipt_from_email']] = self::generateFromEmailAndName($input, $contribution);
     }
     $values['contribution_status'] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $return = $contribution->composeMessageArray($input, $ids, $values, $returnMessageText);
@@ -4985,17 +4982,17 @@ LIMIT 1;";
    * @param int $counter
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName == 'tax_amount') {
+    if ($fieldName === 'tax_amount') {
       $this->{$fieldName} = "0.00";
     }
-    elseif ($fieldName == 'net_amount') {
-      $this->{$fieldName} = "2.00";
+    elseif ($fieldName === 'net_amount') {
+      $this->{$fieldName} = '2.00';
     }
-    elseif ($fieldName == 'total_amount') {
+    elseif ($fieldName === 'total_amount') {
       $this->{$fieldName} = "3.00";
     }
-    elseif ($fieldName == 'fee_amount') {
-      $this->{$fieldName} = "1.00";
+    elseif ($fieldName === 'fee_amount') {
+      $this->{$fieldName} = '1.00';
     }
     else {
       parent::assignTestValues($fieldName, $fieldDef, $counter);
@@ -5281,7 +5278,9 @@ LIMIT 1;";
    *
    * @param int $id
    * @param array $messageToken
+   *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionTokenValues($id, $messageToken) {
     if (empty($id)) {
