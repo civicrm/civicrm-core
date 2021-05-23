@@ -145,7 +145,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpecNewIndex']);
     $this->callAPISuccess('System', 'updatelogtables', []);
     $this->checkINNODBLogTableCreated();
-    $this->assertContains('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
+    $this->assertStringContainsString('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
   }
 
   /**
@@ -165,7 +165,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       $this->assertTrue($this->checkColumnExistsInTable('log_' . $table, 'temp_col'), 'log_' . $table . ' has temp_col');
       $dao = CRM_Core_DAO::executeQuery("SHOW TRIGGERS LIKE '{$table}'");
       while ($dao->fetch()) {
-        $this->assertContains('temp_col', $dao->Statement);
+        $this->assertStringContainsString('temp_col', $dao->Statement);
       }
     }
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP column temp_col");
@@ -216,8 +216,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $dao->fetch();
     $this->assertEquals('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
-    $this->assertContains('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
-    $this->assertContains('`log_conn_id` varchar(17)', $dao->$tableField);
+    $this->assertStringContainsString('`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,', $dao->$tableField);
+    $this->assertStringContainsString('`log_conn_id` varchar(17)', $dao->$tableField);
     return $dao->$tableField;
   }
 
@@ -226,9 +226,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    */
   protected function checkINNODBLogTableCreated() {
     $createTableString = $this->checkLogTableCreated();
-    $this->assertContains('ENGINE=InnoDB', $createTableString);
-    $this->assertContains('ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4', $createTableString);
-    $this->assertContains('KEY `index_id` (`id`),', $createTableString);
+    $this->assertStringContainsString('ENGINE=InnoDB', $createTableString);
+    $this->assertStringContainsString('ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4', $createTableString);
+    $this->assertStringContainsString('KEY `index_id` (`id`),', $createTableString);
   }
 
   /**
@@ -242,10 +242,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     while ($dao->fetch()) {
       if ($dao->Timing == 'After') {
         if ($unique) {
-          $this->assertContains('@uniqueID', $dao->Statement);
+          $this->assertStringContainsString('@uniqueID', $dao->Statement);
         }
         else {
-          $this->assertContains('CONNECTION_ID()', $dao->Statement);
+          $this->assertStringContainsString('CONNECTION_ID()', $dao->Statement);
         }
       }
     }

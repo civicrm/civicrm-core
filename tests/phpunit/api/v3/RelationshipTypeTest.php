@@ -156,8 +156,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = [];
     $result = $this->callAPIFailure('relationship_type', 'create', $params);
-    $this->assertContains('name_a_b', $result['error_message']);
-    $this->assertContains('name_b_a', $result['error_message']);
+    $this->assertStringContainsString('name_a_b', $result['error_message']);
+    $this->assertStringContainsString('name_b_a', $result['error_message']);
   }
 
   /**

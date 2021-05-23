@@ -85,10 +85,9 @@ namespace Civi\Core {
 
     /**
      * Test callback for an invalid object in the container.
-     *
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ExceptionInterface
      */
     public function testCallWithInvalidService() {
+      $this->expectException(\Symfony\Component\DependencyInjection\Exception\ExceptionInterface::class);
       $this->resolver->get('call://totallyNonexistentService/ping');
     }
 
@@ -123,10 +122,9 @@ namespace Civi\Core {
 
     /**
      * Test object-lookup in the container (invalid name).
-     *
-     * @expectedException \Symfony\Component\DependencyInjection\Exception\ExceptionInterface
      */
     public function testObjWithInvalidService() {
+      $this->expectException(\Symfony\Component\DependencyInjection\Exception\ExceptionInterface::class);
       $this->resolver->get('obj://totallyNonexistentService');
     }
 

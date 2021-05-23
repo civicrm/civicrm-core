@@ -135,8 +135,8 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   public function testCreateEmailWithoutEmail($version) {
     $this->_apiversion = $version;
     $result = $this->callAPIFailure('Email', 'Create', ['contact_id' => 4]);
-    $this->assertContains('missing', $result['error_message']);
-    $this->assertContains('email', $result['error_message']);
+    $this->assertStringContainsString('missing', $result['error_message']);
+    $this->assertStringContainsString('email', $result['error_message']);
   }
 
   /**

@@ -81,7 +81,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $params = ['sequential' => 1];
     $result = $this->callAPIAndDocument('domain', 'get', $params, __FUNCTION__, __FILE__);
 
-    $this->assertType('array', $result);
+    $this->assertIsArray($result);
 
     $domain = $result['values'][0];
     $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email']);
@@ -107,7 +107,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $params = ['current_domain' => 1];
     $result = $this->callAPISuccess('domain', 'get', $params);
 
-    $this->assertType('array', $result);
+    $this->assertIsArray($result);
 
     foreach ($result['values'] as $key => $domain) {
       if ($key == 'version') {

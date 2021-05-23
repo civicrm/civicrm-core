@@ -345,7 +345,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   public function testGetFields() {
     $result = $this->callAPISuccess('PledgePayment', 'GetFields', []);
-    $this->assertType('array', $result);
+    $this->assertIsArray($result);
   }
 
 }

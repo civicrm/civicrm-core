@@ -31,9 +31,9 @@ class CiviFacadeTest extends \CiviUnitTestCase {
 
   /**
    * Anonymous users don't have a SettingsBag.
-   * @expectedException \CRM_Core_Exception
    */
   public function testContactSettings_anonFail() {
+    $this->expectException(\CRM_Core_Exception::class);
     \Civi::contactSettings();
   }
 

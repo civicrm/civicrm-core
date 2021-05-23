@@ -95,9 +95,9 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertContains('Mandatory', $result['error_message']);
-    $this->assertContains('missing', $result['error_message']);
-    $this->assertContains('uf_group_id', $result['error_message']);
+    $this->assertStringContainsString('Mandatory', $result['error_message']);
+    $this->assertStringContainsString('missing', $result['error_message']);
+    $this->assertStringContainsString('uf_group_id', $result['error_message']);
   }
 
   /**
@@ -167,10 +167,10 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   public function testFindUFJoinEmptyParams($version) {
     $this->_apiversion = $version;
     $result = $this->callAPIFailure('uf_join', 'create', []);
-    $this->assertContains('Mandatory', $result['error_message']);
-    $this->assertContains('missing', $result['error_message']);
-    $this->assertContains('module', $result['error_message']);
-    $this->assertContains('uf_group_id', $result['error_message']);
+    $this->assertStringContainsString('Mandatory', $result['error_message']);
+    $this->assertStringContainsString('missing', $result['error_message']);
+    $this->assertStringContainsString('module', $result['error_message']);
+    $this->assertStringContainsString('uf_group_id', $result['error_message']);
   }
 
   /**
@@ -187,9 +187,9 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
     $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertContains('Mandatory', $result['error_message']);
-    $this->assertContains('missing', $result['error_message']);
-    $this->assertContains('uf_group_id', $result['error_message']);
+    $this->assertStringContainsString('Mandatory', $result['error_message']);
+    $this->assertStringContainsString('missing', $result['error_message']);
+    $this->assertStringContainsString('uf_group_id', $result['error_message']);
   }
 
   /**

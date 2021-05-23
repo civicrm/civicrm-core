@@ -52,7 +52,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
-    $this->assertInternalType('numeric', $entityId);
+    $this->assertIsNumeric($entityId);
     $this->assertEquals(7, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
@@ -505,7 +505,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       GROUP BY contact_civireport.id');
     // Exclude whitespace in comparison as we don't care if it changes & this allows us to make the above readable.
     $whitespacelessSql = preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]);
-    $this->assertContains($expected, $whitespacelessSql);
+    $this->assertStringContainsString($expected, $whitespacelessSql);
   }
 
   /**
@@ -718,9 +718,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY contribution_civireport.contribution_status_id WITH ROLLUP', $rowsSql[0]);
+    $this->assertStringContainsString('GROUP BY contribution_civireport.contribution_status_id WITH ROLLUP', $rowsSql[0]);
     $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY contribution_civireport.contribution_status_id, currency', $statsSql[2]);
+    $this->assertStringContainsString('GROUP BY contribution_civireport.contribution_status_id, currency', $statsSql[2]);
   }
 
   /**
@@ -737,9 +737,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY  YEAR(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $this->assertStringContainsString('GROUP BY  YEAR(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
     $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY  YEAR(contribution_civireport.receive_date), currency', $statsSql[2]);
+    $this->assertStringContainsString('GROUP BY  YEAR(contribution_civireport.receive_date), currency', $statsSql[2]);
   }
 
   /**
@@ -756,9 +756,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $this->assertStringContainsString('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
     $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date), currency', $statsSql[2]);
+    $this->assertStringContainsString('GROUP BY YEAR(contribution_civireport.receive_date), QUARTER(contribution_civireport.receive_date), currency', $statsSql[2]);
   }
 
   /**
@@ -775,9 +775,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY DATE(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $this->assertStringContainsString('GROUP BY DATE(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
     $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY DATE(contribution_civireport.receive_date), currency', $statsSql[2]);
+    $this->assertStringContainsString('GROUP BY DATE(contribution_civireport.receive_date), currency', $statsSql[2]);
   }
 
   /**
@@ -794,9 +794,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rowsSql = $this->callAPISuccess('report_template', 'getrows', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY YEARWEEK(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
+    $this->assertStringContainsString('GROUP BY YEARWEEK(contribution_civireport.receive_date) WITH ROLLUP', $rowsSql[0]);
     $statsSql = $this->callAPISuccess('report_template', 'getstatistics', $params)['metadata']['sql'];
-    $this->assertContains('GROUP BY YEARWEEK(contribution_civireport.receive_date), currency', $statsSql[2]);
+    $this->assertStringContainsString('GROUP BY YEARWEEK(contribution_civireport.receive_date), currency', $statsSql[2]);
   }
 
   /**
@@ -1153,13 +1153,13 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         case 'YEAR':
           // Year only contains one grouping.
           // Also note the extra space.
-          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $rowsSql[1], "Failed for frequency $frequency");
-          $this->assertContains('GROUP BY  YEAR(activity_civireport.activity_date_time)', $statsSql[1], "Failed for frequency $frequency");
+          $this->assertStringContainsString('GROUP BY  YEAR(activity_civireport.activity_date_time)', $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertStringContainsString('GROUP BY  YEAR(activity_civireport.activity_date_time)', $statsSql[1], "Failed for frequency $frequency");
           break;
 
         default:
-          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $rowsSql[1], "Failed for frequency $frequency");
-          $this->assertContains("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $statsSql[1], "Failed for frequency $frequency");
+          $this->assertStringContainsString("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $rowsSql[1], "Failed for frequency $frequency");
+          $this->assertStringContainsString("GROUP BY YEAR(activity_civireport.activity_date_time), {$frequency}(activity_civireport.activity_date_time)", $statsSql[1], "Failed for frequency $frequency");
           break;
       }
     }
@@ -1315,7 +1315,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => ['metadata' => ['sql']],
     ];
     $rows = $this->callAPISuccess('report_template', 'getrows', $params);
-    $this->assertContains("civicrm_contact_source.sort_name LIKE '%z%'", $rows['metadata']['sql'][3]);
+    $this->assertStringContainsString("civicrm_contact_source.sort_name LIKE '%z%'", $rows['metadata']['sql'][3]);
   }
 
   /**
