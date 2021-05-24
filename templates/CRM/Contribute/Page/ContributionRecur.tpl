@@ -20,7 +20,11 @@
         <td class="label">{ts}From{/ts}</td>
         <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=`$recur.contact_id`"}">{$displayName}</a></td>
       </tr>
-      <tr><td class="label">{ts}Amount{/ts}</td><td>{$recur.amount|crmMoney:$recur.currency}{if $is_test} ({ts}test{/ts}){/if}</td></tr>
+      {if $displayLineItems}
+        <tr><td class="label">{ts}Amount{/ts}</td><td>{include file="CRM/Price/Page/LineItem.tpl" context="ContributionRecur" totalAmount=$recur.amount currency=$recur.currency}</td></tr>
+      {else}
+        <tr><td class="label">{ts}Amount{/ts}</td><td>{$recur.amount|crmMoney:$recur.currency}{if $is_test} ({ts}test{/ts}){/if}</td></tr>
+      {/if}
       <tr><td class="label">{ts}Frequency{/ts}</td><td>every {$recur.frequency_interval} {$recur.frequency_unit}</td></tr>
       <tr><td class="label">{ts}Installments{/ts}</td><td>{$recur.installments}</td></tr>
       <tr><td class="label">{ts}Status{/ts}</td><td>{$recur.contribution_status}</td></tr>

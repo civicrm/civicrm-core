@@ -75,6 +75,32 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
     $this->assign('recur', $contributionRecur);
 
+    $lineItems = [];
+    $displayLineItems = FALSE;
+    if ($this->getEntityId()) {
+      $lineItems = [CRM_Price_BAO_LineItem::getLineItems($this->getEntityId(), 'contribution_recur', NULL, TRUE, FALSE)];
+      $firstLineItem = reset($lineItems[0]);
+      if (empty($firstLineItem['price_set_id'])) {
+        // CRM-20297 All we care is that it's not QuickConfig, so no price set
+        // is no problem.
+        $displayLineItems = TRUE;
+      }
+      else {
+        try {
+          $priceSet = civicrm_api3('PriceSet', 'getsingle', [
+            'id' => $firstLineItem['price_set_id'],
+            'return' => 'is_quick_config, id',
+          ]);
+          $displayLineItems = !$priceSet['is_quick_config'];
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          throw new CRM_Core_Exception('Cannot find price set by ID');
+        }
+      }
+    }
+    $this->assign('lineItem', $lineItems);
+    $this->assign('displayLineItems', $displayLineItems);
+
     $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
     $this->assign('displayName', $displayName);
 

@@ -46,7 +46,18 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
   public static function add(&$params) {
-    if (!empty($params['id'])) {
+    // Get Line Items if we don't have them already.
+    if (empty($params['line_item'])) {
+      if (isset($params['id'])) {
+        CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']], 'contribution_recur');
+      }
+      else {
+        CRM_Price_BAO_LineItem::getLineItemArray($params, null, 'contribution_recur');
+      }
+    }
+
+    $isUpdate = !empty($params['id']);
+    if ($isUpdate) {
       CRM_Utils_Hook::pre('edit', 'ContributionRecur', $params['id'], $params);
     }
     else {
@@ -78,7 +89,12 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
     $recurring->save();
 
-    if (!empty($params['id'])) {
+    // Record line items.
+    if (empty($params['skipLineItem'])) {
+      CRM_Price_BAO_LineItem::processPriceSet($recurring->id, CRM_Utils_Array::value('line_item', $params), null, 'civicrm_contribution_recur', $isUpdate);
+    }
+
+    if ($isUpdate) {
       CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
     }
     else {
