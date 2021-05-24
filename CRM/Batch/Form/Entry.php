@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * This class provides the functionality for batch entry for contributions/memberships.
  */
@@ -78,6 +80,54 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @var array
    */
   public $_fields = [];
+
+  /**
+   * @var int
+   */
+  protected $currentRowContributionID;
+
+  /**
+   * Get the contribution id for the current row.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getCurrentRowContributionID(): int {
+    if (!isset($this->currentRowContributionID)) {
+      $this->currentRowContributionID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $this->getCurrentRowMembershipID(), 'contribution_id', 'membership_id');
+    }
+    return $this->currentRowContributionID;
+  }
+
+  /**
+   * Set the contribution ID for the current row.
+   *
+   * @param int $currentRowContributionID
+   */
+  public function setCurrentRowContributionID(int $currentRowContributionID): void {
+    $this->currentRowContributionID = $currentRowContributionID;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getCurrentRowMembershipID() {
+    return $this->currentRowMembershipID;
+  }
+
+  /**
+   * Set the membership id for the current row.
+   *
+   * @param int $currentRowMembershipID
+   */
+  public function setCurrentRowMembershipID(int $currentRowMembershipID): void {
+    $this->currentRowMembershipID = $currentRowMembershipID;
+  }
+
+  /**
+   * @var int
+   */
+  protected $currentRowMembershipID;
 
   /**
    * Monetary fields that may be submitted.
@@ -679,28 +729,22 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     if (isset($params['field'])) {
       // @todo - most of the wrangling in this function is because the api is not being used, especially date stuff.
-      $customFields = [];
       foreach ($params['field'] as $key => $value) {
+        // if contact is not selected we should skip the row
+        if (empty($params['primary_contact_id'][$key])) {
+          continue;
+        }
+        $value['contact_id'] = $params['primary_contact_id'][$key];
         foreach ($value as $fieldKey => $fieldValue) {
           if (isset($this->_fields[$fieldKey]) && $this->_fields[$fieldKey]['data_type'] === 'Money') {
             $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
           }
         }
-        // if contact is not selected we should skip the row
-        if (empty($params['primary_contact_id'][$key])) {
-          continue;
-        }
-
-        $value['contact_id'] = $params['primary_contact_id'][$key] ?? NULL;
 
         // update contact information
         $this->updateContactInfo($value);
 
         $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
-
-        if (!empty($value['send_receipt'])) {
-          $value['receipt_date'] = date('Y-m-d His');
-        }
 
         if (!empty($value['membership_source'])) {
           $value['source'] = $value['membership_source'];
@@ -830,6 +874,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           // @todo - calling this from here is pretty hacky since it is called from membership.create anyway
           // This form should set the correct params & not call this fn directly.
           CRM_Member_BAO_Membership::recordMembershipContribution($contrbutionParams);
+          $this->setCurrentRowMembershipID($membership->id);
         }
         else {
           $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeId,
@@ -842,6 +887,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           unset($value['membership_start_date']);
           unset($value['membership_end_date']);
           $membership = CRM_Member_BAO_Membership::create($value);
+          $this->setCurrentRowMembershipID($membership->id);
         }
 
         //process premiums
@@ -857,7 +903,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
             $premiumParams = [
               'product_id' => $value['product_name'][0],
-              'contribution_id' => CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id'),
+              'contribution_id' => $this->getCurrentRowContributionID(),
               'product_option' => $value['product_option'],
               'quantity' => 1,
             ];
@@ -875,7 +921,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
           $value['from_email_address'] = $domainEmail;
           $value['membership_id'] = $membership->id;
-          $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
           $this->emailReceipt($this, $value, $membership);
         }
       }
@@ -915,10 +960,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $form->assign('contactID', $formValues['contact_id']);
 
     $form->assign('membershipID', CRM_Utils_Array::value('membership_id', $form->_params, CRM_Utils_Array::value('membership_id', $form->_defaultValues)));
-
-    if (!empty($formValues['contribution_id'])) {
-      $form->assign('contributionID', $formValues['contribution_id']);
-    }
+    $this->assign('contributionID', $this->getCurrentRowContributionID());
 
     if (!empty($formValues['contribution_status_id'])) {
       $form->assign('contributionStatusID', $formValues['contribution_status_id']);
@@ -954,10 +996,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
-        'contributionId' => $formValues['contribution_id'],
+        'contributionId' => $this->getCurrentRowContributionID(),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
       ]
     );
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $this->getCurrentRowContributionID())
+      ->setValues(['receipt_date', 'now'])
+      ->execute();
 
     return TRUE;
   }
