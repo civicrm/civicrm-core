@@ -46,8 +46,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
   public static function add(&$params) {
-    $isUpdate = !empty($params['id']);
-    if ($isUpdate) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'ContributionRecur', $params['id'], $params);
     }
     else {
@@ -79,7 +78,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     }
     $recurring->save();
 
-    if ($isUpdate) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
     }
     else {
@@ -1037,6 +1036,8 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // CRM-19309 if more than one then just pass them through:
     elseif (count($lineItems) > 1) {
       foreach ($lineItems as $index => $lineItem) {
+        // we don't need the $index we add all price field ids to the same
+        // index: 0.
         $lineSets[0][$lineItem['price_field_id']] = $lineItem;
       }
     }
