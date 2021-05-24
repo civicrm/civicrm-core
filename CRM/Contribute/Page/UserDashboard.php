@@ -109,7 +109,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
         $action -= CRM_Core_Action::UPDATE;
       }
 
-      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $this->_contactId),
+      $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
         $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
