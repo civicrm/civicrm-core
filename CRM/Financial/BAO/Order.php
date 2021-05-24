@@ -447,7 +447,7 @@ class CRM_Financial_BAO_Order {
   public function getTotalAmount() :float {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {
-      $amount += $lineItem['line_total'] ?? 0.0;
+      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
     }
     return $amount;
   }

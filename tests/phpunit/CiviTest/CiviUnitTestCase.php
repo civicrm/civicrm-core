@@ -3643,7 +3643,7 @@ VALUES
         $taxTotal += (float) ($lineItem['tax_amount'] ?? 0);
       }
       $this->assertEquals($taxTotal, (float) ($contribution['tax_amount'] ?? 0));
-      $this->assertEquals($total, $contribution['total_amount']);
+      $this->assertEquals($total + $taxTotal, $contribution['total_amount']);
     }
   }
 
