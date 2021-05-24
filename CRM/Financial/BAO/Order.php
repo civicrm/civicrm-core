@@ -200,6 +200,38 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set price set ID based on the contribution page id.
+   *
+   * @param int $contributionPageID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function setPriceSetIDByContributionPageID(int $contributionPageID): void {
+    $this->setPriceSetIDByEntity('contribution_page', $contributionPageID);
+  }
+
+  /**
+   * Set price set ID based on the event id.
+   *
+   * @param int $eventID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function setPriceSetIDByEventPageID(int $eventID): void {
+    $this->setPriceSetIDByEntity('event', $eventID);
+  }
+
+  /**
+   * Set the price set id based on looking up the entity.
+   * @param string $entity
+   * @param int $id
+   *
+   */
+  protected function setPriceSetIDByEntity(string $entity, int $id): void {
+    $this->priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_' . $entity, $id);
+  }
+
+  /**
    * Getter for price selection.
    *
    * @return array

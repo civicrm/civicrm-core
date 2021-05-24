@@ -983,7 +983,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE]);
     $this->assertEquals(3, $financialTransactions['count']);
 
-    list($oldTrxn, $reversedTrxn, $latestTrxn) = $financialTransactions['values'];
+    [$oldTrxn, $reversedTrxn, $latestTrxn] = $financialTransactions['values'];
 
     $this->assertEquals(1200.55, $oldTrxn['total_amount']);
     $this->assertEquals('123AX', $oldTrxn['check_number']);
@@ -1459,61 +1459,65 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   }
 
   /**
-   * CRM-21711 Test that custom fields on relevant memberships get updated wehn updating multiple memberships
+   * CRM-21711 Test that custom fields on relevant memberships get updated wehn
+   * updating multiple memberships
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testCustomFieldsOnMembershipGetUpdated() {
+  public function testCustomFieldsOnMembershipGetUpdated(): void {
     $contactID = $this->individualCreate();
     $contactID1 = $this->organizationCreate();
     $contactID2 = $this->organizationCreate();
 
     // create membership types
-    $membershipTypeOne = civicrm_api3('membership_type', 'create', [
+    $membershipTypeOne = civicrm_api3('MembershipType', 'create', [
       'domain_id' => 1,
-      'name' => "One",
+      'name' => 'One',
       'member_of_contact_id' => $contactID1,
-      'duration_unit' => "year",
+      'duration_unit' => 'year',
       'minimum_fee' => 50,
       'duration_interval' => 1,
-      'period_type' => "fixed",
-      'fixed_period_start_day' => "101",
-      'fixed_period_rollover_day' => "1231",
+      'period_type' => 'fixed',
+      'fixed_period_start_day' => '101',
+      'fixed_period_rollover_day' => '1231',
       'financial_type_id' => 1,
       'weight' => 50,
       'is_active' => 1,
-      'visibility' => "Public",
+      'visibility' => 'Public',
     ]);
 
-    $membershipTypeTwo = civicrm_api3('membership_type', 'create', [
+    $membershipTypeTwo = civicrm_api3('MembershipType', 'create', [
       'domain_id' => 1,
-      'name' => "Two",
+      'name' => 'Two',
       'member_of_contact_id' => $contactID2,
-      'duration_unit' => "year",
+      'duration_unit' => 'year',
       'minimum_fee' => 50,
       'duration_interval' => 1,
-      'period_type' => "fixed",
-      'fixed_period_start_day' => "101",
-      'fixed_period_rollover_day' => "1231",
+      'period_type' => 'fixed',
+      'fixed_period_start_day' => '101',
+      'fixed_period_rollover_day' => '1231',
       'financial_type_id' => 1,
       'weight' => 51,
       'is_active' => 1,
-      'visibility' => "Public",
+      'visibility' => 'Public',
     ]);
 
     //create custom Fields
     $membershipCustomFieldsGroup = civicrm_api3('CustomGroup', 'create', [
-      'title' => "Custom Fields on Membership",
-      'extends' => "Membership",
+      'title' => 'Custom Fields on Membership',
+      'extends' => 'Membership',
     ]);
 
     $membershipCustomField = civicrm_api3('CustomField', 'create', [
-      "custom_group_id" => $membershipCustomFieldsGroup['id'],
-      "name" => "my_membership_custom_field",
-      "label" => "Membership Custom Field",
-      "data_type" => "String",
-      "html_type" => "Text",
-      "is_active" => "1",
-      "is_view" => "0",
-      "text_length" => "255",
+      'custom_group_id' => $membershipCustomFieldsGroup['id'],
+      'name' => 'my_membership_custom_field',
+      'label' => 'Membership Custom Field',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'is_active' => TRUE,
+      'text_length' => 255,
     ]);
 
     // create profile
@@ -1529,7 +1533,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ]);
 
     // add custom fields to profile
-    $membershipCustomFieldsProfileFields = civicrm_api3('UFField', 'create', [
+    civicrm_api3('UFField', 'create', [
       "uf_group_id" => $membershipCustomFieldsProfile['id'],
       "field_name" => "custom_" . $membershipCustomField['id'],
       "is_active" => "1",
@@ -1554,7 +1558,6 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       "is_pay_later" => "1",
       "pay_later_text" => "I will send payment by check",
       "is_partial_payment" => "0",
-      "is_allow_other_amount" => "0",
       "is_email_receipt" => "0",
       "is_active" => "1",
       "amount_block_is_active" => "0",
@@ -1574,14 +1577,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'extends' => "CiviMember",
       'is_active' => 1,
       "financial_type_id" => "1",
-      "is_quick_config" => "0",
-      "is_reserved" => "0",
-      "entity" => ["civicrm_contribution_page" => [$contribPage1]],
     ]);
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set_entity (entity_table, entity_id, price_set_id) VALUES('civicrm_contribution_page', $contribPage1, {$priceSet['id']})");
 
     $priceField = civicrm_api3('PriceField', 'create', [
-      "price_set_id" => $priceSet['id'],
-      "name" => "mt",
+      'price_set_id' => $priceSet['id'],
+      'name' => 'mt',
       "label" => "Membership Types",
       "html_type" => "CheckBox",
       "is_enter_qty" => "0",
@@ -1624,7 +1625,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ]);
 
     // assign profile with custom fields to contribution page
-    $profile = civicrm_api3('UFJoin', 'create', [
+    civicrm_api3('UFJoin', 'create', [
       'module' => "CiviContribute",
       'weight' => "1",
       'uf_group_id' => $membershipCustomFieldsProfile['id'],
@@ -1635,14 +1636,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_params = [
       'id' => $contribPage1,
-      "qfKey" => "donotcare",
+      'qfKey' => "donotcare",
       "custom_{$membershipCustomField['id']}" => "Hello",
-      "email-5" => "admin@example.com",
       "priceSetId" => $priceSet['id'],
       'price_set_id' => $priceSet['id'],
       "price_" . $priceField['id'] => [$priceFieldOption1['id'] => 1, $priceFieldOption2['id'] => 1],
-      "invoiceID" => "9a6f7b49358dc31c3604e463b225c5be",
-      "email" => "admin@example.com",
+      'invoiceID' => "9a6f7b49358dc31c3604e463b225c5be",
+      'email' => "admin@example.com",
       "currencyID" => "USD",
       'description' => "Membership Contribution",
       'contact_id' => $contactID,

@@ -274,7 +274,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params['amount_level'] = 'Unreasonable';
     $params['cancel_reason'] = 'You lose sucker';
     $params['creditnote_id'] = 'sudo rm -rf';
-    $params['tax_amount'] = '1';
     $address = $this->callAPISuccess('Address', 'create', [
       'street_address' => 'Knockturn Alley',
       'contact_id' => $this->_individualId,
@@ -308,6 +307,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('bouncer', $contribution['contribution_check_number']);
 
     $fields = CRM_Contribute_BAO_Contribution::fields();
+    // Do not check for tax_amount as this test has not enabled invoicing
+    // & hence it is not reliable.
+    unset($fields['tax_amount']);
     // Re-add these 2 to the fields to check. They were locked in but the metadata changed so we
     // need to specify them.
     $fields['address_id'] = $fields['contribution_address_id'];
@@ -319,12 +321,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'fee_amount', 'net_amount', 'trxn_id', 'invoice_id', 'currency', 'contribution_cancel_date', 'cancel_reason',
       'receipt_date', 'thankyou_date', 'contribution_source', 'amount_level', 'contribution_recur_id',
       'is_test', 'is_pay_later', 'contribution_status_id', 'address_id', 'check_number', 'contribution_campaign_id',
-      'creditnote_id', 'tax_amount', 'revenue_recognition_date', 'decoy',
+      'creditnote_id', 'revenue_recognition_date', 'decoy',
     ];
     $missingFields = array_diff($fieldsLockedIn, array_keys($fields));
     // If any of the locked in fields disappear from the $fields array we need to make sure it is still
     // covered as the test contract now guarantees them in the return array.
-    $this->assertEquals($missingFields, [29 => 'decoy'], 'A field which was covered by the test contract has changed.');
+    $this->assertEquals([28 => 'decoy'], $missingFields, 'A field which was covered by the test contract has changed.');
     foreach ($fields as $fieldName => $fieldSpec) {
       $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => $fieldName]);
       $returnField = $fieldName;
@@ -510,8 +512,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->customGroupDelete($idsContact['custom_group_id']);
   }
 
-  public function testCreateContributionNoLineItems() {
-
+  /**
+   * Test creating a contribution without skipLineItems.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateContributionNoLineItems(): void {
+    // Turn off this validation as this test results in invalid
+    // financial entities.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -559,7 +568,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => 12345,
       'invoice_id' => 67890,
       'source' => 'SSF',
-      'contribution_status_id' => 1,
+      'contribution_status_id' => 'Pending',
       'skipLineItem' => 1,
       'api.line_item.create' => [
         [
