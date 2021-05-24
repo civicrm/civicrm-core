@@ -490,7 +490,7 @@ WHERE li.contribution_id = %1";
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
-      $totalAmount = CRM_Utils_Array::value('partial_payment_total', $params, CRM_Utils_Array::value('total_amount', $params));
+      $totalAmount = $params['total_amount'] ?? 0;
       $financialType = $params['financial_type_id'] ?? NULL;
       foreach ($priceSetDetails as $values) {
         if ($entityTable == 'membership') {
