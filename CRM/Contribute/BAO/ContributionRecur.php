@@ -46,16 +46,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @todo move hook calls / extended logic to create - requires changing calls to call create not add
    */
   public static function add(&$params) {
-    // Get Line Items if we don't have them already.
-    if (empty($params['line_item'])) {
-      if (isset($params['id'])) {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']], 'contribution_recur');
-      }
-      else {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'contribution_recur');
-      }
-    }
-
     $isUpdate = !empty($params['id']);
     if ($isUpdate) {
       CRM_Utils_Hook::pre('edit', 'ContributionRecur', $params['id'], $params);
@@ -88,11 +78,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recurring->currency = $config->defaultCurrency;
     }
     $recurring->save();
-
-    // Record line items.
-    if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($recurring->id, CRM_Utils_Array::value('line_item', $params), NULL, 'civicrm_contribution_recur', $isUpdate);
-    }
 
     if ($isUpdate) {
       CRM_Utils_Hook::post('edit', 'ContributionRecur', $recurring->id, $recurring);
@@ -1052,7 +1037,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     // CRM-19309 if more than one then just pass them through:
     elseif (count($lineItems) > 1) {
       foreach ($lineItems as $index => $lineItem) {
-        $lineSets[$index][$lineItem['price_field_id']] = $lineItem;
+        $lineSets[0][$lineItem['price_field_id']] = $lineItem;
       }
     }
     return $lineSets;

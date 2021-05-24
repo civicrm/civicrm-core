@@ -1216,9 +1216,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['financial_type_id'] = $params['financial_type_id'] ?? NULL;
     $recurParams['currency'] = $params['currency'] ?? NULL;
     $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
-    if (isset($params['line_item'])) {
-      $recurParams['line_item'] = $params['line_item'];
-    }
 
     // CRM-14354: For an auto-renewing membership with an additional contribution,
     // if separate payments is not enabled, make sure only the membership fee recurs
