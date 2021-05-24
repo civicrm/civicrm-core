@@ -32,9 +32,11 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   Parameters for Processor entity.
    *
    * @return CRM_Financial_DAO_PaymentProcessor
-   * @throws Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function create($params) {
+  public static function create(array $params): CRM_Financial_DAO_PaymentProcessor {
     // If we are creating a new PaymentProcessor and have not specified the payment instrument to use, get the default from the Payment Processor Type.
     if (empty($params['id']) && empty($params['payment_instrument_id'])) {
       $params['payment_instrument_id'] = civicrm_api3('PaymentProcessorType', 'getvalue', [
@@ -89,15 +91,8 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * Class constructor.
-   */
-  public function __construct() {
-    parent::__construct();
-  }
-
-  /**
    * Retrieve array of allowed credit cards for this payment processor.
-   * @param interger|null $paymentProcessorID id of processor.
+   * @param integer|null $paymentProcessorID id of processor.
    * @return array
    */
   public static function getCreditCards($paymentProcessorID = NULL) {
@@ -227,7 +222,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *   associated array with payment processor related fields
    */
   public static function getPayment($paymentProcessorID, $mode = 'based_on_id') {
-    $capabilities = ($mode == 'test') ? ['TestMode'] : [];
+    $capabilities = ($mode === 'test') ? ['TestMode'] : [];
     $processors = self::getPaymentProcessors($capabilities, [$paymentProcessorID]);
     return $processors[$paymentProcessorID];
   }
@@ -305,10 +300,10 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     if ($isCurrentDomainOnly) {
       $retrievalParameters['domain_id'] = CRM_Core_Config::domainID();
     }
-    if ($mode == 'test') {
+    if ($mode === 'test') {
       $retrievalParameters['is_test'] = 1;
     }
-    elseif ($mode == 'live') {
+    elseif ($mode === 'live') {
       $retrievalParameters['is_test'] = 0;
     }
 
@@ -417,7 +412,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       }
       // Invalid processors will store a null value in 'object' (e.g. if not all required config fields are present).
       // This is determined by calling when loading the processor via the $processorObject->checkConfig() function.
-      if (!$processor['object'] instanceof \CRM_Core_Payment) {
+      if (!$processor['object'] instanceof CRM_Core_Payment) {
         unset($processors[$index]);
         continue;
       }
@@ -504,7 +499,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       return $result;
     }
 
-    if ($component == 'membership') {
+    if ($component === 'membership') {
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
       FROM civicrm_membership mem
@@ -514,7 +509,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
  LEFT JOIN civicrm_contribution_page  cp  ON ( con.contribution_page_id  = cp.id )
      WHERE mp.membership_id = %1";
     }
-    elseif ($component == 'contribute') {
+    elseif ($component === 'contribute') {
       $sql = "
     SELECT cr.payment_processor_id as ppID1, cp.payment_processor as ppID2, con.is_test
       FROM civicrm_contribution       con
@@ -522,7 +517,7 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
  LEFT JOIN civicrm_contribution_page  cp  ON ( con.contribution_page_id  = cp.id )
      WHERE con.id = %1";
     }
-    elseif ($component == 'recur') {
+    elseif ($component === 'recur') {
       // @deprecated - use getPaymentProcessorForRecurringContribution.
       $sql = "
     SELECT cr.payment_processor_id as ppID1, NULL as ppID2, cr.is_test
@@ -544,13 +539,13 @@ INNER JOIN civicrm_contribution       con ON ( mp.contribution_id = con.id )
 
     $ppID = (isset($dao->ppID1) && $dao->ppID1) ? $dao->ppID1 : ($dao->ppID2 ?? NULL);
     $mode = (isset($dao->is_test) && $dao->is_test) ? 'test' : 'live';
-    if (!$ppID || $type == 'id') {
+    if (!$ppID || $type === 'id') {
       $result = $ppID;
     }
-    elseif ($type == 'info') {
+    elseif ($type === 'info') {
       $result = self::getPayment($ppID, $mode);
     }
-    elseif ($type == 'obj' && is_numeric($ppID)) {
+    elseif ($type === 'obj' && is_numeric($ppID)) {
       try {
         $paymentProcessor = civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $ppID]);
       }

@@ -1129,9 +1129,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * Function tests that additional financial records are created when online contribution is created.
+   * Function tests that additional financial records are created when online
+   * contribution is created.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testCreateContributionOnline() {
+  public function testCreateContributionOnline(): void {
     CRM_Financial_BAO_PaymentProcessor::create($this->_processorParams);
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
     $this->assertAPISuccess($contributionPage);
