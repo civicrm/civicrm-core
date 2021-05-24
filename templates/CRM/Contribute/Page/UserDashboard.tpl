@@ -18,13 +18,12 @@
                     <th>{ts}Financial Type{/ts}</th>
                     <th>{ts}Received date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
+                    <th>{ts}Balance{/ts}</th>
                     <th>{ts}Status{/ts}</th>
                     {if $isIncludeInvoiceLinks}
                       <th></th>
                     {/if}
-                    {foreach from=$row.buttons item=button}
-                      <th></th>
-                    {/foreach}
+                    <th></th>
                 </tr>
 
                 {foreach from=$contribute_rows item=row}
@@ -39,6 +38,7 @@
                         <td>{$row.financial_type}</td>
                         <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                         <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
+                        <td>{$row.balance_amount|crmMoney:$row.currency}</td>
                         <td>{$row.contribution_status}</td>
                         {if $isIncludeInvoiceLinks}
                           <td>
@@ -59,9 +59,11 @@
                             {/if}
                           </td>
                         {/if}
+                        <td>
                         {foreach from=$row.buttons item=button}
-                          <td><a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a></td>
+                          <a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a>
                         {/foreach}
+                        </td>
                     </tr>
                 {/foreach}
             </table>
