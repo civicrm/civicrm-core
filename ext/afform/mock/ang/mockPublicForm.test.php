@@ -51,16 +51,15 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $me[0]['fields']['first_name'] = 'Firsty' . $r;
     $me[0]['fields']['last_name'] = 'Lasty' . $r;
 
-    $this->submitError(['args' => [], 'values' => ['me' => $me]]);
-    $this->assertContentType('application/json')->assertStatusCode(403);
+    $this->submit(['args' => [], 'values' => ['me' => $me]]);
 
-    // Contact hasn't changed
+    // Original contact hasn't changed
     $get = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->execute()->single();
     $this->assertEquals('FirstBegin', $get['first_name']);
     $this->assertEquals('LastBegin', $get['last_name']);
 
-    // No other contacts were created or edited with the requested value.
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
+    // Instead of updating original, a new contact was created.
+    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
   }
 
   /**

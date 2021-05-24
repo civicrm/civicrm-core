@@ -37,6 +37,31 @@ EOHTML;
   </fieldset>
 </af-form>
 EOHTML;
+    self::$layouts['employer'] = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" url-autofill="1" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" autofill="user" />
+  <af-entity data="{contact_type: 'Organization'}" type="Contact" name="Organization1" label="Organization 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1">
+    <legend class="af-text">Individual 1</legend>
+    <div class="af-container">
+      <div class="af-container af-layout-inline">
+        <af-field name="first_name" />
+        <af-field name="middle_name" />
+        <af-field name="last_name" />
+        <div class="af-container"></div>
+      </div>
+    </div>
+    <af-field name="employer_id" defn="{input_type: 'Select', input_attrs: {}}" />
+  </fieldset>
+  <fieldset af-fieldset="Organization1">
+    <legend class="af-text">Organization 1</legend>
+    <div class="af-container">
+      <af-field name="organization_name" />
+    </div>
+  </fieldset>
+  <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
   }
 
   public function setUp(): void {
@@ -70,13 +95,13 @@ EOHTML;
     $this->assertEquals('Logged In', $prefill['me']['values'][0]['fields']['first_name']);
     $this->assertRegExp('/^User/', $prefill['me']['values'][0]['fields']['last_name']);
 
-    $me = $prefill['me']['values'];
-    $me[0]['fields']['first_name'] = 'Firsty';
-    $me[0]['fields']['last_name'] = 'Lasty';
+    $submission = [
+      ['fields' => ['first_name' => 'Firsty', 'last_name' => 'Lasty']],
+    ];
 
     Civi\Api4\Afform::submit()
       ->setName($this->formName)
-      ->setValues(['me' => $me])
+      ->setValues(['me' => $submission])
       ->execute();
 
     $contact = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $cid)->execute()->first();
@@ -90,7 +115,6 @@ EOHTML;
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
     ]);
 
-    CRM_Core_Config::singleton()->userPermissionTemp = new CRM_Core_Permission_Temp();
     $firstName = uniqid(__FUNCTION__);
 
     $values = [
@@ -99,7 +123,10 @@ EOHTML;
           'fields' => [
             'first_name' => $firstName,
             'last_name' => 'site',
-            'source' => 'test source',
+            // Not allowed to be updated because it's set in 'data'
+            'source' => 'This field is set in the data array',
+            // Not allowed to be updated because it's not a field on the form
+            'formal_title' => 'Danger this field is not on the form',
           ],
         ],
       ],
@@ -160,6 +187,47 @@ EOHTML;
     catch (\API_Exception $e) {
       // Should fail permission check
     }
+  }
+
+  public function testEmployerReference(): void {
+    $this->useValues([
+      'layout' => self::$layouts['employer'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $firstName = uniqid(__FUNCTION__);
+    $orgName = uniqid(__FUNCTION__);
+
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => $firstName,
+            'last_name' => 'employee',
+            // Selecting the Org entity as employer of the Individual
+            'employer_id' => 'Organization1',
+          ],
+        ],
+      ],
+      'Organization1' => [
+        [
+          'fields' => [
+            'organization_name' => $orgName,
+          ],
+        ],
+      ],
+    ];
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $contact = \Civi\Api4\Contact::get()
+      ->addWhere('first_name', '=', $firstName)
+      ->addWhere('last_name', '=', 'employee')
+      ->addJoin('Contact AS org', 'LEFT', ['employer_id', '=', 'org.id'])
+      ->addSelect('org.organization_name')
+      ->execute()->first();
+    $this->assertEquals($orgName, $contact['org.organization_name']);
   }
 
   protected function useValues($values) {

@@ -19,27 +19,15 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  /**
-   * Ids of each saved entity.
-   *
-   * Each key in the array corresponds to the name of an entity,
-   * and the value is an array of ids
-   * (because of `<af-repeat>` all entities are treated as if they may be multi)
-   * E.g. $entityIds['Individual1'] = [1];
-   *
-   * @var array
-   */
-  private $entityIds = [];
-
   protected function processForm() {
     $entityValues = [];
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
-      $this->entityIds[$entityName] = [];
       $entityValues[$entityName] = [];
 
       // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
       foreach ($this->values[$entityName] ?? [] as $values) {
-        $values['fields'] = $values['fields'] ?? [];
+        // Only accept values from fields on the form
+        $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
         $entityValues[$entityName][] = $values;
       }
       // Predetermined values override submitted values
@@ -53,7 +41,8 @@ class Submit extends AbstractProcessor {
     foreach ($entityWeights as $entityName) {
       $entityType = $this->_formDataModel->getEntity($entityName)['type'];
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->entityIds);
+      $this->fillIdFields($records, $entityName);
+      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
     }
 
@@ -67,7 +56,7 @@ class Submit extends AbstractProcessor {
    * @param $records
    */
   private function replaceReferences($entityName, $records) {
-    $entityNames = array_diff(array_keys($this->entityIds), [$entityName]);
+    $entityNames = array_diff(array_keys($this->_entityIds), [$entityName]);
     $entityType = $this->_formDataModel->getEntity($entityName)['type'];
     foreach ($records as $key => $record) {
       foreach ($record['fields'] as $field => $value) {
@@ -75,12 +64,12 @@ class Submit extends AbstractProcessor {
           if (is_array($value)) {
             foreach ($value as $i => $val) {
               if (in_array($val, $entityNames, TRUE)) {
-                $records[$key]['fields'][$field][$i] = $this->entityIds[$val][0];
+                $records[$key]['fields'][$field][$i] = $this->_entityIds[$val][0]['id'] ?? NULL;
               }
             }
           }
           else {
-            $records[$key]['fields'][$field] = $this->entityIds[$value][0];
+            $records[$key]['fields'][$field] = $this->_entityIds[$value][0]['id'] ?? NULL;
           }
         }
       }
@@ -96,9 +85,15 @@ class Submit extends AbstractProcessor {
   public static function processGenericEntity(AfformSubmitEvent $event) {
     $api4 = $event->getSecureApi4();
     foreach ($event->records as $index => $record) {
-      $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-      $event->setEntityId($index, $saved['id']);
-      self::saveJoins($event->getEntityType(), $saved['id'], $record['joins'] ?? []);
+      try {
+        $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
+        $event->setEntityId($index, $saved['id']);
+        self::saveJoins($event->getEntityType(), $saved['id'], $record['joins'] ?? []);
+      }
+      catch (\API_Exception $e) {
+        // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
+        // intentionally left blank. Other times it's a real error the user should know about.
+      }
     }
   }
 
@@ -184,6 +179,18 @@ class Submit extends AbstractProcessor {
   public function setValues(array $values) {
     $this->values = $values;
     return $this;
+  }
+
+  /**
+   * @param array $records
+   * @param string $entityName
+   */
+  private function fillIdFields(array &$records, string $entityName): void {
+    foreach ($records as $index => &$record) {
+      if (empty($record['fields']['id']) && !empty($this->_entityIds[$entityName][$index]['id'])) {
+        $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
+      }
+    }
   }
 
 }

@@ -67,7 +67,7 @@
         <code>{{ afform.name }}</code>
       </td>
       <td>
-        <a ng-if="afform.server_route" ng-href="{{ crmUrl(afform.server_route) }}" target="_blank">
+        <a ng-if="afform.server_route" ng-href="{{:: crmUrl(afform.server_route, null, afform.is_public ? 'front' : 'back') }}" target="_blank">
           <code>{{ afform.server_route }}</code>
         </a>
       </td>
