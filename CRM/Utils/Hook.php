@@ -2545,7 +2545,7 @@ abstract class CRM_Utils_Hook {
    * @return mixed
    */
   public static function check(&$messages, $statusNames = [], $includeDisabled = FALSE) {
-    return self::singleton()->invoke(['messages'],
+    return self::singleton()->invoke(['messages', 'statusNames', 'includeDisabled'],
       $messages, $statusNames, $includeDisabled,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_check'
