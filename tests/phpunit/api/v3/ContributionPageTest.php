@@ -1752,9 +1752,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment() {
-    // Need to work on valid financials on this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
+  public function testSubmitPledgePaymentPaymentProcessorRecurFuturePayment(): void {
     $this->params['adjust_recur_start_date'] = TRUE;
     $this->params['is_pay_later'] = FALSE;
     $this->setUpContributionPage();
@@ -1765,7 +1763,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $submitParams = [
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 100,
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][0],
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
@@ -1782,7 +1780,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'pledge_block_id' => (int) $this->_ids['pledge_block_id'],
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
 
     // Check if contribution created.
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [
@@ -1795,26 +1793,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     // Check if pledge created.
     $pledge = $this->callAPISuccess('pledge', 'getsingle', []);
-    $this->assertEquals(date('Ymd', strtotime($pledge['pledge_start_date'])), date('Ymd', strtotime("+1 month")));
-    $this->assertEquals($pledge['pledge_amount'], 300.00);
+    $this->assertEquals(date('Ymd', strtotime($pledge['pledge_start_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(30.00, $pledge['pledge_amount']);
 
     // Check if pledge payments created.
     $params = [
       'pledge_id' => $pledge['id'],
     ];
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
-    $this->assertEquals($pledgePayment['count'], 3);
-    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime("+1 month")));
-    $this->assertEquals($pledgePayment['values'][1]['scheduled_amount'], 100.00);
+    $this->assertEquals(3, $pledgePayment['count']);
+    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(10.00, $pledgePayment['values'][1]['scheduled_amount']);
     // Will be pending when actual payment processor is used (dummy processor does not support future payments).
-    $this->assertEquals($pledgePayment['values'][1]['status_id'], 1);
+    $this->assertEquals(1, $pledgePayment['values'][1]['status_id']);
 
     // Check contribution recur record.
     $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
-    $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime("+1 month")));
-    $this->assertEquals($recur['amount'], 100.00);
+    $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(10.00, $recur['amount']);
     // In progress status.
-    $this->assertEquals($recur['contribution_status_id'], 5);
+    $this->assertEquals(5, $recur['contribution_status_id']);
   }
 
   /**
@@ -1825,16 +1823,15 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPledgePayment(): void {
-    // Need to work on valid financials on this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
-    $pledge = $this->callAPISuccess('pledge', 'getsingle', []);
+    $pledge = $this->callAPISuccess('Pledge', 'getsingle', []);
     $params = [
       'pledge_id' => $pledge['id'],
     ];
     $submitParams = [
       'id' => (int) $pledge['pledge_contribution_page_id'],
       'pledge_amount' => [2 => 1],
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][0],
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
@@ -1847,27 +1844,26 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'pledge_id' => $pledge['id'],
       'cid' => $pledge['contact_id'],
       'contact_id' => $pledge['contact_id'],
-      'amount' => 100.00,
       'is_pledge' => TRUE,
       'pledge_block_id' => $this->_ids['pledge_block_id'],
     ];
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
     $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
+    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
 
     // Check if contribution created.
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', [
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
       'contribution_page_id' => $pledge['pledge_contribution_page_id'],
       'contribution_status_id' => 'Completed',
       'contact_id' => $pledge['contact_id'],
       'contribution_recur_id' => ['IS NULL' => 1],
     ]);
 
-    $this->assertEquals(100.00, $contribution['total_amount']);
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params)['values'];
+    $this->assertEquals(10.00, $contribution['total_amount']);
+    $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', $params)['values'];
     $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
-    $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
+    $this->assertEquals($pledgePayment[2]['contribution_id'], $contribution['id']);
   }
 
   /**
