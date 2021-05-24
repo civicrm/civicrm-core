@@ -1824,7 +1824,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitPledgePayment() {
+  public function testSubmitPledgePayment(): void {
     // Need to work on valid financials on this test.
     $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
@@ -1852,7 +1852,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'pledge_block_id' => $this->_ids['pledge_block_id'],
     ];
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
-    $this->assertEquals($pledgePayment['values'][2]['status_id'], 2);
+    $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
 
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page', NULL);
 
@@ -1865,9 +1865,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals(100.00, $contribution['total_amount']);
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params);
-    $this->assertEquals($pledgePayment['values'][2]['status_id'], 1, 'This pledge payment should have been completed');
-    $this->assertEquals($pledgePayment['values'][2]['contribution_id'], $contribution['id']);
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', $params)['values'];
+    $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
+    $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
   }
 
   /**
