@@ -2040,7 +2040,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *
    * @param array $params
    *
-   * @throws CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function submit($params) {
     $form = new CRM_Contribute_Form_Contribution_Confirm();
@@ -2060,8 +2062,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
 
     $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSetIDByContributionPageID($params['id']);
     $order->setPriceSelectionFromUnfilteredInput($params);
-    if (isset($params['amount'])) {
+    if (isset($params['amount']) && !CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id)) {
       // @todo deprecate receiving amount, calculate on the form.
       $order->setOverrideTotalAmount($params['amount']);
     }
@@ -2111,11 +2114,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $form->_useForMember = 1;
     }
     $priceFields = $priceFields[$priceSetID]['fields'];
-    $lineItems = [];
-    $form->processAmountAndGetAutoRenew($priceFields, $paramsProcessedForForm, $lineItems, $priceSetID);
-    $form->_lineItem = [$priceSetID => $lineItems];
+
+    $form->_lineItem = [$priceSetID => $order->getLineItems()];
     $membershipPriceFieldIDs = [];
-    foreach ((array) $lineItems as $lineItem) {
+    foreach ($order->getLineItems() as $lineItem) {
       if (!empty($lineItem['membership_type_id'])) {
         $form->set('useForMember', 1);
         $form->_useForMember = 1;
