@@ -3595,7 +3595,7 @@ VALUES
    *
    * @throws \CRM_Core_Exception
    */
-  protected function validatePayments($payments) {
+  protected function validatePayments($payments): void {
     foreach ($payments as $payment) {
       $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($payment['contribution_id']);
       if ($balance < 0 && $balance + $payment['total_amount'] === 0.0) {
@@ -3632,7 +3632,7 @@ VALUES
    *
    * @throws \CRM_Core_Exception
    */
-  protected function validateAllContributions() {
+  protected function validateAllContributions(): void {
     $contributions = $this->callAPISuccess('Contribution', 'get', ['return' => ['tax_amount', 'total_amount']])['values'];
     foreach ($contributions as $contribution) {
       $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
