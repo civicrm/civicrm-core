@@ -1606,6 +1606,60 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Verify that attempt to create individual contact just email succeeds.
+   *
+   * @throws API_Exception
+   * @throws CRM_Core_Exception
+   */
+  public function testCreateIndividualWithJustEmail(): void {
+    $params = [
+      'contact_type' => 'Individual',
+      'email' => 'garlic@example.com',
+    ];
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $created = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id']]);
+    $this->assertEquals('garlic@example.com', $created['display_name']);
+    $this->assertEquals('garlic@example.com', $created['sort_name']);
+    $this->callAPISuccessGetSingle('Email', [
+      'email' => 'garlic@example.com',
+      'is_primary' => 1,
+      'location_type_id' => CRM_Core_BAO_LocationType::getDefault()->id,
+      'contact_id' => $contact['id'],
+    ]);
+  }
+
+  /**
+   * Verify that updating a contact email updates their display name.
+   *
+   * @param int $version
+   *
+   * @throws \CRM_Core_Exception
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateIndividualWithJustEmailViaChain($version): void {
+    $this->_apiversion = $version;
+    $params = [
+      'contact_type' => 'Individual',
+      // In APIv4 this param will be ignored as 'email' is not a field on the Contact record
+      'email' => 'onion@example.com',
+      'api.Email.create' => [
+        'email' => 'garlic@example.com',
+        'is_primary' => 1,
+      ],
+    ];
+    $contact = $this->callAPISuccess('contact', 'create', $params);
+    $created = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id']]);
+    $this->assertEquals('garlic@example.com', $created['display_name']);
+    $this->assertEquals('garlic@example.com', $created['sort_name']);
+    $this->callAPISuccessGetSingle('Email', [
+      'email' => 'garlic@example.com',
+      'is_primary' => 1,
+      'location_type_id' => CRM_Core_BAO_LocationType::getDefault()->id,
+      'contact_id' => $contact['id'],
+    ]);
+  }
+
+  /**
    * Verify that attempt to create individual contact with no data fails.
    */
   public function testCreateIndividualWithOutNameEmail(): void {

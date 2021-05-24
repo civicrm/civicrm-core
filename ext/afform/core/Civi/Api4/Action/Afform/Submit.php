@@ -78,6 +78,38 @@ class Submit extends AbstractProcessor {
   }
 
   /**
+   * Validate contact(s) meet the minimum requirements to be created (name and/or email).
+   *
+   * This requires a function because simple required fields validation won't work
+   * across multiple entities (contact + n email addresses).
+   *
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   * @throws \API_Exception
+   * @see afform_civicrm_config
+   */
+  public static function preprocessContact(AfformSubmitEvent $event): void {
+    if ($event->getEntityType() !== 'Contact') {
+      return;
+    }
+    // When creating a contact, verify they have a name or email address
+    foreach ($event->records as $index => $contact) {
+      if (!empty($contact['fields']['id'])) {
+        continue;
+      }
+      if (empty($contact['fields']) || \CRM_Contact_BAO_Contact::hasName($contact['fields'])) {
+        continue;
+      }
+      foreach ($contact['joins']['Email'] ?? [] as $email) {
+        if (!empty($email['email'])) {
+          continue 2;
+        }
+      }
+      // Contact has no id, name, or email. Stop creation.
+      $event->records[$index]['fields'] = NULL;
+    }
+  }
+
+  /**
    * @param \Civi\Afform\Event\AfformSubmitEvent $event
    * @throws \API_Exception
    * @see afform_civicrm_config
@@ -85,6 +117,9 @@ class Submit extends AbstractProcessor {
   public static function processGenericEntity(AfformSubmitEvent $event) {
     $api4 = $event->getSecureApi4();
     foreach ($event->records as $index => $record) {
+      if (empty($record['fields'])) {
+        continue;
+      }
       try {
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
         $event->setEntityId($index, $saved['id']);

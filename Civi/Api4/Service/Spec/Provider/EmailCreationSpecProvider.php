@@ -30,6 +30,9 @@ class EmailCreationSpecProvider implements Generic\SpecProviderInterface {
     $spec->getFieldByName('email')->setRequired(TRUE);
     $spec->getFieldByName('on_hold')->setRequired(FALSE);
     $spec->getFieldByName('is_bulkmail')->setRequired(FALSE);
+
+    $defaultLocationType = \CRM_Core_BAO_LocationType::getDefault()->id ?? NULL;
+    $spec->getFieldByName('location_type_id')->setDefaultValue($defaultLocationType);
   }
 
   /**

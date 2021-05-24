@@ -72,7 +72,9 @@
 
         function filterFields(fields) {
           return _.transform(fields, function(fieldList, field) {
-            if (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search)) {
+            if (!field.readonly &&
+              (!search || _.contains(field.name, search) || _.contains(field.label.toLowerCase(), search))
+            ) {
               fieldList.push(fieldDefaults(field));
             }
           }, []);

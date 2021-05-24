@@ -71,6 +71,12 @@ WHERE  contact_id = {$params['contact_id']}
 
     $email->save();
 
+    $contactId = (int) ($email->contact_id ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'contact_id'));
+    if ($contactId && $email->is_primary) {
+      $address = $email->email ?? CRM_Core_DAO::getFieldValue(__CLASS__, $email->id, 'email');
+      self::updateContactName($contactId, $address);
+    }
+
     if ($email->is_primary) {
       // update the UF user email if that has changed
       CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
@@ -359,6 +365,21 @@ AND    reset_date IS NULL
       }
     }
     return $contactFields;
+  }
+
+  /**
+   *
+   *
+   * @param int $contactId
+   * @param string $primaryEmail
+   */
+  public static function updateContactName($contactId, string $primaryEmail) {
+    if (is_string($primaryEmail) && $primaryEmail !== '' &&
+      !CRM_Contact_BAO_Contact::hasName(['id' => $contactId])
+    ) {
+      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name', $primaryEmail);
+      CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'sort_name', $primaryEmail);
+    }
   }
 
 }

@@ -241,7 +241,7 @@ WHERE  id IN ( $idString )
    */
   public static function createCurrentEmployerRelationship($contactID, $organization, $previousEmployerID = NULL, $newContact = FALSE) {
     //if organization name is passed. CRM-15368,CRM-15547
-    if ($organization && !is_numeric($organization)) {
+    if (!CRM_Utils_System::isNull($organization) && !is_numeric($organization)) {
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $organization], 'Organization', 'Unsupervised', [], FALSE);
 
       if (is_array($dupeIDs) && !empty($dupeIDs)) {

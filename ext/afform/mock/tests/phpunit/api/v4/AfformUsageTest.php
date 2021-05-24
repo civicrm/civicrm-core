@@ -43,13 +43,9 @@ EOHTML;
   <af-entity data="{contact_type: 'Organization'}" type="Contact" name="Organization1" label="Organization 1" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1">
     <legend class="af-text">Individual 1</legend>
-    <div class="af-container">
-      <div class="af-container af-layout-inline">
-        <af-field name="first_name" />
-        <af-field name="middle_name" />
-        <af-field name="last_name" />
-        <div class="af-container"></div>
-      </div>
+    <afblock-name-individual></afblock-name-individual>
+    <div af-join="Email" min="1" af-repeat="Add">
+      <afjoin-email-default></afjoin-email-default>
     </div>
     <af-field name="employer_id" defn="{input_type: 'Select', input_attrs: {}}" />
   </fieldset>
@@ -57,6 +53,9 @@ EOHTML;
     <legend class="af-text">Organization 1</legend>
     <div class="af-container">
       <af-field name="organization_name" />
+    </div>
+    <div af-join="Email">
+      <afjoin-email-default></afjoin-email-default>
     </div>
   </fieldset>
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
@@ -228,6 +227,89 @@ EOHTML;
       ->addSelect('org.organization_name')
       ->execute()->first();
     $this->assertEquals($orgName, $contact['org.organization_name']);
+  }
+
+  public function testEmptyEmployerReference(): void {
+    $this->useValues([
+      'layout' => self::$layouts['employer'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $firstName = uniqid(__FUNCTION__);
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'first_name' => $firstName,
+            'last_name' => 'non-employee',
+            // This should result in a NULL value because organization_name is left blank
+            'employer_id' => 'Organization1',
+          ],
+        ],
+      ],
+      'Organization1' => [
+        [
+          'fields' => [
+            'organization_name' => '',
+          ],
+        ],
+      ],
+    ];
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $contact = \Civi\Api4\Contact::get()
+      ->addWhere('first_name', '=', $firstName)
+      ->addWhere('last_name', '=', 'non-employee')
+      ->addSelect('employer_id')
+      ->execute()->first();
+    $this->assertNull($contact['employer_id']);
+  }
+
+  public function testCreatingContactsWithOnlyEmail(): void {
+    $this->useValues([
+      'layout' => self::$layouts['employer'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $individualEmail = uniqid('individual@') . '.test';
+    $orgEmail = uniqid('org@') . '.test';
+    $locationType = CRM_Core_BAO_LocationType::getDefault()->id;
+    $values = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'employer_id' => 'Organization1',
+          ],
+          'joins' => [
+            'Email' => [
+              ['email' => $individualEmail, 'location_type_id' => $locationType],
+            ],
+          ],
+        ],
+      ],
+      'Organization1' => [
+        [
+          'fields' => [],
+          'joins' => [
+            'Email' => [
+              ['email' => $orgEmail, 'location_type_id' => $locationType],
+            ],
+          ],
+        ],
+      ],
+    ];
+    Civi\Api4\Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    $contact = \Civi\Api4\Contact::get()
+      ->addWhere('display_name', '=', $individualEmail)
+      ->addJoin('Contact AS org', 'LEFT', ['employer_id', '=', 'org.id'])
+      ->addSelect('display_name', 'org.display_name')
+      ->execute()->first();
+    $this->assertEquals($orgEmail, $contact['org.display_name']);
   }
 
   protected function useValues($values) {
