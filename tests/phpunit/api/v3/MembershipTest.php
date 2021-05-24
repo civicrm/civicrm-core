@@ -307,8 +307,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test civicrm_membership_get with params not array.
    *
    * Gets treated as contact_id, memberships expected.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetInSyntax() {
+  public function testGetInSyntax(): void {
     $this->_membershipID = $this->contactMembershipCreate($this->_params);
     $this->_membershipID2 = $this->contactMembershipCreate($this->_params);
     $this->_membershipID3 = $this->contactMembershipCreate($this->_params);
