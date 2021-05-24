@@ -2248,6 +2248,23 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-19126 Add test to verify when complete transaction is called tax
    * amount is not changed.
    *
+   * We start of with a pending contribution.
+   *  - total_amount (input) = 100
+   *  - total_amount post save (based on tax being added) = 105
+   *  - net_amount = 95
+   *  - fee_amount = 5
+   *  - non_deductible_amount = 10
+   *  - tax rate = 5%
+   *  - tax_amount = 5
+   *  - sum of (calculated) line items = 105
+   *
+   * Note the fee_amount should really be set when the payment is received
+   * and whatever the non_deductible amount is, it is ignored.
+   *
+   * The fee amount when the payment comes in is 6 rather than 5. The net_amount
+   * and fee_amount should change, but not the total_amount or
+   * the line items.
+   *
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
@@ -2259,18 +2276,24 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createFinancialTypeWithSalesTax();
     $financialTypeId = $this->ids['FinancialType']['taxable'];
 
-    $params = array_merge($this->_params, ['contribution_status_id' => 2, 'financial_type_id' => $financialTypeId]);
-    $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $contribution1 = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id'], 'return' => 'tax_amount', 'sequential' => 1]);
-    $this->callAPISuccess('contribution', 'completetransaction', [
-      'id' => $contribution['id'],
+    $contributionID = $this->callAPISuccess('Order', 'create',
+      array_merge($this->_params, ['financial_type_id' => $financialTypeId])
+    )['id'];
+    $contributionPrePayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'total_amount']]);
+    $this->validateAllContributions();
+    $this->callAPISuccess('Contribution', 'completetransaction', [
+      'id' => $contributionID,
       'trxn_id' => '777788888',
       'fee_amount' => '6.00',
+      'sequential' => 1,
     ]);
-    $contribution2 = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id'], 'return' => ['tax_amount', 'fee_amount', 'net_amount'], 'sequential' => 1]);
-    $this->assertEquals($contribution1['values'][0]['tax_amount'], $contribution2['values'][0]['tax_amount']);
-    $this->assertEquals('6.00', $contribution2['values'][0]['fee_amount']);
-    $this->assertEquals('99.00', $contribution2['values'][0]['net_amount']);
+    $contributionPostPayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'fee_amount', 'net_amount']]);
+    $this->assertEquals(5, $contributionPrePayment['tax_amount']);
+    $this->assertEquals(5, $contributionPostPayment['tax_amount']);
+    $this->assertEquals('6.00', $contributionPostPayment['fee_amount']);
+    $this->assertEquals('99.00', $contributionPostPayment['net_amount']);
+    $this->validateAllContributions();
+    $this->validateAllPayments();
   }
 
   /**

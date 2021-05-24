@@ -826,7 +826,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contribution_ids = [];
     $found_membership_amount = $found_contribution_amount = FALSE;
     foreach ($result['values'] as $value) {
-      list($junk, $json) = explode("$test_uniq:", $value['message']);
+      [$junk, $json] = explode("$test_uniq:", $value['message']);
       $logged_contribution = json_decode($json, TRUE);
       $contribution_ids[] = $logged_contribution['contributionID'];
       if (!empty($logged_contribution['total_amount'])) {
@@ -1947,13 +1947,23 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   /**
    * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
    *
+   * The created contribution has 3 line items
+   *
+   * |qty  | unit_price| line_total| tax |total including tax|
+   * | 1   | 10        | 10        | 0     |     10 |
+   * | 180   | 16.95   | 3051      |305.1  |  3356.1|
+   * | 110   | 2.95    | 324.5     | 32.45 |   356.95|
+   *
+   * Contribution total = 3723.05
+   *  made up of  tax 337.55
+   *          non tax 3385.5
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
    * @dataProvider getThousandSeparators
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitContributionPageWithPriceSetQuantity($thousandSeparator) {
+  public function testSubmitContributionPageWithPriceSetQuantity(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $this->_priceSetParams['is_quick_config'] = 0;
     $this->enableTaxAndInvoicing();
@@ -1984,7 +1994,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'html_type' => 'Text',
     ]);
 
-    $this->callAPISuccess('price_field_value', 'create', [
+    $this->callAPISuccess('PriceFieldValue', 'create', [
       'price_set_id' => $priceSetID,
       'price_field_id' => $priceField['id'],
       'label' => 'Printing Rights',
@@ -1996,7 +2006,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Set quantity for our test
     $submitParams['price_' . $priceFieldId] = 180;
 
-    $priceField = $this->callAPISuccess('price_field', 'create', [
+    $priceField = $this->callAPISuccess('PriceField', 'create', [
       'price_set_id' => $priceSetID,
       'label' => 'Another Line Item',
       'html_type' => 'Text',
@@ -2020,7 +2030,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
     $this->validateAllContributions();
 
-    $contribution = $this->callAPISuccessGetSingle('contribution', [
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contribution_page_id' => $this->_ids['contribution_page'],
     ]);
 
