@@ -100,7 +100,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       $values['recur_status'] = $recurStatus[$values['contribution_status_id']];
       $recurRow[$values['id']] = $values;
 
-      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::dashboardRecurLinks((int) $recur->id, (int) $recur->contact_id)));
+      $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard')));
 
       $details = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recur->id, 'recur');
       $hideUpdate = $details->membership_id & $details->auto_renew;
