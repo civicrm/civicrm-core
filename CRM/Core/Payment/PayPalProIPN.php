@@ -364,25 +364,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if ((!$recur) || ($recur && $first)) {
-      if ($contribution->invoice_id != $input['invoice']) {
-        Civi::log()->debug('PayPalProIPN: Invoice values dont match between database and IPN request.');
-        echo "Failure: Invoice values dont match between database and IPN request<p>contribution is" . $contribution->invoice_id . " and input is " . $input['invoice'];
-        return;
+      if ($this->getContributionObject()->invoice_id !== $input['invoice']) {
+        throw new CRM_Core_Exception('PayPalProIPN: Invoice values dont match between database and IPN request.');
       }
-    }
-    else {
-      $contribution->invoice_id = md5(uniqid(rand(), TRUE));
     }
 
     if (!$recur) {
-      if ($contribution->total_amount != $input['amount']) {
-        Civi::log()->debug('PayPalProIPN: Amount values dont match between database and IPN request.');
-        echo "Failure: Amount values dont match between database and IPN request<p>";
-        return;
+      if ($this->getContributionObject()->total_amount != $input['amount']) {
+        throw new CRM_Core_Exception('PayPalProIPN: Amount values dont match between database and IPN request.');
       }
-    }
-    else {
-      $contribution->total_amount = $input['amount'];
     }
 
     $status = $input['paymentStatus'];
@@ -402,7 +392,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       Contribution::update(FALSE)->setValues([
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Cancelled',
-      ])->addWhere('id', '=', $contribution->id)->execute();
+      ])->addWhere('id', '=', $this->getContributionID())->execute();
       Civi::log()->debug("Setting contribution status to Cancelled");
       return;
     }
@@ -419,7 +409,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    CRM_Contribute_BAO_Contribution::completeOrder($input, $this->getContributionRecurID(), $contribution->id ?? NULL);
+    CRM_Contribute_BAO_Contribution::completeOrder($input, $this->getContributionRecurID(), $this->getContributionID());
   }
 
   /**
