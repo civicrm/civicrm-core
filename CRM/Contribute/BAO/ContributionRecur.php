@@ -52,7 +52,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         CRM_Price_BAO_LineItem::getLineItemArray($params, [$params['id']], 'contribution_recur');
       }
       else {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, null, 'contribution_recur');
+        CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'contribution_recur');
       }
     }
 
@@ -91,7 +91,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
 
     // Record line items.
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($recurring->id, CRM_Utils_Array::value('line_item', $params), null, 'civicrm_contribution_recur', $isUpdate);
+      CRM_Price_BAO_LineItem::processPriceSet($recurring->id, CRM_Utils_Array::value('line_item', $params), NULL, 'civicrm_contribution_recur', $isUpdate);
     }
 
     if ($isUpdate) {
