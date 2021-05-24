@@ -59,6 +59,7 @@ function _civicrm_api3_event_create_spec(&$params) {
   $params['is_active']['api.default'] = 1;
   $params['financial_type_id']['api.aliases'] = ['contribution_type_id'];
   $params['is_template']['api.default'] = 0;
+  $params['event_tz']['api.default'] = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
 }
 
 /**
