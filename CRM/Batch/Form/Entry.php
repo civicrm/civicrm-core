@@ -812,7 +812,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           // The following parameter setting may be obsolete.
           $this->_params = $params;
           $value['is_renew'] = TRUE;
-          $isPayLater = $params['is_pay_later'] ?? NULL;
 
           $formDates = [
             'end_date' => $value['membership_end_date'] ?? NULL,
@@ -821,7 +820,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $membershipSource = $value['source'] ?? NULL;
           $membership = $this->legacyProcessMembership(
             $value['contact_id'], $value['membership_type_id'],
-            $value['custom'], $membershipSource, $isPayLater, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
+            $value['custom'], $membershipSource, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
           );
 
           // make contribution entry
@@ -1024,7 +1023,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessMembership($contactID, $membershipTypeID, $customFieldsFormatted, $membershipSource, $isPayLater, $memParams = [], $formDates = []): CRM_Member_BAO_Membership {
+  protected function legacyProcessMembership($contactID, $membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_BAO_Membership {
     $updateStatusId = FALSE;
     $changeToday = NULL;
     $is_test = FALSE;
@@ -1038,6 +1037,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $statusFormat = '%Y-%m-%d';
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $ids = [];
+    $isPayLater = NULL;
 
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
