@@ -45,38 +45,38 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
     top: 70px;
     z-index: 1000;
     position: absolute;
-	border-top: 1px solid #aaa;
+	  border-top: 1px solid #aaa;
   }
   
   body.crm-menubar-below-cms-menu.layout-default #header {
-	margin-bottom: calc($menubarHeight + 1px);
+	  margin-bottom: calc($menubarHeight + 1px);
   }
   
   body.crm-menubar-below-cms-menu.crm-menubar-wrapped.layout-default #header {
-	margin-bottom: 81px;
+	  margin-bottom: 81px;
   }
 }
 
 @media (max-width: $breakMin) {
 	
   body.com_civicrm.layout-default #header {
-	min-height: 45px;
-	padding: 10px 0;
-	margin-bottom: $menubarHeight;
+    min-height: 45px;
+    padding: 10px 0;
+    margin-bottom: $menubarHeight;
   }
   
   body.admin.com_civicrm.layout-default #civicrm-menu-nav {
-	margin-top: 45px;
-	background: #1b1b1b;
-	z-index: 1000;
-	height: $menubarHeight;
-	border-top: 1px solid #aaa;
+    margin-top: 45px;
+    background: #1b1b1b;
+    z-index: 1000;
+    height: $menubarHeight;
+    border-top: 1px solid #aaa;
   }
 }
 
 @media (max-width: 575px) {
 	
   body.admin.com_civicrm.layout-default #civicrm-menu-nav {
-	margin-top: 77px;
+  	margin-top: 77px;
   }
 }	
