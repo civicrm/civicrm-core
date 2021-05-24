@@ -644,10 +644,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //send receipt mail.
         if ($contribution->id && !empty($value['send_receipt'])) {
-          // add the domain email id
-          $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
-          $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
-          $value['from_email_address'] = $domainEmail;
+          $value['from_email_address'] = $this->getFromEmailAddress();
           $value['contribution_id'] = $contribution->id;
           if (!empty($value['soft_credit'])) {
             $value = array_merge($value, CRM_Contribute_BAO_ContributionSoft::getSoftContribution($contribution->id));
@@ -868,12 +865,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         //send receipt mail.
         if ($membership->id && !empty($value['send_receipt'])) {
-
-          // add the domain email id
-          $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
-          $domainEmail = "$domainEmail[0] <$domainEmail[1]>";
-
-          $value['from_email_address'] = $domainEmail;
           $value['membership_id'] = $membership->id;
           $value['contribution_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $membership->id, 'contribution_id', 'membership_id');
           $this->emailReceipt($this, $value, $membership);
@@ -894,17 +885,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return bool
    *   true if mail was sent successfully
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\API_Exception
    *
    * @deprecated
    *   This function is shared with Batch_Entry which has limited overlap
    *   & needs rationalising.
    *
    */
-  public function emailReceipt($form, &$formValues, $membership) {
-    // retrieve 'from email id' for acknowledgement
-    $receiptFrom = $formValues['from_email_address'] ?? NULL;
-
+  protected function emailReceipt($form, &$formValues, $membership): bool {
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
@@ -949,7 +937,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'groupName' => 'msg_tpl_workflow_membership',
         'valueName' => 'membership_offline_receipt',
         'contactId' => $form->_receiptContactId,
-        'from' => $receiptFrom,
+        'from' => $this->getFromEmailAddress(),
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
@@ -1229,6 +1217,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $membership->find(TRUE);
 
     return $membership;
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function getFromEmailAddress(): string {
+    $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
+    return "$domainEmail[0] <$domainEmail[1]>";
   }
 
 }
