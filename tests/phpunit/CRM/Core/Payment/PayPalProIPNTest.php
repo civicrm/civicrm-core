@@ -124,14 +124,18 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-13743 test IPN edge case where the first transaction fails and the second succeeds.
+   * CRM-13743 test IPN edge case where the first transaction fails and the
+   * second succeeds.
    *
-   * We are checking that the created contribution has the same date as IPN says it should
-   * Note that only one contribution will be created (no evidence of the failed contribution is left)
-   * It seems likely that may change in future & this test will start failing (I point this out in the hope it
-   * will help future debuggers)
+   * We are checking that the created contribution has the same date as IPN
+   * says it should Note that only one contribution will be created (no
+   * evidence of the failed contribution is left) It seems likely that may
+   * change in future & this test will start failing (I point this out in the
+   * hope it will help future debuggers)
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testIPNPaymentCRM13743() {
+  public function testIPNPaymentCRM13743(): void {
     $this->setupRecurringPaymentProcessorTransaction();
     $firstPaymentParams = $this->getPaypalProRecurTransaction();
     $firstPaymentParams['txn_type'] = 'recurring_payment_failed';
