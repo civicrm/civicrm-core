@@ -919,7 +919,7 @@
 - github      : lalgwebdev
   name        : Tony Maynard-Smith
 
-- github      : larssg-wildsight
+- github      : larssandergreen
   name        : Lars Sanders-Green
   organization: Wildsight
   jira        : larssg
@@ -1638,7 +1638,7 @@
   name        : Allen Shaw
   organization: Joinery
   jira        : allenshaw
-  
+
 - github      : ufundo
   jira        : ufundo
   name        : Benjamin W
