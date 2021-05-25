@@ -37,6 +37,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_eventId;
 
   /**
+   * Get the event it.
+   *
+   * @return int
+   */
+  protected function getEventID(): int {
+    return $this->_eventId;
+  }
+
+  /**
    * The array of ids of all the participant we are processing.
    *
    * @var int
@@ -173,7 +182,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
+    $this->_eventId = (int) CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric', $this, FALSE, CRM_Core_Action::ADD);
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
@@ -210,14 +219,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
 
     if (!$this->_values) {
-      // create redirect URL to send folks back to event info page is registration not available
-      $infoUrl = CRM_Utils_System::url('civicrm/event/info', "reset=1&id={$this->_eventId}",
-        FALSE, NULL, FALSE, TRUE
-      );
-
       // this is the first time we are hitting this, so check for permissions here
       if (!CRM_Core_Permission::event(CRM_Core_Permission::EDIT, $this->_eventId, 'register for events')) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $infoUrl);
+        CRM_Core_Error::statusBounce(ts('You do not have permission to register for this event'), $this->getInfoPageUrl());
       }
 
       // get all the values from the dao object
@@ -236,7 +240,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
 
-      $this->checkValidEvent($infoUrl);
+      $this->checkValidEvent();
       // get the participant values, CRM-4320
       $this->_allowConfirmation = FALSE;
       if ($this->_participantId) {
@@ -263,7 +267,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         //lets redirecting to info only when to waiting list.
         $this->_allowWaitlist = $this->_values['event']['has_waitlist'] ?? NULL;
         if (!$this->_allowWaitlist) {
-          CRM_Utils_System::redirect($infoUrl);
+          CRM_Utils_System::redirect($this->getInfoPageUrl());
         }
       }
       $this->set('isEventFull', $this->_isEventFull);
@@ -300,18 +304,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         'module' => 'CiviEvent',
         'entity_id' => $this->_eventId,
       ];
-      list($this->_values['custom_pre_id'],
-        $this->_values['custom_post_id']
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      [$this->_values['custom_pre_id'], $this->_values['custom_post_id']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       // set profiles for additional participants
       if ($this->_values['event']['is_multiple_registrations']) {
         // CRM-4377: CiviEvent for the main participant, CiviEvent_Additional for additional participants
         $ufJoinParams['module'] = 'CiviEvent_Additional';
 
-        list($this->_values['additional_custom_pre_id'],
-          $this->_values['additional_custom_post_id'], $preActive, $postActive
-          ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+        [$this->_values['additional_custom_pre_id'], $this->_values['additional_custom_post_id'], $preActive, $postActive] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
         // CRM-4377: we need to maintain backward compatibility, hence if there is profile for main contact
         // set same profile for additional contacts.
@@ -440,7 +440,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     foreach ($vars as $v) {
       if (!empty($params[$v])) {
-        if ($v == 'receive_date') {
+        if ($v === 'receive_date') {
           $this->assign($v, CRM_Utils_Date::mysqlToIso($params[$v]));
         }
         else {
@@ -1375,14 +1375,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Check if event is valid.
    *
-   * @param string $redirect
-   *
    * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
    * (probably extract relevant values here & call that with them & handle bounces & redirects here -as
    * those belong in the form layer)
    *
    */
-  public function checkValidEvent($redirect = NULL) {
+  protected function checkValidEvent(): void {
     // is the event active (enabled)?
     if (!$this->_values['event']['is_active']) {
       // form is inactive, die a fatal death
@@ -1391,12 +1389,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     // is online registration is enabled?
     if (!$this->_values['event']['is_online_registration']) {
-      CRM_Core_Error::statusBounce(ts('Online registration is not currently available for this event (contact the site administrator for assistance).'), $redirect);
+      CRM_Core_Error::statusBounce(ts('Online registration is not currently available for this event (contact the site administrator for assistance).'), $this->getInfoPageUrl());
     }
 
     // is this an event template ?
     if (!empty($this->_values['event']['is_template'])) {
-      CRM_Core_Error::statusBounce(ts('Event templates are not meant to be registered.'), $redirect);
+      CRM_Core_Error::statusBounce(ts('Event templates are not meant to be registered.'), $this->getInfoPageUrl());
     }
 
     $now = date('YmdHis');
@@ -1408,7 +1406,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $startDate &&
       $startDate >= $now
     ) {
-      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', [1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event']))]), $redirect, ts('Sorry'));
+      CRM_Core_Error::statusBounce(ts('Registration for this event begins on %1', [1 => CRM_Utils_Date::customFormat(CRM_Utils_Array::value('registration_start_date', $this->_values['event']))]), $this->getInfoPageUrl(), ts('Sorry'));
     }
 
     $regEndDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('registration_end_date',
@@ -1420,7 +1418,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       if (empty($regEndDate)) {
         $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('event_end_date', $this->_values['event']));
       }
-      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', [1 => $endDate]), $redirect, ts('Sorry'));
+      CRM_Core_Error::statusBounce(ts('Registration for this event ended on %1', [1 => $endDate]), $this->getInfoPageUrl(), ts('Sorry'));
     }
   }
 
@@ -1640,6 +1638,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       //send Confirmation mail to Primary & additional Participants if exists
       CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
     }
+  }
+
+  /**
+   * Get redirect URL to send folks back to event info page is registration not available.
+   *
+   * @return string
+   */
+  private function getInfoPageUrl(): string {
+    return CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $this->getEventID(),
+      FALSE, NULL, FALSE, TRUE
+    );
   }
 
 }
