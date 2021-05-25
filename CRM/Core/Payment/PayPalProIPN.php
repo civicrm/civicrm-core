@@ -345,14 +345,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
     $contribution->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
-    $this->single($input, $contribution, TRUE, $first);
+    $this->single($input);
   }
 
   /**
    * @param array $input
-   * @param \CRM_Contribute_BAO_Contribution $contribution
-   * @param bool $recur
-   * @param bool $first
    *
    * @return void
    * @throws \API_Exception
@@ -360,7 +357,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function single($input, $contribution, $recur = FALSE, $first = FALSE) {
+  public function single($input) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if (!$this->isContributionCompleted()) {
@@ -527,7 +524,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         return;
       }
 
-      $this->single($input, $contribution, FALSE, FALSE);
+      $this->single($input);
     }
     catch (CRM_Core_Exception $e) {
       Civi::log()->debug($e->getMessage() . ' input {input}', ['input' => $input]);
