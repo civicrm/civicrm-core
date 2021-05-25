@@ -33,6 +33,7 @@ class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
     $creator->setDescription('Contact who created the case.');
     $creator->setFkEntity('Contact');
     $creator->setInputType('EntityRef');
+    $creator->setRequired(TRUE);
     $creator->setDefaultValue('user_contact_id');
     $spec->addFieldSpec($creator);
 
