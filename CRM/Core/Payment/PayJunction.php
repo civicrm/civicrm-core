@@ -188,43 +188,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       return FALSE;
     }
     return TRUE;
-
-  }
-
-  /**
-   * Get the value of a field if set.
-   *
-   * @param string $field
-   *   The field.
-   *
-   * @return mixed
-   *   value of the field, or empty string if the field is
-   *   not set
-   */
-  public function _getParam($field) {
-    if (isset($this->_params[$field])) {
-      return $this->_params[$field];
-    }
-    return '';
-  }
-
-  /**
-   * Set a field to the specified value.  Value must be a scalar (int,
-   * float, string, or boolean)
-   *
-   * @param string $field
-   * @param mixed $value
-   *
-   * @return bool
-   *   false if value is not a scalar, true if successful
-   */
-  public function _setParam($field, $value) {
-    if (!is_scalar($value)) {
-      return FALSE;
-    }
-    else {
-      $this->_params[$field] = $value;
-    }
   }
 
   /**
