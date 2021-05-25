@@ -46,10 +46,11 @@ class LoaderTest extends \CiviUnitTestCase {
    * @param $expectedPermissions
    */
   public function testSettingFactory($module, $expectedSettingCount, $expectedCallbackCount, $expectedPermissions) {
-    (new \Civi\Angular\AngularLoader())
-      ->setModules([$module])
-      ->useApp()
-      ->load();
+    $loader = new \Civi\Angular\AngularLoader();
+    $loader->setModules([$module]);
+    $loader->useApp();
+    // Load triggers a depreaction notice, use @ to suppress it for the test.
+    @$loader->load();
 
     // Run factory callbacks
     $actual = \Civi::resources()->getSettings();

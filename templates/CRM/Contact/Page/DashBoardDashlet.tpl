@@ -13,8 +13,8 @@
 <div class="clear"></div>
 <div class="crm-block crm-content-block">
 
-  <div ng-app="crmDashboard">
+  <crm-angular-js modules="crmDashboard">
     <crm-dashboard></crm-dashboard>
-  </div>
+  </crm-angular-js>
 
 </div>

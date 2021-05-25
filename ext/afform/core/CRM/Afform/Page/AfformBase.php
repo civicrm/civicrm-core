@@ -15,9 +15,8 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
 
     $this->assign('directive', $afform['directive_name']);
 
-    (new \Civi\Angular\AngularLoader())
-      ->setModules([$afform['module_name'], 'afformStandalone'])
-      ->load();
+    Civi::service('angularjs.loader')
+      ->addModules([$afform['module_name'], 'afformStandalone']);
 
     // If the user has "access civicrm" append home breadcrumb
     if (CRM_Core_Permission::check('access CiviCRM')) {

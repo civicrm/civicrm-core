@@ -5,8 +5,8 @@
   }
 </script>
 
-<div ng-app="crmApp">
+<crm-angular-js modules="crmApp">
   <div ng-view></div>
-</div>
+</crm-angular-js>
 {/literal}
 
