@@ -576,16 +576,13 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * but let's assume knowledge on invoice id & schedule is enough for now esp
    * for donations only contribute is handled
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function handlePaymentExpress() {
-    //@todo - loads of copy & paste / code duplication but as this not going into core need to try to
-    // keep discreet
-    // also note that a lot of the complexity above could be removed if we used
-    // http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
-    // as membership id etc can be derived by the load objects fn
-    $objects = $ids = $input = [];
-    $input['invoice'] = self::getValue('i', FALSE);
+  public function handlePaymentExpress(): void {
+    $input = ['invoice' => $this->getValue('i', FALSE)];
     //Avoid return in case of unit test.
     if (empty($input['invoice']) && empty($this->_inputParameters['is_unit_test'])) {
       return;
@@ -601,48 +598,13 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       throw new CRM_Core_Exception('Paypal IPNS not handled other than recurring_payments');
     }
 
-    $this->getInput($input, $ids);
+    $this->getInput($input);
     if ($input['txnType'] === 'recurring_payment' && $this->transactionExists($input['trxn_id'])) {
       throw new CRM_Core_Exception('This transaction has already been processed');
     }
-
-    $ids['contact'] = $contributionRecur['contact_id'];
-    $ids['contributionRecur'] = $this->getContributionRecurID();
     $result = civicrm_api3('contribution', 'getsingle', ['invoice_id' => $input['invoice'], 'contribution_test' => '']);
-
     $this->setContributionID((int) $result['id']);
-    $ids['contribution'] = $this->getContributionID();
-    // arg api won't get this - fix it
-    $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", [
-      1 => [
-        $ids['contribution'],
-        'Integer',
-      ],
-    ]);
-    // only handle component at this stage - not terribly sure how a recurring event payment would arise
-    // & suspec main function may be a victom of copy & paste
-    // membership would be an easy add - but not relevant to my customer...
-    $this->_component = $input['component'] = 'contribute';
-    $input['trxn_date'] = date('Y-m-d H:i:s', strtotime(self::retrieve('time_created', 'String')));
-    $paymentProcessorID = $contributionRecur['payment_processor_id'];
-
-    // Check if the contribution exists
-    // make sure contribution exists and is valid
-    $contribution = $this->getContributionObject();
-    $objects['contribution'] = &$contribution;
-
-    // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
-    if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
-      // We don't need to worry if about removing contribution page id as it will be set later in
-      //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
-      unset($ids['contributionPage']);
-    }
-
-    $contribution = &$objects['contribution'];
-    $ids['paymentProcessor'] = $paymentProcessorID;
-    $contribution->loadRelatedObjects($input, $ids);
-    $objects = array_merge($objects, $contribution->_relatedObjects);
-
+    $input['trxn_date'] = date('Y-m-d H:i:s', strtotime($this->retrieve('time_created', 'String')));
     $this->recur($input);
   }
 
