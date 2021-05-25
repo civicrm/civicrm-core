@@ -25,6 +25,16 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   /**
+   * Do not check financial entities in this test class.
+   *
+   * The class uses lots of crud to do things by-passing
+   * BAO logic & entities are often not valid as a result.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * @var array
    * e.g. $this->deletes['CRM_Contact_DAO_Contact'][] = $contactID;
    */

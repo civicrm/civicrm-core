@@ -148,10 +148,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testIPNPaymentMembershipRecurSuccess() {
+  public function testIPNPaymentMembershipRecurSuccess(): void {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
     $this->callAPISuccessGetSingle('membership_payment', []);

@@ -172,13 +172,17 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test Assigning a target contact but then the logged in user cannot see the contact
+   * Test Assigning a target contact but then the logged in user cannot see the
+   * contact
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTargetContactNotavaliable() {
     $contactId = $this->individualCreate();
     $params = [
       'first_name' => 'liz',
-      'last_name' => 'hurleey',
+      'last_name' => 'Hurley',
     ];
     $targetContactId = $this->individualCreate($params);
 
