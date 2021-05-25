@@ -365,7 +365,7 @@ class CRM_Core_Invoke {
    *
    * @throws Exception
    */
-  public static function rebuildMenuAndCaches($triggerRebuild = FALSE, $sessionReset = FALSE) {
+  public static function rebuildMenuAndCaches(bool $triggerRebuild = FALSE, bool $sessionReset = FALSE): void {
     $config = CRM_Core_Config::singleton();
     $config->clearModuleList();
 
@@ -393,7 +393,7 @@ class CRM_Core_Invoke {
       $triggerRebuild ||
       CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
     ) {
-      CRM_Core_DAO::triggerRebuild();
+      Civi::service('sql_triggers')->rebuild();
       $config->userSystem->invalidateRouteCache();
     }
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
