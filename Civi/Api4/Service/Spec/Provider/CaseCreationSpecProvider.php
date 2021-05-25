@@ -33,6 +33,8 @@ class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
     $creator->setDescription('Contact who created the case.');
     $creator->setFkEntity('Contact');
     $creator->setInputType('EntityRef');
+    $creator->setRequired(TRUE);
+    $creator->setDefaultValue('user_contact_id');
     $spec->addFieldSpec($creator);
 
     $contact = new FieldSpec('contact_id', $spec->getEntity(), 'Array');
@@ -69,6 +71,8 @@ class CaseCreationSpecProvider implements Generic\SpecProviderInterface {
       $status = $spec->getFieldByName('status_id');
       $status->setDefaultValue((int) $defaultStatus);
     }
+
+    $spec->getFieldByName('start_date')->setDefaultValue('now');
   }
 
   /**
