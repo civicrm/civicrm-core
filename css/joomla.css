@@ -399,3 +399,17 @@ body.admin.com_civicrm #content-right {
 body.ui-dialog-open #status {
   z-index: 100 !important;
 }
+
+/* Joomla 4 */
+
+body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
+	padding: 0;
+}
+
+body.admin.com_civicrm.layout-default #subhead {
+	display: none;
+}
+
+body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
+	max-width: 50vw; /* fixes over-wide news dashlet */ 
+}

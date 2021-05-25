@@ -1,8 +1,9 @@
 @media (min-width: $breakMin) {
-
+	
   body.crm-menubar-over-cms-menu.crm-menubar-visible {
     padding-top: $menubarHeight;
   }
+
   body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
     padding-top: calc($menubarHeight * 2);
   }
@@ -10,11 +11,12 @@
   body.crm-menubar-below-cms-menu.crm-menubar-visible {
     margin-top: $menubarHeight;
   }
+
   body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
     margin-top: calc($menubarHeight * 2);
   }
-
 }
+
 @media (max-width: $breakMax) {
 
   body #civicrm-menu-nav {
@@ -25,5 +27,56 @@
     margin-top: 3px;
     margin-left: 6px;
   }
-
 }
+
+/* Joomla 4 */
+
+body.admin.com_civicrm.layout-default #crm-qsearch label {
+  color: #fff;
+}
+
+@media (min-width: $breakMin) {
+
+  body.crm-menubar-below-cms-menu.crm-menubar-visible.layout-default {
+    margin-top: 0;
+  }
+
+  body.crm-menubar-below-cms-menu.layout-default > #civicrm-menu-nav #civicrm-menu {
+    top: 70px;
+    z-index: 1000;
+    position: absolute;
+	  border-top: 1px solid #aaa;
+  }
+
+  body.crm-menubar-below-cms-menu.layout-default #header {
+	  margin-bottom: calc($menubarHeight + 1px);
+  }
+
+  body.crm-menubar-below-cms-menu.crm-menubar-wrapped.layout-default #header {
+	  margin-bottom: 81px;
+  }
+}
+
+@media (max-width: $breakMin) {
+
+  body.com_civicrm.layout-default #header {
+    min-height: 45px;
+    padding: 10px 0;
+    margin-bottom: $menubarHeight;
+  }
+
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav {
+    margin-top: 45px;
+    background: #1b1b1b;
+    z-index: 1000;
+    height: $menubarHeight;
+    border-top: 1px solid #aaa;
+  }
+}
+
+@media (max-width: 575px) {
+
+  body.admin.com_civicrm.layout-default #civicrm-menu-nav {
+  	margin-top: 77px;
+  }
+}	
