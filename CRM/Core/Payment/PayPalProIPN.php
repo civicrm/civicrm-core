@@ -352,9 +352,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function single($input) {
+  protected function single(array $input): void {
 
     // make sure the invoice is valid and matches what we have in the contribution record
     if (!$this->isContributionCompleted()) {
@@ -384,7 +383,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Cancelled',
       ])->addWhere('id', '=', $this->getContributionID())->execute();
-      Civi::log()->debug("Setting contribution status to Cancelled");
+      Civi::log()->debug('Setting contribution status to Cancelled');
       return;
     }
     if ($status !== 'Completed') {
@@ -434,76 +433,29 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @todo the references to POST throughout this class need to be removed
    * @return void
    */
-  public function main() {
+  public function main(): void {
     CRM_Core_Error::debug_var('GET', $_GET, TRUE, TRUE);
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
-    $ids = $input = [];
+    $input = [];
     try {
       if ($this->_isPaymentExpress) {
         $this->handlePaymentExpress();
         return;
       }
-      $this->_component = $input['component'] = self::getValue('m');
-      $input['invoice'] = $this->getValue('i', TRUE);
-
-      $ids['contact'] = $this->getContactID();
-      $ids['contribution'] = $this->getContributionID();
+      if ($this->getValue('m') === 'event') {
+        // Validate required params.
+        $this->getValue('e');
+        $this->getValue('p');
+      }
+      $input['invoice'] = $this->getValue('i');
       if ($this->getContributionObject()->contact_id !== $this->getContactID()) {
         // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
         CRM_Core_Error::debug_log_message('Contact ID in IPN ' . $this->getContactID() . ' not found but contact_id found in contribution ' . $this->getContributionID() . ' used instead');
         echo 'WARNING: Could not find contact record: ' . $this->getContactID() . '<p>';
-        $ids['contact'] = $this->getContributionObject()->contact_id;
       }
 
       $this->getInput($input);
-
-      if ($this->_component == 'event') {
-        $ids['event'] = self::getValue('e', TRUE);
-        $ids['participant'] = self::getValue('p', TRUE);
-        $ids['contributionRecur'] = $this->getContributionRecurID();
-      }
-      else {
-        // get the optional ids
-        //@ how can this not be broken retrieving from GET as we are dealing with a POST request?
-        // copy & paste? Note the retrieve function now uses data from _REQUEST so this will be included
-        $ids['membership'] = self::retrieve('membershipID', 'Integer', 'GET', FALSE);
-        $ids['contributionRecur'] = $this->getContributionRecurID();
-        $ids['contributionPage'] = self::getValue('p', FALSE);
-        $ids['related_contact'] = self::retrieve('relatedContactID', 'Integer', 'GET', FALSE);
-        $ids['onbehalf_dupe_alert'] = self::retrieve('onBehalfDupeAlert', 'Integer', 'GET', FALSE);
-      }
-
-      if (!$ids['membership'] && $this->getContributionRecurID()) {
-        $sql = "
-    SELECT m.id
-      FROM civicrm_membership m
-INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contribution_id = %1
-     WHERE m.contribution_recur_id = %2
-     LIMIT 1";
-        $sqlParams = [
-          1 => [$ids['contribution'], 'Integer'],
-          2 => [$this->getContributionRecurID(), 'Integer'],
-        ];
-        if ($membershipId = CRM_Core_DAO::singleValueQuery($sql, $sqlParams)) {
-          $ids['membership'] = $membershipId;
-        }
-      }
-
-      $paymentProcessorID = $this->_inputParameters['processor_id'] ?? $this->getPayPalPaymentProcessorID();
-
-      $contribution = $this->getContributionObject();
-
-      // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
-      if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
-        // We don't need to worry if about removing contribution page id as it will be set later in
-        //  CRM_Contribute_BAO_Contribution::loadRelatedObjects(..) using $objects['contribution']->contribution_page_id
-        unset($ids['contributionPage']);
-      }
-
-      $ids['paymentProcessor'] = $paymentProcessorID;
-      $contribution->loadRelatedObjects($input, $ids);
-
-      $input['payment_processor_id'] = $paymentProcessorID;
+      $input['payment_processor_id'] = $this->_inputParameters['processor_id'] ?? $this->getPayPalPaymentProcessorID();
 
       if ($this->getContributionRecurID()) {
         $this->recur($input);
@@ -512,7 +464,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
       $this->single($input);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (Exception $e) {
       Civi::log()->debug($e->getMessage() . ' input {input}', ['input' => $input]);
       echo 'Invalid or missing data';
     }
@@ -560,10 +512,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    *
    * For one off IPNS no actual response is required
    * Recurring is more difficult as we have limited confirmation material
-   * lets look up invoice id in recur_contribution & rely on the unique transaction id to ensure no
-   * duplicated
-   * this may not be acceptable to all sites - e.g. if they are shipping or delivering something in return
-   * then the quasi security of the ids array might be required - although better to
+   * lets look up invoice id in recur_contribution & rely on the unique
+   * transaction id to ensure no duplicated this may not be acceptable to all
+   * sites - e.g. if they are shipping or delivering something in return then
+   * the quasi security of the ids array might be required - although better to
    * http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
    * but let's assume knowledge on invoice id & schedule is enough for now esp
    * for donations only contribute is handled
@@ -571,7 +523,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function handlePaymentExpress(): void {
     $input = ['invoice' => $this->getValue('i', FALSE)];
@@ -646,6 +597,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       if (!$contribution->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution record');
       }
+      // The DAO types it as int but doesn't return it as int.
+      $contribution->contact_id = (int) $contribution->contact_id;
       $this->contributionObject = $contribution;
     }
     return $this->contributionObject;
