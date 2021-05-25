@@ -28,6 +28,7 @@
 
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Contribution;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
@@ -155,7 +156,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @var bool
    */
-  protected $isValidateFinancialsOnPostAssert = FALSE;
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * Should location types be checked to ensure primary addresses are correctly assigned after each test.
@@ -3626,10 +3627,12 @@ VALUES
   /**
    * Validate all created contributions.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateAllContributions(): void {
-    $contributions = $this->callAPISuccess('Contribution', 'get', ['return' => ['tax_amount', 'total_amount']])['values'];
+    $contributions = Contribution::get(FALSE)->setSelect(['total_amount', 'tax_amount'])->execute();
     foreach ($contributions as $contribution) {
       $lineItems = $this->callAPISuccess('LineItem', 'get', [
         'contribution_id' => $contribution['id'],
