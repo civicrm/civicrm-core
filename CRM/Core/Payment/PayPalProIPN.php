@@ -221,17 +221,16 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * Process recurring contributions.
    *
    * @param array $input
-   * @param \CRM_Contribute_BAO_ContributionRecur $recur
-   * @param \CRM_Contribute_BAO_Contribution $contribution
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function recur($input, $recur, $contribution) {
+  public function recur(array $input): void {
     // check if first contribution is completed, else complete first contribution
     $first = !$this->isContributionCompleted();
+    $recur = $this->getContributionRecurObject();
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalProIPN: Could not find txn_type in input request.');
       echo 'Failure: Invalid parameters<p>';
@@ -342,9 +341,6 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     if ($txnType !== 'recurring_payment') {
       return;
     }
-
-    // CRM-13737 - am not aware of any reason why payment_date would not be set - this if is a belt & braces
-    $contribution->receive_date = !empty($input['payment_date']) ? date('YmdHis', strtotime($input['payment_date'])) : $now;
 
     $this->single($input);
   }
@@ -518,8 +514,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       $input['payment_processor_id'] = $paymentProcessorID;
 
       if ($this->getContributionRecurID()) {
-        $contributionRecur = $this->getContributionRecurObject();
-        $this->recur($input, $contributionRecur, $contribution);
+        $this->recur($input);
         return;
       }
 
@@ -648,7 +643,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $contribution->loadRelatedObjects($input, $ids);
     $objects = array_merge($objects, $contribution->_relatedObjects);
 
-    $this->recur($input, $this->getContributionRecurObject(), $objects['contribution']);
+    $this->recur($input);
   }
 
   /**
