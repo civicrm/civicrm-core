@@ -195,8 +195,10 @@
         showHideLimitTo();
       }
 
-      // CRM-14070 Hide limit-to when entity is activity
+      // Magic numbers, sigh. `1` is "Activity", `2`, `3`, and `5` are participant-based.
+      // Can't use labels because of i18n concerns.
       function showHideLimitTo() {
+        // CRM-14070 Hide limit-to when entity is activity
         $('#limit_to', $form).toggle(!($('#entity_0', $form).val() == '1'));
         if ($('#entity_0', $form).val() != '1' || !($('#entity_0').length)) {
           if ($('#limit_to', $form).val() == '') {
@@ -215,6 +217,9 @@
           $('a.limit_to').hide();
           $("label[for='recipient']").text('{/literal}{$recipientLabels.activity}{literal}');
         }
+        // core#1590 Disable "Also include" on participant-based reminders.
+        isParticipantReminder = ["2", "3", "5"].includes($('#entity_0', $form).val());
+        $('#limit_to option[value="0"]').prop('disabled', isParticipantReminder);
       }
 
       $('#recipient', $form).change(populateRecipient);
