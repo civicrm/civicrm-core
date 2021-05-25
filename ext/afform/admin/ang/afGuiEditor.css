@@ -39,13 +39,15 @@
 }
 #afGuiEditor .panel-heading {
   height: 44px;
-  padding: 10px;
+  padding: 5px 10px 10px 10px;
+  border-bottom: 1px solid #ddd;
 }
 #afGuiEditor .panel-heading ul.nav-tabs {
   border-bottom: 0 none;
+  padding: 0!important;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li {
-  top: 1px;
+  top: 6px;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
   white-space: nowrap;
@@ -67,6 +69,7 @@
   height: calc(100% - 44px);
   overflow-y: scroll;
   overflow-x: hidden;
+  border-top: none!important;
 }
 
 #afGuiEditor .af-gui-columns {
