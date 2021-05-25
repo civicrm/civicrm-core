@@ -223,14 +223,15 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
    * @param array $input
    * @param \CRM_Contribute_BAO_ContributionRecur $recur
    * @param \CRM_Contribute_BAO_Contribution $contribution
-   * @param bool $first
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function recur($input, $recur, $contribution, $first) {
+  public function recur($input, $recur, $contribution) {
+    // check if first contribution is completed, else complete first contribution
+    $first = !$this->isContributionCompleted();
     if (!isset($input['txnType'])) {
       Civi::log()->debug('PayPalProIPN: Could not find txn_type in input request.');
       echo 'Failure: Invalid parameters<p>';
@@ -521,9 +522,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
       if ($this->getContributionRecurID()) {
         $contributionRecur = $this->getContributionRecurObject();
-        // check if first contribution is completed, else complete first contribution
-        $first = !$this->isContributionCompleted();
-        $this->recur($input, $contributionRecur, $contribution, $first);
+        $this->recur($input, $contributionRecur, $contribution);
         return;
       }
 
@@ -594,7 +593,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     // http://stackoverflow.com/questions/4848227/validate-that-ipn-call-is-from-paypal
     // as membership id etc can be derived by the load objects fn
     $objects = $ids = $input = [];
-    $isFirst = FALSE;
     $input['invoice'] = self::getValue('i', FALSE);
     //Avoid return in case of unit test.
     if (empty($input['invoice']) && empty($this->_inputParameters['is_unit_test'])) {
@@ -622,11 +620,6 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
 
     $this->setContributionID((int) $result['id']);
     $ids['contribution'] = $this->getContributionID();
-    //@todo hardcoding 'pending' for now
-    $pendingStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    if ($result['contribution_status_id'] == $pendingStatusId) {
-      $isFirst = TRUE;
-    }
     // arg api won't get this - fix it
     $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", [
       1 => [
@@ -658,7 +651,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $contribution->loadRelatedObjects($input, $ids);
     $objects = array_merge($objects, $contribution->_relatedObjects);
 
-    $this->recur($input, $this->getContributionRecurObject(), $objects['contribution'], $isFirst);
+    $this->recur($input, $this->getContributionRecurObject(), $objects['contribution']);
   }
 
   /**
