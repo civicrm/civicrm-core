@@ -157,7 +157,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @var bool
    */
-  protected $isValidateFinancialsOnPostAssert = FALSE;
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * Should location types be checked to ensure primary addresses are correctly assigned after each test.
@@ -3621,6 +3621,9 @@ VALUES
    * Validate all created contributions.
    *
    * @throws \API_Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateAllContributions(): void {
     $contributions = Contribution::get(FALSE)->setSelect(['total_amount', 'tax_amount'])->execute();
