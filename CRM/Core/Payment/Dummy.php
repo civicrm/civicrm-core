@@ -20,9 +20,8 @@ use Civi\Payment\PropertyBag;
  * Dummy payment processor
  */
 class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
-  protected $_mode;
 
-  protected $_params = [];
+  protected $_mode;
   protected $_doDirectPaymentResult = [];
 
   /**
