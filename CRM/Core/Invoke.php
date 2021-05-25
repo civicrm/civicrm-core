@@ -394,6 +394,9 @@ class CRM_Core_Invoke {
       CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET')
     ) {
       Civi::service('sql_triggers')->rebuild();
+      // Rebuild Drupal 8/9/10 route cache only if "triggerRebuild" is set to TRUE as it's
+      // computationally very expensive and only needs to be done when routes change on the Civi-side.
+      // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
       $config->userSystem->invalidateRouteCache();
     }
     CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
