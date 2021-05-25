@@ -363,14 +363,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   public function single($input, $contribution, $recur = FALSE, $first = FALSE) {
 
     // make sure the invoice is valid and matches what we have in the contribution record
-    if ((!$recur) || ($recur && $first)) {
+    if (!$this->isContributionCompleted()) {
       if ($this->getContributionObject()->invoice_id !== $input['invoice']) {
         throw new CRM_Core_Exception('PayPalProIPN: Invoice values dont match between database and IPN request.');
       }
-    }
-
-    if (!$recur) {
-      if ($this->getContributionObject()->total_amount != $input['amount']) {
+      if (!$this->getContributionRecurID() && $this->getContributionObject()->total_amount != $input['amount']) {
         throw new CRM_Core_Exception('PayPalProIPN: Amount values dont match between database and IPN request.');
       }
     }
@@ -380,8 +377,8 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       Contribution::update(FALSE)->setValues([
         'cancel_date' => 'now',
         'contribution_status_id:name' => 'Failed',
-      ])->addWhere('id', '=', $contribution->id)->execute();
-      Civi::log()->debug("Setting contribution status to Failed");
+      ])->addWhere('id', '=', $this->getContributionID())->execute();
+      Civi::log()->debug('Setting contribution status to Failed');
       return;
     }
     if ($status === 'Pending') {
@@ -396,14 +393,12 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
       Civi::log()->debug("Setting contribution status to Cancelled");
       return;
     }
-    elseif ($status !== 'Completed') {
+    if ($status !== 'Completed') {
       Civi::log()->debug('Returning since contribution status is not handled');
       return;
     }
 
-    // check if contribution is already completed, if so we ignore this ipn
-    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-    if ($contribution->contribution_status_id == $completedStatusId) {
+    if ($this->isContributionCompleted()) {
       Civi::log()->debug('PayPalProIPN: Returning since contribution has already been handled.');
       echo 'Success: Contribution has already been handled<p>';
       return;
@@ -527,11 +522,7 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
       if ($this->getContributionRecurID()) {
         $contributionRecur = $this->getContributionRecurObject();
         // check if first contribution is completed, else complete first contribution
-        $first = TRUE;
-        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-        if ($contribution->contribution_status_id == $completedStatusId) {
-          $first = FALSE;
-        }
+        $first = !$this->isContributionCompleted();
         $this->recur($input, $contributionRecur, $contribution, $first);
         return;
       }
@@ -729,6 +720,17 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
    */
   protected function getContactID(): int {
     return $this->getValue('c', TRUE);
+  }
+
+  /**
+   * Is the original contribution completed.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private function isContributionCompleted(): bool {
+    $status = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getContributionObject()->contribution_status_id);
+    return $status === 'Completed';
   }
 
 }
