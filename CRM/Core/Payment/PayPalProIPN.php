@@ -444,10 +444,16 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
         return;
       }
       $this->_component = $input['component'] = self::getValue('m');
-      $input['invoice'] = self::getValue('i', TRUE);
-      // get the contribution and contact ids from the GET params
+      $input['invoice'] = $this->getValue('i', TRUE);
+
       $ids['contact'] = $this->getContactID();
       $ids['contribution'] = $this->getContributionID();
+      if ($this->getContributionObject()->contact_id !== $this->getContactID()) {
+        // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
+        CRM_Core_Error::debug_log_message('Contact ID in IPN ' . $this->getContactID() . ' not found but contact_id found in contribution ' . $this->getContributionID() . ' used instead');
+        echo 'WARNING: Could not find contact record: ' . $this->getContactID() . '<p>';
+        $ids['contact'] = $this->getContributionObject()->contact_id;
+      }
 
       $this->getInput($input);
 
@@ -483,23 +489,9 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
         }
       }
 
-      $paymentProcessorID = CRM_Utils_Array::value('processor_id', $this->_inputParameters);
-      if (!$paymentProcessorID) {
-        $paymentProcessorID = self::getPayPalPaymentProcessorID();
-      }
-      $contribution = $this->getContributionObject();
+      $paymentProcessorID = $this->_inputParameters['processor_id'] ?? $this->getPayPalPaymentProcessorID();
 
-      // make sure contact exists and is valid
-      // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
-      $contact = new CRM_Contact_BAO_Contact();
-      $contact->id = $contribution->contact_id;
-      $contact->find(TRUE);
-      if ($contact->id != $ids['contact']) {
-        // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
-        CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
-        echo "WARNING: Could not find contact record: {$ids['contact']}<p>";
-        $ids['contact'] = $contribution->contact_id;
-      }
+      $contribution = $this->getContributionObject();
 
       // CRM-19478: handle oddity when p=null is set in place of contribution page ID,
       if (!empty($ids['contributionPage']) && !is_numeric($ids['contributionPage'])) {
