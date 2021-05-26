@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 
 /**
@@ -687,31 +688,28 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockTwoTypesIsSeparatePayment(): void {
-    // Need to work on valid financials on this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->_ids['membership_type'] = [$this->membershipTypeCreate(['minimum_fee' => 6])];
     $this->_ids['membership_type'][] = $this->membershipTypeCreate(['name' => 'Student', 'minimum_fee' => 50]);
     $this->setUpMembershipContributionPage(TRUE);
     $submitParams = [
+      'price_' . $this->_ids['price_field']['cont'] =>  $this->_ids['price_field_value']['cont'],
       'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value'][1],
       'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
       'billing_first_name' => 'Billy',
       'billing_middle_name' => 'Goat',
       'billing_last_name' => 'Gruff',
       'selectMembership' => $this->_ids['membership_type'][1],
     ];
 
-    $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
-    $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
-    $this->assertCount(2, $contributions['values']);
-    $ids = array_keys($contributions['values']);
-    $this->assertEquals('10.00', $contributions['values'][$ids[0]]['total_amount']);
-    $this->assertEquals('50.00', $contributions['values'][$ids[1]]['total_amount']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
-    $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page'], 'sequential' => TRUE])['values'];
+    $this->assertCount(2, $contributions);
+    $this->assertEquals('528.00', $contributions[0]['total_amount']);
+    $this->assertEquals('50.00', $contributions[1]['total_amount']);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', []);
+    $this->assertEquals($contributions[1]['id'], $membershipPayment['contribution_id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
-    $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
+    $this->assertEquals($membership['contact_id'], $contributions[1]['contact_id']);
   }
 
   /**
@@ -1471,11 +1469,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
   }
 
   /**
-   * The default data set does not include a complete default membership price set - not quite sure why.
+   * The default data set does not include a complete default membership price
+   * set - not quite sure why.
    *
    * This function ensures it exists & populates $this->_ids with it's data
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setUpMembershipBlockPriceSet($membershipTypeParams = []): void {
     $this->_ids['price_set'][] = $this->callAPISuccess('price_set', 'getvalue', [
@@ -1501,7 +1501,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
         'name' => 'membership_amount',
         'label' => 'Membership Amount',
-        'amount' => $this->_membershipBlockAmount,
+        'amount' => CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['minimum_fee'],
         'financial_type_id' => 'Donation',
         'format.only_id' => TRUE,
         'membership_type_id' => $membershipTypeID,
@@ -1547,7 +1547,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'format.only_id' => TRUE,
       'price_field_id' => $priceField['id'],
     ]);
-    $this->_ids['price_field_value'][] = $priceFieldValue;
+    $this->_ids['price_field_value']['cont'] = $priceFieldValue;
   }
 
   /**
