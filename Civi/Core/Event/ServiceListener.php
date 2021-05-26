@@ -64,10 +64,10 @@ class ServiceListener {
       }
     }
     if ($class) {
-      return sprintf('$(%s)->%s() [%s]', $this->inertCb[0], $this->inertCb[1], $class);
+      return sprintf('$(%s)->%s($e) [%s]', $this->inertCb[0], $this->inertCb[1], $class);
     }
     else {
-      return sprintf('\$(%s)->%s()', $this->inertCb[0], $this->inertCb[1]);
+      return sprintf('\$(%s)->%s($e)', $this->inertCb[0], $this->inertCb[1]);
     }
   }
 
