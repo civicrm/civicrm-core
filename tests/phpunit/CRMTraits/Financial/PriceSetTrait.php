@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceSet;
+
 /**
  * Trait PriceSetTrait
  *
@@ -23,7 +25,7 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * @return int
    */
-  protected function getPriceSetID($key = 'membership'):int {
+  protected function getPriceSetID(string $key = 'membership'):int {
     return $this->ids['PriceSet'][$key];
   }
 
@@ -34,7 +36,7 @@ trait CRMTraits_Financial_PriceSetTrait {
    *
    * @return int
    */
-  protected function getPriceFieldID($key = 'membership'):int {
+  protected function getPriceFieldID(string $key = 'membership'):int {
     return $this->ids['PriceField'][$key];
   }
 
@@ -47,8 +49,8 @@ trait CRMTraits_Financial_PriceSetTrait {
    * @param array $lineItemFinancialTypes
    *   Financial Types, if an override is intended.
    */
-  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, $lineItemFinancialTypes = []): void {
-    $params = array_merge([
+  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, array $lineItemFinancialTypes = []): void {
+    $params = (array) array_merge([
       'total_amount' => 300,
       'financial_type_id' => 'Donation',
       'contribution_status_id' => 'Pending',
@@ -116,6 +118,97 @@ trait CRMTraits_Financial_PriceSetTrait {
       $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
       $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
     ];
+  }
+
+  /**
+   * Set up a membership block (quick config) price set.
+   *
+   * This creates a price set consistent with a contribution
+   * page with non-quick config membership and an optional
+   * additional contribution non-membership amount.
+   *
+   * @param array $membershipTypeParams
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setUpMembershipBlockPriceSet(array $membershipTypeParams = []): void {
+    $this->ids['PriceSet']['membership_block'] = PriceSet::create(FALSE)
+      ->setValues([
+        'is_quick_config' => TRUE,
+        'extends' => 'CiviMember',
+        'name' => 'Membership Block',
+        'title' => 'Membership, not quick config',
+      ])
+      ->execute()->first()['id'];
+
+    if (empty($this->ids['MembershipType'])) {
+      $membershipTypeParams = array_merge([
+        'minimum_fee' => 2,
+      ], $membershipTypeParams);
+      $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
+    }
+    $priceField = $this->callAPISuccess('price_field', 'create', [
+      'price_set_id' => $this->ids['PriceSet']['membership_block'],
+      'name' => 'membership_amount',
+      'label' => 'Membership Amount',
+      'html_type' => 'Radio',
+      'sequential' => 1,
+    ]);
+    $this->ids['PriceField']['membership'] = $priceField['id'];
+
+    foreach ($this->ids['MembershipType'] as $membershipTypeID) {
+      $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+        'name' => 'membership_amount',
+        'label' => 'Membership Amount',
+        'amount' => CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['minimum_fee'],
+        'financial_type_id' => 'Donation',
+        'format.only_id' => TRUE,
+        'membership_type_id' => $membershipTypeID,
+        'price_field_id' => $priceField['id'],
+      ]);
+      $key = 'membership_' . strtolower(CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID)['name']);
+      $this->ids['PriceFieldValue'][$key] = $priceFieldValue;
+    }
+    if (!empty($this->ids['MembershipType']['org2'])) {
+      $priceField = $this->callAPISuccess('price_field', 'create', [
+        'price_set_id' => reset($this->_ids['price_set']),
+        'name' => 'membership_org2',
+        'label' => 'Membership Org2',
+        'html_type' => 'Checkbox',
+        'sequential' => 1,
+      ]);
+      $this->ids['PriceField']['org2'] = $priceField['id'];
+
+      $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+        'name' => 'membership_org2',
+        'label' => 'Membership org 2',
+        'amount' => 55,
+        'financial_type_id' => 'Member Dues',
+        'format.only_id' => TRUE,
+        'membership_type_id' => $this->ids['MembershipType']['org2'],
+        'price_field_id' => $priceField['id'],
+      ]);
+      $this->ids['PriceFieldValue']['org2'] = $priceFieldValue;
+    }
+    $priceField = $this->callAPISuccess('price_field', 'create', [
+      'price_set_id' => $this->ids['PriceSet']['membership_block'],
+      'name' => 'Contribution',
+      'label' => 'Contribution',
+      'html_type' => 'Text',
+      'sequential' => 1,
+      'is_enter_qty' => 1,
+    ]);
+    $this->ids['PriceField']['contribution'] = $priceField['id'];
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+      'name' => 'contribution',
+      'label' => 'Give me money',
+      'amount' => 88,
+      'financial_type_id' => 'Donation',
+      'format.only_id' => TRUE,
+      'price_field_id' => $priceField['id'],
+    ]);
+    $this->ids['PriceFieldValue']['contribution'] = $priceFieldValue;
   }
 
 }

@@ -470,7 +470,7 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Get the total tax amount for the order.
+   * Get the total amount for the order.
    *
    * @return float
    *
@@ -479,6 +479,21 @@ class CRM_Financial_BAO_Order {
   public function getTotalAmount() :float {
     $amount = 0.0;
     foreach ($this->getLineItems() as $lineItem) {
+      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total amount relating to memberships for the order.
+   *
+   * @return float
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getMembershipTotalAmount() :float {
+    $amount = 0.0;
+    foreach ($this->getMembershipLineItems() as $lineItem) {
       $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
     }
     return $amount;

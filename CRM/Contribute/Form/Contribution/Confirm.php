@@ -2055,10 +2055,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->controller = new CRM_Contribute_Controller_Contribution();
     $params['invoiceID'] = md5(uniqid(rand(), TRUE));
 
-    // We want to move away from passing in amount as it is calculated by the actually-submitted params.
-    if ($form->getMainContributionAmount($params)) {
-      $params['amount'] = $form->getMainContributionAmount($params);
-    }
     $paramsProcessedForForm = $form->_params = self::getFormParams($params['id'], $params);
 
     $order = new CRM_Financial_BAO_Order();
@@ -2069,7 +2065,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $order->setOverrideTotalAmount($params['amount']);
     }
     $amount = $order->getTotalAmount();
-    $form->_amount = $params['amount'] = $form->_params['amount'] = $params['amount'] ?? $amount;
+    if ($form->_separateMembershipPayment) {
+      $amount -= $order->getMembershipTotalAmount();
+    }
+    $form->_amount = $params['amount'] = $form->_params['amount'] = $amount;
     // hack these in for test support.
     $form->_fields['billing_first_name'] = 1;
     $form->_fields['billing_last_name'] = 1;
