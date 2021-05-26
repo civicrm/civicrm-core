@@ -16,7 +16,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-
+use Civi\Core\Event\EventScanner;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
@@ -43,11 +43,8 @@ class CRM_Api4_Services {
     $subscribers = $container->findTaggedServiceIds('event_subscriber');
 
     foreach (array_keys($subscribers) as $subscriber) {
-      $getSubscribedEvents = [$container->findDefinition($subscriber)->getClass(), 'getSubscribedEvents'];
-      $dispatcher->addMethodCall(
-        'addSubscriberServiceMap',
-        [$subscriber, $getSubscribedEvents()]
-      );
+      $listenerMap = EventScanner::findListeners($container->findDefinition($subscriber)->getClass());
+      $dispatcher->addMethodCall('addSubscriberServiceMap', [$subscriber, $listenerMap]);
     }
 
     // add spec providers
