@@ -10,6 +10,9 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
+use Civi\Api4\PriceSet;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -58,6 +61,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @var CiviMailUtils
    */
   protected $mut;
+
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * Setup function.
@@ -2117,59 +2127,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test to ensure mail is sent for pay later
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testPayLater(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
+    $contributionPageID = $this->createQuickConfigContributionPage();
 
-    // create contribution page first
-    $contributionPageParams = [
-      'title' => 'Help Support CiviCRM!',
-      'financial_type_id' => 1,
-      'is_monetary' => TRUE,
-      'is_pay_later' => 1,
-      'is_quick_config' => TRUE,
-      'pay_later_text' => 'I will send payment by check',
-      'pay_later_receipt' => 'This is a pay later reciept',
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10.00,
-      'max_amount' => 10000.00,
-      'goal_amount' => 100000.00,
-      'is_email_receipt' => 1,
-      'is_active' => 1,
-      'amount_block_is_active' => 1,
-      'currency' => 'USD',
-      'is_billing_required' => 0,
-    ];
-    $contributionPageResult = $this->callAPISuccess('ContributionPage', 'create', $contributionPageParams);
-
-    // submit form values
-    $priceSet = $this->callAPISuccess('price_set', 'getsingle', ['name' => 'default_contribution_amount']);
     $params = [
-      'id' => $contributionPageResult['id'],
+      'id' => $contributionPageID,
+      'price_' . $this->ids['PriceField']['basic'] => $this->ids['PriceFieldValue']['basic'],
       'contact_id' => $this->_individualId,
       'email-5' => 'anthony_anderson@civicrm.org',
       'payment_processor_id' => 0,
-      'amount' => 100.00,
-      'tax_amount' => '',
       'currencyID' => 'USD',
       'is_pay_later' => 1,
       'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
-      'is_quick_config' => 1,
       'description' => 'Online Contribution: Help Support CiviCRM!',
-      'price_set_id' => $priceSet['id'],
     ];
     $this->callAPISuccess('ContributionPage', 'submit', $params);
 
     $mut->checkMailLog([
       'is_pay_later:::1',
       'email:::anthony_anderson@civicrm.org',
-      'pay_later_receipt:::' . $contributionPageParams['pay_later_receipt'],
+      'pay_later_receipt:::This is a pay later receipt',
       'displayName:::Mr. Anthony Anderson II',
-      'contributionPageId:::' . $contributionPageResult['id'],
-      'title:::' . $contributionPageParams['title'],
-      'amount:::' . $params['amount'],
+      'contributionPageId:::' . $contributionPageID,
+      'title:::Test Contribution Page',
+      'amount:::100',
     ]);
     $mut->stop();
     $this->revertTemplateToReservedTemplate();
@@ -2396,6 +2382,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionLineItems(): void {
+    // @todo - figure out why this test is not valid.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     // CRM-19309
     $originalContribution = $this->setUpRepeatTransaction([], 'multiple');
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -3153,24 +3141,20 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
-   * CRM-19710 - Test to ensure that completetransaction respects the input for is_email_receipt setting.
+   * CRM-19710 - Test to ensure that completetransaction respects the input for
+   * is_email_receipt setting.
    *
    * If passed in it will override the default from contribution page.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCompleteTransactionWithEmailReceiptInputTrue() {
+  public function testCompleteTransactionWithEmailReceiptInputTrue(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->createLoggedInUser();
+    $contributionPageParams = ['is_email_receipt' => 0];
     // Create a Contribution Page with is_email_receipt = FALSE
-    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
-      'receipt_from_name' => 'Mickey Mouse',
-      'receipt_from_email' => 'mickey@mouse.com',
-      'title' => "Test Contribution Page",
-      'financial_type_id' => 1,
-      'currency' => 'CAD',
-      'is_monetary' => TRUE,
-      'is_email_receipt' => 0,
-    ]);
-    $this->_params['contribution_page_id'] = $contributionPage['id'];
+    $contributionPageID = $this->createQuickConfigContributionPage($contributionPageParams);
+    $this->_params['contribution_page_id'] = $contributionPageID;
     $params = array_merge($this->_params, ['contribution_status_id' => 2, 'receipt_date' => 'now']);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     // Complete the transaction overriding is_email_receipt to = TRUE
@@ -3482,6 +3466,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testPendingToCompleteContribution(): void {
+    // @todo - figure out why this test is not valid.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
@@ -3742,7 +3728,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testSendConfirmationPayLater(): void {
     $mut = new CiviMailUtils($this, TRUE);
-
+    // This probably needs to call the order api in order to generate valid financial entities.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Create contribution page
     $pageParams = [
       'title' => 'Webform Contributions',
@@ -3841,19 +3828,19 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function checkReceiptDetails($mut, $pageID, $contributionID, $pageParams) {
+  public function checkReceiptDetails($mut, $pageID, $contributionID, $pageParams): void {
     $pageReceipt = [
-      'receipt_from_name' => "Page FromName",
-      'receipt_from_email' => "page_from@email.com",
-      'cc_receipt' => "page_cc@email.com",
-      'receipt_text' => "Page Receipt Text",
+      'receipt_from_name' => 'Page FromName',
+      'receipt_from_email' => 'page_from@email.com',
+      'cc_receipt' => 'page_cc@email.com',
+      'receipt_text' => 'Page Receipt Text',
       'pay_later_receipt' => $pageParams['pay_later_receipt'],
     ];
     $customReceipt = [
-      'receipt_from_name' => "Custom FromName",
-      'receipt_from_email' => "custom_from@email.com",
-      'cc_receipt' => "custom_cc@email.com",
-      'receipt_text' => "Test Custom Receipt Text",
+      'receipt_from_name' => 'Custom FromName',
+      'receipt_from_email' => 'custom_from@email.com',
+      'cc_receipt' => 'custom_cc@email.com',
+      'receipt_text' => 'Test Custom Receipt Text',
       'pay_later_receipt' => 'Mail your check to test@example.com within 3 business days.',
     ];
     $this->callAPISuccess('ContributionPage', 'create', array_merge([
@@ -5126,6 +5113,68 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals('20.00', $contribution['fee_amount']);
     $this->assertEquals('80.00', $contribution['net_amount']);
     $this->assertEquals('80.00', $contribution['non_deductible_amount']);
+  }
+
+  /**
+   * Create a price set with a quick config price set.
+   *
+   * The params to use this look like
+   *
+   * ['price_' . $this->ids['PriceField']['basic'] => $this->ids['PriceFieldValue']['basic']]
+   *
+   * @param array $contributionPageParams
+   *
+   * @return int
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function createQuickConfigContributionPage(array $contributionPageParams = []): int {
+    $contributionPageID = $this->callAPISuccess('ContributionPage', 'create', array_merge([
+      'receipt_from_name' => 'Mickey Mouse',
+      'receipt_from_email' => 'mickey@mouse.com',
+      'title' => 'Test Contribution Page',
+      'financial_type_id' => 'Member Dues',
+      'currency' => 'CAD',
+      'is_pay_later' => 1,
+      'is_quick_config' => TRUE,
+      'pay_later_text' => 'I will send payment by check',
+      'pay_later_receipt' => 'This is a pay later receipt',
+      'is_allow_other_amount' => 1,
+      'min_amount' => 10.00,
+      'max_amount' => 10000.00,
+      'goal_amount' => 100000.00,
+      'is_email_receipt' => 1,
+      'is_active' => 1,
+      'amount_block_is_active' => 1,
+      'is_billing_required' => 0,
+    ], $contributionPageParams))['id'];
+
+    $priceSetID = PriceSet::create()->setValues([
+      'name' => 'quick config set',
+      'title' => 'basic price set',
+      'is_quick_config' => TRUE,
+      'extends' => 2,
+    ])->execute()->first()['id'];
+
+    $priceFieldID = PriceField::create()->setValues([
+      'price_set_id' => $priceSetID,
+      'name' => 'quick config field name',
+      'label' => 'quick config field name',
+      'html_type' => 'Radio',
+    ])->execute()->first()['id'];
+    $this->ids['PriceSet']['basic'] = $priceSetID;
+    $this->ids['PriceField']['basic'] = $priceFieldID;
+    $this->ids['PriceFieldValue']['basic'] = PriceFieldValue::create()->setValues([
+      'price_field_id' => $priceFieldID,
+      'name' => 'quick config price field',
+      'label' => 'quick config price field',
+      'amount' => 100,
+      'financial_type_id:name' => 'Member Dues',
+    ])->execute()->first()['id'];
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPageID, $priceSetID);
+    return $contributionPageID;
   }
 
 }
