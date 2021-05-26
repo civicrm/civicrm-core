@@ -1141,7 +1141,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       ]
     );
     $this->assertEquals(100, $contribution['total_amount']);
-    $this->assertEquals(NULL, $contribution['tax_amount']);
+    $this->assertEquals(0, (float) $contribution['tax_amount']);
     $this->callAPISuccessGetCount('FinancialTrxn', [], 1);
     $this->callAPISuccessGetCount('FinancialItem', [], 1);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', [

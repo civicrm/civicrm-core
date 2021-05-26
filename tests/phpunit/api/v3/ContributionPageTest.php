@@ -89,6 +89,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     foreach ($this->contactIds as $id) {
       $this->callAPISuccess('contact', 'delete', ['id' => $id]);
     }
+    $this->quickCleanup(['civicrm_system_log']);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
