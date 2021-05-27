@@ -1498,14 +1498,11 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'contact_id' => $membership['contact_id'],
       'email' => 'test-member@example.com',
     ]);
-    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership->contact_id]));
-    $actionScheduleOn['effective_start_date'] = '2012-06-14 00:00:00';
-    $actionScheduleAfter['effective_end_date'] = '2012-06-15 01:00:00';
+    $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership['contact_id']]));
 
     $this->createScheduleFromFixtures('sched_membership_end_2week', [
-      'entity_value' => $membership->membership_type_id,
-      'effective_start_date' => '2012-06-14 00:00:00',
-      'effective_end_date' => '2012-06-15 01:00:00',
+      'entity_value' => $membership['membership_type_id'],
+      'effective_start_date' => '2012-06-01 00:00:00',
     ]);
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -1939,7 +1936,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];
     $actionScheduleAfter['effective_start_date'] = '2012-06-15 01:00:00';
     $actionScheduleAfter['effective_end_date'] = '2012-06-16 02:00:00';
-    $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership->membership_type_id;
+    $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership['membership_type_id'];
     foreach (['actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter'] as $value) {
       $$value = CRM_Core_BAO_ActionSchedule::add($$value);
     }
@@ -2006,6 +2003,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $membershipBAO->id = $membership['id'];
     $membershipBAO->end_date = '2012-06-20';
     $membershipBAO->save();
+
+    // increase the effective end date to future
+    $actionScheduleAfter->effective_end_date = '2012-07-22 00:00:00';
+    $actionScheduleAfter->save();
 
     $this->callAPISuccess('Contact', 'get', ['id' => $membership['contact_id']]);
     $this->assertCronRuns(
@@ -2184,7 +2185,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // CASE 2: Create a schedule reminder which was created 1 day after the schdule day,
     // so it shouldn't deliver reminders schedule to send 1 week before the event start date
     $actionSchedule = $this->fixtures['sched_event_type_start_1week_before'];
-    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'event_type_id');
     $actionSchedule['effective_start_date'] = '20120309000000';
     $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -2209,7 +2210,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // CASE 3: Create a schedule reminder which is created less then a week before the event start date,
     // so it should deliver reminders schedule to send 1 week before the event start date, set the effective end date just an hour later the reminder delivery date
     $actionSchedule = $this->fixtures['sched_event_type_start_1week_before'];
-    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $participant->event_id, 'event_type_id');
+    $actionSchedule['entity_value'] = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $params['event_id'], 'event_type_id');
     $actionSchedule['effective_end_date'] = '20120309010000';
     $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
