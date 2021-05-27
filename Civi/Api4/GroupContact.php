@@ -24,9 +24,10 @@ namespace Civi\Api4;
  * A contact can either be "Added" "Removed" or "Pending" in a group.
  * CiviCRM only considers them to be "in" a group if their status is "Added".
  *
+ * @ui_join_filters status
+ *
  * @bridge group_id contact_id
  * @see \Civi\Api4\Group
- * @searchable false
  * @package Civi\Api4
  */
 class GroupContact extends Generic\DAOEntity {

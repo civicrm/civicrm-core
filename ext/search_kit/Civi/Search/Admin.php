@@ -192,13 +192,15 @@ class Admin {
         $bridge = in_array('EntityBridge', $entity['type']) ? $entity['name'] : NULL;
         foreach ($references as $reference) {
           $keyField = $fields[$reference->getReferenceKey()] ?? NULL;
-          // Exclude any joins that are better represented by pseudoconstants
-          if (is_a($reference, 'CRM_Core_Reference_OptionValue')
-            || !$keyField || !empty($keyField['options'])
+          if (
+            // Sanity check - keyField must exist
+            !$keyField ||
+            // Exclude any joins that are better represented by pseudoconstants
+            is_a($reference, 'CRM_Core_Reference_OptionValue') || (!$bridge && !empty($keyField['options'])) ||
             // Limit bridge joins to just the first
-            || $bridge && array_search($keyField['name'], $entity['bridge']) !== 0
+            ($bridge && array_search($keyField['name'], $entity['bridge']) !== 0) ||
             // Sanity check - table should match
-            || $daoClass::getTableName() !== $reference->getReferenceTable()
+            $daoClass::getTableName() !== $reference->getReferenceTable()
           ) {
             continue;
           }
