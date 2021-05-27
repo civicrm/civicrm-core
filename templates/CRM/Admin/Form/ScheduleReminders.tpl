@@ -54,6 +54,14 @@
         </table>
      </td>
     </tr>
+    <tr class="crm-scheduleReminder-effective_start_date">
+      <td class="right">{$form.effective_start_date.label}</td>
+      <td colspan="3">{$form.effective_start_date.html} <div class="description">{ts}Earliest date to consider start events from.{/ts}</div></td>
+    </tr>
+    <tr class="crm-scheduleReminder-effective_end_date">
+      <td class="right">{$form.effective_end_date.label}</td>
+      <td colspan="3">{$form.effective_end_date.html} <div class="description">{ts}Latest date to consider end events from.{/ts}</div></td>
+    </tr>
     <tr>
       <td class="label" width="20%">{$form.from_name.label}</td>
       <td>{$form.from_name.html}&nbsp;&nbsp;{help id="id-from_name_email"}</td>
@@ -166,6 +174,23 @@
     CRM.$(function($) {
       var $form = $('form.{/literal}{$form.formClass}{literal}'),
         recipientMapping = eval({/literal}{$recipientMapping}{literal});
+  
+      $('#absolute_date', $form).change(function() {
+        if ($(this).val()) {
+          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').hide();
+        }
+        else {
+          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').show();
+        }
+      });
+      $('#start_action_offset', $form).change(function() {
+        if ($(this).val()) {
+          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').show();
+        }
+        else {
+          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').hide();
+        }
+      });
 
       $('#absolute_date_display', $form).change(function() {
         if($(this).val()) {
