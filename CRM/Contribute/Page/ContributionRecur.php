@@ -75,6 +75,17 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
     $this->assign('recur', $contributionRecur);
 
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getEntityId());
+
+    $lineItems = [];
+    $displayLineItems = FALSE;
+    if (!empty($templateContribution['id'])) {
+      $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($templateContribution['id']))];
+      $displayLineItems = TRUE;
+    }
+    $this->assign('lineItem', $lineItems);
+    $this->assign('displayLineItems', $displayLineItems);
+
     $displayName = CRM_Contact_BAO_Contact::displayName($contributionRecur['contact_id']);
     $this->assign('displayName', $displayName);
 
