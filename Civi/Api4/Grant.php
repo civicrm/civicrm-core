@@ -25,6 +25,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/grants/what-is-civigrant/
  *
+ * @searchable primary
  * @package Civi\Api4
  */
 class Grant extends Generic\DAOEntity {

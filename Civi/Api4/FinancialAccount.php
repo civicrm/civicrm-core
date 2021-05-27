@@ -25,6 +25,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/contributions/key-concepts-and-configurations/#financial-types-financial-accounts-and-accounting-codes
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class FinancialAccount extends Generic\DAOEntity {

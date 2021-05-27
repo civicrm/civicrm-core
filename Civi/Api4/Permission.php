@@ -25,7 +25,7 @@ namespace Civi\Api4;
  * It may be poorly suited to recursive usage (e.g. permissions defined dynamically
  * on top of permissions!) or during install/uninstall processes.
  *
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class Permission extends Generic\AbstractEntity {

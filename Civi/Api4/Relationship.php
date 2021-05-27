@@ -23,7 +23,7 @@ namespace Civi\Api4;
  * Relationship entity.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/relationships/
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class Relationship extends Generic\DAOEntity {

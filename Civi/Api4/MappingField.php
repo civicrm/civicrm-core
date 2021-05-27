@@ -24,7 +24,7 @@ namespace Civi\Api4;
  * This represents one field in a Mapping collection.
  *
  * @see \Civi\Api4\Mapping
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class MappingField extends Generic\DAOEntity {

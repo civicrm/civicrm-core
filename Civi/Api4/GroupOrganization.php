@@ -24,7 +24,7 @@ namespace Civi\Api4;
  * Relates groups to organizations.
  *
  * FIXME: For now, excluding this from SearchKit because it's confusingly similar to GroupContact
- * @searchable false
+ * @searchable none
  *
  * @see \Civi\Api4\Group
  * @package Civi\Api4

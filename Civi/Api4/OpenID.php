@@ -22,6 +22,7 @@ namespace Civi\Api4;
 /**
  * OpenID entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class OpenID extends Generic\DAOEntity {

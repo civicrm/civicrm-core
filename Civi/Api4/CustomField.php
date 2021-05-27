@@ -23,7 +23,7 @@ namespace Civi\Api4;
  * CustomField entity.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class CustomField extends Generic\DAOEntity {

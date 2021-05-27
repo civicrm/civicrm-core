@@ -142,7 +142,7 @@ class CustomValue {
     return [
       'class' => __CLASS__,
       'type' => ['CustomValue'],
-      'searchable' => TRUE,
+      'searchable' => 'secondary',
       'see' => [
         'https://docs.civicrm.org/user/en/latest/organising-your-data/creating-custom-fields/#multiple-record-fieldsets',
         '\Civi\Api4\CustomGroup',

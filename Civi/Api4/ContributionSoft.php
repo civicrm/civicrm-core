@@ -15,6 +15,7 @@ namespace Civi\Api4;
 /**
  * ContributionSoft entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class ContributionSoft extends Generic\DAOEntity {

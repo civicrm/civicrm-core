@@ -15,6 +15,7 @@ namespace Civi\Api4;
 /**
  * PriceFieldValue entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class PriceFieldValue extends Generic\DAOEntity {

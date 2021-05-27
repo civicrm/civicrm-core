@@ -30,6 +30,7 @@ namespace Civi\Api4;
  * An activity is a record of some type of interaction with one or more contacts.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/activities/
+ * @searchable primary
  * @package Civi\Api4
  */
 class Activity extends Generic\DAOEntity {

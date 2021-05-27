@@ -26,6 +26,7 @@ namespace Civi\Api4;
  * They are connected to those entities via the EntityTag table.
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/groups-and-tags/#tags
+ * @searchable secondary
  * @package Civi\Api4
  */
 class Tag extends Generic\DAOEntity {
