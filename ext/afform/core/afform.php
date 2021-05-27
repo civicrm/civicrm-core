@@ -51,6 +51,7 @@ function afform_civicrm_config(&$config) {
 
   $dispatcher = Civi::dispatcher();
   $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], 0);
+  $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'preprocessContact'], 10);
   $dispatcher->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);

@@ -5,15 +5,19 @@ use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\Submit;
 
 /**
- * Class AfformSubmitEvent
- * @package Civi\Afform\Event
+ * Handle submission of an "<af-form>" entity (or set of entities in the case of `<af-repeat>`).
  *
- * Handle submission of an "<af-form>" entity.
+ * @see Submit::processGenericEntity
+ * which is the default handler of this event, with priority 0.
  *
- * The default handler of this event is `Submit::processGenericEntity`
  * If special processing for an entity type is desired, add a new listener with a higher priority
- * than 0, and either manipulate the $records and allow the default listener to perform the save,
- * or fully process the save and cancel event propagation to bypass `processGenericEntity`.
+ * than 0, and do one of two things:
+ *
+ * 1. Fully process the save, and cancel event propagation to bypass `processGenericEntity`.
+ * 2. Manipulate the $records and allow the default listener to perform the save.
+ *    Setting $record['fields'] = NULL will cancel saving a record, e.g. if the record is not valid.
+ *
+ * @package Civi\Afform\Event
  */
 class AfformSubmitEvent extends AfformBaseEvent {
 
@@ -54,14 +58,14 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
-   * @param array $values
+   * @param array $records
    * @param string $entityType
    * @param string $entityName
    * @param array $entityIds
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, &$values, string $entityType, string $entityName, array &$entityIds) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, &$records, string $entityType, string $entityName, array &$entityIds) {
     parent::__construct($afform, $formDataModel, $apiRequest);
-    $this->records =& $values;
+    $this->records =& $records;
     $this->entityType = $entityType;
     $this->entityName = $entityName;
     $this->entityIds =& $entityIds;

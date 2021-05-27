@@ -348,7 +348,7 @@ class CRM_Core_BAO_Block {
       $entity = new $class();
       $entity->id = $params['id'];
       $entity->find(TRUE);
-      $contactId = $entity->contact_id;
+      $contactId = $params['contact_id'] = $entity->contact_id;
     }
     // If entity is not associated with contact, concept of is_primary not relevant
     if (!$contactId) {
@@ -397,6 +397,9 @@ class CRM_Core_BAO_Block {
       // primary or return if is already is
       $existingEntities->is_primary = 1;
       $existingEntities->save();
+      if ($class === 'CRM_Core_BAO_Email') {
+        CRM_Core_BAO_Email::updateContactName($contactId, $existingEntities->email);
+      }
     }
   }
 
