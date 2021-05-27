@@ -190,7 +190,7 @@ AND (
    * @param bool $processed
    *   Whether the cache data was recently modified.
    */
-  public static function updateCacheTime($groupID, $processed) {
+  protected static function updateCacheTime($groupID, $processed) {
     // only update cache entry if we had any values
     if ($processed) {
       // also update the group with cache date information
@@ -216,7 +216,7 @@ WHERE  id IN ( $groupIDs )
    * @param int $groupID
    *
    */
-  public static function clearGroupContactCache($groupID): void {
+  protected static function clearGroupContactCache($groupID): void {
     $transaction = new CRM_Core_Transaction();
     $query = "
     DELETE  g
