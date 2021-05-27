@@ -54,10 +54,11 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     }
 
     // hack for basic CRM-1014 and CRM-1151 and CRM-3492 compliance:
-    // let's not replace possible image URLs and CiviMail ones
+    // let's not replace possible image URLs, CiviMail URLs or internal anchor URLs
     if (preg_match('/\.(png|jpg|jpeg|gif|css)[\'"]?$/i', $url)
       or substr_count($url, 'civicrm/extern/')
       or substr_count($url, 'civicrm/mailing/')
+      or ($url[0] === '#')
     ) {
       // let's not cache these, so they don't get &qid= appended to them
       return $url;
