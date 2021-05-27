@@ -5,14 +5,12 @@ namespace Civi\Angular;
  * The AngularLoader loads any JS/CSS/JSON resources
  * required for setting up AngularJS.
  *
- * The AngularLoader stops short of bootstrapping AngularJS. You may
- * need to `<div ng-app="..."></div>` or `angular.bootstrap(...)`.
+ * This class is returned by 'angularjs.loader' service. Example use:
  *
  * ```
- * $loader = new AngularLoader();
- * $loader->setPageName('civicrm/case/a');
- * $loader->setModules(array('crmApp'));
- * $loader->load();
+ * Civi::service('angularjs.loader')
+ *   ->addModules('moduleFoo')
+ *   ->useApp(); // Optional, if Civi's routing is desired (full-page apps only)
  * ```
  *
  * @link https://docs.angularjs.org/guide/bootstrap
@@ -80,19 +78,23 @@ class AngularLoader {
   /**
    * Calling this method from outside this class is deprecated.
    *
-   * The correct way to use this class is as a service, which will load automatically. E.g.:
+   * Use the `angularjs.loader` service instead.
    *
-   * ```
-   * Civi::service('angularjs.loader')
-   *   ->addModules('moduleFoo')
-   *   ->useApp(); // Optional, if Civi's routing is desired (full-page apps only)
-   * ```
-   *
-   * @internal
    * @deprecated
-   * @return AngularLoader
+   * @return $this
    */
   public function load() {
+    \CRM_Core_Error::deprecatedFunctionWarning('angularjs.loader service');
+    return $this->loadAngularResources();
+  }
+
+  /**
+   * Load scripts, styles & settings for the active modules.
+   *
+   * @return $this
+   * @throws \CRM_Core_Exception
+   */
+  private function loadAngularResources() {
     $angular = $this->getAngular();
     $res = $this->getRes();
 
@@ -353,11 +355,15 @@ class AngularLoader {
   }
 
   /**
+   * Loader service callback when rendering a page region.
+   *
+   * Loads Angular resources if any modules have been requested for this page.
+   *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function onRegionRender($e) {
     if ($e->region->_name === $this->region && ($this->modules || $this->crmApp)) {
-      $this->load();
+      $this->loadAngularResources();
       $this->res->addScriptFile('civicrm', 'js/crm-angularjs-loader.js', 200, $this->getRegion(), FALSE);
     }
   }
