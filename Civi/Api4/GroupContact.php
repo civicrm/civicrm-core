@@ -26,7 +26,6 @@ namespace Civi\Api4;
  *
  * @ui_join_filters status
  *
- * @bridge group_id contact_id
  * @see \Civi\Api4\Group
  * @package Civi\Api4
  */
@@ -58,6 +57,18 @@ class GroupContact extends Generic\DAOEntity {
   public static function update($checkPermissions = TRUE) {
     return (new Action\GroupContact\Update(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @return array
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['bridge'] = [
+      'group_id' => ['description' => ts('Static (non-smart) group contacts')],
+      'contact_id' => ['description' => ts('Static (non-smart) group contacts')],
+    ];
+    return $info;
   }
 
 }

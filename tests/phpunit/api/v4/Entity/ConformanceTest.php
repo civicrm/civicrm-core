@@ -156,6 +156,10 @@ class ConformanceTest extends UnitTestCase {
     $this->assertNotEmpty($info['title_plural']);
     $this->assertNotEmpty($info['type']);
     $this->assertNotEmpty($info['description']);
+    // Bridge must be between exactly 2 entities
+    if (in_array('EntityBridge', $info['type'], TRUE)) {
+      $this->assertCount(2, $info['bridge']);
+    }
   }
 
   /**

@@ -98,9 +98,6 @@ class ReflectionUtils {
         elseif ($key == 'searchable') {
           $info[$key] = strtolower($words[0]) !== 'false';
         }
-        elseif ($key == 'bridge') {
-          $info[$key] = $words;
-        }
         elseif ($key == 'param' && $words) {
           $type = $words[0][0] !== '$' ? explode('|', array_shift($words)) : NULL;
           $param = rtrim(array_shift($words), '-:()/');
