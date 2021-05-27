@@ -474,12 +474,36 @@ if (!CRM.vars) CRM.vars = {};
         };
       }
 
-      // Use description as title for each option
-      $el.on('select2-loaded.crmSelect2', function() {
-        $('.crm-select2-row-description', '#select2-drop').each(function() {
-          $(this).closest('.select2-result-label').attr('title', $(this).text());
+      $el
+        .on('select2-loaded.crmSelect2', function() {
+          // Use description as title for each option
+          $('.crm-select2-row-description', '#select2-drop').each(function() {
+            $(this).closest('.select2-result-label').attr('title', $(this).text());
+          });
+          // Collapsible optgroups should be expanded when searching
+          if ($('#select2-drop.collapsible-optgroups-enabled .select2-search input.select2-input').val()) {
+            $('#select2-drop.collapsible-optgroups-enabled li.select2-result-with-children')
+              .addClass('optgroup-expanded');
+          }
+        })
+        // Handle collapsible optgroups
+        .on('select2-open', function(e) {
+          var isCollapsible = $(e.target).hasClass('collapsible-optgroups');
+          $('#select2-drop')
+            .off('.collapseOptionGroup')
+            .toggleClass('collapsible-optgroups-enabled', isCollapsible);
+          if (isCollapsible) {
+            $('#select2-drop')
+              .on('click.collapseOptionGroup', '.select2-result-with-children > .select2-result-label', function() {
+                $(this).parent().toggleClass('optgroup-expanded');
+              })
+              // If the first item in the list is an optgroup, expand it
+              .find('li.select2-result-with-children:first-child').addClass('optgroup-expanded');
+          }
+        })
+        .on('select2-close', function() {
+          $('#select2-drop').off('.collapseOptionGroup').removeClass('collapsible-optgroups-enabled');
         });
-      });
 
       // Defaults for single-selects
       if ($el.is('select:not([multiple])')) {
