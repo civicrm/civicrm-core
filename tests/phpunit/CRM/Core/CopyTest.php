@@ -113,4 +113,3 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   }
 
 }
-
