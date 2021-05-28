@@ -1778,11 +1778,9 @@ LIKE %1
       $newObject = new $daoName();
 
       $fields = $object->fields();
-      if (!is_array($fieldsFix)) {
-        $fieldsToPrefix = [];
-        $fieldsToSuffix = [];
-        $fieldsToReplace = [];
-      }
+      $fieldsToPrefix = [];
+      $fieldsToSuffix = [];
+      $fieldsToReplace = [];
       if (!empty($fieldsFix['prefix'])) {
         $fieldsToPrefix = $fieldsFix['prefix'];
       }
