@@ -381,25 +381,7 @@ WHERE  id IN ( $groupIDs )
         ->setCategory('gccache')
         ->setMemory();
       self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
-      $tempTable = $groupContactsTempTable->getName();
-      // Don't call clearGroupContactCache as we don't want to clear the cache dates
-      // The will get updated by updateCacheTime() below and not clearing the dates reduces
-      // the chance that loadAll() will try and rebuild at the same time.
-      $clearCacheQuery = "
-    DELETE  g
-      FROM  civicrm_group_contact_cache g
-      WHERE  g.group_id = %1 ";
-      $params = [
-        1 => [$groupID, 'Integer'],
-      ];
-      CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
-
-      CRM_Core_DAO::executeQuery(
-        "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT contact_id, group_id FROM $tempTable
-      ");
-      $groupContactsTempTable->drop();
-      self::updateCacheTime([$groupID], TRUE);
+      self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
       $lock->release();
     }
   }
@@ -809,6 +791,37 @@ AND  civicrm_group_contact.group_id = $groupID ";
       $processGroupIDs[] = $dao->id;
     }
     return $processGroupIDs;
+  }
+
+  /**
+   * Transfer the contact ids to the group cache table and update the cache time.
+   *
+   * @param \CRM_Utils_SQL_TempTable $groupContactsTempTable
+   * @param array $groupIDs
+   */
+  private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs): void {
+    $tempTable = $groupContactsTempTable->getName();
+
+    // Don't call clearGroupContactCache as we don't want to clear the cache dates
+    // The will get updated by updateCacheTime() below and not clearing the dates reduces
+    // the chance that loadAll() will try and rebuild at the same time.
+    $clearCacheQuery = '
+    DELETE  g
+      FROM  civicrm_group_contact_cache g
+      WHERE  g.group_id IN (%1) ';
+    $params = [
+      1 => [implode(',', $groupIDs), 'CommaSeparatedIntegers'],
+    ];
+    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
+        SELECT DISTINCT contact_id, group_id FROM $tempTable
+      ");
+    $groupContactsTempTable->drop();
+    foreach ($groupIDs as $groupID) {
+      self::updateCacheTime([$groupID], TRUE);
+    }
   }
 
 }
