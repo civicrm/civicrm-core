@@ -30,12 +30,6 @@
         {k: 'INNER', v: ts('With (required)')},
         {k: 'EXCLUDE', v: ts('Without')},
       ];
-      // Try to create a sensible list of entities one might want to search for,
-      // excluding those whos primary purpose is to provide joins or option lists to other entities
-      var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
-        return !_.includes(entity.type, 'EntityBridge') && !_.includes(entity.type, 'OptionList');
-      });
-      $scope.entities = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
       $scope.getEntity = searchMeta.getEntity;
       $scope.getField = searchMeta.getField;
       this.perm = {
@@ -62,6 +56,19 @@
             }
           });
         }
+
+        var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
+          return entity.searchable === 'primary' && !_.includes(entity.type, 'EntityBridge');
+        });
+        var secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
+          return entity.searchable === 'secondary' && !_.includes(entity.type, 'EntityBridge');
+        });
+        $scope.mainEntitySelect = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
+        $scope.mainEntitySelect.push({
+          text: ts('More...'),
+          description: ts('Other less-commonly searched entities'),
+          children: formatForSelect2(secondaryEntities, 'name', 'title_plural', ['description', 'icon'])
+        });
 
         $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
 
