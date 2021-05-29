@@ -43,7 +43,7 @@ class CRM_Utils_Request {
    */
   public static function id() {
     if (!isset(\Civi::$statics[__CLASS__]['id'])) {
-      \Civi::$statics[__CLASS__]['id'] = uniqid() . CRM_Utils_String::createRandom(CRM_Utils_String::ALPHANUMERIC, 4);
+      \Civi::$statics[__CLASS__]['id'] = uniqid() . CRM_Utils_String::createRandom(4, CRM_Utils_String::ALPHANUMERIC);
     }
     return \Civi::$statics[__CLASS__]['id'];
   }
