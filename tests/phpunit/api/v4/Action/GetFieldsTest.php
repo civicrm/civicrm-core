@@ -20,11 +20,27 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Contact;
 
 /**
  * @group headless
  */
 class GetFieldsTest extends UnitTestCase {
+
+  public function testOptionsAreReturned() {
+    $fields = Contact::getFields(FALSE)
+      ->execute()
+      ->indexBy('name');
+    $this->assertTrue($fields['gender_id']['options']);
+    $this->assertFalse($fields['first_name']['options']);
+
+    $fields = Contact::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->execute()
+      ->indexBy('name');
+    $this->assertTrue(is_array($fields['gender_id']['options']));
+    $this->assertFalse($fields['first_name']['options']);
+  }
 
   public function testComponentFields() {
     \CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');

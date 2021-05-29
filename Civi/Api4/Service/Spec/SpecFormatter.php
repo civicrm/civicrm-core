@@ -19,29 +19,10 @@
 
 namespace Civi\Api4\Service\Spec;
 
+use Civi\Api4\Utils\CoreUtil;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class SpecFormatter {
-
-  /**
-   * @param FieldSpec[] $fields
-   * @param bool $includeFieldOptions
-   * @param array $values
-   *
-   * @return array
-   */
-  public static function specToArray($fields, $includeFieldOptions = FALSE, $values = []) {
-    $fieldArray = [];
-
-    foreach ($fields as $field) {
-      if ($includeFieldOptions) {
-        $field->getOptions($values, $includeFieldOptions);
-      }
-      $fieldArray[$field->getName()] = $field->toArray();
-    }
-
-    return $fieldArray;
-  }
 
   /**
    * @param array $data
@@ -67,7 +48,9 @@ class SpecFormatter {
       $field->setLabel($data['custom_group.title'] . ': ' . $data['label']);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
-      $field->setOptions(self::customFieldHasOptions($data));
+      if (self::customFieldHasOptions($data)) {
+        $field->setOptionsCallback([__CLASS__, 'getOptions']);
+      }
       $field->setreadonly($data['is_view']);
     }
     else {
@@ -76,7 +59,9 @@ class SpecFormatter {
       $field->setRequired(!empty($data['required']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);
-      $field->setOptions(!empty($data['pseudoconstant']));
+      if (!empty($data['pseudoconstant'])) {
+        $field->setOptionsCallback([__CLASS__, 'getOptions']);
+      }
       $field->setreadonly(!empty($data['readonly']));
     }
     $field->setSerialize($data['serialize'] ?? NULL);
@@ -133,6 +118,119 @@ class SpecFormatter {
     $dataTypeName = \CRM_Utils_Type::typeToString($dataTypeInt);
 
     return $dataTypeName;
+  }
+
+  /**
+   * Callback function to build option lists for all DAO & custom fields.
+   *
+   * @param FieldSpec $spec
+   * @param array $values
+   * @param bool|array $returnFormat
+   * @param bool $checkPermissions
+   * @return array|false
+   */
+  public static function getOptions($spec, $values, $returnFormat, $checkPermissions) {
+    $fieldName = $spec->getName();
+
+    if ($spec instanceof CustomFieldSpec) {
+      // buildOptions relies on the custom_* type of field names
+      $fieldName = sprintf('custom_%d', $spec->getCustomFieldId());
+    }
+
+    // BAO::buildOptions returns a single-dimensional list, we call that first because of the hook contract,
+    // @see CRM_Utils_Hook::fieldOptions
+    // We then supplement the data with additional properties if requested.
+    $bao = CoreUtil::getBAOFromApiName($spec->getEntity());
+    $optionLabels = $bao::buildOptions($fieldName, NULL, $values);
+
+    if (!is_array($optionLabels) || !$optionLabels) {
+      $options = FALSE;
+    }
+    else {
+      $options = \CRM_Utils_Array::makeNonAssociative($optionLabels, 'id', 'label');
+      if (is_array($returnFormat)) {
+        self::addOptionProps($options, $spec, $bao, $fieldName, $values, $returnFormat);
+      }
+    }
+    return $options;
+  }
+
+  /**
+   * Augment the 2 values returned by BAO::buildOptions (id, label) with extra properties (name, description, color, icon, etc).
+   *
+   * We start with BAO::buildOptions in order to respect hooks which may be adding/removing items, then we add the extra data.
+   *
+   * @param array $options
+   * @param FieldSpec $spec
+   * @param \CRM_Core_DAO $baoName
+   * @param string $fieldName
+   * @param array $values
+   * @param array $returnFormat
+   */
+  private static function addOptionProps(&$options, $spec, $baoName, $fieldName, $values, $returnFormat) {
+    // FIXME: For now, call the buildOptions function again and then combine the arrays. Not an ideal approach.
+    // TODO: Teach CRM_Core_Pseudoconstant to always load multidimensional option lists so we can get more properties like 'color' and 'icon',
+    // however that might require a change to the hook_civicrm_fieldOptions signature so that's a bit tricky.
+    if (in_array('name', $returnFormat)) {
+      $props['name'] = $baoName::buildOptions($fieldName, 'validate', $values);
+    }
+    $returnFormat = array_diff($returnFormat, ['id', 'name', 'label']);
+    // CRM_Core_Pseudoconstant doesn't know how to fetch extra stuff like icon, description, color, etc., so we have to invent that wheel here...
+    if ($returnFormat) {
+      $optionIds = implode(',', array_column($options, 'id'));
+      $optionIndex = array_flip(array_column($options, 'id'));
+      if ($spec instanceof CustomFieldSpec) {
+        $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $spec->getCustomFieldId(), 'option_group_id');
+      }
+      else {
+        $dao = new $baoName();
+        $fieldSpec = $dao->getFieldSpec($fieldName);
+        $pseudoconstant = $fieldSpec['pseudoconstant'] ?? NULL;
+        $optionGroupName = $pseudoconstant['optionGroupName'] ?? NULL;
+        $optionGroupId = $optionGroupName ? \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name') : NULL;
+      }
+      if (!empty($optionGroupId)) {
+        $extraStuff = \CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupId);
+        $keyColumn = $pseudoconstant['keyColumn'] ?? 'value';
+        foreach ($extraStuff as $item) {
+          if (isset($optionIndex[$item[$keyColumn]])) {
+            foreach ($returnFormat as $ret) {
+              // Note: our schema is inconsistent about whether `description` fields allow html,
+              // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
+              $options[$optionIndex[$item[$keyColumn]]][$ret] = ($ret === 'description' && isset($item[$ret])) ? strip_tags($item[$ret]) : $item[$ret] ?? NULL;
+            }
+          }
+        }
+      }
+      else {
+        // Fetch the abbr if requested using context: abbreviate
+        if (in_array('abbr', $returnFormat)) {
+          $props['abbr'] = $baoName::buildOptions($fieldName, 'abbreviate', $values);
+          $returnFormat = array_diff($returnFormat, ['abbr']);
+        }
+        // Fetch anything else (color, icon, description)
+        if ($returnFormat && !empty($pseudoconstant['table']) && \CRM_Utils_Rule::commaSeparatedIntegers($optionIds)) {
+          $sql = "SELECT * FROM {$pseudoconstant['table']} WHERE id IN (%1)";
+          $query = \CRM_Core_DAO::executeQuery($sql, [1 => [$optionIds, 'CommaSeparatedIntegers']]);
+          while ($query->fetch()) {
+            foreach ($returnFormat as $ret) {
+              if (property_exists($query, $ret)) {
+                // Note: our schema is inconsistent about whether `description` fields allow html,
+                // but it's usually assumed to be plain text, so we strip_tags() to standardize it.
+                $options[$optionIndex[$query->id]][$ret] = $ret === 'description' ? strip_tags($query->$ret) : $query->$ret;
+              }
+            }
+          }
+        }
+      }
+    }
+    if (isset($props)) {
+      foreach ($options as &$option) {
+        foreach ($props as $name => $prop) {
+          $option[$name] = $prop[$option['id']] ?? NULL;
+        }
+      }
+    }
   }
 
   /**

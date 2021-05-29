@@ -23,17 +23,17 @@ class CustomFieldSpec extends FieldSpec {
   /**
    * @var int
    */
-  protected $customFieldId;
+  public $customFieldId;
 
   /**
    * @var int
    */
-  protected $customGroup;
+  public $customGroup;
 
   /**
    * @var string
    */
-  protected $tableName;
+  public $tableName;
 
   /**
    * @inheritDoc
