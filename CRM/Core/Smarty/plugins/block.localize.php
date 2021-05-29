@@ -31,7 +31,7 @@
  *   multilingualized query
  */
 function smarty_block_localize($params, $text, &$smarty) {
-  if (!$smarty->_tpl_vars['multilingual']) {
+  if (!array_key_exists('multilingual', $smarty->_tpl_vars) || !$smarty->_tpl_vars['multilingual']) {
     return $text;
   }
 
