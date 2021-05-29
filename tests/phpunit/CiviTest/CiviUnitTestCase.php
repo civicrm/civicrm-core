@@ -30,6 +30,7 @@ use Civi\Api4\OptionGroup;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
+use Civi\Test\Api3DocTrait;
 use League\Csv\Reader;
 
 /**
@@ -58,7 +59,7 @@ define('API_LATEST_VERSION', 3);
  */
 class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
-  use \Civi\Test\Api3DocTrait;
+  use Api3DocTrait;
   use \Civi\Test\GenericAssertionsTrait;
   use \Civi\Test\DbTestTrait;
   use \Civi\Test\ContactTestTrait;
@@ -3122,7 +3123,7 @@ VALUES
    *
    * @throws \CRM_Core_Exception
    */
-  protected function disableTaxAndInvoicing() {
+  protected function disableTaxAndInvoicing(): \Civi\Core\SettingsBag {
     $accounts = $this->callAPISuccess('EntityFinancialAccount', 'get', ['account_relationship' => 'Sales Tax Account is'])['values'];
     foreach ($accounts as $account) {
       $this->callAPISuccess('EntityFinancialAccount', 'delete', ['id' => $account['id']]);
