@@ -48,7 +48,7 @@ class api_v3_CustomFieldTooManyJoinsTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function tearDown() {
+  public function tearDown(): void {
     foreach ($this->createdCustomGroups as $customGroup) {
       $this->customGroupDelete($customGroup['id']);
     }
