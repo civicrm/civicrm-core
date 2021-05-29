@@ -142,9 +142,12 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @param string $thousandSeparator
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    * @dataProvider getThousandSeparators
    */
-  public function testSubmit($thousandSeparator) {
+  public function testSubmit(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit([
@@ -162,8 +165,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitCreditCard() {
+  public function testSubmitCreditCard(): void {
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit([
       'total_amount' => 50,
@@ -180,8 +186,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testSubmitCreditCardPayPal() {
+  public function testSubmitCreditCardPayPal(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
@@ -236,8 +245,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       ]),
     ]);
 
-    $this->assertEquals(1, $contribution["count"], "Contribution count should be one.");
-    $this->assertTrue(!empty($contribution["values"][$contribution["id"]]["receipt_date"]), "Receipt date should not be blank.");
+    $this->assertEquals(1, $contribution['count'], 'Contribution count should be one.');
+    $this->assertNotTrue(empty($contribution['values'][$contribution['id']]['receipt_date']), 'Receipt date should not be blank.');
 
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $this->_individualId]);
     $this->assertTrue(empty($contact['source']));
@@ -251,6 +260,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitCreditCardWithEmailReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -909,7 +920,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @dataProvider getThousandSeparators
    */
-  public function testSubmitUpdate($thousandSeparator) {
+  public function testSubmitUpdate(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $form = new CRM_Contribute_Form_Contribution();
 
