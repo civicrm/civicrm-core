@@ -60,6 +60,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -199,7 +201,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with recurring membership data.
    */
-  public function testSendMailParticipantObjectsCheckLog() {
+  public function testSendMailParticipantObjectsCheckLog(): void {
     $this->_setUpParticipantObjects();
     $mut = new CiviMailUtils($this, TRUE);
     $this->callAPISuccess('Contribution', 'sendconfirmation', [
@@ -215,8 +217,11 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
   /**
    * Test the LoadObjects function with recurring membership data.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
    */
-  public function testsendMailParticipantObjectsNoMail() {
+  public function testsendMailParticipantObjectsNoMail(): void {
     $this->_setUpParticipantObjects();
     $event = new CRM_Event_BAO_Event();
     $event->id = $this->_eventId;
@@ -238,7 +243,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Test the LoadObjects function with a pledge.
    */
-  public function testSendMailPledge() {
+  public function testSendMailPledge(): void {
     $this->_setUpPledgeObjects();
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
@@ -246,7 +251,13 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->assertStringContainsString('Contribution Information', $msg['html']);
   }
 
-  public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities() {
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testThatCancellingEventPaymentWillCancelAllAdditionalPendingParticipantsAndCreateCancellationActivities(): void {
     $this->_setUpParticipantObjects('Pending from incomplete transaction');
     $additionalParticipantId = $this->participantCreate([
       'event_id' => $this->_eventId,
@@ -259,7 +270,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
       'contribution_status_id:name' => 'Cancelled',
     ])->addWhere('id', '=', $this->_contributionId)->execute();
 
-    $cancelledParticipantsCount = civicrm_api3('Participant', 'get', [
+    $cancelledParticipantsCount = $this->callAPISuccess('Participant', 'get', [
       'sequential' => 1,
       'id' => ['IN' => [$this->_participantId, $additionalParticipantId]],
       'status_id' => 'Cancelled',
@@ -355,7 +366,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   /**
    * Prepare for membership test.
    */
-  public function _setUpMembershipObjects() {
+  public function _setUpMembershipObjects(): void {
     try {
       if (!$this->_membershipTypeID) {
         $this->_membershipTypeID = $this->membershipTypeCreate();

@@ -24,8 +24,9 @@
  *
  * @return array
  *   Array of Order, if error an array with an error id and error message
+ * @throws \CiviCRM_API3_Exception
  */
-function civicrm_api3_order_get($params) {
+function civicrm_api3_order_get(array $params): array {
   $contributions = [];
   $params['api.line_item.get'] = ['qty' => ['<>' => 0]];
   $isSequential = FALSE;
@@ -53,7 +54,7 @@ function civicrm_api3_order_get($params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_order_get_spec(&$params) {
+function _civicrm_api3_order_get_spec(array &$params) {
   $params['id']['api.aliases'] = ['order_id'];
   $params['id']['title'] = ts('Contribution / Order ID');
 }
@@ -70,7 +71,7 @@ function _civicrm_api3_order_get_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  * @throws API_Exception
  */
-function civicrm_api3_order_create($params) {
+function civicrm_api3_order_create(array $params): array {
   civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
   $entity = NULL;
   $entityIds = [];
@@ -156,10 +157,10 @@ function civicrm_api3_order_create($params) {
         $entity . '_id' => $entityId,
       ];
       // if entity is pledge then build pledge param
-      if ($entity == 'pledge') {
+      if ($entity === 'pledge') {
         $paymentParams += $entityParams;
       }
-      elseif ($entity == 'membership') {
+      elseif ($entity === 'membership') {
         $contribution['values'][$contribution['id']]['membership_id'][] = $entityId;
         $paymentParams['isSkipLineItem'] = TRUE;
       }
@@ -174,11 +175,12 @@ function civicrm_api3_order_create($params) {
  *
  * @param array $params
  *   Input parameters.
+ *
  * @return array
  * @throws API_Exception
  * @throws CiviCRM_API3_Exception
  */
-function civicrm_api3_order_delete($params) {
+function civicrm_api3_order_delete(array $params): array {
   $contribution = civicrm_api3('Contribution', 'get', [
     'return' => ['is_test'],
     'id' => $params['id'],
@@ -199,8 +201,9 @@ function civicrm_api3_order_delete($params) {
  *   Input parameters.
  *
  * @return array
+ * @throws \CiviCRM_API3_Exception
  */
-function civicrm_api3_order_cancel($params) {
+function civicrm_api3_order_cancel(array $params) {
   $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
   $params['contribution_status_id'] = array_search('Cancelled', $contributionStatuses);
   $result = civicrm_api3('Contribution', 'create', $params);
@@ -215,7 +218,7 @@ function civicrm_api3_order_cancel($params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_order_cancel_spec(&$params) {
+function _civicrm_api3_order_cancel_spec(array &$params) {
   $params['contribution_id'] = [
     'api.required' => 1,
     'title' => 'Contribution ID',
@@ -231,7 +234,7 @@ function _civicrm_api3_order_cancel_spec(&$params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_order_create_spec(&$params) {
+function _civicrm_api3_order_create_spec(array &$params) {
   $params['contact_id'] = [
     'name' => 'contact_id',
     'title' => 'Contact ID',
@@ -271,7 +274,7 @@ function _civicrm_api3_order_create_spec(&$params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_order_delete_spec(&$params) {
+function _civicrm_api3_order_delete_spec(array &$params) {
   $params['contribution_id'] = [
     'api.required' => TRUE,
     'title' => 'Contribution ID',
