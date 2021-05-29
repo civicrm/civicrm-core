@@ -37,7 +37,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $providers = array_merge($providers, $this->providers);
   }
 
-  public function makeDummyProviderThatGetsAToken(): void {
+  public function makeDummyProviderThatGetsAToken(): array {
     $idTokenHeader = ['alg' => 'RS256', 'kid' => '123456789', 'typ' => 'JWT'];
     $idTokenPayload = [
       'iss' => 'https://dummy',
@@ -102,6 +102,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     ];
 
     require_once 'tests/fixtures/DummyProvider.php';
+
+    return $this->providers;
   }
 
   public function makeDummyProviderClient(): array {
@@ -114,7 +116,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     )->execute()->single();
   }
 
-  public function testFetchAndStoreSysToken() {
+  public function testSysToken_FetchAndStore() {
     $this->makeDummyProviderThatGetsAToken();
     $client = $this->makeDummyProviderClient();
 
@@ -153,6 +155,237 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
         'exp' => 9999999999,
       ],
       $tokenRecord['resource_owner']);
+  }
+
+  public function testContactToken_AnonymousUser_LinkExistingContactRecord() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+
+    $this->assertNull(\CRM_Core_Session::singleton()->getLoggedInContactID());
+    $notLoggedInContactID = \Civi\Api4\Contact::get(FALSE)
+      ->setSelect(['id'])
+      ->setLimit(1)
+      ->execute()
+      ->single()['id'];
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set the tag to $notLoggedInContactID in the call to
+    // Civi\Api4\OAuthClient::authorizationCode(), this is the call that
+    // \CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => "linkContact:$notLoggedInContactID",
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertEquals($notLoggedInContactID, $tokenRecord['contact_id']);
+  }
+
+  public function testContactToken_AnonymousUser_SetNullContactId() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+
+    $this->assertNull(\CRM_Core_Session::singleton()->getLoggedInContactID());
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set tag='nullContactId' in the call to Civi\Api4\OAuthClient::authorizationCode(),
+    // this is the call that \CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => 'nullContactId',
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertNull($tokenRecord['contact_id']);
+  }
+
+  public function testContactToken_AnonymousUser_CreateContact() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+
+    $this->assertNull(\CRM_Core_Session::singleton()->getLoggedInContactID());
+    $notLoggedInContactID = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('id')
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->single()['id'];
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set tag='createContact' when calling Civi\Api4\OAuthClient::authorizationCode(),
+    // this is the call that \CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => "createContact",
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertGreaterThan($notLoggedInContactID, $tokenRecord['contact_id']);
+    $contact = \Civi\Api4\Contact::get(0)
+      ->addWhere('id', '=', $tokenRecord['contact_id'])
+      ->addJoin('Email AS email')
+      ->addSelect('email.email')
+      ->execute()->single();
+    $this->assertEquals('test@baz.biff', $contact['email.email']);
+  }
+
+  public function testContactToken_LoggedInUser_Default() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+    $loggedInContactID = $this->createLoggedInUser();
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // This is what \CRM_OAuth_Page_Return::run would call upon receiving an auth code,
+    // assuming we hadn't set any tag earlier in the process.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => NULL,
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertEquals($loggedInContactID, $tokenRecord['contact_id']);
+  }
+
+  public function testContactToken_LoggedInUser_LinkOtherContact() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+    $loggedInContactID = $this->createLoggedInUser();
+    $notLoggedInContactID = \Civi\Api4\Contact::get(FALSE)
+      ->setSelect(['id'])
+      ->setLimit(1)
+      ->execute()
+      ->single()['id'];
+    $this->assertNotEquals($loggedInContactID, $notLoggedInContactID);
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set tag="linkContact:$notLoggedInContactID" when invoking
+    // Civi\Api4\OAuthClient::authorizationCode(), this is the call that
+    // CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => "linkContact:$notLoggedInContactID",
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertEquals($notLoggedInContactID, $tokenRecord['contact_id']);
+  }
+
+  public function testContactToken_LoggedInUser_CreateContact() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+    $loggedInContactID = $this->createLoggedInUser();
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set tag='createContact' when calling Civi\Api4\OAuthClient::authorizationCode(),
+    // this is the call that \CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => "createContact",
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertGreaterThan($loggedInContactID, $tokenRecord['contact_id']);
+    $contact = \Civi\Api4\Contact::get(0)
+      ->addWhere('id', '=', $tokenRecord['contact_id'])
+      ->addJoin('Email AS email')
+      ->addSelect('email.email')
+      ->execute()->single();
+    $this->assertEquals('test@baz.biff', $contact['email.email']);
+  }
+
+  public function testContactToken_LoggedInUser_SetNullContactId() {
+    $this->makeDummyProviderThatGetsAToken();
+    $client = $this->makeDummyProviderClient();
+    $loggedInContactID = $this->createLoggedInUser();
+
+    /** @var OAuthTokenFacade $tokenService */
+    $tokenService = \Civi::service('oauth2.token');
+
+    // Assuming we set tag="nullContactId" when invoking
+    // Civi\Api4\OAuthClient::authorizationCode(), this is the call that
+    // CRM_OAuth_Page_Return::run would make upon receiving an auth code.
+    $tokenRecord = $tokenService->init(
+      [
+        'client' => $client,
+        'scope' => 'foo',
+        'tag' => "nullContactId",
+        'storage' => 'OAuthContactToken',
+        'grant_type' => 'authorization_code',
+        'cred' => ['code' => 'example-auth-code'],
+      ]
+    );
+    $this->assertTrue(is_numeric($tokenRecord['id']));
+    $this->assertEquals($client['id'], $tokenRecord['client_id']);
+    $this->assertEquals(['foo'], $tokenRecord['scopes']);
+    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertNull($tokenRecord['contact_id']);
   }
 
 }

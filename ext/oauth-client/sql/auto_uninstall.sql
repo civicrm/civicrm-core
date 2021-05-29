@@ -11,13 +11,14 @@
 --
 -- /*******************************************************
 -- *
--- * Clean up the exisiting tables
+-- * Clean up the existing tables
 -- *
 -- *******************************************************/
 
 SET FOREIGN_KEY_CHECKS=0;
 
 DROP TABLE IF EXISTS `civicrm_oauth_systoken`;
+DROP TABLE IF EXISTS `civicrm_oauth_contact_token`;
 DROP TABLE IF EXISTS `civicrm_oauth_client`;
 
 SET FOREIGN_KEY_CHECKS=1;
