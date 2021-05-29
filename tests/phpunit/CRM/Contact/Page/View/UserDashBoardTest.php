@@ -113,8 +113,8 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
-      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
+      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td><td></td></tr><tr id=\'rowid2\'',
       'Pay Now',
     ];
 
@@ -149,9 +149,42 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
-      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th>',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
       '<td>$ 100.00 </td><td>Donation</td>',
       '<td>Completed</td>',
+    ];
+    $this->assertPageContains($expectedStrings);
+  }
+
+  /**
+   * Test the presence of a "Pay Now" button on partial payments
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testDashboardPartialPayments() {
+    $contributionId = $this->contributionCreate([
+      'contact_id' => $this->contactID,
+      'contribution_status_id' => 'Pending',
+      'total_amount' => 25,
+    ]);
+    $result = civicrm_api3('Payment', 'create', [
+      'contribution_id' => $contributionId,
+      'total_amount' => 11,
+      'trxn_date' => "2021-05-11",
+    ]);
+    $this->contributions[] = civicrm_api3('Contribution', 'get', [
+      'contact_id' => $this->contactID,
+      'options' => ['limit' => 12, 'sort' => 'receive_date DESC'],
+      'sequential' => 1,
+    ])['values'];
+    $this->runUserDashboard();
+    $expectedStrings = [
+      'Your Contribution(s)',
+      '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th>',
+      '<td>$ 25.00 </td><td>Donation</td>',
+      '<td>$ 14.00</td><td>Partially paid</td>',
+      'Pay Now',
     ];
     $this->assertPageContains($expectedStrings);
   }
