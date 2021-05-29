@@ -2011,7 +2011,7 @@ SELECT contact_id
    * @return object
    *   an object of type referenced by daoName
    */
-  public static function commonRetrieveAll($daoName, $fieldIdName = 'id', $fieldId, &$details, $returnProperities = NULL) {
+  public static function commonRetrieveAll($daoName, $fieldIdName, $fieldId, &$details, $returnProperities = NULL) {
     require_once str_replace('_', DIRECTORY_SEPARATOR, $daoName) . ".php";
     $object = new $daoName();
     $object->$fieldIdName = $fieldId;
