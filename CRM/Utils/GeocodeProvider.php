@@ -68,7 +68,7 @@ class CRM_Utils_GeocodeProvider {
       // or extend a base class. While we identify and implement a geocoding
       // abstraction library (rather than continue to roll our own), we settle for
       // this check.
-      if (!method_exists($provider, 'format') && $provider !== FALSE) {
+      if ($provider !== FALSE && !method_exists($provider, 'format')) {
         Civi::log()->error('Configured geocoder is invalid, must provide a format method', ['geocode_class' => $provider]);
         $provider = FALSE;
       }
