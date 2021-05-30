@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'CiviTest/CiviReportTestCase.php';
-
 use Civi\Test\Invasive;
 
 /**
@@ -33,9 +31,18 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   ];
 
   /**
+   * Financial data used in these tests is invalid - do not validate.
+   *
+   * Note ideally it would be fixed and we would always use valid data.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * @return array
    */
-  public function dataProvider() {
+  public function dataProvider(): array {
     $testCaseA = [
       'CRM_Report_Form_Contribute_Detail',
       [
@@ -69,7 +76,7 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   /**
    * @return array
    */
-  public function badDataProvider() {
+  public function badDataProvider(): array {
     return [
       // This test-case is bad because the dataset-ascii.sql does not match the
       // report.csv (due to differences in international chars)
@@ -115,6 +122,9 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     ];
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp(): void {
     parent::setUp();
     $this->quickCleanup($this->_tablesToTruncate);
@@ -128,54 +138,41 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
    * @param $expectedOutputCsvFile
    * @throws \Exception
    */
-  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
+  public function testReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile): void {
     $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+    CRM_Utils_File::sourceSQLFile($config->dsn, __DIR__ . "/$dataSet");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/$expectedOutputCsvFile");
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
   /**
    * @dataProvider badDataProvider
+   *
    * @param $reportClass
    * @param $inputParams
    * @param $dataSet
    * @param $expectedOutputCsvFile
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile) {
-    $config = CRM_Core_Config::singleton();
-    CRM_Utils_File::sourceSQLFile($config->dsn, dirname(__FILE__) . "/{$dataSet}");
+  public function testBadReportOutput($reportClass, $inputParams, $dataSet, $expectedOutputCsvFile): void {
+    CRM_Utils_File::sourceSQLFile(CIVICRM_DSN, __DIR__ . "/$dataSet");
 
     $reportCsvFile = $this->getReportOutputAsCsv($reportClass, $inputParams);
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
-    $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    try {
-      $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
-      // @todo But...doesn't this mean this test can't ever notify you of a
-      // fail? I think what you could do instead is right here in the try
-      // section throw something that doesn't get caught, since then that means
-      // the previous line passed and so the arrays ARE equal, which means
-      // something is wrong. Or just don't use assertCsvArraysEqual and
-      // explicity compare that they are NOT equal.
-    }
-    catch (PHPUnit\Framework\AssertionFailedError $e) {
-      /* OK */
-    }
-    catch (PHPUnit_Framework_AssertionFailedError $e) {
-      /* OK */
-    }
+    $expectedOutputCsvArray = $this->getArrayFromCsv(__DIR__ . "/$expectedOutputCsvFile");
+    $this->assertNotEquals($expectedOutputCsvArray[1], $reportCsvArray[1]);
   }
 
   /**
    * Test processReportMode() Function in Reports
    */
-  public function testOutputMode() {
+  public function testOutputMode(): void {
     $reportForm = new CRM_Report_Form();
 
     Invasive::set([$reportForm, '_params'], ['groups' => 4]);
