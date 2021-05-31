@@ -22,6 +22,7 @@ namespace Civi\Api4;
 /**
  * Batch entity.
  *
+ * @searchable secondary
  * @see https://docs.civicrm.org/user/en/latest/pledges/everyday-tasks/#batch-entry-of-pledges
  * @package Civi\Api4
  */

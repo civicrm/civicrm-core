@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * Creating a new email address requires at minimum a contact's ID and email
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class Email extends Generic\DAOEntity {

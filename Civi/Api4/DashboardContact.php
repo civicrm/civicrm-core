@@ -24,7 +24,7 @@ namespace Civi\Api4;
  * This places a dashboard item on a user's home screen.
  *
  * @see \Civi\Api4\Dashboard
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class DashboardContact extends Generic\DAOEntity {

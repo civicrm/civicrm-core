@@ -17,7 +17,7 @@ namespace Civi\Api4;
  *
  * Links addresses, emails & phones to Events.
  *
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class LocBlock extends Generic\DAOEntity {

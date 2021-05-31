@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Generic\AbstractEntity
  *
+ * @searchable none
  * @package Civi\Api4
  */
 class Entity extends Generic\AbstractEntity {
@@ -90,7 +91,12 @@ class Entity extends Generic\AbstractEntity {
         ],
         [
           'name' => 'searchable',
-          'description' => 'Should this entity be selectable in search kit UI',
+          'description' => 'How should this entity be presented in search UIs',
+          'options' => [
+            'primary' => ts('Primary'),
+            'secondary' => ts('Secondary'),
+            'none' => ts('None'),
+          ],
         ],
         [
           'name' => 'paths',

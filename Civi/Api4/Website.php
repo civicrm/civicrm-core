@@ -22,6 +22,7 @@ namespace Civi\Api4;
 /**
  * Website entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class Website extends Generic\DAOEntity {

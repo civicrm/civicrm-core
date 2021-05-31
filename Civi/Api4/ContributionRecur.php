@@ -15,6 +15,7 @@ namespace Civi\Api4;
 /**
  * ContributionRecur entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class ContributionRecur extends Generic\DAOEntity {

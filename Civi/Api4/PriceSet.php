@@ -15,6 +15,7 @@ namespace Civi\Api4;
 /**
  * PriceSet entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class PriceSet extends Generic\DAOEntity {

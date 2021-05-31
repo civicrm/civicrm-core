@@ -795,7 +795,7 @@ class Api4SelectQuery {
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects
     $joinRef = $baseRef = NULL;
     foreach ($bridgeDAO::getReferenceColumns() as $ref) {
-      if (in_array($ref->getReferenceKey(), $bridgeFields)) {
+      if (array_key_exists($ref->getReferenceKey(), $bridgeFields)) {
         if (!$joinRef && in_array($joinEntity, $ref->getTargetEntities())) {
           $joinRef = $ref;
         }

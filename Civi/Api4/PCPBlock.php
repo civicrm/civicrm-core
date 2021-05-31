@@ -21,6 +21,7 @@ namespace Civi\Api4;
 /**
  * PCP Block entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class PCPBlock extends Generic\DAOEntity {

@@ -22,6 +22,7 @@ namespace Civi\Api4;
 /**
  * Note entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class Note extends Generic\DAOEntity {

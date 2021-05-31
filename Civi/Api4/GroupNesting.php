@@ -22,7 +22,7 @@ namespace Civi\Api4;
  * GroupNesting entity.
  *
  * @see \Civi\Api4\Group
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class GroupNesting extends Generic\DAOEntity {

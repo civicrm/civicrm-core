@@ -23,17 +23,16 @@ trait EntityBridge {
   /**
    * Adds "bridge" info, which should specify an array of two field names from this entity
    *
-   * This automatic function can be overridden by annotating the APIv4 entity like
-   * `@bridge contact_id group_id`
+   * This automatic function can be overridden by adding a getInfo function to the api entity class.
    *
    * @return array
    */
   public static function getInfo() {
     $info = parent::getInfo();
-    if (!empty($info['dao']) && empty($info['bridge'])) {
+    if (!empty($info['dao'])) {
       foreach (($info['dao'])::fields() as $field) {
         if (!empty($field['FKClassName']) || $field['name'] === 'entity_id') {
-          $info['bridge'][] = $field['name'];
+          $info['bridge'][$field['name']] = [];
         }
       }
     }

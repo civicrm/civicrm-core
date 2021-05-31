@@ -17,7 +17,7 @@ namespace Civi\Api4\Generic\Traits;
  * The options appear in the field metadata for other entities that reference this one via pseudoconstant.
  *
  * Note: At time of writing, this trait does nothing except toggle the searchable flag, (and adds "OptionList" to the "type" in Entity::get() metadata).
- * @searchable false (FYI annotation isn't functional because this is a trait - workaround in AbstractEntity::getInfo)
+ * @searchable none (FYI annotation isn't functional because this is a trait - workaround in AbstractEntity::getInfo)
  */
 trait OptionList {
 

@@ -16,7 +16,7 @@ use Civi\Api4\Generic\BasicBatchAction;
  *      The `prefill` and `submit` actions are used for preparing forms and processing submissions.
  *
  * @see https://lab.civicrm.org/extensions/afform
- * @searchable false
+ * @searchable none
  * @package Civi\Api4
  */
 class Afform extends Generic\AbstractEntity {
