@@ -48,6 +48,7 @@
 }
 #afGuiEditor .panel-heading ul.nav-tabs li {
   top: 6px;
+  margin: 0;
 }
 #afGuiEditor .panel-heading ul.nav-tabs li.fluid-width-tab {
   white-space: nowrap;
