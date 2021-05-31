@@ -198,6 +198,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     $clauses = [
       "contrib.contact_id = contact_a.id",
       "contrib.is_test = 0",
+      "contrib.is_template = 0",
       "contrib.contribution_status_id = " . intval($contributionCompletedStatusId),
     ];
 
