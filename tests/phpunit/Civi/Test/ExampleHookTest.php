@@ -57,7 +57,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    *
    * @see \CRM_Utils_Hook::alterContent
    */
-  public function on_hook_civicrm_alterContent(\Civi\Core\Event\GenericHookEvent $event) {
+  public function on_hook_civicrm_alterContent(\Civi\Core\Event\GenericHookEvent $event): void {
     $event->content .= ' ' . __FUNCTION__;
   }
 
@@ -66,7 +66,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    *
    * @see \Civi\API\Event\ResolveEvent
    */
-  public function on_civi_api_resolve(\Civi\API\Event\ResolveEvent $event) {
+  public function on_civi_api_resolve(\Civi\API\Event\ResolveEvent $event): void {
     $this->tracker['civi.api.resolve'][__FUNCTION__] = TRUE;
   }
 
@@ -75,7 +75,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    *
    * @see \Civi\API\Event\PrepareEvent
    */
-  public function on_civi_api_prepare(\Civi\API\Event\PrepareEvent $event) {
+  public function on_civi_api_prepare(\Civi\API\Event\PrepareEvent $event): void {
     $this->tracker['civi.api.prepare'][__FUNCTION__] = TRUE;
   }
 

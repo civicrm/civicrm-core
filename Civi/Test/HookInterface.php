@@ -21,10 +21,10 @@ namespace Civi\Test;
  *
  * ```
  * class MyTest extends \PHPUnit_Framework_TestCase implements \Civi\Test\HookInterface {
- *   public function on_civi_api_authorize(AuthorizeEvent $e) {
+ *   public function on_civi_api_authorize(AuthorizeEvent $e): void {
  *     echo "Running civi.api.authorize\n";
  *   }
- *   public function on_hook_civicrm_post(GenericHookEvent $e) {
+ *   public function on_hook_civicrm_post(GenericHookEvent $e): void {
  *     echo "Running hook_civicrm_post\n";
  *   }
  * }

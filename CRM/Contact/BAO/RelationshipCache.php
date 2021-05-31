@@ -69,7 +69,7 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::triggerInfo
    */
-  public static function on_hook_civicrm_triggerInfo($e) {
+  public static function on_hook_civicrm_triggerInfo($e): void {
     $relUpdates = self::createInsertUpdateQueries();
     // Use utf8mb4_bin or utf8_bin, depending on what's in use.
     $collation = preg_replace('/^(utf8(?:mb4)?)_.*$/', '$1_bin', CRM_Core_BAO_SchemaHandler::getInUseCollation());

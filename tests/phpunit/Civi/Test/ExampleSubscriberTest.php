@@ -51,15 +51,15 @@ class ExampleSubscriberTest extends \PHPUnit\Framework\TestCase implements Headl
     ];
   }
 
-  public function myCiviApiResolve(\Civi\API\Event\ResolveEvent $event) {
+  public function myCiviApiResolve(\Civi\API\Event\ResolveEvent $event): void {
     $this->tracker['civi.api.resolve'][__FUNCTION__] = TRUE;
   }
 
-  public function myCiviApiPrepare(\Civi\API\Event\PrepareEvent $event) {
+  public function myCiviApiPrepare(\Civi\API\Event\PrepareEvent $event): void {
     $this->tracker['civi.api.prepare'][__FUNCTION__] = TRUE;
   }
 
-  public function myAlterContentObject(GenericHookEvent $event) {
+  public function myAlterContentObject(GenericHookEvent $event): void {
     $event->content .= ' ' . __FUNCTION__;
   }
 
