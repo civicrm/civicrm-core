@@ -451,7 +451,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // Third renewal (4th payment).
     $order = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecurId,
-      'contribution_status_id' => 'Completed'
+      'contribution_status_id' => 'Completed',
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $order['id']]);
     $this->assertEquals(150, $contribution['total_amount']);
@@ -507,7 +507,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // Update the template contribution to total amount 100
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $templateContributionId,
-      'total_amount' => 100
+      'total_amount' => 100,
     ]);
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
