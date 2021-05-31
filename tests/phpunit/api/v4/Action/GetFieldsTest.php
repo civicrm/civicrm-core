@@ -42,6 +42,14 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertFalse($fields['first_name']['options']);
   }
 
+  public function testTableAndColumnReturned() {
+    $fields = Contact::getFields(FALSE)
+      ->execute()
+      ->indexBy('name');
+    $this->assertEquals('civicrm_contact', $fields['display_name']['table_name']);
+    $this->assertEquals('display_name', $fields['display_name']['column_name']);
+  }
+
   public function testComponentFields() {
     \CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
     $fields = \Civi\Api4\Event::getFields()

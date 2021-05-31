@@ -31,11 +31,6 @@ class CustomFieldSpec extends FieldSpec {
   public $customGroup;
 
   /**
-   * @var string
-   */
-  public $tableName;
-
-  /**
    * @inheritDoc
    */
   public function setDataType($dataType) {
@@ -87,24 +82,6 @@ class CustomFieldSpec extends FieldSpec {
    */
   public function setCustomGroupName($customGroupName) {
     $this->customGroup = $customGroupName;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getCustomTableName() {
-    return $this->tableName;
-  }
-
-  /**
-   * @param string $customFieldColumnName
-   *
-   * @return $this
-   */
-  public function setCustomTableName($customFieldColumnName) {
-    $this->tableName = $customFieldColumnName;
 
     return $this;
   }

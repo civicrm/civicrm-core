@@ -66,6 +66,11 @@ class FieldSpec {
   public $options;
 
   /**
+   * @var string
+   */
+  public $tableName;
+
+  /**
    * @var callable
    */
   private $optionsCallback;
@@ -215,6 +220,17 @@ class FieldSpec {
    */
   public function setTitle($title) {
     $this->title = $title;
+
+    return $this;
+  }
+
+  /**
+   * @param string $entity
+   *
+   * @return $this
+   */
+  public function setEntity($entity) {
+    $this->entity = $entity;
 
     return $this;
   }
@@ -444,6 +460,24 @@ class FieldSpec {
    */
   public function setHelpPost($helpPost) {
     $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;
+  }
+
+  /**
+   * @param string $customFieldColumnName
+   *
+   * @return CustomFieldSpec
+   */
+  public function setTableName($customFieldColumnName) {
+    $this->tableName = $customFieldColumnName;
+
+    return $this;
+  }
+
+  /**
+   * @return string
+   */
+  public function getTableName() {
+    return $this->tableName;
   }
 
   /**
