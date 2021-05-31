@@ -49,6 +49,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    */
   public static function recurLinks(int $recurID, $context = 'contribution') {
     $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($recurID));
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($recurID);
     $links = [
       CRM_Core_Action::VIEW => [
         'name' => ts('View'),
@@ -57,6 +58,16 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
       ],
     ];
+    if (!empty($templateContribution['id'])) {
+      // Use constant CRM_Core_Action::PREVIEW as there is no such thing as view template.
+      // And reusing view will mangle the actions.
+      $links[CRM_Core_Action::PREVIEW] = [
+        'name' => ts('View Template'),
+        'title' => ts('View Template Contribution'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => "reset=1&id={$templateContribution['id']}&cid=%%cid%%&action=view&context={$context}",
+      ];
+    }
     if (
       (CRM_Core_Permission::check('edit contributions') || $context !== 'contribution') &&
       ($paymentProcessorObj->supports('ChangeSubscriptionAmount')
