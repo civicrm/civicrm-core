@@ -30,10 +30,11 @@ class HookStyleListener {
   }
 
   public function __invoke(GenericHookEvent $e) {
-    return call_user_func_array($this->callback, $e->getHookValues());
+    $result = call_user_func_array($this->callback, $e->getHookValues());
+    $e->addReturnValues($result);
   }
 
-  public function __toString() {
+  public function __toString(): string {
     $name = EventPrinter::formatName($this->callback);
     return preg_replace('/\(\$?e?\)$/', '(&...)', $name);
   }
