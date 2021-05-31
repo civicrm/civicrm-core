@@ -56,11 +56,11 @@
     </tr>
     <tr class="crm-scheduleReminder-effective_start_date">
       <td class="right">{$form.effective_start_date.label}</td>
-      <td colspan="3">{$form.effective_start_date.html} <div class="description">{ts}Earliest date to consider start events from.{/ts}</div></td>
+      <td colspan="3">{$form.effective_start_date.html} <div class="description"></div></td>
     </tr>
     <tr class="crm-scheduleReminder-effective_end_date">
       <td class="right">{$form.effective_end_date.label}</td>
-      <td colspan="3">{$form.effective_end_date.html} <div class="description">{ts}Latest date to consider end events from.{/ts}</div></td>
+      <td colspan="3">{$form.effective_end_date.html} <div class="description"></div></td>
     </tr>
     <tr>
       <td class="label" width="20%">{$form.from_name.label}</td>
@@ -174,22 +174,17 @@
     CRM.$(function($) {
       var $form = $('form.{/literal}{$form.formClass}{literal}'),
         recipientMapping = eval({/literal}{$recipientMapping}{literal});
-  
+
+      updatedEffectiveDateDescription($('#entity_0 option:selected').text(), $('#start_action_date option:selected').text());
+      $('#entity_0, #start_action_date', $form).change(function() {
+       updatedEffectiveDateDescription($('#entity_0 option:selected').text(), $('#start_action_date option:selected').text());
+      });
+
       $('#absolute_date', $form).change(function() {
-        if ($(this).val()) {
-          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').hide();
-        }
-        else {
-          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').show();
-        }
+        $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').toggle(($(this).val() === null));
       });
       $('#start_action_offset', $form).change(function() {
-        if ($(this).val()) {
-          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').show();
-        }
-        else {
-          $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').hide();
-        }
+        $('.crm-scheduleReminder-effective_start_date, .crm-scheduleReminder-effective_end_date').toggle(($(this).val() !== null));
       });
 
       $('#absolute_date_display', $form).change(function() {
@@ -205,6 +200,11 @@
 
       loadMsgBox();
       $('#mode', $form).change(loadMsgBox);
+
+      function updatedEffectiveDateDescription(entityText, startActionDateText) {
+        $('.crm-scheduleReminder-effective_start_date .description').text(ts('Earliest %1 %2 to include.', {1: entityText, 2: startActionDateText}));
+        $('.crm-scheduleReminder-effective_end_date .description').text(ts('Earliest %1 %2 to exclude.', {1: entityText, 2: startActionDateText}));
+      }
 
       function populateRecipient() {
         var mappingID = $('#entity_0', $form).val() || $('[name^=mappingID]', $form).val();
