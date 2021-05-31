@@ -8,7 +8,8 @@
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
     controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        fieldsForJoinGetters = {};
 
       this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
 
@@ -748,6 +749,17 @@
         };
       };
 
+      function getFieldsForJoin(joinEntity) {
+        return {results: ctrl.getAllFields(':name', null, joinEntity)};
+      }
+
+      $scope.fieldsForJoin = function(joinEntity) {
+        if (!fieldsForJoinGetters[joinEntity]) {
+          fieldsForJoinGetters[joinEntity] = _.wrap(joinEntity, getFieldsForJoin);
+        }
+        return fieldsForJoinGetters[joinEntity];
+      };
+
       $scope.fieldsForWhere = function() {
         return {results: ctrl.getAllFields(':name')};
       };
@@ -777,7 +789,7 @@
         });
       }
 
-      this.getAllFields = function(suffix, disabledIf) {
+      this.getAllFields = function(suffix, disabledIf, topJoin) {
         disabledIf = disabledIf || _.noop;
         function formatFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
@@ -809,13 +821,11 @@
         }
 
         var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-          result = [{
-            text: mainEntity.title_plural,
-            icon: mainEntity.icon,
-            children: formatFields(ctrl.savedSearch.api_entity)
-          }];
-        _.each(ctrl.savedSearch.api_params.join, function(join) {
-          var joinInfo = searchMeta.getJoin(join[0]),
+          joinEntities = _.map(ctrl.savedSearch.api_params.join, 0),
+          result = [];
+
+        function addJoin(join) {
+          var joinInfo = searchMeta.getJoin(join),
             joinEntity = searchMeta.getEntity(joinInfo.entity);
           result.push({
             text: joinInfo.label,
@@ -823,7 +833,20 @@
             icon: joinEntity.icon,
             children: formatFields(joinEntity.name, joinInfo)
           });
+        }
+
+        // Place specified join at top of list
+        if (topJoin) {
+          addJoin(topJoin);
+          _.pull(joinEntities, topJoin);
+        }
+
+        result.push({
+          text: mainEntity.title_plural,
+          icon: mainEntity.icon,
+          children: formatFields(ctrl.savedSearch.api_entity)
         });
+        _.each(joinEntities, addJoin);
         return result;
       };
 

@@ -9,6 +9,8 @@
       op: '@',
       skip: '<',
       label: '@',
+      hideLabel: '@',
+      placeholder: '<',
       deleteGroup: '&'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
