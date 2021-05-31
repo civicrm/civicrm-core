@@ -58,7 +58,7 @@ class EventScanner {
    *   List of events/listeners. Format is compatible with 'getSubscribedEvents()'.
    *   Ex: ['some.event' => [['firstFunc'], ['secondFunc']]
    */
-  public static function findListeners($target, $self = NULL) {
+  public static function findListeners($target, $self = NULL): array {
     $class = is_object($target) ? get_class($target) : $target;
     $key = "$class::" . ($self ?: '');
     if (isset(self::$listenerMaps[$key])) {
@@ -86,9 +86,9 @@ class EventScanner {
    *   If the target $class is focused on a specific entity/form/etc, use the `$self` parameter to specify it.
    *   This will activate support for `self_{$event}` methods.
    *   Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'hook_civicrm_pre::Contact'.
-   * @return \Generator
+   * @return array
    */
-  protected static function findFunctionListeners($class, $self = NULL) {
+  protected static function findFunctionListeners(string $class, $self = NULL): array {
     $listenerMap = [];
 
     /**
@@ -137,7 +137,7 @@ class EventScanner {
   /**
    * Convert the listeners to a standard flavor.
    *
-   * @param array $listenerMap
+   * @param iterable $listenerMap
    *   List of events/listeners. Listeners may be given in singular or plural form.
    *   Ex: ['some.event' => 'oneListener']
    *   Ex: ['some.event' => ['oneListener', 100]]
@@ -146,7 +146,7 @@ class EventScanner {
    *   List of events/listeners. All listeners are described in plural form.
    *   Ex: ['some.event' => [['firstListener', 100], ['secondListener']]]
    */
-  protected static function normalizeListenerMap($listenerMap) {
+  protected static function normalizeListenerMap(iterable $listenerMap): array {
     $r = [];
     foreach ($listenerMap as $eventName => $params) {
       $r[$eventName] = [];
@@ -163,7 +163,7 @@ class EventScanner {
     return $r;
   }
 
-  protected static function mergeListenerMap($left, $right) {
+  protected static function mergeListenerMap(array $left, array $right): array {
     if ($left === []) {
       return $right;
     }
