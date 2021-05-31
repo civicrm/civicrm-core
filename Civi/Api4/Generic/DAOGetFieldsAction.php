@@ -19,8 +19,6 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\Api4\Service\Spec\SpecFormatter;
-
 /**
  * @inheritDoc
  * @method bool getIncludeCustom()
@@ -48,7 +46,7 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       $this->includeCustom = strpos(implode('', $fieldsToGet), '.') !== FALSE;
     }
     $spec = $gatherer->getSpec($this->getEntityName(), $this->getAction(), $this->includeCustom, $this->values);
-    $fields = SpecFormatter::specToArray($spec->getFields($fieldsToGet), $this->loadOptions, $this->values);
+    $fields = $this->specToArray($spec->getFields($fieldsToGet));
     foreach ($fieldsToGet ?? [] as $fieldName) {
       if (empty($fields[$fieldName]) && strpos($fieldName, '.') !== FALSE) {
         $fkField = $this->getFkFieldSpec($fieldName, $fields);
@@ -59,6 +57,24 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       }
     }
     return $fields;
+  }
+
+  /**
+   * @param \Civi\Api4\Service\Spec\FieldSpec[] $fields
+   *
+   * @return array
+   */
+  protected function specToArray($fields) {
+    $fieldArray = [];
+
+    foreach ($fields as $field) {
+      if ($this->loadOptions) {
+        $field->getOptions($this->values, $this->loadOptions, $this->checkPermissions);
+      }
+      $fieldArray[$field->getName()] = $field->toArray();
+    }
+
+    return $fieldArray;
   }
 
   /**
