@@ -2,6 +2,7 @@
 
 namespace Civi\Core;
 
+use Civi\Core\Event\HookStyleListener;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -84,6 +85,52 @@ class CiviEventDispatcher extends EventDispatcher {
       else {
         foreach ($params as $listener) {
           $this->addListenerService($eventName, [$subscriber, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
+        }
+      }
+    }
+  }
+
+  /**
+   * Add a test listener.
+   *
+   * @param string $eventName
+   *   Ex: 'civi.internal.event'
+   *   Ex: 'hook_civicrm_publicEvent'
+   *   Ex: '&hook_civicrm_publicEvent' (an alias for 'hook_civicrm_publicEvent' in which the listener abides hook-style ordered parameters).
+   *        This notation is handy when attaching via listener-maps (e.g. `getSubscribedEvents()`).
+   * @param callable $listener
+   * @param int $priority
+   */
+  public function addListener($eventName, $listener, $priority = 0) {
+    if ($eventName[0] === '&') {
+      $eventName = substr($eventName, 1);
+      $listener = new HookStyleListener($listener);
+    }
+    parent::addListener($eventName, $listener, $priority);
+  }
+
+  /**
+   * Adds a series of event listeners from methods in a class.
+   *
+   * @param string|object $target
+   *   The object/class which will receive the notifications.
+   *   Use a string (class-name) if the listeners are static methods.
+   *   Use an object-instance if the listeners are regular methods.
+   * @param array $events
+   *   List of events/methods/priorities.
+   * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface::getSubscribedEvents()
+   */
+  public function addListenerMap($target, array $events) {
+    foreach ($events as $eventName => $params) {
+      if (\is_string($params)) {
+        $this->addListener($eventName, [$target, $params]);
+      }
+      elseif (\is_string($params[0])) {
+        $this->addListener($eventName, [$target, $params[0]], isset($params[1]) ? $params[1] : 0);
+      }
+      else {
+        foreach ($params as $listener) {
+          $this->addListener($eventName, [$target, $listener[0]], isset($listener[1]) ? $listener[1] : 0);
         }
       }
     }

@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Core;
 
+use Civi\Core\Event\EventScanner;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -338,6 +339,16 @@ class Container {
       ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     }
 
+    $dispatcherDefn = $container->getDefinition('dispatcher');
+    foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {
+      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
+      if ($listenerMap) {
+        $file = (new \ReflectionClass($baoClass))->getFileName();
+        $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
+        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
+      }
+    }
+
     \CRM_Api4_Services::hook_container($container);
 
     \CRM_Utils_Hook::container($container);
@@ -389,10 +400,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
     $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
 
-    $dispatcher->addListener('hook_civicrm_triggerInfo', ['\CRM_Contact_BAO_RelationshipCache', 'onHookTriggerInfo']);
-    $dispatcher->addListener('civi.dao.postInsert', ['\CRM_Core_BAO_RecurringEntity', 'triggerInsert']);
-    $dispatcher->addListener('civi.dao.postUpdate', ['\CRM_Core_BAO_RecurringEntity', 'triggerUpdate']);
-    $dispatcher->addListener('civi.dao.postDelete', ['\CRM_Core_BAO_RecurringEntity', 'triggerDelete']);
     $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
     $dispatcher->addListener('hook_civicrm_unhandled_exception', [
       'CRM_Core_LegacyErrorHandler',
