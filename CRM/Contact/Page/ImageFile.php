@@ -52,11 +52,11 @@ class CRM_Contact_Page_ImageFile extends CRM_Core_Page {
         'image/' . ($fileExtension == 'jpg' ? 'jpeg' : $fileExtension),
         $this->ttl
       );
-      CRM_Utils_System::civiExit();
     }
     else {
-      throw new CRM_Core_Exception(ts('Photo does not exist'));
+      header("HTTP/1.0 404 Not Found");
     }
+    CRM_Utils_System::civiExit();
   }
 
   /**
