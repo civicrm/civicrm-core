@@ -16,7 +16,7 @@ class EventPrinter {
    * @param mixed $callback
    * @return string
    */
-  public static function formatName($callback) {
+  public static function formatName($callback): string {
     $normalizeNamespace = function($symbol) {
       return $symbol{0} === '\\' ? substr($symbol, 1) : $symbol;
     };
