@@ -67,7 +67,7 @@ class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCach
    * @return string
    *   the sql query which lists the groups that need to be refreshed
    */
-  public static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE): string {
+  protected static function groupRefreshedClause($groupIDClause = NULL, $includeHiddenGroups = FALSE): string {
     $smartGroupCacheTimeoutDateTime = self::getCacheInvalidDateTime();
 
     $query = "
@@ -165,7 +165,7 @@ AND (
    * @param array $groupID
    * @param array $values
    */
-  public static function store($groupID, &$values) {
+  protected static function store($groupID, &$values) {
     $processed = FALSE;
 
     // sort the values so we put group IDs in front and hence optimize
@@ -419,7 +419,7 @@ WHERE  id IN ( $groupIDs )
    *
    * @return int
    */
-  public static function smartGroupCacheTimeout() {
+  protected static function smartGroupCacheTimeout() {
     $config = CRM_Core_Config::singleton();
 
     if (
