@@ -246,6 +246,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post($action, 'Contribution', $contribution->id, $contribution);
+
+    // Check whether this is linked to a recurring contribution and whether this is the first contribution.
+    // If so we should create the template contribution for the recurring contribution.
+    if (self::isFirstContributionOfRecurringContribution($params, $contribution->id)) {
+      CRM_Contribute_BAO_ContributionRecur::createTemplateContributionFromFirstContribution($params['contribution_recur_id']);
+    }
+
     return $result;
   }
 
@@ -274,6 +281,58 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Check whether this is the first contribution within a recurring contribution.
+   * This function is used to determine whether we should create a template contribution.
+   *
+   * @param $params
+   * @param $contribution_id
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function isFirstContributionOfRecurringContribution($params, $contribution_id) {
+    if (empty($params['contribution_recur_id'])) {
+      // No recurring contribution
+      return FALSE;
+    }
+
+    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+    $recurringContribution = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $params['contribution_recur_id'])
+      ->setSelect($recurFields)
+      ->execute()
+      ->first();
+
+    // Check if a template contribution already exists.
+    $templateContributions = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $params['contribution_recur_id'])
+      ->addWhere('is_template', '=', 1)
+      ->addWhere('is_test', '=', $recurringContribution['is_test'])
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute();
+    if ($templateContributions->count()) {
+      // A template contribution already exists
+      return FALSE;
+    }
+
+    $firstContribution = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $params['contribution_recur_id'])
+      ->addWhere('is_test', '=', $recurringContribution['is_test'])
+      ->addWhere('is_template', '=', 0)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->setSelect(['id'])
+      ->execute()
+      ->first();
+    if ($firstContribution && $firstContribution['id'] != $contribution_id) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**

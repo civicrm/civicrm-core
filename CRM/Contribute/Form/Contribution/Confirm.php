@@ -1185,6 +1185,15 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // create an activity record
     if ($contribution) {
       CRM_Activity_BAO_Activity::addActivity($contribution, 'Contribution', $targetContactID, $actParams);
+      if (!empty($contributionParams['contribution_recur_id'])) {
+        // Add the on behalf activity to the template contribution.
+        // We have to do this by looking the template contribution as a DAO object.
+        $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionParams['contribution_recur_id']);
+        $templateContributionObject = new CRM_Contribute_BAO_Contribution();
+        $templateContributionObject->id = $templateContribution['id'];
+        $templateContributionObject->find(TRUE);
+        CRM_Activity_BAO_Activity::addActivity($templateContributionObject, 'Contribution', $targetContactID, $actParams);
+      }
     }
 
     $transaction->commit();

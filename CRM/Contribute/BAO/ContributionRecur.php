@@ -404,6 +404,87 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * Create a template contribution based on the first contribution of an
+   * recurring contribution.
+   * When a template contribution already exists this function will not try to create
+   * a new one.
+   * This way we make sure only one template contribution exists.
+   *
+   * @param int $id
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function createTemplateContributionFromFirstContribution(int $id) {
+    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
+    $recurringContribution = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->setSelect($recurFields)
+      ->execute()
+      ->first();
+
+    // Check if a template contribution already exists.
+    $templateContributions = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_template', '=', 1)
+      ->addWhere('is_test', '=', $recurringContribution['is_test'])
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute();
+    if ($templateContributions->count()) {
+      // A template contribution already exists.
+      // Skip the creation of a new one.
+      return;
+    }
+
+    // Retrieve the first contribution
+    $firstContribution = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_test', '=', $recurringContribution['is_test'])
+      ->addWhere('is_template', '=', 0)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
+    if (!$firstContribution) {
+      // No first contribution is found.
+      return;
+    }
+
+    // Retrieve the line items and format them
+    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($firstContribution['id']);
+    $firstContribution['line_item'] = self::reformatLineItemsForRepeatContribution($firstContribution['total_amount'], $firstContribution['financial_type_id'], $lineItems, (array) $firstContribution);
+
+    // If the template contribution was made on-behalf then add the
+    // relevant values to ensure the activity reflects that.
+    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($firstContribution['id']);
+
+    $templateContributionParams = array();
+    $templateContributionParams['is_test'] = $recurringContribution['is_test'];
+    $templateContributionParams['is_template'] = '1';
+    $templateContributionParams['skipRecentView'] = TRUE;
+    $templateContributionParams['contribution_recur_id'] = $id;
+    $templateContributionParams['line_item'] = $firstContribution['line_item'];
+    $templateContributionParams['status_id'] = 'Template';
+    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
+      if (isset($firstContribution[$fieldName])) {
+        $templateContributionParams[$fieldName] = $firstContribution[$fieldName];
+      }
+    }
+    if (!empty($relatedContact['individual_id'])) {
+      $templateContributionParams['on_behalf'] = TRUE;
+      $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
+    }
+    $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
+    $templateContribution = civicrm_api3('Contribution', 'create', $templateContributionParams);
+    $temporaryObject = new CRM_Contribute_BAO_Contribution();
+    $temporaryObject->copyCustomFields($firstContribution['id'], $templateContribution['id']);
+    // Add new soft credit against current $contribution.
+    CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($templateContributionParams['contribution_recur_id'], $templateContribution['id']);
+  }
+
+  /**
    * Get the contribution to be used as the template for later contributions.
    *
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
@@ -443,9 +524,12 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       ->setLimit(1)
       ->execute();
     if (!$templateContributions->count()) {
-      // Fall back to old style template contributions
+      // Create a template contribution based on the first contribution
+      self::createTemplateContributionFromFirstContribution($id);
+      // And then try to find the newly generated template contribution.
       $templateContributions = Contribution::get(FALSE)
         ->addWhere('contribution_recur_id', '=', $id)
+        ->addWhere('is_template', '=', 1)
         ->addWhere('is_test', '=', $recurringContribution['is_test'])
         ->addOrderBy('id', 'DESC')
         ->setLimit(1)
