@@ -30,11 +30,15 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
       'is_email_confirm',
     ];
 
+    // same format for better comparison
+    $eventData = civicrm_api3('Event', 'getsingle', ['id' => $eventId]);
+    $eventCopy = civicrm_api3('Event', 'getsingle', ['id' => $eventCopy->id]);
+
     foreach ($identicalParams as $name) {
-      $this->assertEquals($eventCopy->$name, $eventRes[$name]);
+      $this->assertEquals($eventCopy[$name], $eventData[$name], "{$name} should be equals between source and copy");
     }
 
-    $this->assertEquals($eventCopy->title, 'Copy of ' . $eventRes['title']);
+    $this->assertEquals($eventCopy['title'], 'Copy of ' . $eventRes['title']);
 
   }
 
@@ -135,10 +139,10 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
   protected function compareLocalizedCopy($source, $dest, $locParams, $identicalParams, $locSuffix) {
 
     foreach ($identicalParams as $name) {
-      $this->assertEquals($dest[$name], $source[$name]);
+      $this->assertEquals($dest[$name], $source[$name], "{$name} should be equals between source and copy");
     }
     foreach ($locParams as $name) {
-      $this->assertEquals($dest[$name], $source[$name] . $locSuffix);
+      $this->assertEquals($dest[$name], $source[$name] . $locSuffix, "copy of {$name} is not properly localized");
     }
 
   }
