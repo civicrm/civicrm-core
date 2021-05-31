@@ -961,6 +961,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->addYesNo('contribution_recurring', ts('Contribution is Recurring?'), TRUE);
 
     $form->addYesNo('contribution_test', ts('Contribution is a Test?'), TRUE);
+    $form->addYesNo('is_template', ts('Contribution is Template?'), TRUE);
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
@@ -1029,6 +1030,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->assign('validCiviContribute', TRUE);
     $form->setDefaults(['contribution_test' => 0]);
+    $form->setDefaults(['is_template' => 0]);
 
     CRM_Contribute_BAO_ContributionRecur::recurringContribution($form);
   }

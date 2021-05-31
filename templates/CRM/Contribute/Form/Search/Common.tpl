@@ -110,6 +110,12 @@
           {$form.contribution_recurring.html}
         </td>
       </tr>
+      <tr>
+        <td>{$form.is_template.label} {help id="is-template" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td>
+          {$form.is_template.html}
+        </td>
+      </tr>
       </tbody>
     </table>
   </td>

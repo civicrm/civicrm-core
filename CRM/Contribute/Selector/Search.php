@@ -53,6 +53,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     'contribution_cancel_date',
     'product_name',
     'is_test',
+    'is_template',
     'contribution_recur_id',
     'receipt_date',
     'membership_id',
