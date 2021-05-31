@@ -9,9 +9,9 @@
             <i class="crm-i fa-trash" aria-hidden="true"></i>
           </button>
         </div>
-        <fieldset class="api4-clause-fieldset">
-          <crm-search-clause clauses="join" format="json" skip="2 + getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" fields="fieldsForWhere" ></crm-search-clause>
-        </fieldset>
+        <div class="api4-clause-fieldset">
+          <crm-search-clause clauses="join" format="json" skip="2 + getJoin(join[0]).conditions.length" op="AND" label="{{:: ts('If') }}" hide-label="true" placeholder="ts('Add Condition')" fields="fieldsForJoin(join[0])" ></crm-search-clause>
+        </div>
       </fieldset>
       <fieldset>
         <div class="form-inline">
