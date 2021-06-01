@@ -2,7 +2,7 @@
 
 <tables xmlns:xi="http://www.w3.org/2001/XInclude">
 
-<xi:include href="RuleGroup.xml" parse="xml" />
-<xi:include href="Rule.xml"      parse="xml" />
-<xi:include href="Exception.xml" parse="xml" />
+<xi:include href="DedupeRuleGroup.xml" parse="xml" />
+<xi:include href="DedupeRule.xml"      parse="xml" />
+<xi:include href="DedupeException.xml" parse="xml" />
 </tables>

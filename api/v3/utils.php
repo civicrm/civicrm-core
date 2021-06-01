@@ -330,6 +330,18 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'SmsProvider') {
     return 'CRM_SMS_DAO_Provider';
   }
+  // Entity was renamed to CRM_Dedupe_DAO_DedupeRule for APIv4
+  if ($name === 'Rule') {
+    return 'CRM_Dedupe_DAO_DedupeRule';
+  }
+  // Entity was renamed to CRM_Dedupe_DAO_DedupeRuleGroup for APIv4
+  if ($name === 'RuleGroup') {
+    return 'CRM_Dedupe_DAO_DedupeRuleGroup';
+  }
+  // Entity was renamed to CRM_Dedupe_DAO_DedupeException for APIv4
+  if ($name === 'Exception') {
+    return 'CRM_Dedupe_DAO_DedupeException';
+  }
   // FIXME: DAO names should follow CamelCase convention
   if ($name === 'Im' || $name === 'Acl' || $name === 'Pcp') {
     $name = strtoupper($name);
