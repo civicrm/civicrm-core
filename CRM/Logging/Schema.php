@@ -272,26 +272,26 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   /**
    * Enable site-wide logging.
    */
-  public function enableLogging() {
-    $this->fixSchemaDifferences(TRUE);
+  public function enableLogging(): void {
+    $this->fixSchemaDifferencesForAll();
+    Civi::service('sql_triggers')->rebuild();
     $this->addReports();
   }
 
   /**
    * Sync log tables and rebuild triggers.
-   *
-   * @param bool $enableLogging : Ensure logging is enabled
    */
-  public function fixSchemaDifferences($enableLogging = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    if ($enableLogging) {
-      $config->logging = TRUE;
-    }
-    if ($config->logging) {
+  public function fixSchemaDifferences(): void {
+    if (Civi::settings()->get('logging')) {
       $this->fixSchemaDifferencesForAll();
     }
-    // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild(NULL, TRUE);
+    else {
+      // It is unclear if this is needed but it is done during
+      // the above fixSchemaDifferences call and might help
+      // if the static holds older schema info.
+      $this->resetTableColumnsCache();
+    }
+    Civi::service('sql_triggers')->rebuild();
   }
 
   /**
