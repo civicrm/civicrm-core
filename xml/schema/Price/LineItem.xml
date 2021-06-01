@@ -28,7 +28,10 @@
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
-    <comment>table which has the transaction</comment>
+    <pseudoconstant>
+      <callback>CRM_Price_BAO_LineItem::entityTables</callback>
+    </pseudoconstant>
+    <comment>May contain civicrm_contribution, civicrm_participant or civicrm_membership</comment>
     <add>1.7</add>
   </field>
   <field>
@@ -225,4 +228,3 @@
    </html>
   </field>
 </table>
-

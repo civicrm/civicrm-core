@@ -289,4 +289,16 @@ WHERE cc.id IN (' . implode(',', $contactIds) . ') AND con.is_test = 0';
     return civicrm_api3('FinancialItem', 'getsingle', $params);
   }
 
+  /**
+   * Whitelist of possible values for the entity_table field
+   *
+   * @return array
+   */
+  public static function entityTables(): array {
+    return [
+      'civicrm_line_item' => ts('Line Item'),
+      'civicrm_financial_trxn' => ts('Financial Trxn'),
+    ];
+  }
+
 }
