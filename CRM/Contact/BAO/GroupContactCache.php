@@ -628,89 +628,12 @@ ORDER BY   gc.contact_id, g.children
    * @throws \CiviCRM_API3_Exception
    */
   protected static function buildGroupContactTempTable(array $groupIDs, $tempTableObject): void {
-    $group = Group::get(FALSE)->addWhere('id', 'IN', $groupIDs)
-      ->setSelect(['saved_search_id', 'children'])->execute()->first();
-    $groupID = (int) $group['id'];
-
-    if ($group['saved_search_id']) {
-      $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($group['saved_search_id']);
-
-      $excludeClause = "NOT IN (
-                        SELECT contact_id FROM civicrm_group_contact
-                        WHERE civicrm_group_contact.status = 'Removed'
-                        AND civicrm_group_contact.group_id = $groupID )";
-      $addSelect = "$groupID AS group_id";
-
-      if (!empty($ssParams['api_entity'])) {
-        $sql = self::getApiSQL($ssParams, $addSelect, $excludeClause);
-      }
-      else {
-        // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
-        if (!empty($ssParams)) {
-          CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
-        }
-        if (isset($ssParams['customSearchID'])) {
-          $sql = self::getCustomSearchSQL($group['saved_search_id'], $ssParams, $addSelect, $excludeClause);
-        }
-        else {
-          $sql = self::getQueryObjectSQL($group['saved_search_id'], $ssParams, $addSelect, $excludeClause);
-        }
-      }
-    }
-
+    $groups = Group::get(FALSE)->addWhere('id', 'IN', $groupIDs)
+      ->setSelect(['saved_search_id', 'children', 'id'])->execute();
     $tempTableName = $tempTableObject->getName();
     $tempTableObject->createWithColumns('contact_id int, group_id int, UNIQUE UI_contact_group (contact_id,group_id)');
-
-    if (!empty($sql)) {
-      $contactQueries[] = $sql;
-    }
-    // lets also store the records that are explicitly added to the group
-    // this allows us to skip the group contact LEFT JOIN
-    $contactQueries[] =
-      "SELECT $groupID as group_id, contact_id as contact_id
-       FROM   civicrm_group_contact
-       WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
-
-    self::clearGroupContactCache($groupID);
-
-    foreach ($contactQueries as $contactQuery) {
-      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) {$contactQuery}");
-    }
-
-    CRM_Core_DAO::reenableFullGroupByMode();
-
-    if ($group['children']) {
-
-      // Store a list of contacts who are removed from the parent group
-      $sqlContactsRemovedFromGroup = "
-SELECT contact_id
-FROM civicrm_group_contact
-WHERE  civicrm_group_contact.status = 'Removed'
-AND  civicrm_group_contact.group_id = $groupID ";
-      $dao = CRM_Core_DAO::executeQuery($sqlContactsRemovedFromGroup);
-      $removed_contacts = [];
-      while ($dao->fetch()) {
-        $removed_contacts[] = $dao->contact_id;
-      }
-
-      $childrenIDs = explode(',', $group['children']);
-      foreach ($childrenIDs as $childID) {
-        $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
-        // Unset each contact that is removed from the parent group
-        foreach ($removed_contacts as $removed_contact) {
-          unset($contactIDs[$removed_contact]);
-        }
-        if (empty($contactIDs)) {
-          // This child group has no contact IDs so we don't need to add them to
-          continue;
-        }
-        $values = [];
-        foreach ($contactIDs as $contactID => $dontCare) {
-          $values[] = "({$groupID},{$contactID})";
-        }
-        $str = implode(',', $values);
-        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) VALUES $str");
-      }
+    foreach ($groups as $group) {
+      self::insertGroupContactsIntoTempTable($tempTableName, $group['id'], $group['saved_search_id'], $group['children']);
     }
   }
 
@@ -818,6 +741,102 @@ AND  civicrm_group_contact.group_id = $groupID ";
     $groupContactsTempTable->drop();
     foreach ($groupIDs as $groupID) {
       self::updateCacheTime([$groupID], TRUE);
+    }
+  }
+
+  /**
+   * Inserts all the contacts in the group into a temp table.
+   *
+   * This is the worker function for building the list of contacts in the
+   * group.
+   *
+   * @param string $tempTableName
+   * @param int $groupID
+   * @param int|null $savedSearchID
+   * @param string|null $children
+   *
+   * @return void
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?string $children): void {
+    if ($savedSearchID) {
+      $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
+
+      $excludeClause = "NOT IN (
+                        SELECT contact_id FROM civicrm_group_contact
+                        WHERE civicrm_group_contact.status = 'Removed'
+                        AND civicrm_group_contact.group_id = $groupID )";
+      $addSelect = "$groupID AS group_id";
+
+      if (!empty($ssParams['api_entity'])) {
+        $sql = self::getApiSQL($ssParams, $addSelect, $excludeClause);
+      }
+      else {
+        // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+        if (!empty($ssParams)) {
+          CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+        }
+        if (isset($ssParams['customSearchID'])) {
+          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
+        }
+        else {
+          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
+        }
+      }
+    }
+
+    if (!empty($sql)) {
+      $contactQueries[] = $sql;
+    }
+    // lets also store the records that are explicitly added to the group
+    // this allows us to skip the group contact LEFT JOIN
+    $contactQueries[] =
+      "SELECT $groupID as group_id, contact_id as contact_id
+       FROM   civicrm_group_contact
+       WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
+
+    self::clearGroupContactCache($groupID);
+
+    foreach ($contactQueries as $contactQuery) {
+      CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) {$contactQuery}");
+    }
+
+    CRM_Core_DAO::reenableFullGroupByMode();
+
+    if ($children) {
+
+      // Store a list of contacts who are removed from the parent group
+      $sqlContactsRemovedFromGroup = "
+SELECT contact_id
+FROM civicrm_group_contact
+WHERE  civicrm_group_contact.status = 'Removed'
+AND  civicrm_group_contact.group_id = $groupID ";
+      $dao = CRM_Core_DAO::executeQuery($sqlContactsRemovedFromGroup);
+      $removed_contacts = [];
+      while ($dao->fetch()) {
+        $removed_contacts[] = $dao->contact_id;
+      }
+
+      $childrenIDs = explode(',', $children);
+      foreach ($childrenIDs as $childID) {
+        $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
+        // Unset each contact that is removed from the parent group
+        foreach ($removed_contacts as $removed_contact) {
+          unset($contactIDs[$removed_contact]);
+        }
+        if (empty($contactIDs)) {
+          // This child group has no contact IDs so we don't need to add them to
+          continue;
+        }
+        $values = [];
+        foreach ($contactIDs as $contactID => $dontCare) {
+          $values[] = "({$groupID},{$contactID})";
+        }
+        $str = implode(',', $values);
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) VALUES $str");
+      }
     }
   }
 
