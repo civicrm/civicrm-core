@@ -64,10 +64,16 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if ($entity['name'] === 'Contact') {
-      // Add contact tasks which support standalone mode (with a 'url' property)
-      $contactTasks = \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission());
+      // Add contact tasks which support standalone mode
+      $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;
       foreach (\CRM_Contact_Task::tasks() as $id => $task) {
-        if (isset($contactTasks[$id]) && !empty($task['url']) && $task['url'] !== 'civicrm/task/delete-contact') {
+        if (
+          (!$this->checkPermissions || isset($contactTasks[$id])) &&
+          // Must support standalone mode (with a 'url' property)
+          !empty($task['url']) &&
+          // The delete task is redundant with the new api-based one
+          $task['url'] !== 'civicrm/task/delete-contact'
+        ) {
           if ($task['url'] === 'civicrm/task/pick-profile') {
             $task['title'] = E::ts('Profile Update');
           }
@@ -84,6 +90,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if ($entity['name'] === 'Contribution') {
+      // FIXME: tasks() function always checks permissions, should respect `$this->checkPermissions`
       foreach (\CRM_Contribute_Task::tasks() as $id => $task) {
         if (!empty($task['url'])) {
           $tasks[$entity['name']]['contribution.' . $id] = [
@@ -98,9 +105,19 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       }
     }
 
+    // Call `hook_civicrm_searchKitTasks`.
+    // Note - this hook serves 2 purposes, both to augment this list of tasks AND to
+    // get a full list of Angular modules which provide tasks. That's why this hook needs
+    // the base-level array and not just the array of tasks for `$this->entity`.
+    // Although it may seem wasteful to have extensions add tasks for all possible entities and then
+    // discard most of it (all but the ones relevant to `$this->entity`), it's necessary to do it this way
+    // so that they can be declared as angular dependencies - see search_kit_civicrm_angularModules().
     $null = NULL;
-    \CRM_Utils_Hook::singleton()->invoke(['tasks'], $tasks,
-      $null, $null, $null, $null, $null, 'civicrm_searchKitTasks'
+    $checkPermissions = $this->checkPermissions;
+    $userId = $this->checkPermissions ? \CRM_Core_Session::getLoggedInContactID() : NULL;
+    \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId'],
+      $tasks, $checkPermissions, $userId,
+      $null, $null, $null, 'civicrm_searchKitTasks'
     );
 
     usort($tasks[$entity['name']], function($a, $b) {

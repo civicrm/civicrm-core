@@ -45,11 +45,13 @@ function search_kit_civicrm_managed(&$entities) {
  */
 function search_kit_civicrm_angularModules(&$angularModules) {
   _search_kit_civix_civicrm_angularModules($angularModules);
-  // Fetch all search tasks provided by other modules and add them as crmSearchTasks dependencies
-  $tasks = $dependencies = [];
+  // Fetch all search tasks provided by extensions and add their Angular modules as crmSearchTasks dependencies
+  $tasks = [];
   $null = NULL;
-  CRM_Utils_Hook::singleton()->invoke(['tasks'], $tasks,
-    $null, $null, $null, $null, $null, 'civicrm_searchKitTasks'
+  $checkPermissions = FALSE;
+  \CRM_Utils_Hook::singleton()->invoke(['tasks', 'checkPermissions', 'userId'],
+    $tasks, $checkPermissions, $null,
+    $null, $null, $null, 'civicrm_searchKitTasks'
   );
   foreach ($tasks as $entityTasks) {
     foreach ($entityTasks as $task) {
