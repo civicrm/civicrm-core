@@ -99,18 +99,15 @@ AND (
    *
    * @param int $groupID
    *   The group ID.
-   * @param bool $includeHiddenGroups
-   *   Hidden groups are excluded by default.
    *
-   * @return string
-   *   the sql query which lists the groups that need to be refreshed
+   * @return bool
    */
-  public static function shouldGroupBeRefreshed($groupID, $includeHiddenGroups = FALSE) {
-    $query = self::groupRefreshedClause("g.id = %1", $includeHiddenGroups);
+  public static function shouldGroupBeRefreshed($groupID): bool {
+    $query = self::groupRefreshedClause('g.id = %1');
     $params = [1 => [$groupID, 'Integer']];
 
     // if the query returns the group ID, it means the group is a valid candidate for refreshing
-    return CRM_Core_DAO::singleValueQuery($query, $params);
+    return (bool) CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
   /**
