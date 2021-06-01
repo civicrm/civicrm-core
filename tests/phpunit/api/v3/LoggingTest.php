@@ -29,6 +29,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Clean up log tables.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);
@@ -41,8 +45,10 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Test that logging is successfully enabled and disabled.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testEnableDisableLogging() {
+  public function testEnableDisableLogging(): void {
     $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
 
@@ -150,16 +156,20 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
   /**
    * Check that if a field is added then the trigger is updated on refresh.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testRebuildTriggerAfterSchemaChange() {
+  public function testRebuildTriggerAfterSchemaChange(): void {
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $tables = ['civicrm_acl', 'civicrm_website'];
     foreach ($tables as $table) {
       CRM_Core_DAO::executeQuery("ALTER TABLE $table ADD column temp_col INT(10)");
     }
+    unset(\Civi::$statics['CRM_Logging_Schema']);
 
     $schema = new CRM_Logging_Schema();
-    $schema->fixSchemaDifferencesForAll(TRUE);
+    $schema->fixSchemaDifferencesForAll();
+    Civi::service('sql_triggers')->rebuild();
 
     foreach ($tables as $table) {
       $this->assertTrue($this->checkColumnExistsInTable('log_' . $table, 'temp_col'), 'log_' . $table . ' has temp_col');
@@ -168,8 +178,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         $this->assertStringContainsString('temp_col', $dao->Statement);
       }
     }
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP column temp_col");
-    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP column temp_col");
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_acl DROP column temp_col');
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_website DROP column temp_col');
   }
 
   /**
