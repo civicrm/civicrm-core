@@ -86,6 +86,10 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Class name for dao-based entities',
         ],
         [
+          'name' => 'id_field',
+          'description' => 'Name of unique identifier field (e.g. "id")',
+        ],
+        [
           'name' => 'label_field',
           'description' => 'Field to show when displaying a record',
         ],
