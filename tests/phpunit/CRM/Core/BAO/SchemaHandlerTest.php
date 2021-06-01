@@ -336,13 +336,12 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
   /**
    * Test that columns are dropped
    */
-  public function testDropColumn() {
+  public function testDropColumn(): void {
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS `civicrm_test_drop_column`');
     CRM_Core_DAO::executeQuery('CREATE TABLE `civicrm_test_drop_column` (`id` int(10), `col1` varchar(255), `col2` varchar(255))');
 
     // test with logging enabled to ensure log triggers don't break anything
-    $schema = new CRM_Logging_Schema();
-    $schema->enableLogging();
+    Civi::settings()->set('logging', TRUE);
 
     $alterParams = [
       'table_name' => 'civicrm_test_drop_column',
