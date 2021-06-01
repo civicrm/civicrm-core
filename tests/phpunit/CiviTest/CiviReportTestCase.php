@@ -29,7 +29,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
    * @param array $inputParams
    *
    * @return string
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public function getReportOutputAsCsv($reportClass, $inputParams) {
 
@@ -46,9 +46,9 @@ class CiviReportTestCase extends CiviUnitTestCase {
    * @param array $inputParams
    *
    * @return CRM_Report_Form
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
-  public function getReportObject($reportClass, $inputParams) {
+  public function getReportObject(string $reportClass, array $inputParams): CRM_Report_Form {
     $config = CRM_Core_Config::singleton();
     $config->keyDisable = TRUE;
     $controller = new CRM_Core_Controller_Simple($reportClass, ts('some title'));
@@ -81,7 +81,7 @@ class CiviReportTestCase extends CiviUnitTestCase {
       $reportObj->storeResultSet();
       $reportObj->buildForm();
     }
-    catch (Exception $e) {
+    catch (CRM_Core_Exception $e) {
       // print_r($e->getCause()->getUserInfo());
       CRM_Utils_GlobalStack::singleton()->pop();
       throw $e;
@@ -121,10 +121,8 @@ class CiviReportTestCase extends CiviUnitTestCase {
       . "\n===== ACTUAL DATA ====\n"
       . $this->flattenCsvArray($actualCsvArray);
 
-    $this->assertEquals(
-      count($actualCsvArray),
-      count($expectedCsvArray),
-      'Arrays have different number of rows; in line ' . __LINE__ . '; data: ' . $flatData
+    $this->assertCount(
+      count($actualCsvArray), $expectedCsvArray, 'Arrays have different number of rows; data: ' . $flatData
     );
 
     foreach ($actualCsvArray as $intKey => $strVal) {
