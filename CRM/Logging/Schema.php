@@ -213,15 +213,8 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   /**
    * Disable logging by dropping the triggers (but keep the log tables intact).
    */
-  public function disableLogging() {
-    $config = CRM_Core_Config::singleton();
-    $config->logging = FALSE;
-
-    $this->dropTriggers();
-
-    // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild();
-
+  public function disableLogging(): void {
+    Civi::service('sql_triggers')->rebuild();
     $this->deleteReports();
   }
 
@@ -920,7 +913,7 @@ COLS;
    * @param bool $force
    */
   public function triggerInfo(&$info, $tableName = NULL, $force = FALSE) {
-    if (!CRM_Core_Config::singleton()->logging) {
+    if (!Civi::settings()->get('logging')) {
       return;
     }
 
