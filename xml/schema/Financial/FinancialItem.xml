@@ -139,7 +139,10 @@
     <type>varchar</type>
     <title>Entity Table</title>
     <length>64</length>
-    <comment>The table providing the source of this item such as civicrm_line_item</comment>
+    <pseudoconstant>
+      <callback>CRM_Financial_BAO_FinancialItem::entityTables</callback>
+    </pseudoconstant>
+    <comment>May contain civicrm_line_item, civicrm_financial_trxn etc</comment>
     <add>4.3</add>
   </field>
   <field>
