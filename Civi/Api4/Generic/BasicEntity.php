@@ -132,8 +132,17 @@ abstract class BasicEntity extends AbstractEntity {
    * @return BasicReplaceAction
    */
   public static function replace($checkPermissions = TRUE) {
-    return (new BasicReplaceAction(static::getEntityName(), __FUNCTION__))
+    return (new BasicReplaceAction(static::getEntityName(), __FUNCTION__, static::$idField))
       ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['id_field'] = static::$idField;
+    return $info;
   }
 
 }

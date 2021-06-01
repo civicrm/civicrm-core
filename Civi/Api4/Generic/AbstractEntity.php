@@ -139,6 +139,7 @@ abstract class AbstractEntity {
       'type' => [self::stripNamespace(get_parent_class(static::class))],
       'paths' => static::getEntityPaths(),
       'class' => static::class,
+      'id_field' => 'id',
     ];
     // Add info for entities with a corresponding DAO
     $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);

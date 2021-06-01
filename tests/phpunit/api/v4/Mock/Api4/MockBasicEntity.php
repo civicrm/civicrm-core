@@ -28,6 +28,8 @@ use api\v4\Mock\MockEntityDataStorage;
  */
 class MockBasicEntity extends Generic\BasicEntity {
 
+  protected static $idField = 'identifier';
+
   protected static $getter = [MockEntityDataStorage::CLASS, 'get'];
   protected static $setter = [MockEntityDataStorage::CLASS, 'write'];
   protected static $deleter = [MockEntityDataStorage::CLASS, 'delete'];
@@ -39,7 +41,7 @@ class MockBasicEntity extends Generic\BasicEntity {
     return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
       return [
         [
-          'name' => 'id',
+          'name' => 'identifier',
           'data_type' => 'Integer',
         ],
         [
@@ -94,9 +96,9 @@ class MockBasicEntity extends Generic\BasicEntity {
    * @return Generic\BasicBatchAction
    */
   public static function batchFrobnicate($checkPermissions = TRUE) {
-    return (new Generic\BasicBatchAction(__CLASS__, __FUNCTION__, ['id', 'number'], function($item) {
+    return (new Generic\BasicBatchAction(__CLASS__, __FUNCTION__, ['identifier', 'number'], function($item) {
       return [
-        'id' => $item['id'],
+        'identifier' => $item['identifier'],
         'frobnication' => $item['number'] * $item['number'],
       ];
     }))->setCheckPermissions($checkPermissions);
