@@ -230,7 +230,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *
    * @param string $tableName
    */
-  public function dropTriggers($tableName = NULL) {
+  public function dropTriggers($tableName = NULL): void {
     /** @var \Civi\Core\SqlTriggers $sqlTriggers */
     $sqlTriggers = Civi::service('sql_triggers');
     $dao = new CRM_Core_DAO();
@@ -244,7 +244,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
 
     // Sort the table names so the sql output is consistent for those sites
     // loading it asynchronously (using the setting 'logging_no_trigger_permission')
-    asort($tableNames);
+    ksort($tableNames);
     foreach ($tableNames as $table) {
       $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
 

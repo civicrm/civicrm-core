@@ -37,6 +37,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   protected function tearDown(): void {
     $this->quickCleanup(['civicrm_email', 'civicrm_address']);
     parent::tearDown();
+    Civi::settings()->set('logging_no_trigger_permission', FALSE);
     $this->callAPISuccess('Setting', 'create', ['logging' => FALSE]);
     $schema = new CRM_Logging_Schema();
     $schema->dropAllLogTables();
@@ -490,6 +491,43 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_acl DROP Column temp_col");
       CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_website DROP Column temp_col");
     }
+  }
+
+  /**
+   * Test the output under logging_no_trigger_permission.
+   *
+   * The logging_no_trigger_permission setting causes the trigger sql
+   * to be output to a file rather than run. It is for situations
+   * where the db user does not have adequate permissions (Super permission
+   * is required when replication is enabled.
+   *
+   * This tests the output of that file.
+   */
+  public function testTriggerOutput(): void {
+    Civi::settings()->set('logging_no_trigger_permission', TRUE);
+    Civi::settings()->set('logging', TRUE);
+    /* @var \Civi\Core\SqlTriggers $sqlTriggers */
+    $sqlTriggers = Civi::service('sql_triggers');
+    $fileName = $sqlTriggers->getFile();
+    $triggerOutPut = file_get_contents($fileName);
+    $this->assertStringStartsWith('DELIMITER //
+DROP FUNCTION', $triggerOutPut);
+    $this->assertStringContainsString('DROP TRIGGER IF EXISTS civicrm_activity_before_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_before_update //
+DROP TRIGGER IF EXISTS civicrm_activity_before_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_after_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_after_update //
+DROP TRIGGER IF EXISTS civicrm_activity_after_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_update //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_before_delete //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_insert //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_update //
+DROP TRIGGER IF EXISTS civicrm_activity_contact_after_delete //', $triggerOutPut);
+
+    $this->assertStringEndsWith('END //
+DELIMITER ;
+', $triggerOutPut);
   }
 
 }
