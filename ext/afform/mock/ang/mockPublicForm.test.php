@@ -13,7 +13,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertContentType('text/html', $r);
     $this->assertStatusCode(200, $r);
     $body = (string) $r->getBody();
-    $this->assertContains('mockPublicForm', $body);
+    $this->assertStringContainsString('mockPublicForm', $body);
   }
 
   public function testPublicCreateAllowed() {
