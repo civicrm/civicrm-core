@@ -64,6 +64,7 @@ class Entity extends Generic\AbstractEntity {
           'options' => [
             'AbstractEntity' => 'AbstractEntity',
             'DAOEntity' => 'DAOEntity',
+            'CustomValue' => 'CustomValue',
             'BasicEntity' => 'BasicEntity',
             'EntityBridge' => 'EntityBridge',
             'OptionList' => 'OptionList',

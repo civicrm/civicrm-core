@@ -284,7 +284,7 @@
         specialParams.push('limit', 'offset');
       }
       return _.transform($scope.availableParams, function(genericParams, param, name) {
-        if (!_.contains(specialParams, name) &&
+        if (!_.contains(specialParams, name) && !param.deprecated &&
           !(typeof paramType !== 'undefined' && !_.contains(paramType, param.type[0])) &&
           !(typeof defaultNull !== 'undefined' && ((param.default === null) !== defaultNull))
         ) {
