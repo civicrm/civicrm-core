@@ -86,15 +86,15 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertEquals("[CiviMail Draft] Hello $displayName",
       $previewResult['values']['subject']);
 
-    $this->assertContains("This is $displayName", $previewResult['values']['body_text']);
-    $this->assertContains("civicrm/mailing/optout", $previewResult['values']['body_text']);
-    $this->assertContains("&jid=&qid=&h=fakehash", $previewResult['values']['body_text']);
-    $this->assertContains("subj=(Hello ", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("civicrm/mailing/optout", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("&jid=&qid=&h=fakehash", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_text']);
 
-    $this->assertContains("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertContains("civicrm/mailing/optout", $previewResult['values']['body_html']);
-    $this->assertContains("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
-    $this->assertContains("subj=(Hello ", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("civicrm/mailing/optout", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_html']);
 
     $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
   }
@@ -115,15 +115,15 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertEquals("[CiviMail Draft] Hello $displayName",
       $previewResult['values']['subject']);
 
-    $this->assertContains("This is $displayName", $previewResult['values']['body_text']);
-    $this->assertContains("civicrm/mailing/optout", $previewResult['values']['body_text']);
-    $this->assertContains("&jid=&qid=&h=fakehash", $previewResult['values']['body_text']);
-    $this->assertContains("subj=(Hello ", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("civicrm/mailing/optout", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("&jid=&qid=&h=fakehash", $previewResult['values']['body_text']);
+    $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_text']);
 
-    $this->assertContains("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertContains("civicrm/mailing/optout", $previewResult['values']['body_html']);
-    $this->assertContains("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
-    $this->assertContains("subj=(Hello ", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("civicrm/mailing/optout", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
+    $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_html']);
 
     $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
   }
