@@ -26,7 +26,7 @@ class Drupal8 implements AuthxInterface {
    * @inheritDoc
    */
   public function loginSession($userId) {
-    $user = user_load($userId);
+    $user = \Drupal\user\Entity\User::load($userId);
     user_login_finalize($user);
   }
 
@@ -41,7 +41,7 @@ class Drupal8 implements AuthxInterface {
    * @inheritDoc
    */
   public function loginStateless($userId) {
-    $user = user_load($userId);
+    $user = \Drupal\user\Entity\User::load($userId);
     // In theory, we could use either account_switcher->switchTo() or current_user->setAccount().
     // switchTo() sounds more conscientious, but setAccount() might be a more accurate rendition
     // of "stateless login". At time of writing, there doesn't seem to be a compelling difference.
