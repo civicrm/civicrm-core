@@ -111,7 +111,8 @@ class BasicGetFieldsAction extends BasicGetAction {
    * @param array $values
    */
   protected function formatResults(&$values) {
-    $fields = array_column($this->fields(), 'name');
+    $fieldDefaults = array_column($this->fields(), 'default_value', 'name') +
+      array_fill_keys(array_column($this->fields(), 'name'), NULL);
     // Enforce field permissions
     if ($this->checkPermissions) {
       foreach ($values as $key => $field) {
@@ -124,17 +125,15 @@ class BasicGetFieldsAction extends BasicGetAction {
       $defaults = array_intersect_key([
         'title' => empty($field['name']) ? NULL : ucwords(str_replace('_', ' ', $field['name'])),
         'entity' => $this->getEntityName(),
-        'required' => FALSE,
-        'readonly' => FALSE,
         'options' => !empty($field['pseudoconstant']),
-        'data_type' => \CRM_Utils_Array::value('type', $field, 'String'),
-      ], array_flip($fields));
-      $field += $defaults;
-      $field['label'] = $field['label'] ?? $field['title'];
+      ], $fieldDefaults);
+      $field += $defaults + $fieldDefaults;
+      if (array_key_exists('label', $fieldDefaults)) {
+        $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
+      }
       if (isset($defaults['options'])) {
         $field['options'] = $this->formatOptionList($field['options']);
       }
-      $field += array_fill_keys($fields, NULL);
     }
   }
 
@@ -261,6 +260,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'required',
         'data_type' => 'Boolean',
+        'default_value' => FALSE,
       ],
       [
         'name' => 'required_if',
@@ -269,10 +269,11 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'options',
         'data_type' => 'Array',
+        'default_value' => FALSE,
       ],
       [
         'name' => 'data_type',
-        'data_type' => 'String',
+        'default_value' => 'String',
         'options' => [
           'Array' => ts('Array'),
           'Boolean' => ts('Boolean'),
@@ -319,6 +320,7 @@ class BasicGetFieldsAction extends BasicGetAction {
         'name' => 'readonly',
         'data_type' => 'Boolean',
         'description' => 'True for auto-increment, calculated, or otherwise non-editable fields.',
+        'default_value' => FALSE,
       ],
       [
         'name' => 'output_formatters',
