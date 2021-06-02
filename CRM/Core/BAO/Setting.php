@@ -96,7 +96,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @return array
    */
-  public static function getItems(&$params, $domains = NULL, $settingsToReturn) {
+  public static function getItems(&$params, $domains, $settingsToReturn) {
     $originalDomain = CRM_Core_Config::domainID();
     if (empty($domains)) {
       $domains[] = $originalDomain;

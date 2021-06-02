@@ -271,8 +271,8 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    *   Result set
    */
   public static function &getRows(
-    $mailing_id, $job_id = NULL,
-    $is_distinct = FALSE, $url_id,
+    $mailing_id, $job_id,
+    $is_distinct, $url_id,
     $offset = NULL, $rowCount = NULL, $sort = NULL, $contact_id = NULL
   ) {
 

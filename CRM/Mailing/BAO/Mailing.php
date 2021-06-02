@@ -1327,7 +1327,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *
    * @return bool|mixed|null|string
    */
-  private function getTokenData(&$token_a, $html = FALSE, &$contact, &$verp, &$urls, $event_queue_id) {
+  private function getTokenData(&$token_a, $html, &$contact, &$verp, &$urls, $event_queue_id) {
     $type = $token_a['type'];
     $token = $token_a['token'];
     $data = $token;

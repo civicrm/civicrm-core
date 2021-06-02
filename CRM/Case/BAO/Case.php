@@ -400,7 +400,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    *
    * @return string
    */
-  public static function getCaseActivityCountQuery($type = 'upcoming', $userID, $condition = NULL) {
+  public static function getCaseActivityCountQuery($type, $userID, $condition = NULL) {
     return sprintf(" SELECT COUNT(*) FROM (%s) temp ", self::getCaseActivityQuery($type, $userID, $condition));
   }
 
@@ -413,7 +413,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    *
    * @return string
    */
-  public static function getCaseActivityQuery($type = 'upcoming', $userID, $condition = NULL, $limit = NULL, $order = NULL) {
+  public static function getCaseActivityQuery($type, $userID, $condition = NULL, $limit = NULL, $order = NULL) {
     $selectClauses = [
       'civicrm_case.id as case_id',
       'civicrm_case.subject as case_subject',
@@ -1258,7 +1258,7 @@ HERESQL;
    *
    * @return bool |array
    */
-  public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments = NULL, $caseId) {
+  public static function sendActivityCopy($clientId, $activityId, $contacts, $attachments, $caseId) {
     if (!$activityId) {
       return FALSE;
     }
