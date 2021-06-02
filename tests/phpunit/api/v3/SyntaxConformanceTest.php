@@ -861,7 +861,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
 
     $entitiesWithNamingIssues = [
       'SmsProvider' => 'Provider',
-      'AclRole' => 'EntityRole',
+      'AclRole' => 'ACLEntityRole',
       'MailingEventQueue' => 'Queue',
       'Dedupe' => 'PrevNextCache',
       'Exception' => 'DedupeException',

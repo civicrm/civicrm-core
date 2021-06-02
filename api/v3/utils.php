@@ -320,9 +320,8 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'MailingRecipients') {
     return 'CRM_Mailing_DAO_Recipients';
   }
-  // FIXME: DAO should be renamed CRM_ACL_DAO_AclRole
   if ($name === 'AclRole') {
-    return 'CRM_ACL_DAO_EntityRole';
+    return 'CRM_ACL_DAO_ACLEntityRole';
   }
   // FIXME: DAO should be renamed CRM_SMS_DAO_SmsProvider
   // But this would impact SMS extensions so need to coordinate

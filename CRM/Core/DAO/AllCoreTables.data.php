@@ -87,9 +87,9 @@ return [
     'class' => 'CRM_ACL_DAO_ACLCache',
     'table' => 'civicrm_acl_cache',
   ],
-  'CRM_ACL_DAO_EntityRole' => [
-    'name' => 'EntityRole',
-    'class' => 'CRM_ACL_DAO_EntityRole',
+  'CRM_ACL_DAO_ACLEntityRole' => [
+    'name' => 'ACLEntityRole',
+    'class' => 'CRM_ACL_DAO_ACLEntityRole',
     'table' => 'civicrm_acl_entity_role',
   ],
   'CRM_Contact_DAO_Contact' => [

@@ -2,7 +2,7 @@
 
 <table>
   <base>CRM/ACL</base>
-  <class>EntityRole</class>
+  <class>ACLEntityRole</class>
   <name>civicrm_acl_entity_role</name>
   <comment>Join table for Contacts and Groups to ACL Roles</comment>
   <add>1.6</add>
@@ -35,6 +35,9 @@
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
+    <pseudoconstant>
+      <callback>CRM_ACL_BAO_ACLEntityRole::entityTables</callback>
+    </pseudoconstant>
     <comment>Table of the object joined to the ACL Role (Contact or Group)</comment>
     <add>1.6</add>
   </field>

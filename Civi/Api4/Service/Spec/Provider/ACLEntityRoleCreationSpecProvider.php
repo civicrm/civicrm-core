@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -15,7 +16,25 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-/**
- *  Access Control EntityRole.
- */
-class CRM_ACL_BAO_EntityRole extends CRM_ACL_BAO_ACLEntityRole {}
+
+namespace Civi\Api4\Service\Spec\Provider;
+
+use Civi\Api4\Service\Spec\RequestSpec;
+
+class ACLEntityRoleCreationSpecProvider implements Generic\SpecProviderInterface {
+
+  /**
+   * @inheritDoc
+   */
+  public function modifySpec(RequestSpec $spec) {
+    $spec->getFieldByName('is_active')->setDefaultValue(1);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function applies($entity, $action) {
+    return $entity === 'ACLEntityRole' && $action === 'create';
+  }
+
+}
