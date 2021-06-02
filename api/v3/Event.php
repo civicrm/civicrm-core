@@ -262,3 +262,15 @@ function _civicrm_api3_event_getlist_output($result, $request) {
   }
   return $output;
 }
+
+/**
+ * Add missing timezones to all events.
+ *
+ * @return array
+ */
+function civicrm_api3_event_addmissingtimezones($params) {
+  $defaultTZ = CRM_Core_Config::singleton()->userSystem->getTimeZoneString();
+
+  CRM_Core_DAO::executeQuery('UPDATE civicrm_event SET event_tz = %1 WHERE event_tz IS NULL OR event_tz = ""', [1 => [$defaultTZ, 'String']]);
+  return civicrm_api3_create_success($events, $params, 'Event', 'addMissingTimezones');
+}
