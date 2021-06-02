@@ -13,6 +13,7 @@
   <field>
     <add>5.39</add>
     <name>id</name>
+    <title>Translated String ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Unique String ID</comment>
@@ -25,6 +26,7 @@
   <field>
     <add>5.39</add>
     <name>entity_table</name>
+    <title>Translated Entity</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -37,6 +39,7 @@
   <field>
     <add>5.39</add>
     <name>entity_field</name>
+    <title>Translated Field</title>
     <type>varchar</type>
     <length>64</length>
     <required>true</required>
@@ -49,6 +52,7 @@
   <field>
     <add>5.39</add>
     <name>entity_id</name>
+    <title>Translated Entity ID</title>
     <type>int</type>
     <length>64</length>
     <required>true</required>
@@ -58,6 +62,7 @@
   <field>
     <add>5.39</add>
     <name>language</name>
+    <title>Language</title>
     <type>varchar</type>
     <length>5</length>
     <required>true</required>
@@ -76,6 +81,7 @@
     <add>5.39</add>
     <name>status_id</name>
     <type>tinyint</type>
+    <title>Status</title>
     <length>3</length>
     <default>1</default>
     <required>true</required>
@@ -87,6 +93,7 @@
 
   <field>
     <add>5.39</add>
+    <title>Translated String</title>
     <name>string</name>
     <type>longtext</type>
     <required>true</required>
