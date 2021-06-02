@@ -241,7 +241,7 @@ class CRM_Core_Resources_Common {
     if (
       $contactID && !CRM_Core_Config::singleton()->userFrameworkFrontend
       && CRM_Core_Permission::check('access CiviCRM')
-      && !@constant('CIVICRM_DISABLE_DEFAULT_MENU')
+      && !CRM_Utils_Constant::value('CIVICRM_DISABLE_DEFAULT_MENU')
       && !CRM_Core_Config::isUpgradeMode()
     ) {
       $position = $settings->get('menubar_position') ?: 'over-cms-menu';
