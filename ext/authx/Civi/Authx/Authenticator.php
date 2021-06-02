@@ -158,7 +158,7 @@ class Authenticator {
 
       // If any one of these passes, then we allow the authentication.
       $passGuard = [];
-      $passGuard[] = in_array('site_key', $useGuards) && defined('CIVICRM_SITE_KEY') && hash_equals(CIVICRM_SITE_KEY, $tgt->siteKey);
+      $passGuard[] = in_array('site_key', $useGuards) && defined('CIVICRM_SITE_KEY') && hash_equals(CIVICRM_SITE_KEY, (string) $tgt->siteKey);
       $passGuard[] = in_array('perm', $useGuards) && isset($perms[$tgt->credType]) && \CRM_Core_Permission::check($perms[$tgt->credType], $tgt->contactId);
       // JWTs are signed by us. We don't need user to prove that they're allowed to use them.
       $passGuard[] = ($tgt->credType === 'jwt');
