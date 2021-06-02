@@ -48,6 +48,7 @@ class CoreUtilTest extends UnitTestCase {
       ->execute()->first();
 
     $this->assertEquals('Custom_' . $multiGroup['name'], CoreUtil::getApiNameFromTableName($multiGroup['table_name']));
+    $this->assertEquals($multiGroup['table_name'], CoreUtil::getTableName('Custom_' . $multiGroup['name']));
   }
 
   public function testGetApiClass() {

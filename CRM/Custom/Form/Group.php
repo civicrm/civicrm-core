@@ -318,7 +318,7 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     // $min_multiple = $this->add('text', 'min_multiple', ts('Minimum number of multiple records'), $attributes['min_multiple'] );
     // $this->addRule('min_multiple', ts('is a numeric field') , 'numeric');
 
-    $max_multiple = $this->add('text', 'max_multiple', ts('Maximum number of multiple records'), $attributes['max_multiple']);
+    $max_multiple = $this->add('number', 'max_multiple', ts('Maximum number of multiple records'), $attributes['max_multiple']);
     $this->addRule('max_multiple', ts('is a numeric field'), 'numeric');
 
     //allow to edit settings if custom set is empty CRM-5258

@@ -5,13 +5,7 @@
  *
  * @group headless
  */
-class api_v4_AfformUsageTest extends api_v4_AfformTestCase {
-  use \Civi\Test\Api3TestTrait;
-  use \Civi\Test\ContactTestTrait;
-
-  protected static $layouts = [];
-
-  protected $formName;
+class api_v4_AfformContactUsageTest extends api_v4_AfformUsageTestCase {
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -61,21 +55,6 @@ EOHTML;
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
 </af-form>
 EOHTML;
-  }
-
-  public function setUp(): void {
-    parent::setUp();
-    Civi\Api4\Afform::revert(FALSE)
-      ->addWhere('type', '=', 'block')
-      ->execute();
-    $this->formName = 'mock' . rand(0, 100000);
-  }
-
-  public function tearDown(): void {
-    Civi\Api4\Afform::revert(FALSE)
-      ->addWhere('name', '=', $this->formName)
-      ->execute();
-    parent::tearDown();
   }
 
   public function testAboutMeAllowed(): void {
@@ -310,18 +289,6 @@ EOHTML;
       ->addSelect('display_name', 'org.display_name')
       ->execute()->first();
     $this->assertEquals($orgEmail, $contact['org.display_name']);
-  }
-
-  protected function useValues($values) {
-    $defaults = [
-      'title' => 'My form',
-      'name' => $this->formName,
-    ];
-    $full = array_merge($defaults, $values);
-    Civi\Api4\Afform::create(FALSE)
-      ->setLayoutFormat('html')
-      ->setValues($full)
-      ->execute();
   }
 
 }
