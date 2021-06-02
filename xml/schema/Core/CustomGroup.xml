@@ -147,6 +147,7 @@
     <html>
       <label>Table Name</label>
     </html>
+    <readonly>true</readonly>
     <add>2.0</add>
   </field>
   <field>
