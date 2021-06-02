@@ -299,7 +299,7 @@ WHERE  email = %2
    * @param int $job
    *   The job ID.
    */
-  public static function send_unsub_response($queue_id, $groups, $is_domain = FALSE, $job) {
+  public static function send_unsub_response($queue_id, $groups, $is_domain, $job) {
     $config = CRM_Core_Config::singleton();
     $domain = CRM_Core_BAO_Domain::getDomain();
     $jobObject = new CRM_Mailing_BAO_MailingJob();

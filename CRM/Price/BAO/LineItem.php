@@ -424,7 +424,7 @@ WHERE li.contribution_id = %1";
    * @param $amount
    * @param array $otherParams
    */
-  public static function syncLineItems($entityId, $entityTable = 'civicrm_contribution', $amount, $otherParams = NULL) {
+  public static function syncLineItems($entityId, $entityTable, $amount, $otherParams = NULL) {
     if (!$entityId || CRM_Utils_System::isNull($amount)) {
       return;
     }
