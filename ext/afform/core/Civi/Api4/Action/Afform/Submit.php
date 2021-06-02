@@ -28,6 +28,16 @@ class Submit extends AbstractProcessor {
       foreach ($this->values[$entityName] ?? [] as $values) {
         // Only accept values from fields on the form
         $values['fields'] = array_intersect_key($values['fields'] ?? [], $entity['fields']);
+        // Only accept joins set on the form
+        $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins']);
+        foreach ($values['joins'] as $joinEntity => &$joinValues) {
+          // Enforce the limit set by join[max]
+          $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
+          // Only accept values from join fields on the form
+          foreach ($joinValues as $index => $vals) {
+            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields']);
+          }
+        }
         $entityValues[$entityName][] = $values;
       }
       // Predetermined values override submitted values
