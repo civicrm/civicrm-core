@@ -10,15 +10,12 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
    */
   public $cart;
 
-  public $_action;
   public $contact;
   public $event_cart_id = NULL;
-  public $_mode;
   public $participants;
 
   public function preProcess() {
     $this->_action = CRM_Utils_Request::retrieveValue('action', 'String');
-    $this->_mode = 'live';
     $this->loadCart();
 
     $this->checkWaitingList();
@@ -49,16 +46,10 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
   public function stub_out_and_inherit() {
     $transaction = new CRM_Core_Transaction();
 
+    /** @var CRM_Event_Cart_BAO_EventInCart $event_in_cart */
     foreach ($this->cart->get_main_events_in_carts() as $event_in_cart) {
       if (empty($event_in_cart->participants)) {
-        $participant_params = [
-          'cart_id' => $this->cart->id,
-          'event_id' => $event_in_cart->event_id,
-          'contact_id' => self::find_or_create_contact(),
-        ];
-        $participant = CRM_Event_Cart_BAO_MerParticipant::create($participant_params);
-        $participant->save();
-        $event_in_cart->add_participant($participant);
+        $event_in_cart->load_associations();
       }
       $event_in_cart->save();
     }
@@ -94,28 +85,6 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     else {
       return NULL;
     }
-  }
-
-  /**
-   * @return int
-   * @throws \CRM_Core_Exception
-   */
-  public function getContactID() {
-    $tempID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
-
-    //check if this is a checksum authentication
-    $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
-    if ($userChecksum) {
-      //check for anonymous user.
-      $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($tempID, $userChecksum);
-      if ($validUser) {
-        return $tempID;
-      }
-    }
-
-    // check if the user is registered and we have a contact ID
-    $session = CRM_Core_Session::singleton();
-    return $session->get('userID');
   }
 
   /**

@@ -2,7 +2,7 @@
 
 require_once 'eventcart.civix.php';
 // phpcs:disable
-use CRM_Eventcart_ExtensionUtil as E;
+use CRM_Event_Cart_ExtensionUtil as E;
 // phpcs:enable
 
 /**
@@ -130,4 +130,19 @@ function eventcart_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  */
 function eventcart_civicrm_entityTypes(&$entityTypes) {
   _eventcart_civix_civicrm_entityTypes($entityTypes);
+}
+
+/**
+ * Implements hook_civicrm_navigationMenu().
+ */
+function eventcart_civicrm_navigationMenu(&$menu) {
+  _eventcart_civix_insert_navigation_menu($menu, 'Administer/CiviEvent', array(
+    'label' => E::ts('Event Cart Settings'),
+    'name' => 'eventcart_settings',
+    'url' => 'civicrm/admin/setting/eventcart',
+    'permission' => 'administer CiviCRM',
+    'operator' => 'OR',
+    'separator' => 0,
+  ));
+  _eventcart_civix_navigationMenu($menu);
 }

@@ -2,7 +2,6 @@
 
 /**
  * Class CRM_Event_Cart_Form_MerParticipant
- * @fixme What is a MerParticipant!
  */
 class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
 
@@ -12,10 +11,16 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
   public $participant = NULL;
 
   /**
-   * @param null|object $participant
+   * @param array|\CRM_Event_BAO_Participant $participant
    */
   public function __construct($participant) {
     parent::__construct();
+    if (is_array($participant)) {
+      $participantObject = new CRM_Event_BAO_Participant();
+      $participantObject->id = $participant['id'];
+      $participantObject->find();
+      $participant = $participantObject;
+    }
     $this->participant = $participant;
   }
 
@@ -23,9 +28,6 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    * @param \CRM_Core_Form $form
    */
   public function appendQuickForm(&$form) {
-    $textarea_size = ['size' => 30, 'maxlength' => 60];
-    $form->add('text', $this->email_field_name(), ts('Email Address'), $textarea_size, TRUE);
-
     list($custom_fields_pre, $custom_fields_post) = $this->get_participant_custom_data_fields();
 
     foreach ($custom_fields_pre as $key => $field) {

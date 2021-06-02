@@ -3,9 +3,7 @@
 <div class="crm-block crm-event-thankyou-form-block">
   <p>
     {ts}This is your receipt of payment made for the following event registration.{/ts}
-  </p>
-  <p>
-    {ts 1=$transaction_id 2=$transaction_date|date_format:"%D %I:%M %p %Z"}Your order number is <strong>#%1</strong>. Please print this confirmation for your records. You will receive a confirmation email with the information below.  Information about the workshops will be sent separately to each participant. Here's a summary of your transaction placed on %2:{/ts}
+    {ts}Information about the events will be sent separately to each participant.{/ts}
   </p>
   {if $pay_later_receipt && $is_pay_later}
   <p>
@@ -112,10 +110,10 @@
       {/if}
     </td>
     <td class="cost">
-      {$line_item.cost|crmMoney:$currency|string_format:"%10s"}
+      {$line_item.unit_price|crmMoney:$currency|string_format:"%10s"}
     </td>
     <td class="amount">
-      &nbsp;{$line_item.amount|crmMoney:$currency|string_format:"%10s"}
+      &nbsp;{$line_item.line_total|crmMoney:$currency|string_format:"%10s"}
     </td>
       </tr>
       {/foreach}
