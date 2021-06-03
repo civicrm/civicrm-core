@@ -48,8 +48,7 @@ class CRM_Core_BAO_CustomValueTable {
         $count = 1;
 
         $firstField = reset($fields);
-        $entityID = $firstField['entity_id'];
-        $hookID = $firstField['custom_group_id'];
+        $entityID = (int) $firstField['entity_id'];
         $isMultiple = $firstField['is_multiple'];
         if (array_key_exists('id', $firstField)) {
           $sqlOP = "UPDATE $tableName ";
@@ -64,8 +63,9 @@ class CRM_Core_BAO_CustomValueTable {
           $hookOP = 'create';
         }
 
-        CRM_Utils_Hook::customPre($hookOP,
-          $hookID,
+        CRM_Utils_Hook::customPre(
+          $hookOP,
+          (int) $firstField['custom_group_id'],
           $entityID,
           $fields
         );
@@ -273,7 +273,7 @@ class CRM_Core_BAO_CustomValueTable {
           CRM_Core_DAO::executeQuery($query, $params);
 
           CRM_Utils_Hook::custom($hookOP,
-            $hookID,
+            (int) $firstField['custom_group_id'],
             $entityID,
             $fields
           );

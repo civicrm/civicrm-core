@@ -517,9 +517,9 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op
    *   The type of operation being performed.
-   * @param string $groupID
+   * @param int $groupID
    *   The custom group ID.
-   * @param object $entityID
+   * @param int $entityID
    *   The entityID of the row in the custom table.
    * @param array $params
    *   The parameters that were sent into the calling function.
@@ -527,7 +527,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    *   the return value is ignored
    */
-  public static function custom($op, $groupID, $entityID, &$params) {
+  public static function custom(string $op, int $groupID, int $entityID, &$params) {
     return self::singleton()
       ->invoke(['op', 'groupID', 'entityID', 'params'], $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_custom');
   }
@@ -537,9 +537,9 @@ abstract class CRM_Utils_Hook {
    *
    * @param string $op
    *   The type of operation being performed.
-   * @param string $groupID
+   * @param int $groupID
    *   The custom group ID.
-   * @param object $entityID
+   * @param int $entityID
    *   The entityID of the row in the custom table.
    * @param array $params
    *   The parameters that were sent into the calling function.
@@ -547,7 +547,7 @@ abstract class CRM_Utils_Hook {
    * @return null
    *   the return value is ignored
    */
-  public static function customPre($op, $groupID, $entityID, &$params) {
+  public static function customPre(string $op, int $groupID, int $entityID, array &$params) {
     return self::singleton()
       ->invoke(['op', 'groupID', 'entityID', 'params'], $op, $groupID, $entityID, $params, self::$_nullObject, self::$_nullObject, 'civicrm_customPre');
   }
