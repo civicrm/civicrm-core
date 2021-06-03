@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -15,7 +16,15 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+
+namespace Civi\Api4;
+
 /**
- *  Access Control EntityRole.
+ * This api exposes CiviCRM ACLEntityRole.
+ *
+ * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
+ * @package Civi\Api4
  */
-class CRM_ACL_BAO_EntityRole extends CRM_ACL_BAO_ACLEntityRole {}
+class ACLEntityRole extends Generic\DAOEntity {
+
+}
