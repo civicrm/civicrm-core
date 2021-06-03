@@ -864,6 +864,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'AclRole' => 'EntityRole',
       'MailingEventQueue' => 'Queue',
       'Dedupe' => 'PrevNextCache',
+      'Exception' => 'DedupeException',
+      'RuleGroup' => 'DedupeRuleGroup',
     ];
 
     $usableName = !empty($entitiesWithNamingIssues[$entityName]) ? $entitiesWithNamingIssues[$entityName] : $entityName;
