@@ -37,6 +37,9 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
         if (!empty($info['type']) && !self::checkType($value, $info['type'])) {
           throw new \API_Exception('Parameter "' . $param . '" is not of the correct type. Expecting ' . implode(' or ', $info['type']) . '.');
         }
+        if (!empty($info['deprecated']) && isset($value)) {
+          \CRM_Core_Error::deprecatedWarning('APIv4 ' . $apiRequest->getEntityName() . ".$param parameter is deprecated.");
+        }
       }
     }
   }
