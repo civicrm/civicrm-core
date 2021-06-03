@@ -1811,13 +1811,9 @@ abstract class CRM_Utils_Hook {
    * @param array $fields
    *   List of data fields to translate, organized by table and column.
    *   Omitted/unlisted fields are not translated. Any listed field may be translated.
-   *   Values should be TRUE-ish.
+   *   Values should be TRUE.
    *   Ex: $fields['civicrm_event']['summary'] = TRUE
-   *   Ex: $fields['civicrm_event']['summary'] = 'yesplease';
-   *
-   * At time of writing, the `$fields` list x is prepopulated based on `<localizable>` fields in core's `xml/schema`.
-   * In the future, it may also be prepopulated with `<localizable>` fields in ext's `xml/schema`.
-   * For the interim, you may wish to fill-in `<localizable>` fields from ext's.
+   * @return mixed
    */
   public static function translateFields(&$fields) {
     return self::singleton()->invoke(['fields'], $fields, self::$_nullObject,
