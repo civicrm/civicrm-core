@@ -494,7 +494,7 @@ LIMIT {$offset}, {$rowCount}
         break;
     }
 
-    $dedupeRules = CRM_Dedupe_BAO_RuleGroup::getByType($contactType);
+    $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
 
     CRM_Utils_JSON::output($dedupeRules);
   }
@@ -825,7 +825,7 @@ LIMIT {$offset}, {$rowCount}
       }
     }
 
-    $exception = new CRM_Dedupe_DAO_Exception();
+    $exception = new CRM_Dedupe_DAO_DedupeException();
     $exception->contact_id1 = $cid;
     $exception->contact_id2 = $oid;
     //make sure contact2 > contact1.

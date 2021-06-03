@@ -30,7 +30,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    *   Classname of BAO.
    */
   public function getBAOName() {
-    return 'CRM_Dedupe_BAO_RuleGroup';
+    return 'CRM_Dedupe_BAO_DedupeRuleGroup';
   }
 
   /**
@@ -115,7 +115,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   public function browse() {
     // get all rule groups
     $ruleGroups = [];
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->orderBy('contact_type ASC, used ASC, title ASC');
     $dao->find();
 
@@ -188,11 +188,11 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    * @param int $id
    */
   public function delete($id) {
-    $ruleDao = new CRM_Dedupe_DAO_Rule();
+    $ruleDao = new CRM_Dedupe_DAO_DedupeRule();
     $ruleDao->dedupe_rule_group_id = $id;
     $ruleDao->delete();
 
-    $rgDao = new CRM_Dedupe_DAO_RuleGroup();
+    $rgDao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $rgDao->id = $id;
     if ($rgDao->find(TRUE)) {
       $rgDao->delete();

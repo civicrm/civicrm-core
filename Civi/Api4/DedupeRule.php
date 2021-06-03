@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * This api exposes CiviCRM (dedupe) rules.
  *
+ * @searchable none
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
  * @package Civi\Api4
  */

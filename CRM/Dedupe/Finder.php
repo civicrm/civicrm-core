@@ -39,7 +39,7 @@ class CRM_Dedupe_Finder {
    * @throws \CRM_Core_Exception
    */
   public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
-    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
@@ -99,7 +99,7 @@ class CRM_Dedupe_Finder {
 
     $foundByID = FALSE;
     if ($ruleGroupID) {
-      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->id = $ruleGroupID;
       $rgBao->contact_type = $ctype;
       if ($rgBao->find(TRUE)) {
@@ -108,7 +108,7 @@ class CRM_Dedupe_Finder {
     }
 
     if (!$foundByID) {
-      $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+      $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
@@ -258,7 +258,7 @@ class CRM_Dedupe_Finder {
     }
 
     $params = [];
-    $supportedFields = CRM_Dedupe_BAO_RuleGroup::supportedFields($ctype);
+    $supportedFields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields($ctype);
     if (is_array($supportedFields)) {
       foreach ($supportedFields as $table => $fields) {
         if ($table === 'civicrm_address') {

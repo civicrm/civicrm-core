@@ -600,7 +600,7 @@ LEFT JOIN  civicrm_email ce ON ( ce.contact_id=c.id AND ce.is_primary = 1 )
         }
       }
       if (!empty($originalId) && array_key_exists('merge', $hasPermissions)) {
-        $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+        $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
         $rgBao->contact_type = $dao->contact_type;
         $rgBao->used = 'Supervised';
         if ($rgBao->find(TRUE)) {

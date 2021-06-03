@@ -202,7 +202,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
           'sample' => 'Email',
         ],
       ],
-      'CRM_Dedupe_DAO_RuleGroup' => [
+      'CRM_Dedupe_DAO_DedupeRuleGroup' => [
         [
           'fieldName' => 'contact_type',
           'sample' => 'Individual',

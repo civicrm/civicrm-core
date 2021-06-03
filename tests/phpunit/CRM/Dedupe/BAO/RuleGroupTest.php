@@ -19,7 +19,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
    * importable & exportable fields.
    */
   public function testSupportedFields() {
-    $fields = CRM_Dedupe_BAO_RuleGroup::supportedFields('Organization');
+    $fields = CRM_Dedupe_BAO_DedupeRuleGroup::supportedFields('Organization');
 
     $this->assertEquals([
       'civicrm_address' =>

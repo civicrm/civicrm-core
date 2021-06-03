@@ -119,7 +119,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           'contact_type' => $cType,
           'used' => 'Unsupervised',
         ];
-        $this->_dedupeFields[$cType] = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
+        $this->_dedupeFields[$cType] = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
       }
 
       //Modify mapper fields title if fields are present in dedupe rule

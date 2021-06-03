@@ -186,12 +186,12 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    *   rule fields array associated to rule group
    */
   public static function dedupeRuleFields($params) {
-    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->used = $params['used'];
     $rgBao->contact_type = $params['contact_type'];
     $rgBao->find(TRUE);
 
-    $ruleBao = new CRM_Dedupe_BAO_Rule();
+    $ruleBao = new CRM_Dedupe_BAO_DedupeRule();
     $ruleBao->dedupe_rule_group_id = $rgBao->id;
     $ruleBao->find();
     $ruleFields = [];
@@ -215,7 +215,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
     if (!$cid || !$oid) {
       return NULL;
     }
-    $exception = new CRM_Dedupe_DAO_Exception();
+    $exception = new CRM_Dedupe_DAO_DedupeException();
     $exception->contact_id1 = $cid;
     $exception->contact_id2 = $oid;
     //make sure contact2 > contact1.

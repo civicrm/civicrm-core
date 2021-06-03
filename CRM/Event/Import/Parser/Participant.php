@@ -396,7 +396,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           'contact_type' => $this->_contactType,
           'used' => 'Unsupervised',
         ];
-        $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
+        $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
 
         $disp = '';
         foreach ($fieldsArray as $value) {

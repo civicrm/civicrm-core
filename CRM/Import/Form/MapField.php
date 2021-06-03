@@ -180,7 +180,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    *   Message if insufficient fields are present. Empty string otherwise.
    */
   protected static function validateRequiredContactMatchFields(string $contactType, array $importKeys): string {
-    [$ruleFields, $threshold] = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight([
+    [$ruleFields, $threshold] = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight([
       'used' => 'Unsupervised',
       'contact_type' => $contactType,
     ]);
