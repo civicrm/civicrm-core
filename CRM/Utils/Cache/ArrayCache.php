@@ -122,7 +122,7 @@ class CRM_Utils_Cache_ArrayCache implements CRM_Utils_Cache_Interface {
    * @return int|null
    */
   public function getExpires($key) {
-    return $this->_expires[$key] ?: NULL;
+    return $this->_expires[$key] ?? NULL;
   }
 
 }
