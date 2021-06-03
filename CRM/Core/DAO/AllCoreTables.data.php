@@ -212,19 +212,19 @@ return [
     'class' => 'CRM_Event_Cart_DAO_Cart',
     'table' => 'civicrm_event_carts',
   ],
-  'CRM_Dedupe_DAO_RuleGroup' => [
-    'name' => 'RuleGroup',
-    'class' => 'CRM_Dedupe_DAO_RuleGroup',
+  'CRM_Dedupe_DAO_DedupeRuleGroup' => [
+    'name' => 'DedupeRuleGroup',
+    'class' => 'CRM_Dedupe_DAO_DedupeRuleGroup',
     'table' => 'civicrm_dedupe_rule_group',
   ],
-  'CRM_Dedupe_DAO_Rule' => [
-    'name' => 'Rule',
-    'class' => 'CRM_Dedupe_DAO_Rule',
+  'CRM_Dedupe_DAO_DedupeRule' => [
+    'name' => 'DedupeRule',
+    'class' => 'CRM_Dedupe_DAO_DedupeRule',
     'table' => 'civicrm_dedupe_rule',
   ],
-  'CRM_Dedupe_DAO_Exception' => [
-    'name' => 'Exception',
-    'class' => 'CRM_Dedupe_DAO_Exception',
+  'CRM_Dedupe_DAO_DedupeException' => [
+    'name' => 'DedupeException',
+    'class' => 'CRM_Dedupe_DAO_DedupeException',
     'table' => 'civicrm_dedupe_exception',
   ],
   'CRM_Case_DAO_CaseType' => [

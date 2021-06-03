@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <table>
   <base>CRM/Dedupe</base>
-  <class>RuleGroup</class>
+  <class>DedupeRuleGroup</class>
   <name>civicrm_dedupe_rule_group</name>
   <comment>Dedupe rule groups</comment>
   <add>1.8</add>

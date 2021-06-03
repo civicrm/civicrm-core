@@ -1,4 +1,5 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC. All rights reserved.                        |
@@ -15,8 +16,17 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+
+namespace Civi\Api4;
+
 /**
- * The CiviCRM duplicate discovery engine is based on an
- * algorithm designed by David Strauss <david@fourkitchens.com>.
+ * DedupeRuleGroup entity.
+ *
+ * This api exposes CiviCRM (dedupe) groups.
+ *
+ * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
+ * @package Civi\Api4
  */
-class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_BAO_DedupeRule {}
+class DedupeRuleGroup extends Generic\DAOEntity {
+
+}

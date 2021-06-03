@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <table>
   <base>CRM/Dedupe</base>
-  <class>Exception</class>
+  <class>DedupeException</class>
   <name>civicrm_dedupe_exception</name>
   <comment>Dedupe exceptions</comment>
   <add>3.3</add>
