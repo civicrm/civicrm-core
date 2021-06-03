@@ -25,14 +25,16 @@ class CRM_Dedupe_BAO_DedupeException extends CRM_Dedupe_DAO_DedupeException {
    *
    * @param array $params
    *
-   * @return \CRM_Dedupe_BAO_Exception
+   * @return \CRM_Dedupe_DAO_DedupeException
    */
   public static function create($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
-    CRM_Utils_Hook::pre($hook, 'Exception', CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, 'DedupeException', $params['id'] ?? NULL, $params);
+    // Also call hook with deprecated entity name
+    CRM_Utils_Hook::pre($hook, 'Exception', $params['id'] ?? NULL, $params);
     $contact1 = $params['contact_id1'] ?? NULL;
     $contact2 = $params['contact_id2'] ?? NULL;
-    $dao = new CRM_Dedupe_BAO_Exception();
+    $dao = new CRM_Dedupe_BAO_DedupeException();
     $dao->copyValues($params);
     if ($contact1 && $contact2) {
       CRM_Core_DAO::singleValueQuery("
@@ -48,7 +50,8 @@ class CRM_Dedupe_BAO_DedupeException extends CRM_Dedupe_DAO_DedupeException {
       }
     }
     $dao->save();
-
+    CRM_Utils_Hook::post($hook, 'DedupeException', $dao->id, $dao);
+    // Also call hook with deprecated entity name
     CRM_Utils_Hook::post($hook, 'Exception', $dao->id, $dao);
     return $dao;
   }

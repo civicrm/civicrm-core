@@ -395,7 +395,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         'contact_type' => $this->_contactType,
         'used' => 'Unsupervised',
       ];
-      $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
+      $fieldsArray = CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields($ruleParams);
       $disp = NULL;
       foreach ($fieldsArray as $value) {
         if (array_key_exists(trim($value), $params)) {

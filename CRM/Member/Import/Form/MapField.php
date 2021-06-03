@@ -315,7 +315,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         'used' => 'Unsupervised',
         'contact_type' => $contactTypes[$contactTypeId],
       );
-      list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
+      list($ruleFields, $threshold) = CRM_Dedupe_BAO_DedupeRuleGroup::dedupeRuleFieldsWeight($params);
       $weightSum = 0;
       foreach ($importKeys as $key => $val) {
         if (array_key_exists($val, $ruleFields)) {

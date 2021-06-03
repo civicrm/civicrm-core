@@ -154,7 +154,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
       // Find all rules contained by this script sorted by weight so that
       // their execution can be short circuited on RuleGroup::fillTable()
-      $bao = new CRM_Dedupe_BAO_Rule();
+      $bao = new CRM_Dedupe_BAO_DedupeRule();
       $bao->dedupe_rule_group_id = $this->id;
       $bao->orderBy('rule_weight DESC');
       $bao->find();
@@ -413,7 +413,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   (rule field => weight) array and threshold associated to rule group
    */
   public static function dedupeRuleFieldsWeight($params) {
-    $rgBao = new CRM_Dedupe_BAO_RuleGroup();
+    $rgBao = new CRM_Dedupe_BAO_DedupeRuleGroup();
     $rgBao->contact_type = $params['contact_type'];
     if (!empty($params['id'])) {
       // accept an ID if provided
@@ -424,7 +424,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
     $rgBao->find(TRUE);
 
-    $ruleBao = new CRM_Dedupe_BAO_Rule();
+    $ruleBao = new CRM_Dedupe_BAO_DedupeRule();
     $ruleBao->dedupe_rule_group_id = $rgBao->id;
     $ruleBao->find();
     $ruleFields = [];
@@ -475,7 +475,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
    *   id => "nice name" of rule group
    */
   public static function getByType($contactType = NULL) {
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
 
     if ($contactType) {
       $dao->contact_type = $contactType;
@@ -505,7 +505,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
     }
     if (empty(\Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id])) {
       \Civi::$statics[__CLASS__]['rule_groups'][$rule_group_id]['contact_type'] = CRM_Core_DAO::getFieldValue(
-        'CRM_Dedupe_DAO_RuleGroup',
+        'CRM_Dedupe_DAO_DedupeRuleGroup',
         $rule_group_id,
         'contact_type'
       );

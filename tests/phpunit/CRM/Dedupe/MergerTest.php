@@ -160,7 +160,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($this->_contactIds), 9, 'Check for number of contacts.');
 
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
     $dao->is_default = 1;
@@ -230,7 +230,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($this->_contactIds), 9, 'Check for number of contacts.');
 
-    $dao = new CRM_Dedupe_DAO_RuleGroup();
+    $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
     $dao->name = 'IndividualSupervised';
     $dao->is_default = 1;
