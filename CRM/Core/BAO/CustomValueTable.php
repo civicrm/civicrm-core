@@ -37,12 +37,9 @@ class CRM_Core_BAO_CustomValueTable {
     $VS = CRM_Core_DAO::VALUE_SEPARATOR;
 
     foreach ($customParams as $tableName => $tables) {
-      foreach ($tables as $index => $fields) {
-        $sqlOP = NULL;
+      foreach ($tables as $fields) {
         $hookID = NULL;
-        $hookOP = NULL;
         $entityID = NULL;
-        $isMultiple = FALSE;
         $set = [];
         $params = [];
         $count = 1;
@@ -237,11 +234,11 @@ class CRM_Core_BAO_CustomValueTable {
 
           $fieldExtends = $field['extends'] ?? NULL;
           if (
-            CRM_Utils_Array::value('entity_table', $field) == 'civicrm_contact'
-            || $fieldExtends == 'Contact'
-            || $fieldExtends == 'Individual'
-            || $fieldExtends == 'Organization'
-            || $fieldExtends == 'Household'
+            CRM_Utils_Array::value('entity_table', $field) === 'civicrm_contact'
+            || $fieldExtends === 'Contact'
+            || $fieldExtends === 'Individual'
+            || $fieldExtends === 'Organization'
+            || $fieldExtends === 'Household'
           ) {
             $paramFieldsExtendContactForEntities[$entityID]['custom_' . CRM_Utils_Array::value('custom_field_id', $field)] = $field['custom_field_id'] ?? NULL;
           }
