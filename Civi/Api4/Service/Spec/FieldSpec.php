@@ -128,7 +128,7 @@ class FieldSpec {
   /**
    * @var callable[]
    */
-  public $outputFormatters = [];
+  public $outputFormatters;
 
   /**
    * Aliases for the valid data types
@@ -391,13 +391,6 @@ class FieldSpec {
   }
 
   /**
-   * @return callable[]
-   */
-  public function getOutputFormatters() {
-    return $this->outputFormatters;
-  }
-
-  /**
    * @param callable[] $outputFormatters
    * @return $this
    */
@@ -412,33 +405,22 @@ class FieldSpec {
    * @return $this
    */
   public function addOutputFormatter($outputFormatter) {
+    if (!$this->outputFormatters) {
+      $this->outputFormatters = [];
+    }
     $this->outputFormatters[] = $outputFormatter;
 
     return $this;
   }
 
   /**
-   * @return bool
-   */
-  public function getreadonly() {
-    return $this->readonly;
-  }
-
-  /**
    * @param bool $readonly
    * @return $this
    */
-  public function setreadonly($readonly) {
+  public function setReadonly($readonly) {
     $this->readonly = (bool) $readonly;
 
     return $this;
-  }
-
-  /**
-   * @return string|NULL
-   */
-  public function getHelpPre() {
-    return $this->helpPre;
   }
 
   /**
@@ -446,13 +428,6 @@ class FieldSpec {
    */
   public function setHelpPre($helpPre) {
     $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
-  }
-
-  /**
-   * @return string|NULL
-   */
-  public function getHelpPost() {
-    return $this->helpPost;
   }
 
   /**
@@ -464,8 +439,7 @@ class FieldSpec {
 
   /**
    * @param string $customFieldColumnName
-   *
-   * @return CustomFieldSpec
+   * @return $this
    */
   public function setTableName($customFieldColumnName) {
     $this->tableName = $customFieldColumnName;
@@ -528,13 +502,6 @@ class FieldSpec {
   public function setOptionsCallback($callback) {
     $this->optionsCallback = $callback;
     return $this;
-  }
-
-  /**
-   * @return callable
-   */
-  public function getOptionsCallback() {
-    return $this->optionsCallback;
   }
 
   /**

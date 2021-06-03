@@ -63,4 +63,20 @@ class GetFieldsTest extends UnitTestCase {
     $this->assertCount(1, $fields);
   }
 
+  public function testInternalPropsAreHidden() {
+    // Public getFields should not contain @internal props
+    $fields = Contact::getFields(FALSE)
+      ->execute()
+      ->getArrayCopy();
+    foreach ($fields as $field) {
+      $this->assertArrayNotHasKey('output_formatters', $field);
+    }
+    // Internal entityFields should contain @internal props
+    $fields = Contact::get(FALSE)
+      ->entityFields();
+    foreach ($fields as $field) {
+      $this->assertArrayHasKey('output_formatters', $field);
+    }
+  }
+
 }

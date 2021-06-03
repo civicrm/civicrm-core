@@ -51,7 +51,7 @@ class SpecFormatter {
       if (self::customFieldHasOptions($data)) {
         $field->setOptionsCallback([__CLASS__, 'getOptions']);
       }
-      $field->setreadonly($data['is_view']);
+      $field->setReadonly($data['is_view']);
     }
     else {
       $name = $data['name'] ?? NULL;
@@ -62,7 +62,7 @@ class SpecFormatter {
       if (!empty($data['pseudoconstant'])) {
         $field->setOptionsCallback([__CLASS__, 'getOptions']);
       }
-      $field->setreadonly(!empty($data['readonly']));
+      $field->setReadonly(!empty($data['readonly']));
     }
     $field->setSerialize($data['serialize'] ?? NULL);
     $field->setDefaultValue($data['default'] ?? NULL);

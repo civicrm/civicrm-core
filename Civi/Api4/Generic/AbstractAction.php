@@ -440,7 +440,8 @@ abstract class AbstractAction implements \ArrayAccess {
         'includeCustom' => FALSE,
       ]);
       $result = new Result();
-      $getFields->_run($result);
+      // Pass TRUE for the private $isInternal param
+      $getFields->_run($result, TRUE);
       $this->_entityFields = (array) $result->indexBy('name');
     }
     return $this->_entityFields;

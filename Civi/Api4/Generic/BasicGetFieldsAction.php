@@ -94,7 +94,9 @@ class BasicGetFieldsAction extends BasicGetAction {
     else {
       $values = $this->getRecords();
     }
-    $this->formatResults($values);
+    // $isInternal param is not part of function signature (to be compatible with parent class)
+    $isInternal = func_get_args()[1] ?? FALSE;
+    $this->formatResults($values, $isInternal);
     $this->queryArray($values, $result);
   }
 
@@ -109,8 +111,9 @@ class BasicGetFieldsAction extends BasicGetAction {
    * Instead just override $this->fields and this function will respect that.
    *
    * @param array $values
+   * @param bool $isInternal
    */
-  protected function formatResults(&$values) {
+  protected function formatResults(&$values, $isInternal) {
     $fieldDefaults = array_column($this->fields(), 'default_value', 'name') +
       array_fill_keys(array_column($this->fields(), 'name'), NULL);
     // Enforce field permissions
@@ -121,6 +124,8 @@ class BasicGetFieldsAction extends BasicGetAction {
         }
       }
     }
+    // Unless this is an internal getFields call, filter out @internal properties
+    $internalProps = $isInternal ? [] : array_filter(array_column($this->fields(), '@internal', 'name'));
     foreach ($values as &$field) {
       $defaults = array_intersect_key([
         'title' => empty($field['name']) ? NULL : ucwords(str_replace('_', ' ', $field['name'])),
@@ -134,6 +139,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (isset($defaults['options'])) {
         $field['options'] = $this->formatOptionList($field['options']);
       }
+      $field = array_diff_key($field, $internalProps);
     }
   }
 
@@ -325,6 +331,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       [
         'name' => 'output_formatters',
         'data_type' => 'Array',
+        '@internal' => TRUE,
       ],
     ];
   }

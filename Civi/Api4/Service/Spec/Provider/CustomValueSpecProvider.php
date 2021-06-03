@@ -32,14 +32,14 @@ class CustomValueSpecProvider implements Generic\SpecProviderInterface {
     if ($action !== 'create') {
       $idField = new FieldSpec('id', $spec->getEntity(), 'Integer');
       $idField->setTitle(ts('Custom Value ID'));
-      $idField->setreadonly(TRUE);
+      $idField->setReadonly(TRUE);
       $spec->addFieldSpec($idField);
     }
     $entityField = new FieldSpec('entity_id', $spec->getEntity(), 'Integer');
     $entityField->setTitle(ts('Entity ID'));
     $entityField->setRequired($action === 'create');
     $entityField->setFkEntity('Contact');
-    $entityField->setreadonly(TRUE);
+    $entityField->setReadonly(TRUE);
     $spec->addFieldSpec($entityField);
   }
 
