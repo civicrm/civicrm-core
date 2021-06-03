@@ -3130,7 +3130,7 @@ class CRM_Contact_BAO_Query {
    * @return string WHERE clause component for smart group criteria.
    * @throws \CRM_Core_Exception
    */
-  public function addGroupContactCache($groups, $tableAlias, $joinTable = "contact_a", $op, $joinColumn = 'id') {
+  public function addGroupContactCache($groups, $tableAlias, $joinTable, $op, $joinColumn = 'id') {
     $isNullOp = (strpos($op, 'NULL') !== FALSE);
     $groupsIds = $groups;
 
@@ -5909,7 +5909,7 @@ AND   displayRelType.is_active = 1
     $op,
     $value,
     $grouping,
-    $daoName = NULL,
+    $daoName,
     $field,
     $label,
     $dataType = 'String'

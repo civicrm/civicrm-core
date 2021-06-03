@@ -489,7 +489,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
  *
  * @return array|void
  */
-function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour = 1, $is_flush) {
+function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, $is_flush) {
   static $profileFields = [];
   if ($is_flush) {
     $profileFields = [];
