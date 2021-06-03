@@ -13,6 +13,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\PledgePayment;
 
@@ -922,15 +923,29 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @param int $contributionID
    *
    * @return array
+   * @throws \API_Exception
    */
-  protected static function getRelatedMemberships($contributionID) {
-    $membershipPayments = civicrm_api3('MembershipPayment', 'get', [
+  protected static function getRelatedMemberships(int $contributionID): array {
+    $membershipIDs = array_keys((array) LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addSelect('entity_id')
+      ->execute()->indexBy('entity_id'));
+
+    $doubleCheckParams = [
       'return' => 'membership_id',
-      'contribution_id' => (int) $contributionID,
-    ])['values'];
-    $membershipIDs = [];
-    foreach ($membershipPayments as $membershipPayment) {
-      $membershipIDs[] = $membershipPayment['membership_id'];
+      'contribution_id' => $contributionID,
+    ];
+    if (!empty($membershipIDs)) {
+      $doubleCheckParams['membership_id'] = ['NOT IN' => $membershipIDs];
+    }
+    $membershipPayments = civicrm_api3('MembershipPayment', 'get', $doubleCheckParams)['values'];
+    if (!empty($membershipPayments)) {
+      $membershipIDs = [];
+      CRM_Core_Error::deprecatedWarning('Not having valid line items for membership payments is invalid.');
+      foreach ($membershipPayments as $membershipPayment) {
+        $membershipIDs[] = $membershipPayment['membership_id'];
+      }
     }
     if (empty($membershipIDs)) {
       return [];
@@ -4417,7 +4432,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
     if (!empty($lineItems)) {
       // get financial item
-      list($ftIds, $taxItems) = self::getLastFinancialItemIds($trxnParams['contribution_id']);
+      [$ftIds, $taxItems] = self::getLastFinancialItemIds($trxnParams['contribution_id']);
       $entityParams = [
         'contribution_total_amount' => $contributionTotalAmount,
         'trxn_total_amount' => $trxnParams['total_amount'],
@@ -4741,7 +4756,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CiviCRM_API3_Exception
    */
   public static function updateMembershipBasedOnCompletionOfContribution($contributionID, $changeDate) {
-    $memberships = self::getRelatedMemberships($contributionID);
+    $memberships = self::getRelatedMemberships((int) $contributionID);
     foreach ($memberships as $membership) {
       $membershipParams = [
         'id' => $membership['id'],
