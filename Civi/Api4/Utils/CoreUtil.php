@@ -34,6 +34,9 @@ class CoreUtil {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
       return 'CRM_Core_BAO_CustomValue';
     }
+    if ($entityName === 'Attachment') {
+      return 'CRM_Core_BAO_Attachment';
+    }
     $dao = self::getApiClass($entityName)::getInfo()['dao'] ?? NULL;
     if (!$dao) {
       return NULL;
