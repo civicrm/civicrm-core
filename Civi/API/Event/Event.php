@@ -17,6 +17,8 @@ namespace Civi\API\Event;
  */
 class Event extends \Symfony\Component\EventDispatcher\Event {
 
+  use RequestTrait;
+
   /**
    * @var \Civi\API\Kernel
    */
@@ -29,14 +31,6 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
   protected $apiProvider;
 
   /**
-   * @var array
-   *   The full description of the API request.
-   *
-   * @see \Civi\API\Request::create
-   */
-  protected $apiRequest;
-
-  /**
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API responsible for executing the request.
    * @param array $apiRequest
@@ -46,7 +40,7 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
   public function __construct($apiProvider, $apiRequest, $apiKernel) {
     $this->apiKernel = $apiKernel;
     $this->apiProvider = $apiProvider;
-    $this->apiRequest = $apiRequest;
+    $this->setApiRequest($apiRequest);
   }
 
   /**
@@ -63,26 +57,6 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
    */
   public function getApiProvider() {
     return $this->apiProvider;
-  }
-
-  /**
-   * @return array
-   */
-  public function getApiRequest() {
-    return $this->apiRequest;
-  }
-
-  /**
-   * Create a brief string identifying the entity/action. Useful for
-   * pithy matching/switching.
-   *
-   * Ex: if ($e->getApiRequestSig() === '3.contact.get') { ... }
-   *
-   * @return string
-   *   Ex: '3.contact.get'
-   */
-  public function getApiRequestSig() {
-    return mb_strtolower($this->apiRequest['version'] . '.' . $this->apiRequest['entity'] . '.' . $this->apiRequest['action']);
   }
 
 }
