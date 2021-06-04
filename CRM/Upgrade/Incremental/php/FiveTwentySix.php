@@ -81,7 +81,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySix extends CRM_Upgrade_Incremental_
   /**
    * Update workflow_name based on workflow_id values.
    */
-  public function populateWorkflowName() {
+  public static function populateWorkflowName() {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_msg_template
       LEFT JOIN  civicrm_option_value ov ON ov.id = workflow_id
       SET workflow_name = ov.name'

@@ -268,7 +268,7 @@ class CRM_Upgrade_Incremental_Base {
    *
    * @return bool
    */
-  public function updateSmartGroups($ctx, $actions) {
+  public static function updateSmartGroups($ctx, $actions) {
     $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups();
     $groupUpdateObject->updateGroups($actions);
     return TRUE;
