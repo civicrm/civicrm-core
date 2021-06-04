@@ -736,21 +736,21 @@
       }
 
       $scope.fieldsForGroupBy = function() {
-        return {results: ctrl.getAllFields('', function(key) {
+        return {results: ctrl.getAllFields('', ['Field', 'Custom'], function(key) {
             return _.contains(ctrl.savedSearch.api_params.groupBy, key);
           })
         };
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: ctrl.getAllFields(':label', function(key) {
+        return {results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra'], function(key) {
             return _.contains(ctrl.savedSearch.api_params.select, key);
           })
         };
       };
 
       function getFieldsForJoin(joinEntity) {
-        return {results: ctrl.getAllFields(':name', null, joinEntity)};
+        return {results: ctrl.getAllFields(':name', ['Field', 'Custom'], null, joinEntity)};
       }
 
       $scope.fieldsForJoin = function(joinEntity) {
@@ -789,7 +789,7 @@
         });
       }
 
-      this.getAllFields = function(suffix, disabledIf, topJoin) {
+      this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
         disabledIf = disabledIf || _.noop;
         function formatFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
@@ -805,7 +805,9 @@
               if (disabledIf(item.id)) {
                 item.disabled = true;
               }
-              result.push(item);
+              if (!allowedTypes || _.includes(allowedTypes, field.type)) {
+                result.push(item);
+              }
             });
           }
 

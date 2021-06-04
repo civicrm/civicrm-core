@@ -47,7 +47,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     // Individual fields should show up when contact_type = null|Individual but not other contact types
     $getFields = Contact::getFields(FALSE);
-    $this->assertContains('MyIndividualFields.FavColor', $getFields->execute()->column('name'));
+    $this->assertEquals('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.FavColor']['type']);
     $this->assertContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
     $this->assertNotContains('MyIndividualFields.FavColor', $getFields->setValues(['contact_type' => 'Household'])->execute()->column('name'));
 

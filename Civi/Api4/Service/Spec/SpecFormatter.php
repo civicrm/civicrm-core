@@ -56,6 +56,8 @@ class SpecFormatter {
     else {
       $name = $data['name'] ?? NULL;
       $field = new FieldSpec($name, $entity, $dataTypeName);
+      $field->setType('Field');
+      $field->setColumnName($name);
       $field->setRequired(!empty($data['required']));
       $field->setTitle($data['title'] ?? NULL);
       $field->setLabel($data['html']['label'] ?? NULL);

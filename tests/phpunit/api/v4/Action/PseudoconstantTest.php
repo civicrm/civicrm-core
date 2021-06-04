@@ -170,7 +170,6 @@ class PseudoconstantTest extends BaseCustomValueTest {
 
     $fields = Contact::getFields()
       ->setLoadOptions(array_keys($technicolor[0]))
-      ->setIncludeCustom(TRUE)
       ->execute()
       ->indexBy('name');
 

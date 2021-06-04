@@ -22,20 +22,8 @@ class GetFields extends \Civi\Api4\Generic\DAOGetFieldsAction {
     $fields = $this->_itemsToGet('name');
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
-    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), $this->includeCustom, $this->values);
+    $spec = $gatherer->getSpec('Custom_' . $this->getCustomGroup(), $this->getAction(), TRUE, $this->values);
     return $this->specToArray($spec->getFields($fields));
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function getParamInfo($param = NULL) {
-    $info = parent::getParamInfo($param);
-    if (!$param) {
-      // This param is meaningless here.
-      unset($info['includeCustom']);
-    }
-    return $info;
   }
 
 }

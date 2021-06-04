@@ -84,6 +84,7 @@ class CustomValueTest extends BaseCustomValueTest {
     $expectedResult = [
       [
         'custom_group' => $group,
+        'type' => 'Custom',
         'name' => $colorFieldName,
         'title' => $colorFieldName,
         'entity' => "Custom_$group",
@@ -96,6 +97,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'custom_group' => $group,
+        'type' => 'Custom',
         'name' => $multiFieldName,
         'title' => $multiFieldName,
         'entity' => "Custom_$group",
@@ -108,6 +110,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'custom_group' => $group,
+        'type' => 'Custom',
         'name' => $textFieldName,
         'title' => $textFieldName,
         'entity' => "Custom_$group",
@@ -119,6 +122,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'name' => 'id',
+        'type' => 'Field',
         'title' => ts('Custom Value ID'),
         'entity' => "Custom_$group",
         'table_name' => $customGroup['table_name'],
@@ -128,6 +132,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'name' => 'entity_id',
+        'type' => 'Field',
         'title' => ts('Entity ID'),
         'table_name' => $customGroup['table_name'],
         'column_name' => 'entity_id',
@@ -139,7 +144,7 @@ class CustomValueTest extends BaseCustomValueTest {
 
     foreach ($expectedResult as $key => $field) {
       foreach ($field as $attr => $value) {
-        $this->assertEquals($expectedResult[$key][$attr], $fields[$key][$attr]);
+        $this->assertEquals($expectedResult[$key][$attr], $fields[$key][$attr], "$key $attr");
       }
     }
 

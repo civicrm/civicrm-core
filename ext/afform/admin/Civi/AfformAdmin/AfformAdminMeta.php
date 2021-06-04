@@ -87,7 +87,6 @@ class AfformAdminMeta {
   public static function getFields($entityName, $params = []) {
     $params += [
       'checkPermissions' => FALSE,
-      'includeCustom' => TRUE,
       'loadOptions' => ['id', 'label'],
       'action' => 'create',
       'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'fk_entity', 'readonly'],
