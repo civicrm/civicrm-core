@@ -96,7 +96,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         if (!isset($a['dashboard_contact.weight'])) {
           return 1;
         }
-        return $a['dashboard_contact.weight'] > $b['dashboard_contact.weight'];
+        return $a['dashboard_contact.weight'] <=> $b['dashboard_contact.weight'];
       });
     }
     return Civi::$statics[__CLASS__][__FUNCTION__][$cid] ?? [];
