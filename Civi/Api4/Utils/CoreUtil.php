@@ -158,16 +158,18 @@ class CoreUtil {
    * @param string $entityName
    * @param string $actionName
    * @param array $record
+   * @param int|null $userID
+   *   Contact ID of the user we are testing, or NULL for the default/active user.
    * @return bool
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkAccess(string $entityName, string $actionName, array $record) {
+  public static function checkAccess(string $entityName, string $actionName, array $record, $userID = NULL) {
     $action = Request::create($entityName, $actionName, ['version' => 4]);
     // This checks gatekeeper permissions
-    $granted = $action->isAuthorized();
+    $granted = $action->isAuthorized($userID);
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
@@ -179,14 +181,14 @@ class CoreUtil {
       $baoName = self::getBAOFromApiName($entityName);
       // CustomValue also requires the name of the group
       if ($baoName === 'CRM_Core_BAO_CustomValue') {
-        $granted = \CRM_Core_BAO_CustomValue::checkAccess($actionName, $record, NULL, $granted, substr($entityName, 7));
+        $granted = \CRM_Core_BAO_CustomValue::checkAccess($actionName, $record, $userID, $granted, substr($entityName, 7));
       }
       elseif ($baoName) {
-        $granted = $baoName::checkAccess($actionName, $record, NULL, $granted);
+        $granted = $baoName::checkAccess($actionName, $record, $userID, $granted);
       }
       // Otherwise, call the hook directly
       else {
-        \CRM_Utils_Hook::checkAccess($entityName, $actionName, $record, NULL, $granted);
+        \CRM_Utils_Hook::checkAccess($entityName, $actionName, $record, $userID, $granted);
       }
     }
     return $granted;

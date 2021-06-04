@@ -389,11 +389,13 @@ abstract class AbstractAction implements \ArrayAccess {
    *
    * This function is called if checkPermissions is set to true.
    *
+   * @param int|null $userID
+   *   Contact ID of the user we are testing, or NULL for the default/active user.
    * @return bool
    */
-  public function isAuthorized() {
+  public function isAuthorized(?int $userID): bool {
     $permissions = $this->getPermissions();
-    return \CRM_Core_Permission::check($permissions);
+    return \CRM_Core_Permission::check($permissions, $userID);
   }
 
   /**

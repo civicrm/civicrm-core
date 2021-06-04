@@ -62,7 +62,7 @@ class CheckAccessAction extends AbstractAction {
    *
    * @return bool
    */
-  public function isAuthorized() {
+  public function isAuthorized(?int $userID): bool {
     return TRUE;
   }
 
