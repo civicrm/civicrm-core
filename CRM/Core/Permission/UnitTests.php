@@ -43,9 +43,8 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
-
     // return the stubbed permission (defaulting to true if the array is missing)
-    return is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
+    return isset($this->permissions) && is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
   }
 
   /**
