@@ -54,7 +54,7 @@ class Drupal8 implements AuthxInterface {
    */
   public function getCurrentUserId() {
     $user = \Drupal::currentUser();
-    return $user ? $user->getAccount()->id() : NULL;
+    return $user && $user->getAccount()->id() ? $user->getAccount()->id() : NULL;
   }
 
 }
