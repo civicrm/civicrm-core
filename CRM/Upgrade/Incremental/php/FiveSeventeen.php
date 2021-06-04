@@ -104,7 +104,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
   /**
    * Update safe file types.
    */
-  public function updateFileTypes() {
+  public static function updateFileTypes() {
     CRM_Core_BAO_OptionValue::ensureOptionValueExists([
       'option_group_id' => 'safe_file_extension',
       'label' => 'pptx',

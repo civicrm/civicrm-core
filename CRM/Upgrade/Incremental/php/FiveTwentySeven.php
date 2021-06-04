@@ -71,7 +71,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
-  public function priceFieldValueLabelRequired($ctx) {
+  public static function priceFieldValueLabelRequired($ctx) {
     $locales = CRM_Core_I18n::getMultilingual();
     if ($locales) {
       foreach ($locales as $locale) {
@@ -86,7 +86,7 @@ class CRM_Upgrade_Incremental_php_FiveTwentySeven extends CRM_Upgrade_Incrementa
     return TRUE;
   }
 
-  public function nameMembershipTypeRequired($ctx) {
+  public static function nameMembershipTypeRequired($ctx) {
     $locales = CRM_Core_I18n::getMultilingual();
     if ($locales) {
       foreach ($locales as $locale) {
