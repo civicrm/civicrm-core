@@ -177,7 +177,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @return int
    *   new pageId to display to the user
    */
-  public function getPageID($defaultPageId = 1, &$params) {
+  public function getPageID($defaultPageId, &$params) {
     // POST has higher priority than GET vars
     // else if a value is set that has higher priority and finally the GET var
     $currentPage = $defaultPageId;
