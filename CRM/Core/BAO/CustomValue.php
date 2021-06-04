@@ -194,7 +194,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
     // Retrieve the $entityId so we can pass that to the hook.
-    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
+    $entityID = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
       1 => [$customValueID, 'Integer'],
     ]);
 
@@ -203,7 +203,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     CRM_Core_DAO::executeQuery($sql);
 
     CRM_Utils_Hook::custom('delete',
-      $customGroupID,
+      (int) $customGroupID,
       $entityID,
       $customValueID
     );
