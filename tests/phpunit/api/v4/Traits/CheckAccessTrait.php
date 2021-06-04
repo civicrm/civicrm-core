@@ -1,8 +1,10 @@
 <?php
 namespace api\v4\Traits;
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
 /**
- * Define an implementation of `hook_civicrm_checkAccess` in which access-control decisions are
+ * Define an implementation of `civi.api4.authorizeRecord` in which access-control decisions are
  * based on a predefined list. For example:
  *
  *   $this->setCheckAccessGrants(['Contact::create' => TRUE]);
@@ -28,17 +30,14 @@ trait CheckAccessTrait {
   protected $checkAccessCounts = [];
 
   /**
-   * @param string $entity
-   * @param string $action
-   * @param array $record
-   * @param int|null $contactID
-   * @param bool $granted
-   * @see \CRM_Utils_Hook::checkAccess()
+   * Listen to 'civi.api4.authorizeRecord'. Override decisions with specified grants.
+   *
+   * @param \Civi\Api4\Event\AuthorizeRecordEvent $e
    */
-  public function hook_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, ?bool &$granted) {
-    $key = "{$entity}::{$action}";
+  public function on_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $key = $e->getEntityName() . '::' . $e->getActionName();
     if (isset($this->checkAccessGrants[$key])) {
-      $granted = $this->checkAccessGrants[$key];
+      $e->setAuthorized($this->checkAccessGrants[$key]);
       $this->checkAccessCounts[$key]++;
     }
   }

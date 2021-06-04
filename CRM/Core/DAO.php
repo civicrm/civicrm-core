@@ -3041,39 +3041,6 @@ SELECT contact_id
   }
 
   /**
-   * Check whether action can be performed on a given record.
-   *
-   * Dispatches to internal BAO function ('static::_checkAccess())` and `hook_civicrm_checkAccess`.
-   *
-   * @param string $entityName
-   *   Ex: 'Contact' or 'Custom_Foobar'
-   * @param string $action
-   *   APIv4 action name.
-   *   Ex: 'create', 'get', 'delete'
-   * @param array $record
-   *   All (known/loaded) values of individual record being accessed.
-   *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
-   * @param int|null $userID
-   *   Contact ID of the active user (whose access we must check). NULL for anonymous.
-   * @return bool
-   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
-   */
-  public static function checkAccess(string $entityName, string $action, array $record, $userID): ?bool {
-    // Ensure this function was either called on a BAO class or a DAO that has no BAO
-    if (!$entityName ||
-      (!strpos(static::class, '_BAO_') && CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class) !== static::class)
-    ) {
-      throw new CRM_Core_Exception('Function checkAccess must be called on a BAO class');
-    }
-    if (method_exists(static::class, '_checkAccess')) {
-      return static::_checkAccess($entityName, $action, $record, $userID);
-    }
-    else {
-      return TRUE;
-    }
-  }
-
-  /**
    * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
    * and dashes, and contains at least one [a-z] case insensitive.
    *

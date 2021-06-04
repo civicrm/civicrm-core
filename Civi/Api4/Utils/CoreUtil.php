@@ -173,13 +173,21 @@ class CoreUtil {
       return (bool) $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
     }
 
-    $granted = NULL;
-    \CRM_Utils_Hook::checkAccess($apiRequest->getEntityName(), $apiRequest->getActionName(), $record, $userID, $granted);
-    $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
-    if ($granted === NULL && $baoName) {
-      $granted = $baoName::checkAccess($apiRequest->getEntityName(), $apiRequest->getActionName(), $record, $userID);
+    $event = new \Civi\Api4\Event\AuthorizeRecordEvent($apiRequest, $record, $userID);
+    \Civi::dispatcher()->dispatch('civi.api4.authorizeRecord', $event);
+
+    // Note: $bao::_checkAccess() is a quasi-listener. TODO: Convert to straight-up listener.
+    if ($event->isAuthorized() === NULL) {
+      $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
+      if ($baoName && method_exists($baoName, '_checkAccess')) {
+        $authorized = $baoName::_checkAccess($event->getEntityName(), $event->getActionName(), $event->getRecord(), $event->getUserID());
+        $event->setAuthorized($authorized);
+      }
+      else {
+        $event->setAuthorized(TRUE);
+      }
     }
-    return $granted;
+    return $event->isAuthorized();
   }
 
   /**
