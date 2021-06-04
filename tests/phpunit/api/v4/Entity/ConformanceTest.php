@@ -19,16 +19,19 @@
 
 namespace api\v4\Entity;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Entity;
 use api\v4\UnitTestCase;
 use Civi\Api4\Event\ValidateValuesEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Test\HookInterface;
 
 /**
  * @group headless
  */
-class ConformanceTest extends UnitTestCase {
+class ConformanceTest extends UnitTestCase implements HookInterface {
 
+  use \api\v4\Traits\CheckAccessTrait;
   use \api\v4\Traits\TableDropperTrait;
   use \api\v4\Traits\OptionCleanupTrait {
     setUp as setUpOptionCleanup;
@@ -58,6 +61,7 @@ class ConformanceTest extends UnitTestCase {
     $this->loadDataSet('ConformanceTest');
     $this->creationParamProvider = \Civi::container()->get('test.param_provider');
     parent::setUp();
+    $this->resetCheckAccess();
   }
 
   /**
@@ -137,13 +141,16 @@ class ConformanceTest extends UnitTestCase {
     }
 
     $this->checkFields($entityClass, $entity);
-    $id = $this->checkCreation($entity, $entityClass);
+    $this->checkCreationDenied($entity, $entityClass);
+    $id = $this->checkCreationAllowed($entity, $entityClass);
     $this->checkGet($entityClass, $id, $entity);
+    $this->checkGetAllowed($entityClass, $id, $entity);
     $this->checkGetCount($entityClass, $id, $entity);
     $this->checkUpdateFailsFromCreate($entityClass, $id);
     $this->checkWrongParamType($entityClass);
     $this->checkDeleteWithNoId($entityClass);
-    $this->checkDeletion($entityClass, $id);
+    $this->checkDeletionDenied($entityClass, $id, $entity);
+    $this->checkDeletionAllowed($entityClass, $id, $entity);
     $this->checkPostDelete($entityClass, $id, $entity);
   }
 
@@ -205,31 +212,62 @@ class ConformanceTest extends UnitTestCase {
    *
    * @return mixed
    */
-  protected function checkCreation($entity, $entityClass) {
+  protected function checkCreationAllowed($entity, $entityClass) {
     $hookLog = [];
     $onValidate = function(ValidateValuesEvent $e) use (&$hookLog) {
-      $hookLog[$e->entity][$e->action] = 1 + ($hookLog[$e->entity][$e->action] ?? 0);
+      $hookLog[$e->getEntityName()][$e->getActionName()] = 1 + ($hookLog[$e->getEntityName()][$e->getActionName()] ?? 0);
     };
     \Civi::dispatcher()->addListener('civi.api4.validate', $onValidate);
     \Civi::dispatcher()->addListener('civi.api4.validate::' . $entity, $onValidate);
 
+    $this->setCheckAccessGrants(["{$entity}::create" => TRUE]);
+    $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
+
     $requiredParams = $this->creationParamProvider->getRequired($entity);
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
-      ->setCheckPermissions(FALSE)
+      ->setCheckPermissions(TRUE)
       ->execute()
       ->first();
 
     $this->assertArrayHasKey('id', $createResult, "create missing ID");
     $id = $createResult['id'];
-
     $this->assertGreaterThanOrEqual(1, $id, "$entity ID not positive");
+    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    $this->resetCheckAccess();
 
     $this->assertEquals(2, $hookLog[$entity]['create']);
     \Civi::dispatcher()->removeListener('civi.api4.validate', $onValidate);
     \Civi::dispatcher()->removeListener('civi.api4.validate::' . $entity, $onValidate);
 
     return $id;
+  }
+
+  /**
+   * @param string $entity
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   *
+   * @return mixed
+   */
+  protected function checkCreationDenied($entity, $entityClass) {
+    $this->setCheckAccessGrants(["{$entity}::create" => FALSE]);
+    $this->assertEquals(0, $this->checkAccessCounts["{$entity}::create"]);
+
+    $requiredParams = $this->creationParamProvider->getRequired($entity);
+
+    try {
+      $entityClass::create()
+        ->setValues($requiredParams)
+        ->setCheckPermissions(TRUE)
+        ->execute()
+        ->first();
+      $this->fail("{$entityClass}::create() should throw an authorization failure.");
+    }
+    catch (UnauthorizedException $e) {
+      // OK, expected exception
+    }
+    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    $this->resetCheckAccess();
   }
 
   /**
@@ -265,6 +303,26 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
+   * Use a permissioned request for `get()`, with access grnted
+   * via checkAccess event.
+   *
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   * @param int $id
+   * @param string $entity
+   */
+  protected function checkGetAllowed($entityClass, $id, $entity) {
+    $this->setCheckAccessGrants(["{$entity}::get" => TRUE]);
+    $getResult = $entityClass::get()
+      ->addWhere('id', '=', $id)
+      ->execute();
+
+    $errMsg = sprintf('Failed to fetch a %s after creation', $entity);
+    $this->assertEquals($id, $getResult->first()['id'], $errMsg);
+    $this->assertEquals(1, $getResult->count(), $errMsg);
+    $this->resetCheckAccess();
+  }
+
+  /**
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param int $id
    * @param string $entity
@@ -280,7 +338,6 @@ class ConformanceTest extends UnitTestCase {
     $getResult = $entityClass::get(FALSE)
       ->selectRowCount()
       ->execute();
-    $errMsg = sprintf('%s getCount failed', $entity);
     $this->assertGreaterThanOrEqual(1, $getResult->count(), $errMsg);
   }
 
@@ -317,16 +374,49 @@ class ConformanceTest extends UnitTestCase {
   }
 
   /**
+   * Delete an entity - while having a targeted grant (hook_civirm_checkAccess).
+   *
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    * @param int $id
+   * @param string $entity
    */
-  protected function checkDeletion($entityClass, $id) {
-    $deleteResult = $entityClass::delete(FALSE)
+  protected function checkDeletionAllowed($entityClass, $id, $entity) {
+    $this->setCheckAccessGrants(["{$entity}::delete" => TRUE]);
+    $this->assertEquals(0, $this->checkAccessCounts["{$entity}::delete"]);
+
+    $deleteResult = $entityClass::delete()
       ->addWhere('id', '=', $id)
       ->execute();
 
     // should get back an array of deleted id
     $this->assertEquals([['id' => $id]], (array) $deleteResult);
+    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    $this->resetCheckAccess();
+  }
+
+  /**
+   * Attempt to delete an entity while having explicitly denied permission (hook_civicrm_checkAccess).
+   *
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   * @param int $id
+   * @param string $entity
+   */
+  protected function checkDeletionDenied($entityClass, $id, $entity) {
+    $this->setCheckAccessGrants(["{$entity}::delete" => FALSE]);
+    $this->assertEquals(0, $this->checkAccessCounts["{$entity}::delete"]);
+
+    try {
+      $entityClass::delete()
+        ->addWhere('id', '=', $id)
+        ->execute();
+      $this->fail("{$entity}::delete should throw an authorization failure.");
+    }
+    catch (UnauthorizedException $e) {
+      // OK
+    }
+
+    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    $this->resetCheckAccess();
   }
 
   /**
