@@ -20,6 +20,7 @@
 namespace api\v4\Service;
 
 use Civi\Api4\Service\Spec\FieldSpec;
+use Civi\Api4\Service\Spec\Provider\FinancialItemCreationSpecProvider;
 use Civi\Api4\Service\Spec\SpecGatherer;
 
 class TestCreationParameterProvider {
@@ -82,8 +83,18 @@ class TestCreationParameterProvider {
     elseif ($field->getDefaultValue()) {
       return $field->getDefaultValue();
     }
-    elseif (in_array($field->getName(), ['entity_id', 'contact_id'])) {
+    elseif ($field->getName() === 'contact_id') {
       return $this->getFkID($field, 'Contact');
+    }
+    elseif ($field->getName() === 'entity_id') {
+      // What could possibly go wrong with this?
+      switch ($field->getTableName()) {
+        case 'civicrm_financial_item':
+          return $this->getFkID($field, FinancialItemCreationSpecProvider::DEFAULT_ENTITY);
+
+        default:
+          return $this->getFkID($field, 'Contact');
+      }
     }
 
     $randomValue = $this->getRandomValue($field->getDataType());
