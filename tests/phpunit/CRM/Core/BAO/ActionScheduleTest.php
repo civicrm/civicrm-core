@@ -881,15 +881,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       '{activity.activity_type}',
     ]);
     // Further tokens can be tested in the body text/html.
+    // We use a dummy string to represent the custom token as this is done in setUp which is run after this function is called.
     $manyTokensTmpl = implode(';;', [
       $someTokensTmpl,
       '{contact.email_greeting}',
-      $this->fixtures['contact_custom_token']['token'],
+      '{contactCustomToken}',
     ]);
     // Note: The behavior of domain-tokens on a scheduled reminder is undefined. All we
     // can really do is check that it has something.
     $someTokensExpected = 'Churmondleia Ōtākou;;Female;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
-    $manyTokensExpected = sprintf('%s;;Dear Churmondleia;;%s', $someTokensExpected, $this->fixtures['contact_custom_token']['value']);
+    $manyTokensExpected = sprintf('%s;;Dear Churmondleia;;%s', $someTokensExpected, '{contactCustomTokenValue}');
 
     // In this example, we use a lot of tokens cutting across multiple components.
     $cases[0] = [
@@ -974,6 +975,14 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @dataProvider mailerExamples
    */
   public function testMailer(array $schedule, array $patterns): void {
+    // Replace the dummy custom contact token referecnes in schedule and patterns that we had to insert because phpunit
+    // evaluates dataProviders before running setUp
+    foreach ($schedule as $type => $content) {
+      $schedule[$type] = str_replace('{contactCustomToken}', $this->fixtures['contact_custom_token']['token'], $content);
+    }
+    foreach ($patterns as $type => $content) {
+      $patterns[$type] = str_replace('{contactCustomTokenValue}', $this->fixtures['contact_custom_token']['value'], $content);
+    }
     $this->createScheduleFromFixtures('sched_activity_1day', $schedule);
     $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
     $contact = $this->callAPISuccess('contact', 'create', array_merge(
