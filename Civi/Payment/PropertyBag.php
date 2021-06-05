@@ -302,7 +302,28 @@ class PropertyBag extends \ArrayObject {
    */
   protected function set($prop, $label, $value) {
     $this->props[$label][$prop] = $value;
+
+    $pseudonyms = $this->getPseudonyms($prop);
+    $data = (array) $this;
+    $data[$prop] = $value;
+    if (!empty($pseudonyms)) {
+      foreach ($pseudonyms as $pseudonym) {
+        $data[$pseudonym] = $value;
+      }
+      $this->exchangeArray($data);
+    }
+
     return $this;
+  }
+
+  protected function getPseudonyms($label) {
+    $pseudonyms = [];
+    foreach (self::$propMap as $key => $preferredKey) {
+      if ($preferredKey === $label) {
+        $pseudonyms[] = $key;
+      }
+    }
+    return $pseudonyms;
   }
 
   /**
