@@ -287,7 +287,9 @@ class CRM_Core_CodeGen_Specification {
           $this->getDynamicForeignKey($foreignXML, $dynamicForeign, $name);
         }
       }
-      $table['dynamicForeignKey'] = $dynamicForeign;
+      if (!empty($dynamicForeign)) {
+        $table['dynamicForeignKey'] = $dynamicForeign;
+      }
     }
 
     $tables[$name] = &$table;
