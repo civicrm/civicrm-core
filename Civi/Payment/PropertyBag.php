@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Payment;
 
+use ArrayIterator;
 use InvalidArgumentException;
 use CRM_Core_Error;
 use CRM_Core_PseudoConstant;
@@ -20,9 +21,16 @@ use CRM_Core_PseudoConstant;
  * This class is also supposed to help with transition away from array key naming nightmares.
  *
  */
-class PropertyBag implements \ArrayAccess {
+class PropertyBag extends \ArrayObject {
 
   protected $props = ['default' => []];
+
+  /**
+   * Parameters that were cast to the property bag.
+   *
+   * @var array
+   */
+  protected $originalParams = [];
 
   protected static $propMap = [
     'amount'                      => TRUE,
@@ -181,6 +189,15 @@ class PropertyBag implements \ArrayAccess {
       );
     }
     return $this->get($prop, 'default');
+  }
+
+  /**
+   * Implements Iterator::current
+   *
+   * @return mixed
+   */
+  public function getIterator() {
+    return new ArrayIterator(array_merge($this->originalParams, $this->props));
   }
 
   /**
@@ -352,6 +369,7 @@ class PropertyBag implements \ArrayAccess {
         $this->offsetSet($key, $value);
       }
     }
+    $this->originalParams = $data;
     $this->setSuppressLegacyWarnings($suppressLegacyWarnings);
   }
 

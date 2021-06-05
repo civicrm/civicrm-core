@@ -38,13 +38,20 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Test doing a one-off payment.
    *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $usePaymentBag
+   *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    * @throws \CiviCRM_API3_Exception
    */
-  public function testSinglePayment() {
+  public function testSinglePayment(bool $usePaymentBag): void {
     $this->setupMockHandler();
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;
+    if ($usePaymentBag) {
+      $params = PropertyBag::cast($params);
+    }
     $this->processor->doPayment($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequest(), $this->getRequestBodies()[0]);
   }
@@ -52,9 +59,16 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Create a single post dated payment as a recurring transaction.
    *
-   * Test works but not both due to some form of caching going on in the SmartySingleton
+   * Test works but not both due to some form of caching going on in the
+   * SmartySingleton
+   *
+   * @dataProvider getBooleanDataProvider
+   * @param bool $usePaymentBag
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateSingleNowDated() {
+  public function testCreateSingleNowDated(bool $usePaymentBag): void {
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $firstName = 'John';
@@ -152,6 +166,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     // turn verifySSL off
     Civi::settings()->set('verifySSL', '0');
+    if ($usePaymentBag) {
+      $params = PropertyBag::cast($params);
+    }
     $this->processor->doPayment($params);
     // turn verifySSL on
     Civi::settings()->set('verifySSL', '0');
@@ -175,8 +192,15 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   /**
    * Create a single post dated payment as a recurring transaction.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $usePaymentBag
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateSinglePostDated() {
+  public function testCreateSinglePostDated(bool $usePaymentBag): void {
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $start_date = date('Ymd', strtotime('+ 1 week'));
@@ -294,6 +318,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('subscriptionType', 'create');
 
+    if ($usePaymentBag) {
+      $params = PropertyBag::cast($params);
+    }
     $this->processor->doPayment($params);
 
     // if subscription was successful, processor_id / subscription-id must not be null
@@ -320,7 +347,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @return string
    */
-  public function getExpectedRequest($contactID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09') {
+  public function getExpectedRequest($contactID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09'): string {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -394,12 +421,18 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   /**
    * Test the update billing function.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $usePaymentBag
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testUpdateBilling() {
+  public function testUpdateBilling(bool $usePaymentBag): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'qfKey' => '52e3078a34158a80b18d0e3c690c5b9f_2369',
-      'entryURL' => 'http://dmaster.local/civicrm/contribute/updatebilling?reset=1&amp;crid=2&amp;cid=202&amp;context=contribution',
+      'entryURL' => 'https://dmaster.local/civicrm/contribute/updatebilling?reset=1&amp;crid=2&amp;cid=202&amp;context=contribution',
       'credit_card_number' => '4444333322221111',
       'cvv2' => '123',
       'credit_card_exp_date' => ['M' => '3', 'Y' => '2022'],
@@ -419,6 +452,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'subscriptionId' => 6656444,
       'amount' => '6.00',
     ];
+    if ($usePaymentBag) {
+      $params = PropertyBag::cast($params);
+    }
     $message = '';
     $result = $this->processor->updateSubscriptionBillingInfo($message, $params);
     $requests = $this->getRequestBodies();
@@ -430,9 +466,12 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
   /**
    * Test change subscription function.
    *
+   * @dataProvider getBooleanDataProvider
+   * @param bool $usePaymentBag
+   *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testChangeSubscription() {
+  public function testChangeSubscription(bool $usePaymentBag): void {
     $this->setUpClient($this->getExpectedUpdateResponse());
     $params = [
       'hidden_custom' => '1',
@@ -450,6 +489,9 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'subscriptionId' => 1234,
     ];
     $message = '';
+    if ($usePaymentBag) {
+      $params = PropertyBag::cast($params);
+    }
     $result = $this->processor->changeSubscriptionAmount($message, $params);
     $requests = $this->getRequestBodies();
     $this->assertEquals('I00001: Successful.', $message);
@@ -462,7 +504,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @return string
    */
-  public function getExpectedUpdateRequest() {
+  public function getExpectedUpdateRequest(): string {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -496,7 +538,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @return string
    */
-  public function getExpectedUpdateResponse() {
+  public function getExpectedUpdateResponse(): string {
     return 'HTTP/1.1 200 OK
 Cache-Control: no-store
 Pragma: no-cache
@@ -519,7 +561,7 @@ Content-Length: 557
    *
    * @return string
    */
-  protected function getExpectedChangeSubscriptionRequest() {
+  protected function getExpectedChangeSubscriptionRequest(): string {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBUpdateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -542,7 +584,7 @@ Content-Length: 557
    *
    * @return string
    */
-  protected function getExpectedChangeSubscriptionResponse() {
+  protected function getExpectedChangeSubscriptionResponse(): string {
     return 'HTTP/1.1 200 OK
 Cache-Control: no-store
 Pragma: no-cache
@@ -565,7 +607,7 @@ Content-Length: 492
    *
    * @param string $response
    */
-  protected function setUpClient($response) {
+  protected function setUpClient($response): void {
     $this->createMockHandler([$response]);
     $this->setUpClientWithHistoryContainer();
     $this->processor->setGuzzleClient($this->getGuzzleClient());
@@ -574,7 +616,7 @@ Content-Length: 492
   /**
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function testCancelRecurring() {
+  public function testCancelRecurring(): void {
     $this->setUpClient($this->getExpectedCancelResponse());
     $propertyBag = new PropertyBag();
     $propertyBag->setContributionRecurID(9);
@@ -590,7 +632,7 @@ Content-Length: 492
    *
    * @return string
    */
-  protected function getExpectedCancelResponse() {
+  protected function getExpectedCancelResponse(): string {
     return 'HTTP/1.1 200 OK
 Cache-Control: no-store
 Pragma: no-cache
@@ -613,7 +655,7 @@ Content-Length: 361
    *
    * @return string
    */
-  protected function getExpectedCancelRequest() {
+  protected function getExpectedCancelRequest(): string {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBCancelSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
