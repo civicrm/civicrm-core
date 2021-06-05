@@ -19,7 +19,6 @@
  *  Access Control AclRole.
  */
 class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
-  public static $_entityTable = NULL;
 
   /**
    * Whitelist of possible values for the entity_table field
@@ -27,13 +26,10 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    * @return array
    */
   public static function entityTables(): array {
-    if (!self::$_entityTable) {
-      self::$_entityTable = [
-        'civicrm_contact' => ts('Contact'),
-        'civicrm_group' => ts('Group'),
-      ];
-    }
-    return self::$_entityTable;
+    return [
+      'civicrm_contact' => ts('Contact'),
+      'civicrm_group' => ts('Group'),
+    ];
   }
 
   /**
@@ -42,10 +38,7 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    * @return CRM_ACL_DAO_EntityRole
    */
   public static function create(&$params) {
-    $dao = new CRM_ACL_DAO_EntityRole();
-    $dao->copyValues($params);
-    $dao->save();
-    return $dao;
+    return self::writeRecord($params);
   }
 
   /**
@@ -53,7 +46,7 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    * @param $defaults
    */
   public static function retrieve(&$params, &$defaults) {
-    CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_EntityRole', $params, $defaults);
+    CRM_Core_DAO::commonRetrieve(__CLASS__, $params, $defaults);
   }
 
   /**
@@ -68,21 +61,18 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
-    return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_EntityRole', $id, 'is_active', $is_active);
+    return CRM_Core_DAO::setFieldValue(__CLASS__, $id, 'is_active', $is_active);
   }
 
   /**
-   * Delete Entity Role records.
+   * Delete Dedupe Entity Role records.
    *
    * @param int $entityRoleId
    *   ID of the EntityRole record to be deleted.
    *
    */
   public static function del($entityRoleId) {
-    $entityDAO = new CRM_ACL_DAO_EntityRole();
-    $entityDAO->id = $entityRoleId;
-    $entityDAO->find(TRUE);
-    $entityDAO->delete();
+    return parent::deleteRecord(['id' => $entityRoleId]);
   }
 
 }
