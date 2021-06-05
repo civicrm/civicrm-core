@@ -511,7 +511,12 @@ function _civicrm_api3_generic_get_metadata_options(&$metadata, $apiRequest, $fi
     return;
   }
 
-  $fieldsToResolve = $apiRequest['params']['options']['get_options'];
+  if (!is_array($apiRequest['params']['options'])) {
+    $fieldsToResolve = [];
+  }
+  else {
+    $fieldsToResolve = $apiRequest['params']['options']['get_options'];
+  }
 
   if (!empty($metadata[$fieldname]['options']) || (!in_array($fieldname, $fieldsToResolve) && !in_array('all', $fieldsToResolve))) {
     return;
