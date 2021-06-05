@@ -20,7 +20,7 @@ use CRM_Core_PseudoConstant;
  * This class is also supposed to help with transition away from array key naming nightmares.
  *
  */
-class PropertyBag implements \ArrayAccess {
+class PropertyBag extends \ArrayObject {
 
   protected $props = ['default' => []];
 
@@ -352,6 +352,12 @@ class PropertyBag implements \ArrayAccess {
         $this->offsetSet($key, $value);
       }
     }
+    foreach (self::$propMap as $key => $value) {
+      if ($value === TRUE && !isset($data[$key]) && $this->has($key)) {
+        $data[$key] = $this->get($key, 'default');
+      }
+    }
+    $this->exchangeArray($data);
     $this->setSuppressLegacyWarnings($suppressLegacyWarnings);
   }
 
