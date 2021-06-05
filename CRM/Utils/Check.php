@@ -114,7 +114,7 @@ class CRM_Utils_Check {
       return strcmp($a->getName(), $b->getName());
     }
     // The Message constructor guarantees that these will always be integers.
-    return ($aSeverity < $bSeverity);
+    return ($aSeverity <=> $bSeverity);
   }
 
   /**

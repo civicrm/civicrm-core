@@ -615,7 +615,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
  * @return bool
  */
 function _civicrm_api3_order_by_weight($a, $b) {
-  return ($b['weight'] ?? 0) < ($a['weight'] ?? 0);
+  return ($b['weight'] ?? 0) < ($a['weight'] ?? 0) ? 1 : -1;
 }
 
 /**
