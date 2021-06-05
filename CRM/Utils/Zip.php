@@ -116,7 +116,7 @@ class CRM_Utils_Zip {
    */
   public static function createTestZip($zipName, $dirs, $files) {
     $zip = new ZipArchive();
-    $res = $zip->open($zipName, ZipArchive::CREATE);
+    $res = $zip->open($zipName, ZipArchive::OVERWRITE);
     if ($res === TRUE) {
       foreach ($dirs as $dir) {
         if (!$zip->addEmptyDir($dir)) {
