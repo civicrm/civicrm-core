@@ -38,7 +38,7 @@ function smarty_block_localize($params, $text, &$smarty) {
   $lines = [];
   foreach ($smarty->_tpl_vars['locales'] as $locale) {
     $line = $text;
-    if ($params['field']) {
+    if (isset($params['field'])) {
       $fields = explode(',', $params['field']);
       foreach ($fields as $field) {
         $field = trim($field);

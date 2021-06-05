@@ -314,7 +314,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
   }
 
-  public static function submit($params = [], $form) {
+  public static function submit($params, $form) {
     $groups = [];
     if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
       foreach ($params['includeGroups'] as $key => $id) {
