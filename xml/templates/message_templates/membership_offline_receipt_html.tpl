@@ -24,9 +24,9 @@
     <tr>
       <td>
         {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
-        {if $formValues.receipt_text_signup}
+        {if !empty($formValues.receipt_text_signup)}
           <p>{$formValues.receipt_text_signup|htmlize}</p>
-        {elseif $formValues.receipt_text_renewal}
+        {elseif !empty($formValues.receipt_text_renewal)}
           <p>{$formValues.receipt_text_renewal|htmlize}</p>
         {else}
           <p>{ts}Thank you for this contribution.{/ts}</p>
@@ -36,7 +36,7 @@
     <tr>
       <td>
         <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-          {if !$lineItem}
+          {if empty($lineItem)}
             <tr>
               <th {$headerStyle}>
                 {ts}Membership Information{/ts}
@@ -51,8 +51,8 @@
               </td>
             </tr>
           {/if}
-          {if ! $cancelled}
-            {if !$lineItem}
+          {if empty($cancelled)}
+            {if empty($lineItem)}
               <tr>
                 <td {$labelStyle}>
                   {ts}Membership Start Date{/ts}
@@ -87,7 +87,7 @@
                 </tr>
               {/if}
 
-              {if $lineItem}
+              {if !empty($lineItem)}
                 {foreach from=$lineItem item=value key=priceset}
                   <tr>
                     <td colspan="2" {$valueStyle}>
@@ -95,7 +95,7 @@
                         <tr>
                           <th>{ts}Item{/ts}</th>
                           <th>{ts}Fee{/ts}</th>
-                          {if $dataArray}
+                          {if !empty($dataArray)}
                             <th>{ts}SubTotal{/ts}</th>
                             <th>{ts}Tax Rate{/ts}</th>
                             <th>{ts}Tax Amount{/ts}</th>
@@ -113,11 +113,11 @@
                             <td>
                               {$line.line_total|crmMoney}
                             </td>
-                            {if $dataArray}
+                            {if !empty($dataArray)}
                               <td>
                                 {$line.unit_price*$line.qty|crmMoney}
                               </td>
-                              {if $line.tax_rate != "" || $line.tax_amount != ""}
+                              {if $line.tax_rate and ($line.tax_rate != "" || $line.tax_amount != "")}
                                 <td>
                                   {$line.tax_rate|string_format:"%.2f"}%
                                 </td>
@@ -144,7 +144,7 @@
                     </td>
                   </tr>
                 {/foreach}
-                {if $dataArray}
+                {if !empty($dataArray)}
                   <tr>
                     <td {$labelStyle}>
                       {ts}Amount Before Tax:{/ts}
@@ -184,7 +184,7 @@
                   {$formValues.total_amount|crmMoney}
                 </td>
               </tr>
-              {if $receive_date}
+              {if !empty($receive_date)}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Date Received{/ts}
@@ -194,7 +194,7 @@
                   </td>
                 </tr>
               {/if}
-              {if $formValues.paidBy}
+              {if !empty($formValues.paidBy)}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Paid By{/ts}
@@ -203,7 +203,7 @@
                     {$formValues.paidBy}
                   </td>
                 </tr>
-                {if $formValues.check_number}
+                {if !empty($formValues.check_number)}
                   <tr>
                     <td {$labelStyle}>
                       {ts}Check Number{/ts}
@@ -220,12 +220,12 @@
       </td>
     </tr>
 
-    {if $isPrimary}
+    {if !empty($isPrimary)}
       <tr>
         <td>
           <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
 
-            {if $billingName}
+            {if !empty($billingName)}
               <tr>
                 <th {$headerStyle}>
                   {ts}Billing Name and Address{/ts}
@@ -239,7 +239,7 @@
               </tr>
             {/if}
 
-            {if $credit_card_type}
+            {if !empty($credit_card_type)}
               <tr>
                 <th {$headerStyle}>
                   {ts}Credit Card Information{/ts}
@@ -266,7 +266,7 @@
       </tr>
     {/if}
 
-    {if $customValues}
+    {if !empty($customValues)}
       <tr>
         <td>
           <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">

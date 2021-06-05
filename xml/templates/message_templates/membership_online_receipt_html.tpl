@@ -22,12 +22,12 @@
   <tr>
    <td>
      {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
-    {if $receipt_text}
+    {if !empty($receipt_text)}
      <p>{$receipt_text|htmlize}</p>
     {/if}
 
     {if $is_pay_later}
-     <p>{$pay_later_receipt}</p> {* FIXME: this might be text rather than HTML *}
+     <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p> {* FIXME: this might be text rather than HTML *}
     {/if}
 
    </td>
@@ -79,7 +79,7 @@
        </th>
       </tr>
 
-      {if !$useForMember and $membership_amount and $is_quick_config}
+      {if !$useForMember and isset($membership_amount) and !empty($is_quick_config)}
 
        <tr>
         <td {$labelStyle}>
@@ -108,7 +108,7 @@
          </tr>
        {/if}
 
-      {elseif !$useForMember && $lineItem and $priceSetID and !$is_quick_config}
+      {elseif empty($useForMember) && !empty($lineItem) and $priceSetID and empty($is_quick_config)}
 
        {foreach from=$lineItem item=value key=priceset}
         <tr>
@@ -150,7 +150,7 @@
        </tr>
 
       {else}
-       {if $useForMember && $lineItem and !$is_quick_config}
+       {if $useForMember && $lineItem and empty($is_quick_config)}
        {foreach from=$lineItem item=value key=priceset}
         <tr>
          <td colspan="2" {$valueStyle}>
@@ -158,7 +158,7 @@
            <tr>
             <th>{ts}Item{/ts}</th>
             <th>{ts}Fee{/ts}</th>
-            {if $dataArray}
+            {if !empty($dataArray)}
               <th>{ts}SubTotal{/ts}</th>
               <th>{ts}Tax Rate{/ts}</th>
               <th>{ts}Tax Amount{/ts}</th>
@@ -175,11 +175,11 @@
              <td>
               {$line.line_total|crmMoney}
              </td>
-             {if $dataArray}
+             {if !empty($dataArray)}
               <td>
                {$line.unit_price*$line.qty|crmMoney}
               </td>
-              {if $line.tax_rate != "" || $line.tax_amount != ""}
+              {if isset($line.tax_rate) and ($line.tax_rate != "" || $line.tax_amount != "")}
                <td>
                 {$line.tax_rate|string_format:"%.2f"}%
                </td>
@@ -206,7 +206,7 @@
          </td>
         </tr>
        {/foreach}
-       {if $dataArray}
+       {if !empty($dataArray)}
         <tr>
          <td {$labelStyle}>
           {ts}Amount Before Tax:{/ts}
@@ -228,7 +228,7 @@
         {/foreach}
        {/if}
        {/if}
-       {if $totalTaxAmount}
+       {if isset($totalTaxAmount)}
         <tr>
          <td {$labelStyle}>
           {ts}Total Tax Amount{/ts}
@@ -243,14 +243,14 @@
          {ts}Amount{/ts}
         </td>
         <td {$valueStyle}>
-         {$amount|crmMoney} {if $amount_level} - {$amount_level}{/if}
+         {$amount|crmMoney} {if isset($amount_level)} - {$amount_level}{/if}
         </td>
        </tr>
 
       {/if}
 
 
-     {elseif $membership_amount}
+     {elseif isset($membership_amount)}
 
 
       <tr>
@@ -270,7 +270,7 @@
 
      {/if}
 
-     {if $receive_date}
+     {if !empty($receive_date)}
       <tr>
        <td {$labelStyle}>
         {ts}Date{/ts}
@@ -281,7 +281,7 @@
       </tr>
      {/if}
 
-     {if $is_monetary and $trxn_id}
+     {if !empty($is_monetary) and !empty($trxn_id)}
       <tr>
        <td {$labelStyle}>
         {ts}Transaction #{/ts}
@@ -292,7 +292,7 @@
       </tr>
      {/if}
 
-     {if $membership_trx_id}
+     {if !empty($membership_trx_id)}
       <tr>
        <td {$labelStyle}>
         {ts}Membership Transaction #{/ts}
@@ -302,7 +302,7 @@
        </td>
       </tr>
      {/if}
-     {if $is_recur}
+     {if !empty($is_recur)}
        <tr>
         <td colspan="2" {$labelStyle}>
          {ts}This membership will be renewed automatically.{/ts}
@@ -338,7 +338,7 @@
       {/foreach}
      {/if}
 
-     {if $pcpBlock}
+     {if !empty($pcpBlock)}
       <tr>
        <th {$headerStyle}>
         {ts}Personal Campaign Page{/ts}
@@ -374,7 +374,7 @@
       {/if}
      {/if}
 
-     {if $onBehalfProfile}
+     {if !empty($onBehalfProfile)}
       <tr>
        <th {$headerStyle}>
         {$onBehalfProfile_grouptitle}
@@ -392,7 +392,7 @@
       {/foreach}
      {/if}
 
-     {if $billingName}
+     {if !empty($billingName)}
        <tr>
          <th {$headerStyle}>
            {ts}Billing Name and Address{/ts}
@@ -405,7 +405,7 @@
           {$email}
         </td>
       </tr>
-    {elseif $email}
+    {elseif !empty($email)}
       <tr>
         <th {$headerStyle}>
           {ts}Registered Email{/ts}
@@ -418,7 +418,7 @@
       </tr>
     {/if}
 
-     {if $credit_card_type}
+     {if !empty($credit_card_type)}
       <tr>
        <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
@@ -433,7 +433,7 @@
       </tr>
      {/if}
 
-     {if $selectPremium}
+     {if !empty($selectPremium)}
       <tr>
        <th {$headerStyle}>
         {ts}Premium Information{/ts}
@@ -484,20 +484,20 @@
         </td>
        </tr>
       {/if}
-      {if $contact_email OR $contact_phone}
+      {if !empty($contact_email) OR !empty($contact_phone)}
        <tr>
         <td colspan="2" {$valueStyle}>
          <p>{ts}For information about this premium, contact:{/ts}</p>
-         {if $contact_email}
+         {if !empty($contact_email)}
           <p>{$contact_email}</p>
          {/if}
-         {if $contact_phone}
+         {if !empty($contact_phone)}
           <p>{$contact_phone}</p>
          {/if}
         </td>
        </tr>
       {/if}
-      {if $is_deductible AND $price}
+      {if !empty($is_deductible) AND !empty($price)}
         <tr>
          <td colspan="2" {$valueStyle}>
           <p>{ts 1=$price|crmMoney}The value of this premium is %1. This may affect the amount of the tax deduction you can claim. Consult your tax advisor for more information.{/ts}</p>
@@ -506,14 +506,14 @@
       {/if}
      {/if}
 
-     {if $customPre}
+     {if !empty($customPre)}
       <tr>
        <th {$headerStyle}>
         {$customPre_grouptitle}
        </th>
       </tr>
       {foreach from=$customPre item=customValue key=customName}
-       {if ($trackingFields and ! in_array($customName, $trackingFields)) or ! $trackingFields}
+       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}
@@ -526,14 +526,14 @@
       {/foreach}
      {/if}
 
-     {if $customPost}
+     {if !empty($customPost)}
       <tr>
        <th {$headerStyle}>
         {$customPost_grouptitle}
        </th>
       </tr>
       {foreach from=$customPost item=customValue key=customName}
-       {if ($trackingFields and ! in_array($customName, $trackingFields)) or ! $trackingFields}
+       {if (!empty($trackingFields) and ! in_array($customName, $trackingFields)) or empty($trackingFields)}
         <tr>
          <td {$labelStyle}>
           {$customName}

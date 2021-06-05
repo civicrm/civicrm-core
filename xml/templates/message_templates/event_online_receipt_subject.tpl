@@ -1,1 +1,1 @@
-{if $isOnWaitlist}{ts}Wait List Confirmation{/ts}{elseif $isRequireApproval}{ts}Registration Request Confirmation{/ts}{else}{ts}Registration Confirmation{/ts}{/if} - {$event.event_title} - {contact.display_name}
+{if !empty($isOnWaitlist)}{ts}Wait List Confirmation{/ts}{elseif !empty($isRequireApproval)}{ts}Registration Request Confirmation{/ts}{else}{ts}Registration Confirmation{/ts}{/if} - {$event.event_title} - {contact.display_name}

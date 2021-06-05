@@ -365,6 +365,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'pay_later_receipt' => $values['pay_later_receipt'] ?? NULL,
         'honor_block_is_active' => $values['honor_block_is_active'] ?? NULL,
         'contributionStatus' => $values['contribution_status'] ?? NULL,
+        'currency' => CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $values['contribution_id'], 'currency') ?? CRM_Core_Config::singleton()->defaultCurrency,
       ];
 
       if (!empty($values['financial_type_id'])) {
