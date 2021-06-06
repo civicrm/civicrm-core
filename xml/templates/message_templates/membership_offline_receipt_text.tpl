@@ -24,7 +24,7 @@
 {ts}Membership Fee{/ts}
 
 ===========================================================
-{if $formValues.contributionType_name}
+{if !empty($formValues.contributionType_name)}
 {ts}Financial Type{/ts}: {$formValues.contributionType_name}
 {/if}
 {if !empty($lineItem)}

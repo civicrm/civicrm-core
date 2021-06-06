@@ -147,7 +147,7 @@
       {if !empty($lineItem)}
        {foreach from=$lineItem item=value key=priceset}
         {if $value neq 'skip'}
-         {if $isPrimary}
+         {if !empty($isPrimary)}
           {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
            <tr>
             <td colspan="2" {$labelStyle}>
@@ -255,10 +255,10 @@
         </td>
        </tr>
       {/if}
-      {if $isPrimary}
+      {if !empty($isPrimary)}
        <tr>
         <td {$labelStyle}>
-        {if $balanceAmount}
+        {if isset($balanceAmount)}
            {ts}Total Paid{/ts}
         {else}
            {ts}Total Amount{/ts}

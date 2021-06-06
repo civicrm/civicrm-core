@@ -46,12 +46,14 @@
       </td>
      </tr>
      <tr>
-      <td {$labelStyle}>
-       {ts}Financial Type{/ts}
-      </td>
-      <td {$valueStyle}>
-       {$formValues.contributionType_name}
-      </td>
+      {if !empty($formValues.contributionType_name)}
+        <td {$labelStyle}>
+         {ts}Financial Type{/ts}
+        </td>
+        <td {$valueStyle}>
+         {$formValues.contributionType_name}
+        </td>
+      {/if}
      </tr>
 
      {if !empty($lineItem) and empty($is_quick_config)}
