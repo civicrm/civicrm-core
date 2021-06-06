@@ -57,6 +57,9 @@ $MYSQLDUMP -cent --skip-triggers $DBNAME $TABLENAMES > civicrm_generated.mysql
 cat civicrm_sample_custom_data.mysql >> civicrm_generated.mysql
 #cat civicrm_devel_config.mysql >> civicrm_generated.mysql
 cat civicrm_dummy_processor.mysql >> civicrm_generated.mysql
+# adapted from https://bugs.mysql.com/bug.php?id=65465
+sed -i -e 's/VALUES (/VALUES\n (/g' civicrm_generated.mysql
+sed -i -e 's/),(\|), (/),\n (/g' civicrm_generated.mysql
 $MYSQLADMCMD -f drop $DBNAME
 $MYSQLADMCMD create $DBNAME
 $MYSQLCMD < civicrm.mysql
