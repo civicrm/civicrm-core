@@ -23,27 +23,23 @@ use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Service\Spec\SpecFormatter;
 
-class AttachmentSpecProvider implements Generic\SpecProviderInterface {
+class AttachmentCreationSpecProvider implements Generic\SpecProviderInterface {
 
   /**
    * @inheritDoc
    */
   public function modifySpec(RequestSpec $spec) {
-    $action = $spec->getAction();
-
-    if ($action == 'create') {
-      $spec->getFieldByName('name')->setRequired(TRUE);
-      $spec->getFieldByName('mime_type')->setRequired(TRUE);
-      $spec->getFieldByName('entity_id')->setRequired(TRUE);
-      $spec->getFieldByName('upload_date')->setDefaultValue('now');
-    }
+    $spec->getFieldByName('mime_type')->setRequired(TRUE);
+    $spec->getFieldByName('entity_id')->setRequired(TRUE);
+    $spec->getFieldByName('upload_date')->setDefaultValue('now');
+    //$spec->getFieldByName('id')->setRequiredIf('empty($values.entity_table) && empty($values.field_name)');
   }
 
   /**
    * @inheritDoc
    */
   public function applies($entity, $action) {
-    return $entity === 'Attachment';
+    return $entity === 'Attachment' && $action === 'create';
   }
 
 }

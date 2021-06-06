@@ -23,10 +23,15 @@ namespace Civi\Api4;
  * "Attachment" is a pseudo-entity which represents a record in civicrm_file combined with a record in civicrm_entity_file as well as the underlying
  * file content.
  *
- * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
- * @searchable primary
  * @package Civi\Api4
  */
 class Attachment extends Generic\DAOEntity {
 
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\BasicGetAction
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new \Civi\Api4\Action\Attachment\Get(__CLASS__, __FUNCTION__))->setCheckPermissions($checkPermissions);
+  }
 }

@@ -173,31 +173,27 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
   /**
    * Attachment result formatting helper.
    *
-   * @param CRM_Core_DAO_File $fileDao
-   *   Maybe "File" or "File JOIN EntityFile".
-   * @param CRM_Core_DAO_EntityFile $entityFileDao
-   *   Maybe "EntityFile" or "File JOIN EntityFile".
-   * @param bool $returnContent
-   *   Whether to return the full content of the file.
+   * @param array $attachement
    * @param bool $isTrusted
    *   Whether the current request is trusted to perform file-specific operations.
+   * @param array $returnProperties
    *
    * @return array
    */
-  public static function formatResult($fileDao, $entityFileDao, $returnContent, $isTrusted) {
+  public static function formatResult($attachment, $isTrusted, $returnProperties) {
     $config = CRM_Core_Config::singleton();
-    $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
+    $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $attachment['uri'];
 
     $result = [
-      'id' => $fileDao->id,
-      'name' => CRM_Utils_File::cleanFileName($fileDao->uri),
-      'mime_type' => $fileDao->mime_type,
-      'description' => $fileDao->description,
-      'upload_date' => is_numeric($fileDao->upload_date) ? CRM_Utils_Date::mysqlToIso($fileDao->upload_date) : $fileDao->upload_date,
-      'entity_table' => $entityFileDao->entity_table,
-      'entity_id' => $entityFileDao->entity_id,
-      'icon' => CRM_Utils_File::getIconFromMimeType($fileDao->mime_type),
-      'created_id' => $fileDao->created_id,
+      'id' => $attachment['id'],
+      'name' => CRM_Utils_File::cleanFileName($attachment['uri']),
+      'mime_type' => $attachment['mime_type'],
+      'description' => $attachment['description'],
+      'upload_date' => is_numeric($attachment['upload_date']) ? CRM_Utils_Date::mysqlToIso($attachment['upload_date']) : $attachment['upload_date'],
+      'entity_table' => $attachment['entity_table'],
+      'entity_id' => $attachment['entity_id'],
+      'icon' => CRM_Utils_File::getIconFromMimeType($attachment['mime_type']),
+      'created_id' => $attachment['created_id'],
     ];
     $fileHash = CRM_Core_BAO_File::generateFileHash($result['entity_id'], $result['id']);
     $result['url'] = CRM_Utils_System::url(
@@ -210,10 +206,81 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
     if ($isTrusted) {
       $result['path'] = $path;
     }
-    if ($returnContent) {
+    if (!empty($returnProperties)) {
+      foreach ($result as $fieldName => $dontCare) {
+        if (!in_array($fieldName, $returnProperties)) {
+          unset($result[$fieldName]);
+        }
+      }
+    }
+    if (in_array('content', $returnProperties)) {
       $result['content'] = file_get_contents($path);
     }
     return $result;
+  }
+
+  /**
+   * Attachment find helper.
+   *
+   * @param array $params
+   * @param int|null $id the user-supplied ID of the attachment record
+   * @param array $file
+   *   The user-supplied vales for the file (mime_type, description, upload_date).
+   * @param array $entityFile
+   *   The user-supplied values of the entity-file (entity_table, entity_id).
+   * @param bool $isTrusted
+   *
+   * @return CRM_Core_DAO
+   * @throws API_Exception
+   */
+  public static function getAttachement($params) {
+    foreach (['name', 'content', 'path', 'url'] as $unsupportedFilter) {
+      if (!empty($params[$unsupportedFilter])) {
+        throw new CRM_Core_Exception("Get by $unsupportedFilter is not currently supported");
+      }
+    }
+
+    $select = CRM_Utils_SQL_Select::from('civicrm_file cf')
+      ->join('cef', 'INNER JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
+      ->select([
+        'cf.id',
+        'cf.uri',
+        'cf.mime_type',
+        'cf.description',
+        'cf.upload_date',
+        'cf.created_id',
+        'cef.entity_table',
+        'cef.entity_id',
+      ]);
+
+    if ($id) {
+      $select->where('cf.id = #id', ['#id' => $id]);
+    }
+    // Recall: $file is filtered by parse_params.
+    foreach ($file as $key => $value) {
+      $select->where('cf.!field = @value', [
+        '!field' => $key,
+        '@value' => $value,
+      ]);
+    }
+    // Recall: $entityFile is filtered by parse_params.
+    foreach ($entityFile as $key => $value) {
+      $select->where('cef.!field = @value', [
+        '!field' => $key,
+        '@value' => $value,
+      ]);
+    }
+    if (!$isTrusted) {
+      // FIXME ACLs: Add any JOIN or WHERE clauses needed to enforce access-controls for the target entity.
+      //
+      // The target entity is identified by "cef.entity_table" (aka $entityFile['entity_table']) and "cef.entity_id".
+      //
+      // As a simplification, we *require* the "get" actions to filter on a single "entity_table" which should
+      // avoid the complexity of matching ACL's against multiple entity types.
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($select->toSQL());
+    return $dao;
   }
 
 
@@ -228,18 +295,6 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       $entityFileFields = CRM_Core_DAO_EntityFile::fields();
       $fields = [];
       $fields['id'] = $fileFields['id'];
-      $fields['name'] = [
-        'name' => 'name',
-        'title' => 'Name (write-once)',
-        'description' => 'The logical file name (not searchable)',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['field_name'] = [
-        'name' => 'field_name',
-        'title' => 'Field Name (write-once)',
-        'description' => 'Alternative to "entity_table" param - sets custom field value.',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
       $fields['mime_type'] = $fileFields['mime_type'];
       $fields['description'] = $fileFields['description'];
       $fields['upload_date'] = $fileFields['upload_date'];
@@ -249,29 +304,46 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       $fields['entity_id'] = $entityFileFields['entity_id'];
       // would be hard to securely handle changes
       $fields['entity_id']['title'] = CRM_Utils_Array::value('title', $fields['entity_id'], 'Entity ID') . ' (write-once)';
+      $fields['created_id'] = [
+        'name' => 'created_id',
+        'title' => 'Created By Contact ID',
+        'type' => CRM_Utils_Type::T_INT,
+        'description' => 'FK to civicrm_contact, who uploaded this file',
+      ];
+      $fields['name'] = [
+        'pseudo' => TRUE,
+        'name' => 'name',
+        'title' => 'Name (write-once)',
+        'description' => 'The logical file name (not searchable)',
+        'type' => CRM_Utils_Type::T_STRING,
+      ];
+      $fields['field_name'] = [
+        'pseudo' => TRUE,
+        'name' => 'field_name',
+        'title' => 'Field Name (write-once)',
+        'description' => 'Alternative to "entity_table" param - sets custom field value.',
+        'type' => CRM_Utils_Type::T_STRING,
+      ];
       $fields['url'] = [
+        'pseudo' => TRUE,
         'name' => 'url',
         'title' => 'URL (read-only)',
         'description' => 'URL for downloading the file (not searchable, expire-able)',
         'type' => CRM_Utils_Type::T_STRING,
       ];
       $fields['path'] = [
+        'pseudo' => TRUE,
         'name' => 'path',
         'title' => 'Path (read-only)',
         'description' => 'Local file path (not searchable, local-only)',
         'type' => CRM_Utils_Type::T_STRING,
       ];
       $fields['content'] = [
+        'pseudo' => TRUE,
         'name' => 'content',
         'title' => 'Content',
         'description' => 'File content (not searchable, not returned by default)',
         'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['created_id'] = [
-        'name' => 'created_id',
-        'title' => 'Created By Contact ID',
-        'type' => CRM_Utils_Type::T_INT,
-        'description' => 'FK to civicrm_contact, who uploaded this file',
       ];
       Civi::$statics[__CLASS__]['fields'] = $fields;
     }

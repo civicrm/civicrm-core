@@ -107,10 +107,11 @@ function civicrm_api3_attachment_create($params) {
 function civicrm_api3_attachment_get($params) {
   list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = CRM_Core_BAO_Attachment::parseParams($params);
 
-  $dao = __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTrusted);
+  $attachments = __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTrusted)->fetchAll() ?? [];
   $result = [];
-  while ($dao->fetch()) {
-    $result[$dao->id] = CRM_Core_BAO_Attachment::parseParams($dao, $dao, $returnContent, $isTrusted);
+  $returnProperties = $params['return'] ?? [];
+  foreach ($attachments as $attachment) {
+    $result[$attachement['id']] = CRM_Core_BAO_Attachment::formatResult($attachment, $isTrusted, $returnProperties);
   }
   return civicrm_api3_create_success($result, $params, 'Attachment', 'create');
 }

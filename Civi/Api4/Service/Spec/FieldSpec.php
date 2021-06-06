@@ -136,6 +136,11 @@ class FieldSpec {
   public $readonly = FALSE;
 
   /**
+   * @var bool
+   */
+  public $pseudo = FALSE;
+
+  /**
    * @var callable[]
    */
   public $outputFormatters;
@@ -468,6 +473,16 @@ class FieldSpec {
    */
   public function setType(string $type) {
     $this->type = $type;
+
+    return $this;
+  }
+
+  /**
+   * @param bool $readonly
+   * @return $this
+   */
+  public function setPseudo($pseudo) {
+    $this->pseudo = (bool) $pseudo;
 
     return $this;
   }
