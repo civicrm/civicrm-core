@@ -147,6 +147,10 @@ class SavedSearchTest extends UnitTestCase {
         ->execute()->first()['id'];
     }
 
+    $parentGroupId = \Civi\Api4\Group::create(FALSE)
+      ->setValues(['title' => uniqid()])
+      ->execute()->first()['id'];
+
     $savedSearchA = civicrm_api4('SavedSearch', 'create', [
       'values' => [
         'api_entity' => 'Contact',
@@ -158,7 +162,7 @@ class SavedSearchTest extends UnitTestCase {
         ],
       ],
       'chain' => [
-        'group' => ['Group', 'create', ['values' => ['title' => 'In A Test', 'saved_search_id' => '$id']], 0],
+        'group' => ['Group', 'create', ['values' => ['parents' => [$parentGroupId], 'title' => 'In A Test', 'saved_search_id' => '$id']], 0],
       ],
     ])->first();
 
@@ -174,7 +178,7 @@ class SavedSearchTest extends UnitTestCase {
         ],
       ],
       'chain' => [
-        'group' => ['Group', 'create', ['values' => ['title' => 'In B Test', 'saved_search_id' => '$id']], 0],
+        'group' => ['Group', 'create', ['values' => ['parents' => [$parentGroupId], 'title' => 'In B Test', 'saved_search_id' => '$id']], 0],
       ],
     ])->first();
 
@@ -182,6 +186,12 @@ class SavedSearchTest extends UnitTestCase {
       'where' => [['groups:name', 'IN', [$savedSearchA['group']['name'], $savedSearchB['group']['name']]]],
     ]);
     $this->assertCount(15, $bothGroups);
+
+    // Parent group includes both groups a & b so should give the same results as above
+    $parentGroup = civicrm_api4('Contact', 'get', [
+      'where' => [['groups', 'IN', [$parentGroupId]]],
+    ]);
+    $this->assertCount(15, $parentGroup);
 
     $aNotB = civicrm_api4('Contact', 'get', [
       'where' => [
