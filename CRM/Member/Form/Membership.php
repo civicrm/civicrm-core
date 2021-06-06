@@ -945,6 +945,10 @@ DESC limit 1");
 
     if (!empty($formValues['contribution_id'])) {
       $form->assign('contributionID', $formValues['contribution_id']);
+      $form->assign('currency', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $formValues['contribution_id'], 'currency'));
+    }
+    else {
+      $form->assign('currency', CRM_Core_Config::singleton()->defaultCurrency);
     }
 
     if (!empty($formValues['contribution_status_id'])) {

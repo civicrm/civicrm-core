@@ -1360,7 +1360,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     // also store lineitem stuff here
-    if ((($this->_lineItem & $this->_action & CRM_Core_Action::ADD) ||
+    if ((($this->_lineItem && $this->_action & CRM_Core_Action::ADD) ||
       ($this->_lineItem && CRM_Core_Action::UPDATE && !$this->_paymentId))
     ) {
       foreach ($this->_contactIds as $num => $contactID) {
