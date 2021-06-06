@@ -112,6 +112,8 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'activity_date_time' => '20120615100000',
       'is_current_revision' => 1,
       'is_deleted' => 0,
+      'subject' => 'Phone call',
+      'details' => 'A phone call about a bear',
     ];
     $this->fixtures['contact'] = [
       'is_deceased' => 0,
@@ -949,6 +951,27 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       [
         'body_html' => '/^--UNDEFINED--$/',
         'body_text' => '/^Hello world$/',
+      ],
+    ];
+
+    // In this example, we test activity tokens
+    $activityTokens = '{activity.subject};;{activity.details};;{activity.activity_date_time}';
+    $activity = $this->fixtures['phonecall'];
+    $activityTokensExpected = "Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM";
+    $cases[4] = [
+      // Schedule definition.
+      [
+        'subject' => "subj $someTokensTmpl",
+        'body_html' => "html {$activityTokens}",
+        'body_text' => "text {$activityTokens}",
+      ],
+      // Assertions (regex).
+      [
+        'from_name' => '/^FIXME$/',
+        'from_email' => '/^info@EXAMPLE.ORG$/',
+        'subject' => "/^subj $someTokensExpected\$/",
+        'body_html' => "/^html $activityTokensExpected\$/",
+        'body_text' => "/^text $activityTokensExpected\$/",
       ],
     ];
 
