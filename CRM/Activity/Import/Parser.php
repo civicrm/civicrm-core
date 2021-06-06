@@ -58,7 +58,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    */
   public function run(
     array $fileName,
-    $separator = ',',
+    $separator,
     &$mapper,
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,

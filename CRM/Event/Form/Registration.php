@@ -1100,7 +1100,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param array $optionFullIds
    * @param CRM_Core_Form $form
    */
-  public static function resetElementValue($optionFullIds = [], &$form) {
+  public static function resetElementValue($optionFullIds, &$form) {
     if (!is_array($optionFullIds) ||
       empty($optionFullIds) ||
       !$form->isSubmitted()
@@ -1173,7 +1173,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param array $optionIds
    * @param CRM_Core_Form $form
    */
-  public static function resetSubmittedValue($elementName, $optionIds = [], &$form) {
+  public static function resetSubmittedValue($elementName, $optionIds, &$form) {
     if (empty($elementName) ||
       !$form->elementExists($elementName) ||
       !$form->getSubmitValue($elementName)
