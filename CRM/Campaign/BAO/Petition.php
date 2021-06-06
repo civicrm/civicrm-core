@@ -576,6 +576,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     // tokens then available in msg template as {$petition.title}, etc
     $petitionTokens['title'] = $petitionInfo['title'];
     $petitionTokens['petitionId'] = $params['sid'];
+    $tplParams['survey_id'] = $params['sid'];
+    $tplParams['petitionTitle'] = $petitionInfo['title'];
     $tplParams['petition'] = $petitionTokens;
 
     switch ($sendEmailMode) {
