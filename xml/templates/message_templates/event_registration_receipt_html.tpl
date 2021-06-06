@@ -21,7 +21,7 @@
     {/if}
 
     {if $is_pay_later}
-      <p>{$pay_later_receipt}</p>
+      <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p>
     {/if}
 
     <p>Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}

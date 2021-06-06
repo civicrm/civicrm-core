@@ -545,7 +545,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @return bool|object
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function cancelSubscription(&$message = '', $params) {
+  public function cancelSubscription(&$message = '', $params = []) {
     $template = CRM_Core_Smarty::singleton();
 
     $template->assign('subscriptionType', 'cancel');

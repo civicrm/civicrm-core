@@ -176,7 +176,7 @@
       </td>
     </tr>
 
-    {if $event.participant_role}
+    {if !empty($event.participant_role)}
     <tr>
       <td {$labelStyle}>
         {ts}Participant Role{/ts}
@@ -187,7 +187,7 @@
     </tr>
     {/if}
 
-    {if $isShowLocation}
+    {if !empty($isShowLocation)}
     <tr>
       <td colspan="2" {$valueStyle}>
         {$location.address.1.display|nl2br}
@@ -195,7 +195,7 @@
     </tr>
     {/if}
 
-    {if $location.phone.1.phone || $location.email.1.email}
+    {if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
     <tr>
       <td colspan="2" {$labelStyle}>
         {ts}Event Contacts:{/ts}
