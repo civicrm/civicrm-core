@@ -16,7 +16,7 @@
       </p>
     {else}
       <p>
-        This is being sent to you as a {if $is_refund}confirmation of refund{else}receipt of payment made{/if} for the following workshop, event registration or purchase.
+        This is being sent to you as a {if !empty($is_refund)}confirmation of refund{else}receipt of payment made{/if} for the following workshop, event registration or purchase.
       </p>
     {/if}
 
@@ -24,7 +24,7 @@
       <p>{if isset($pay_later_receipt)}{$pay_later_receipt}{/if}</p>
     {/if}
 
-    <p>Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
+    <p>Your order number is #{$transaction_id}. {if !empty($line_items) && empty($is_refund)} Information about the workshops will be sent separately to each participant.{/if}
   Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:</p>
 
 {if $billing_name}
@@ -62,7 +62,7 @@
     </tr>
     </table>
 {/if}
-{if $source}
+{if !empty($source)}
     <p>&nbsp;</p>
     {$source}
 {/if}

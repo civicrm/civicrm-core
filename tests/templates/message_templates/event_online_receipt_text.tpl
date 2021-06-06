@@ -14,7 +14,9 @@ participant_status:::{$participant_status}
 {if isset($pricesetFieldsCount)}
 pricesetFieldsCount:::{$pricesetFieldsCount}
 {/if}
+{if !empty($isPrimary)}
 isPrimary:::{$isPrimary}
+{/if}
 {if isset($conference_sessions)}
 conference_sessions:::{$conference_sessions}
 {/if}

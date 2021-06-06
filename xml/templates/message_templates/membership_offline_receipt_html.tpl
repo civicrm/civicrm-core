@@ -76,7 +76,7 @@
                   {ts}Membership Fee{/ts}
                 </th>
               </tr>
-              {if $formValues.contributionType_name}
+              {if !empty($formValues.contributionType_name)}
                 <tr>
                   <td {$labelStyle}>
                     {ts}Financial Type{/ts}

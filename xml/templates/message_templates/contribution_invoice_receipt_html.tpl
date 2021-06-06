@@ -60,7 +60,7 @@
         </tr>
         <tr>
           <td><font size="1" align="right"> {$country}</font></td>
-          <td><font size="1" align="right">{$source}</font></td>
+          <td><font size="1" align="right">{if !empty($source)}{$source}{/if}</font></td>
           <td valign="top" style="white-space: nowrap"><font size="1" align="right">{if $domain_email}{$domain_email}{/if}</font> </td>
         </tr>
         <tr>

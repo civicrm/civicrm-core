@@ -9,7 +9,9 @@
 
 ===========================================================
 {ts}Contributor{/ts}: {contact.display_name}
+{if !empty($formValues.contributionType_name)}
 {ts}Financial Type{/ts}: {$formValues.contributionType_name}
+{/if}
 {if $lineItem}
 {foreach from=$lineItem item=value key=priceset}
 ---------------------------------------------------------
