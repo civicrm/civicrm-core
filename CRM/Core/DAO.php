@@ -2803,7 +2803,7 @@ SELECT contact_id
             // The first 2 criteria are redundant but are added as they
             // seem like they would
             // be quicker than this 3rd check.
-            && max(array_map('ord', str_split($criterion))) >= 240) {
+            && max(array_map('ord', str_split((string) $criterion))) >= 240) {
             // String contains unsupported emojis.
             // We return a clause that resolves to false as an emoji string by definition cannot be saved.
             // note that if we return just 0 for false if gets lost in empty checks.

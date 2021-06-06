@@ -74,7 +74,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
-      $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
+      if (is_array($extendsChildType)) {
+        $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
+      }
+      else {
+        throw new Exception('implode(): Invalid arguments passed');
+      }
       if (CRM_Utils_Array::value(0, $extends) == 'Relationship') {
         $extendsChildType = str_replace(['_a_b', '_b_a'], [
           '',
