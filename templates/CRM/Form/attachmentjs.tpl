@@ -15,7 +15,7 @@
         request.done(function() {
           $el.trigger('crmPopupFormSuccess');
           $row.remove();
-          {/literal}{if $context EQ 'MessageTemplate'}{literal}
+          {/literal}{if isset($context) and $context EQ 'MessageTemplate'}{literal}
             $('#file_id').show();
           {/literal}{/if}{literal}
         });

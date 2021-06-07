@@ -8,16 +8,16 @@
  +--------------------------------------------------------------------+
 *}
 
-{if $element.help_pre}
+{if !empty($element.help_pre)}
   <tr class="custom_field-help-pre-row {$element.element_name}-row-help-pre">
     <td>&nbsp;</td>
     <td class="html-adjust description">{$element.help_pre}</td>
   </tr>
 {/if}
-{if $element.options_per_line != 0 }
+{if isset($element.options_per_line) and $element.options_per_line != 0 }
   <tr class="custom_field-row {$element.element_name}-row">
     <td
-      class="label">{$formElement.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
+      class="label">{$formElement.label}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}</td>
     <td class="html-adjust">
       {assign var="count" value="1"}
       <table class="form-layout-compressed" style="margin-top: -0.5em;">
@@ -45,7 +45,7 @@
 {else}
   <tr class="custom_field-row {$element.element_name}-row">
     <td class="label">{$formElement.label}
-      {if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}
+      {if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$element.label}{/if}
     </td>
     <td class="html-adjust">
       {$formElement.html}&nbsp;

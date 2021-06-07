@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Custom Data form*}
-{if $formEdit}
+{if !empty($formEdit)}
   {include file="CRM/Custom/Form/Edit/CustomData.tpl" customDataEntity=''}
 {else}
   {foreach from=$groupTree item=cd_edit key=group_id name=custom_sets}
@@ -34,7 +34,11 @@
       </div>
      </div>
     {/if}
-    <div id="custom_group_{$group_id}_{$cgCount}"></div>
+    {if isset($cgCount)}
+      <div id="custom_group_{$group_id}_{$cgCount}"></div>
+    {else}
+      <div id="custom_group_{$group_id}"></div>
+    {/if}
   {/foreach}
 
 {/if}
