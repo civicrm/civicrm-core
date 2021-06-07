@@ -3067,7 +3067,6 @@ SELECT contact_id
     ) {
       throw new CRM_Core_Exception('Function checkAccess must be called on a BAO class');
     }
-    $userID = isset($userID) ? (int) $userID : CRM_Core_Session::getLoggedInContactID();
     // Dispatch to protected function _checkAccess in this BAO
     if ($granted && method_exists(static::class, '_checkAccess')) {
       $granted = static::_checkAccess($entityName, $action, $record, $userID);

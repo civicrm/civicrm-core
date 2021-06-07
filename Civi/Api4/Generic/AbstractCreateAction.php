@@ -70,7 +70,7 @@ abstract class AbstractCreateAction extends AbstractAction {
       throw new \API_Exception("Mandatory values missing from Api4 {$this->getEntityName()}::{$this->getActionName()}: " . implode(", ", $unmatched), "mandatory_missing", ["fields" => $unmatched]);
     }
 
-    if ($this->checkPermissions && !CoreUtil::checkAccess($this->getEntityName(), $this->getActionName(), $this->getValues())) {
+    if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $this->getValues(), \CRM_Core_Session::getLoggedInContactID())) {
       throw new UnauthorizedException("ACL check failed");
     }
 

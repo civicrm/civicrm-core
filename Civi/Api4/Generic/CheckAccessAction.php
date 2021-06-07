@@ -52,7 +52,7 @@ class CheckAccessAction extends AbstractAction {
       $granted = TRUE;
     }
     else {
-      $granted = CoreUtil::checkAccess($this->getEntityName(), $this->action, $this->values);
+      $granted = CoreUtil::checkAccessDelegated($this->getEntityName(), $this->action, $this->values, \CRM_Core_Session::getLoggedInContactID());
     }
     $result->exchangeArray([['access' => $granted]]);
   }

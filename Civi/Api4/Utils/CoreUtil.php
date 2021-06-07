@@ -155,36 +155,33 @@ class CoreUtil {
   /**
    * Check if current user is authorized to perform specified action on a given entity.
    *
-   * @param string $entityName
-   * @param string $actionName
+   * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array $record
    * @param int|null $userID
-   *   Contact ID of the user we are testing, or NULL for the default/active user.
+   *   Contact ID of the user we are testing, or NULL for the anonymous user.
    * @return bool
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkAccess(string $entityName, string $actionName, array $record, $userID = NULL) {
-    $action = Request::create($entityName, $actionName, ['version' => 4]);
-    // This checks gatekeeper permissions
-    $granted = $action->isAuthorized($userID);
+  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, ?int $userID) {
+    $granted = TRUE;
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
-    if (is_a($action, '\Civi\Api4\Generic\DAOGetAction')) {
-      $granted = $granted && $action->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
+    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
+      $granted = $granted && $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
     }
     else {
       // If entity has a BAO, run the BAO::checkAccess function, which will call the hook
-      $baoName = self::getBAOFromApiName($entityName);
+      $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
       if ($baoName) {
-        $granted = $baoName::checkAccess($entityName, $actionName, $record, $userID, $granted);
+        $granted = $baoName::checkAccess($apiRequest->getEntityName(), $apiRequest->getActionName(), $record, $userID, $granted);
       }
       // Otherwise, call the hook directly
       else {
-        \CRM_Utils_Hook::checkAccess($entityName, $actionName, $record, $userID, $granted);
+        \CRM_Utils_Hook::checkAccess($apiRequest->getEntityName(), $apiRequest->getActionName(), $record, $userID, $granted);
       }
     }
     return $granted;
@@ -204,9 +201,13 @@ class CoreUtil {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, $userID = NULL) {
-    // FIXME: Move isAuthorized check into here. It's redundant for normal checkAccess().
-    return static::checkAccess($entityName, $actionName, $record, $userID);
+  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, ?int $userID) {
+    $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
+    // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
+    if (!$apiRequest->isAuthorized($userID)) {
+      return FALSE;
+    }
+    return static::checkAccessRecord($apiRequest, $record, $userID);
   }
 
 }
