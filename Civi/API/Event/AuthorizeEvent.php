@@ -22,24 +22,7 @@ namespace Civi\API\Event;
  * Event name: 'civi.api.authorize'
  */
 class AuthorizeEvent extends Event {
-  /**
-   * @var bool
-   */
-  private $authorized = FALSE;
 
-  /**
-   * Mark the request as authorized.
-   */
-  public function authorize() {
-    $this->authorized = TRUE;
-  }
-
-  /**
-   * @return bool
-   *   TRUE if the request has been authorized.
-   */
-  public function isAuthorized() {
-    return $this->authorized;
-  }
+  use AuthorizedTrait;
 
 }
