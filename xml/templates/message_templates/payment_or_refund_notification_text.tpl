@@ -31,13 +31,13 @@
 {if $receive_date}
 {ts}Transaction Date{/ts}: {$receive_date|crmDate}
 {/if}
-{if $trxn_id}
+{if !empty($trxn_id)}
 {ts}Transaction #{/ts}: {$trxn_id}
 {/if}
-{if $paidBy}
+{if !empty($paidBy)}
 {ts}Paid By{/ts}: {$paidBy}
 {/if}
-{if $checkNumber}
+{if !empty($checkNumber)}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
 
@@ -46,24 +46,33 @@
 {ts}Contribution Details{/ts}
 
 ===============================================================================
+{if isset($totalAmount)}
 {ts}Total Fee{/ts}: {$totalAmount|crmMoney}
+{/if}
+{if isset($totalPaid)}
 {ts}Total Paid{/ts}: {$totalPaid|crmMoney}
+{/if}
+{if isset($amountOwed)}
 {ts}Balance Owed{/ts}: {$amountOwed|crmMoney} {* This will be zero after final payment. *}
+{/if}
 
 
-{if $billingName || $address}
+{if !empty($billingName) || !empty($address)}
 
 ===============================================================================
 
 {ts}Billing Name and Address{/ts}
 
 ===============================================================================
-
+{if !empty($billingName)}
 {$billingName}
+{/if}
+{if !empty($address)}
 {$address}
 {/if}
+{/if}
 
-{if $credit_card_number}
+{if !empty($credit_card_number)}
 ===========================================================
 {ts}Credit Card Information{/ts}
 
@@ -83,15 +92,15 @@
 {$event.event_title}
 {$event.event_start_date|crmDate}{if $event.event_end_date}-{if $event.event_end_date|date_format:"%Y%m%d" == $event.event_start_date|date_format:"%Y%m%d"}{$event.event_end_date|crmDate:0:1}{else}{$event.event_end_date|crmDate}{/if}{/if}
 
-{if $event.participant_role}
+{if !empty($event.participant_role)}
 {ts}Participant Role{/ts}: {$event.participant_role}
 {/if}
 
-{if $isShowLocation}
+{if !empty($isShowLocation)}
 {$location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
-{if $location.phone.1.phone || $location.email.1.email}
+{if !empty($location.phone.1.phone) || !empty($location.email.1.email)}
 
 {ts}Event Contacts:{/ts}
 {foreach from=$location.phone item=phone}

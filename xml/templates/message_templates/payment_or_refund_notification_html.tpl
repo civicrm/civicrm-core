@@ -71,7 +71,7 @@
         </td>
       </tr>
     {/if}
-    {if $trxn_id}
+    {if !empty($trxn_id)}
       <tr>
         <td {$labelStyle}>
         {ts}Transaction #{/ts}
@@ -81,7 +81,7 @@
         </td>
       </tr>
     {/if}
-    {if $paidBy}
+    {if !empty($paidBy)}
       <tr>
         <td {$labelStyle}>
         {ts}Paid By{/ts}
@@ -91,7 +91,7 @@
         </td>
       </tr>
     {/if}
-    {if $checkNumber}
+    {if !empty($checkNumber)}
       <tr>
         <td {$labelStyle}>
         {ts}Check Number{/ts}
@@ -105,6 +105,7 @@
   <tr>
     <th {$headerStyle}>{ts}Contribution Details{/ts}</th>
   </tr>
+  {if isset($totalAmount)}
   <tr>
     <td {$labelStyle}>
       {ts}Total Fee{/ts}
@@ -113,6 +114,8 @@
       {$totalAmount|crmMoney}
     </td>
   </tr>
+  {/if}
+  {if isset($totalPaid)}
   <tr>
     <td {$labelStyle}>
       {ts}Total Paid{/ts}
@@ -121,6 +124,8 @@
       {$totalPaid|crmMoney}
     </td>
   </tr>
+  {/if}
+  {if isset($amountOwed)}
   <tr>
     <td {$labelStyle}>
       {ts}Balance Owed{/ts}
@@ -129,6 +134,7 @@
       {$amountOwed|crmMoney}
     </td> {* This will be zero after final payment. *}
   </tr>
+  {/if}
   </table>
 
   </td>
@@ -136,7 +142,7 @@
     <tr>
       <td>
   <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-    {if $billingName || $address}
+    {if !empty($billingName) || !empty($address)}
           <tr>
             <th {$headerStyle}>
         {ts}Billing Name and Address{/ts}
@@ -144,12 +150,12 @@
           </tr>
           <tr>
             <td colspan="2" {$valueStyle}>
-        {$billingName}<br />
-        {$address|nl2br}
+        {if !empty($billingName)}{$billingName}{/if}<br />
+        {if !empty($address)}{$address|nl2br}{/if}
             </td>
           </tr>
     {/if}
-    {if $credit_card_number}
+    {if !empty($credit_card_number)}
           <tr>
             <th {$headerStyle}>
         {ts}Credit Card Information{/ts}

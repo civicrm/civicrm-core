@@ -214,6 +214,7 @@
         {/if}
        {/foreach}
        {if !empty($dataArray)}
+        {if isset($totalAmount) and isset($totalTaxAmount)}
         <tr>
          <td {$labelStyle}>
           {ts}Amount Before Tax:{/ts}
@@ -222,6 +223,7 @@
           {$totalAmount-$totalTaxAmount|crmMoney}
          </td>
         </tr>
+        {/if}
         {foreach from=$dataArray item=value key=priceset}
           <tr>
            {if $priceset || $priceset == 0}
