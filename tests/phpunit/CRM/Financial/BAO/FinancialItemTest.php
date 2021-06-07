@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\FinancialItem;
+
 /**
  * Class CRM_Financial_BAO_FinancialItemTest
  * @group headless
@@ -16,7 +19,21 @@
 class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * This test class can't utilise the post check as the test deliberately
+   * creates invalid financial items.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * Clean up after each test.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -25,26 +42,20 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
    * Check method add()
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testAdd() {
-    $params = [
-      'first_name' => 'Shane',
-      'last_name' => 'Whatson',
-      'contact_type' => 'Individual',
-    ];
-
-    $contact = $this->callAPISuccess('Contact', 'create', $params);
-
+  public function testAdd(): void {
     $price = 100;
-    $cParams = [
-      'contact_id' => $contact['id'],
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->individualCreate(),
       'total_amount' => $price,
       'financial_type_id' => 1,
       'is_active' => 1,
       'skipLineItem' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $cParams);
+    ]);
     $lParams = [
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
@@ -72,26 +83,21 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method retrive()
+   * Check method retrieve()
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testRetrieve() {
-    $params = [
-      'first_name' => 'Shane',
-      'last_name' => 'Whatson',
-      'contact_type' => 'Individual',
-    ];
-
-    $contact = $this->callAPISuccess('Contact', 'create', $params);
+  public function testRetrieve(): void {
     $price = 100.00;
-    $cParams = [
-      'contact_id' => $contact['id'],
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->individualCreate(),
       'total_amount' => $price,
       'financial_type_id' => 1,
       'is_active' => 1,
       'skipLineItem' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $cParams);
+    ]);
     $lParams = [
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
@@ -118,18 +124,16 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
   /**
    * Check method create()
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
-  public function testCreate() {
-    $params = [
-      'first_name' => 'Shane',
-      'last_name' => 'Whatson',
-      'contact_type' => 'Individual',
-    ];
-
-    $contact = $this->callAPISuccess('Contact', 'create', $params);
+  public function testCreate(): void {
+    $contactID = $this->individualCreate();
     $price = 100.00;
     $cParams = [
-      'contact_id' => $contact['id'],
+      'contact_id' => $contactID,
       'total_amount' => $price,
       'financial_type_id' => 1,
       'is_active' => 1,
@@ -151,7 +155,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
 
     $lineItem = CRM_Price_BAO_LineItem::create($lParams);
     $fParams = [
-      'contact_id' => $contact['id'],
+      'contact_id' => $contactID,
       'description' => 'Contribution Amount',
       'amount' => $price,
       'financial_account_id' => 1,
@@ -160,48 +164,36 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'entity_id' => $lineItem->id,
       'entity_table' => 'civicrm_line_item',
     ];
-
     CRM_Financial_BAO_FinancialItem::create($fParams);
-    $entityTrxn = new CRM_Financial_DAO_EntityFinancialTrxn();
-    $entityTrxn->entity_table = 'civicrm_contribution';
-    $entityTrxn->entity_id = $contribution['id'];
-    $entityTrxn->amount = $price;
-    if ($entityTrxn->find(TRUE)) {
-      $entityId = $entityTrxn->entity_id;
-    }
 
-    $result = $this->assertDBNotNull(
-      'CRM_Financial_DAO_FinancialItem',
-      $lineItem->id,
-      'amount',
-      'entity_id',
-      'Database check on added financial item record.'
-    );
+    $entityTrxn = EntityFinancialTrxn::get()
+      ->addWhere('amount', '=', $price)
+      ->addWhere('entity_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->execute();
+    $this->assertCount(1, $entityTrxn);
 
-    $this->assertEquals($result, $price, 'Verify Amount for Financial Item');
-    $entityResult = $this->assertDBNotNull(
-      'CRM_Financial_DAO_EntityFinancialTrxn',
-      $entityId,
-      'amount',
-      'entity_id',
-      'Database check on added entity financial trxn record.'
-    );
-    $this->assertEquals($entityResult, $price, 'Verify Amount for Financial Item');
+    $result = FinancialItem::get()
+      ->addWhere('entity_id', '=', $lineItem->id)
+      ->addWhere('amount', '=', $price)
+      ->execute();
+    $this->assertCount(1, $result);
   }
 
   /**
    * Check method del()
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateEntityTrxn() {
+  public function testCreateEntityTrxn(): CRM_Financial_DAO_EntityFinancialTrxn {
     $fParams = [
-      'name' => 'Donations' . substr(sha1(rand()), 0, 7),
+      'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
     ];
 
     $amount = 200;
-    $ids = [];
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($fParams, $ids);
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($fParams);
     $financialTrxn = new CRM_Financial_DAO_FinancialTrxn();
     $financialTrxn->to_financial_account_id = $financialAccount->id;
     $financialTrxn->total_amount = $amount;
@@ -226,32 +218,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check method retrieveEntityFinancialTrxn()
-   */
-  public function testRetrieveEntityFinancialTrxn() {
-    $entityTrxn = self::testCreateEntityTrxn();
-    $params = [
-      'entity_table' => 'civicrm_contribution',
-      'entity_id' => 1,
-      'financial_trxn_id' => $entityTrxn->financial_trxn_id,
-      'amount' => $entityTrxn->amount,
-    ];
-
-    CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($params);
-    $entityResult = $this->assertDBNotNull(
-      'CRM_Financial_DAO_EntityFinancialTrxn',
-      $entityTrxn->financial_trxn_id,
-      'amount',
-      'financial_trxn_id',
-      'Database check on added entity financial trxn record.'
-    );
-    $this->assertEquals($entityResult, $entityTrxn->amount, 'Verify Amount for Financial Item');
-  }
-
-  /**
    * Check method getPreviousFinancialItem().
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testGetPreviousFinancialItem() {
+  public function testGetPreviousFinancialItem(): void {
     $contactId = $this->individualCreate();
 
     $params = [
@@ -265,8 +237,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'receipt_date' => '20160522000000',
       'non_deductible_amount' => 0.00,
       'total_amount' => 100.00,
-      'trxn_id' => '22ereerwww444444',
-      'invoice_id' => '86ed39c9e9ee6ef6031621ce0eafe7eb81',
+      'trxn_id' => '22333444444',
+      'invoice_id' => 'abc',
     ];
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
@@ -280,7 +252,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
     $params = ['id' => $financialItem['id']];
     $financialItem = $this->callAPISuccess('FinancialItem', 'get', $params);
-    $this->assertEquals(200.00, $financialItem['values'][$financialItem['id']]['amount'], "The amounts do not match.");
+    $this->assertEquals(200.00, $financialItem['values'][$financialItem['id']]['amount'], 'The amounts do not match.');
   }
 
   /**
@@ -289,9 +261,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    * @dataProvider getThousandSeparators
    */
-  public function testGetPreviousFinancialItemHavingTax($thousandSeparator) {
+  public function testGetPreviousFinancialItemHavingTax(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
