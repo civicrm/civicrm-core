@@ -37,8 +37,8 @@ trait CRM_Core_DynamicFKAccessTrait {
       $table = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'entity_table');
     }
     if ($eid && $table) {
-      $bao = CRM_Core_DAO_AllCoreTables::getBAOClassName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
-      return $bao::checkAccess(CRM_Core_Permission::EDIT, ['id' => $eid], $userID);
+      $targetEntity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table));
+      return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated($targetEntity, 'update', ['id' => $eid], $userID);
     }
     return TRUE;
   }

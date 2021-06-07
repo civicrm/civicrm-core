@@ -237,15 +237,23 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       throw new CRM_Core_Exception('Missing required $groupName in CustomValue::checkAccess');
     }
     // Currently, multi-record custom data always extends Contacts
+    $extends = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'extends', 'name');
+    if (!in_array($extends, ['Contact', 'Individual', 'Organization', 'Household'])) {
+      throw new CRM_Core_Exception("Cannot assess delegated permissions for group {$groupName}.");
+    }
+
     $cid = $record['entity_id'] ?? NULL;
     if (!$cid) {
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'table_name', 'name');
       $cid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
     }
-    $granted = CRM_Contact_BAO_Contact::checkAccess(CRM_Core_Permission::EDIT, ['id' => $cid], $userID, $granted);
 
     // Dispatch to hook
+    $granted = NULL;
     CRM_Utils_Hook::checkAccess("Custom_$groupName", $action, $record, $userID, $granted);
+    if ($granted === NULL) {
+      $granted = \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $cid], $userID);
+    }
     return $granted;
   }
 

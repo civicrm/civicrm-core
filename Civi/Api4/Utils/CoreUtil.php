@@ -194,4 +194,23 @@ class CoreUtil {
     return $granted;
   }
 
+  /**
+   * If the permissions of record $A are based on record $B, then use `checkAccessDelegated($B...)`
+   * to make see if access to $B is permitted.
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @param array $record
+   * @param int|null $userID
+   *   Contact ID of the user we are testing, or NULL for the anonymous user.
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, $userID = NULL) {
+    // FIXME: Move isAuthorized check into here. It's redundant for normal checkAccess().
+    return static::checkAccess($entityName, $actionName, $record, $userID);
+  }
+
 }

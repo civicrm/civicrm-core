@@ -37,7 +37,7 @@ trait CRM_Contact_AccessTrait {
       return in_array(__CLASS__, ['CRM_Core_BAO_Phone', 'CRM_Core_BAO_Email', 'CRM_Core_BAO_Address']) &&
         CRM_Core_Permission::check('edit all events', $userID);
     }
-    return CRM_Contact_BAO_Contact::checkAccess(CRM_Core_Permission::EDIT, ['id' => $cid], $userID);
+    return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $cid], $userID);
   }
 
 }
