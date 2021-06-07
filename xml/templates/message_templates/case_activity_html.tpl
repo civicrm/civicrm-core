@@ -27,7 +27,7 @@
        {ts}Activity Summary{/ts} - {$activityTypeName}
       </th>
      </tr>
-     {if $isCaseActivity}
+     {if !empty($isCaseActivity)}
       <tr>
        <td {$labelStyle}>
         {ts}Your Case Role(s){/ts}
@@ -61,7 +61,7 @@
      {foreach from=$activity.fields item=field}
       <tr>
        <td {$labelStyle}>
-        {$field.label}{if $field.category}({$field.category}){/if}
+        {$field.label}{if !empty($field.category)}({$field.category}){/if}
        </td>
        <td {$valueStyle}>
         {if $field.type eq 'Date'}

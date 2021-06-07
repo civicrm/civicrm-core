@@ -63,7 +63,7 @@
     </td>
   </tr>
 
-  {if $form.separation}
+  {if !empty($form.separation)}
     <tr class="crm-activity-form-block-separation crm-is-multi-activity-wrapper">
       <td class="label">{$form.separation.label}</td>
       <td>{$form.separation.html} {help id="separation"}</td>
@@ -91,7 +91,7 @@
       </td>
   </tr>
 
-  {if $activityTypeFile}
+  {if !empty($activityTypeFile)}
   {include file="CRM/$crmDir/Form/Activity/$activityTypeFile.tpl"}
   {/if}
 
@@ -104,7 +104,7 @@
   campaignTrClass="crm-activity-form-block-campaign_id"}
 
   {* build engagement level CRM-7775 *}
-  {if $buildEngagementLevel}
+  {if !empty($buildEngagementLevel)}
   <tr class="crm-activity-form-block-engagement_level">
     <td class="label">{$form.engagement_level.label}</td>
     <td class="view-value">{$form.engagement_level.html}</td>
@@ -151,12 +151,12 @@
   <tr class="crm-activity-form-block-priority_id">
     <td class="label">{$form.priority_id.label}</td><td class="view-value">{$form.priority_id.html}</td>
   </tr>
-  {if $surveyActivity }
+  {if !empty($surveyActivity) }
   <tr class="crm-activity-form-block-result">
     <td class="label">{$form.result.label}</td><td class="view-value">{$form.result.html}</td>
   </tr>
   {/if}
-  {if $form.tag.html}
+  {if !empty($form.tag.html)}
   <tr class="crm-activity-form-block-tag">
     <td class="label">{$form.tag.label}</td>
     <td class="view-value">
@@ -165,7 +165,7 @@
   </tr>
   {/if}
 
-  {if $tagsetInfo.activity}
+  {if !empty($tagsetInfo.activity)}
     <tr class="crm-activity-form-block-tag_set">
       {include file="CRM/common/Tagset.tpl" tagsetType='activity' tableLayout=true}
     </tr>

@@ -1,7 +1,7 @@
 ===========================================================
 {ts}Activity Summary{/ts} - {$activityTypeName}
 ===========================================================
-{if $isCaseActivity}
+{if !empty($isCaseActivity)}
 {ts}Your Case Role(s){/ts} : {$contact.role}
 {if $manageCaseURL}
 {ts}Manage Case{/ts} : {$manageCaseURL}
@@ -17,9 +17,9 @@
 
 {foreach from=$activity.fields item=field}
 {if $field.type eq 'Date'}
-{$field.label}{if $field.category}({$field.category}){/if} : {$field.value|crmDate:$config->dateformatDatetime}
+{$field.label}{if !empty($field.category)}({$field.category}){/if} : {$field.value|crmDate:$config->dateformatDatetime}
 {else}
-{$field.label}{if $field.category}({$field.category}){/if} : {$field.value}
+{$field.label}{if !empty($field.category)}({$field.category}){/if} : {$field.value}
 {/if}
 {/foreach}
 

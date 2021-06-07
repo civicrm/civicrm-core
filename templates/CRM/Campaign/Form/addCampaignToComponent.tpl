@@ -1,6 +1,6 @@
 {* add campaigns to various components CRM-7362 *}
 
-{if $campaignContext eq 'componentSearch'}
+{if isset($campaignContext) and $campaignContext eq 'componentSearch'}
 
   {* add campaign in component search *}
   <tr class="{$campaignTrClass}">
