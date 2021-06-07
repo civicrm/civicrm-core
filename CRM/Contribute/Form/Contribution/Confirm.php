@@ -1389,68 +1389,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
-   * Function used to send notification mail to pcp owner.
-   *
-   * This is used by contribution and also event PCPs.
-   *
-   * @param object $contribution
-   * @param array $contributionSoft
-   *   Contribution object.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  public static function pcpNotifyOwner($contribution, array $contributionSoft) {
-    $params = ['id' => $contributionSoft['pcp_id']];
-    CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
-    $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
-    $ownerNotifyOption = CRM_Core_PseudoConstant::getName('CRM_PCP_DAO_PCPBlock', 'owner_notify_id', $ownerNotifyID);
-
-    if ($ownerNotifyOption != 'no_notifications' &&
-        (($ownerNotifyOption == 'owner_chooses' &&
-        CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft['pcp_id'], 'is_notify')) ||
-        $ownerNotifyOption == 'all_owners')) {
-      $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
-        "reset=1&id={$contributionSoft['pcp_id']}",
-        TRUE, NULL, FALSE, TRUE
-      );
-      // set email in the template here
-
-      if (CRM_Core_BAO_LocationType::getBilling()) {
-        [$donorName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id,
-          FALSE, CRM_Core_BAO_LocationType::getBilling());
-      }
-      // get primary location email if no email exist( for billing location).
-      if (!$email) {
-        [$donorName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution->contact_id);
-      }
-      [$ownerName, $ownerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contributionSoft['contact_id']);
-      $tplParams = [
-        'page_title' => $pcpInfo['title'],
-        'receive_date' => $contribution->receive_date,
-        'total_amount' => $contributionSoft['amount'],
-        'donors_display_name' => $donorName,
-        'donors_email' => $email,
-        'pcpInfoURL' => $pcpInfoURL,
-        'is_honor_roll_enabled' => $contributionSoft['pcp_display_in_roll'],
-        'currency' => $contributionSoft['currency'],
-      ];
-      $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-      $sendTemplateParams = [
-        'groupName' => 'msg_tpl_workflow_contribution',
-        'valueName' => 'pcp_owner_notify',
-        'contactId' => $contributionSoft['contact_id'],
-        'toEmail' => $ownerEmail,
-        'toName' => $ownerName,
-        'from' => "$domainValues[0] <$domainValues[1]>",
-        'tplParams' => $tplParams,
-        'PDFFilename' => 'receipt.pdf',
-      ];
-      CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
-    }
-  }
-
-  /**
    * Function used to se pcp related defaults / params.
    *
    * This is used by contribution and also event PCPs
