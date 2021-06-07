@@ -10,6 +10,9 @@
 {* entity selector *}
 {crmRegion name="crm-contact-relationshipselector-pre"}
 {/crmRegion}
+{if !isset($entityInClassFormat)}
+   {assign var="entityInClassFormat" value="relationship"}
+{/if}
 <div class="crm-contact-{$entityInClassFormat}-{$context}">
   <table
     class="crm-contact-{$entityInClassFormat}-selector-{$context} crm-ajax-table"
