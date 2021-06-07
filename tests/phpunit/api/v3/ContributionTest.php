@@ -2794,11 +2794,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testContributionOrder() {
-    $this->_contactID = $this->individualCreate();
     $this->createContributionAndMembershipOrder();
     $contribution = $this->callAPISuccess('contribution', 'get')['values'][$this->ids['Contribution'][0]];
     $this->assertEquals('Pending Label**', $contribution['contribution_status']);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_contactID]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['order']]);
 
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->ids['Contribution'][0],

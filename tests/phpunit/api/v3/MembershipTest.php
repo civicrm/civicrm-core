@@ -144,7 +144,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testActivityForCancelledContribution(): void {
-    $contactId = $this->createLoggedInUser();
+    $contactId = $this->ids['Contact']['order'] = $this->createLoggedInUser();
 
     $this->createContributionAndMembershipOrder();
     $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);

@@ -18,6 +18,19 @@
  */
 class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
+  use CRMTraits_Financial_OrderTrait;
+
+
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   /**
    * Contact ID.
    *
@@ -145,7 +158,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $mut->stop();
     $mut->clearMessages();
-    $this->validateAllPayments();
   }
 
   /**
@@ -160,7 +172,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount
     $this->submitPayment(70);
     $this->checkResults([30, 70], 2);
-    $this->validateAllPayments();
   }
 
   /**
@@ -193,7 +204,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Core_Session::singleton()->getLoggedInContactID(), $activities[0]['source_contact_id']);
     $this->assertEquals([$this->_individualId], $activities[0]['target_contact_id']);
     $this->assertEquals([], $activities[0]['assignee_contact_id']);
-    $this->validateAllPayments();
   }
 
   /**
@@ -238,7 +248,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
-    $this->validateAllPayments();
   }
 
   /**
@@ -269,7 +278,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     ]);
     $mut->stop();
     $mut->clearMessages();
-    $this->validateAllPayments();
   }
 
   /**
@@ -278,7 +286,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testAddPaymentForPendingPayLaterContribution() {
+  public function testAddPaymentForPendingPayLaterContribution(): void {
     $this->createPendingOrder();
 
     // pay additional amount
@@ -292,7 +300,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount
     $this->submitPayment(30);
     $this->checkResults([30, 70], 2);
-    $this->validateAllPayments();
   }
 
   /**
@@ -301,16 +308,11 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testMembershipStatusAfterCompletingPayLaterContribution() {
-    $this->createPendingOrder();
-    $membership = $this->createPendingMembershipAndRecordContribution($this->_contributionId);
-    // pay additional amount
-    $this->submitPayment(100);
-    $this->callAPISuccessGetSingle('Contribution', ['id' => $this->_contributionId]);
-    $contributionMembership = $this->callAPISuccessGetSingle('Membership', ['id' => $membership['id']]);
-    $membershipStatus = $this->callAPISuccessGetSingle('MembershipStatus', ['id' => $contributionMembership['status_id']]);
-    $this->assertEquals('New', $membershipStatus['name']);
-    $this->validateAllPayments();
+  public function testMembershipStatusAfterCompletingPayLaterContribution(): void {
+    $this->createContributionAndMembershipOrder();
+    $this->submitPayment(300);
+    $this->callAPISuccessGetSingle('Contribution', ['id' => $this->ids['Contribution'][0]]);
+    $this->callAPISuccessGetSingle('Membership', ['id' => $this->ids['Membership']['order'], 'status_id' => 'New']);
   }
 
   /**
@@ -319,6 +321,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @return array|int
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function createPendingMembershipAndRecordContribution($contributionId) {
     $this->_individualId = $this->individualCreate();
@@ -376,7 +379,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->submitPayment(10);
     $this->checkResults([40, 20, 30, 10], 4);
-    $this->validateAllPayments();
   }
 
   /**
@@ -403,7 +405,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $this->submitPayment(10, 'live');
     $this->checkResults([50, 20, 20, 10], 4);
-    $this->validateAllPayments();
   }
 
   /**
@@ -416,13 +417,14 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @param bool $isEmailReceipt
    *
    * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function submitPayment($amount, $mode = NULL, $isEmailReceipt = FALSE) {
     $form = new CRM_Contribute_Form_AdditionalPayment();
 
     $submitParams = [
-      'contribution_id' => $this->_contributionId,
-      'contact_id' => $this->_individualId,
+      'contribution_id' => $this->ids['Contribution'][0] ?? $this->_contributionId,
+      'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,
       'currency' => 'USD',
       'financial_type_id' => 1,
