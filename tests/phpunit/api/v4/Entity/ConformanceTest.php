@@ -31,6 +31,8 @@ use Civi\Test\HookInterface;
  */
 class ConformanceTest extends UnitTestCase implements HookInterface {
 
+  const READ_ONLY_ENTITIES = '/^(FinancialItem)$/';
+
   use \api\v4\Traits\CheckAccessTrait;
   use \api\v4\Traits\TableDropperTrait;
   use \api\v4\Traits\OptionCleanupTrait {
@@ -142,7 +144,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
 
     $this->checkFields($entityClass, $entity);
     $this->checkCreationDenied($entity, $entityClass);
-    $id = $this->checkCreationAllowed($entity, $entityClass);
+    $id = $this->checkCreation($entity, $entityClass);
     $this->checkGet($entityClass, $id, $entity);
     $this->checkGetAllowed($entityClass, $id, $entity);
     $this->checkGetCount($entityClass, $id, $entity);
@@ -212,7 +214,9 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    *
    * @return mixed
    */
-  protected function checkCreationAllowed($entity, $entityClass) {
+  protected function checkCreation($entity, $entityClass) {
+    $isReadOnly = preg_match(static::READ_ONLY_ENTITIES, $entity);
+
     $hookLog = [];
     $onValidate = function(ValidateValuesEvent $e) use (&$hookLog) {
       $hookLog[$e->getEntityName()][$e->getActionName()] = 1 + ($hookLog[$e->getEntityName()][$e->getActionName()] ?? 0);
@@ -226,14 +230,16 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $requiredParams = $this->creationParamProvider->getRequired($entity);
     $createResult = $entityClass::create()
       ->setValues($requiredParams)
-      ->setCheckPermissions(TRUE)
+      ->setCheckPermissions(!$isReadOnly)
       ->execute()
       ->first();
 
     $this->assertArrayHasKey('id', $createResult, "create missing ID");
     $id = $createResult['id'];
     $this->assertGreaterThanOrEqual(1, $id, "$entity ID not positive");
-    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    if (!$isReadOnly) {
+      $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    }
     $this->resetCheckAccess();
 
     $this->assertEquals(2, $hookLog[$entity]['create']);
@@ -266,7 +272,9 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     catch (UnauthorizedException $e) {
       // OK, expected exception
     }
-    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    if (!preg_match(static::READ_ONLY_ENTITIES, $entity)) {
+      $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
+    }
     $this->resetCheckAccess();
   }
 
