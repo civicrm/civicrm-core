@@ -1375,7 +1375,7 @@ Expires: ',
    */
   public function testContributionFormStatusUpdate(): void {
 
-    $this->_contactID = $this->createLoggedInUser();
+    $this->_contactID = $this->ids['Contact']['order'] = $this->createLoggedInUser();
     $this->createContributionAndMembershipOrder();
 
     $params = [

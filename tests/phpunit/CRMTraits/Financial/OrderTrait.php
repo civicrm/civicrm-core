@@ -79,16 +79,19 @@ trait CRMTraits_Financial_OrderTrait {
    */
   protected function createContributionAndMembershipOrder(): void {
     $this->ids['membership_type'][0] = $this->membershipTypeCreate();
-    $orderID = $this->callAPISuccess('Order', 'create', [
+    if (empty($this->ids['Contact']['order'])) {
+      $this->ids['Contact']['order'] = $this->individualCreate();
+    }
+    $order = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => 'Donation',
-      'contact_id' => $this->_contactID,
+      'contact_id' => $this->ids['Contact']['order'],
       'is_test' => 0,
       'payment_instrument_id' => 'Check',
       'receive_date' => date('Y-m-d'),
       'line_items' => [
         [
           'params' => [
-            'contact_id' => $this->_contactID,
+            'contact_id' => $this->ids['Contact']['order'],
             'source' => 'Payment',
           ],
           'line_item' => [
@@ -110,7 +113,7 @@ trait CRMTraits_Financial_OrderTrait {
         ],
         [
           'params' => [
-            'contact_id' => $this->_contactID,
+            'contact_id' => $this->ids['Contact']['order'],
             'membership_type_id' => 'General',
             'source' => 'Payment',
             // This is necessary because Membership_BAO otherwise ignores the
@@ -121,9 +124,10 @@ trait CRMTraits_Financial_OrderTrait {
           'line_item' => $this->getMembershipLineItem(),
         ],
       ],
-    ])['id'];
+    ]);
 
-    $this->ids['Contribution'][0] = $orderID;
+    $this->ids['Contribution'][0] = $order['id'];
+    $this->ids['Membership']['order'] = $order['values'][$order['id']]['membership_id'][0];
   }
 
   /**
