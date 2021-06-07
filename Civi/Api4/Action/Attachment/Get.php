@@ -19,8 +19,7 @@
 
 namespace Civi\Api4\Action\Attachment;
 
-use Civi\Api4\Utils\CoreUtil;
-use \Civi\Api4\Generic\Result;
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Query\Api4SelectQuery;
 
 /**

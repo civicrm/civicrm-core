@@ -34,4 +34,5 @@ class Attachment extends Generic\DAOEntity {
   public static function get($checkPermissions = TRUE) {
     return (new \Civi\Api4\Action\Attachment\Get(__CLASS__, __FUNCTION__))->setCheckPermissions($checkPermissions);
   }
+
 }

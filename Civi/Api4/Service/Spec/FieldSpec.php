@@ -478,7 +478,7 @@ class FieldSpec {
   }
 
   /**
-   * @param bool $readonly
+   * @param bool $pseudo
    * @return $this
    */
   public function setPseudo($pseudo) {

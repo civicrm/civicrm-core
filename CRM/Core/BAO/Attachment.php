@@ -24,10 +24,8 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
    * Create a dedupe exception record.
    *
    * @param array $params
-   *
-   * @return \CRM_Dedupe_BAO_Exception
    */
-  public static function create($params) {
+  public static function create($params): void {
     $config = CRM_Core_Config::singleton();
     list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($params);
 
@@ -173,7 +171,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
   /**
    * Attachment result formatting helper.
    *
-   * @param array $attachement
+   * @param array $attachment
    * @param bool $isTrusted
    *   Whether the current request is trusted to perform file-specific operations.
    * @param array $returnProperties
@@ -283,7 +281,6 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
     return $dao;
   }
 
-
   /**
    * Returns all the column names of this table
    *
@@ -361,40 +358,40 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
     ];
   }
 
- /**
-  * Bulk delete multiple records.
-  *
-  * @param array[] $record
-  * @return static[]
-  * @throws CRM_Core_Exception
-  */
- public static function deleteRecord(array $record) {
-   $config = CRM_Core_Config::singleton();
-   list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($record);
+  /**
+   * Bulk delete multiple records.
+   *
+   * @param array[] $record
+   * @return static[]
+   * @throws CRM_Core_Exception
+   */
+  public static function deleteRecord(array $record) {
+    $config = CRM_Core_Config::singleton();
+    list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($record);
 
-   $dao = self::getAttachment($record, $id, $file, $entityFile, $isTrusted);
+    $dao = self::getAttachment($record, $id, $file, $entityFile, $isTrusted);
 
-   $filePaths = [];
-   $fileIds = [];
-   while ($dao->fetch()) {
-     $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
-     $fileIds[] = $dao->id;
-   }
+    $filePaths = [];
+    $fileIds = [];
+    while ($dao->fetch()) {
+      $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+      $fileIds[] = $dao->id;
+    }
 
-   if (!empty($fileIds)) {
-     $idString = implode(',', array_filter($fileIds, 'is_numeric'));
-     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_entity_file WHERE file_id in ($idString)");
-     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_file WHERE id in ($idString)");
-   }
+    if (!empty($fileIds)) {
+      $idString = implode(',', array_filter($fileIds, 'is_numeric'));
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_entity_file WHERE file_id in ($idString)");
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_file WHERE id in ($idString)");
+    }
 
-   // unlink is non-transactional, so we do this as the last step -- just in case the other steps produce errors
-   if (!empty($filePaths)) {
-     foreach ($filePaths as $filePath) {
-       unlink($filePath);
-     }
-   }
+    // unlink is non-transactional, so we do this as the last step -- just in case the other steps produce errors
+    if (!empty($filePaths)) {
+      foreach ($filePaths as $filePath) {
+        unlink($filePath);
+      }
+    }
 
-   return [];
- }
+    return [];
+  }
 
 }

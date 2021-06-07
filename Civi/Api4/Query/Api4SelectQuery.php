@@ -240,7 +240,10 @@ class Api4SelectQuery {
       $valid = TRUE;
       foreach ($expr->getFields() as $fieldName) {
         $field = $this->getField($fieldName);
-        if (!empty($field['pseudo'])) $valid = FALSE;
+        // Remove non-DB field from select clause
+        if (!empty($field['pseudo'])) {
+          $valid = FALSE;
+        }
         // Remove expressions with unknown fields without raising an error
         if (!$field || !in_array($field['type'], ['Field', 'Custom'], TRUE)) {
           $select = array_diff($select, [$item]);

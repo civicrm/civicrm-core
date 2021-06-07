@@ -21,7 +21,6 @@ namespace Civi\Api4\Service\Spec\Provider;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
-use Civi\Api4\Service\Spec\SpecFormatter;
 
 class AttachmentSpecProvider implements Generic\SpecProviderInterface {
 

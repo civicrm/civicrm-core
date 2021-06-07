@@ -74,12 +74,12 @@ class CoreUtil {
       return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
     }
     if ($entityName == 'Attachment') {
-        $sql = \CRM_Utils_SQL_Select::from('civicrm_file cf')
-          ->join('cef', 'INNER JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
-          ->select([
-            'cf.*',
-            'cef.entity_table',
-            'cef.entity_id',
+      $sql = \CRM_Utils_SQL_Select::from('civicrm_file cf')
+        ->join('cef', 'INNER JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
+        ->select([
+          'cf.*',
+          'cef.entity_table',
+          'cef.entity_id',
         ])->toSQL();
       return "({$sql})";
     }
