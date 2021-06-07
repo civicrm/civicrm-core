@@ -852,24 +852,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $expectedMembershipStatus = 5;
     }
 
-    $submitParams = [
-      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
-      'id' => (int) $this->_ids['contribution_page'],
-      'amount' => 10,
-      'billing_first_name' => 'Billy',
-      'billing_middle_name' => 'Goat',
-      'billing_last_name' => 'Gruff',
-      'email' => 'billy@goat.gruff',
-      'selectMembership' => $this->ids['MembershipType'],
-      'payment_processor_id' => 1,
-      'credit_card_number' => '4111111111111111',
-      'credit_card_type' => 'Visa',
-      'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+    $submitParams = array_merge($this->getSubmitParamsMembership(TRUE), [
       'is_recur' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => $this->params['recur_frequency_unit'],
-    ];
+    ]);
 
     $this->callAPIAndDocument('ContributionPage', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
     $contribution = $this->callAPISuccess('contribution', 'getsingle', [

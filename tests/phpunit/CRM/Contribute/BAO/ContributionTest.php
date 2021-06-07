@@ -317,7 +317,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the annual query returns a correct result when multiple line items are present.
    */
-  public function testAnnualWithMultipleLineItems() {
+  public function testAnnualWithMultipleLineItems(): void {
     $contactID = $this->createLoggedInUserWithFinancialACL();
     $this->createContributionWithTwoLineItemsAgainstPriceSet([
       'contact_id' => $contactID,
