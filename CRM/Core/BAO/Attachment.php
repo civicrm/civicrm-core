@@ -25,7 +25,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
    *
    * @param array $params
    */
-  public static function create($params): void {
+  public static function create($params): array {
     $config = CRM_Core_Config::singleton();
     list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($params);
 
@@ -71,6 +71,11 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
     $entityFileDao->file_id = $fileDao->id;
     $entityFileDao->save();
 
+    $attachment = array_merge($fileDao->toArray(), [
+      'entity_table' => $entityFileDao->entity_table,
+      'entity_id' => $entityFileDao->entity_id,
+    ]);
+
     $path = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $fileDao->uri;
     if (is_string($content)) {
       file_put_contents($path, $content);
@@ -92,9 +97,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       ]);
     }
 
-    $result = [
-      $fileDao->id => self::formatResult($fileDao, $entityFileDao, $returnContent, $isTrusted),
-    ];
+    return self::formatResult($attachment, $isTrusted, ($params['return'] ?? []));
   }
 
   /**
@@ -205,8 +208,10 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       $result['path'] = $path;
     }
     if (!empty($returnProperties)) {
+      // NOTE : weird but in api3 and test case we always return these properties irrespective of whats there in $params['return']
+      $requiredReturnProperties = ['id', 'entity_table', 'entity_id', 'url'];
       foreach ($result as $fieldName => $dontCare) {
-        if (!in_array($fieldName, $returnProperties)) {
+        if (!in_array($fieldName, $returnProperties) && in_array($fieldName, $requiredReturnProperties)) {
           unset($result[$fieldName]);
         }
       }
@@ -292,6 +297,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       $entityFileFields = CRM_Core_DAO_EntityFile::fields();
       $fields = [];
       $fields['id'] = $fileFields['id'];
+      $fields['uri'] = $fileFields['uri'];
       $fields['mime_type'] = $fileFields['mime_type'];
       $fields['description'] = $fileFields['description'];
       $fields['upload_date'] = $fileFields['upload_date'];
@@ -369,6 +375,11 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
     $config = CRM_Core_Config::singleton();
     list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($record);
 
+    foreach (['name', 'content', 'path', 'url'] as $fieldName) {
+      if (array_key_exists($fieldName, $record)) {
+        unset($record[$fieldName]);
+      }
+    }
     $dao = self::getAttachment($record, $id, $file, $entityFile, $isTrusted);
 
     $filePaths = [];
@@ -391,7 +402,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
       }
     }
 
-    return [];
+    return $fileIds;
   }
 
 }

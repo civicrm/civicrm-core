@@ -30,13 +30,7 @@ class AttachmentSpecProvider implements Generic\SpecProviderInterface {
   public function modifySpec(RequestSpec $spec) {
     $action = $spec->getAction();
 
-    if ($action == 'create') {
-      $spec->getFieldByName('mime_type')->setRequired(TRUE);
-    }
-    if ($action == 'update') {
-      $spec->getFieldByName('id')->setRequired(TRUE);
-    }
-    if ($action == 'get') {
+    if ($action != 'delete') {
       foreach (\CRM_Core_BAO_Attachment::pseudoFields() as $fieldName => $field) {
         $specField = new FieldSpec($fieldName, $spec->getEntity(), 'String');
         $specField->setPseudo(TRUE);
@@ -46,10 +40,18 @@ class AttachmentSpecProvider implements Generic\SpecProviderInterface {
         $spec->addFieldSpec($specField);
       }
     }
-    else {
+    if ($action == 'create') {
+      $spec->getFieldByName('mime_type')->setRequired(TRUE);
       $spec->getFieldByName('entity_id')->setRequired(TRUE);
       $spec->getFieldByName('upload_date')->setDefaultValue('now');
-      $spec->getFieldByName('entity_table')->setRequiredIf('empty($values.id) && empty($values.field_name)');
+      $spec->getFieldByName('entity_table')->setRequiredIf('empty($values.field_name)');
+      $spec->getFieldByName('content')->setRequiredIf('empty($values.options.move-file)');
+    }
+    elseif ($action == 'update') {
+      $spec->getFieldByName('id')->setRequired(TRUE);
+    }
+    elseif ($action == 'delete') {
+      $spec->getFieldByName('id')->setRequired(FALSE);
     }
   }
 

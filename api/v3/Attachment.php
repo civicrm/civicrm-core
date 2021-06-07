@@ -72,6 +72,7 @@
  *   List of fields.
  */
 function _civicrm_api3_attachment_create_spec(&$spec) {
+  $spec = array_merge($spec, CRM_Core_BAO_Attachment::pseudoFields());
   $spec['name']['api.required'] = 1;
   $spec['mime_type']['api.required'] = 1;
   $spec['entity_id']['api.required'] = 1;
@@ -92,7 +93,8 @@ function civicrm_api3_attachment_create($params) {
     // When creating we need either entity_table or field_name.
     civicrm_api3_verify_one_mandatory($params, NULL, ['entity_table', 'field_name']);
   }
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);;
+  $result = CRM_Core_BAO_Attachment::create($params);
+  return civicrm_api3_create_success($result, $params, 'Attachment', 'create');
 }
 
 /**
@@ -111,7 +113,7 @@ function civicrm_api3_attachment_get($params) {
   $result = [];
   $returnProperties = $params['return'] ?? [];
   foreach ($attachments as $attachment) {
-    $result[$attachement['id']] = CRM_Core_BAO_Attachment::formatResult($attachment, $isTrusted, $returnProperties);
+    $result[$attachment['id']] = CRM_Core_BAO_Attachment::formatResult($attachment, $isTrusted, $returnProperties);
   }
   return civicrm_api3_create_success($result, $params, 'Attachment', 'create');
 }
@@ -153,5 +155,6 @@ function civicrm_api3_attachment_delete($params) {
     throw new API_Exception("Mandatory key(s) missing from params array: id or entity_table+entity_table");
   }
 
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Attachment');
+  CRM_Core_BAO_Attachment::deleteRecord($params);
+  return civicrm_api3_create_success();
 }

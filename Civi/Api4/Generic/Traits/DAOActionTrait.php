@@ -143,6 +143,10 @@ trait DAOActionTrait {
       if ($this->getEntityName() === 'Address') {
         $createResult = $baoName::$method($item, $this->fixAddress);
       }
+      elseif ($this->getEntityName() === 'Attachment') {
+        $result[] = $baoName::$method($item);
+        continue;
+      }
       else {
         $createResult = $baoName::$method($item);
       }

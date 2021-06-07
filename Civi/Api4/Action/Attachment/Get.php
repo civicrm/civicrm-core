@@ -39,11 +39,13 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
     $onlyCount = $this->getSelect() === ['row_count'];
 
     if (!$onlyCount) {
+      $returnProperties = $this->getSelect();
+      $this->setSelect(array_merge($returnProperties, array_keys(\CRM_Core_BAO_Attachment::fields())));
       $query = new Api4SelectQuery($this);
       $rows = $query->run();
       \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($rows);
       foreach ($rows as $key => $row) {
-        $rows[$key] = \CRM_Core_BAO_Attachment::formatResult($row, $this->getCheckPermissions(), $this->getSelect());
+        $rows[$key] = \CRM_Core_BAO_Attachment::formatResult($row, $this->getCheckPermissions(), $returnProperties);
       }
       $result->exchangeArray($rows);
       // No need to fetch count if we got a result set below the limit

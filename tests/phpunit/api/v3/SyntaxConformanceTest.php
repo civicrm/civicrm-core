@@ -465,6 +465,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'System',
       'Logging',
       'Payment',
+      'Attachment',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -562,6 +563,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       //a bit of a pseudoapi - keys by domain
       'Payment',
       // pseudoapi - problems with creating required sub  entities.
+      'Attachment',
+      // pseudoapi - problems with creating required sub entities.
     ];
     return $entitiesWithout;
   }
