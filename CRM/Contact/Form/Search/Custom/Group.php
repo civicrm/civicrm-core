@@ -301,7 +301,7 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
         //if no group selected search for all groups
         $iGroups = NULL;
       }
-      if (is_array($this->_excludeGroups)) {
+      if (is_array($this->_excludeGroups) && !empty($this->_excludeGroups)) {
         $xGroups = implode(',', $this->_excludeGroups);
       }
       else {
@@ -309,7 +309,6 @@ class CRM_Contact_Form_Search_Custom_Group extends CRM_Contact_Form_Search_Custo
       }
 
       $this->_xGTable->createWithColumns("contact_id int primary key");
-
       //used only when exclude group is selected
       if ($xGroups != 0) {
         $excludeGroup = "INSERT INTO  {$this->_xGTableName} ( contact_id )
@@ -436,7 +435,7 @@ WHERE  gcc.group_id = {$ssGroup->id}
         //if no group selected search for all groups
         $iTags = NULL;
       }
-      if (is_array($this->_excludeTags)) {
+      if (is_array($this->_excludeTags) && !empty($this->_excludeTags)) {
         $xTags = implode(',', $this->_excludeTags);
       }
       else {
