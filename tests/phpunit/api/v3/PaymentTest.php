@@ -23,6 +23,16 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   protected $_financialTypeId = 1;
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * Setup function.
    *
    * @throws \CiviCRM_API3_Exception
@@ -326,7 +336,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Balance Owed: $ 0.00',
       'Thank you for completing this payment.',
     ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -365,7 +374,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'is_payment' => 1,
     ];
     foreach ($expected as $key => $value) {
-      $this->assertEquals($expected[$key], $payment[$key], 'mismatch on key ' . $key);
+      $this->assertEquals($value, $payment[$key], 'mismatch on key ' . $key);
     }
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
@@ -380,7 +389,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Transaction Date: November 13th, 2018 12:01 PM',
       'Total Paid: $ 170' . $decimalSeparator . '00',
     ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -394,7 +402,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'order_id' => $order['id'],
       'total_amount' => 50,
     ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -418,7 +425,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_financial_item');
     $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'payment_instrument_id' => 'Check', 'total_amount' => 5]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -494,10 +500,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
     $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
     $this->assertEquals('Registered', $participant['values'][$participant['id']]['participant_status']);
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -589,7 +591,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
     $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
     $this->assertEquals('Registered', $participant['values'][$participant['id']]['participant_status']);
-    $this->validateAllPayments();
   }
 
   /**
@@ -599,7 +600,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testRefundPayment(): void {
     $result = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => "Donation",
+      'financial_type_id' => 'Donation',
       'total_amount' => 100,
       'contact_id' => $this->_individualId,
     ]);
@@ -612,7 +613,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
-      'return' => ["contribution_status_id"],
+      'return' => ['contribution_status_id'],
       'id' => $contributionID,
     ]);
     //Still we've a status of Completed after refunding a partial amount.
@@ -638,7 +639,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testRefundPaymentWithCancelledPaymentId(): void {
     $result = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => "Donation",
+      'financial_type_id' => 'Donation',
       'total_amount' => 100,
       'contact_id' => $this->_individualId,
     ]);
@@ -648,7 +649,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contributionID,
       'total_amount' => -100,
-      'cancelled_payment_id' => 12345,
+      'cancelled_payment_id' => (int) $this->callAPISuccess('Payment', 'get', [])['id'],
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'return' => ['contribution_status_id'],
@@ -690,11 +691,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($payment['values'] as $value) {
       $this->assertEquals($value['total_amount'], array_pop($amounts), 'Mismatch total amount');
     }
-
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -798,7 +794,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
     $this->validateAllPayments();
-    // Check for proportional cancelled payment against lineitems.
+    // Check for proportional cancelled payment against line items.
     $minParams = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'] - 1,
@@ -812,7 +808,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
 
-    // Check for proportional updated payment against lineitems.
+    // Check for proportional updated payment against line items.
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
@@ -849,18 +845,15 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
       $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
     }
-
-    $this->callAPISuccess('Contribution', 'Delete', [
-      'id' => $contribution['id'],
-    ]);
-    $this->validateAllPayments();
   }
 
   /**
    * Test that a contribution can be overpaid with the payment api.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreatePaymentOverPay(): void {
     $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate()]);
@@ -873,9 +866,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create payment api for paylater contribution
+   * Test create payment api for pay later contribution
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentPayLater(): void {
     $this->createLoggedInUser();
@@ -983,16 +977,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Check',
       'check_number' => $checkNumber2,
     ]);
-    $expectedConcatanatedCheckNumbers = implode(',', [$checkNumber1, $checkNumber2]);
+    $expectedConcatenatedCheckNumbers = implode(',', [$checkNumber1, $checkNumber2]);
     //Assert check number is concatenated on the main contribution.
     $contributionValues = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $contribution['id']]);
-    $this->assertEquals($expectedConcatanatedCheckNumbers, $contributionValues['check_number']);
+    $this->assertEquals($expectedConcatenatedCheckNumbers, $contributionValues['check_number']);
   }
 
   /**
    * Test create payment api for failed contribution.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentOnFailedContribution(): void {
     $this->createLoggedInUser();
@@ -1118,6 +1113,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    * Test create payment api for pay later contribution with partial payment.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testCreatePaymentPayLaterPartialPayment(): void {
     $this->createLoggedInUser();
@@ -1173,7 +1169,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('OptionValue', 'get', ['name' => 'Completed', 'option_group_id' => 'contribution_status', 'api.OptionValue.create' => ['label' => 'Completed']]);
     $this->callAPISuccessGetCount('Activity', ['target_contact_id' => $this->_individualId, 'activity_type_id' => 'Payment'], 2);
-    $this->validateAllPayments();
   }
 
   /**
@@ -1229,7 +1224,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'loc_block_id' => $location['id'],
       'is_show_location' => TRUE,
     ]);
-    $this->validateAllPayments();
   }
 
   /**
@@ -1243,7 +1237,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  protected function checkPaymentIsValid(int $paymentID, int $contributionID, $amount = 50): void {
+  protected function checkPaymentIsValid(int $paymentID, int $contributionID, int $amount = 50): void {
     $payment = $this->callAPISuccess('Payment', 'getsingle', ['financial_trxn_id' => $paymentID]);
     $this->assertEquals(7, $payment['from_financial_account_id']);
     $this->assertEquals(6, $payment['to_financial_account_id']);
@@ -1258,7 +1252,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals($eft['values'][$eft['id']]['amount'], $amount);
-    $this->validateAllPayments();
   }
 
   /**
@@ -1315,13 +1308,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(99.8, $contribution['net_amount']);
 
     $this->assertEquals($trxnID, $contribution['trxn_id'],
-      "Contribution trxn_id should have been set to that of the payment.");
+      'Contribution trxn_id should have been set to that of the payment.');
 
     $this->assertEquals($originalReceiveDate, $contribution['receive_date'],
-      "Contribution receive date was changed, but should not have been.");
-
-    $this->validateAllPayments();
-    $this->validateAllContributions();
+      'Contribution receive date was changed, but should not have been.');
 
   }
 
