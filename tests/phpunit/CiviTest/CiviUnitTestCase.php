@@ -2032,7 +2032,7 @@ VALUES
     }
 
     foreach ($params as $key => $value) {
-      if ($key == 'version' || substr($key, 0, 3) == 'api' || !array_key_exists($keys[$key], $result)) {
+      if ($key == 'version' || substr($key, 0, 3) == 'api' || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
         continue;
       }
       if (in_array($key, $dateFields)) {
