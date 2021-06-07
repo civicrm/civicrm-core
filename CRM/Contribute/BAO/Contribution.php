@@ -175,9 +175,23 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       CRM_Price_BAO_LineItem::getLineItemArray($params, $contributionID ? [$contributionID] : NULL);
     }
 
+    // We should really ALWAYS calculate tax amount off the line items.
+    // In order to be a bit cautious we are just messaging rather than
+    // overwriting in cases where we were not previously setting it here.
+    $taxAmount = $lineTotal = 0;
+    foreach ($params['line_item'] ?? [] as $lineItems) {
+      foreach ($lineItems as $lineItem) {
+        $taxAmount += (float) ($lineItem['tax_amount'] ?? 0);
+        $lineTotal += (float) ($lineItem['line_total'] ?? 0);
+      }
+    }
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
-      $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params);
+      $params['tax_amount'] = $taxAmount;
+      $params['total_amount'] = $taxAmount + $lineTotal;
+    }
+    if (isset($params['tax_amount']) && $params['tax_amount'] != $taxAmount && empty($params['skipLineItem'])) {
+      CRM_Core_Error::deprecatedWarning('passing in incorrect tax amounts is deprecated');
     }
 
     CRM_Utils_Hook::pre($action, 'Contribution', $contributionID, $params);
@@ -3971,6 +3985,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Optional amount to override the saved amount paid (e.g if calculating what it WILL be).
    *
    * @return float
+   * @throws \CRM_Core_Exception
    */
   public static function getContributionBalance($contributionId, $contributionTotal = NULL) {
     if ($contributionTotal === NULL) {
@@ -3982,88 +3997,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Core_BAO_FinancialTrxn::getTotalPayments($contributionId, TRUE),
       CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'currency')
     );
-  }
-
-  /**
-   * Get the tax amount (misnamed function).
-   *
-   * @param array $params
-   *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
-   */
-  protected static function checkTaxAmount($params) {
-    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
-
-    // Update contribution.
-    if (!empty($params['id'])) {
-      // CRM-19126 and CRM-19152 If neither total or financial_type_id are set on an update
-      // there are no tax implications - early return.
-      if (!isset($params['total_amount']) && !isset($params['financial_type_id'])) {
-        return $params;
-      }
-      if (empty($params['prevContribution'])) {
-        $params['prevContribution'] = self::getOriginalContribution($params['id']);
-      }
-
-      foreach (['total_amount', 'financial_type_id', 'fee_amount'] as $field) {
-        if (!isset($params[$field])) {
-          if ($field == 'total_amount' && $params['prevContribution']->tax_amount) {
-            // Tax amount gets added back on later....
-            $params['total_amount'] = $params['prevContribution']->total_amount -
-              $params['prevContribution']->tax_amount;
-          }
-          else {
-            $params[$field] = $params['prevContribution']->$field;
-            if ($params[$field] != $params['prevContribution']->$field) {
-            }
-          }
-        }
-      }
-
-      self::calculateMissingAmountParams($params, $params['id']);
-      if (!array_key_exists($params['financial_type_id'], $taxRates)) {
-        // Assign tax Amount on update of contribution
-        if (!empty($params['prevContribution']->tax_amount)) {
-          $params['tax_amount'] = 'null';
-          foreach ($params['line_item'] as $setID => $priceField) {
-            foreach ($priceField as $priceFieldID => $priceFieldValue) {
-              $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
-            }
-          }
-        }
-      }
-    }
-
-    // New Contribution and update of contribution with tax rate financial type
-    if (isset($params['financial_type_id']) && array_key_exists($params['financial_type_id'], $taxRates) &&
-      empty($params['skipLineItem'])) {
-      $taxRateParams = $taxRates[$params['financial_type_id']];
-      $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount(CRM_Utils_Array::value('total_amount', $params), $taxRateParams);
-      $params['tax_amount'] = round($taxAmount['tax_amount'], 2);
-
-      foreach ($params['line_item'] as $setID => $priceField) {
-        foreach ($priceField as $priceFieldID => $priceFieldValue) {
-          $params['line_item'][$setID][$priceFieldID]['tax_amount'] = $params['tax_amount'];
-        }
-      }
-      $params['total_amount'] = CRM_Utils_Array::value('total_amount', $params) + $params['tax_amount'];
-    }
-    elseif (isset($params['api.line_item.create'])) {
-      // Update total amount of contribution using lineItem
-      $taxAmountArray = [];
-      foreach ($params['api.line_item.create'] as $key => $value) {
-        if (isset($value['financial_type_id']) && array_key_exists($value['financial_type_id'], $taxRates)) {
-          $taxRate = $taxRates[$value['financial_type_id']];
-          $taxAmount = CRM_Contribute_BAO_Contribution_Utils::calculateTaxAmount($value['line_total'], $taxRate);
-          $taxAmountArray[] = round($taxAmount['tax_amount'], 2);
-        }
-      }
-      $params['tax_amount'] = array_sum($taxAmountArray);
-      $params['total_amount'] = $params['total_amount'] + $params['tax_amount'];
-    }
-
-    return $params;
   }
 
   /**

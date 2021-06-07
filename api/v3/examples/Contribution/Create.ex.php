@@ -81,7 +81,7 @@ function contribution_create_expectedresult() {
         'check_number' => '',
         'campaign_id' => '',
         'creditnote_id' => '',
-        'tax_amount' => '',
+        'tax_amount' => 0,
         'revenue_recognition_date' => '',
         'is_template' => '',
         'contribution_type_id' => '1',
