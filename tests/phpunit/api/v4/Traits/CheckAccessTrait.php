@@ -35,7 +35,7 @@ trait CheckAccessTrait {
    * @param bool $granted
    * @see \CRM_Utils_Hook::checkAccess()
    */
-  public function hook_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {
+  public function hook_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, ?bool &$granted) {
     $key = "{$entity}::{$action}";
     if (isset($this->checkAccessGrants[$key])) {
       $granted = $this->checkAccessGrants[$key];

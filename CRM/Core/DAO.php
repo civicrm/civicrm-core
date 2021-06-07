@@ -3055,25 +3055,22 @@ SELECT contact_id
    *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
    * @param int|null $userID
    *   Contact ID of the active user (whose access we must check). NULL for anonymous.
-   * @param bool $granted
-   *   Initial value (usually TRUE, but the API might pass FALSE if gatekeeper permissions fail)
-   *
    * @return bool
+   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
    */
-  public static function checkAccess(string $entityName, string $action, array $record, $userID, $granted = TRUE): bool {
+  public static function checkAccess(string $entityName, string $action, array $record, $userID): ?bool {
     // Ensure this function was either called on a BAO class or a DAO that has no BAO
     if (!$entityName ||
       (!strpos(static::class, '_BAO_') && CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class) !== static::class)
     ) {
       throw new CRM_Core_Exception('Function checkAccess must be called on a BAO class');
     }
-    // Dispatch to protected function _checkAccess in this BAO
-    if ($granted && method_exists(static::class, '_checkAccess')) {
-      $granted = static::_checkAccess($entityName, $action, $record, $userID);
+    if (method_exists(static::class, '_checkAccess')) {
+      return static::_checkAccess($entityName, $action, $record, $userID);
     }
-    // Dispatch to hook
-    CRM_Utils_Hook::checkAccess($entityName, $action, $record, $userID, $granted);
-    return $granted;
+    else {
+      return TRUE;
+    }
   }
 
   /**

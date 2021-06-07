@@ -291,11 +291,11 @@ function financialacls_civicrm_permission(&$permissions) {
  * @param string $action
  * @param array $record
  * @param int|null $contactID
- * @param bool $granted
+ * @param bool|null $granted
  *
  * @throws \CRM_Core_Exception
  */
-function financialacls_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {
+function financialacls_civicrm_checkAccess(string $entity, string $action, array $record, ?int $contactID, ?bool &$granted) {
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }

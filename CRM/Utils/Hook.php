@@ -2116,9 +2116,10 @@ abstract class CRM_Utils_Hook {
    *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
    * @param int|null $contactID
    *   Contact ID of the active user (whose access we must check).
-   * @param bool $granted
+   * @param bool|null $granted
+   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
    */
-  public static function checkAccess(string $entity, string $action, array $record, ?int $contactID, bool &$granted) {
+  public static function checkAccess(string $entity, string $action, array $record, ?int $contactID, ?bool &$granted) {
     self::singleton()->invoke(['entity', 'action', 'record', 'contactID', 'granted'], $entity, $action, $record,
       $contactID, $granted, self::$_nullObject,
       'civicrm_checkAccess'

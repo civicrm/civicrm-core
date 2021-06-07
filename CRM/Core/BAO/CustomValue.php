@@ -230,10 +230,10 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    * @param array $record
    * @param int|null $userID
    *   Contact ID of the active user (whose access we must check). NULL for anonymous.
-   * @param bool $granted
    * @return bool
+   *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
    */
-  public static function checkAccess(string $entityName, string $action, array $record, $userID, $granted = TRUE): bool {
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID): ?bool {
     $groupName = substr($entityName, 0, 7) === 'Custom_' ? substr($entityName, 7) : NULL;
     if (!$groupName) {
       // $groupName is required but the function signature has to match the parent.
@@ -251,13 +251,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
       $cid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
     }
 
-    // Dispatch to hook
-    $granted = NULL;
-    CRM_Utils_Hook::checkAccess("Custom_$groupName", $action, $record, $userID, $granted);
-    if ($granted === NULL) {
-      $granted = \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $cid], $userID);
-    }
-    return $granted;
+    return \Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $cid], $userID);
   }
 
 }
