@@ -233,7 +233,7 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
    * @return CRM_Core_DAO
    * @throws API_Exception
    */
-  public static function getAttachement($params) {
+  public static function getAttachment($params, $id, $file, $entityFile, $isTrusted) {
     foreach (['name', 'content', 'path', 'url'] as $unsupportedFilter) {
       if (!empty($params[$unsupportedFilter])) {
         throw new CRM_Core_Exception("Get by $unsupportedFilter is not currently supported");
@@ -310,45 +310,91 @@ class CRM_Core_BAO_Attachment extends CRM_Core_DAO {
         'type' => CRM_Utils_Type::T_INT,
         'description' => 'FK to civicrm_contact, who uploaded this file',
       ];
-      $fields['name'] = [
-        'pseudo' => TRUE,
-        'name' => 'name',
-        'title' => 'Name (write-once)',
-        'description' => 'The logical file name (not searchable)',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['field_name'] = [
-        'pseudo' => TRUE,
-        'name' => 'field_name',
-        'title' => 'Field Name (write-once)',
-        'description' => 'Alternative to "entity_table" param - sets custom field value.',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['url'] = [
-        'pseudo' => TRUE,
-        'name' => 'url',
-        'title' => 'URL (read-only)',
-        'description' => 'URL for downloading the file (not searchable, expire-able)',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['path'] = [
-        'pseudo' => TRUE,
-        'name' => 'path',
-        'title' => 'Path (read-only)',
-        'description' => 'Local file path (not searchable, local-only)',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
-      $fields['content'] = [
-        'pseudo' => TRUE,
-        'name' => 'content',
-        'title' => 'Content',
-        'description' => 'File content (not searchable, not returned by default)',
-        'type' => CRM_Utils_Type::T_STRING,
-      ];
       Civi::$statics[__CLASS__]['fields'] = $fields;
     }
 
     return Civi::$statics[__CLASS__]['fields'];
   }
+
+  /**
+   * Returns all the pseudo fields of Attachement Entity
+   *
+   * @return array
+   */
+  public static function pseudoFields() {
+    return [
+      'name' => [
+        'pseudo' => TRUE,
+        'name' => 'name',
+        'title' => 'Name (write-once)',
+        'description' => 'The logical file name (not searchable)',
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'field_name' => [
+        'pseudo' => TRUE,
+        'name' => 'field_name',
+        'title' => 'Field Name (write-once)',
+        'description' => 'Alternative to "entity_table" param - sets custom field value.',
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'url' => [
+        'pseudo' => TRUE,
+        'name' => 'url',
+        'title' => 'URL (read-only)',
+        'description' => 'URL for downloading the file (not searchable, expire-able)',
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'path' => [
+        'pseudo' => TRUE,
+        'name' => 'path',
+        'title' => 'Path (read-only)',
+        'description' => 'Local file path (not searchable, local-only)',
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+      'content' => [
+        'pseudo' => TRUE,
+        'name' => 'content',
+        'title' => 'Content',
+        'description' => 'File content (not searchable, not returned by default)',
+        'type' => CRM_Utils_Type::T_STRING,
+      ],
+    ];
+  }
+
+ /**
+  * Bulk delete multiple records.
+  *
+  * @param array[] $record
+  * @return static[]
+  * @throws CRM_Core_Exception
+  */
+ public static function deleteRecord(array $record) {
+   $config = CRM_Core_Config::singleton();
+   list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = self::parseParams($record);
+
+   $dao = self::getAttachment($record, $id, $file, $entityFile, $isTrusted);
+
+   $filePaths = [];
+   $fileIds = [];
+   while ($dao->fetch()) {
+     $filePaths[] = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $dao->uri;
+     $fileIds[] = $dao->id;
+   }
+
+   if (!empty($fileIds)) {
+     $idString = implode(',', array_filter($fileIds, 'is_numeric'));
+     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_entity_file WHERE file_id in ($idString)");
+     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_file WHERE id in ($idString)");
+   }
+
+   // unlink is non-transactional, so we do this as the last step -- just in case the other steps produce errors
+   if (!empty($filePaths)) {
+     foreach ($filePaths as $filePath) {
+       unlink($filePath);
+     }
+   }
+
+   return [];
+ }
 
 }
