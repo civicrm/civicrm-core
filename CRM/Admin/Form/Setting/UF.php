@@ -71,9 +71,9 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $dsnArray = DB::parseDSN($dsn);
       $tableNames = CRM_Core_DAO::getTableNames();
       asort($tableNames);
-      $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';
+      $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= [';
       if ($config->userFramework === 'Backdrop') {
-        $tablePrefixes = '$database_prefix = array(';
+        $tablePrefixes = '$database_prefix = [';
       }
       // add default prefix: the drupal database prefix
       $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
@@ -87,7 +87,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       foreach ($tableNames as $tableName) {
         $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
       }
-      $tablePrefixes .= "\n);";
+      $tablePrefixes .= "\n];";
       $this->assign('tablePrefixes', $tablePrefixes);
     }
 
