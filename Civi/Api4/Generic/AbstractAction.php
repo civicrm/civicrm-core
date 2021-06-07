@@ -433,11 +433,15 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   public function entityFields() {
     if (!$this->_entityFields) {
+      $allowedTypes = ['Field', 'Filter', 'Extra'];
+      if (method_exists($this, 'getCustomGroup')) {
+        $allowedTypes[] = 'Custom';
+      }
       $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
         'version' => 4,
         'checkPermissions' => $this->checkPermissions,
         'action' => $this->getActionName(),
-        'includeCustom' => FALSE,
+        'where' => [['type', 'IN', $allowedTypes]],
       ]);
       $result = new Result();
       // Pass TRUE for the private $isInternal param

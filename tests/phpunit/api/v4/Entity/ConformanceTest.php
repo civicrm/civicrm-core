@@ -171,7 +171,7 @@ class ConformanceTest extends UnitTestCase {
    */
   protected function checkFields($entityClass, $entity) {
     $fields = $entityClass::getFields(FALSE)
-      ->setIncludeCustom(FALSE)
+      ->addWhere('type', '=', 'Field')
       ->execute()
       ->indexBy('name');
 

@@ -344,7 +344,7 @@
           results: [{
             text: ts('Columns'),
             children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
-          }].concat(ctrl.crmSearchAdmin.getAllFields('', disabledIf))
+          }].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
         };
       };
 

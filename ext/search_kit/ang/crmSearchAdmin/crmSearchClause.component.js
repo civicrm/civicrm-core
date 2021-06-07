@@ -19,7 +19,7 @@
         ctrl = this,
         meta = {};
       this.conjunctions = {AND: ts('And'), OR: ts('Or'), NOT: ts('Not')};
-      this.operators = CRM.crmSearchAdmin.operators;
+      this.operators = {};
       this.sortOptions = {
         axis: 'y',
         connectWith: '.api4-clause-group-sortable',
@@ -31,7 +31,29 @@
 
       this.$onInit = function() {
         ctrl.hasParent = !!$element.attr('delete-group');
+        _.each(ctrl.clauses, updateOperators);
       };
+
+      this.getOperators = function(clause) {
+        var field = ctrl.getField(clause[0]);
+        if (!field || !field.operators) {
+          return CRM.crmSearchAdmin.operators;
+        }
+        var opKey = field.operators.join();
+        if (!ctrl.operators[opKey]) {
+          ctrl.operators[opKey] = _.filter(CRM.crmSearchAdmin.operators, function(operator) {
+            return _.includes(field.operators, operator.key);
+          });
+        }
+        return ctrl.operators[opKey];
+      };
+
+      function updateOperators(clause) {
+        if (!clause[1] || !_.includes(_.pluck(ctrl.getOperators(clause), 'key'), clause[1])) {
+          clause[1] = ctrl.getOperators(clause)[0].key;
+          ctrl.changeClauseOperator(clause);
+        }
+      }
 
       this.getField = function(expr) {
         if (!meta[expr]) {
@@ -68,8 +90,10 @@
       this.addClause = function() {
         $timeout(function() {
           if (ctrl.newClause) {
+            var newIndex = ctrl.clauses.length;
             ctrl.clauses.push([ctrl.newClause, '=', '']);
             ctrl.newClause = null;
+            updateOperators(ctrl.clauses[newIndex]);
           }
         });
       };
@@ -82,6 +106,8 @@
       this.changeClauseField = function(clause, index) {
         if (clause[0] === '') {
           ctrl.deleteRow(index);
+        } else {
+          updateOperators(clause);
         }
       };
 

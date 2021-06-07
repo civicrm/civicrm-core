@@ -43,6 +43,11 @@ class FieldSpec {
   /**
    * @var string
    */
+  public $type = 'Extra';
+
+  /**
+   * @var string
+   */
   public $entity;
 
   /**
@@ -91,6 +96,11 @@ class FieldSpec {
   public $inputAttrs = [];
 
   /**
+   * @var string[]
+   */
+  public $operators;
+
+  /**
    * @var string
    */
   public $fkEntity;
@@ -130,6 +140,12 @@ class FieldSpec {
    */
   public $outputFormatters;
 
+
+  /**
+   * @var callable[]
+   */
+  public $sqlFilters;
+
   /**
    * Aliases for the valid data types
    *
@@ -148,7 +164,7 @@ class FieldSpec {
    */
   public function __construct($name, $entity, $dataType = 'String') {
     $this->entity = $entity;
-    $this->name = $this->columnName = $name;
+    $this->name = $name;
     $this->setDataType($dataType);
   }
 
@@ -391,6 +407,16 @@ class FieldSpec {
   }
 
   /**
+   * @param string[] $operators
+   * @return $this
+   */
+  public function setOperators($operators) {
+    $this->operators = $operators;
+
+    return $this;
+  }
+
+  /**
    * @param callable[] $outputFormatters
    * @return $this
    */
@@ -409,6 +435,39 @@ class FieldSpec {
       $this->outputFormatters = [];
     }
     $this->outputFormatters[] = $outputFormatter;
+
+    return $this;
+  }
+
+  /**
+   * @param callable[] $sqlFilters
+   * @return $this
+   */
+  public function setSqlFilters($sqlFilters) {
+    $this->sqlFilters = $sqlFilters;
+
+    return $this;
+  }
+
+  /**
+   * @param callable $sqlFilter
+   * @return $this
+   */
+  public function addSqlFilter($sqlFilter) {
+    if (!$this->sqlFilters) {
+      $this->sqlFilters = [];
+    }
+    $this->sqlFilters[] = $sqlFilter;
+
+    return $this;
+  }
+
+  /**
+   * @param string $type
+   * @return $this
+   */
+  public function setType(string $type) {
+    $this->type = $type;
 
     return $this;
   }
@@ -438,11 +497,11 @@ class FieldSpec {
   }
 
   /**
-   * @param string $customFieldColumnName
+   * @param string $tableName
    * @return $this
    */
-  public function setTableName($customFieldColumnName) {
-    $this->tableName = $customFieldColumnName;
+  public function setTableName($tableName) {
+    $this->tableName = $tableName;
 
     return $this;
   }
@@ -523,18 +582,18 @@ class FieldSpec {
   }
 
   /**
-   * @return string
+   * @return string|NULL
    */
-  public function getColumnName() {
+  public function getColumnName(): ?string {
     return $this->columnName;
   }
 
   /**
-   * @param string $columnName
+   * @param string|null $columnName
    *
    * @return $this
    */
-  public function setColumnName($columnName) {
+  public function setColumnName(?string $columnName) {
     $this->columnName = $columnName;
     return $this;
   }

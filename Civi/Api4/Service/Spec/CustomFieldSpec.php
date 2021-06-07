@@ -31,6 +31,11 @@ class CustomFieldSpec extends FieldSpec {
   public $customGroup;
 
   /**
+   * @var string
+   */
+  public $type = 'Custom';
+
+  /**
    * @inheritDoc
    */
   public function setDataType($dataType) {

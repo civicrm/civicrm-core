@@ -648,9 +648,10 @@ ORDER BY   gc.contact_id, g.children
    * @throws \CiviCRM_API3_Exception
    */
   public static function populateTemporaryTableWithContactsInGroups(array $groupIDs, string $temporaryTable): void {
+    $childAndParentGroupIDs = array_merge($groupIDs, CRM_Contact_BAO_GroupNesting::getDescendentGroupIds($groupIDs));
     $groups = civicrm_api3('Group', 'get', [
       'is_active' => 1,
-      'id' => ['IN' => $groupIDs],
+      'id' => ['IN' => $childAndParentGroupIDs],
       'saved_search_id' => ['>' => 0],
       'return' => 'id',
     ]);
@@ -659,7 +660,7 @@ ORDER BY   gc.contact_id, g.children
     $query = "
        SELECT DISTINCT group_contact.contact_id as contact_id
        FROM civicrm_group_contact group_contact
-       WHERE group_contact.group_id IN (" . implode(', ', $groupIDs) . ")
+       WHERE group_contact.group_id IN (" . implode(', ', $childAndParentGroupIDs) . ")
        AND group_contact.status = 'Added' ";
 
     if (!empty($smartGroups)) {

@@ -53,11 +53,6 @@ class Api4SelectQuery {
   /**
    * @var array
    */
-  protected $entityFieldNames = [];
-
-  /**
-   * @var array
-   */
   protected $aclFields = [];
 
   /**
@@ -97,7 +92,6 @@ class Api4SelectQuery {
 
     // Build field lists
     foreach ($this->api->entityFields() as $field) {
-      $this->entityFieldNames[] = $field['name'];
       $field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($field['name'], $field);
     }
@@ -205,7 +199,7 @@ class Api4SelectQuery {
     $select = array_diff($select ?? $this->getSelect(), ['row_count']);
     // An empty select is the same as *
     if (empty($select)) {
-      $select = $this->entityFieldNames;
+      $select = $this->selectMatchingFields('*');
     }
     else {
       if ($this->forceSelectId) {
@@ -236,7 +230,7 @@ class Api4SelectQuery {
         // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
         $idField = substr($wildField, 0, strrpos($wildField, '.')) . '.id';
         $this->autoJoinFK($idField);
-        $matches = SelectUtil::getMatchingFields($wildField, array_keys($this->apiFieldSpec));
+        $matches = $this->selectMatchingFields($wildField);
         array_splice($select, $pos, 1, $matches);
       }
       $select = array_unique($select);
@@ -247,7 +241,7 @@ class Api4SelectQuery {
       foreach ($expr->getFields() as $fieldName) {
         $field = $this->getField($fieldName);
         // Remove expressions with unknown fields without raising an error
-        if (!$field) {
+        if (!$field || !in_array($field['type'], ['Field', 'Custom'], TRUE)) {
           $select = array_diff($select, [$item]);
           $this->debug('undefined_fields', $fieldName);
           $valid = FALSE;
@@ -262,6 +256,20 @@ class Api4SelectQuery {
         $this->query->select($expr->render($this->apiFieldSpec) . " AS `$alias`");
       }
     }
+  }
+
+  /**
+   * Get all fields for SELECT clause matching a wildcard pattern
+   *
+   * @param $pattern
+   * @return array
+   */
+  private function selectMatchingFields($pattern) {
+    // Only core & custom fields can be selected
+    $availableFields = array_filter($this->apiFieldSpec, function($field) {
+      return in_array($field['type'], ['Field', 'Custom'], TRUE);
+    });
+    return SelectUtil::getMatchingFields($pattern, array_keys($availableFields));
   }
 
   /**
@@ -352,12 +360,13 @@ class Api4SelectQuery {
    * @param array $clause
    * @param string $type
    *   WHERE|HAVING|ON
+   * @param int $depth
    * @return string SQL where clause
    *
    * @throws \API_Exception
    * @uses composeClause() to generate the SQL etc.
    */
-  protected function treeWalkClauses($clause, $type) {
+  protected function treeWalkClauses($clause, $type, $depth = 0) {
     // Skip empty leaf.
     if (in_array($clause[0], ['AND', 'OR', 'NOT']) && empty($clause[1])) {
       return '';
@@ -368,12 +377,12 @@ class Api4SelectQuery {
         // handle branches
         if (count($clause[1]) === 1) {
           // a single set so AND|OR is immaterial
-          return $this->treeWalkClauses($clause[1][0], $type);
+          return $this->treeWalkClauses($clause[1][0], $type, $depth + 1);
         }
         else {
           $sql_subclauses = [];
           foreach ($clause[1] as $subclause) {
-            $sql_subclauses[] = $this->treeWalkClauses($subclause, $type);
+            $sql_subclauses[] = $this->treeWalkClauses($subclause, $type, $depth + 1);
           }
           return '(' . implode("\n" . $clause[0], $sql_subclauses) . ')';
         }
@@ -383,10 +392,10 @@ class Api4SelectQuery {
         if (!is_string($clause[1][0])) {
           $clause[1] = ['AND', $clause[1]];
         }
-        return 'NOT (' . $this->treeWalkClauses($clause[1], $type) . ')';
+        return 'NOT (' . $this->treeWalkClauses($clause[1], $type, $depth + 1) . ')';
 
       default:
-        return $this->composeClause($clause, $type);
+        return $this->composeClause($clause, $type, $depth);
     }
   }
 
@@ -395,11 +404,13 @@ class Api4SelectQuery {
    * @param array $clause [$fieldName, $operator, $criteria]
    * @param string $type
    *   WHERE|HAVING|ON
+   * @param int $depth
    * @return string SQL
    * @throws \API_Exception
    * @throws \Exception
    */
-  protected function composeClause(array $clause, string $type) {
+  protected function composeClause(array $clause, string $type, int $depth) {
+    $field = NULL;
     // Pad array for unary operators
     [$expr, $operator, $value] = array_pad($clause, 3, NULL);
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
@@ -454,7 +465,7 @@ class Api4SelectQuery {
         if ($fieldName && $valExpr->getType() === 'SqlString') {
           $value = $valExpr->getExpr();
           FormattingUtil::formatInputValue($value, $fieldName, $this->apiFieldSpec[$fieldName], $operator);
-          return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName]);
+          return $this->createSQLClause($fieldAlias, $operator, $value, $this->apiFieldSpec[$fieldName], $depth);
         }
         else {
           $value = $valExpr->render($this->apiFieldSpec);
@@ -467,7 +478,7 @@ class Api4SelectQuery {
       }
     }
 
-    $sqlClause = $this->createSQLClause($fieldAlias, $operator, $value, $field ?? NULL);
+    $sqlClause = $this->createSQLClause($fieldAlias, $operator, $value, $field, $depth);
     if ($sqlClause === NULL) {
       throw new \API_Exception("Invalid value in $type clause for '$expr'");
     }
@@ -479,10 +490,25 @@ class Api4SelectQuery {
    * @param string $operator
    * @param mixed $value
    * @param array|null $field
+   * @param int $depth
    * @return array|string|NULL
    * @throws \Exception
    */
-  protected function createSQLClause($fieldAlias, $operator, $value, $field) {
+  protected function createSQLClause($fieldAlias, $operator, $value, $field, int $depth) {
+    if (!empty($field['operators']) && !in_array($operator, $field['operators'], TRUE)) {
+      throw new \API_Exception('Illegal operator for ' . $field['name']);
+    }
+    // Some fields use a callback to generate their sql
+    if (!empty($field['sql_filters'])) {
+      $sql = [];
+      foreach ($field['sql_filters'] as $filter) {
+        $clause = is_callable($filter) ? $filter($fieldAlias, $operator, $value, $this, $depth) : NULL;
+        if ($clause) {
+          $sql[] = $clause;
+        }
+      }
+      return $sql ? implode(' AND ', $sql) : NULL;
+    }
     if ($operator === 'CONTAINS') {
       switch ($field['serialize'] ?? NULL) {
         case \CRM_Core_DAO::SERIALIZE_JSON:

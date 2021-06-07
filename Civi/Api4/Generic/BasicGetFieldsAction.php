@@ -69,6 +69,12 @@ class BasicGetFieldsAction extends BasicGetAction {
   protected $values = [];
 
   /**
+   * @var bool
+   * @deprecated
+   */
+  protected $includeCustom;
+
+  /**
    * To implement getFields for your own entity:
    *
    * 1. From your entity class add a static getFields method.
@@ -208,18 +214,6 @@ class BasicGetFieldsAction extends BasicGetAction {
   }
 
   /**
-   * @param bool $includeCustom
-   * @return $this
-   */
-  public function setIncludeCustom(bool $includeCustom) {
-    // Be forgiving if the param doesn't exist and don't throw an exception
-    if (property_exists($this, 'includeCustom')) {
-      $this->includeCustom = $includeCustom;
-    }
-    return $this;
-  }
-
-  /**
    * Helper function to retrieve options from an option group (for non-DAO entities).
    *
    * @param string $optionGroupName
@@ -260,6 +254,17 @@ class BasicGetFieldsAction extends BasicGetAction {
         'description' => ts('Explanation of the purpose of the field'),
       ],
       [
+        'name' => 'type',
+        'data_type' => 'String',
+        'default_value' => 'Field',
+        'options' => [
+          'Field' => ts('Primary Field'),
+          'Custom' => ts('Custom Field'),
+          'Filter' => ts('Search Filter'),
+          'Extra' => ts('Extra API Field'),
+        ],
+      ],
+      [
         'name' => 'default_value',
         'data_type' => 'String',
       ],
@@ -276,6 +281,11 @@ class BasicGetFieldsAction extends BasicGetAction {
         'name' => 'options',
         'data_type' => 'Array',
         'default_value' => FALSE,
+      ],
+      [
+        'name' => 'operators',
+        'data_type' => 'Array',
+        'description' => 'If set, limits the operators that can be used on this field for "get" actions.',
       ],
       [
         'name' => 'data_type',

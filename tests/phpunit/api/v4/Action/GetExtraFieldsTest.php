@@ -29,7 +29,7 @@ use Civi\Api4\Contact;
 class GetExtraFieldsTest extends UnitTestCase {
 
   public function testGetFieldsByContactType() {
-    $getFields = Contact::getFields(FALSE)->addSelect('name')->setIncludeCustom(FALSE);
+    $getFields = Contact::getFields(FALSE)->addSelect('name')->addWhere('type', '=', 'Field');
 
     $baseFields = array_column(\CRM_Contact_BAO_Contact::fields(), 'name');
     $returnedFields = $getFields->execute()->column('name');
