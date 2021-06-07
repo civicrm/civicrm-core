@@ -487,7 +487,7 @@
       if (settings.openInline) {
         settings.autoClose = $el.crmSnippet('isOriginalUrl');
         $(this).off('.openInline').on('click.openInline', settings.openInline, function(e) {
-          if ($(this).is(exclude + ', .crm-popup')) {
+          if ($(this).is(exclude + ', .crm-popup, [target=crm-popup]')) {
             return;
           }
           if ($(this).hasClass('open-inline-noreturn')) {
@@ -594,7 +594,7 @@
 
   $(function($) {
     $('body')
-      .on('click', 'a.crm-popup', CRM.popup)
+      .on('click', 'a.crm-popup, a[target=crm-popup]', CRM.popup)
       // Close unsaved dialog messages
       .on('dialogopen', function(e) {
         $('.alert.unsaved-dialog .ui-notify-cross', '#crm-notification-container').click();

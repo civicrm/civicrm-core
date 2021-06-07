@@ -5,7 +5,7 @@
   </button>
   <ul class="dropdown-menu {{ col.alignment === 'text-right' ? 'dropdown-menu-right' : '' }}" ng-if=":: col.open">
     <li ng-repeat="item in col.links" class="bg-{{:: item.style }}">
-      <a href="{{:: displayUtils.getUrl(item.path, row) }}" class="{{:: item.target }}" target="{{:: item.target }}">
+      <a href="{{:: displayUtils.getUrl(item.path, row) }}" target="{{:: item.target }}">
         <i ng-if=":: item.icon" class="crm-i {{:: item.icon }}"></i>
         {{:: item.text }}
       </a>
