@@ -21,13 +21,14 @@
 trait CRM_Contact_AccessTrait {
 
   /**
+   * @param string $entityName
    * @param string $action
    * @param array $record
    * @param int|NULL $userID
    * @return bool
    * @see CRM_Core_DAO::checkAccess
    */
-  public static function _checkAccess(string $action, array $record, $userID) {
+  public static function _checkAccess(string $entityName, string $action, array $record, $userID) {
     $cid = $record['contact_id'] ?? NULL;
     if (!$cid && !empty($record['id'])) {
       $cid = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');

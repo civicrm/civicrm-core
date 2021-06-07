@@ -224,14 +224,17 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
   /**
    * Special checkAccess function for multi-record custom pseudo-entities
    *
+   * @param string $entityName
+   *   Ex: 'Contact' or 'Custom_Foobar'
    * @param string $action
    * @param array $record
-   * @param null $userID
+   * @param int|null $userID
+   *   Contact ID of the active user (whose access we must check). NULL for anonymous.
    * @param bool $granted
-   * @param string $groupName
    * @return bool
    */
-  public static function checkAccess(string $action, array $record, $userID = NULL, $granted = TRUE, $groupName = NULL): bool {
+  public static function checkAccess(string $entityName, string $action, array $record, $userID, $granted = TRUE): bool {
+    $groupName = substr($entityName, 0, 7) === 'Custom_' ? substr($entityName, 7) : NULL;
     if (!$groupName) {
       // $groupName is required but the function signature has to match the parent.
       throw new CRM_Core_Exception('Missing required $groupName in CustomValue::checkAccess');

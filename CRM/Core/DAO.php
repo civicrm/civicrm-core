@@ -3045,21 +3045,22 @@ SELECT contact_id
    *
    * Dispatches to internal BAO function ('static::_checkAccess())` and `hook_civicrm_checkAccess`.
    *
+   * @param string $entityName
+   *   Ex: 'Contact' or 'Custom_Foobar'
    * @param string $action
    *   APIv4 action name.
    *   Ex: 'create', 'get', 'delete'
    * @param array $record
    *   All (known/loaded) values of individual record being accessed.
    *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
-   * @param int $userID
-   *   Contact ID of the active user (whose access we must check).
+   * @param int|null $userID
+   *   Contact ID of the active user (whose access we must check). NULL for anonymous.
    * @param bool $granted
    *   Initial value (usually TRUE, but the API might pass FALSE if gatekeeper permissions fail)
    *
    * @return bool
    */
-  public static function checkAccess(string $action, array $record, $userID = NULL, $granted = TRUE): bool {
-    $entityName = CRM_Core_DAO_AllCoreTables::getBriefName(static::class);
+  public static function checkAccess(string $entityName, string $action, array $record, $userID, $granted = TRUE): bool {
     // Ensure this function was either called on a BAO class or a DAO that has no BAO
     if (!$entityName ||
       (!strpos(static::class, '_BAO_') && CRM_Core_DAO_AllCoreTables::getBAOClassName(static::class) !== static::class)
@@ -3069,7 +3070,7 @@ SELECT contact_id
     $userID = isset($userID) ? (int) $userID : CRM_Core_Session::getLoggedInContactID();
     // Dispatch to protected function _checkAccess in this BAO
     if ($granted && method_exists(static::class, '_checkAccess')) {
-      $granted = static::_checkAccess($action, $record, $userID);
+      $granted = static::_checkAccess($entityName, $action, $record, $userID);
     }
     // Dispatch to hook
     CRM_Utils_Hook::checkAccess($entityName, $action, $record, $userID, $granted);
