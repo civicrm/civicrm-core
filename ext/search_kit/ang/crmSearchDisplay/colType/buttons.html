@@ -1,5 +1,5 @@
 <span ng-repeat="item in col.links">
-  <a class="btn {{:: col.size }} btn-{{:: item.style }} {{:: item.target }}" target="{{:: item.target }}" href="{{:: displayUtils.getUrl(item.path, row) }}">
+  <a class="btn {{:: col.size }} btn-{{:: item.style }}" target="{{:: item.target }}" href="{{:: displayUtils.getUrl(item.path, row) }}">
     <i ng-if=":: item.icon" class="crm-i {{:: item.icon }}"></i>
     {{:: item.text }}
   </a>

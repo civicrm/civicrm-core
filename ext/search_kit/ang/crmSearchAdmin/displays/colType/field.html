@@ -1,9 +1,9 @@
 <div class="form-inline crm-search-admin-flex-row">
-  <label title="{{ ts('Display as clickable link') }}" >
+  <label title="{{:: ts('Display as clickable link') }}" >
     <input type="checkbox" ng-checked="col.link" ng-click="$ctrl.parent.toggleLink(col)" >
     {{:: ts('Link') }}
   </label>
-  <select class="form-control" ng-model="$ctrl.link.target" ng-if="col.link">
+  <select class="form-control" ng-model="col.link.target" ng-if="col.link">
     <option value>{{:: ts('Open normally') }}</option>
     <option value="_blank">{{:: ts('New tab') }}</option>
     <option value="crm-popup">{{:: ts('Popup dialog') }}</option>

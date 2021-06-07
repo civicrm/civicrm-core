@@ -1,2 +1,7 @@
 <crm-search-display-editable row="row" col="col" on-success="$ctrl.refresh(row)" cancel="$ctrl.editing = null;" ng-if="col.editable && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === col.key"></crm-search-display-editable>
-<span ng-bind-html=":: $ctrl.formatFieldValue(row, col)" ng-class="{'crm-editable-enabled': col.editable && !$ctrl.editing && row[col.editable.id]}" ng-click="col.editable && !$ctrl.editing && ($ctrl.editing = [rowIndex, col.key])"></span>
+<span ng-if="::!col.link" ng-class="{'crm-editable-enabled': col.editable && !$ctrl.editing && row[col.editable.id]}" ng-click="col.editable && !$ctrl.editing && ($ctrl.editing = [rowIndex, col.key])">
+  {{:: $ctrl.formatFieldValue(row, col) }}
+</span>
+<a ng-if="::col.link" target="{{:: col.link.target }}" href="{{:: displayUtils.getUrl(col.link.path, row) }}">
+  {{:: $ctrl.formatFieldValue(row, col) }}
+</a>

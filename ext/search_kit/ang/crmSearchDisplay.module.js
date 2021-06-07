@@ -7,7 +7,7 @@
     .factory('searchDisplayUtils', function(crmApi4) {
 
       // Replace tokens keyed to rowData.
-      // If rowMeta is provided, values will be formatted; if omiited, raw values will be provided.
+      // If rowMeta is provided, values will be formatted; if omitted, raw values will be provided.
       function replaceTokens(str, rowData, rowMeta) {
         if (!str) {
           return '';
@@ -30,19 +30,11 @@
         return url;
       }
 
-      // Returns html-escaped display value for a single column in a row
+      // Returns display value for a single column in a row
       function formatDisplayValue(rowData, key, rowMeta) {
         var column = _.findWhere(rowMeta, {key: key}),
-          displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]),
-          result = _.escape(displayValue);
-        if (column.link) {
-          var target = '';
-          if (column.link.target) {
-            target = column.link.target === 'crm-popup' ? 'class="crm-popup" ' : 'target="' + column.link.target + '" ';
-          }
-          result = '<a ' + target + 'href="' + _.escape(getUrl(column.link.path, rowData)) + '">' + result + '</a>';
-        }
-        return result;
+          displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]);
+        return displayValue;
       }
 
       // Formats raw field value according to data type
