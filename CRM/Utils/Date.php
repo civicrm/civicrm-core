@@ -966,9 +966,9 @@ class CRM_Utils_Date {
    */
   public static function intervalAdd($unit, $interval, $date, $dontCareTime = FALSE) {
     if (is_array($date)) {
-      $hour = $date['H'] ?? NULL;
-      $minute = $date['i'] ?? NULL;
-      $second = $date['s'] ?? NULL;
+      $hour = $date['H'] ?? '00';
+      $minute = $date['i'] ?? '00';
+      $second = $date['s'] ?? '00';
       $month = $date['M'] ?? NULL;
       $day = $date['d'] ?? NULL;
       $year = $date['Y'] ?? NULL;
