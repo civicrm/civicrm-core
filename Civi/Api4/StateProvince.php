@@ -21,6 +21,7 @@ namespace Civi\Api4;
 /**
  * StateProvince entity.
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class StateProvince extends Generic\DAOEntity {

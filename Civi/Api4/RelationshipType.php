@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Relationship
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class RelationshipType extends Generic\DAOEntity {

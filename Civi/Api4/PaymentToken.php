@@ -22,6 +22,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/contributions/payment-processors/#managing-recurring-contributions
  *
+ * @searchable secondary
  * @package Civi\Api4
  */
 class PaymentToken extends Generic\DAOEntity {
