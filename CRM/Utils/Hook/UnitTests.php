@@ -22,12 +22,12 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    * @var array
    */
   protected $adhocHooks;
-  protected $civiModules = NULL;
+  protected $civiModules;
 
   /**
    * Call this in CiviUnitTestCase::setUp()
    */
-  public function reset() {
+  public function reset(): void {
     $this->mockObject = NULL;
     $this->adhocHooks = [];
   }
@@ -36,23 +36,24 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    * Use a unit-testing mock object to handle hook invocations.
    *
    * e.g. hook_civicrm_foo === $mockObject->foo()
-   * Mocks with a magic `__call()` method are called for every hook invokation.
+   * Mocks with a magic `__call()` method are called for every hook invocation.
    *
-   * @param object $mockObject
+   * @param PHPUnit\Framework\MockObject\MockBuilder $mockObject
    */
-  public function setMock($mockObject) {
+  public function setMock($mockObject): void {
     $this->mockObject = $mockObject;
   }
 
   /**
    * Register a function to run when invoking a specific hook.
+   *
    * @param string $hook
    *   Hook name, e.g civicrm_pre.
-   * @param array $callable
+   * @param callable|array $callable
    *   Function to call ie array(class, method).
-   *   eg. array($this, mymethod)
+   *   eg. array($this, myMethod)
    */
-  public function setHook($hook, $callable) {
+  public function setHook(string $hook, $callable): void {
     $this->adhocHooks[$hook] = $callable;
   }
 
@@ -76,7 +77,8 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
    * @param string $fnSuffix
    *   Function suffix, this is effectively the hook name.
    *
-   * @return mixed
+   * @return array|bool
+   * @throws \CRM_Core_Exception
    */
   public function invokeViaUF(
     $numParams,
@@ -84,7 +86,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
     $fnSuffix) {
     $params = array(&$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6);
 
-    $fResult1 = $fResult2 = $fResult3 = NULL;
+    $fResult2 = $fResult3 = NULL;
 
     // run standard hooks
     if ($this->civiModules === NULL) {
