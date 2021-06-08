@@ -9,6 +9,9 @@
 *}
 
 {* Financial search component. *}
+{if !isset($batchStatus)}
+  {assign var="batchStatus" value="open"}
+{/if}
 <div id="enableDisableStatusMsg" class="crm-container" style="display:none"></div>
 <div class="action-link">
   <a accesskey="N" href="{crmURL p='civicrm/financial/batch' q="reset=1&action=add&context=$batchStatus"}" id="newBatch" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}New Accounting Batch{/ts}</span></a>
@@ -21,6 +24,7 @@
     <div class="crm-accordion-body">
       <div id="financial-search-form" class="crm-block crm-form-block">
         <table class="form-layout-compressed">
+          {if !empty($elements)}
           {* Loop through all defined search criteria fields (defined in the buildForm() function). *}
           {foreach from=$elements item=element}
             <tr class="crm-financial-search-form-block-{$element}">
@@ -28,16 +32,17 @@
               <td>{$form.$element.html}</td>
             </tr>
           {/foreach}
+          {/if}
         </table>
       </div>
     </div>
   </div>
 </div>
-<div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>
+{if !empty($form.batch_update)}<div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>{/if}
 <table id="crm-batch-selector-{$batchStatus}" class="row-highlight">
   <thead>
     <tr>
-      <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
+      <th class="crm-batch-checkbox">{if !empty($form.toggleSelect.html)}{$form.toggleSelect.html}{/if}</th>
       <th class="crm-batch-name">{ts}Batch Name{/ts}</th>
       <th class="crm-batch-payment_instrument">{ts}Payment Method{/ts}</th>
       <th class="crm-batch-item_count">{ts}Item Count{/ts}</th>

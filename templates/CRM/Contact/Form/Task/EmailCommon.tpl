@@ -21,7 +21,7 @@
   </div>
   <div class="clear"></div>
     <div class='html'>
-  {if $editor EQ 'textarea'}
+  {if !empty($editor) and $editor EQ 'textarea'}
       <div class="help description">{ts}NOTE: If you are composing HTML-formatted messages, you may want to enable a Rich Text (WYSIWYG) editor (Administer &raquo; Customize Data & Screens &raquo; Display Preferences).{/ts}</div>
   {/if}
   {$form.html_message.html}<br />
