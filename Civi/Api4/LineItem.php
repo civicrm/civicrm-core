@@ -26,4 +26,18 @@ namespace Civi\Api4;
  */
 class LineItem extends Generic\DAOEntity {
 
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
+   * @return array
+   */
+  public static function permissions() {
+    $permissions = \CRM_Core_Permission::getEntityActionPermissions()['line_item'] ?? [];
+
+    // Merge permissions for this entity with the defaults
+    return array_merge($permissions, [
+      'create' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
+      'update' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
+    ]);
+  }
+
 }

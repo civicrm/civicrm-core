@@ -33,4 +33,18 @@ namespace Civi\Api4;
  */
 class FinancialTrxn extends Generic\DAOEntity {
 
+  /**
+   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
+   * @return array
+   */
+  public static function permissions() {
+    $permissions = \CRM_Core_Permission::getEntityActionPermissions()['payment'] ?? [];
+
+    // Merge permissions for this entity with the defaults
+    return array_merge($permissions, [
+      'create' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
+      'update' => [\CRM_Core_Permission::ALWAYS_DENY_PERMISSION],
+    ]);
+  }
+
 }

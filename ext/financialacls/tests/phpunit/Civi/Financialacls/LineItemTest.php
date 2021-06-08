@@ -71,7 +71,7 @@ class LineItemTest extends BaseTestClass {
       'price_field_id' => $defaultPriceFieldID,
       'qty' => 1,
       'financial_type_id' => 'Donation',
-      'check_permissions' => TRUE,
+      'check_permissions' => FALSE,
     ];
     $line = $this->callAPISuccess('LineItem', 'Create', $lineParams);
     $lineParams['financial_type_id'] = 'Event Fee';
