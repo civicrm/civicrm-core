@@ -28,7 +28,11 @@ use Civi\Api4\Email;
  */
 class SavedSearchTest extends UnitTestCase {
 
-  public function testContactSmartGroup() {
+  /**
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   */
+  public function testContactSmartGroup(): void {
     $in = Contact::create(FALSE)->addValue('first_name', 'yes')->addValue('do_not_phone', TRUE)->execute()->first();
     $out = Contact::create(FALSE)->addValue('first_name', 'no')->addValue('do_not_phone', FALSE)->execute()->first();
 
