@@ -28,7 +28,7 @@
           <th>{ts}URL{/ts}</th>
           <th>{ts}Description{/ts}</th>
           <th>{ts}Order{/ts}</th>
-          {if $showIsDefault}
+          {if !empty($showIsDefault)}
             <th>{ts}Default{/ts}</th>
           {/if}
           <th>{ts}Reserved{/ts}</th>
@@ -39,12 +39,12 @@
         </tr>
         </thead>
         {foreach from=$rows item=row}
-          <tr id="option_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{$row.class}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
+          <tr id="option_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)}{$row.class}{/if}{if NOT $row.is_active} crm-report-optionList crm-report-optionList-status_disable disabled{else} crm-report-optionList crm-report-optionList-status_enable{/if}">
             <td class="crm-report-optionList-label crm-editable" data-field="label">{$row.label}</td>
             <td class="crm-report-optionList-value">{$row.value}</td>
             <td class="crm-report-optionList-description">{$row.description}</td>
             <td class="nowrap crm-report-optionList-order">{$row.weight}</td>
-            {if $showIsDefault}
+            {if !empty($showIsDefault)}
               <td class="crm-report-optionList-default_value">{$row.default_value}</td>
             {/if}
             <td class="crm-report-optionList-is_reserved">{if $row.is_reserved eq 1}{ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

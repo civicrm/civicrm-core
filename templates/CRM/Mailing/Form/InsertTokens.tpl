@@ -45,7 +45,7 @@ var isMailing    = false;
   {/literal}
 {/if}
 
-{if $templateSelected}
+{if !empty($templateSelected)}
   {literal}
   if ( document.getElementsByName(prefix + "saveTemplate")[0].checked ) {
     document.getElementById(prefix + "template").selectedIndex = {/literal}{$templateSelected}{literal};

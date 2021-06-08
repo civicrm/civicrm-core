@@ -22,7 +22,7 @@
     <tr class="crm-group-form-block-title">
       <td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='title' id=$group.id}{/if}</td>
       <td>{$form.title.html|crmAddClass:huge}
-        {if $group.saved_search_id}&nbsp;({ts}Smart Group{/ts}){/if}
+        {if !empty($group.saved_search_id)}&nbsp;({ts}Smart Group{/ts}){/if}
       </td>
     </tr>
 
@@ -36,7 +36,7 @@
     <tr class="crm-group-form-block-frontend-title">
       <td class="label">{$form.frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_group' field='frontend_title' id=$group.id}{/if}</td>
       <td>{$form.frontend_title.html|crmAddClass:huge}
-        {if $group.saved_search_id}&nbsp;({ts}Smart Group{/ts}){/if}
+        {if !empty($group.saved_search_id)}&nbsp;({ts}Smart Group{/ts}){/if}
       </td>
     </tr>
 
@@ -69,14 +69,14 @@
       <td>{$form.is_active.html}</td>
     </tr>
 
-   {if $group.created_by}
+   {if !empty($group.created_by)}
       <tr class="crm-group-form-block-created">
         <td class="label">{ts}Created By{/ts}</td>
         <td>{$group.created_by}</td>
       </tr>
     {/if}
 
-    {if $group.modified_by}
+    {if !empty($group.modified_by)}
       <tr class="crm-group-form-block-modified">
         <td class="label">{ts}Modified By{/ts}</td>
         <td>{$group.modified_by}</td>
@@ -105,10 +105,10 @@
 
   {literal}
   <script type="text/javascript">
-    {/literal}{if $freezeMailingList}{literal}
+    {/literal}{if !empty($freezeMailingList)}{literal}
     cj('input[type=checkbox][name="group_type[{/literal}{$freezeMailingList}{literal}]"]').prop('disabled',true);
     {/literal}{/if}{literal}
-    {/literal}{if $hideMailingList}{literal}
+    {/literal}{if !empty($hideMailingList)}{literal}
     cj('input[type=checkbox][name="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     cj('label[for="group_type[{/literal}{$hideMailingList}{literal}]"]').hide();
     {/literal}{/if}{literal}

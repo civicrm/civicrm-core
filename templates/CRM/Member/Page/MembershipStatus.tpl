@@ -38,17 +38,17 @@
             <th></th>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="membership_status-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class} {if NOT $row.is_active} disabled{/if} crmf">
+        <tr id="membership_status-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {if !empty($row.class)}{$row.class}{/if} {if NOT $row.is_active} disabled{/if} crmf">
           <td class="crmf-label crm-editable" >{$row.label}</td>
-          <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.start_event}</td>
-          <td class="nowrap crmf-start_event_adjust_unit_interval">{$row.start_event_adjust_unit_interval}</td>
-          <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{$row.end_event}</td>
-          <td class="nowrap crmf-end_event_adjust_interval">{$row.end_event_adjust_interval}</td>
+          <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.start_event)}{$row.start_event}{/if}</td>
+          <td class="nowrap crmf-start_event_adjust_unit_interval">{if !empty($row.start_event_adjust_unit_interval)}{$row.start_event_adjust_unit_interval}{/if}</td>
+          <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.end_event)}{$row.end_event}{/if}</td>
+          <td class="nowrap crmf-end_event_adjust_interval">{if !empty($row.end_event_adjust_unit_interval)}{$row.end_event_adjust_interval}{/if}</td>
           <td class="crmf-is_current_member crm-editable" data-type="boolean">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="nowrap crmf-weight">{$row.weight}</td>
           <td class="crmf-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{if !empty($row.action)}{$row.action|replace:'xx':$row.id}{/if}</td>
         </tr>
         {/foreach}
         </table>

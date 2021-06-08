@@ -8,9 +8,9 @@
  +--------------------------------------------------------------------+
 *}
 {*CRM-14190*}
-{if $parent_groups|@count > 0 or $form.parents.html}
+{if (isset($parent_groups) and $parent_groups|@count > 0) or !empty($form.parents.html)}
   <h3>{ts}Parent Groups{/ts} {help id="id-group-parent" file="CRM/Group/Page/Group.hlp"}</h3>
-  {if $parent_groups|@count > 0}
+  {if isset($parent_groups) and $parent_groups|@count > 0}
     <table class="form-layout-compressed">
       <tr>
         <td><label>{ts}Remove Parent?{/ts}</label></td>
@@ -31,7 +31,7 @@
     </tr>
   </table>
 {/if}
-{if $form.organization_id}
+{if !empty($form.organization_id)}
   <h3>{ts}Associated Organization{/ts} {help id="id-group-organization" file="CRM/Group/Page/Group.hlp"}</h3>
   <table class="form-layout-compressed">
     <tr class="crm-group-form-block-organization">
