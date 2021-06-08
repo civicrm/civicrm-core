@@ -8,23 +8,23 @@
  +--------------------------------------------------------------------+
 *}
 <div class="help">
-    {ts}This screen presents the list of most recent 1,000 scheduled jobs log entries.{/ts} {$docLink}
+    {ts}This screen presents the list of most recent 1,000 scheduled jobs log entries.{/ts} {if !empty($docLink)}{$docLink}{/if}
 </div>
 
 <div class="crm-content-block crm-block">
 
-{if $jobId}
+{if !empty($jobId)}
     <h3>{ts}List of log entries for:{/ts} {$jobName}</h3>
 {/if}
 
   <div class="action-link">
     <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-top" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
-    {if $jobRunUrl}
+    {if !empty($jobRunUrl)}
       <a href="{$jobRunUrl}" id="jobsList-run-top" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
     {/if}
   </div>
 
-{if $rows}
+{if !empty($rows)}
   <div id="ltype">
         {strip}
         {* handle enable/disable actions*}
@@ -63,7 +63,7 @@
 
   <div class="action-link">
     <a href="{crmURL p='civicrm/admin/job' q="reset=1"}" id="jobsList-bottom" class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Scheduled Jobs Listing{/ts}</span></a>
-    {if $jobRunUrl}
+    {if !empty($jobRunUrl)}
       <a href="{$jobRunUrl}" id="jobsList-run-bottom" class="button"><span><i class="crm-i fa-play" aria-hidden="true"></i> {ts}Execute Now{/ts}</span></a>
     {/if}
   </div>
