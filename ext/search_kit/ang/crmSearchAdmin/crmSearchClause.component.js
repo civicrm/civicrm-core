@@ -49,7 +49,7 @@
       };
 
       function updateOperators(clause) {
-        if (!clause[1] || !_.includes(_.pluck(ctrl.getOperators(clause), 'key'), clause[1])) {
+        if (!ctrl.skip && (!clause[1] || !_.includes(_.pluck(ctrl.getOperators(clause), 'key'), clause[1]))) {
           clause[1] = ctrl.getOperators(clause)[0].key;
           ctrl.changeClauseOperator(clause);
         }
