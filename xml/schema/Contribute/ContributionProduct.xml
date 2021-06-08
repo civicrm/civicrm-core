@@ -28,6 +28,13 @@
     <required>true</required>
     <add>1.4</add>
   </field>
+  <foreignKey>
+    <name>product_id</name>
+    <table>civicrm_product</table>
+    <key>id</key>
+    <add>5.39</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
   <field>
     <name>contribution_id</name>
     <title>Contribution ID</title>

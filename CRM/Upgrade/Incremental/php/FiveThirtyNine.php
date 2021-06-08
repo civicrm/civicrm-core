@@ -49,6 +49,29 @@ class CRM_Upgrade_Incremental_php_FiveThirtyNine extends CRM_Upgrade_Incremental
     // }
   }
 
+  public function upgrade_5_39_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('core-issue#2486  - Add product_id foreign key to civicrm_contribution_product', 'addContributionProductFK');
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function addContributionProductFK(CRM_Queue_TaskContext $ctx): bool {
+    if (!self::checkFKExists('civicrm_contribution_product', 'FK_civicrm_contribution_product_product_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_contribution_product`
+          ADD CONSTRAINT `FK_civicrm_contribution_product_product_id`
+            FOREIGN KEY (`product_id`) REFERENCES `civicrm_product` (`id`)
+            ON DELETE CASCADE;
+      ", [], TRUE, NULL, FALSE, FALSE);
+    }
+
+    return TRUE;
+  }
+
   /*
    * Important! All upgrade functions MUST add a 'runSql' task.
    * Uncomment and use the following template for a new upgrade version
