@@ -23,6 +23,7 @@ namespace Civi\Api4;
  *
  * This places a dashboard item on a user's home screen.
  *
+ * @searchable bridge
  * @see \Civi\Api4\Dashboard
  * @searchable none
  * @package Civi\Api4

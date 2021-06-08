@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @ui_join_filters status
  *
+ * @searchable bridge
  * @see \Civi\Api4\Group
  * @package Civi\Api4
  */

@@ -22,7 +22,7 @@ namespace Civi\Api4;
  * EntityTag - links tags to contacts, activities, etc.
  *
  * @see \Civi\Api4\Tag
- *
+ * @searchable bridge
  * @package Civi\Api4
  */
 class EntityTag extends Generic\DAOEntity {

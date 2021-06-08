@@ -8,6 +8,11 @@
   <add>1.1</add>
   <log>true</log>
   <icon>fa-handshake-o</icon>
+  <paths>
+    <view>civicrm/contact/view/rel?action=view&amp;reset=1&amp;cid=[contact_id_a]&amp;id=[id]</view>
+    <delete>civicrm/contact/view/rel?action=delete&amp;reset=1&amp;cid=[contact_id_a]&amp;id=[id]</delete>
+  </paths>
+
   <field>
     <name>id</name>
     <type>int unsigned</type>

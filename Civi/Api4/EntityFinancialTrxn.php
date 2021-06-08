@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/dev/en/latest/financial/financialentities/
  *
+ * @searchable bridge
  * @package Civi\Api4
  */
 class EntityFinancialTrxn extends Generic\DAOEntity {

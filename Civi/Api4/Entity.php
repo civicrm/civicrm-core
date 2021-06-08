@@ -100,6 +100,7 @@ class Entity extends Generic\AbstractEntity {
           'options' => [
             'primary' => ts('Primary'),
             'secondary' => ts('Secondary'),
+            'bridge' => ts('Bridge'),
             'none' => ts('None'),
           ],
         ],
