@@ -17,7 +17,6 @@
       </div>
      {else}
       <table class="form-layout-compressed">
-          <tr class="crm-admin-optiongroup-form-block-name">
           <tr class="crm-admin-optiongroup-form-block-title">
               <td class="label">{$form.title.label}
             {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_group' field='title' id=$id}{/if}</td><td>{$form.title.html}</td>
@@ -26,8 +25,12 @@
               <td class="label">{$form.description.label}
             {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_option_group' field='description' id=$id}{/if}</td><td>{$form.description.html}</td>
           </tr>
-        <td class="label">{$form.name.label}</td>
-              <td>{$form.name.html}</td></tr>
+          {if !empty($form.name)}
+            <tr class="crm-admin-optiongroup-form-block-name">
+              <td class="label">{$form.name.label}</td>
+              <td>{$form.name.html}</td>
+           </tr>
+         {/if}
           <tr class="crm-admin-optiongroup-form-block-data-type">
             <td class="label">{$form.data_type.label}</td>
             <td>{$form.data_type.html}</td>
@@ -36,10 +39,12 @@
               <td class="label">{$form.is_active.label}</td>
               <td>{$form.is_active.html}</td>
           </tr>
-        <tr class="crm-admin-optiongroup-form-block-is_reserved">
-          <td class="label">{$form.is_reserved.label}</td>
-          <td>{$form.is_reserved.html}</td>
-        </tr>
+        {if !empty($form.is_reserved)}
+          <tr class="crm-admin-optiongroup-form-block-is_reserved">
+            <td class="label">{$form.is_reserved.label}</td>
+            <td>{$form.is_reserved.html}</td>
+          </tr>
+        {/if}
       </table>
      {/if}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

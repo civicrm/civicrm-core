@@ -29,7 +29,7 @@
    </tr>
    <tr class="crm-contact-type-form-block-parent_id">
       <td class="label">{$form.parent_id.label}</td>
-           {if $is_parent OR $action EQ 1}
+           {if !empty($is_parent) OR $action EQ 1}
              <td>{$form.parent_id.html}</td>
            {else}
              <td>{ts}{$contactTypeName}{/ts} {ts}(built-in){/ts}</td>
