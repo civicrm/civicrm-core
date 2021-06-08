@@ -1,4 +1,4 @@
-{if $customDataType}
+{if !empty($customDataType)}
   <div id="customData"></div>
   {*include custom data js file*}
   {include file="CRM/common/customData.tpl"}
