@@ -87,4 +87,23 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     Civi::$statics['CRM_Core_I18n']['singleton'] = [];
   }
 
+  /**
+   * Quirk in strtolower does not handle "I" as expected, compared to mb_strtolower.
+   * I think setting locale messes up something that I don't know how to reset,
+   * so see if these help:
+   * @runInSeparateProcess
+   * @preserveGlobalState disabled
+   */
+  public function testInsertTurkish() {
+    CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS foo");
+    CRM_Core_DAO::executeQuery("CREATE TABLE foo ( bar varchar(32) )");
+    // Change locale - assert it actually changed.
+    $this->assertEquals('tr_TR.utf8', setlocale(LC_ALL, 'tr_TR.utf8'));
+    $dao = new CRM_Core_DAO();
+    // When query() uses strtolower this returns NULL instead
+    $this->assertEquals(1, $dao->query("INSERT INTO foo VALUES ('Turkish Delight')"));
+    setlocale(LC_ALL, 'en_US');
+    CRM_Core_DAO::executeQuery("DROP TABLE foo");
+  }
+
 }
