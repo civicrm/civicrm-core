@@ -49,6 +49,7 @@ class ConformanceTest extends UnitTestCase {
       'civicrm_group',
       'civicrm_event',
       'civicrm_participant',
+      'civicrm_batch',
     ];
     $this->dropByPrefix('civicrm_value_myfavorite');
     $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
