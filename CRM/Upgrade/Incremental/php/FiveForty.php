@@ -51,7 +51,32 @@ class CRM_Upgrade_Incremental_php_FiveForty extends CRM_Upgrade_Incremental_Base
 
   public function upgrade_5_40_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add option list for group_used_for', 'addGroupOptionList');
     $this->addTask('core-issue#2486  - Add product_id foreign key to civicrm_contribution_product', 'addContributionProductFK');
+  }
+
+  /**
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function addGroupOptionList(CRM_Queue_TaskContext $ctx) {
+    $optionGroupId = \CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
+      'name' => 'note_used_for',
+      'title' => ts('Note Used For'),
+      'is_reserved' => 1,
+      'is_active' => 1,
+      'is_locked' => 1,
+    ]);
+    $values = [
+      ['value' => 'civicrm_relationship', 'name' => 'Relationship', 'label' => ts('Relationships')],
+      ['value' => 'civicrm_contact', 'name' => 'Contact', 'label' => ts('Contacts')],
+      ['value' => 'civicrm_participant', 'name' => 'Participant', 'label' => ts('Participants')],
+      ['value' => 'civicrm_contribution', 'name' => 'Contribution', 'label' => ts('Contributions')],
+    ];
+    foreach ($values as $value) {
+      \CRM_Core_BAO_OptionValue::ensureOptionValueExists($value + ['option_group_id' => $optionGroupId]);
+    }
+    return TRUE;
   }
 
   /**

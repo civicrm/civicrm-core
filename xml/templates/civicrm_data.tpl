@@ -164,6 +164,7 @@ VALUES
    ('contact_reference_options'     , '{ts escape="sql"}Contact Reference Autocomplete Options{/ts}', NULL, 1, 1, 1),
    ('website_type'                  , '{ts escape="sql"}Website Type{/ts}'                       , NULL, 1, 1, 0),
    ('tag_used_for'                  , '{ts escape="sql"}Tag Used For{/ts}'                       , NULL, 1, 1, 1),
+   ('note_used_for'                 , '{ts escape="sql"}Note Used For{/ts}'                      , NULL, 1, 1, 1),
    ('currencies_enabled'            , '{ts escape="sql"}Currencies Enabled{/ts}'                 , NULL, 1, 1, 0),
    ('event_badge'                   , '{ts escape="sql"}Event Name Badge{/ts}'                   , NULL, 1, 1, 0),
    ('note_privacy'                  , '{ts escape="sql"}Privacy levels for notes{/ts}'           , NULL, 1, 1, 0),
@@ -248,6 +249,7 @@ SELECT @option_group_id_acsOpt         := max(id) from civicrm_option_group wher
 SELECT @option_group_id_acConRef       := max(id) from civicrm_option_group where name = 'contact_reference_options';
 SELECT @option_group_id_website        := max(id) from civicrm_option_group where name = 'website_type';
 SELECT @option_group_id_tuf            := max(id) from civicrm_option_group where name = 'tag_used_for';
+SELECT @option_group_id_nuf            := max(id) from civicrm_option_group where name = 'note_used_for';
 SELECT @option_group_id_currency       := max(id) from civicrm_option_group where name = 'currencies_enabled';
 SELECT @option_group_id_eventBadge     := max(id) from civicrm_option_group where name = 'event_badge';
 SELECT @option_group_id_notePrivacy    := max(id) from civicrm_option_group where name = 'note_privacy';
@@ -754,6 +756,12 @@ VALUES
    (@option_group_id_tuf, '{ts escape="sql"}Activities{/ts}',  'civicrm_activity', 'Activity', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_tuf, '{ts escape="sql"}Cases{/ts}',       'civicrm_case',     'Case',     NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_tuf, '{ts escape="sql"}Attachments{/ts}', 'civicrm_file',     'File',     NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
+
+-- Note used for
+   (@option_group_id_nuf, '{ts escape="sql"}Contacts{/ts}',      'civicrm_contact',      'Contact',      NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_nuf, '{ts escape="sql"}Relationships{/ts}', 'civicrm_relationship', 'Relationship', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_nuf, '{ts escape="sql"}Participants{/ts}',  'civicrm_participant',  'Participant',  NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_nuf, '{ts escape="sql"}Contributions{/ts}', 'civicrm_contribution', 'Contribution', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_currency, 'USD ($)',      'USD',     'USD',       NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
 
