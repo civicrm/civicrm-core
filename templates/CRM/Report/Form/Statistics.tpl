@@ -7,45 +7,51 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $top}
+{if !empty($top)}
   {if $printOnly}
     <h1>{$reportTitle}</h1>
     <div id="report-date">{$reportDate}</div>
   {/if}
   {if $statistics}
     <table class="report-layout statistics-table">
-      {foreach from=$statistics.groups item=row}
-        <tr>
-          <th class="statistics" scope="row">{$row.title}</th>
-          <td>{$row.value|escape}</td>
-        </tr>
-      {/foreach}
-      {foreach from=$statistics.filters item=row}
-        <tr>
-          <th class="statistics" scope="row">{$row.title}</th>
-          <td>{$row.value|escape}</td>
-        </tr>
-      {/foreach}
+      {if !empty($statistics.groups)} 
+        {foreach from=$statistics.groups item=row}
+          <tr>
+            <th class="statistics" scope="row">{$row.title}</th>
+            <td>{$row.value|escape}</td>
+          </tr>
+        {/foreach}
+      {/if}
+      {if !empty($statistics.filters)}
+        {foreach from=$statistics.filters item=row}
+          <tr>
+            <th class="statistics" scope="row">{$row.title}</th>
+            <td>{$row.value|escape}</td>
+          </tr>
+        {/foreach}
+      {/if}
     </table>
   {/if}
 {/if}
 
-{if $bottom and $rows and $statistics}
+{if !empty($bottom) and !empty($rows) and !empty($statistics)}
   <table class="report-layout">
-    {foreach from=$statistics.counts item=row}
-      <tr>
-        <th class="statistics" scope="row">{$row.title}</th>
-        <td>
-          {if $row.type eq 1024}
-            {$row.value|crmMoney|escape}
-          {elseif $row.type eq 2}
-            {$row.value|escape}
-          {else}
-            {$row.value|crmNumberFormat|escape}
-          {/if}
+    {if !empty($statistics.counts)}
+      {foreach from=$statistics.counts item=row}
+        <tr>
+          <th class="statistics" scope="row">{$row.title}</th>
+          <td>
+            {if !empty($row.type) and $row.type eq 1024}
+              {$row.value|crmMoney|escape}
+            {elseif !empty($row.type) and $row.type eq 2}
+              {$row.value|escape}
+            {else}
+               {$row.value|crmNumberFormat|escape}
+            {/if}
 
-        </td>
-      </tr>
-    {/foreach}
+          </td>
+        </tr>
+      {/foreach}
+    {/if}
   </table>
 {/if}
