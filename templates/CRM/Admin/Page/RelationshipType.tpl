@@ -49,10 +49,10 @@
             <td class="crm-relationship-label_b_a crm-editable" data-field="label_b_a">{$row.label_b_a}</td>
             <td class="crm-relationship-contact_type_a_display">
                 {if $row.contact_type_a_display} {$row.contact_type_a_display}
-                {if $row.contact_sub_type_a} - {$row.contact_sub_type_a} {/if}{else} {ts}All Contacts{/ts} {/if} </td>
+                {if !empty($row.contact_sub_type_a)} - {$row.contact_sub_type_a} {/if}{else} {ts}All Contacts{/ts} {/if} </td>
             <td class="crm-relationship-contact_type_b_display">
                 {if $row.contact_type_b_display} {$row.contact_type_b_display}
-                {if $row.contact_sub_type_b} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
+                {if !empty($row.contact_sub_type_b)} - {$row.contact_sub_type_b}{/if} {else} {ts}All Contacts{/ts} {/if} </td>
             <td class="crm-relationship-is_active" id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>

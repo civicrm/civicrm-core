@@ -8,15 +8,15 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is for configuring Scheduled Reminders *}
-{if $setTab eq 1}
-  {if $component eq 'event'}
+{if !empty($setTab) and $setTab eq 1}
+  {if !empty($component) and $component eq 'event'}
      {include file="CRM/Event/Form/ManageEvent/Tab.tpl"}
   {/if}
 {else}
 {if $action eq 1 or $action eq 2 or $action eq 8 or $action eq 16384}
    {include file="CRM/Admin/Form/ScheduleReminders.tpl"}
 {else}
-  {if !$component}
+  {if empty($component)}
     {capture assign=schedRemindersDocLink}{docURL page="user/email/scheduled-reminders/"}{/capture}
     <div class="help">
       {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
@@ -35,7 +35,7 @@
   {/if}
   <div class="action-link">
     {assign var='link' value="civicrm/admin/scheduleReminders"}
-    {if $component}
+    {if !empty($component)}
       {assign var='urlParams' value="action=add&context=$component&compId=$id&reset=1"}
     {else}
       {assign var='urlParams' value="action=add&reset=1"}
