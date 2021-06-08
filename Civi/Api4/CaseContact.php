@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * This connects a client to a case.
  *
+ * @searchable bridge
  * @see \Civi\Api4\Case
  * @package Civi\Api4
  */

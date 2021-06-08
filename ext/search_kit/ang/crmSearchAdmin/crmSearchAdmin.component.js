@@ -58,12 +58,8 @@
           });
         }
 
-        var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
-          return entity.searchable === 'primary' && !_.includes(entity.type, 'EntityBridge');
-        });
-        var secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, function(entity) {
-          return entity.searchable === 'secondary' && !_.includes(entity.type, 'EntityBridge');
-        });
+        var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'}),
+          secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'secondary'});
         $scope.mainEntitySelect = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
         $scope.mainEntitySelect.push({
           text: ts('More...'),
@@ -814,7 +810,7 @@
           // Add extra searchable fields from bridge entity
           if (join && join.bridge) {
             addFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity);
+              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity && !_.includes(field.name, '.'));
             }));
           }
 

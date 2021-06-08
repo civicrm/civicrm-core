@@ -64,6 +64,11 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   private $_afform;
 
   /**
+   * @var array
+   */
+  private $_extraEntityFields = [];
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws UnauthorizedException
    * @throws \API_Exception
@@ -270,11 +275,11 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * Determines if a column is eligible to use an aggregate function
-   * @param $fieldName
-   * @param $prefix
+   * @param string $fieldName
+   * @param string $prefix
    * @return bool
    */
-  private function canAggregate($fieldName, $prefix) {
+  private function canAggregate($fieldName, $prefix = '') {
     $apiParams = $this->savedSearch['api_params'];
 
     // If the query does not use grouping, never
@@ -357,13 +362,21 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   private function augmentSelectClause(&$apiParams): void {
+    foreach ($this->getExtraEntityFields($this->savedSearch['api_entity']) as $extraFieldName) {
+      if (!in_array($extraFieldName, $apiParams['select']) && !$this->canAggregate($extraFieldName)) {
+        $apiParams['select'][] = $extraFieldName;
+      }
+    }
     $joinAliases = [];
-    // Select the ids of explicitly joined entities (helps with displaying links)
+    // Select the ids, etc. of explicitly joined entities (helps with displaying links)
     foreach ($apiParams['join'] ?? [] as $join) {
-      $joinAliases[] = $joinAlias = explode(' AS ', $join[0])[1];
-      $idFieldName = $joinAlias . '.id';
-      if (!in_array($idFieldName, $apiParams['select']) && !$this->canAggregate('id', $joinAlias . '.')) {
-        $apiParams['select'][] = $idFieldName;
+      [$joinEntity, $joinAlias] = explode(' AS ', $join[0]);
+      $joinAliases[] = $joinAlias;
+      foreach ($this->getExtraEntityFields($joinEntity) as $extraField) {
+        $extraFieldName = $joinAlias . '.' . $extraField;
+        if (!in_array($extraFieldName, $apiParams['select']) && !$this->canAggregate($extraField, $joinAlias . '.')) {
+          $apiParams['select'][] = $extraFieldName;
+        }
       }
     }
     // Select the ids of implicitly joined entities (helps with displaying links)
@@ -389,6 +402,25 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         $apiParams['select'][] = $column['editable']['value'];
       }
     }
+  }
+
+  /**
+   * Get list of extra fields needed for displaying links for a given entity
+   *
+   * @param string $entityName
+   * @return array
+   */
+  private function getExtraEntityFields(string $entityName): array {
+    if (!isset($this->_extraEntityFields[$entityName])) {
+      $info = CoreUtil::getApiClass($entityName)::getInfo();
+      $this->_extraEntityFields[$entityName] = [$info['id_field']];
+      foreach ($info['paths'] ?? [] as $path) {
+        $matches = [];
+        preg_match_all('#\[(\w+)]#', $path, $matches);
+        $this->_extraEntityFields[$entityName] = array_unique(array_merge($this->_extraEntityFields[$entityName], $matches[1] ?? []));
+      }
+    }
+    return $this->_extraEntityFields[$entityName];
   }
 
 }

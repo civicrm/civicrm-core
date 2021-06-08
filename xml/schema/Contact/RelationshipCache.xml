@@ -9,6 +9,12 @@
   <log>false</log>
   <icon>fa-handshake-o</icon>
   <title>Related Contact</title>
+  <paths>
+    <view>civicrm/contact/view/rel?action=view&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]</view>
+    <update>civicrm/contact/view/rel?action=update&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]&amp;rtype=[orientation]</update>
+    <delete>civicrm/contact/view/rel?action=delete&amp;reset=1&amp;cid=[near_contact_id]&amp;id=[relationship_id]</delete>
+  </paths>
+
   <field>
     <name>id</name>
     <type>int unsigned</type>

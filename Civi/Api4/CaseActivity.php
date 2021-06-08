@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * This connects an activity to one or more cases.
  *
+ * @searchable bridge
  * @see \Civi\Api4\Case
  * @package Civi\Api4
  */
