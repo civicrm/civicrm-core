@@ -10,6 +10,9 @@ use Civi\Afform\Event\AfformSubmitEvent;
  */
 class Submit extends AbstractProcessor {
 
+  /**
+   * @deprecated - You may simply use the event name directly. dev/core#1744
+   */
   const EVENT_NAME = 'civi.afform.submit';
 
   /**
@@ -53,7 +56,7 @@ class Submit extends AbstractProcessor {
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
-      \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
+      \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
     // What should I return?

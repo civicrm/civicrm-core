@@ -2,7 +2,6 @@
 
 require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
-use Civi\Api4\Action\Afform\Submit;
 
 /**
  * Filter the content of $params to only have supported afform fields.
@@ -50,8 +49,8 @@ function afform_civicrm_config(&$config) {
   Civi::$statics[__FUNCTION__] = 1;
 
   $dispatcher = Civi::dispatcher();
-  $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], 0);
-  $dispatcher->addListener(Submit::EVENT_NAME, [Submit::class, 'preprocessContact'], 10);
+  $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
+  $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
   $dispatcher->addListener('hook_civicrm_angularModules', ['\Civi\Afform\AngularDependencyMapper', 'autoReq'], -1000);
   $dispatcher->addListener('hook_civicrm_alterAngular', ['\Civi\Afform\AfformMetadataInjector', 'preprocess']);
   $dispatcher->addListener('hook_civicrm_check', ['\Civi\Afform\StatusChecks', 'hook_civicrm_check']);
