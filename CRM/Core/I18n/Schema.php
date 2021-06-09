@@ -461,14 +461,14 @@ class CRM_Core_I18n_Schema {
     $dao->query("DESCRIBE {$table}", FALSE);
     while ($dao->fetch()) {
       // view non-internationalized columns directly
-      if (!in_array($dao->Field, array_keys($columns[$table])) and
+      if (!array_key_exists($dao->Field, $columns[$table]) &&
         !preg_match('/_[a-z][a-z]_[A-Z][A-Z]$/', $dao->Field)
       ) {
         $cols[] = '`' . $dao->Field . '`';
       }
       $tableCols[] = $dao->Field;
     }
-    // view intrernationalized columns through an alias
+    // view internationalized columns through an alias
     foreach ($columns[$table] as $column => $_) {
       if (!$isUpgradeMode) {
         $cols[] = "`{$column}_{$locale}` `{$column}`";

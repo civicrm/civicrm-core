@@ -201,7 +201,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         $val = explode(',', $val);
         if ($key == 'participant_role_id') {
           foreach ($val as $role) {
-            if (!in_array(trim($role), array_keys($roleIDs))) {
+            if (!array_key_exists(trim($role), $roleIDs)) {
               CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Role Id', $errorMessage);
               break;
             }
@@ -219,7 +219,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       elseif ($val && (($key == 'participant_status_id') || ($key == 'participant_status'))) {
         $statusIDs = CRM_Event_PseudoConstant::participantStatus();
         if ($key == 'participant_status_id') {
-          if (!in_array(trim($val), array_keys($statusIDs))) {
+          if (!array_key_exists(trim($val), $statusIDs)) {
             CRM_Contact_Import_Parser_Contact::addToErrorMsg('Participant Status Id', $errorMessage);
             break;
           }

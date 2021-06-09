@@ -4429,7 +4429,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'Chargeback' => 'Chargeback Account is',
     ];
 
-    if (in_array($contributionStatus, array_keys($preferredAccountsRelationships))) {
+    if (array_key_exists($contributionStatus, $preferredAccountsRelationships)) {
       $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
       return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $financialTypeID,

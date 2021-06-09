@@ -336,7 +336,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
     if ($customDataType && !is_array($customDataType)) {
 
-      if (in_array($customDataType, CRM_Contact_BAO_ContactType::subTypes())) {
+      if (in_array($customDataType, CRM_Contact_BAO_ContactType::subTypes(), TRUE)) {
         // This is the case when getFieldsForImport() requires fields
         // limited strictly to a subtype.
         $customDataSubType = $customDataType;
@@ -344,7 +344,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $onlySubType = TRUE;
       }
 
-      if (in_array($customDataType, array_keys(CRM_Core_SelectValues::customGroupExtends()))) {
+      if (array_key_exists($customDataType, CRM_Core_SelectValues::customGroupExtends())) {
         // this makes the method flexible to support retrieving fields
         // for multiple extends value.
         $customDataType = [$customDataType];
@@ -404,7 +404,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if (is_array($customDataType)) {
           $value = NULL;
           foreach ($customDataType as $dataType) {
-            if (in_array($dataType, array_keys(CRM_Core_SelectValues::customGroupExtends()))) {
+            if (array_key_exists($dataType, CRM_Core_SelectValues::customGroupExtends())) {
               if (in_array($dataType, ['Individual', 'Household', 'Organization'])) {
                 $val = "'" . CRM_Utils_Type::escape($dataType, 'String') . "', 'Contact' ";
               }

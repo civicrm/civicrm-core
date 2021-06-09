@@ -664,7 +664,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       FALSE, FALSE
     );
     //Check if custom table is included in $query->_tables.
-    $this->assertTrue(in_array($cgTableName, array_keys($query->_tables)));
+    $this->assertTrue(array_key_exists($cgTableName, $query->_tables));
     //Assert if from clause joins the custom table.
     $this->assertTrue(strpos($query->_fromClause, $cgTableName) !== FALSE);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);

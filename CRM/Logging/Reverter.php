@@ -140,7 +140,7 @@ class CRM_Logging_Reverter {
 
         // custom data tables
 
-        case in_array($table, array_keys($ctypes)):
+        case array_key_exists($table, $ctypes):
           foreach ($row as $id => $changes) {
             $inserts = ['id' => '%1'];
             $updates = [];
