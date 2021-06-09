@@ -2380,6 +2380,25 @@ SELECT count(*)
     AND is_current_member = 1";
     $result = CRM_Core_DAO::singleValueQuery($query);
     if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
+      // Convert custom_xx_id fields to custom_xx
+      // See https://lab.civicrm.org/dev/membership/-/issues/37
+      // This makes sure the value is copied and not the looked up value.
+      // Which is the case when the custom field is a contact reference field.
+      // The custom_xx contains the display name of the contact, instead of the contact id.
+      // The contact id is then available in custom_xx_id.
+      foreach ($membershipValues as $field => $value) {
+        if (stripos($field, 'custom_') !== 0) {
+          // No a custom field
+          continue;
+        }
+        $custom_id = substr($field, 7);
+        if (substr($custom_id, -3) === '_id') {
+          $custom_id = substr($custom_id, 0, -3);
+          unset($membershipValues[$field]);
+          $membershipValues['custom_' . $custom_id] = $value;
+        }
+      }
+
       civicrm_api3('Membership', 'create', $membershipValues);
     }
     return $membershipValues;

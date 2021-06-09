@@ -932,6 +932,55 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipStatusDelete($otherStatusID);
   }
 
+  public function testRelatedMembershipWithContactReferenceCustomField() {
+    $relatedContactId = $this->individualCreate();
+    $customContactId = $this->individualCreate();
+    $membershipOrganizationId = $this->organizationCreate();
+    $organizationId = $this->organizationCreate();
+
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $customGroup = $this->customGroupCreate(['extends' => 'Membership']);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'default_value' => '',
+    ]);
+
+    // Creating membership of organisation
+    $membership = $this->callAPISuccess("Membership", "create", [
+      'membership_type_id' => $membershipTypeWithRelationship["id"],
+      'contact_id'         => $organizationId,
+      'status_id'          => $this->_membershipStatusID,
+      'custom_' . $customField['id'] => $customContactId,
+    ]);
+
+    $membership = $membership['values'][$membership["id"]];
+
+    // Create relationship between organization and individual contact
+    $relationship = $this->callAPISuccess('Relationship', 'create', [
+      // Employer of relationship
+      'relationship_type_id' => 5,
+      'contact_id_a'         => $relatedContactId,
+      'contact_id_b'         => $organizationId,
+      'is_active'            => 1,
+    ]);
+
+    // Check count of related memberships. It should be one for individual contact.
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+
+    $relatedMembership = $this->callAPISuccess("Membership", "getsingle", [
+      'owner_membership_id' => $membership["id"],
+    ]);
+
+    $this->assertEquals($customContactId, $relatedMembership['custom_' . $customField['id'] . '_id']);
+
+    $this->callAPISuccess('Relationship', 'delete', ['id' => $relationship['id']]);
+    $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
+    $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+  }
+
   /**
    * Creates the given amount of contacts.
    *
