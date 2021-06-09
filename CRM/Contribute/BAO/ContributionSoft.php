@@ -607,8 +607,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
       $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
       $contributionSoft = self::add($softParams);
-      //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id && empty($pcpId)) {
+      // Send notification to owner for PCP.
+      $completedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+      if ($contributionSoft->pcp_id && empty($pcpId) && empty($contribution->contribution_page_id) && $contribution->contribution_status_id == $completedStatusID) {
         CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, (array) $contributionSoft);
       }
     }
