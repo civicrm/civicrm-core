@@ -24,9 +24,16 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   ];
 
   /**
+   * Skip validating financials as the financial data is not correct in the csvs.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
+  /**
    * @return array
    */
-  public function dataProvider() {
+  public function dataProvider(): array {
     return [
       [
         'CRM_Report_Form_Contribute_Detail',
