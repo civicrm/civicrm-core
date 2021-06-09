@@ -124,7 +124,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
    * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
    */
-  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $batchLimit, $isSelected, $criteria, $searchLimit) {
+  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode, $batchLimit, $isSelected, $criteria, $searchLimit) {
     CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected, $criteria, TRUE, FALSE, $searchLimit);
     return CRM_Queue_Task::TASK_SUCCESS;
   }

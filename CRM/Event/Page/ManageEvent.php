@@ -480,7 +480,7 @@ ORDER BY start_date desc
    *
    * @return string
    */
-  public function whereClause(&$params, $sortBy = TRUE, $force) {
+  public function whereClause(&$params, $sortBy, $force) {
     $values = [];
     $clauses = [];
     $title = $this->get('title');

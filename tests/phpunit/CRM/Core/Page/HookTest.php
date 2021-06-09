@@ -52,6 +52,9 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
     $items = CRM_Core_Menu::items(TRUE);
     // Check if they extend the class we care about; test if needed.
     foreach ($items as $item) {
+      if (!isset($item['page_callback'])) {
+        continue;
+      }
       $class = is_array($item['page_callback']) ? $item['page_callback'][0] : $item['page_callback'];
       if (in_array($class, $this->skip)) {
         continue;
