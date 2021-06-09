@@ -1076,7 +1076,7 @@ class CRM_Contact_BAO_Query {
           $elementCmpName = 'phone';
         }
 
-        if (in_array($elementCmpName, array_keys($addressCustomFields))) {
+        if (array_key_exists($elementCmpName, $addressCustomFields)) {
           if ($cfID = CRM_Core_BAO_CustomField::getKeyID($elementCmpName)) {
             $addressCustomFieldIds[$cfID][$name] = 1;
           }
@@ -6330,7 +6330,7 @@ AND   displayRelType.is_active = 1
       $value = $formValues[$element] ?? NULL;
       if ($value) {
         if (is_array($value)) {
-          if (in_array($element, array_keys($changeNames))) {
+          if (array_key_exists($element, $changeNames)) {
             unset($formValues[$element]);
             $element = $changeNames[$element];
           }

@@ -164,7 +164,7 @@ function financialacls_civicrm_pre($op, $objectName, $id, &$params) {
     if (empty($params['financial_type_id'])) {
       $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_LineItem', $params['id'], 'financial_type_id');
     }
-    if (!in_array($params['financial_type_id'], array_keys($types))) {
+    if (!array_key_exists($params['financial_type_id'], $types)) {
       throw new API_Exception('You do not have permission to ' . $op . ' this line item');
     }
   }

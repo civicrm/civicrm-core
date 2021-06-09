@@ -306,7 +306,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     //Check if both indices are deleted.
     $indices = CRM_Core_BAO_SchemaHandler::getIndexes($tables);
     foreach ($tables as $index => $tableName) {
-      $this->assertFalse(in_array($index, array_keys($indices[$tableName])));
+      $this->assertFalse(array_key_exists($index, $indices[$tableName]));
     }
     //Drop false index and create again.
     CRM_Core_BAO_SchemaHandler::createMissingIndices($missingIndices);

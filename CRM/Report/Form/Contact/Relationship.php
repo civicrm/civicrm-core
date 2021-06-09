@@ -824,7 +824,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $fieldName,
     $relative, $from, $to, $type = NULL) {
     $clauses = [];
-    if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
+    if (array_key_exists($relative, $this->getOperationPair(CRM_Report_Form::OP_DATE))) {
       return NULL;
     }
 

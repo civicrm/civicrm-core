@@ -84,7 +84,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     $componentPanes = [];
     foreach ($components as $name => $component) {
-      if (in_array($name, array_keys($this->_searchOptions)) &&
+      if (array_key_exists($name, $this->_searchOptions) &&
         $this->_searchOptions[$name] &&
         CRM_Core_Permission::access($component->name)
       ) {

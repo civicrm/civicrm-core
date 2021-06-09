@@ -89,7 +89,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
     $reservedKeyWords = CRM_Core_SelectValues::customGroupExtends();
     //restrict "name" from being a reserved keyword when a new contact subtype is created
-    if (!$self->_id && in_array($contactName, array_keys($reservedKeyWords))) {
+    if (!$self->_id && array_key_exists($contactName, $reservedKeyWords)) {
       $errors['label'] = ts('Contact type names should not use reserved keywords.');
     }
     return empty($errors) ? TRUE : $errors;

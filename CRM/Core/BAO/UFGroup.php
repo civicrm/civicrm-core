@@ -443,7 +443,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $addressCustom = FALSE;
     if (in_array($permissionType, [CRM_Core_Permission::CREATE, CRM_Core_Permission::EDIT]) &&
-      in_array($field->field_name, array_keys($addressCustomFields))
+      array_key_exists($field->field_name, $addressCustomFields)
     ) {
       $addressCustom = TRUE;
       $name = "address_{$name}";

@@ -795,7 +795,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
             $selectedAmounts[$opId] = $options[$opId]['amount'];
           }
         }
-        elseif (in_array($fields["price_{$fieldId}"], array_keys($options))) {
+        elseif (array_key_exists($fields["price_{$fieldId}"], $options)) {
           $selectedAmounts[$fields["price_{$fieldId}"]] = $options[$fields["price_{$fieldId}"]]['amount'];
         }
       }

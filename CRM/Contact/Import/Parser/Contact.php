@@ -1892,7 +1892,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       return array_keys($possibleMatches['values']);
     }
     if ($possibleMatches['count']) {
-      if (in_array($extIDMatch, array_keys($possibleMatches['values']))) {
+      if (array_key_exists($extIDMatch, $possibleMatches['values'])) {
         return [$extIDMatch];
       }
       throw new CRM_Core_Exception(ts(
