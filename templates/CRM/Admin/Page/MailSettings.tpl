@@ -34,15 +34,15 @@
         {foreach from=$rows item=row}
           <tr id='rowid{$row.id}' class="crm-mailSettings {cycle values="odd-row,even-row"}">
               <td class="crm-mailSettings-name">{$row.name}</td>
-              <td class="crm-mailSettings-server">{$row.server}</td>
-              <td class="crm-mailSettings-username">{$row.username}</td>
-              <td class="crm-mailSettings-localpart">{$row.localpart}</td>
-              <td class="crm-mailSettings-domain">{$row.domain}</td>
-              <td class="crm-mailSettings-return_path">{$row.return_path}</td>
-              <td class="crm-mailSettings-protocol">{$row.protocol}</td>
-              <td class="crm-mailSettings-source">{$row.source}</td>
-              <!--<td>{$row.port}</td>-->
-              <td class="crm-mailSettings-is_ssl">{if $row.is_ssl eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+              <td class="crm-mailSettings-server">{if !empty($row.server)}{$row.server}{/if}</td>
+              <td class="crm-mailSettings-username">{if !empty($row.username)}{$row.username}{/if}</td>
+              <td class="crm-mailSettings-localpart">{if !empty($row.localpart)}{$row.localpart}{/if}</td>
+              <td class="crm-mailSettings-domain">{if !empty($row.domain)}{$row.domain}{/if}</td>
+              <td class="crm-mailSettings-return_path">{if !empty($row.return_path)}{$row.return_path}{/if}</td>
+              <td class="crm-mailSettings-protocol">{if !empty($row.protocol)}{$row.protocol}{/if}</td>
+              <td class="crm-mailSettings-source">{if !empty($row.source)}{$row.source}{/if}</td>
+              <!--<td>{if !empty($row.port)}{$row.port}{/if}</td>-->
+              <td class="crm-mailSettings-is_ssl">{if isset($row.is_ssl) and $row.is_ssl eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
               <td class="crm-mailSettings-is_default">{if $row.is_default eq 1}{ts}Bounce Processing <strong>(Default)</strong>{/ts}{else}{ts}Email-to-Activity{/ts}{/if}&nbsp;</td>
               <td>{$row.action|replace:'xx':$row.id}</td>
           </tr>
@@ -58,7 +58,7 @@
       {ts}None found.{/ts}
     </div>
 {/if}
-    {if $setupActions}
+    {if !empty($setupActions)}
         <form>
             <select id="crm-mail-setup" name="crm-mail-setup" class="crm-select2 crm-form-select" aria-label="{ts}Add Mail Account{/ts}">
                 <option value="" aria-hidden="true">{ts}Add Mail Account{/ts}</option>

@@ -39,11 +39,12 @@
            <td>{$form.class.html}<br />
             <span class="description">{ts}The general class of this status. Participant counts are grouped by class on the CiviEvent Dashboard. Participants with a 'Pending' class status will be moved to 'Expired' status if Pending Participant Hours has elapsed (when the ParticipantProcessor.php background processing script is run).{/ts}</span></td>
         </tr>
-
+        {if !empty($form.is_reserved)}
         <tr class="crm-participant-status-form-block-is_reserved">
            <td class="label">{$form.is_reserved.label}</td>
            <td>{$form.is_reserved.html}</td>
         </tr>
+        {/if}
         <tr class="crm-participant-status-form-block-is_active">
            <td class="label">{$form.is_active.label}</td>
            <td>{$form.is_active.html}</td>

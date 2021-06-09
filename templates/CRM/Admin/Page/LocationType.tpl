@@ -37,10 +37,10 @@
     <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crmf-name">{$row.name}</td>
         <td class="crmf-display_name crm-editable">{$row.display_name}</td>
-        <td class="crmf-vcard_name crm-editable">{$row.vcard_name}</td>
+        <td class="crmf-vcard_name crm-editable">{if !empty($row.vcard_name)}{$row.vcard_name}{/if}</td>
         <td class="crmf-description crm-editable">{$row.description}</td>
         <td id="row_{$row.id}_status" class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-        <td class="crmf-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
+        <td class="crmf-is_default">{if isset($row.is_default)}{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;{/if}</td>
         <td>{$row.action|replace:'xx':$row.id}</td>
     </tr>
     {/foreach}
