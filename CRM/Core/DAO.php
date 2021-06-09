@@ -1811,11 +1811,9 @@ LIKE %1
       $newObject = new $daoName();
 
       $fields = $object->fields();
-      if (!is_array($fieldsFix)) {
-        $fieldsToPrefix = [];
-        $fieldsToSuffix = [];
-        $fieldsToReplace = [];
-      }
+      $fieldsToPrefix = [];
+      $fieldsToSuffix = [];
+      $fieldsToReplace = [];
       if (!empty($fieldsFix['prefix'])) {
         $fieldsToPrefix = $fieldsFix['prefix'];
       }
@@ -1826,6 +1824,7 @@ LIKE %1
         $fieldsToReplace = $fieldsFix['replace'];
       }
 
+      $localizableFields = FALSE;
       foreach ($fields as $name => $value) {
         if ($name == 'id' || $value['name'] == 'id') {
           // copy everything but the id!
@@ -1849,11 +1848,33 @@ LIKE %1
           $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
         }
 
+        if (!empty($value['localizable'])) {
+          $localizableFields = TRUE;
+        }
+
         if ($newData) {
           $newObject->copyValues($newData);
         }
       }
       $newObject->save();
+
+      // ensure we copy all localized fields as well
+      if (CRM_Core_I18n::isMultilingual() && $localizableFields) {
+        global $dbLocale;
+        $locales = CRM_Core_I18n::getMultilingual();
+        $curLocale = CRM_Core_I18n::getLocale();
+        // loop on other locales
+        foreach ($locales as $locale) {
+          if ($locale != $curLocale) {
+            // setLocale doesn't seems to be reliable to set dbLocale and we only need to change the db locale
+            $dbLocale = '_' . $locale;
+            $newObject->copyLocalizable($object->id, $newObject->id, $fieldsToPrefix, $fieldsToSuffix, $fieldsToReplace);
+          }
+        }
+        // restore dbLocale to starting value
+        $dbLocale = '_' . $curLocale;
+      }
+
       if (!$blockCopyofCustomValues) {
         $newObject->copyCustomFields($object->id, $newObject->id);
       }
@@ -1861,6 +1882,67 @@ LIKE %1
     }
 
     return $newObject;
+  }
+
+  /**
+   * Method that copies localizable fields from an old entity to a new one.
+   *
+   * Fixes bug dev/core#2479,
+   * where non current locale fields are copied from current locale losing translation when copying
+   *
+   * @param int $entityID
+   * @param int $newEntityID
+   * @param array $fieldsToPrefix
+   * @param array $fieldsToSuffix
+   * @param array $fieldsToReplace
+   */
+  protected function copyLocalizable($entityID, $newEntityID, $fieldsToPrefix, $fieldsToSuffix, $fieldsToReplace) {
+    $entity = get_class($this);
+    $object = new $entity();
+    $object->id = $entityID;
+    $object->find();
+
+    $newObject = new $entity();
+    $newObject->id = $newEntityID;
+
+    $newObject->find();
+
+    if ($object->fetch() && $newObject->fetch()) {
+
+      $fields = $object->fields();
+      foreach ($fields as $name => $value) {
+
+        if ($name == 'id' || $value['name'] == 'id') {
+          // copy everything but the id!
+          continue;
+        }
+
+        // only copy localizable fields
+        if (!$value['localizable']) {
+          continue;
+        }
+
+        $dbName = $value['name'];
+        $type = CRM_Utils_Type::typeToString($value['type']);
+        $newObject->$dbName = $object->$dbName;
+        if (isset($fieldsToPrefix[$dbName])) {
+          $newObject->$dbName = $fieldsToPrefix[$dbName] . $newObject->$dbName;
+        }
+        if (isset($fieldsToSuffix[$dbName])) {
+          $newObject->$dbName .= $fieldsToSuffix[$dbName];
+        }
+        if (isset($fieldsToReplace[$dbName])) {
+          $newObject->$dbName = $fieldsToReplace[$dbName];
+        }
+
+        if ($type == 'Timestamp' || $type == 'Date') {
+          $newObject->$dbName = CRM_Utils_Date::isoToMysql($newObject->$dbName);
+        }
+
+      }
+      $newObject->save();
+
+    }
   }
 
   /**
