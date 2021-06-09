@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * This contains configuration settings for each type of CiviCase.
  *
  * @see \Civi\Api4\Case
+ * @searchable none
  * @package Civi\Api4
  */
 class CaseType extends Generic\DAOEntity {
