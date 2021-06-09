@@ -31,6 +31,7 @@ class AuthorizeRecordEvent extends GenericHookEvent {
 
   use RequestTrait;
   use AuthorizedTrait;
+  use ActiveUserTrait;
 
   /**
    * All (known/loaded) values of individual record being accessed.
@@ -41,28 +42,20 @@ class AuthorizeRecordEvent extends GenericHookEvent {
   private $record;
 
   /**
-   * Contact ID of the active/target user (whose access we must check).
-   * NULL for anonymous.
-   *
-   * @var int|null
-   */
-  private $userID;
-
-  /**
    * CheckAccessEvent constructor.
    *
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array $record
    *   All (known/loaded) values of individual record being accessed.
    *   The record should provide an 'id' but may otherwise be incomplete; guard accordingly.
-   * @param int|null $userID
+   * @param int $userID
    *   Contact ID of the active/target user (whose access we must check).
-   *   NULL for anonymous.
+   *   0 for anonymous.
    */
-  public function __construct($apiRequest, array $record, ?int $userID) {
+  public function __construct($apiRequest, array $record, int $userID) {
     $this->setApiRequest($apiRequest);
     $this->record = $record;
-    $this->userID = $userID;
+    $this->setUser($userID);
   }
 
   /**
@@ -77,15 +70,6 @@ class AuthorizeRecordEvent extends GenericHookEvent {
    */
   public function getRecord(): array {
     return $this->record;
-  }
-
-  /**
-   * @return int|null
-   *   Contact ID of the active/target user (whose access we must check).
-   *   NULL for anonymous.
-   */
-  public function getUserID(): ?int {
-    return $this->userID;
   }
 
 }

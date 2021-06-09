@@ -228,12 +228,12 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
    *   Ex: 'Contact' or 'Custom_Foobar'
    * @param string $action
    * @param array $record
-   * @param int|null $userID
-   *   Contact ID of the active user (whose access we must check). NULL for anonymous.
+   * @param int $userID
+   *   Contact ID of the active user (whose access we must check). 0 for anonymous.
    * @return bool
    *   TRUE if granted. FALSE if prohibited. NULL if indeterminate.
    */
-  public static function _checkAccess(string $entityName, string $action, array $record, $userID): ?bool {
+  public static function _checkAccess(string $entityName, string $action, array $record, int $userID): ?bool {
     $groupName = substr($entityName, 0, 7) === 'Custom_' ? substr($entityName, 7) : NULL;
     if (!$groupName) {
       // $groupName is required but the function signature has to match the parent.

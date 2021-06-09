@@ -11,8 +11,11 @@
 
 namespace Civi\API\Event;
 
+use Civi\Api4\Event\ActiveUserTrait;
+
 /**
  * Class AuthorizeEvent
+ *
  * @package Civi\API\Event
  *
  * Determine whether the API request is allowed for the current user.
@@ -24,5 +27,11 @@ namespace Civi\API\Event;
 class AuthorizeEvent extends Event {
 
   use AuthorizedTrait;
+  use ActiveUserTrait;
+
+  public function __construct($apiProvider, $apiRequest, $apiKernel, int $userID) {
+    parent::__construct($apiProvider, $apiRequest, $apiKernel);
+    $this->setUser($userID);
+  }
 
 }

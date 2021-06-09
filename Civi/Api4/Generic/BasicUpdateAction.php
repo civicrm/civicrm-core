@@ -63,7 +63,7 @@ class BasicUpdateAction extends AbstractUpdateAction {
     $this->validateValues();
     foreach ($this->getBatchRecords() as $item) {
       $record = $this->values + $item;
-      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $record, \CRM_Core_Session::getLoggedInContactID())) {
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $record, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
         throw new UnauthorizedException("ACL check failed");
       }
       $result[] = $this->writeRecord($record);

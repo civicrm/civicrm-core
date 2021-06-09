@@ -157,15 +157,15 @@ class CoreUtil {
    *
    * @param \Civi\Api4\Generic\AbstractAction $apiRequest
    * @param array $record
-   * @param int|null $userID
-   *   Contact ID of the user we are testing, or NULL for the anonymous user.
+   * @param int|string $userID
+   *   Contact ID of the user we are testing,. 0 for the anonymous user.
    * @return bool
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\NotImplementedException
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, ?int $userID) {
+  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, int $userID) {
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
@@ -197,17 +197,17 @@ class CoreUtil {
    * @param string $entityName
    * @param string $actionName
    * @param array $record
-   * @param int|null $userID
-   *   Contact ID of the user we are testing, or NULL for the anonymous user.
+   * @param int $userID
+   *   Contact ID of the user we are testing, or 0 for the anonymous user.
    *
    * @return bool
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, ?int $userID) {
+  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {
     $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
     // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
-    if (!$apiRequest->isAuthorized($userID)) {
+    if (!$apiRequest->isAuthorized()) {
       return FALSE;
     }
     return static::checkAccessRecord($apiRequest, $record, $userID);

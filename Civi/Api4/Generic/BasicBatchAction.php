@@ -67,7 +67,7 @@ class BasicBatchAction extends AbstractBatchAction {
    */
   public function _run(Result $result) {
     foreach ($this->getBatchRecords() as $item) {
-      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID())) {
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
         throw new UnauthorizedException("ACL check failed");
       }
       $result[] = $this->doTask($item);
