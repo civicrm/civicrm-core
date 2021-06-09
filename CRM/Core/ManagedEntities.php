@@ -261,7 +261,7 @@ class CRM_Core_ManagedEntities {
    */
   public function updateExistingEntity($dao, $todo) {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');
-    $doUpdate = ($policy == 'always');
+    $doUpdate = ($policy === 'always');
 
     if ($doUpdate) {
       $defaults = ['id' => $dao->entity_id];
@@ -481,7 +481,9 @@ class CRM_Core_ManagedEntities {
       'params' => $params,
       'result' => $result,
     ]);
-    throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action);
+    throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action
+      . !empty($params['name']) ? '( entity name ' . $params['name'] . ')' : ''
+    );
   }
 
   /**
