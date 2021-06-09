@@ -537,7 +537,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the group filter works on the contribution summary (with a smart group).
+   * Test the group filter works on the contribution summary (with a smart
+   * group).
    *
    * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
    *
@@ -545,6 +546,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *   Name of the template to test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testContributionSummaryWithSmartGroupFilter(string $template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
@@ -568,8 +570,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    * @param string $template
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testContributionSummaryWithNotINSmartGroupFilter($template) {
+  public function testContributionSummaryWithNotINSmartGroupFilter($template): void {
     $groupID = $this->setUpPopulatedSmartGroup();
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/summary',

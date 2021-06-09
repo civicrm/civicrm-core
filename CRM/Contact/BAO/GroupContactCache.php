@@ -638,13 +638,15 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
-   * Populate a temporary table with group ids and contact ids.
+   * [Internal core function] Populate a temporary table with group ids and contact ids.
    *
    * Do not call this outside of core tested code - it WILL change.
    *
    * @param array[int] $groupIDs
    * @param string $temporaryTable
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public static function populateTemporaryTableWithContactsInGroups(array $groupIDs, string $temporaryTable): void {
@@ -657,14 +659,39 @@ ORDER BY   gc.contact_id, g.children
     ]);
     $smartGroups = array_keys($groups['values']);
 
-    $query = "
+    $query = '
        SELECT DISTINCT group_contact.contact_id as contact_id
        FROM civicrm_group_contact group_contact
-       WHERE group_contact.group_id IN (" . implode(', ', $childAndParentGroupIDs) . ")
+       WHERE group_contact.group_id IN (' . implode(', ', $childAndParentGroupIDs) . ")
        AND group_contact.status = 'Added' ";
 
     if (!empty($smartGroups)) {
-      CRM_Contact_BAO_GroupContactCache::check($smartGroups);
+      $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('gccache')
+        ->setMemory();
+      $locks = self::getLocksForRefreshableGroupsTo($smartGroups);
+      if (!empty($locks)) {
+        self::buildGroupContactTempTable(array_keys($locks), $groupContactsTempTable);
+        // Note in theory we could do this transfer from the temp
+        // table to the group_contact_cache table out-of-process - possibly by
+        // continuing on after the browser is released (which seems to be
+        // possibly possible https://stackoverflow.com/questions/15273570/continue-processing-php-after-sending-http-response
+        // or by making the table durable and using a cron to process it (or an ajax call
+        // at the end to process out of the queue.
+        // if we did that we would union in DISTINCT contact_id FROM
+        // $groupContactsTempTable->getName()
+        // but still use the last union for array_diff_key($smartGroups, $locks)
+        // as that would hold the already-cached groups (if any).
+        // Also - if we switched to the 'triple union' approach described above
+        // we could throw a try-catch around this line since best-effort would
+        // be good enough & potentially improve user experience.
+        self::updateCacheFromTempTable($groupContactsTempTable, array_keys($locks));
+
+        foreach ($locks as $lock) {
+          $lock->release();
+        }
+      }
+
       $smartGroups = implode(',', $smartGroups);
       $query .= "
         UNION DISTINCT
