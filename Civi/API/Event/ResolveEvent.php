@@ -46,7 +46,8 @@ class ResolveEvent extends Event {
    *   The full description of the API request.
    */
   public function setApiRequest($apiRequest) {
-    $this->apiRequest = $apiRequest;
+    // Elevate from 'protected' to 'public'.
+    return parent::setApiRequest($apiRequest);
   }
 
 }

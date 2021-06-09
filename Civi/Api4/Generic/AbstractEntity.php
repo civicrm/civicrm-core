@@ -56,6 +56,13 @@ abstract class AbstractEntity {
   abstract public static function getFields();
 
   /**
+   * @return \Civi\Api4\Generic\CheckAccessAction
+   */
+  public static function checkAccess() {
+    return new CheckAccessAction(self::getEntityName(), __FUNCTION__);
+  }
+
+  /**
    * Returns a list of permissions needed to access the various actions in this api.
    *
    * @return array

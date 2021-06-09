@@ -390,8 +390,9 @@ abstract class AbstractAction implements \ArrayAccess {
    * This function is called if checkPermissions is set to true.
    *
    * @return bool
+   * @internal Implement/override in civicrm-core.git only. Signature may evolve.
    */
-  public function isAuthorized() {
+  public function isAuthorized(): bool {
     $permissions = $this->getPermissions();
     return \CRM_Core_Permission::check($permissions);
   }

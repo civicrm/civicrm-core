@@ -204,23 +204,13 @@ function _civicrm_api3_contribution_create_legacy_support_45(&$params) {
 function civicrm_api3_contribution_delete($params) {
 
   $contributionID = !empty($params['contribution_id']) ? $params['contribution_id'] : $params['id'];
-  // First check contribution financial type
-  $financialType = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id');
-  // Now check permissioned lineitems & permissioned contribution
-  if (!empty($params['check_permissions']) && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() &&
-    (
-      !CRM_Core_Permission::check('delete contributions of type ' . CRM_Contribute_PseudoConstant::financialType($financialType))
-      || !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE)
-    )
-  ) {
+  if (!empty($params['check_permissions']) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contribution', 'delete', ['id' => $contributionID], CRM_Core_Session::getLoggedInContactID() ?: 0)) {
     throw new API_Exception('You do not have permission to delete this contribution');
   }
   if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
     return civicrm_api3_create_success([$contributionID => 1]);
   }
-  else {
-    throw new API_Exception('Could not delete contribution');
-  }
+  throw new API_Exception('Could not delete contribution');
 }
 
 /**
@@ -671,7 +661,7 @@ function _ipn_process_transaction($params, $contribution, $input, $ids) {
     static $domainFromName;
     static $domainFromEmail;
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
-      list($domainFromName, $domainFromEmail) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+      [$domainFromName, $domainFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
     $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
     $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);

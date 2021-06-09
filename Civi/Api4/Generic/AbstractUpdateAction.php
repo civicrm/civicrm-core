@@ -19,6 +19,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Event\ValidateValuesEvent;
+
 /**
  * Base class for all `Update` api actions
  *
@@ -68,6 +70,25 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   public function addValue(string $fieldName, $value) {
     $this->values[$fieldName] = $value;
     return $this;
+  }
+
+  /**
+   * @throws \API_Exception
+   */
+  protected function validateValues() {
+    // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
+    $e = new ValidateValuesEvent($this, [$this->values], new \CRM_Utils_LazyArray(function () {
+      $existing = $this->getBatchAction()->setSelect(['*'])->execute();
+      $result = [];
+      foreach ($existing as $record) {
+        $result[] = ['old' => $record, 'new' => $this->values];
+      }
+      return $result;
+    }));
+    \Civi::dispatcher()->dispatch('civi.api4.validate', $e);
+    if (!empty($e->errors)) {
+      throw $e->toException();
+    }
   }
 
 }

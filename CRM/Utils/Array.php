@@ -18,6 +18,31 @@
 class CRM_Utils_Array {
 
   /**
+   * Cast a value to an array.
+   *
+   * This is similar to PHP's `(array)`, but it also converts iterators.
+   *
+   * @param mixed $value
+   * @return array
+   */
+  public static function cast($value) {
+    if (is_array($value)) {
+      return $value;
+    }
+    if ($value instanceof CRM_Utils_LazyArray || $value instanceof ArrayObject) {
+      // iterator_to_array() would work here, but getArrayCopy() doesn't require actual iterations.
+      return $value->getArrayCopy();
+    }
+    if (is_iterable($value)) {
+      return iterator_to_array($value);
+    }
+    if (is_scalar($value)) {
+      return [$value];
+    }
+    throw new \RuntimeException(sprintf("Cannot cast %s to array", gettype($value)));
+  }
+
+  /**
    * Returns $list[$key] if such element exists, or a default value otherwise.
    *
    * If $list is not actually an array at all, then the default value is

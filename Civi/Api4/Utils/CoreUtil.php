@@ -19,6 +19,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\API\Request;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -149,6 +150,67 @@ class CoreUtil {
    */
   private static function isCustomEntity($customGroupName) {
     return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
+  }
+
+  /**
+   * Check if current user is authorized to perform specified action on a given entity.
+   *
+   * @param \Civi\Api4\Generic\AbstractAction $apiRequest
+   * @param array $record
+   * @param int|string $userID
+   *   Contact ID of the user we are testing,. 0 for the anonymous user.
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\NotImplementedException
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkAccessRecord(\Civi\Api4\Generic\AbstractAction $apiRequest, array $record, int $userID) {
+    // For get actions, just run a get and ACLs will be applied to the query.
+    // It's a cheap trick and not as efficient as not running the query at all,
+    // but BAO::checkAccess doesn't consistently check permissions for the "get" action.
+    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
+      return (bool) $apiRequest->addSelect('id')->addWhere('id', '=', $record['id'])->execute()->count();
+    }
+
+    $event = new \Civi\Api4\Event\AuthorizeRecordEvent($apiRequest, $record, $userID);
+    \Civi::dispatcher()->dispatch('civi.api4.authorizeRecord', $event);
+
+    // Note: $bao::_checkAccess() is a quasi-listener. TODO: Convert to straight-up listener.
+    if ($event->isAuthorized() === NULL) {
+      $baoName = self::getBAOFromApiName($apiRequest->getEntityName());
+      if ($baoName && method_exists($baoName, '_checkAccess')) {
+        $authorized = $baoName::_checkAccess($event->getEntityName(), $event->getActionName(), $event->getRecord(), $event->getUserID());
+        $event->setAuthorized($authorized);
+      }
+      else {
+        $event->setAuthorized(TRUE);
+      }
+    }
+    return $event->isAuthorized();
+  }
+
+  /**
+   * If the permissions of record $A are based on record $B, then use `checkAccessDelegated($B...)`
+   * to make see if access to $B is permitted.
+   *
+   * @param string $entityName
+   * @param string $actionName
+   * @param array $record
+   * @param int $userID
+   *   Contact ID of the user we are testing, or 0 for the anonymous user.
+   *
+   * @return bool
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function checkAccessDelegated(string $entityName, string $actionName, array $record, int $userID) {
+    $apiRequest = Request::create($entityName, $actionName, ['version' => 4]);
+    // TODO: Should probably emit civi.api.authorize for checking guardian permission; but in APIv4 with std cfg, this is de-facto equivalent.
+    if (!$apiRequest->isAuthorized()) {
+      return FALSE;
+    }
+    return static::checkAccessRecord($apiRequest, $record, $userID);
   }
 
 }

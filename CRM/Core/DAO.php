@@ -3075,7 +3075,7 @@ SELECT contact_id
         $clauses[$fieldName] = CRM_Utils_SQL::mergeSubquery('Contact');
       }
       // Clause for an entity_table/entity_id combo
-      if ($fieldName == 'entity_id' && isset($fields['entity_table'])) {
+      if ($fieldName === 'entity_id' && isset($fields['entity_table'])) {
         $relatedClauses = [];
         $relatedEntities = $this->buildOptions('entity_table', 'get');
         foreach ((array) $relatedEntities as $table => $ent) {
@@ -3124,7 +3124,7 @@ SELECT contact_id
 
   /**
    * ensure database name is 'safe', i.e. only contains word characters (includes underscores)
-   * and dashes, and contains at least one [a-z] case insenstive.
+   * and dashes, and contains at least one [a-z] case insensitive.
    *
    * @param $database
    *

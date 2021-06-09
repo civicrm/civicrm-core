@@ -19,6 +19,9 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Update one or more $ENTITY with new values.
  *
@@ -60,7 +63,11 @@ class DAOUpdateAction extends AbstractUpdateAction {
     // Update a single record by ID unless select requires more than id
     if ($this->getSelect() === ['id'] && count($this->where) === 1 && $this->where[0][0] === 'id' && $this->where[0][1] === '=' && !empty($this->where[0][2])) {
       $this->values['id'] = $this->where[0][2];
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $this->values, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+        throw new UnauthorizedException("ACL check failed");
+      }
       $items = [$this->values];
+      $this->validateValues();
       $result->exchangeArray($this->writeObjects($items));
       return;
     }
@@ -69,8 +76,12 @@ class DAOUpdateAction extends AbstractUpdateAction {
     $items = $this->getBatchRecords();
     foreach ($items as &$item) {
       $item = $this->values + $item;
+      if ($this->checkPermissions && !CoreUtil::checkAccessRecord($this, $item, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
+        throw new UnauthorizedException("ACL check failed");
+      }
     }
 
+    $this->validateValues();
     $result->exchangeArray($this->writeObjects($items));
   }
 

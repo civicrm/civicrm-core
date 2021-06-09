@@ -15,6 +15,15 @@ function financialacls_civicrm_config(&$config) {
 }
 
 /**
+ * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+ */
+function financialacls_civicrm_container($container) {
+  $dispatcherDefn = $container->getDefinition('dispatcher');
+  $container->addResource(new \Symfony\Component\Config\Resource\FileResource(__FILE__));
+  $dispatcherDefn->addMethodCall('addListener', ['civi.api4.authorizeRecord::Contribution', '_financialacls_civi_api4_authorizeContribution']);
+}
+
+/**
  * Implements hook_civicrm_xmlMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
@@ -284,6 +293,29 @@ function financialacls_civicrm_permission(&$permissions) {
     ts('CiviCRM: administer CiviCRM Financial Types'),
     ts('Administer access to Financial Types'),
   ];
+}
+
+/**
+ * Listener for 'civi.api4.authorizeRecord::Contribution'
+ *
+ * @param \Civi\Api4\Event\AuthorizeRecordEvent $e
+ * @throws \CRM_Core_Exception
+ */
+function _financialacls_civi_api4_authorizeContribution(\Civi\Api4\Event\AuthorizeRecordEvent $e) {
+  if (!financialacls_is_acl_limiting_enabled()) {
+    return;
+  }
+  if ($e->getActionName() === 'delete' && $e->getEntityName() === 'Contribution') {
+    $contributionID = $e->getRecord()['id'];
+    // First check contribution financial type
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'financial_type_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id'));
+    // Now check permissioned line items & permissioned contribution
+    if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType, $e->getUserID()) ||
+      !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
+    ) {
+      $e->setAuthorized(FALSE);
+    }
+  }
 }
 
 /**

@@ -420,20 +420,20 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param string $op
    *   the mode of operation, can be add, view, edit, delete
    * @param bool $force
+   * @param int $contactID
    *
    * @return bool
    */
-  public static function checkPermissionedLineItems($id, $op, $force = TRUE) {
+  public static function checkPermissionedLineItems($id, $op, $force = TRUE, $contactID = NULL) {
     if (!self::isACLFinancialTypeStatus()) {
       return TRUE;
     }
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($id);
     $flag = FALSE;
     foreach ($lineItems as $items) {
-      if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']))) {
+      if (!CRM_Core_Permission::check($op . ' contributions of type ' . CRM_Contribute_PseudoConstant::financialType($items['financial_type_id']), $contactID)) {
         if ($force) {
           throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
-          break;
         }
         $flag = FALSE;
         break;

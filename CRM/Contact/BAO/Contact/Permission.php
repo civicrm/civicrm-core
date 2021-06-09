@@ -136,37 +136,39 @@ WHERE contact_id IN ({$contact_id_list})
    * @param int $id
    *   Contact id.
    * @param int|string $type the type of operation (view|edit)
+   * @param int $userID
+   *   Contact id of user to check (defaults to current logged-in user)
    *
    * @return bool
    *   true if the user has permission, false otherwise
    */
-  public static function allow($id, $type = CRM_Core_Permission::VIEW) {
-    // get logged in user
-    $contactID = CRM_Core_Session::getLoggedInContactID();
+  public static function allow($id, $type = CRM_Core_Permission::VIEW, $userID = NULL) {
+    // Default to logged in user if not supplied
+    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
 
     // first: check if contact is trying to view own contact
-    if ($contactID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
-     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact'))
+    if ($userID == $id && ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view my contact')
+     || $type == CRM_Core_Permission::EDIT && CRM_Core_Permission::check('edit my contact', $userID))
       ) {
       return TRUE;
     }
 
     // FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
-    if (CRM_Core_Permission::check('access deleted contacts') && $isDeleted) {
+    if (CRM_Core_Permission::check('access deleted contacts', $userID) && $isDeleted) {
       return TRUE;
     }
 
     // short circuit for admin rights here so we avoid unneeeded queries
     // some duplication of code, but we skip 3-5 queries
-    if (CRM_Core_Permission::check('edit all contacts') ||
-      ($type == CRM_ACL_API::VIEW && CRM_Core_Permission::check('view all contacts'))
+    if (CRM_Core_Permission::check('edit all contacts', $userID) ||
+      ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts', $userID))
     ) {
       return TRUE;
     }
 
     // check permission based on relationship, CRM-2963
-    if (self::relationshipList([$id], $type)) {
+    if (self::relationshipList([$id], $type, $userID)) {
       return TRUE;
     }
 
@@ -175,7 +177,7 @@ WHERE contact_id IN ({$contact_id_list})
     $tables = [];
     $whereTables = [];
 
-    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, NULL, FALSE, FALSE, TRUE);
+    $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
 
     $query = "
@@ -185,10 +187,7 @@ WHERE contact_a.id = %1 AND $permission
   LIMIT 1
 ";
 
-    if (CRM_Core_DAO::singleValueQuery($query, [1 => [$id, 'Integer']])) {
-      return TRUE;
-    }
-    return FALSE;
+    return (bool) CRM_Core_DAO::singleValueQuery($query, [1 => [$id, 'Integer']]);
   }
 
   /**
@@ -362,18 +361,18 @@ AND    $operationClause
 
   /**
    * Filter a list of contact_ids by the ones that the
-   *  currently active user as a permissioned relationship with
+   * user as a permissioned relationship with
    *
    * @param array $contact_ids
    *   List of contact IDs to be filtered
-   *
    * @param int $type
    *   access type CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT
+   * @param int $userID
    *
    * @return array
    *   List of contact IDs that the user has permissions for
    */
-  public static function relationshipList($contact_ids, $type) {
+  public static function relationshipList($contact_ids, $type, $userID = NULL) {
     $result_set = [];
 
     // no processing empty lists (avoid SQL errors as well)
@@ -381,9 +380,9 @@ AND    $operationClause
       return [];
     }
 
-    // get the currently logged in user
-    $contactID = CRM_Core_Session::getLoggedInContactID();
-    if (empty($contactID)) {
+    // Default to currently logged in user
+    $userID = $userID ?? CRM_Core_Session::getLoggedInContactID();
+    if (empty($userID)) {
       return [];
     }
 
@@ -418,7 +417,7 @@ AND    $operationClause
 SELECT civicrm_relationship.{$contact_id_column} AS contact_id
   FROM civicrm_relationship
   {$LEFT_JOIN_DELETED}
- WHERE civicrm_relationship.{$user_id_column} = {$contactID}
+ WHERE civicrm_relationship.{$user_id_column} = {$userID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
    AND civicrm_relationship.is_active = 1
    AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} {$is_perm_condition}
@@ -444,7 +443,7 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
   FROM civicrm_relationship first_degree_relationship
   LEFT JOIN civicrm_relationship second_degree_relationship ON first_degree_relationship.contact_id_{$first_direction['to']} = second_degree_relationship.contact_id_{$second_direction['from']}
   {$LEFT_JOIN_DELETED}
- WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$contactID}
+ WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$userID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
    AND first_degree_relationship.is_active = 1
    AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} {$is_perm_condition}

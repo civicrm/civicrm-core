@@ -40,7 +40,7 @@ class PermissionCheckSubscriber implements EventSubscriberInterface {
     /* @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['version'] == 4) {
-      if (!$apiRequest->getCheckPermissions() || $apiRequest->isAuthorized()) {
+      if (!$apiRequest->getCheckPermissions() || $apiRequest->isAuthorized(\CRM_Core_Session::singleton()->getLoggedInContactID())) {
         $event->authorize();
         $event->stopPropagation();
       }
