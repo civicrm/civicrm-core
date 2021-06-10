@@ -409,6 +409,12 @@ class RecipientBuilder {
       else {
         $startDateClauses[] = "DATE_SUB(!casNow, INTERVAL 1 DAY ) <= {$date}";
       }
+      if (!empty($actionSchedule->effective_start_date)) {
+        $startDateClauses[] = "'{$actionSchedule->effective_start_date}' <= {$date}";
+      }
+      if (!empty($actionSchedule->effective_end_date)) {
+        $startDateClauses[] = "'{$actionSchedule->effective_end_date}' > {$date}";
+      }
     }
     elseif ($actionSchedule->absolute_date) {
       $startDateClauses[] = "DATEDIFF(DATE('!casNow'),'{$actionSchedule->absolute_date}') = 0";
