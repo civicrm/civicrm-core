@@ -158,6 +158,9 @@ function _civicrm_api3_contact_create_spec(&$params) {
  */
 function civicrm_api3_contact_get($params) {
   $options = [];
+  if (!isset($params['return'])) {
+    CRM_Core_Error::deprecatedWarning('return should be set to avoid https://github.com/civicrm/civicrm-core/pull/18968');
+  }
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
   if (!empty($params['check_permissions'])) {
