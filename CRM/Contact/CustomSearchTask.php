@@ -25,13 +25,6 @@ class CRM_Contact_CustomSearchTask extends CRM_Core_Task {
    */
   public static $objectType = 'contact';
 
-  public static function tasks() {
-    if (!self::$_tasks) {
-      parent::tasks();
-    }
-    return self::$_tasks;
-  }
-
   /**
    * Show tasks selectively based on the permission level
    * of the user
@@ -45,10 +38,7 @@ class CRM_Contact_CustomSearchTask extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params) {
-    $tasks = self::taskTitles();
-    if (!is_array($tasks)) {
-      $tasks = array();
-    }
+    $tasks = (array) self::taskTitles();
     return self::corePermissionedTaskTitles($tasks, $permission, $params);
   }
 

@@ -55,7 +55,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @return string
    */
   public function getObjectTypeForTaskList() {
-    return 'contact';
+    return 'Contact';
   }
 
   /**
@@ -67,7 +67,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @return string
    */
   public function getTasklistClass() {
-    if ($this->getObjectTypeForTaskList() != 'contact') {
+    if ($this->getObjectTypeForTaskList() != 'Contact') {
       return 'CRM_Contact_CustomSearchTask';
     }
     return 'CRM_Contact_Task';
