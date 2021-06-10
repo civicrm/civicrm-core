@@ -26,6 +26,9 @@
     <title>ACL Role ID</title>
     <type>int unsigned</type>
     <required>true</required>
+    <pseudoconstant>
+      <optionGroupName>acl_role</optionGroupName>
+    </pseudoconstant>
     <comment>Foreign Key to ACL Role (which is an option value pair and hence an implicit FK)</comment>
     <add>1.6</add>
   </field>
