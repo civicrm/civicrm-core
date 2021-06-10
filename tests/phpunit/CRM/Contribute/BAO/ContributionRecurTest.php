@@ -167,7 +167,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'contribution_status_id' => 1,
       'receive_date' => 'yesterday',
-      'is_test' => 0,
+      'is_test' => 1,
     ]);
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     $this->assertNotEquals($testContrib['id'], $fetchedTemplate['id']);
