@@ -11,6 +11,7 @@
 namespace Civi\API;
 
 use Civi\API\Exception\UnauthorizedException;
+use CRM_Core_Exception;
 
 /**
  * Query builder for civicrm_api_basic_get.
@@ -78,11 +79,16 @@ abstract class SelectQuery {
   /**
    * @param string $entity
    * @param bool $checkPermissions
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($entity, $checkPermissions) {
     $this->entity = $entity;
     require_once 'api/v3/utils.php';
     $baoName = _civicrm_api3_get_BAO($entity);
+    if (!$baoName) {
+      throw new CRM_Core_Exception('Invalid entity: ' . \CRM_Utils_Type::validate($entity, 'Alphanumeric'));
+    }
     $bao = new $baoName();
 
     $this->entityFieldNames = array_column($baoName::fields(), 'name');
@@ -239,7 +245,7 @@ abstract class SelectQuery {
       $this->join($side, $fkTable, $tableAlias, $joinCondition);
 
       if (strpos($fieldName, 'custom_') === 0) {
-        list($tableAlias, $fieldName) = $this->addCustomField($fieldInfo, $side, $tableAlias);
+        [$tableAlias, $fieldName] = $this->addCustomField($fieldInfo, $side, $tableAlias);
       }
 
       // Get ready to recurse to the next level
@@ -473,7 +479,7 @@ abstract class SelectQuery {
         }
       }
       elseif ($field && strpos($fieldName, 'custom_') === 0) {
-        list($table_name, $column_name) = $this->addCustomField($field, 'LEFT');
+        [$table_name, $column_name] = $this->addCustomField($field, 'LEFT');
 
         if ($field['data_type'] != 'ContactReference') {
           // 'ordinary' custom field. We will select the value as custom_XX.
