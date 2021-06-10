@@ -221,7 +221,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check whether template contribution is created based on the first contribution.
+   * Check whether template contribution is created based on the most recent contribution.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
@@ -229,30 +229,51 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testCreateTemplateContributionFromFirstContributionTest(): void {
+    $custom_group = $this->customGroupCreate(['extends' => 'Contribution', 'name' => 'template']);
+    $custom_field = $this->customFieldCreate(['custom_group_id' => $custom_group['id'], 'name' => 'field']);
+
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     // Create a first test contrib
+    $date = new DateTime();
     $firstContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $this->_params['contact_id'],
       'contribution_status_id' => 1,
-      'receive_date' => 'yesterday',
+      'receive_date' => $date->format('YmdHis'),
+      'custom_' . $custom_field['id'] => 'First Contribution',
     ]);
+    $date->modify('+2 days');
     $secondContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'currency' => 'USD',
-      'contact_id' => $this->individualCreate(),
+      'contact_id' => $this->_params['contact_id'],
       'contribution_status_id' => 1,
-      'receive_date' => 'yesterday',
+      'receive_date' => $date->format('YmdHis'),
+      'custom_' . $custom_field['id'] => 'Second and most recent Contribution',
+    ]);
+
+    $date->modify('-1 days');
+    $thirdContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->_params['contact_id'],
+      'contribution_status_id' => 1,
+      'receive_date' => $date->format('YmdHis'),
+      'custom_' . $custom_field['id'] => 'Third Contribution',
     ]);
 
     $templateContribution = Contribution::get(FALSE)
+      ->addSelect('*', 'custom.*')
       ->addWhere('contribution_recur_id', '=', $contributionRecur['id'])
       ->addWhere('is_template', '=', 1)
       ->addWhere('is_test', '=', 0)
@@ -262,9 +283,13 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     $this->assertNotEquals($firstContrib['id'], $fetchedTemplate['id']);
     $this->assertNotEquals($secondContrib['id'], $fetchedTemplate['id']);
+    $this->assertNotEquals($thirdContrib['id'], $fetchedTemplate['id']);
     $this->assertTrue($fetchedTemplate['is_template']);
     $this->assertFalse($fetchedTemplate['is_test']);
     $this->assertEquals(1, $templateContribution->count());
+    $templateContribution = $templateContribution->first();
+    $this->assertNotNull($templateContribution['template.field']);
+    $this->assertEquals('First Contribution', $templateContribution['template.field']);
   }
 
   /**
@@ -303,7 +328,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'receive_date' => 'yesterday',
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $isFirstContribution = CRM_Contribute_BAO_Contribution::isFirstContributionOfRecurringContribution($contributionParams, $contribution['id']);
+    $isFirstContribution = CRM_Contribute_BAO_Contribution::recurringContributionRequiresTemplate($contributionParams, $contribution['id']);
     $this->assertFalse($isFirstContribution);
     $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     // Fetched template should be the is_template, not the latest contrib

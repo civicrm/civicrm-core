@@ -249,8 +249,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     // Check whether this is linked to a recurring contribution and whether this is the first contribution.
     // If so we should create the template contribution for the recurring contribution.
-    if (self::isFirstContributionOfRecurringContribution($params, $contribution->id)) {
-      CRM_Contribute_BAO_ContributionRecur::createTemplateContributionFromFirstContribution($params['contribution_recur_id']);
+    if (self::recurringContributionRequiresTemplate($params, $contribution->id)) {
+      CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($params['contribution_recur_id']);
     }
 
     return $result;
@@ -294,7 +294,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public static function isFirstContributionOfRecurringContribution($params, $contribution_id) {
+  public static function recurringContributionRequiresTemplate($params, $contribution_id) {
     if (empty($params['contribution_recur_id'])) {
       // No recurring contribution
       return FALSE;
@@ -324,7 +324,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       ->addWhere('contribution_recur_id', '=', $params['contribution_recur_id'])
       ->addWhere('is_test', '=', $recurringContribution['is_test'])
       ->addWhere('is_template', '=', 0)
-      ->addOrderBy('id', 'DESC')
+      ->addOrderBy('receive_date', 'ASC')
       ->setLimit(1)
       ->setSelect(['id'])
       ->execute()
