@@ -443,7 +443,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_test', '=', $recurringContribution['is_test'])
       ->addWhere('is_template', '=', 0)
-      ->addOrderBy('id', 'DESC')
+      ->addOrderBy('receive_date', 'DESC')
       ->setLimit(1)
       ->execute()
       ->first();

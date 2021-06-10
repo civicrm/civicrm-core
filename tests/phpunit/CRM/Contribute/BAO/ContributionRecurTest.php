@@ -221,7 +221,14 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check whether template contribution is created based on the most recent contribution.
+   * Check whether template contribution is created based on the first contribution.
+   *
+   * There are three contributions created. Each of them with a different value at a custom field.
+   * The first contribution created should be copied as a template contribution.
+   * The other two should not be used as a template.
+   *
+   * Then we delete the template contribution and make sure a new one exists.
+   * At that time the second contribution should be used a template as that is the most recent one (according to the date).
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
@@ -259,7 +266,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'custom_' . $custom_field['id'] => 'Second and most recent Contribution',
     ]);
 
-    $date->modify('-1 days');
+    $date->modify('-1 week');
     $thirdContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
@@ -272,6 +279,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'custom_' . $custom_field['id'] => 'Third Contribution',
     ]);
 
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     $templateContribution = Contribution::get(FALSE)
       ->addSelect('*', 'custom.*')
       ->addWhere('contribution_recur_id', '=', $contributionRecur['id'])
@@ -280,7 +288,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addOrderBy('id', 'DESC')
       ->execute();
 
-    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
     $this->assertNotEquals($firstContrib['id'], $fetchedTemplate['id']);
     $this->assertNotEquals($secondContrib['id'], $fetchedTemplate['id']);
     $this->assertNotEquals($thirdContrib['id'], $fetchedTemplate['id']);
@@ -290,6 +297,27 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
     $this->assertEquals('First Contribution', $templateContribution['template.field']);
+
+    // Now delete the template contribution and make sure a new template contribution is created.
+    // This time the second contribution should be used a template (as that is the most recent one).
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $templateContribution['id']]);
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+    $templateContribution = Contribution::get(FALSE)
+      ->addSelect('*', 'custom.*')
+      ->addWhere('contribution_recur_id', '=', $contributionRecur['id'])
+      ->addWhere('is_template', '=', 1)
+      ->addWhere('is_test', '=', 0)
+      ->addOrderBy('id', 'DESC')
+      ->execute();
+    $this->assertNotEquals($firstContrib['id'], $fetchedTemplate['id']);
+    $this->assertNotEquals($secondContrib['id'], $fetchedTemplate['id']);
+    $this->assertNotEquals($thirdContrib['id'], $fetchedTemplate['id']);
+    $this->assertTrue($fetchedTemplate['is_template']);
+    $this->assertFalse($fetchedTemplate['is_test']);
+    $this->assertEquals(1, $templateContribution->count());
+    $templateContribution = $templateContribution->first();
+    $this->assertNotNull($templateContribution['template.field']);
+    $this->assertEquals('Second and most recent Contribution', $templateContribution['template.field']);
   }
 
   /**
