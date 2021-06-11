@@ -151,7 +151,7 @@
 
   //plugin to sort on currency
   cj.fn.dataTableExt.oSort['currency-asc']  = function(a,b) {
-    var symbol = "{/literal}{$defaultCurrencySymbol}{literal}";
+    var symbol = "{/literal}{if isset($defaultCurrencySymbol)}{$defaultCurrencySymbol}{/if}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
     x = parseFloat( x );
@@ -160,7 +160,7 @@
   };
 
   cj.fn.dataTableExt.oSort['currency-desc'] = function(a,b) {
-    var symbol = "{/literal}{$defaultCurrencySymbol}{literal}";
+    var symbol = "{/literal}{if isset($defaultCurrencySymbol)}{$defaultCurrencySymbol}{/if}{literal}";
     var x = (a == "-") ? 0 : a.replace( symbol, "" );
     var y = (b == "-") ? 0 : b.replace( symbol, "" );
     x = parseFloat( x );

@@ -57,7 +57,7 @@
           </tr>
         {/if}
     </table>
-    {else}
+    {elseif $action eq 8}
         <div class="status">{ts 1=$delName}Are you sure you want to delete <b>%1</b>?{/ts}<br />{ts}This tag will be removed from any currently tagged contacts, and users will no longer be able to assign contacts to this tag.{/ts}</div>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

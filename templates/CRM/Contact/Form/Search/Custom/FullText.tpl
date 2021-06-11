@@ -28,14 +28,22 @@
   </div>
 </div>
 <div class="crm-block crm-content-block">
-{if !$table}{include file="CRM/common/pager.tpl" location="top"}{/if}
+{if empty($table)}{include file="CRM/common/pager.tpl" location="top"}{/if}
 {include file="CRM/common/jsortable.tpl"}
 {if $rowsEmpty}
   {include file="CRM/Contact/Form/Search/Custom/EmptyResults.tpl"}
 {/if}
 
-{assign var=table value=$form.table.value.0}
-{assign var=text  value=$form.text.value}
+{if !empty($form.table.value)}
+  {assign var=table value=$form.table.value.0}
+{else}
+  {assign var=table value=false}
+{/if}
+{if !empty($form.text.value)}
+  {assign var=text  value=$form.text.value}
+{else}
+  {assign var=text value=false}
+{/if}
 {if !empty($summary.Contact) }
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}

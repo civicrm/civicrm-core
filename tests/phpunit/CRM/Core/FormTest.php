@@ -28,6 +28,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     $form->buildQuickForm();
     $form->setDefaultValues();
     $form->assign('action', $form->_action ?? CRM_Core_Action::UPDATE);
+    $form->assign('form', $form->toSmarty());
     $form->getTemplate()->fetch($form->getTemplateFileName());
   }
 
