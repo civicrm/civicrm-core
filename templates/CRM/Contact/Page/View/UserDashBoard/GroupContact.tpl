@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $userChecksum}
+{if !empty($userChecksum)}
   {assign var=edit value='0'}
 {/if}
 {crmRegion name="crm-contact-userdashboard-groupcontact-pre"}

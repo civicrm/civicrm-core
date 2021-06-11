@@ -12,7 +12,7 @@
 <div class="crm-footer" id="crm-record-log">
   <span class="col1">
     {if !empty($external_identifier)}{ts}External ID{/ts}:&nbsp;{$external_identifier}{/if}
-    {if $action NEQ 2}&nbsp; &nbsp;{ts}Contact ID{/ts}:&nbsp;{$contactId}{/if}
+    {if !isset($action) || (isset($action) && $action NEQ 2)}&nbsp; &nbsp;{ts}Contact ID{/ts}:&nbsp;{$contactId}{/if}
   </span>
   {if !empty($lastModified)}
     {ts}Last Change by{/ts}: <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$lastModified.id`"}">{$lastModified.name}</a> ({$lastModified.date|crmDate}) &nbsp;

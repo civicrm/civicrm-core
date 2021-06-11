@@ -21,7 +21,7 @@
     <th>{ts}In Support of{/ts}</th>
     <th>{ts}Campaign Ends{/ts}</th>
     <th>{ts}Status{/ts}</th>
-    {if !$userChecksum} <th></th> {/if}
+    {if empty($userChecksum)} <th></th> {/if}
   </tr>
 
   {foreach from=$pcpInfo item=row}
@@ -30,7 +30,7 @@
         <td>{$row.pageTitle}</td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
         <td>{$row.pcpStatus}</td>
-        {if !$userChecksum}
+        {if empty($userChecksum)}
           <td>{$row.action|replace:'xx':$row.pcpId}</td>
         {/if}
   </tr>

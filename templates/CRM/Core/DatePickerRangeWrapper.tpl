@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {* Wrapper around DatePickerRange TPL file *}
-<td {if $colspan} colspan="{$colspan}" {else} colspan="2" {/if} {if $class} class="{$class}" {/if}>
+<td {if !empty($colspan)} colspan="{$colspan}" {else} colspan="2" {/if} {if !empty($class)} class="{$class}" {/if}>
   {assign var='hideRelativeLabel' value=$hideRelativeLabel|default:0}
   {assign var='from' value=$from|default:'_low'}
   {assign var='to' value=$to|default:'_high'}
