@@ -163,7 +163,7 @@
       </tr>
      {/if}
 
-      {if $receipt_date}
+      {if !empty($receipt_date)}
       <tr>
        <td {$labelStyle}>
         {ts}Receipt Date{/ts}
@@ -303,7 +303,7 @@
         </td>
        </tr>
       {/if}
-      {if $fulfilled_date}
+      {if !empty($fulfilled_date)}
        <tr>
         <td {$labelStyle}>
          {ts}Sent{/ts}
