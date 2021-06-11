@@ -502,7 +502,7 @@ class Api4SelectQuery {
     if (!empty($field['sql_filters'])) {
       $sql = [];
       foreach ($field['sql_filters'] as $filter) {
-        $clause = is_callable($filter) ? $filter($fieldAlias, $operator, $value, $this, $depth) : NULL;
+        $clause = is_callable($filter) ? $filter($field, $fieldAlias, $operator, $value, $this, $depth) : NULL;
         if ($clause) {
           $sql[] = $clause;
         }

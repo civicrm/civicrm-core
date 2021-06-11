@@ -750,10 +750,10 @@ VALUES
    (@option_group_id_website, 'Vine',  12, 'Vine ',  NULL, 0, NULL, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
 
 -- Tag used for
-   (@option_group_id_tuf, 'Contacts',   'civicrm_contact',  'Contacts',     NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_tuf, 'Activities', 'civicrm_activity', 'Activities',   NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_tuf, 'Cases',      'civicrm_case',     'Cases',        NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_tuf, 'Attachments','civicrm_file',     'Attachements', NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_tuf, '{ts escape="sql"}Contacts{/ts}',    'civicrm_contact',  'Contact',  NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_tuf, '{ts escape="sql"}Activities{/ts}',  'civicrm_activity', 'Activity', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_tuf, '{ts escape="sql"}Cases{/ts}',       'civicrm_case',     'Case',     NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_tuf, '{ts escape="sql"}Attachments{/ts}', 'civicrm_file',     'File',     NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL, NULL),
 
    (@option_group_id_currency, 'USD ($)',      'USD',     'USD',       NULL, 0, 1, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
 

@@ -2344,6 +2344,18 @@ function _civicrm_api3_api_match_pseudoconstant_value(&$value, $options, $fieldN
     return;
   }
 
+  // Legacy handling of tag used_for values, see https://github.com/civicrm/civicrm-core/pull/20573
+  if ($fieldName === 'used_for') {
+    $legacyTagUsedFor = [
+      'Activities' => 'Activity',
+      'Contacts' => 'Contact',
+      'Cases' => 'Case',
+      // Attachements [sic] was the original spelling
+      'Attachements' => 'File',
+    ];
+    $value = $legacyTagUsedFor[$value] ?? $value;
+  }
+
   // Translate value into key
   // Cast $value to string to avoid a bug in array_search
   $newValue = array_search((string) $value, $options);
