@@ -52,7 +52,7 @@
 {*pledge row if*}
 
 {*Display honor block*}
-{if $pledgeHonor && $pledgeHonorRows}
+{if !empty($pledgeHonor) && !empty($pledgeHonorRows)}
 {strip}
 <div class="help">
     <p>{ts}Pledges made in your honor.{/ts}</p>
