@@ -51,7 +51,7 @@
 {if !empty($receive_date)}
 {ts}Date Received{/ts}: {$receive_date|truncate:10:''|crmDate}
 {/if}
-{if $receipt_date}
+{if !empty($receipt_date)}
 {ts}Receipt Date{/ts}: {$receipt_date|truncate:10:''|crmDate}
 {/if}
 {if !empty($formValues.paidBy) and empty($formValues.hidden_CreditCard)}
@@ -114,7 +114,7 @@
 {if $formValues.product_sku}
 {ts}SKU{/ts}: {$formValues.product_sku}
 {/if}
-{if $fulfilled_date}
+{if !empty($fulfilled_date)}
 {ts}Sent{/ts}: {$fulfilled_date|crmDate}
 {/if}
 {/if}
