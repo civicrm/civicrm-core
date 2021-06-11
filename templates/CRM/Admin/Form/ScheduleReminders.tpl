@@ -7,6 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
+{if !isset($isAdmin)}
+  {assign var="isAdmin" value="0"}
+{/if}
 {* This template is used for adding/scheduling reminders.  *}
 <div class="crm-block crm-form-block crm-scheduleReminder-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
@@ -85,11 +88,13 @@
         <td class="label">{$form.group_id.label}</td>
         <td>{$form.group_id.html}</td>
     </tr>
+    {if !empty($form.mode)}
     <tr id="msgMode" class="crm-scheduleReminder-form-block-mode">
       <td class="label">{$form.mode.label}</td>
       <td>{$form.mode.html}</td>
     </tr>
-    {if $multilingual}
+    {/if}
+    {if !empty($multilingual)}
     <tr class="crm-scheduleReminder-form-block-filter-contact-language">
       <td class="label">{$form.filter_contact_language.label}</td>
       <td>{$form.filter_contact_language.html} {help id="filter_contact_language"}</td>
@@ -124,7 +129,7 @@
        {include file="CRM/Contact/Form/Task/EmailCommon.tpl" upload=1 noAttach=1}
     </div>
     </fieldset>
-    {if $sms}
+    {if !empty($sms)}
       <fieldset id="sms" class="crm-collapsible"><legend class="collapsible-title">{ts}SMS Screen{/ts}</legend>
         <div>
         <table id="sms-field-table" class="form-layout-compressed">
