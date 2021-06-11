@@ -39,37 +39,50 @@
   {section name=rowLoop start=1 loop=16}
   {assign var=index value=$smarty.section.rowLoop.index}
   <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
-        <td>
-        {if $index GT 1}
-            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts}hide field or section{/ts}" aria-hidden="true"></i></a>
-        {/if}
-        </td>
+    <td>
+      {if $index GT 1}
+        <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts}hide field or section{/ts}" aria-hidden="true"></i></a>
+      {/if}
+    </td>
+    {if !empty($form.default_option)}
       <td>
-    <div id="radio{$index}" style="display:none">
+        <div id="radio{$index}" style="display:none">
          {$form.default_option[$index].html}
-    </div>
-    <div id="checkbox{$index}" style="display:none">
+        </div>
+        <div id="checkbox{$index}" style="display:none">
          {$form.default_checkbox_option.$index.html}
-    </div>
+        </div>
       </td>
-      {if $useForMember}
-          <td>{$form.membership_type_id.$index.html}</td>
-          <td>{$form.membership_num_terms.$index.html}</td>
-      {/if}
+    {/if}
+    {if !empty($useForMember)}
+       <td>{$form.membership_type_id.$index.html}</td>
+       <td>{$form.membership_num_terms.$index.html}</td>
+    {/if}
+    {if !empty($form.option_label)}
       <td> {$form.option_label.$index.html}</td>
-
+    {/if}
+    {if !empty($form.option_amount)}
       <td> {$form.option_amount.$index.html}</td>
+    {/if}
+    {if !empty($form.option_financial_type_id)}
       <td>{$form.option_financial_type_id.$index.html}</td>
-      {if $useForEvent}
-          <td>{$form.option_count.$index.html}</td>
-          <td>{$form.option_max_value.$index.html}</td>
-      {/if}
+    {/if}
+    {if !empty($useForEvent)}
+       <td>{$form.option_count.$index.html}</td>
+       <td>{$form.option_max_value.$index.html}</td>
+    {/if}
+    {if !empty($form.option_weight)}
       <td> {$form.option_weight.$index.html}</td>
+    {/if}
+    {if !empty($form.option_visibility_id)}
       <td> {$form.option_visibility_id.$index.html}</td>
+    {/if}
+    {if !empty($form.option_status)}
       <td> {$form.option_status.$index.html}</td>
+    {/if}
   </tr>
-    {/section}
-    </table>
+  {/section}
+  </table>
   <div id="optionFieldLink" class="add-remove-link">
         <a onclick="showHideRow(); return false;" name="optionFieldLink" href="#" class="form-link"><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {ts}add another choice{/ts}</a>
     </div>

@@ -18,16 +18,18 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
 
     <table class="form-layout">
-
-      <tr class="crm-contribution-form-block-account_relationship">
-      <td class="label">{$form.account_relationship.label}</td>
-  <td class="html-adjust">{$form.account_relationship.html}</td>
-      </tr>
-      <tr class="crm-contribution-form-block-financial_account_id">
-      <td class="label">{$form.financial_account_id.label}</td>
-  <td class="html-adjust">{$form.financial_account_id.html}</td>
-      </tr>
-
+      {if !empty($form.account_relationship)}
+        <tr class="crm-contribution-form-block-account_relationship">
+          <td class="label">{$form.account_relationship.label}</td>
+          <td class="html-adjust">{$form.account_relationship.html}</td>
+        </tr>
+      {/if}
+      {if !empty($form.financial_account_id)}
+        <tr class="crm-contribution-form-block-financial_account_id">
+          <td class="label">{$form.financial_account_id.label}</td>
+          <td class="html-adjust">{$form.financial_account_id.html}</td>
+        </tr>
+      {/if}
     </table>
    {/if}
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>

@@ -28,13 +28,15 @@
   {/foreach}
 {/if}
 
-{foreach from=$form.buttons item=button key=key name=btns}
-  {if $key|substring:0:4 EQ '_qf_'}
-    {if !empty($location)}
-      {$form.buttons.$key.html|crmReplace:id:"$key-$location"}
-    {else}
-      {$form.buttons.$key.html}
+{if !empty($form.buttons)}
+  {foreach from=$form.buttons item=button key=key name=btns}
+    {if $key|substring:0:4 EQ '_qf_'}
+      {if !empty($location)}
+        {$form.buttons.$key.html|crmReplace:id:"$key-$location"}
+      {else}
+        {$form.buttons.$key.html}
+      {/if}
     {/if}
-  {/if}
-{/foreach}
+  {/foreach}
+{/if}
 {/crmRegion}

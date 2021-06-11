@@ -58,14 +58,14 @@
         {/if}
     </table>
     {else}
-        <div class="status">{ts 1=$delName}Are you sure you want to delete <b>%1</b>?{/ts}<br />{ts}This tag will be removed from any currently tagged contacts, and users will no longer be able to assign contacts to this tag.{/ts}</div>
+        <div class="status">{if !empty($delName)}{ts 1=$delName}Are you sure you want to delete <b>%1</b>?{/ts}<br />{ts}This tag will be removed from any currently tagged contacts, and users will no longer be able to assign contacts to this tag.{/ts}{/if}</div>
     {/if}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {literal}
 <script type="text/javascript">
   CRM.$(function($) {
-    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    var $form = $('form.{/literal}{if !empty($form.formclass)}{$form.formClass}{/if}{literal}');
     function toggleUsedFor() {
       var value = $(this).val() && $(this).val() !== '0';
       $('.crm-tag-form-block-used_for', $form).toggle(!value);

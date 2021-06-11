@@ -13,29 +13,40 @@
     <div class="form-item">
       <table class="form-layout-compressed">
         <tr>
-          <td>
-            <label>{$form.text.label}</label>
-            {$form.text.html}
-          </td>
-          <td>
-            <label>{ts}in...{/ts}</label>
-            {$form.table.html}
-          </td>
-          <td>{$form.buttons.html} {help id="id-fullText"}</td>
+         {if !empty($form.text)}
+            <td>
+              <label>{$form.text.label}</label>
+              {$form.text.html}
+            </td>
+          {/if}
+          {if !empty($form.table)}
+            <td>
+              <label>{ts}in...{/ts}</label>
+              {$form.table.html}
+            </td>
+          {/if}
+          {if !empty($form.buttons)}
+            <td>{$form.buttons.html} {help id="id-fullText"}</td>
+          {/if}
         </tr>
       </table>
     </div>
   </div>
 </div>
 <div class="crm-block crm-content-block">
-{if !$table}{include file="CRM/common/pager.tpl" location="top"}{/if}
+{if empty($table)}{include file="CRM/common/pager.tpl" location="top"}{/if}
 {include file="CRM/common/jsortable.tpl"}
 {if $rowsEmpty}
   {include file="CRM/Contact/Form/Search/Custom/EmptyResults.tpl"}
 {/if}
 
-{assign var=table value=$form.table.value.0}
-{assign var=text  value=$form.text.value}
+{if !empty($form.table) || !empty($form.text)}
+  {assign var=table value=$form.table.value.0}
+  {assign var=text  value=$form.text.value}
+{else}
+  {assign var=table value=false}
+  {assign var=text value=false}
+{/if}
 {if !empty($summary.Contact) }
   <div class="section">
     {* Search request has returned 1 or more matching rows. Display results. *}

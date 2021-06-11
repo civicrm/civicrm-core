@@ -20,11 +20,12 @@
 
 {strip}
 <div class="crm-block crm-form-block crm-basic-criteria-form-block">
-    <div class="crm-accordion-wrapper crm-case_search-accordion {if $rows}collapsed{/if}">
-     <div class="crm-accordion-header crm-master-accordion-header">
-        {$editTitle}
-    </div><!-- /.crm-accordion-header -->
+  <div class="crm-accordion-wrapper crm-case_search-accordion {if $rows}collapsed{/if}">
+    <div class="crm-accordion-header crm-master-accordion-header">
+     {$editTitle}
+   </div><!-- /.crm-accordion-header -->
     <div class="crm-accordion-body">
+      {if !empty($form.sort_name)}
         <div class="crm-section sort_name-section">
           <div class="label">
             {$form.sort_name.label}
@@ -34,27 +35,27 @@
           </div>
           <div class="clear"></div>
         </div>
-
-        {if $form.contact_type}
-          <div class="crm-section contact_type-section">
-            <div class="label">
-              {$form.contact_type.label}
-            </div>
-              <div class="content">
-                {$form.contact_type.html}
-              </div>
-              <div class="clear"></div>
+      {/if}
+      {if !empty($form.contact_type)}
+        <div class="crm-section contact_type-section">
+          <div class="label">
+            {$form.contact_type.label}
           </div>
-        {/if}
+          <div class="content">
+            {$form.contact_type.html}
+          </div>
+          <div class="clear"></div>
+        </div>
+      {/if}
 
-        {if $form.group}
+      {if !empty($form.group)}
         <div class="crm-section group_selection-section">
           <div class="label">
             {if $context EQ 'smog'}
-                    {$form.group_contact_status.label}
-                {else}
-                    {ts}in{/ts} &nbsp;
-                {/if}
+              {$form.group_contact_status.label}
+            {else}
+              {ts}in{/ts} &nbsp;
+            {/if}
           </div>
           <div class="content">
             {if $context EQ 'smog'}
@@ -65,21 +66,21 @@
           </div>
           <div class="clear"></div>
         </div>
-        {/if}
+      {/if}
 
-        {if $form.tag}
-            <div class="crm-section tag-section">
-              <div class="label">
-                {$form.tag.label}
-              </div>
-              <div class="content">
-                {$form.tag.html|crmAddClass:medium}
-              </div>
-              <div class="clear"></div>
-            </div>
-        {/if}
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+      {if !empty($form.tag)}
+        <div class="crm-section tag-section">
+          <div class="label">
+            {$form.tag.label}
+          </div>
+          <div class="content">
+            {$form.tag.html|crmAddClass:medium}
+          </div>
+          <div class="clear"></div>
+        </div>
+      {/if}
+      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
     </div><!-- /.crm-accordion-body -->
-    </div><!-- /.crm-accordion-wrapper -->
+  </div><!-- /.crm-accordion-wrapper -->
 </div><!-- /.crm-form-block -->
 {/strip}
