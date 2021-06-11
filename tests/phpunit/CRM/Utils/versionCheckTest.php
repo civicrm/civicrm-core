@@ -183,8 +183,8 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('PPTypes', $stats);
       $this->assertArrayHasKey('entities', $stats);
       $this->assertArrayHasKey('extensions', $stats);
-      $this->assertType('array', $stats['entities']);
-      $this->assertType('array', $stats['extensions']);
+      $this->assertIsArray($stats['entities']);
+      $this->assertIsArray($stats['extensions']);
 
       // Assert $stats['domain_isoCode'] is correct.
       $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
@@ -192,7 +192,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       $entity_names = [];
       foreach ($stats['entities'] as $entity) {
         $entity_names[] = $entity['name'];
-        $this->assertType('int', $entity['size'], "Stats entity {$entity['name']} has integer size?");
+        $this->assertIsInt($entity['size'], "Stats entity {$entity['name']} has integer size?");
       }
 
       $expected_entity_names = [
