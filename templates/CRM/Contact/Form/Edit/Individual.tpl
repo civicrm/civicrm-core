@@ -26,7 +26,7 @@ CRM.$(function($) {
       {$form.prefix_id.html}
     </td>
     {/if}
-    {if $form.formal_title}
+    {if !empty($form.formal_title)}
     <td>
       {$form.formal_title.label}<br/>
       {$form.formal_title.html}
@@ -50,7 +50,7 @@ CRM.$(function($) {
       {$form.last_name.html}
     </td>
     {/if}
-    {if $form.suffix_id}
+    {if !empty($form.suffix_id)}
     <td>
       {$form.suffix_id.label}<br/>
       {$form.suffix_id.html}

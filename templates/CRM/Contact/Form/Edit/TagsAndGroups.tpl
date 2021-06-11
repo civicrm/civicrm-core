@@ -12,35 +12,37 @@
   <div class="crm-accordion-header">{$title}</div>
   <div class="crm-accordion-body" id="tagGroup">
 {/if}
-    <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
+    <table class="form-layout-compressed{if isset($context) && $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-        {if !$type || $type eq 'tag'}
+        {if empty($type) || $type eq 'tag'}
           <td>
             <div class="crm-section tag-section">
-              {if $title}{$form.tag.label}<br>{/if}
+              {if !empty($title)}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
-            {if $context NEQ 'profile'}
+            {if !isset($context) || $context NEQ 'profile'}
               {include file="CRM/common/Tagset.tpl"}
             {/if}
           </td>
         {/if}
-        {if !$type || $type eq 'group'}
+        {if empty($type) || $type eq 'group'}
           <td>
-            {if $groupElementType eq 'select'}
+            {if isset($groupElementType) && $groupElementType eq 'select'}
               <div class="crm-section group-section">
-              {if $title}{$form.group.label}<br>{/if}
+              {if !empty($title)}{$form.group.label}<br>{/if}
               {$form.group.html}
             </div>
             {else}
-              {foreach key=key item=item from=$tagGroup.group}
-                <div class="group-wrapper">
-                  {$form.group.$key.html}
-                  {if $item.description}
-                    <div class="description">{$item.description}</div>
-                  {/if}
-                </div>
-              {/foreach}
+              {if isset($form.group)} 
+                {foreach key=key item=item from=$tagGroup.group}
+                  <div class="group-wrapper">
+                    {$form.group.$key.html}
+                      {if $item.description}
+                      <div class="description">{$item.description}</div>
+                    {/if}
+                  </div>
+                {/foreach}
+              {/if}
             {/if}
           </td>
         {/if}

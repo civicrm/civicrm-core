@@ -26,7 +26,7 @@
 
 {if !empty($pageTitle)}
   <div class="crm-title">
-    <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+    <h1 class="title">{if !empty($isDeleted)}<del>{/if}{$pageTitle}{if !empty($isDeleted)}</del>{/if}</h1>
   </div>
 {/if}
 
