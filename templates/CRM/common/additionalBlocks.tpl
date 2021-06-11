@@ -19,7 +19,7 @@ CRM.$(function($) {
         {/foreach}
     {/if}
 
-    {if $loadShowHideAddressFields}
+    {if !empty($loadShowHideAddressFields)}
         {foreach from=$showHideAddressFields key="blockId" item="fieldName"}
            processAddressFields( '{$fieldName}', '{$blockId}', 0 );
         {/foreach}
