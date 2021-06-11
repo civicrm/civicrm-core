@@ -28,9 +28,9 @@
 
                 {foreach from=$contribute_rows item=row}
                     <tr id='rowid{$row.contribution_id}'
-                        class="{cycle values="odd-row,even-row"}{if $row.cancel_date} disabled{/if}">
-                        <td>{$row.total_amount|crmMoney:$row.currency} {if $row.amount_level && !is_array($row.amount_level)} - {$row.amount_level} {/if}
-                            {if $row.contribution_recur_id}
+                        class="{cycle values="odd-row,even-row"}{if !empty($row.cancel_date)} disabled{/if}">
+                        <td>{$row.total_amount|crmMoney:$row.currency} {if !empty($row.amount_level) && !is_array($row.amount_level)} - {$row.amount_level} {/if}
+                            {if !empty($row.contribution_recur_id)}
                                 <br/>
                                 {ts}(Recurring Contribution){/ts}
                             {/if}
@@ -50,7 +50,7 @@
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
                                     <i class="crm-i fa-print" aria-hidden="true"></i>
-                                    {if $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled' }
+                                    {if empty($row.contribution_status_name) || (!empty($row.contribution_status_name) && $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled') }
                                         <span>{ts}Print Invoice{/ts}</span>
                                     {else}
                                         <span>{ts}Print Invoice and Credit Note{/ts}</span>
@@ -59,16 +59,18 @@
                             {/if}
                           </td>
                         {/if}
+                        {if !empty($row.buttons)}
                         <td>
                         {foreach from=$row.buttons item=button}
                           <a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a>
                         {/foreach}
                         </td>
+                        {/if}
                     </tr>
                 {/foreach}
             </table>
         {/strip}
-        {if $contributionSummary.total.count gt 12}
+        {if !empty($contributionSummary.total) and $contributionSummary.total.count gt 12}
             {ts}Contact us for information about contributions prior to those listed above.{/ts}
         {/if}
     {else}
@@ -79,7 +81,7 @@
     {/if}
 
 
-    {if $honor}
+    {if !empty($honor)}
         {if $honorRows}
             {strip}
                 <div class="help">
@@ -112,7 +114,7 @@
         {/if}
     {/if}
 
-    {if $recur}
+    {if !empty($recur)}
         {if $recurRows}
             {strip}
                 <div><label>{ts}Recurring Contribution(s){/ts}</label></div>

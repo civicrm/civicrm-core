@@ -47,7 +47,7 @@ CRM.$(function($) {
   });
 
   function buildBatchSelector( filterSearch ) {
-    var status = {/literal}{$status}{literal};
+    var status = {/literal}{if !empty($status)}{$status}{else}0{/if}{literal};
     if (filterSearch) {
       crmBatchSelector.fnDestroy();
       var ZeroRecordText = '<div class="status messages">{/literal}{ts escape="js"}No matching Data Entry Batches found for your search criteria.{/ts}{literal}</li></ul></div>';

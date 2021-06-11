@@ -40,7 +40,7 @@
                        </td>
                        <td class="crm-participant-participant_status">{$row.participant_status}</td>
                        <td class="crm-participant-showConfirmUrl">
-                            {if $row.showConfirmUrl}
+                            {if !empty($row.showConfirmUrl)}
                                 <a href="{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$row.participant_id`"}">{ts}Confirm Registration{/ts}</a>
                             {/if}
                         </td>

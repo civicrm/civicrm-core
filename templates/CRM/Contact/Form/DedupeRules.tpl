@@ -31,7 +31,7 @@
      <tr class="crm-dedupe-rules-form-block-is_reserved">
         <td class="label">{$form.is_reserved.label}</td>
         <td>{$form.is_reserved.html}
-          {if !$isReserved}
+          {if empty($isReserved)}
             <br />
             <span class="description">{ts}WARNING: Once a rule is marked as reserved it can not be deleted and the fields and weights can not be modified.{/ts}</span>
           {/if}
@@ -42,7 +42,7 @@
         <td>
           <table class="form-layout-compressed">
             {* Hide fields and document match criteria for optimized reserved rules. *}
-            {if $ruleName EQ 'IndividualSupervised' OR $ruleName EQ 'IndividualUnsupervised' OR $ruleName EQ 'IndividualGeneral'}
+            {if !empty($ruleName) and ($ruleName EQ 'IndividualSupervised' OR $ruleName EQ 'IndividualUnsupervised' OR $ruleName EQ 'IndividualGeneral')}
             <tr>
                 <td>
                   <div class="status message">
@@ -67,7 +67,7 @@
                 </td>
             </tr>
             {else}
-              {if $isReserved}
+              {if !empty($isReserved)}
                   <tr>
                       <td>
                         <div class="status message">
