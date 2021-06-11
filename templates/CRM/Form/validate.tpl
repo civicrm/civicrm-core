@@ -9,7 +9,7 @@
 *}
 {* Initialize jQuery validate on a form *}
 {* Extra params and functions may be added to the CRM.validate object before this template is loaded *}
-{if !$crm_form_validate_included and $smarty.get.snippet neq 'json' and $form and $form.formClass}
+{if empty($crm_form_validate_included) and !empty($smarty.get.snippet) and $smarty.get.snippet neq 'json' and !empty($form) and !empty($form.formClass)}
   {assign var=crm_form_validate_included value=1}
   {literal}
   <script type="text/javascript">
