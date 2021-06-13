@@ -48,14 +48,24 @@ class TestCreationParameterProvider {
 
     $requiredParams = [];
     foreach ($requiredFields as $requiredField) {
-      $value = $this->getRequiredValue($requiredField);
-      if ($entity === 'UFField' && $requiredField->getName() === 'field_name') {
-        // This is a ruthless hack to avoid a unique constraint - but
-        // it's also a test class & hard to care enough to do something
-        // better
-        $value = 'activity_campaign_id';
-      }
-      $requiredParams[$requiredField->getName()] = $value;
+      $requiredParams[$requiredField->getName()] = $this->getRequiredValue($requiredField);
+    }
+
+    // This is a ruthless hack to avoid peculiar constraints - but
+    // it's also a test class & hard to care enough to do something
+    // better
+    $overrides = [];
+    $overrides['UFField'] = [
+      'field_name' => 'activity_campaign_id',
+    ];
+    $overrides['Translation'] = [
+      'entity_table' => 'civicrm_event',
+      'entity_field' => 'description',
+      'entity_id' => \CRM_Core_DAO::singleValueQuery('SELECT min(id) FROM civicrm_event'),
+    ];
+
+    if (isset($overrides[$entity])) {
+      $requiredParams = array_merge($requiredParams, $overrides[$entity]);
     }
 
     unset($requiredParams['id']);
