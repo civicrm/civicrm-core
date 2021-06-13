@@ -16,6 +16,10 @@ use Civi\Api4\CustomField;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\CoreUtil;
 
+/**
+ * Class SpecGatherer
+ * @package Civi\Api4\Service\Spec
+ */
 class SpecGatherer {
 
   /**

@@ -13,7 +13,6 @@
 namespace Civi\Api4\Service\Schema\Joinable;
 
 use Civi\Api4\Utils\CoreUtil;
-use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class Joinable {
 
@@ -275,17 +274,13 @@ class Joinable {
   }
 
   /**
-   * @return \Civi\Api4\Service\Spec\FieldSpec[]
+   * @return \Civi\Api4\Service\Spec\RequestSpec
    */
   public function getEntityFields() {
-    $entityFields = [];
-    $bao = AllCoreTables::getClassForTable($this->getTargetTable());
-    if ($bao) {
-      foreach ($bao::getSupportedFields() as $field) {
-        $entityFields[] = \Civi\Api4\Service\Spec\SpecFormatter::arrayToField($field, $this->getEntity());
-      }
-    }
-    return $entityFields;
+    /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
+    $gatherer = \Civi::container()->get('spec_gatherer');
+    $spec = $gatherer->getSpec($this->entity, 'get', FALSE);
+    return $spec;
   }
 
   /**
@@ -303,12 +298,7 @@ class Joinable {
    * @return \Civi\Api4\Service\Spec\FieldSpec|NULL
    */
   public function getField($fieldName) {
-    foreach ($this->getEntityFields() as $field) {
-      if ($field->getName() === $fieldName) {
-        return $field;
-      }
-    }
-    return NULL;
+    return $this->getEntityFields()->getFieldByName($fieldName);
   }
 
 }

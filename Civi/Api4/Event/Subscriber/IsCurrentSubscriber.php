@@ -16,8 +16,7 @@ use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Utils\ReflectionUtils;
 
 /**
- * Process $current api param for Get actions
- *
+ * @deprecated
  * @see \Civi\Api4\Generic\Traits\IsCurrentTrait
  */
 class IsCurrentSubscriber extends Generic\AbstractPrepareSubscriber {

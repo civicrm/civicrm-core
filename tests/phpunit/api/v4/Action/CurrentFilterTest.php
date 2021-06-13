@@ -62,15 +62,15 @@ class CurrentFilterTest extends UnitTestCase {
       'is_active' => 0,
     ])->execute()->first();
 
-    $getCurrent = (array) Relationship::get()->setCurrent(TRUE)->execute()->indexBy('id');
-    $notCurrent = (array) Relationship::get()->setCurrent(FALSE)->execute()->indexBy('id');
-    $getAll = (array) Relationship::get()->execute()->indexBy('id');
+    $getCurrent = Relationship::get()->addWhere('is_current', '=', TRUE)->execute()->indexBy('id');
+    $notCurrent = Relationship::get()->addWhere('is_current', '=', FALSE)->execute()->indexBy('id');
+    $getAll = Relationship::get()->addSelect('is_current')->execute()->indexBy('id');
 
-    $this->assertArrayHasKey($current['id'], $getAll);
-    $this->assertArrayHasKey($indefinite['id'], $getAll);
-    $this->assertArrayHasKey($expiring['id'], $getAll);
-    $this->assertArrayHasKey($past['id'], $getAll);
-    $this->assertArrayHasKey($inactive['id'], $getAll);
+    $this->assertTrue($getAll[$current['id']]['is_current']);
+    $this->assertTrue($getAll[$indefinite['id']]['is_current']);
+    $this->assertTrue($getAll[$expiring['id']]['is_current']);
+    $this->assertFalse($getAll[$past['id']]['is_current']);
+    $this->assertFalse($getAll[$inactive['id']]['is_current']);
 
     $this->assertArrayHasKey($current['id'], $getCurrent);
     $this->assertArrayHasKey($indefinite['id'], $getCurrent);

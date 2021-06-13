@@ -14,7 +14,7 @@ namespace Civi\Api4\Service\Spec;
 
 use Civi\Api4\Utils\CoreUtil;
 
-class RequestSpec {
+class RequestSpec implements \Iterator {
 
   /**
    * @var string
@@ -131,6 +131,26 @@ class RequestSpec {
    */
   public function getAction() {
     return $this->action;
+  }
+
+  public function rewind() {
+    return reset($this->fields);
+  }
+
+  public function current() {
+    return current($this->fields);
+  }
+
+  public function key() {
+    return key($this->fields);
+  }
+
+  public function next() {
+    return next($this->fields);
+  }
+
+  public function valid() {
+    return key($this->fields) !== NULL;
   }
 
 }

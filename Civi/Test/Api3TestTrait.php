@@ -315,7 +315,8 @@ trait Api3TestTrait {
     $onlyId = !empty($v3Params['format.only_id']);
     $onlySuccess = !empty($v3Params['format.is_success']);
     if (!empty($v3Params['filters']['is_current']) || !empty($v3Params['isCurrent'])) {
-      $v4Params['current'] = TRUE;
+      $v3Params['is_current'] = 1;
+      unset($v3Params['filters']['is_current'], $v3Params['isCurrent']);
     }
     $language = $v3Params['options']['language'] ?? $v3Params['option.language'] ?? NULL;
     if ($language) {

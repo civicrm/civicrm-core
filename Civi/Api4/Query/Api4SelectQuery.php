@@ -246,7 +246,7 @@ class Api4SelectQuery {
       foreach ($expr->getFields() as $fieldName) {
         $field = $this->getField($fieldName);
         // Remove expressions with unknown fields without raising an error
-        if (!$field || !in_array($field['type'], ['Field', 'Custom'], TRUE)) {
+        if (!$field || $field['type'] === 'Filter') {
           $select = array_diff($select, [$item]);
           $valid = FALSE;
         }
@@ -439,7 +439,7 @@ class Api4SelectQuery {
     if ($type === 'WHERE') {
       $field = $this->getField($expr, TRUE);
       FormattingUtil::formatInputValue($value, $expr, $field, $operator);
-      $fieldAlias = $field['sql_name'];
+      $fieldAlias = $this->getExpression($expr)->render($this->apiFieldSpec);
     }
     // For HAVING, expr must be an item in the SELECT clause
     elseif ($type === 'HAVING') {
@@ -562,6 +562,9 @@ class Api4SelectQuery {
         $isEmptyClause = $operator === 'IS NULL' ? "= $emptyVal OR" : "<> $emptyVal AND";
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }
+    }
+    if (is_bool($value)) {
+      $value = (int) $value;
     }
 
     return \CRM_Core_DAO::createSQLFilter($fieldAlias, [$operator => $value]);
@@ -816,7 +819,9 @@ class Api4SelectQuery {
     else {
       $joinEntityClass = CoreUtil::getApiClass($joinEntity);
       foreach ($joinEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
-        $bridgeFields[$field['column_name']] = '`' . $joinAlias . '`.`' . $field['column_name'] . '`';
+        if ($field['type'] === 'Field') {
+          $bridgeFields[$field['column_name']] = '`' . $joinAlias . '`.`' . $field['column_name'] . '`';
+        }
       }
       $select = implode(',', $bridgeFields);
       $joinConditions = array_merge($joinConditions, $bridgeConditions);
@@ -898,7 +903,7 @@ class Api4SelectQuery {
     $bridgeFkFields = [$joinRef->getReferenceKey(), $joinRef->getTypeColumn(), $baseRef->getReferenceKey(), $baseRef->getTypeColumn()];
     $bridgeEntityClass = CoreUtil::getApiClass($bridgeEntity);
     foreach ($bridgeEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
-      if ($name === 'id' || ($side === 'INNER' && in_array($name, $bridgeFkFields, TRUE))) {
+      if ($field['type'] !== 'Field' || $name === 'id' || ($side === 'INNER' && in_array($name, $bridgeFkFields, TRUE))) {
         continue;
       }
       // For INNER joins, these fields get a sql alias pointing to the bridge entity,

@@ -118,6 +118,11 @@ class DAOGetFieldsAction extends BasicGetFieldsAction {
       'data_type' => 'Array',
       '@internal' => TRUE,
     ];
+    $fields[] = [
+      'name' => 'sql_renderer',
+      'data_type' => 'Array',
+      '@internal' => TRUE,
+    ];
     return $fields;
   }
 
