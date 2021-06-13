@@ -49,6 +49,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
+    CRM_Utils_Token::$_tokens['contribution'] = NULL;
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match', 'civicrm_campaign'], TRUE);
     CRM_Utils_Hook::singleton()->reset();
