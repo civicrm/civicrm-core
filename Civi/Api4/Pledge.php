@@ -15,6 +15,8 @@ namespace Civi\Api4;
 /**
  * Pledge entity.
  *
+ * @see https://docs.civicrm.org/user/en/latest/pledges/what-is-civipledge/
+ * @searchable primary
  * @package Civi\Api4
  */
 class Pledge extends Generic\DAOEntity {
