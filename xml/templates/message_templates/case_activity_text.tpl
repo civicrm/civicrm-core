@@ -2,16 +2,16 @@
 {ts}Activity Summary{/ts} - {$activityTypeName}
 ===========================================================
 {if !empty($isCaseActivity)}
-{ts}Your Case Role(s){/ts} : {$contact.role}
-{if $manageCaseURL}
+{ts}Your Case Role(s){/ts} : {$contact.role|default:''}
+{if !empty($manageCaseURL)}
 {ts}Manage Case{/ts} : {$manageCaseURL}
 {/if}
 {/if}
 
-{if $editActURL}
+{if !empty($editActURL)}
 {ts}Edit activity{/ts} : {$editActURL}
 {/if}
-{if $viewActURL}
+{if !empty($viewActURL)}
 {ts}View activity{/ts} : {$viewActURL}
 {/if}
 
@@ -23,6 +23,7 @@
 {/if}
 {/foreach}
 
+{if !empty($activity.customGroups)}
 {foreach from=$activity.customGroups key=customGroupName item=customGroup}
 ==========================================================
 {$customGroupName}
@@ -36,3 +37,4 @@
 {/foreach}
 
 {/foreach}
+{/if}
