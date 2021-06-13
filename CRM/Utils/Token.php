@@ -1556,16 +1556,6 @@ class CRM_Utils_Token {
     return $value;
   }
 
-  protected static function _buildContributionTokens() {
-    $key = 'contribution';
-    if (self::$_tokens[$key] == NULL) {
-      self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        ['campaign', 'financial_type'],
-        self::getCustomFieldTokens('Contribution')
-      ));
-    }
-  }
-
   /**
    * Store membership tokens on the static _tokens array.
    */
@@ -1680,7 +1670,6 @@ class CRM_Utils_Token {
       //early return
       return $str;
     }
-    self::_buildContributionTokens();
 
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
@@ -1792,7 +1781,17 @@ class CRM_Utils_Token {
    * @throws \CRM_Core_Exception
    */
   public static function getContributionTokenReplacement($token, &$contribution, $html = FALSE, $escapeSmarty = FALSE) {
-    self::_buildContributionTokens();
+    if (self::$_tokens['contribution'] == NULL) {
+      self::$_tokens['contribution'] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
+        ['campaign', 'financial_type'],
+        self::getCustomFieldTokens('Contribution')
+      ));
+    }
+    $tokens = self::$_tokens;
+    foreach($tokens as $tokenField) {
+      // Ensure we are also supporting the actual name field.
+      $tokens[$tokenField['name']] = $tokenField;
+    }
 
     switch ($token) {
       case 'total_amount':
@@ -1813,7 +1812,7 @@ class CRM_Utils_Token {
         break;
 
       default:
-        if (!in_array($token, self::$_tokens['contribution'])) {
+        if (!in_array($token, $tokens)) {
           $value = "{contribution.$token}";
         }
         else {
