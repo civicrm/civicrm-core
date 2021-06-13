@@ -48,10 +48,10 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
   public function fillWithSql($cacheKey, $sql, $sqlParams = []) {
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams, FALSE);
 
-    list($allKey, $dataKey, , $maxScore) = $this->initCacheKey($cacheKey);
+    [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
 
     while ($dao->fetch()) {
-      list (, $entity_id, $data) = array_values($dao->toArray());
+      [, $entity_id, $data] = array_values($dao->toArray());
       $maxScore++;
       $this->redis->zAdd($allKey, $maxScore, $entity_id);
       $this->redis->hSet($dataKey, $entity_id, $data);
@@ -61,7 +61,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
   }
 
   public function fillWithArray($cacheKey, $rows) {
-    list($allKey, $dataKey, , $maxScore) = $this->initCacheKey($cacheKey);
+    [$allKey, $dataKey, , $maxScore] = $this->initCacheKey($cacheKey);
 
     foreach ($rows as $row) {
       $maxScore++;
@@ -88,16 +88,19 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       }
     }
     elseif ($action === 'unselect' && $ids === NULL) {
-      $this->redis->delete($selKey);
-      $this->redis->setTimeout($selKey, self::TTL);
+      $this->redis->del($selKey);
+      $this->redis->expire($selKey, self::TTL);
     }
     elseif ($action === 'unselect' && $ids !== NULL) {
       foreach ((array) $ids as $id) {
-        $this->redis->zDelete($selKey, $id);
+        $this->redis->zRem($selKey, $id);
       }
     }
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function getSelection($cacheKey, $action = 'get') {
     $allKey = $this->key($cacheKey, 'all');
     $selKey = $this->key($cacheKey, 'sel');
@@ -152,13 +155,16 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return $pos;
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function deleteItem($id = NULL, $cacheKey = NULL) {
     if ($id === NULL && $cacheKey !== NULL) {
       // Delete by cacheKey.
       $allKey = $this->key($cacheKey, 'all');
       $selKey = $this->key($cacheKey, 'sel');
       $dataKey = $this->key($cacheKey, 'data');
-      $this->redis->delete($allKey, $selKey, $dataKey);
+      $this->redis->del($allKey, $selKey, $dataKey);
     }
     elseif ($id === NULL && $cacheKey === NULL) {
       // Delete everything.
@@ -167,8 +173,8 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     }
     elseif ($id !== NULL && $cacheKey !== NULL) {
       // Delete a specific contact, within a specific cache.
-      $this->redis->zDelete($this->key($cacheKey, 'all'), $id);
-      $this->redis->zDelete($this->key($cacheKey, 'sel'), $id);
+      $this->redis->zRem($this->key($cacheKey, 'all'), $id);
+      $this->redis->zRem($this->key($cacheKey, 'sel'), $id);
       $this->redis->hDel($this->key($cacheKey, 'data'), $id);
     }
     elseif ($id !== NULL && $cacheKey === NULL) {
@@ -182,13 +188,13 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
       }
     }
     else {
-      throw new CRM_Core_Exception("Not implemented: Redis::deleteItem");
+      throw new CRM_Core_Exception('Not implemented: Redis::deleteItem');
     }
   }
 
   public function getCount($cacheKey) {
     $allKey = $this->key($cacheKey, 'all');
-    return $this->redis->zSize($allKey);
+    return $this->redis->zCard($allKey);
   }
 
   /**
@@ -222,9 +228,9 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     $selKey = $this->key($cacheKey, 'sel');
     $dataKey = $this->key($cacheKey, 'data');
 
-    $this->redis->setTimeout($allKey, self::TTL);
-    $this->redis->setTimeout($dataKey, self::TTL);
-    $this->redis->setTimeout($selKey, self::TTL);
+    $this->redis->expire($allKey, self::TTL);
+    $this->redis->expire($dataKey, self::TTL);
+    $this->redis->expire($selKey, self::TTL);
 
     $maxScore = 0;
     foreach ($this->redis->zRange($allKey, -1, -1, TRUE) as $lastElem => $lastScore) {
