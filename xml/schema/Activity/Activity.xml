@@ -3,6 +3,7 @@
   <base>CRM/Activity</base>
   <class>Activity</class>
   <name>civicrm_activity</name>
+  <description>Past or future actions concerning one or more contacts.</description>
   <comment>Other Activity details stored here include contact, location, details.</comment>
   <add>1.1</add>
   <log>true</log>

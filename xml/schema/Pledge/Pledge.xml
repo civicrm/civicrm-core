@@ -3,6 +3,7 @@
   <base>CRM/Pledge</base>
   <class>Pledge</class>
   <name>civicrm_pledge</name>
+  <description>Promises to contribute at a future time, either in full, or at regular intervals until a total goal is reached.</description>
   <add>2.1</add>
   <log>true</log>
   <icon>fa-paper-plane</icon>

@@ -4,6 +4,7 @@
   <class>Campaign</class>
   <name>civicrm_campaign</name>
   <comment>Campaign Details.</comment>
+  <description>Campaigns link activities, contributions, mailings, etc. that share a programmatic goal.</description>
   <add>3.3</add>
   <icon>fa-bullhorn</icon>
   <labelField>title</labelField>

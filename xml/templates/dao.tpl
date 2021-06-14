@@ -87,6 +87,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
         return $plural ? {$tsFunctionName}('{$table.titlePlural}') : {$tsFunctionName}('{$table.title}');
     {rdelim}
 
+{if !empty($table.description)}
+  /**
+  * Returns user-friendly description of this entity.
+  *
+  * @return string
+  */
+  public static function getEntityDescription() {ldelim}
+    return {$tsFunctionName}('{$table.description|replace:"'":"\'"}');
+  {rdelim}
+{/if}
 
 
 {if !empty($table.foreignKey) || !empty($table.dynamicForeignKey)}

@@ -5,6 +5,7 @@
   <class>Mailing</class>
   <name>civicrm_mailing</name>
   <comment>Stores information about a mailing.</comment>
+  <description>Mass emails sent from CiviMail.</description>
   <archive>true</archive>
   <icon>fa-envelope-o</icon>
   <component>CiviMail</component>

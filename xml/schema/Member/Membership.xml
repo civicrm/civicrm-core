@@ -4,6 +4,7 @@
   <base>CRM/Member</base>
   <class>Membership</class>
   <name>civicrm_membership</name>
+  <description>Records of contacts belonging to an organization's membership program.</description>
   <comment>Contact Membership records.</comment>
   <add>1.5</add>
   <log>true</log>
