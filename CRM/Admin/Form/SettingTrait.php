@@ -85,8 +85,12 @@ trait CRM_Admin_Form_SettingTrait {
     // Handle quickform hateability just once, right here right now.
     $unsetValues = array_diff_key($this->_settings, $params);
     foreach ($unsetValues as $key => $unsetValue) {
-      if ($this->getQuickFormType($this->getSettingMetadata($key)) === 'CheckBox') {
+      $quickFormType = $this->getQuickFormType($this->getSettingMetadata($key));
+      if ($quickFormType === 'CheckBox') {
         $setValues[$key] = [$key => 0];
+      }
+      elseif ($quickFormType === 'CheckBoxes') {
+        $setValues[$key] = [];
       }
     }
     return $setValues;
