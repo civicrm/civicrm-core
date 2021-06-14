@@ -34,6 +34,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
       $listenerMap = \Civi\Core\Event\EventScanner::findListeners($test);
       \Civi::dispatcher()->addListenerMap($test, $listenerMap);
     }
+    \Civi\Test::eventChecker()->addListeners();
   }
 
   /**

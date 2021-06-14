@@ -65,9 +65,24 @@ else {
       else {
         $this->tx = NULL;
       }
+
+      if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+        \Civi\Test::eventChecker()->start($test);
+      }
     }
 
     public function endTest(\PHPUnit\Framework\Test $test, $time) {
+      $exception = NULL;
+
+      if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+        try {
+          \Civi\Test::eventChecker()->stop($test);
+        }
+        catch (\Exception $e) {
+          $exception = $e;
+        }
+      }
+
       if ($test instanceof TransactionalInterface) {
         $this->tx->rollback()->commit();
         $this->tx = NULL;
@@ -80,6 +95,10 @@ else {
         unset($GLOBALS['CIVICRM_TEST_CASE']);
         error_reporting(E_ALL & ~E_NOTICE);
         $this->errorScope = NULL;
+      }
+
+      if ($exception) {
+        throw $exception;
       }
     }
 
