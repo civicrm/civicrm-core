@@ -165,12 +165,12 @@ class CRM_Core_Form_Date {
     &$form,
     $fieldName,
     $selector,
-    $from = '_from',
-    $to = '_to',
-    $fromLabel = 'From:',
-    $required = FALSE,
-    $dateFormat = 'searchDate',
-    $displayTime = FALSE,
+    $from,
+    $to,
+    $fromLabel,
+    $required,
+    $dateFormat,
+    $displayTime,
     $attributes
   ) {
     CRM_Core_Error::deprecatedFunctionWarning('function will be removed');

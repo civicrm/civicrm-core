@@ -32,7 +32,7 @@
 {/if}
 
 {* Add all the form elements sent in by the hook  - formerly used by civiDiscount, now deprecated*}
-{if $beginHookFormElements}
+{if !empty($beginHookFormElements)}
   <table class="form-layout-compressed">
   {foreach from=$beginHookFormElements key=dontCare item=hookFormElement}
       <tr><td class="label nowrap">{$form.$hookFormElement.label}</td><td>{$form.$hookFormElement.html}</td></tr>
