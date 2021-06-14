@@ -316,6 +316,7 @@ WHERE      t.table_name = 'Activity' AND
     $form->assign('limit', self::LIMIT);
 
     // set form defaults
+    $form->assign('table', '');
     if (!empty($form->_formValues)) {
       $defaults = [];
 

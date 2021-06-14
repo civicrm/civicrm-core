@@ -26,7 +26,8 @@
   </div>
 {/if}
 
-{if $action NEQ 8 and $priceField}
+{* priceField is set when e.g. in browse mode *}
+{if $action NEQ 8 and !empty($priceField)}
 <div class="crm-content-block crm-block">
   <div class="action-link">
     {if !$isReserved}
