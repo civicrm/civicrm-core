@@ -134,6 +134,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
         'options' => [
           'info' => ts('Info Page'),
           'transact' => ts('Contribution Page'),
+          'setup' => ts('Setup a Personal Campaign Page'),
         ],
       ],
       [
