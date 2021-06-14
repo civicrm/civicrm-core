@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  *
  * @package CRM
@@ -588,6 +590,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   protected static function processPCP($pcp, $contribution) {
     $pcpId = self::getSoftCreditIds($contribution->id, TRUE);
@@ -607,14 +610,79 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $softParams['pcp_personal_note'] = $pcp['pcp_personal_note'] ?? NULL;
       $softParams['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'pcp');
       $contributionSoft = self::add($softParams);
-      //Send notification to owner for PCP
-      if ($contributionSoft->pcp_id && empty($pcpId)) {
-        CRM_Contribute_Form_Contribution_Confirm::pcpNotifyOwner($contribution, (array) $contributionSoft);
+      //Send notification to owner for PCP if the contribution is already completed.
+      if ($contributionSoft->pcp_id && empty($pcpId)
+        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id)
+      ) {
+        self::pcpNotifyOwner($contribution->id, (array) $contributionSoft);
       }
     }
     //Delete PCP against this contribution and create new on submitted PCP information
     elseif ($pcpId) {
       civicrm_api3('ContributionSoft', 'delete', ['id' => $pcpId]);
+    }
+  }
+
+  /**
+   * Function used to send notification mail to pcp owner.
+   *
+   * @param int $contributionID
+   * @param array $contributionSoft
+   *   Contribution object.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function pcpNotifyOwner(int $contributionID, array $contributionSoft): void {
+    $params = ['id' => $contributionSoft['pcp_id']];
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->addSelect('receive_date', 'contact_id')->execute()->first();
+    CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
+    $ownerNotifyID = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
+    $ownerNotifyOption = CRM_Core_PseudoConstant::getName('CRM_PCP_DAO_PCPBlock', 'owner_notify_id', $ownerNotifyID);
+
+    if ($ownerNotifyOption !== 'no_notifications' &&
+      (($ownerNotifyOption === 'owner_chooses' &&
+          CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $contributionSoft['pcp_id'], 'is_notify')) ||
+        $ownerNotifyOption === 'all_owners')) {
+      $pcpInfoURL = CRM_Utils_System::url('civicrm/pcp/info',
+        "reset=1&id={$contributionSoft['pcp_id']}",
+        TRUE, NULL, FALSE, TRUE
+      );
+      // set email in the template here
+
+      if (CRM_Core_BAO_LocationType::getBilling()) {
+        [$donorName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id'],
+          FALSE, CRM_Core_BAO_LocationType::getBilling());
+      }
+      // get primary location email if no email exist( for billing location).
+      if (!$email) {
+        [$donorName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contribution['contact_id']);
+      }
+      [$ownerName, $ownerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contributionSoft['contact_id']);
+      $tplParams = [
+        'page_title' => $pcpInfo['title'],
+        'receive_date' => $contribution['receive_date'],
+        'total_amount' => $contributionSoft['amount'],
+        'donors_display_name' => $donorName,
+        'donors_email' => $email,
+        'pcpInfoURL' => $pcpInfoURL,
+        'is_honor_roll_enabled' => $contributionSoft['pcp_display_in_roll'],
+        'currency' => $contributionSoft['currency'],
+      ];
+      $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      $sendTemplateParams = [
+        'groupName' => 'msg_tpl_workflow_contribution',
+        'valueName' => 'pcp_owner_notify',
+        'contactId' => $contributionSoft['contact_id'],
+        'toEmail' => $ownerEmail,
+        'toName' => $ownerName,
+        'from' => "$domainValues[0] <$domainValues[1]>",
+        'tplParams' => $tplParams,
+        'PDFFilename' => 'receipt.pdf',
+      ];
+      CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
   }
 

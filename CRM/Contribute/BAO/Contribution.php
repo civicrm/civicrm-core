@@ -14,6 +14,7 @@ use Civi\Api4\ActivityContact;
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\ContributionSoft;
 use Civi\Api4\PaymentProcessor;
 use Civi\Api4\PledgePayment;
 
@@ -4206,6 +4207,14 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $transaction->commit();
     \Civi::log()->info("Contribution {$contributionParams['id']} updated successfully");
 
+    $contributionSoft = ContributionSoft::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addWhere('pcp_id', '>', 0)
+      ->addSelect('*')
+      ->execute()->first();
+    if (!empty($contributionSoft)) {
+      CRM_Contribute_BAO_ContributionSoft::pcpNotifyOwner($contributionID, $contributionSoft);
+    }
     // @todo - check if Contribution::create does this, test, remove.
     CRM_Contribute_BAO_ContributionRecur::updateRecurLinkedPledge($contributionID, $recurringContributionID,
       $contributionParams['contribution_status_id'], $input['amount']);
