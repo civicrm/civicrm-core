@@ -1559,10 +1559,16 @@ class CRM_Utils_Token {
   protected static function _buildContributionTokens() {
     $key = 'contribution';
     if (self::$_tokens[$key] == NULL) {
-      self::$_tokens[$key] = array_keys(array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
-        ['campaign', 'financial_type'],
+      $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
+        ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
         self::getCustomFieldTokens('Contribution')
-      ));
+      );
+      foreach ($tokens as $token) {
+        if (!empty($token['name'])) {
+          $tokens[$token['name']] = [];
+        }
+      }
+      self::$_tokens[$key] = array_keys($tokens);
     }
   }
 
@@ -1680,7 +1686,6 @@ class CRM_Utils_Token {
       //early return
       return $str;
     }
-    self::_buildContributionTokens();
 
     // here we intersect with the list of pre-configured valid tokens
     // so that we remove anything we do not recognize
