@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if ! $suppressForm}
+{if empty($suppressForm)}
 <form {$form.attributes} >
   {crmRegion name='form-top'}{/crmRegion}
 {/if}
@@ -18,7 +18,7 @@
     {include file=$tplFile}
   {/crmRegion}
 
-{if ! $suppressForm}
+{if empty($suppressForm)}
   {crmRegion name='form-bottom'}{/crmRegion}
 </form>
 {/if}
