@@ -66,6 +66,7 @@ class SpecFormatter {
       }
       $field->setReadonly(!empty($data['readonly']));
     }
+    $field->setPseudo(($data['pseudo'] ?? FALSE));
     $field->setSerialize($data['serialize'] ?? NULL);
     $field->setDefaultValue($data['default'] ?? NULL);
     $field->setDescription($data['description'] ?? NULL);

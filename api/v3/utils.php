@@ -341,6 +341,9 @@ function _civicrm_api3_get_DAO($name) {
   if ($name === 'Exception') {
     return 'CRM_Dedupe_DAO_DedupeException';
   }
+  if ($name == 'Attachment') {
+    return 'CRM_Core_BAO_Attachment';
+  }
   // FIXME: DAO names should follow CamelCase convention
   if ($name === 'Im' || $name === 'Acl' || $name === 'Pcp') {
     $name = strtoupper($name);

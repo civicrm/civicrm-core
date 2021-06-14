@@ -35,6 +35,9 @@ class CoreUtil {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
       return 'CRM_Core_BAO_CustomValue';
     }
+    if ($entityName === 'Attachment') {
+      return 'CRM_Core_BAO_Attachment';
+    }
     $dao = self::getApiClass($entityName)::getInfo()['dao'] ?? NULL;
     if (!$dao) {
       return NULL;
@@ -70,6 +73,16 @@ class CoreUtil {
     if (strpos($entityName, 'Custom_') === 0) {
       $customGroup = substr($entityName, 7);
       return \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup, 'table_name', 'name');
+    }
+    if ($entityName == 'Attachment') {
+      $sql = \CRM_Utils_SQL_Select::from('civicrm_file cf')
+        ->join('cef', 'INNER JOIN civicrm_entity_file cef ON cf.id = cef.file_id')
+        ->select([
+          'cf.*',
+          'cef.entity_table',
+          'cef.entity_id',
+        ])->toSQL();
+      return "({$sql})";
     }
     return AllCoreTables::getTableForEntityName($entityName);
   }
