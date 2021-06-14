@@ -397,6 +397,8 @@ class CRM_Activity_Page_AJAX {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+    // $params will be modified later on, need to save original filters
+    $filterParams = $params;
 
     // To be consistent, the cid parameter should be renamed to contact_id in
     // the template file, see templates/CRM/Activity/Selector/Selector.tpl
@@ -416,6 +418,7 @@ class CRM_Activity_Page_AJAX {
 
     // store the activity filter preference CRM-11761
     if (Civi::settings()->get('preserve_activity_tab_filter') && ($userID = CRM_Core_Session::getLoggedInContactID())) {
+      $activityFilter = [];
       unset($optionalParameters['context']);
       foreach ($optionalParameters as $searchField => $dataType) {
         $formSearchField = $searchField;
@@ -425,8 +428,8 @@ class CRM_Activity_Page_AJAX {
         elseif ($searchField === 'activity_type_exclude_id') {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
-        if (!empty($params[$searchField])) {
-          $activityFilter[$formSearchField] = $params[$searchField];
+        if (!empty($filterParams[$searchField])) {
+          $activityFilter[$formSearchField] = $filterParams[$searchField];
           if (in_array($searchField, ['activity_date_time_low', 'activity_date_time_high'])) {
             $activityFilter['activity_date_time_relative'] = 0;
           }
