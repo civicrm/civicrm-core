@@ -36,6 +36,9 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
+      this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
+
       this.preview = this.stale = false;
 
       this.colTypes = {

@@ -30,6 +30,7 @@
                 'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
                 'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
                 'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
+                'GROUP_CONCAT(display.acl_bypass ORDER BY display.id) AS display_acl_bypass',
                 'GROUP_CONCAT(DISTINCT group.title) AS groups'
               ],
               join: [['SearchDisplay AS display'], ['Group AS group']],
