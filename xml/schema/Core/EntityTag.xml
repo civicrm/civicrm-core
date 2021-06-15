@@ -57,6 +57,7 @@
       <table>civicrm_tag</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <condition>is_tagset != 1</condition>
     </pseudoconstant>
     <html>
       <type>Select</type>

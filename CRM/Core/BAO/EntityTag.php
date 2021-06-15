@@ -456,16 +456,17 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
     $params = [];
 
     if ($fieldName == 'tag' || $fieldName == 'tag_id') {
+      $table = 'civicrm_contact';
       if (!empty($props['entity_table'])) {
-        $entity = CRM_Utils_Type::escape($props['entity_table'], 'String');
-        $params[] = "used_for LIKE '%$entity%'";
+        $table = CRM_Utils_Type::escape($props['entity_table'], 'String');
+        $params['condition'][] = "used_for LIKE '%$table%'";
       }
 
       // Output tag list as nested hierarchy
       // TODO: This will only work when api.entity is "entity_tag". What about others?
       if ($context == 'search' || $context == 'create') {
         $dummyArray = [];
-        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), $dummyArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+        return CRM_Core_BAO_Tag::getTags($table, $dummyArray, NULL, '- ');
       }
     }
 

@@ -207,13 +207,13 @@ class FkJoinTest extends UnitTestCase {
 
     $grouped = Contact::get()->setCheckPermissions(FALSE)
       ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag3]])
-      ->addSelect('first_name', 'COUNT(tag.name) AS tags')
+      ->addSelect('first_name', 'COUNT(tag.name) AS tag_count')
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->addGroupBy('id')
       ->execute()->indexBy('id');
-    $this->assertEquals(1, (int) $grouped[$cid1]['tags']);
-    $this->assertEquals(2, (int) $grouped[$cid2]['tags']);
-    $this->assertEquals(0, (int) $grouped[$cid3]['tags']);
+    $this->assertEquals(1, (int) $grouped[$cid1]['tag_count']);
+    $this->assertEquals(2, (int) $grouped[$cid2]['tag_count']);
+    $this->assertEquals(0, (int) $grouped[$cid3]['tag_count']);
 
     $reverse = Tag::get()->setCheckPermissions(FALSE)
       ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
