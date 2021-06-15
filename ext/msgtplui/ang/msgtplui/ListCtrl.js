@@ -9,6 +9,12 @@
     $scope.checkPerm = CRM.checkPerm;
     $scope.help = CRM.help;
 
+    $scope.$bindToRoute({
+      param: 'f',
+      expr: 'filters',
+      default: {text: ''}
+    });
+
     var ctrl = this;
     ctrl.records = records;
 

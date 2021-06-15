@@ -18,6 +18,7 @@ return [
     'bootstrap3',
   ],
   'requires' => [
+    'crmRouteBinder',
     'crmUi',
     'crmUtil',
     'ngRoute',

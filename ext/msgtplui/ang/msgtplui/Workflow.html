@@ -5,7 +5,7 @@
 
   <div class="form-inline">
     <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
-    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="$ctrl.filterText">
+    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
   </div>
 
   <table>
@@ -19,7 +19,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:$ctrl.filterText">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text">
       <td>{{record.msg_title}}</td>
       <td>{{record['tx.language:label']}}</td>
       <td>

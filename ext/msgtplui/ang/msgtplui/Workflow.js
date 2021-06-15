@@ -3,6 +3,7 @@
   // Display a list of system-workflow message-templates.
   angular.module('msgtplui').config(function($routeProvider) {
       $routeProvider.when('/workflow', {
+        reloadOnSearch: false,
         controller: 'MsgtpluiListCtrl',
         controllerAs: '$ctrl',
         templateUrl: '~/msgtplui/Workflow.html',

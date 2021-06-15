@@ -5,7 +5,7 @@
 
   <div class="form-inline">
     <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
-    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="$ctrl.filterText">
+    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
 
     <a class="btn btn-primary pull-right" ng-href="{{crmUrl('civicrm/admin/messageTemplates/add', 'action=add&reset=1')}}">
       <i class="crm-i fa-plus"></i>
@@ -23,7 +23,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:$ctrl.filterText">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text">
       <td>{{record.msg_title}}</td>
       <td>{{record.msg_subject}}</td>
       <td>{{record.is_active ? ts('Yes') : ts('No')}}</td>
