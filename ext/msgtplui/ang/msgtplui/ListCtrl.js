@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, records, $location) {
+  angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location) {
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/User'}); // See: templates/CRM/msgtplui/User.hlp
     $scope.crmUrl = CRM.url;
@@ -16,7 +16,7 @@
     });
 
     var ctrl = this;
-    ctrl.records = records;
+    ctrl.records = [].concat(prefetch.records, prefetch.translations || []);
 
     /**
      *

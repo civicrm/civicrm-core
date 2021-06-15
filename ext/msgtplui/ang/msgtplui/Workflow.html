@@ -19,22 +19,22 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:'msg_title'">
       <td>{{record.msg_title}}</td>
-      <td>{{record['tx.language:label']}}</td>
+      <td>{{record['tx.language:label'] || ts('Standard')}}</td>
       <td>
-        <span ng-if="!record['tx.language'] || !!record.statuses.active">
+        <span ng-if="!record['tx.language'] || !!record['tx.statuses'].active">
           <a class="text-success" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
         </span>
-        <span ng-if="!(!record['tx.language'] || !!record.statuses.active)">
+        <span ng-if="!(!record['tx.language'] || !!record['tx.statuses'].active)">
           <span class="text-danger" crm-icon="fa-file">{{ts('Current')}}</span>
         </span>
       </td>
       <td>
-        <span ng-if="!!record.statuses.draft">
+        <span ng-if="!!record['tx.statuses'].draft">
           <a class="text-warning" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
         </span>
-        <span ng-if="!record.statuses.draft">
+        <span ng-if="!record['tx.statuses'].draft">
           <span class="text-muted" crm-icon="fa-file">{{ts('Draft')}}</span>
         </span>
       </td>
