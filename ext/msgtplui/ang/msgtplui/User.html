@@ -1,0 +1,21 @@
+<div id="bootstrap-theme">
+  <div crm-ui-debug="$ctrl.records"></div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Title')}}</th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="msgtpl in $ctrl.records">
+      <td>{{msgtpl.msg_title}}</td>
+      <td>
+        (...Actions...)
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
