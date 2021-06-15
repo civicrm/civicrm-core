@@ -170,3 +170,9 @@ function msgtplui_civicrm_themes(&$themes) {
 //  ));
 //  _msgtplui_civix_navigationMenu($menu);
 //}
+
+function msgtplui_civicrm_translateFields(&$fields) {
+  $fields['civicrm_msg_template']['msg_subject'] = TRUE;
+  $fields['civicrm_msg_template']['msg_text'] = TRUE;
+  $fields['civicrm_msg_template']['msg_html'] = TRUE;
+}
