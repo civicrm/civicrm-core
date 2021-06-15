@@ -11,24 +11,31 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    * on the screen, but which are hidden when using popup forms.
    * So no assertions required.
    *
-   * @param string $classname
-   * @param callable $additionalSetup
-   *   Function that performs some additional setup steps specific to the form
+   * @param string $url
    *
-   * @dataProvider formClassList
+   * @dataProvider formList
    */
-  public function testOpeningForms(string $classname, callable $additionalSetup) {
-    $form = $this->getFormObject($classname);
+  public function testOpeningForms(string $url) {
+    $this->createLoggedInUser();
 
-    // call the callable parameter we were passed in
-    $additionalSetup($form);
+    $_SERVER['REQUEST_URI'] = $url;
+    $urlParts = explode('?', $url);
+    $_GET['q'] = $urlParts[0];
 
-    // typical quickform/smarty flow
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->setDefaultValues();
-    $form->assign('action', $form->_action ?? CRM_Core_Action::UPDATE);
-    $form->getTemplate()->fetch($form->getTemplateFileName());
+    $parsed = [];
+    parse_str($urlParts[1], $parsed);
+    foreach ($parsed as $param => $value) {
+      $_REQUEST[$param] = $value;
+    }
+
+    $item = CRM_Core_Invoke::getItem([$_GET['q']]);
+    ob_start();
+    CRM_Core_Invoke::runItem($item);
+    ob_end_clean();
+
+    foreach ($parsed as $param => $dontcare) {
+      unset($_REQUEST[$param]);
+    }
   }
 
   /**
@@ -36,51 +43,55 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
    * TODO: Add more forms!
    *
    * @return array
-   *   See first one below for description.
    */
-  public function formClassList() {
+  public function formList(): array {
     return [
       // Array key is descriptive term to make it clearer which form it is when it fails.
       'Add New Tag' => [
-        // classname
-        'CRM_Tag_Form_Edit',
-        // Function that performs some class-specific additional setup steps.
-        // If there's a lot of complex steps then that suggests it should have
-        // its own test elsewhere and doesn't fit well here.
-        function(CRM_Core_Form $form) {},
+        'civicrm/tag/edit?action=add&parent_id=',
       ],
       'Assign Account to Financial Type' => [
-        'CRM_Financial_Form_FinancialTypeAccount',
-        function(CRM_Core_Form $form) {
-          $form->set('id', 1);
-          $form->set('aid', 1);
-          $form->_action = CRM_Core_Action::ADD;
-        },
+        'civicrm/admin/financial/financialType/accounts?action=add&reset=1&aid=1',
       ],
-      // This one is a bit flawed but the only point of this test is to catch
-      // simple stuff. This will catch e.g. "undefined index" and similar.
       'Find Contacts' => [
-        'CRM_Contact_Form_Search_Basic',
-        function(CRM_Core_Form $form) {
-          $form->_action = CRM_Core_Action::BASIC;
-        },
+        'civicrm/contact/search?reset=1',
       ],
-      'New Price Field' => [
-        'CRM_Price_Form_Field',
-        function(CRM_Core_Form $form) {
-          $form->set('sid', 1);
-          $form->_action = CRM_Core_Action::ADD;
-        },
-      ],
-      // Also a bit flawed, but catches simple stuff.
       'Fulltext search' => [
-        'CRM_Contact_Form_Search_Custom',
-        function(CRM_Core_Form $form) {
-          $form->_action = CRM_Core_Action::BASIC;
-          $form->set('csid', 15);
-        },
+        'civicrm/contact/search/custom?csid=15&reset=1',
       ],
     ];
+  }
+
+  public function testNewPriceField() {
+    $this->createLoggedInUser();
+
+    $priceSetId = $this->callAPISuccess('PriceSet', 'create', [
+      'is_active' => 1,
+      // extends contribution
+      'extends' => 2,
+      'is_quick_config' => 0,
+      // donation
+      'financial_type_id' => 1,
+      'name' => 'priciest',
+      'title' => 'Priciest Price Set',
+    ])['id'];
+
+    $_SERVER['REQUEST_URI'] = "civicrm/admin/price/field?reset=1&action=add&sid={$priceSetId}";
+    $_GET['q'] = 'civicrm/admin/price/field';
+    $_REQUEST['reset'] = 1;
+    $_REQUEST['action'] = 'add';
+    $_REQUEST['sid'] = $priceSetId;
+
+    $item = CRM_Core_Invoke::getItem([$_GET['q']]);
+    ob_start();
+    CRM_Core_Invoke::runItem($item);
+    ob_end_clean();
+
+    unset($_REQUEST['reset']);
+    unset($_REQUEST['action']);
+    unset($_REQUEST['sid']);
+
+    $this->callAPISuccess('PriceSet', 'delete', ['id' => $priceSetId]);
   }
 
 }
