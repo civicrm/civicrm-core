@@ -305,7 +305,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // get all students and parents
     $result = $this->callAPISuccess('Contact', 'get', ['return' => 'id', 'contact_sub_type' => ['IN' => ['Parent', 'Student']]])['values'];
-    $this->assertEquals([$student['id'], $parent['id']], array_keys($result));
+    // check that we retrieved the student and the parent.
+    // On MySQL 8 this can have different order in the array as there is no specific order set.
+    $this->assertArrayHasKey($student['id'], $result);
+    $this->assertArrayHasKey($parent['id'], $result);
+    $this->assertCount(2, $result);
   }
 
   /**
