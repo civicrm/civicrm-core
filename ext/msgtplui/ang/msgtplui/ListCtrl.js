@@ -32,7 +32,13 @@
     });
 
     var ctrl = this;
-    ctrl.records = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
+    ctrl.records = _.map(
+      [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys)),
+      function(r) {
+        r._is_translation = (r.tx_language !== undefined);
+        return r;
+      }
+    );
 
     /**
      *

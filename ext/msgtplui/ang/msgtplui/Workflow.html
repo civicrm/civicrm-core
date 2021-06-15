@@ -19,7 +19,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','tx_language_label']">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
       <td>{{record.msg_title}}</td>
       <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
