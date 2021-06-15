@@ -61,7 +61,7 @@ class LineItemTest extends BaseTestClass {
     $this->assertCount(2, $lineItems);
     $this->callAPISuccessGetCount('LineItem', ['check_permissions' => TRUE], 1);
 
-    $this->callAPISuccess('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[0]['id']]);
+    $this->callAPISuccess('LineItem', 'Delete', ['check_permissions' => ($version == 3), 'id' => $lineItems[0]['id']]);
     $this->callAPIFailure('LineItem', 'Delete', ['check_permissions' => TRUE, 'id' => $lineItems[1]['id']]);
     $lineParams = [
       'entity_id' => $order['id'],
@@ -71,14 +71,15 @@ class LineItemTest extends BaseTestClass {
       'price_field_id' => $defaultPriceFieldID,
       'qty' => 1,
       'financial_type_id' => 'Donation',
-      'check_permissions' => TRUE,
+      'check_permissions' => ($version == 3),
     ];
     $line = $this->callAPISuccess('LineItem', 'Create', $lineParams);
     $lineParams['financial_type_id'] = 'Event Fee';
+    $lineParams['check_permissions'] = TRUE;
     $this->callAPIFailure('LineItem', 'Create', $lineParams);
 
     $this->callAPIFailure('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Event Fee']);
-    $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Donation']);
+    $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => ($version == 3), 'financial_type_id' => 'Donation']);
   }
 
   /**
