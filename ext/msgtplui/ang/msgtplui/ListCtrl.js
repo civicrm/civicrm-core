@@ -1,5 +1,21 @@
 (function(angular, $, _) {
 
+  /**
+   * Convert keys with literal dots to Javascript subtrees.
+   *
+   * @param rec
+   *   Ex: {'foo.bar.whiz:bang': 123}
+   * @returns {{}}
+   *   Ex: {foo_bar_whiz_bang: 123}
+   */
+  function simpleKeys(rec) {
+    var newRec = {};
+    angular.forEach(rec, function(value, key) {
+      newRec[key.replaceAll('.','_').replaceAll(':', '_')] = value;
+    });
+    return newRec;
+  }
+
   angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location) {
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/User'}); // See: templates/CRM/msgtplui/User.hlp
@@ -16,7 +32,7 @@
     });
 
     var ctrl = this;
-    ctrl.records = [].concat(prefetch.records, prefetch.translations || []);
+    ctrl.records = [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys));
 
     /**
      *
@@ -29,8 +45,8 @@
         return CRM.url('civicrm/admin/messageTemplates/add', {action: 'update', id: record.id, reset: 1});
       }
       var url = '#/edit?id=' + encodeURIComponent(record.id);
-      if (record['tx.language']) {
-        url = url + '&lang=' + encodeURIComponent(record['tx.language']);
+      if (record.tx_language) {
+        url = url + '&lang=' + encodeURIComponent(record.tx_language);
       }
       if (variant === 'draft') {
         url = url + '&status=draft';

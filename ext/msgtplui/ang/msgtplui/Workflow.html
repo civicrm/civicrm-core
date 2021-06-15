@@ -19,27 +19,27 @@
     </tr>
     </thead>
     <tbody>
-    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:'msg_title'">
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','tx_language_label']">
       <td>{{record.msg_title}}</td>
-      <td>{{record['tx.language:label'] || ts('Standard')}}</td>
+      <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
-        <span ng-if="!record['tx.language'] || !!record['tx.statuses'].active">
+        <span ng-if="!record.tx_language || !!record.tx_statuses.active">
           <a class="text-success" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
         </span>
-        <span ng-if="!(!record['tx.language'] || !!record['tx.statuses'].active)">
+        <span ng-if="!(!record.tx_language || !!record.tx_statuses.active)">
           <span class="text-danger" crm-icon="fa-file">{{ts('Current')}}</span>
         </span>
       </td>
       <td>
-        <span ng-if="!!record['tx.statuses'].draft">
+        <span ng-if="!!record.tx_statuses.draft">
           <a class="text-warning" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
         </span>
-        <span ng-if="!record['tx.statuses'].draft">
+        <span ng-if="!record.tx_statuses.draft">
           <span class="text-muted" crm-icon="fa-file">{{ts('Draft')}}</span>
         </span>
       </td>
       <td>
-        <span ng-if="!record['tx.language']">
+        <span ng-if="!record.tx_language">
           <a class="" crm-icon="fa-plus" ng-click="crmUiAlert({title: 'Not implemented', text: '', type: 'error'})">{{ts('Translate')}}</a>
         </span>
       </td>
