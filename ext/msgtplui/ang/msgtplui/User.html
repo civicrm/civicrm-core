@@ -28,7 +28,7 @@
       <td>{{record.msg_subject}}</td>
       <td>{{record.is_active ? ts('Yes') : ts('No')}}</td>
       <td class="text-right">
-        <a class="btn btn-xs btn-default" ng-href="#/edit?id={{record.id}}">{{ts('Edit')}}</a>
+        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record, 'legacy')}}">{{ts('Edit')}}</a>
         <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!!record.is_active">{{ts('Disable')}}</a>
         <a class="btn btn-xs btn-default" ng-click="$ctrl.toggle(record)" ng-if="!record.is_active">{{ts('Enable')}}</a>
         <a class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: record}" on-yes="$ctrl.delete(record)">{{ts('Delete')}}</a>

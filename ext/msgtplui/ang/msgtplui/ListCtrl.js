@@ -18,12 +18,21 @@
     var ctrl = this;
     ctrl.records = records;
 
-    ctrl.editUrl = function(record, stage) {
+    /**
+     *
+     * @param record
+     * @param variant - One of null 'legacy', 'current', 'draft'. (If null, then 'current'.)
+     * @returns {string}
+     */
+    ctrl.editUrl = function(record, variant) {
+      if (variant === 'legacy') {
+        return CRM.url('civicrm/admin/messageTemplates/add', {action: 'update', id: record.id, reset: 1});
+      }
       var url = '#/edit?id=' + encodeURIComponent(record.id);
       if (record['tx.language']) {
         url = url + '&lang=' + encodeURIComponent(record['tx.language']);
       }
-      if (stage === 'draft') {
+      if (variant === 'draft') {
         url = url + '&status=draft';
       }
       return url;
