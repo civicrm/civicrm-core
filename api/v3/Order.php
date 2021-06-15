@@ -76,9 +76,9 @@ function civicrm_api3_order_create(array $params): array {
   $entity = NULL;
   $entityIds = [];
   $params['contribution_status_id'] = 'Pending';
+  $priceSetID = NULL;
 
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
-    $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
       $entityParams = $lineItems['params'] ?? [];
@@ -149,6 +149,8 @@ function civicrm_api3_order_create(array $params): array {
   }
 
   $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
+  $contribution['values'][$contribution['id']]['line_item'] = $params['line_item'][$priceSetID] ?? [];
+
   // add payments
   if ($entity && !empty($contribution['id'])) {
     foreach ($entityIds as $entityId) {
@@ -161,7 +163,6 @@ function civicrm_api3_order_create(array $params): array {
         $paymentParams += $entityParams;
       }
       elseif ($entity === 'membership') {
-        $contribution['values'][$contribution['id']]['membership_id'][] = $entityId;
         $paymentParams['isSkipLineItem'] = TRUE;
       }
       civicrm_api3($entity . '_payment', 'create', $paymentParams);
