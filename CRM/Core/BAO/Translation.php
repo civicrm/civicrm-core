@@ -114,7 +114,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements \Civi
   public static function self_civi_api4_validate(\Civi\Api4\Event\ValidateValuesEvent $e) {
     $statuses = self::getStatuses('validate');
     $dataTypes = [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT, CRM_Utils_Type::T_LONGTEXT];
-    $htmlTypes = ['Text', 'TextArea', 'RichTextEditor'];
+    $htmlTypes = ['Text', 'TextArea', 'RichTextEditor', ''];
 
     foreach ($e->records as $r => $record) {
       if (array_key_exists('status_id', $record) && !isset($statuses[$record['status_id']])) {
