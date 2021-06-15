@@ -31,8 +31,6 @@ use Civi\Test\HookInterface;
  */
 class ConformanceTest extends UnitTestCase implements HookInterface {
 
-  const READ_ONLY_ENTITIES = '/^(FinancialItem)$/';
-
   use \api\v4\Traits\CheckAccessTrait;
   use \api\v4\Traits\TableDropperTrait;
   use \api\v4\Traits\OptionCleanupTrait {
@@ -215,7 +213,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @return mixed
    */
   protected function checkCreation($entity, $entityClass) {
-    $isReadOnly = preg_match(static::READ_ONLY_ENTITIES, $entity);
+    $isReadOnly = $this->isReadOnly($entityClass);
 
     $hookLog = [];
     $onValidate = function(ValidateValuesEvent $e) use (&$hookLog) {
@@ -272,7 +270,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     catch (UnauthorizedException $e) {
       // OK, expected exception
     }
-    if (!preg_match(static::READ_ONLY_ENTITIES, $entity)) {
+    if (!$this->isReadOnly($entityClass)) {
       $this->assertEquals(1, $this->checkAccessCounts["{$entity}::create"]);
     }
     $this->resetCheckAccess();
@@ -353,15 +351,14 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
    */
   protected function checkDeleteWithNoId($entityClass) {
-    $exceptionThrown = '';
     try {
       $entityClass::delete()
         ->execute();
+      $this->fail("$entityClass should require ID to delete.");
     }
     catch (\API_Exception $e) {
-      $exceptionThrown = $e->getMessage();
+      // OK
     }
-    $this->assertStringContainsString('required', $exceptionThrown);
   }
 
   /**
@@ -391,14 +388,18 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
   protected function checkDeletionAllowed($entityClass, $id, $entity) {
     $this->setCheckAccessGrants(["{$entity}::delete" => TRUE]);
     $this->assertEquals(0, $this->checkAccessCounts["{$entity}::delete"]);
+    $isReadOnly = $this->isReadOnly($entityClass);
 
     $deleteResult = $entityClass::delete()
+      ->setCheckPermissions(!$isReadOnly)
       ->addWhere('id', '=', $id)
       ->execute();
 
     // should get back an array of deleted id
     $this->assertEquals([['id' => $id]], (array) $deleteResult);
-    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    if (!$isReadOnly) {
+      $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    }
     $this->resetCheckAccess();
   }
 
@@ -423,7 +424,9 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       // OK
     }
 
-    $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    if (!$this->isReadOnly($entityClass)) {
+      $this->assertEquals(1, $this->checkAccessCounts["{$entity}::delete"]);
+    }
     $this->resetCheckAccess();
   }
 
@@ -457,6 +460,14 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       $result[$name] = [$name];
     }
     return $result;
+  }
+
+  /**
+   * @param \Civi\Api4\Generic\AbstractEntity|string $entityClass
+   * @return bool
+   */
+  protected function isReadOnly($entityClass) {
+    return in_array('ReadOnly', $entityClass::getInfo()['type'], TRUE);
   }
 
 }
