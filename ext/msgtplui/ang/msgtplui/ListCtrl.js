@@ -5,6 +5,9 @@
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/User'}); // See: templates/CRM/msgtplui/User.hlp
     $scope.crmUrl = CRM.url;
     $scope.crmUiAlert = crmUiAlert;
+    $scope.location = $location;
+    $scope.checkPerm = CRM.checkPerm;
+    $scope.help = CRM.help;
 
     var ctrl = this;
     ctrl.records = records;

@@ -21,13 +21,15 @@ return [
     'crmUi',
     'crmUtil',
     'ngRoute',
+    'ngSanitize',
     'api4',
   ],
   'settings' => [],
   'basePages' => [],
   'permissions' => [
-    "edit message templates",
-    "edit user-driven message templates",
-    "edit system workflow message templates",
+    'edit message templates',
+    'edit user-driven message templates',
+    'edit system workflow message templates',
+    'access CiviMail',
   ],
 ];
