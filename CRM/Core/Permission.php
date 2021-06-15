@@ -1488,6 +1488,10 @@ class CRM_Core_Permission {
       ],
     ];
 
+    $permissions['saved_search'] = [
+      'default' => ['administer CiviCRM data'],
+    ];
+
     // Profile permissions
     $permissions['profile'] = [
       // the profile will take care of this

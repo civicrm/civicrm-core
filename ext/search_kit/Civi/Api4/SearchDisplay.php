@@ -31,6 +31,7 @@ class SearchDisplay extends Generic\DAOEntity {
 
   public static function permissions() {
     $permissions = parent::permissions();
+    $permissions['default'] = ['administer CiviCRM data'];
     $permissions['run'] = [];
     return $permissions;
   }
