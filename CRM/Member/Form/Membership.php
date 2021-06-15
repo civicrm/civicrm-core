@@ -1168,7 +1168,7 @@ DESC limit 1");
           ]
         );
         $this->ids['Contribution'] = $contribution['id'];
-        $this->setMembershipIDs($contribution['values'][$contribution['id']]['membership_id']);
+        $this->setMembershipIDsFromOrder($contribution);
 
         //create new soft-credit record, CRM-13981
         if ($softParams) {
@@ -1986,6 +1986,19 @@ DESC limit 1");
    */
   protected function getMembershipParamsForType(int $membershipTypeID) {
     return array_merge($this->getFormMembershipParams(), $this->getMembershipParameters()[$membershipTypeID]);
+  }
+
+  /**
+   * @param array $contribution
+   */
+  protected function setMembershipIDsFromOrder(array $contribution): void {
+    $ids = [];
+    foreach ($contribution['values'][$contribution['id']]['line_item'] as $line) {
+      if ($line['entity_table'] ?? '' === 'civicrm_membership') {
+        $ids[] = $line['entity_id'];
+      }
+    }
+    $this->setMembershipIDs($ids);
   }
 
 }

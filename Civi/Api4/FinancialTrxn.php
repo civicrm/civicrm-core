@@ -32,5 +32,6 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class FinancialTrxn extends Generic\DAOEntity {
+  use Generic\Traits\ReadOnly;
 
 }

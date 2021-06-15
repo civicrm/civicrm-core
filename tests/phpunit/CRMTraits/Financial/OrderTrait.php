@@ -127,7 +127,12 @@ trait CRMTraits_Financial_OrderTrait {
     ]);
 
     $this->ids['Contribution'][0] = $order['id'];
-    $this->ids['Membership']['order'] = $order['values'][$order['id']]['membership_id'][0];
+    foreach ($order['values'][$order['id']]['line_item'] as $line) {
+      if (($line['entity_table'] ?? '') === 'civicrm_membership') {
+        $this->ids['Membership']['order'] = $line['entity_id'];
+      }
+    }
+
   }
 
   /**
