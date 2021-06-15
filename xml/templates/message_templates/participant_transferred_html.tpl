@@ -56,7 +56,7 @@
       </tr>
      {/if}
 
-     {if $event.location.phone.1.phone || $event.location.email.1.email}
+     {if !empty($event.location.phone.1.phone) || !empty($event.location.email.1.email)}
       <tr>
        <td colspan="2" {$labelStyle}>
         {ts}Event Contacts:{/ts}

@@ -16,7 +16,7 @@
 {$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
-{if $event.location.phone.1.phone || $event.location.email.1.email}
+{if !empty($event.location.phone.1.phone) || !empty($event.location.email.1.email)}
 
 {ts}Event Contacts:{/ts}
 {foreach from=$event.location.phone item=phone}
@@ -39,7 +39,7 @@
 {$contact.email}
 {/if}
 
-{if $register_date}
+{if !empty($register_date)}
 {ts}Registration Date{/ts}: {$participant.register_date|crmDate}
 {/if}
 
