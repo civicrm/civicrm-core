@@ -11,7 +11,7 @@
           records: function(crmApi4, crmStatus) {
             var q = crmApi4('MessageTemplate', 'get', {
               select: ["id", "msg_title", "msg_subject", "is_active"],
-              where: [["workflow_name", "IS EMPTY"]],
+              where: [["workflow_name", "IS EMPTY"], ["is_reserved", "=", "0"]],
               orderBy: {"msg_title":"ASC"},
             });
             return crmStatus({start: ts('Loading...'), success: ''}, q);
