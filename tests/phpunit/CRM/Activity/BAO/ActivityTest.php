@@ -1218,13 +1218,28 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testSendEmailBasic() {
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSendEmailBasic(): void {
     $contactId = $this->individualCreate();
 
     // create a logged in USER since the code references it for sendEmail user.
     $loggedInUser = $this->createLoggedInUser();
 
-    $contact = $this->civicrm_api('contact', 'getsingle', ['id' => $contactId, 'version' => $this->_apiversion]);
+    $contactDetailsIntersectKeys = [
+      'contact_id' => '',
+      'sort_name' => '',
+      'display_name' => '',
+      'do_not_email' => '',
+      'preferred_mail_format' => '',
+      'is_deceased' => '',
+      'email' => '',
+      'on_hold' => '',
+    ];
+
+    $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactId, 'return' => array_keys($contactDetailsIntersectKeys)]);
     $contactDetailsIntersectKeys = [
       'contact_id' => '',
       'sort_name' => '',
@@ -1244,7 +1259,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $text = __FUNCTION__ . ' text';
     $userID = $loggedInUser;
 
-    [$sent, $activity_ids] = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activity_ids] = CRM_Activity_BAO_Activity::sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1254,7 +1269,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $from = __FUNCTION__ . '@example.com'
     );
 
-    $activity = $this->civicrm_api('activity', 'getsingle', ['id' => $activity_ids[0], 'version' => $this->_apiversion]);
+    $activity = $this->callAPISuccessGetSingle('Activity', ['id' => $activity_ids[0], 'return' => ['details', 'subject']]);
     $details = "-ALTERNATIVE ITEM 0-
 $html
 -ALTERNATIVE ITEM 1-

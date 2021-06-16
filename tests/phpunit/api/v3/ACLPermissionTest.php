@@ -604,7 +604,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider versionThreeAndFour
    * @throws \CRM_Core_Exception
    */
-  public function testGetActivityNoPermissions($version) {
+  public function testGetActivityNoPermissions(int $version): void {
     $this->_apiversion = $version;
     $this->setPermissions([]);
     $this->callAPISuccess('Activity', 'get');
@@ -620,7 +620,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityViewAllActivitiesDoesntCutItAnymore($version) {
+  public function testGetActivityViewAllActivitiesDoesntCutItAnymore(int $version): void {
     $this->_apiversion = $version;
     $activity = $this->activityCreate();
     $this->setPermissions(['view all activities', 'access CiviCRM']);
