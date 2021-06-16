@@ -160,6 +160,7 @@ function civicrm_api3_order_create(array $params): array {
       ];
       // if entity is pledge then build pledge param
       if ($entity === 'pledge') {
+        throw new CiviCRM_API3_Exception('is this tested');
         $paymentParams += $entityParams;
       }
       elseif ($entity === 'membership') {
