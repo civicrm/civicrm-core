@@ -1,6 +1,59 @@
 (function(angular, $, _) {
 
-  function chainTranslations(lang, status) {
+  var TRANSLATED = ['msg_subject', 'msg_html', 'msg_text'];
+
+  /**
+   * Create an APIv4 request to replace a series of translations.
+   *
+   * @param id
+   *   The ID of the translated entity.
+   * @param lang
+   *   The language of the translation ('fr_CA', 'en_GB').
+   * @param status
+   *   The status of the translation ('active', 'draft').
+   * @param values
+   *   Key-value pairs. ({msg_title: 'Cheerio'})
+   * @returns []
+   *   An API call which replaces the translations ([entity,action,params]).
+   */
+  function reqReplaceTranslations(id, lang, status, values) {
+    var records = [];
+    angular.forEach(values, function(value, key) {
+      records.push({"entity_field":key, "string":value});
+    });
+    return ['Translation', 'replace', {
+      records: records,
+      where: [
+        ["entity_table", "=", "civicrm_msg_template"],
+        ["entity_id", "=", id],
+        ["language", "=", lang],
+        ["status_id:name", "=", status]
+      ]
+    }];
+  }
+
+  function reqDeleteTranslations(id, lang, status) {
+    return ['Translation', 'delete', {
+      where: [
+        ["entity_table", "=", "civicrm_msg_template"],
+        ["entity_id", "=", id],
+        ["language", "=", lang],
+        ["status_id:name", "=", status]
+      ]
+    }];
+  }
+
+  /**
+   * Create an APIv4 request to read a series of translations.
+   *
+   * @param lang
+   *   The language of the translation ('fr_CA', 'en_GB').
+   * @param status
+   *   The status of the translation ('active', 'draft').
+   * @returns []
+   *   An API call which replaces the translations ([entity,action,params]).
+   */
+  function reqChainTranslations(lang, status) {
     return ["Translation", "get", {
       "select": ['id', 'entity_field', 'string'],
       "where": [
@@ -12,7 +65,7 @@
     }];
   }
 
-  function mergeTranslations(prefetch) {
+  function respMergeTranslations(prefetch) {
     angular.forEach(prefetch, function(results) {
       angular.forEach(results, function(result) {
         if (result.translations) {
@@ -24,6 +77,7 @@
     });
     return prefetch;
   }
+
 
   function pickFirsts(prefetch) {
     return _.reduce(prefetch, function(all, record, key){
@@ -58,16 +112,16 @@
             if (args.lang) {
               requests.txActive = ['MessageTemplate', 'get', {
                 where: [['id', '=', args.id]],
-                chain: {translations: chainTranslations(args.lang, 'active')}
+                chain: {translations: reqChainTranslations(args.lang, 'active')}
               }];
 
               requests.txDraft = ['MessageTemplate', 'get', {
                 where: [['id', '=', args.id]],
-                chain: {translations: chainTranslations(args.lang, 'draft')}
+                chain: {translations: reqChainTranslations(args.lang, 'draft')}
               }];
             }
 
-            return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(mergeTranslations).then(pickFirsts));
+            return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts));
           }
         }
       });
@@ -91,20 +145,34 @@
       ctrl.tab = 'main';
     }
 
-    ctrl.allowDelete = function() {
-      return !!ctrl.lang;
-    };
-
     ctrl.save = function save() {
-      var p = crmApi4('Contact', 'get', {limit: 1}); // TODO
-      return block(crmStatus({start: ts('TODO-ing...'), success: ts('TODO-ed')}, p));
+      var requests = {};
+      if (ctrl.lang) {
+        requests.txActive = reqReplaceTranslations(ctrl.records.main.id, ctrl.lang, 'active', _.pick(ctrl.records.txActive, TRANSLATED));
+        requests.txDraft = reqReplaceTranslations(ctrl.records.main.id, ctrl.lang, 'draft', _.pick(ctrl.records.txDraft, TRANSLATED));
+      }
+      else {
+        requests.main = ['MessageTemplate', 'update', {
+          where: [['id', '=', ctrl.records.main.id]],
+          values: ctrl.records.main
+        }];
+      }
+      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, crmApi4(requests)));
     };
     ctrl.cancel = function() {
       window.location = '#/workflow';
     };
     ctrl.delete = function() {
-      var p = crmApi4('Contact', 'get', {limit: 1}); // TODO
-      return block(crmStatus({start: ts('TODO-ing...'), success: ts('TODO-ed')}, p));
+      var requests = {};
+      if (ctrl.lang) {
+        requests.txActive = reqDeleteTranslations(ctrl.records.main.id, ctrl.lang, 'active');
+        requests.txDraft = reqDeleteTranslations(ctrl.records.main.id, ctrl.lang, 'draft');
+      }
+      else {
+        requests.main = ['MessageTemplate', 'delete', {where: [['id', '=', ctrl.records.main.id]]}];
+      }
+      return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, crmApi4(requests)))
+        .then(ctrl.cancel);
     };
   });
 
