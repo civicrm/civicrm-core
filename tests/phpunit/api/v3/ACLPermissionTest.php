@@ -944,8 +944,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->callAPIFailure('activity', 'getsingle', array_merge($params, [
       'id' => [
-        'IN',
-        [$activity2['id']],
+        'IN' => [$activity2['id']],
       ],
     ]));
   }
