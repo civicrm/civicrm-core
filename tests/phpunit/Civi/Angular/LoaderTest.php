@@ -47,9 +47,9 @@ class LoaderTest extends \CiviUnitTestCase {
    */
   public function testSettingFactory($module, $expectedSettingCount, $expectedCallbackCount, $expectedPermissions) {
     $loader = new \Civi\Angular\AngularLoader();
-    $loader->setModules([$module]);
+    $loader->addModules([$module]);
     $loader->useApp();
-    // Load triggers a depreaction notice, use @ to suppress it for the test.
+    // Load triggers a deprecation notice, use @ to suppress it for the test.
     @$loader->load();
 
     // Run factory callbacks
