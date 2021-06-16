@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\OptionGroup;
+
 /**
  *  Test APIv3 civicrm_create_custom_group
  *
@@ -573,17 +575,22 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
-  public function testCustomFieldCreateWithOptionGroupName() {
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomFieldCreateWithOptionGroupName(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Individual', 'title' => 'test_custom_group']);
+    OptionGroup::create()->setValues(['name' => 'abc'])->execute();
     $params = [
       'custom_group_id' => $customGroup['id'],
       'name' => 'Activity type',
       'label' => 'Activity type',
       'data_type' => 'String',
       'html_type' => 'Select',
-      'option_group_id' => 'activity_type',
+      'option_group_id' => 'abc',
     ];
-    $result = $this->callAPISuccess('CustomField', 'create', $params);
+    $this->callAPISuccess('CustomField', 'create', $params);
   }
 
   /**
@@ -593,15 +600,18 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    */
   public function getCustomFieldKeys($getFieldsResult) {
     $isCustom = function ($key) {
-      return preg_match('/^custom_/', $key);
+      return 0 === strpos($key, 'custom_');
     };
     $r = array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
     sort($r);
     return $r;
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function testMakeSearchableContactReferenceFieldUnsearchable() {
-    $customGroup = $this->customGroupCreate([
+    $this->customGroupCreate([
       'name' => 'testCustomGroup',
       'title' => 'testCustomGroup',
       'extends' => 'Individual',

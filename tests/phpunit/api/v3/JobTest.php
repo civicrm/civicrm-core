@@ -1146,9 +1146,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -1180,9 +1177,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -1207,9 +1201,6 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
     $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(0, $result['values']['merged']);
-
-    $this->customFieldDelete($customField['id']);
-    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
