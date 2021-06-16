@@ -58,7 +58,9 @@ class CRM_Api4_Services {
       );
     }
 
-    if (defined('CIVICRM_UF') && CIVICRM_UF === 'UnitTests') {
+    if (defined('CIVICRM_UF') && CIVICRM_UF === 'UnitTests'
+      && file_exists('tests/phpunit/api/v4/services.xml')
+    ) {
       $loader->load('tests/phpunit/api/v4/services.xml');
     }
   }
