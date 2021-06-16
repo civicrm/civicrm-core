@@ -41,6 +41,9 @@
             }
           });
 
+          heightPct = options.crmHeightPct || heightPct;
+          delete options.crmHeightPct;
+
           var editorEl = $el.find('.crm-monaco-container');
           editorEl.css({height: Math.round(heightPct * $(window).height())});
           editor = monaco.editor.create(editorEl[0], options);
