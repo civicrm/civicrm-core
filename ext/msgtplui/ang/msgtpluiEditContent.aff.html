@@ -17,11 +17,11 @@
   <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
     <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
     <div ng-if="options.disabled"
-      crm-monaco="{language: 'html', readOnly: true}"
+      crm-monaco="{language: 'html', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent', readOnly: true}"
       ng-model="options.record.msg_html">
     </div>
     <div ng-if="!options.disabled"
-       crm-monaco="{language: 'html'}"
+       crm-monaco="{language: 'html', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent'}"
        ng-model="options.record.msg_html">
     </div>
   </div>
@@ -29,11 +29,11 @@
   <div crm-ui-accordion="{title: ts('Text Content'), collapsed: true}">
     <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
     <div ng-if="options.disabled"
-       crm-monaco="{language: 'smarty', readOnly: true}"
+       crm-monaco="{language: 'smarty', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent', readOnly: true}"
        ng-model="options.record.msg_text">
     </div>
     <div ng-if="!options.disabled"
-       crm-monaco="{language: 'smarty'}"
+       crm-monaco="{language: 'smarty', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent'}"
        ng-model="options.record.msg_text">
     </div>
   </div>
