@@ -20,7 +20,7 @@ or want to inquire about reinstating your registration for this event.{/ts}
 {$event.location.address.1.display|strip_tags:false}
 {/if}{*End of isShowLocation condition*}
 
-{if $event.location.phone.1.phone || $event.location.email.1.email}
+{if !empty($event.location.phone.1.phone) || !empty($event.location.email.1.email)}
 
 {ts}Event Contacts:{/ts}
 {foreach from=$event.location.phone item=phone}
