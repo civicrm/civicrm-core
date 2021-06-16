@@ -2,9 +2,7 @@
 
   <div crm-ui-debug="$ctrl"></div>
 
-  The edit view.
-
-  <ng-form name="config_form">
+  <ng-form name="edit_form">
 
     <div class="form-group">
       <label for="msgtpl_title">
@@ -38,7 +36,7 @@
         </li>
       </ul>
       <div class="panel-body">
-        <msgtplui-edit-content options="{msg: $ctrl.records[$ctrl.tab]}"></msgtplui-edit-content>
+        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], disabled: $ctrl.tab==='original'}"></msgtplui-edit-content>
 <!--        <msgtplui-edit-content options="" />-->
       </div>
     </div>
