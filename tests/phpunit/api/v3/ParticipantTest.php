@@ -15,6 +15,8 @@
  * @package CiviCRM_APIv3
  */
 
+use Civi\Api4\Participant;
+
 /**
  * Class api_v3_ParticipantTest
  * @group headless
@@ -482,6 +484,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Test the line items for participant fee with multiple price field values.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateParticipantLineItems() {
     // Create a price set for this event.
@@ -602,8 +606,11 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
   /**
    * Check with complete array.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
-  public function testUpdate() {
+  public function testUpdate(): void {
     $participantId = $this->participantCreate([
       'contactID' => $this->_individualId,
       'eventID' => $this->_eventID,
@@ -613,13 +620,19 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'event_id' => $this->_eventID,
       'status_id' => 3,
-      'role_id' => 3,
-      'register_date' => '2006-01-21',
+      'role_id' => [3],
+      'register_date' => '2006-01-21 00:00:00',
       'source' => 'US Open',
     ];
-    $participant = $this->callAPISuccess('participant', 'create', $params);
-    $this->getAndCheck($params, $participant['id'], 'participant');
-    $result = $this->participantDelete($params['id']);
+    $participantID = $this->callAPISuccess('Participant', 'create', $params)['id'];
+    $participant = Participant::get()
+      ->setSelect(array_keys($params))
+      ->addWhere('id', '=', $participantID)
+      ->execute()->first();
+
+    foreach ($params as $key => $value) {
+      $this->assertEquals($value, $participant[$key], $key . ' mismatch');
+    }
   }
 
   /**

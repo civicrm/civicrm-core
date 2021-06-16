@@ -1012,9 +1012,13 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test api updates an existing activity, including removing activity contacts in apiv3 style.
+   * Test api updates an existing activity, including removing activity
+   * contacts in apiv3 style.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testActivityUpdate() {
+  public function testActivityUpdate(): void {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
 
     $params = [
@@ -1074,15 +1078,17 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'record_type_id' => ['IN' => ['Activity Assignees', 'Activity Targets']],
     ], 0);
 
-    unset($params['source_contact_id']);
+    unset($params['source_contact_id'], $params['assignee_contact_id'], $params['target_contact_id']);
     $this->getAndCheck($params, $result['id'], 'activity');
   }
 
   /**
    * Test civicrm_activity_update() with valid parameters
    * and some custom data
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testActivityUpdateCustom() {
+  public function testActivityUpdateCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
