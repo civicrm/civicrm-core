@@ -43,7 +43,7 @@
     <div class="btn-group pull-right">
       <button type="button" class="btn btn-primary" ng-click="$ctrl.save()">{{ ts('Save') }}</button>
       <button type="button" class="btn btn-primary" ng-click="$ctrl.cancel()">{{ ts('Cancel') }}</button>
-      <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}}" on-yes="$ctrl.delete()" ng-if="$ctrl.allowDelete()">{{ ts('Delete') }}</button>
+      <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}, message: ts('Are you sure want to delete this translation (%1)?', {1: $ctrl.lang})}" on-yes="$ctrl.delete()" ng-if="!!$ctrl.lang">{{ ts('Delete') }}</button>
     </div>
 
     <div class="clearfix"></div>
