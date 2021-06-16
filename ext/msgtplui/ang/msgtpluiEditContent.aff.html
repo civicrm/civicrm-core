@@ -13,16 +13,16 @@
 
     <msgtplui-monaco
       ng-if="options.record.msg_subject.search('\n') >= 0"
-      options="{disabled: options.disabled, record: options.record, field: 'msg_subject', language: 'smarty'}">
+      options="{disabled: options.disabled, record: options.record, field: 'msg_subject', language: 'smarty', crmHeightPct: 0.25}">
     </msgtplui-monaco>
   </div>
 
   <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
-    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_html', language: 'html'}"></msgtplui-monaco>
+    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_html', language: 'html', crmHeightPct: 0.5}"></msgtplui-monaco>
   </div>
 
   <div crm-ui-accordion="{title: ts('Text Content'), collapsed: true}">
-    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_text', language: 'smarty'}"></msgtplui-monaco>
+    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_text', language: 'smarty', crmHeightPct: 0.5}"></msgtplui-monaco>
   </div>
 
 </ng-form>
