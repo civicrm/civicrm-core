@@ -2,40 +2,27 @@
 
 <ng-form name="content_form">
 
-  <div class="form-group">
-    <label for="msgtpl_subject">
-      {{:: ts('Subject') }} <span class="crm-marker">*</span>
-    </label>
+  <div crm-ui-accordion="{title: ts('Subject'), collapsed: false}">
     <input
-      ng-model="options.record.msg_title"
+      ng-if="options.record.msg_subject.search('\n') < 0"
+      ng-model="options.record.msg_subject"
       class="form-control" id="msgtpl_subject"
       required
       title="{{:: ts('Required') }}"
       ng-disabled="options.disabled" />
+
+    <msgtplui-monaco
+      ng-if="options.record.msg_subject.search('\n') >= 0"
+      options="{disabled: options.disabled, record: options.record, field: 'msg_subject', language: 'smarty'}">
+    </msgtplui-monaco>
   </div>
 
   <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
-    <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
-    <div ng-if="options.disabled"
-      crm-monaco="{language: 'html', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent', readOnly: true}"
-      ng-model="options.record.msg_html">
-    </div>
-    <div ng-if="!options.disabled"
-       crm-monaco="{language: 'html', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent'}"
-       ng-model="options.record.msg_html">
-    </div>
+    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_html', language: 'html'}"></msgtplui-monaco>
   </div>
 
   <div crm-ui-accordion="{title: ts('Text Content'), collapsed: true}">
-    <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
-    <div ng-if="options.disabled"
-       crm-monaco="{language: 'smarty', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent', readOnly: true}"
-       ng-model="options.record.msg_text">
-    </div>
-    <div ng-if="!options.disabled"
-       crm-monaco="{language: 'smarty', wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent'}"
-       ng-model="options.record.msg_text">
-    </div>
+    <msgtplui-monaco options="{disabled: options.disabled, record: options.record, field: 'msg_text', language: 'smarty'}"></msgtplui-monaco>
   </div>
 
 </ng-form>
