@@ -298,7 +298,10 @@ function civicrm_api3_activity_get($params) {
     $options['return']['status_id'] = $options['return']['activity_date_time'] = 1;
     $params['return'] = array_keys($options['return']);
   }
-
+  if (!isset($params['return']) && !$options['is_count']) {
+    // https://github.com/civicrm/civicrm-core/pull/18968
+    CRM_Core_Error::deprecatedWarning('Not setting a return array is deprecated as it will fail on complex sites.');
+  }
   $activities = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, FALSE, 'Activity', $sql);
   if ($options['is_count']) {
     return civicrm_api3_create_success($activities, $params, 'Activity', 'get');

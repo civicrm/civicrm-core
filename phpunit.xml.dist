@@ -5,7 +5,7 @@
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
          processIsolation="false"
-         stopOnFailure="false"
+         stopOnFailure="true"
          stderr="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
          bootstrap="tests/phpunit/CiviTest/bootstrap.php"
