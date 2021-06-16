@@ -476,7 +476,7 @@ SELECT g.*
     if (!empty($acls)) {
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
-      $cacheKey = CRM_Utils_Cache::cleanKey("{$tableName}-{$type}-{$aclKeys}");
+      $cacheKey = CRM_Utils_Cache::cleanKey("$type-$tableName-$aclKeys");
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!is_array($ids)) {
