@@ -162,6 +162,9 @@ trait Api3TestTrait {
     ],
       $params
     );
+    if (!isset($params['return']) && strtolower($entity) !== 'setting' && in_array(strtolower($action), ['get', 'getvalue', 'getsingle'])) {
+      $params['return'] = 'id';
+    }
     switch (strtolower($action)) {
       case 'getvalue':
         return $this->callAPISuccessGetValue($entity, $params, $checkAgainst);
