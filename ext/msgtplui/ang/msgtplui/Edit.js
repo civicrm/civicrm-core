@@ -67,7 +67,6 @@
               }];
             }
 
-            console.log('requests', requests);
             return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(mergeTranslations).then(pickFirsts));
           }
         }
@@ -75,7 +74,8 @@
     }
   );
 
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi, crmStatus, crmUiHelp, $location, prefetch) {
+  angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch) {
+    var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/Edit'}); // See: templates/CRM/msgtplui/Edit.hlp
     var ctrl = this;
@@ -87,8 +87,25 @@
       ctrl.tab = args.status === 'draft' ? 'txDraft' : 'txActive';
     }
     else {
+      ctrl.lang = null;
       ctrl.tab = 'main';
     }
+
+    ctrl.allowDelete = function() {
+      return !!ctrl.lang;
+    };
+
+    ctrl.save = function save() {
+      var p = crmApi4('Contact', 'get', {limit: 1}); // TODO
+      return block(crmStatus({start: ts('TODO-ing...'), success: ts('TODO-ed')}, p));
+    };
+    ctrl.cancel = function() {
+      window.location = '#/workflow';
+    };
+    ctrl.delete = function() {
+      var p = crmApi4('Contact', 'get', {limit: 1}); // TODO
+      return block(crmStatus({start: ts('TODO-ing...'), success: ts('TODO-ed')}, p));
+    };
   });
 
 })(angular, CRM.$, CRM._);
