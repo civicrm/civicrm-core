@@ -161,11 +161,14 @@ function civicrm_api3_order_create(array $params): array {
       // if entity is pledge then build pledge param
       if ($entity === 'pledge') {
         $paymentParams += $entityParams;
+        // Pledges are not stored as entity_id in the line_item table.
+        CRM_Core_Error::deprecatedWarning('This should be unreachable & tests show it is never tested.');
+        civicrm_api3('PledgePayment', 'create', $paymentParams);
       }
-      elseif ($entity === 'membership') {
-        $paymentParams['isSkipLineItem'] = TRUE;
+      if ($entity === 'participant') {
+        civicrm_api3('ParticipantPayment', 'create', $paymentParams);
       }
-      civicrm_api3($entity . '_payment', 'create', $paymentParams);
+
     }
   }
   return civicrm_api3_create_success($contribution['values'] ?? [], $params, 'Order', 'create');
