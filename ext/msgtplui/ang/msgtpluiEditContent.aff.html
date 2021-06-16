@@ -14,28 +14,28 @@
       ng-disabled="options.disabled" />
   </div>
 
-  <div class="form-group">
-    <label for="msgtpl_text">
-      {{:: ts('Text') }} <span class="crm-marker">*</span>
-    </label>
-    <textarea
-      ng-model="options.record.msg_text"
-      class="form-control" id="msgtpl_text"
-      required
-      title="{{:: ts('Required') }}"
-      ng-disabled="options.disabled"></textarea>
+  <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
+    <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
+    <div ng-if="options.disabled"
+      crm-monaco="{language: 'html', readOnly: true}"
+      ng-model="options.record.msg_html">
+    </div>
+    <div ng-if="!options.disabled"
+       crm-monaco="{language: 'html'}"
+       ng-model="options.record.msg_html">
+    </div>
   </div>
 
-  <div class="form-group">
-    <label for="msgtpl_html">
-      {{:: ts('Text') }} <span class="crm-marker">*</span>
-    </label>
-    <textarea
-      ng-model="options.record.msg_html"
-      class="form-control" id="msgtpl_html"
-      required
-      title="{{:: ts('Required') }}"
-      ng-disabled="options.disabled"></textarea>
+  <div crm-ui-accordion="{title: ts('Text Content'), collapsed: true}">
+    <!-- At time of writing, changes to disabled/readOnly don't propagate dynamically. So use separate widgets. -->
+    <div ng-if="options.disabled"
+       crm-monaco="{language: 'smarty', readOnly: true}"
+       ng-model="options.record.msg_text">
+    </div>
+    <div ng-if="!options.disabled"
+       crm-monaco="{language: 'smarty'}"
+       ng-model="options.record.msg_text">
+    </div>
   </div>
 
 </ng-form>
