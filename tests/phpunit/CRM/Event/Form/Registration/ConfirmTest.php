@@ -349,6 +349,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'id' => $event['id'],
       'contributeMode' => 'direct',
       'registerByID' => $this->createLoggedInUser(),
+      'totalAmount' => 0,
       'params' => [
         [
           'qfKey' => 'e6eb2903eae63d4c5c6cc70bfdda8741_2801',
