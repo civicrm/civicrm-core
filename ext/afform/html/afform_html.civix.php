@@ -7,9 +7,9 @@
  * extension.
  */
 class CRM_AfformHtml_ExtensionUtil {
-  const SHORT_NAME = "afform_html";
-  const LONG_NAME = "org.civicrm.afform-html";
-  const CLASS_PREFIX = "CRM_AfformHtml";
+  const SHORT_NAME = 'afform_html';
+  const LONG_NAME = 'org.civicrm.afform-html';
+  const CLASS_PREFIX = 'CRM_AfformHtml';
 
   /**
    * Translate a string using the extension's domain.
@@ -221,7 +221,8 @@ function _afform_html_civix_upgrader() {
  * Search directory tree for files which match a glob pattern.
  *
  * Note: Dot-directories (like "..", ".git", or ".svn") will be ignored.
- * Note: In Civi 4.3+, delegate to CRM_Utils_File::findFiles()
+ * Note: Delegate to CRM_Utils_File::findFiles(), this function kept only
+ * for backward compatibility of extension code that uses it.
  *
  * @param string $dir base dir
  * @param string $pattern , glob pattern, eg "*.txt"
@@ -229,32 +230,7 @@ function _afform_html_civix_upgrader() {
  * @return array
  */
 function _afform_html_civix_find_files($dir, $pattern) {
-  if (is_callable(['CRM_Utils_File', 'findFiles'])) {
-    return CRM_Utils_File::findFiles($dir, $pattern);
-  }
-
-  $todos = [$dir];
-  $result = [];
-  while (!empty($todos)) {
-    $subdir = array_shift($todos);
-    foreach (_afform_html_civix_glob("$subdir/$pattern") as $match) {
-      if (!is_dir($match)) {
-        $result[] = $match;
-      }
-    }
-    if ($dh = opendir($subdir)) {
-      while (FALSE !== ($entry = readdir($dh))) {
-        $path = $subdir . DIRECTORY_SEPARATOR . $entry;
-        if ($entry[0] == '.') {
-        }
-        elseif (is_dir($path)) {
-          $todos[] = $path;
-        }
-      }
-      closedir($dh);
-    }
-  }
-  return $result;
+  return CRM_Utils_File::findFiles($dir, $pattern);
 }
 
 /**
