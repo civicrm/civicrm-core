@@ -45,36 +45,13 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->title = $params['title'];
     }
 
-    $extends = CRM_Utils_Array::value('extends', $params, []);
-    $extendsEntity = $extends[0] ?? NULL;
-
-    $participantEntities = [
-      'ParticipantRole',
-      'ParticipantEventName',
-      'ParticipantEventType',
-    ];
-
-    if (in_array($extendsEntity, $participantEntities)) {
-      $group->extends = 'Participant';
-    }
-    else {
-      $group->extends = $extendsEntity;
-    }
-
-    $group->extends_entity_column_id = 'null';
-    if (in_array($extendsEntity, $participantEntities)
-    ) {
-      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
-    }
-
-    // this is format when form get submit.
-    $extendsChildType = $extends[1] ?? NULL;
+    $extendsChildType = NULL;
     // lets allow user to pass direct child type value, CRM-6893
     if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
-      $registeredSubTypes = self::getSubTypes()[$extendsEntity];
+      $registeredSubTypes = self::getSubTypes()[$params['extends']];
       if (is_array($extendsChildType)) {
         foreach ($extendsChildType as $childType) {
           if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
@@ -88,8 +65,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         }
         $extendsChildType = [$extendsChildType];
       }
-      $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, (array) $extendsChildType);
-      if (CRM_Utils_Array::value(0, $extends) == 'Relationship') {
+      $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
+      if ($params['extends'] == 'Relationship') {
         $extendsChildType = str_replace(['_a_b', '_b_a'], [
           '',
           '',
@@ -121,6 +98,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_active',
       'is_multiple',
       'icon',
+      'extends_entity_column_id',
+      'extends',
     ];
     $current_db_version = CRM_Core_BAO_Domain::version();
     $is_public_version = version_compare($current_db_version, '4.7.19', '>=');
@@ -214,7 +193,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $params['id'],
         'table_name'
       );
-      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($extendsEntity));
+      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends']));
     }
     $transaction->commit();
 

@@ -27,13 +27,8 @@ class CustomGroupPreCreationSubscriber extends Generic\PreCreationSubscriber {
    * @param \Civi\Api4\Generic\DAOCreateAction $request
    */
   protected function modify(DAOCreateAction $request) {
-    $extends = $request->getValue('extends');
     $title = $request->getValue('title');
     $name = $request->getValue('name');
-
-    if (is_string($extends)) {
-      $request->addValue('extends', [$extends]);
-    }
 
     if (NULL === $title && $name) {
       $request->addValue('title', $name);
