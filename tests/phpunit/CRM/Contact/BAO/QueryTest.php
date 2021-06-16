@@ -1007,7 +1007,7 @@ civicrm_relationship.is_active = 1 AND
     $this->assertEquals(3, $dao->N);
     $this->assertFalse(strstr($sql, ' OR '), 'Query does not include or');
     while ($dao->fetch()) {
-      $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID), $dao->groups . ' includes ' . $groupID);
+      $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID || $dao->groups == $groupID . ',' . $groupID), $dao->groups . ' includes ' . $groupID);
     }
   }
 
