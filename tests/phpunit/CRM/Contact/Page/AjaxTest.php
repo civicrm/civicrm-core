@@ -34,9 +34,8 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['columns'] = [
       [
         'search' => [
-          'value' => [
-            'src' => 'first_name',
-          ],
+          'value' => 'first_name',
+          'regex' => FALSE,
         ],
         'data' => 'src',
       ],
