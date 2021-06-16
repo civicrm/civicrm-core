@@ -1986,10 +1986,11 @@ VALUES
    *
    * @throws CRM_Core_Exception
    */
-  public function getAndCheck($params, $id, $entity, $delete = 1, $errorText = '') {
+  public function getAndCheck(array $params, int $id, $entity, int $delete = 1, string $errorText = ''): void {
 
     $result = $this->callAPISuccessGetSingle($entity, [
       'id' => $id,
+      'return' => array_keys($params),
     ]);
 
     if ($delete) {
@@ -2007,23 +2008,23 @@ VALUES
         $keys[CRM_Utils_Array::value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
       }
       $type = $settings['type'] ?? NULL;
-      if ($type == CRM_Utils_Type::T_DATE) {
+      if ($type === CRM_Utils_Type::T_DATE) {
         $dateFields[] = $settings['name'];
         // we should identify both real names & unique names as dates
-        if ($field != $settings['name']) {
+        if ($field !== $settings['name']) {
           $dateFields[] = $field;
         }
       }
-      if ($type == CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) {
+      if ($type === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME) {
         $dateTimeFields[] = $settings['name'];
         // we should identify both real names & unique names as dates
-        if ($field != $settings['name']) {
+        if ($field !== $settings['name']) {
           $dateTimeFields[] = $field;
         }
       }
     }
 
-    if (strtolower($entity) == 'contribution') {
+    if (strtolower($entity) === 'contribution') {
       $params['receive_date'] = date('Y-m-d', strtotime($params['receive_date']));
       // this is not returned in id format
       unset($params['payment_instrument_id']);
@@ -2032,14 +2033,14 @@ VALUES
     }
 
     foreach ($params as $key => $value) {
-      if ($key == 'version' || substr($key, 0, 3) == 'api' || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
+      if ($key === 'version' || strpos($key, 'api') === 0 || (!array_key_exists($key, $keys) || !array_key_exists($keys[$key], $result))) {
         continue;
       }
-      if (in_array($key, $dateFields)) {
+      if (in_array($key, $dateFields, TRUE)) {
         $value = date('Y-m-d', strtotime($value));
         $result[$key] = date('Y-m-d', strtotime($result[$key]));
       }
-      if (in_array($key, $dateTimeFields)) {
+      if (in_array($key, $dateTimeFields, TRUE)) {
         $value = date('Y-m-d H:i:s', strtotime($value));
         $result[$keys[$key]] = date('Y-m-d H:i:s', strtotime(CRM_Utils_Array::value($keys[$key], $result, CRM_Utils_Array::value($key, $result))));
       }

@@ -228,31 +228,37 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * Is_primary should be set as a default.
    *
    * ie. create the address, unset the params & recreate.
-   * is_primary should be 0 before & after the update. ie - having no other address
-   * is_primary is invalid.
+   * is_primary should be 0 before & after the update. ie - having no other
+   * address is_primary is invalid.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testCreateAddressTestDefaultWithID($version) {
+  public function testCreateAddressTestDefaultWithID(int $version): void {
     $this->_apiversion = $version;
     $params = $this->_params;
     $params['is_primary'] = 0;
-    $result = $this->callAPISuccess('address', 'create', $params);
+    $result = $this->callAPISuccess('Address', 'create', $params);
     unset($params['is_primary']);
     $params['id'] = $result['id'];
-    $this->callAPISuccess('address', 'create', $params);
-    $result = $this->callAPISuccess('address', 'get', ['contact_id' => $params['contact_id']]);
+    $this->callAPISuccess('Address', 'create', $params);
+    $result = $this->callAPISuccess('Address', 'get', ['contact_id' => $params['contact_id']]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
-    $this->getAndCheck($params, $result['id'], 'address', __FUNCTION__);
+    $this->getAndCheck($params, $result['id'], 'address');
   }
 
   /**
    * test address deletion.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
-  public function testDeleteAddress($version) {
+  public function testDeleteAddress($version): void {
     $this->_apiversion = $version;
     //check there are no address to start with
     $get = $this->callAPISuccess('address', 'get', [

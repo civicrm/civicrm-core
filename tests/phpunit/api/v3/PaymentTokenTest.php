@@ -44,12 +44,12 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreatePaymentToken(): void {
-    $description = "Create a payment token - Note use of relative dates here:
-      @link http://www.php.net/manual/en/datetime.formats.relative.php.";
+    $description = 'Create a payment token - Note use of relative dates here:
+      @link http://www.php.net/manual/en/datetime.formats.relative.php.';
     $result = $this->callAPIAndDocument('payment_token', 'create', $this->params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck(array_merge($this->params, [$this->params]), $result['id'], 'payment_token', TRUE);
+    $this->getAndCheck($this->params, $result['id'], 'payment_token', TRUE);
   }
 
   /**
