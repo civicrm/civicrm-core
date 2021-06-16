@@ -21,6 +21,7 @@ return [
     'crmRouteBinder',
     'crmUi',
     'crmUtil',
+    'msgtpluiEditContent',
     'ngRoute',
     'ngSanitize',
     'api4',

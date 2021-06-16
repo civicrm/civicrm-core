@@ -1,5 +1,37 @@
 (function(angular, $, _) {
 
+  function chainTranslations(lang, status) {
+    return ["Translation", "get", {
+      "select": ['id', 'entity_field', 'string'],
+      "where": [
+        ['entity_table', '=', 'civicrm_msg_template'],
+        ['entity_id', '=', '$id'],
+        ['language', '=', lang],
+        ['status_id:name', '=', status]
+      ]
+    }];
+  }
+
+  function mergeTranslations(prefetch) {
+    angular.forEach(prefetch, function(results) {
+      angular.forEach(results, function(result) {
+        if (result.translations) {
+          angular.forEach(result.translations, function(tx) {
+            result[tx.entity_field] = tx.string;
+          });
+        }
+      });
+    });
+    return prefetch;
+  }
+
+  function pickFirsts(prefetch) {
+    return _.reduce(prefetch, function(all, record, key){
+      all[key] = record[0] || undefined;
+      return all;
+    }, {});
+  }
+
   angular.module('msgtplui').config(function($routeProvider) {
       $routeProvider.when('/edit', {
         controller: 'MsgtpluiEdit',
@@ -9,43 +41,54 @@
         // If you need to look up data when opening the page, list it out
         // under "resolve".
         resolve: {
-          myContact: function(crmApi) {
-            return crmApi('Contact', 'getsingle', {
-              id: 'user_contact_id',
-              return: ['first_name', 'last_name']
-            });
+          prefetch: function(crmApi4, crmStatus, $location) {
+            var args = $location.search();
+            var requests = {};
+
+            requests.main = ['MessageTemplate', 'get', {
+              where: [['id', '=', args.id]],
+            }];
+
+            requests.original = ['MessageTemplate', 'get', {
+              join: [["MessageTemplate AS other", "INNER", null, ["workflow_name", "=", "other.workflow_name"]]],
+              where: [["other.id", "=", args.id], ["is_reserved", "=", true]],
+              limit: 25
+            }];
+
+            if (args.lang) {
+              requests.txActive = ['MessageTemplate', 'get', {
+                where: [['id', '=', args.id]],
+                chain: {translations: chainTranslations(args.lang, 'active')}
+              }];
+
+              requests.txDraft = ['MessageTemplate', 'get', {
+                where: [['id', '=', args.id]],
+                chain: {translations: chainTranslations(args.lang, 'draft')}
+              }];
+            }
+
+            console.log('requests', requests);
+            return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(mergeTranslations).then(pickFirsts));
           }
         }
       });
     }
   );
 
-  // The controller uses *injection*. This default injects a few things:
-  //   $scope -- This is the set of variables shared between JS and HTML.
-  //   crmApi, crmStatus, crmUiHelp -- These are services provided by civicrm-core.
-  //   myContact -- The current contact, defined above in config().
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi, crmStatus, crmUiHelp, myContact) {
-    // The ts() and hs() functions help load strings for this module.
+  angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi, crmStatus, crmUiHelp, $location, prefetch) {
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/Edit'}); // See: templates/CRM/msgtplui/Edit.hlp
-    // Local variable for this controller (needed when inside a callback fn where `this` is not available).
     var ctrl = this;
+    var args = $location.search();
 
-    // We have myContact available in JS. We also want to reference it in HTML.
-    this.myContact = myContact;
-
-    this.save = function() {
-      return crmStatus(
-        // Status messages. For defaults, just use "{}"
-        {start: ts('Saving...'), success: ts('Saved')},
-        // The save action. Note that crmApi() returns a promise.
-        crmApi('Contact', 'create', {
-          id: ctrl.myContact.id,
-          first_name: ctrl.myContact.first_name,
-          last_name: ctrl.myContact.last_name
-        })
-      );
-    };
+    ctrl.records = prefetch;
+    if (args.lang) {
+      ctrl.lang = args.lang;
+      ctrl.tab = args.status === 'draft' ? 'txDraft' : 'txActive';
+    }
+    else {
+      ctrl.tab = 'main';
+    }
   });
 
 })(angular, CRM.$, CRM._);

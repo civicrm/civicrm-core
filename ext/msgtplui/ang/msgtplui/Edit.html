@@ -1,10 +1,51 @@
-<div class="crm-container">
+<div id="bootstrap-theme">
+
+  <div crm-ui-debug="$ctrl"></div>
 
   The edit view.
 
-<!--  <div crm-ui-debug="$ctrl.myContact"></div>-->
+  <ng-form name="config_form">
 
-<!--  <h1 crm-page-title>{{ts('About %1', {1: $ctrl.myContact.first_name + ' ' + $ctrl.myContact.last_name})}}</h1>-->
+    <div class="form-group">
+      <label for="msgtpl_title">
+        {{:: ts('Message Title') }} <span class="crm-marker">*</span>
+      </label>
+      <input ng-model="$ctrl.records.main.msg_title" class="form-control" id="msgtpl_title" required title="{{:: ts('Required') }}" ng-disabled="!!$ctrl.records.main.workflow_name" />
+      <p class="help-block">{{:: ts('Descriptive title of the message - used for template selection') }}</p>
+    </div>
+
+    <div class="form-group" ng-if="$ctrl.lang">
+      <label for="msgtpl_language">
+        {{:: ts('Locale') }} <span class="crm-marker">*</span>
+      </label>
+      <input ng-model="$ctrl.lang" class="form-control" id="msgtpl_language" required title="{{:: ts('Required') }}" ng-disabled="true" />
+      <!-- TODO: Pretty name -->
+    </div>
+
+    <div class="panel panel-info">
+      <ul class="panel-heading nav nav-tabs">
+        <li role="presentation" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
+          <a class="text-success" crm-icon="fa-file" ng-click="$ctrl.tab = 'main'">{{ts('Current')}}</a>
+        </li>
+        <li role="presentation" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
+          <a class="text-success" crm-icon="fa-file" ng-click="$ctrl.tab = 'txActive'">{{ts('Current')}}</a>
+        </li>
+        <li role="presentation" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="!!$ctrl.lang">
+          <a class="text-warning" crm-icon="fa-file" ng-click="$ctrl.tab = 'txDraft'">{{ts('Draft')}}</a>
+        </li>
+        <li role="presentation" ng-class="{active: $ctrl.tab == 'original'}">
+          <a class="text-info" crm-icon="fa-file" ng-click="$ctrl.tab = 'original'">{{ts('Original')}}</a>
+        </li>
+      </ul>
+      <div class="panel-body">
+        <msgtplui-edit-content options="{msg: $ctrl.records[$ctrl.tab]}"></msgtplui-edit-content>
+<!--        <msgtplui-edit-content options="" />-->
+      </div>
+    </div>
+
+  </ng-form>
+
+    <!--  <h1 crm-page-title>{{ts('About %1', {1: $ctrl.myContact.first_name + ' ' + $ctrl.myContact.last_name})}}</h1>-->
 
 <!--  <form name="myForm" crm-ui-id-scope>-->
 
