@@ -399,7 +399,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    */
   public static function getLocationFilterAndOrderBy($email_selection_method, $location_type_id) {
     if ($email_selection_method !== 'automatic' && !$location_type_id) {
-      throw new \CRM_Core_Exception('You set an email Selection Method without specifying a Location Type.  Please go back and change your recipient settings (using the wrench icon next to "Recipients".');
+      throw new \CRM_Core_Exception(ts('You have selected an email Selection Method without specifying a Location Type. Please go back and change your recipient settings (using the wrench icon next to "Recipients").'));
     }
     $email = CRM_Core_DAO_Email::getTableName();
     // Note: When determining the ORDER that results are returned, it's
