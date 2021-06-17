@@ -1317,15 +1317,17 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activities_contact_get()
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testActivitiesContactGet() {
+  public function testActivitiesContactGet(): void {
     $activity = $this->callAPISuccess('activity', 'create', $this->_params);
     $activity2 = $this->callAPISuccess('activity', 'create', $this->_params2);
     // Get activities associated with contact $this->_contactID.
-    $params = [
+    $result = $this->callAPISuccess('Activity', 'get', [
       'contact_id' => $this->_contactID,
-    ];
-    $result = $this->callAPISuccess('activity', 'get', $params);
+      'return' => ['activity_type_id', 'activity_name'],
+    ]);
 
     $this->assertEquals(2, $result['count']);
     $this->assertEquals($this->test_activity_type_value, $result['values'][$activity['id']]['activity_type_id']);
@@ -1335,11 +1337,13 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test chained Activity format.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testChainedActivityGet() {
+  public function testChainedActivityGet(): void {
 
     $activity = $this->callAPISuccess('Contact', 'Create', [
-      'display_name' => "bob brown",
+      'display_name' => 'bob brown',
       'contact_type' => 'Individual',
       'api.activity_type.create' => [
         'weight' => '2',
@@ -1355,7 +1359,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $result = $this->callAPISuccess('Activity', 'Get', [
+    $this->callAPISuccess('Activity', 'Get', [
       'id' => $activity['id'],
       'return.assignee_contact_id' => 1,
       'api.contact.get' => ['api.pledge.get' => 1],

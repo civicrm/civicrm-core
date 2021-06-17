@@ -75,23 +75,23 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
 
   /**
    * Test access related to the 'access deleted contact' permission
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testViewEditDeleted() {
+  public function testViewEditDeleted(): void {
     // create test contacts
     $contacts = $this->createScenarioPlain();
 
     // delete one contact
     $deleted_contact_id = $contacts[2];
     $this->callAPISuccess('Contact', 'create', ['id' => $deleted_contact_id, 'contact_is_deleted' => 1]);
-    $deleted_contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $deleted_contact_id]);
-    $this->assertEquals($deleted_contact['contact_is_deleted'], 1, "Contact should've been deleted");
 
     // test WITH explicit permission
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['edit all contacts', 'view all contacts'];
     $result = CRM_Contact_BAO_Contact_Permission::allowList($contacts, CRM_Core_Permission::EDIT);
     sort($result);
-    $this->assertNotContains($deleted_contact_id, $result, "Deleted contacts should be excluded");
-    $this->assertEquals(count($result), count($contacts) - 1, "Only deleted contacts should be excluded");
+    $this->assertNotContains($deleted_contact_id, $result, 'Deleted contacts should be excluded');
+    $this->assertEquals(count($result), count($contacts) - 1, 'Only deleted contacts should be excluded');
   }
 
   /**
@@ -100,7 +100,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    * There should be the following permission-relationship
    * contact[0] -> contact[1] -> contact[2]
    */
-  public function testPermissionByRelation() {
+  public function testPermissionByRelation(): void {
     // create test scenario
     $contacts = $this->createScenarioRelations();
 
