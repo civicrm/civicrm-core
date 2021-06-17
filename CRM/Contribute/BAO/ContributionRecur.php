@@ -417,20 +417,11 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function ensureTemplateContributionExists(int $id) {
-    $recurFields = ['is_test', 'financial_type_id', 'total_amount', 'campaign_id'];
-    $recurringContribution = ContributionRecur::get(FALSE)
-      ->addWhere('id', '=', $id)
-      ->setSelect($recurFields)
-      ->execute()
-      ->first();
-
     // Check if a template contribution already exists.
     $templateContributions = Contribution::get(FALSE)
+      ->selectRowCount()
       ->addWhere('contribution_recur_id', '=', $id)
       ->addWhere('is_template', '=', 1)
-      ->addWhere('is_test', '=', $recurringContribution['is_test'])
-      ->addOrderBy('id', 'DESC')
-      ->setLimit(1)
       ->execute();
     if ($templateContributions->count()) {
       // A template contribution already exists.
@@ -438,10 +429,9 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       return;
     }
 
-    // Retrieve the most recent contribution
+    // Retrieve the most recently added contribution
     $mostRecentContribution = Contribution::get(FALSE)
       ->addWhere('contribution_recur_id', '=', $id)
-      ->addWhere('is_test', '=', $recurringContribution['is_test'])
       ->addWhere('is_template', '=', 0)
       ->addOrderBy('receive_date', 'DESC')
       ->setLimit(1)
@@ -461,7 +451,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($mostRecentContribution['id']);
 
     $templateContributionParams = array();
-    $templateContributionParams['is_test'] = $recurringContribution['is_test'];
+    $templateContributionParams['is_test'] = $mostRecentContribution['is_test'];
     $templateContributionParams['is_template'] = '1';
     $templateContributionParams['skipRecentView'] = TRUE;
     $templateContributionParams['contribution_recur_id'] = $id;
