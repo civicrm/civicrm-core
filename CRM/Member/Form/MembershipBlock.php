@@ -386,7 +386,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
         $editedResults = [];
         CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
         if (empty($editedResults['id'])) {
-          $fieldParams['name'] = strtolower(CRM_Utils_String::munge('Membership Amount', '_', 245));
+          $fieldParams['name'] = 'membership_amount';
           if (empty($params['mem_price_field_id'])) {
             CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceField', 0, 1, ['price_set_id' => $priceSetID]);
           }
