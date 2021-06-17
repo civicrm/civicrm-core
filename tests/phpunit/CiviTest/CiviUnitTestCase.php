@@ -2914,7 +2914,10 @@ VALUES
       'entity_id' => $params['id'],
       'entity_table' => 'civicrm_contribution',
     ];
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $params['id']]);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', [
+      'id' => $params['id'],
+      'return' => ['total_amount', 'fee_amount', 'net_amount'],
+    ]);
     $this->assertEquals($contribution['total_amount'] - $contribution['fee_amount'], $contribution['net_amount']);
     if ($context == 'pending') {
       $trxn = CRM_Financial_BAO_FinancialItem::retrieveEntityFinancialTrxn($entityParams);
@@ -2935,7 +2938,7 @@ VALUES
     if ($context == 'feeAmount') {
       $compareParams['fee_amount'] = 50;
     }
-    elseif ($context == 'online') {
+    elseif ($context === 'online') {
       $compareParams = [
         'to_financial_account_id' => 12,
         'total_amount' => (float) CRM_Utils_Array::value('total_amount', $params, 100.00),
@@ -3613,7 +3616,10 @@ VALUES
    * @throws \CRM_Core_Exception
    */
   protected function validateAllPayments() {
-    $payments = $this->callAPISuccess('Payment', 'get', ['options' => ['limit' => 0]])['values'];
+    $payments = $this->callAPISuccess('Payment', 'get', [
+      'return' => ['total_amount', 'tax_amount'],
+      'options' => ['limit' => 0],
+    ])['values'];
     $this->validatePayments($payments);
   }
 
@@ -3625,7 +3631,10 @@ VALUES
   protected function validateAllContributions(): void {
     $contributions = $this->callAPISuccess('Contribution', 'get', ['return' => ['tax_amount', 'total_amount']])['values'];
     foreach ($contributions as $contribution) {
-      $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $contribution['id']])['values'];
+      $lineItems = $this->callAPISuccess('LineItem', 'get', [
+        'contribution_id' => $contribution['id'],
+        'return' => ['tax_amount', 'line_total'],
+      ])['values'];
       $total = 0;
       $taxTotal = 0;
       foreach ($lineItems as $lineItem) {
