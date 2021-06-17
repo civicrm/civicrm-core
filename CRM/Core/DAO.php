@@ -2591,7 +2591,7 @@ SELECT contact_id
    * @param string $tableName
    *   Table referred to.
    *
-   * @return array
+   * @return CRM_Core_Reference_Interface[]
    *   structure of table and column, listing every table with a
    *   foreign key reference to $tableName, and the column where the key appears.
    */
@@ -2628,7 +2628,12 @@ SELECT contact_id
     $contactReferences = [];
     $coreReferences = CRM_Core_DAO::getReferencesToTable('civicrm_contact');
     foreach ($coreReferences as $coreReference) {
-      if (!is_a($coreReference, 'CRM_Core_Reference_Dynamic')) {
+      if (
+        // Exclude option values
+        !is_a($coreReference, 'CRM_Core_Reference_Dynamic') &&
+        // Exclude references to other columns
+        $coreReference->getTargetKey() === 'id'
+      ) {
         $contactReferences[$coreReference->getReferenceTable()][] = $coreReference->getReferenceKey();
       }
     }
