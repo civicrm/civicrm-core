@@ -285,11 +285,6 @@ class Container {
     $container->setDefinition('cache_config', new Definition('ArrayObject'))
       ->setFactory([new Reference(self::SELF), 'createCacheConfig'])->setPublic(TRUE);
 
-    $container->setDefinition('civi.mailing.triggers', new Definition(
-      'Civi\Core\SqlTrigger\TimestampTriggers',
-      ['civicrm_mailing', 'Mailing']
-    ))->addTag('kernel.event_listener', ['event' => 'hook_civicrm_triggerInfo', 'method' => 'onTriggerInfo'])->setPublic(TRUE);
-
     $container->setDefinition('civi.activity.triggers', new Definition(
       'Civi\Core\SqlTrigger\TimestampTriggers',
       ['civicrm_activity', 'Activity']

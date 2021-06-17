@@ -325,7 +325,7 @@
   <field>
     <name>created_date</name>
     <type>timestamp</type>
-    <default>NULL</default>
+    <default>CURRENT_TIMESTAMP</default>
     <required>false</required>
     <title>Mailing Created Date</title>
     <comment>Date and time this mailing was created.</comment>
