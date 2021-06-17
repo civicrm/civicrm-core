@@ -10,3 +10,6 @@ UPDATE civicrm_option_value SET name = 'Case'
   WHERE value = 'civicrm_case' AND option_group_id = @option_group_id_tuf;
 UPDATE civicrm_option_value SET name = 'File'
   WHERE value = 'civicrm_file' AND option_group_id = @option_group_id_tuf;
+
+ALTER TABLE civicrm_mailing
+MODIFY COLUMN `created_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date and time this mailing was created.';
