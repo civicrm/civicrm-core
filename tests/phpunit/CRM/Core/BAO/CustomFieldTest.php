@@ -607,7 +607,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'label' => 'Enter text here',
         'groupTitle' => 'Custom Group',
         'default_value' => 'xyz',
-        'custom_group_id' => '1',
+        'custom_group_id' => $customGroupID,
         'extends' => 'Contact',
         'extends_entity_column_value' => NULL,
         'extends_entity_column_id' => NULL,

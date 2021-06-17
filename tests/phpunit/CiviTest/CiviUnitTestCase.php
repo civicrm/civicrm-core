@@ -26,6 +26,8 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
@@ -1844,22 +1846,24 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param bool $dropCustomValueTables
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {
       throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
-      $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
-      while ($optionGroupResult->fetch()) {
-        // We have a test that sets the option_group_id for a custom group to that of 'activity_type'.
-        // Then test tearDown deletes it. This is all mildly terrifying but for the context here we can be pretty
-        // sure the low-numbered (50 is arbitrary) option groups are not ones to 'just delete' in a
-        // generic cleanup routine.
-        if (!empty($optionGroupResult->option_group_id) && $optionGroupResult->option_group_id > 50) {
-          CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $optionGroupResult->option_group_id);
-        }
-      }
+
+      CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
+        ->addChain('delete_options', OptionGroup::delete()
+          ->addWhere('id', '=', '$option_group_id')
+        )
+        ->addChain('delete_fields', CustomField::delete()
+          ->addWhere('id', '=', '$id')
+        )->execute();
+
+      CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+      // Reset autoincrement too.
       $tablesToTruncate[] = 'civicrm_custom_group';
       $tablesToTruncate[] = 'civicrm_custom_field';
     }
@@ -1872,22 +1876,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       CRM_Core_DAO::executeQuery($sql);
     }
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
-
-    if ($dropCustomValueTables) {
-      $dbName = self::getDBName();
-      $query = "
-SELECT TABLE_NAME as tableName
-FROM   INFORMATION_SCHEMA.TABLES
-WHERE  TABLE_SCHEMA = '{$dbName}'
-AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
-";
-
-      $tableDAO = CRM_Core_DAO::executeQuery($query);
-      while ($tableDAO->fetch()) {
-        $sql = "DROP TABLE {$tableDAO->tableName}";
-        CRM_Core_DAO::executeQuery($sql);
-      }
-    }
   }
 
   /**
