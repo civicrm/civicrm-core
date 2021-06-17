@@ -346,6 +346,11 @@ WHERE li.contribution_id = %1";
       $entityId = [$entityId];
     }
 
+    $params = [];
+    foreach ($entityId as $id) {
+      CRM_Utils_Hook::pre('delete', 'LineItem', $id, $params);
+    }
+
     $query = "DELETE FROM civicrm_line_item where entity_id IN ('" . implode("','", $entityId) . "') AND entity_table = '$entityTable'";
     $dao = CRM_Core_DAO::executeQuery($query);
     return TRUE;
