@@ -226,6 +226,7 @@ class CRM_Core_CodeGen_Specification {
       'attributes_simple' => trim($database['tableAttributes_simple']),
       'attributes_modern' => trim($database['tableAttributes_modern']),
       'comment' => $this->value('comment', $tableXML),
+      'description' => $this->value('description', $tableXML),
       'localizable' => $localizable,
       'log' => $this->value('log', $tableXML, 'false'),
       'archive' => $this->value('archive', $tableXML, 'false'),

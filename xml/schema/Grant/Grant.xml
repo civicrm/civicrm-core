@@ -3,6 +3,7 @@
   <base>CRM/Grant</base>
   <class>Grant</class>
   <name>civicrm_grant</name>
+  <description>Funds applied for and given out by this organization.</description>
   <comment>This table stores information about grants given to a contact.</comment>
   <add>1.8</add>
   <log>true</log>

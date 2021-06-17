@@ -3,6 +3,7 @@
   <base>CRM/Case</base>
   <class>Case</class>
   <name>civicrm_case</name>
+  <description>Collections of activities and relationships for a given purpose.</description>
   <comment>This table stores information about cases grouping activities.</comment>
   <add>1.8</add>
   <log>true</log>

@@ -4,6 +4,7 @@
   <base>CRM/Event</base>
   <class>Event</class>
   <name>civicrm_event</name>
+  <description>Scheduled in-person or online events which contacts can register for and attend.</description>
   <add>1.7</add>
   <log>true</log>
   <icon>fa-calendar</icon>

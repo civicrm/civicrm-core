@@ -4,6 +4,7 @@
   <base>CRM/Contribute</base>
   <class>Contribution</class>
   <name>civicrm_contribution</name>
+  <description>Financial records consisting of transactions, line-items, etc.</description>
   <add>1.3</add>
   <log>true</log>
   <icon>fa-credit-card</icon>

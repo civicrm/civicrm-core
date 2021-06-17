@@ -4,6 +4,7 @@
   <base>CRM/Event</base>
   <class>Participant</class>
   <name>civicrm_participant</name>
+  <description>Records of contacts' attendance and roles in events.</description>
   <add>1.7</add>
   <log>true</log>
   <icon>fa-ticket</icon>

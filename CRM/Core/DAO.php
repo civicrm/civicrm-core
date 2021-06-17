@@ -137,6 +137,15 @@ class CRM_Core_DAO extends DB_DataObject {
     return CRM_Core_DAO_AllCoreTables::getBriefName($className);
   }
 
+  /**
+   * Returns user-friendly description of this entity.
+   *
+   * @return string|null
+   */
+  public static function getEntityDescription() {
+    return NULL;
+  }
+
   public function __clone() {
     if (!empty($this->_DB_resultid)) {
       $this->resultCopies++;
