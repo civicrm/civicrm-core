@@ -98,7 +98,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'processor_id' => $this->createPaymentProcessor(),
     ]);
     $ipn->main();
-    $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
+    $this->callAPISuccessGetCount('Contribution', ['contribution_status_id' => 'Cancelled'], 1);
     $this->callAPISuccessGetCount('Membership', ['status_id' => 'Cancelled'], 2);
   }
 
