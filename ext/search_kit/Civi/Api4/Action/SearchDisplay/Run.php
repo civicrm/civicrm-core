@@ -75,7 +75,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    */
   public function _run(\Civi\Api4\Generic\Result $result) {
     // Only administrators can use this in unsecured "preview mode"
-    if (!(is_string($this->savedSearch) && is_string($this->display)) && $this->checkPermissions && !\CRM_Core_Permission::check('administer CiviCRM')) {
+    if (!(is_string($this->savedSearch) && is_string($this->display)) && $this->checkPermissions && !\CRM_Core_Permission::check('administer CiviCRM data')) {
       throw new UnauthorizedException('Access denied');
     }
     if (is_string($this->savedSearch)) {
@@ -93,9 +93,16 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     if (!$this->savedSearch || !$this->display) {
       throw new \API_Exception("Error: SearchDisplay not found.");
     }
+    // Displays with acl_bypass must be embedded on an afform which the user has access to
+    if (
+      $this->checkPermissions && !empty($this->display['acl_bypass']) &&
+      !\CRM_Core_Permission::check('all CiviCRM permissions and ACLs') && !$this->loadAfform()
+    ) {
+      throw new UnauthorizedException('Access denied');
+    }
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->savedSearch['api_params'];
-    $apiParams['checkPermissions'] = $this->checkPermissions;
+    $apiParams['checkPermissions'] = empty($this->display['acl_bypass']);
     $apiParams += ['where' => []];
     $settings = $this->display['settings'];
     $page = NULL;

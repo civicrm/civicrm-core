@@ -62,8 +62,8 @@
               {{:: search.display_name.length === 1 ? ts('1 Display') : ts('%1 Displays', {1: search.display_name.length}) }} <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" ng-if=":: search.display_name.length">
-              <li ng-repeat="display_name in search.display_name">
-                <a href="{{:: $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}" target="_blank">
+              <li ng-repeat="display_name in search.display_name" ng-class="{disabled: search.display_acl_bypass[$index]}" title="{{:: search.display_acl_bypass[$index] ? ts('Display has permissions disabled') : ts('View display') }}">
+                <a ng-href="{{:: search.display_acl_bypass[$index] ? '' : $ctrl.searchPath + '#/display/' + search.name + '/' + display_name }}" target="_blank">
                   <i class="fa {{:: search.display_icon[$index] }}"></i>
                   {{:: search.display_label[$index] }}
                 </a>
@@ -107,7 +107,7 @@
           {{:: search['modified.display_name'] ? ts('%1 by %2', {1: formatDate(search.modified_date), 2: search['modified.display_name']}) : formatDate(search.modified_date) }}
         </td>
         <td class="text-right">
-          <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}">{{:: ts('Edit') }}</a>
+          <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}" ng-if="search.permissionToEdit">{{:: ts('Edit') }}</a>
           <a class="btn btn-xs btn-default" href="#/create/{{:: search.api_entity + '?params=' + $ctrl.encode(search.api_params) }}">{{:: ts('Clone') }}</a>
           <a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: search}" on-yes="$ctrl.deleteSearch(search)">{{:: ts('Delete') }}</a>
         </td>

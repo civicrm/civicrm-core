@@ -32,9 +32,12 @@ class SqlFunctionCOUNT extends SqlFunction {
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string $value
+   * @param string $dataType
    * @return string|array
    */
-  public function formatOutputValue($value) {
+  public function formatOutputValue($value, &$dataType) {
+    // Count is always an integer
+    $dataType = 'Integer';
     return (int) $value;
   }
 

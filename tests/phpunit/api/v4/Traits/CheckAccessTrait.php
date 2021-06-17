@@ -56,6 +56,10 @@ trait CheckAccessTrait {
 
   protected function resetCheckAccess() {
     $this->setCheckAccessGrants([]);
+    // Grant the test user all permissions EXCEPT 'all CiviCRM permissions and ACLs' (which bypass ACL checks)
+    $allPermissions = \CRM_Core_Permission::basicPermissions(TRUE);
+    unset($allPermissions['all CiviCRM permissions and ACLs']);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = array_keys($allPermissions);
   }
 
 }

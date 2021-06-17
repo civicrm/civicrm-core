@@ -1,6 +1,7 @@
 <?php
 namespace api\v4\SearchDisplay;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
@@ -200,7 +201,189 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertCount(2, $result);
     $this->assertEquals($sampleData['Three'], $result[0]['id']);
     $this->assertEquals($sampleData['Four'], $result[1]['id']);
+  }
 
+  public function testWithACLBypass() {
+    $config = \CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+
+    $lastName = uniqid(__FUNCTION__);
+    $searchName = uniqid(__FUNCTION__);
+    $displayName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'Four', 'last_name' => $lastName],
+    ];
+    Contact::save()->setRecords($sampleData)->execute();
+
+    // Super admin may create a display with acl_bypass
+    $search = SavedSearch::create()
+      ->setValues([
+        'name' => $searchName,
+        'title' => 'Test Saved Search',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name', 'last_name'],
+          'where' => [],
+        ],
+      ])
+      ->addChain('display', SearchDisplay::create()
+        ->setValues([
+          'saved_search_id' => '$id',
+          'name' => $displayName,
+          'type' => 'table',
+          'label' => '',
+          'acl_bypass' => TRUE,
+          'settings' => [
+            'limit' => 20,
+            'pager' => TRUE,
+            'columns' => [
+              [
+                'key' => 'id',
+                'label' => 'Contact ID',
+                'dataType' => 'Integer',
+                'type' => 'field',
+              ],
+              [
+                'key' => 'first_name',
+                'label' => 'First Name',
+                'dataType' => 'String',
+                'type' => 'field',
+              ],
+              [
+                'key' => 'last_name',
+                'label' => 'Last Name',
+                'dataType' => 'String',
+                'type' => 'field',
+              ],
+            ],
+            'sort' => [
+              ['id', 'ASC'],
+            ],
+          ],
+        ]))
+      ->execute()->first();
+
+    // Super admin may update a display with acl_bypass
+    SearchDisplay::update()->addWhere('name', '=', $displayName)
+      ->addValue('label', 'Test Display')
+      ->execute();
+
+    $config->userPermissionClass->permissions = ['administer CiviCRM'];
+    // Ordinary admin may not edit display because it has acl_bypass
+    $error = NULL;
+    try {
+      SearchDisplay::update()->addWhere('name', '=', $displayName)
+        ->addValue('label', 'Test Display')
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Ordinary admin may not change the value of acl_bypass
+    $error = NULL;
+    try {
+      SearchDisplay::update()->addWhere('name', '=', $displayName)
+        ->addValue('acl_bypass', FALSE)
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    // Ordinary admin may not edit the search because the display has acl_bypass
+    $error = NULL;
+    try {
+      SavedSearch::update()->addWhere('name', '=', $searchName)
+        ->addValue('title', 'Tested Search')
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => $searchName,
+      'display' => $displayName,
+      'filters' => ['last_name' => $lastName],
+      'afform' => NULL,
+    ];
+
+    $config->userPermissionClass->permissions = ['access CiviCRM'];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+
+    $config->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+    $params['checkPermissions'] = TRUE;
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+
+    $config->userPermissionClass->permissions = ['administer CiviCRM'];
+    $error = NULL;
+    try {
+      civicrm_api4('SearchDisplay', 'run', $params);
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('denied', $error);
+
+    $config->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+
+    // Super users can update the acl_bypass field
+    SearchDisplay::update()->addWhere('name', '=', $displayName)
+      ->addValue('acl_bypass', FALSE)
+      ->execute();
+
+    $config->userPermissionClass->permissions = ['view all contacts'];
+    // And ordinary users can now run it
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $result);
+
+    // But not edit
+    $error = NULL;
+    try {
+      SearchDisplay::update()->addWhere('name', '=', $displayName)
+        ->addValue('label', 'Tested Display')
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
+
+    $config->userPermissionClass->permissions = ['administer CiviCRM data'];
+
+    // Admins can edit the search and the display
+    SavedSearch::update()->addWhere('name', '=', $searchName)
+      ->addValue('title', 'Tested Search')
+      ->execute();
+    SearchDisplay::update()->addWhere('name', '=', $displayName)
+      ->addValue('label', 'Tested Display')
+      ->execute();
+
+    // But they can't edit the acl_bypass field
+    $error = NULL;
+    try {
+      SearchDisplay::update()->addWhere('name', '=', $displayName)
+        ->addValue('acl_bypass', TRUE)
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertStringContainsString('failed', $error);
   }
 
 }

@@ -2,5 +2,18 @@
   <div class="form-inline">
     <label for="crm-search-admin-display-label">{{:: ts('Name') }} <span class="crm-marker">*</span></label>
     <input id="crm-search-admin-display-label" type="text" class="form-control" ng-model="$ctrl.display.label" required placeholder="{{:: ts('Untitled') }}"/>
+    <div class="form-control" ng-class="{disabled: !$ctrl.isSuperAdmin}" title="{{:: $ctrl.aclBypassHelp }}">
+      <label>
+        <input type="checkbox" ng-if="$ctrl.isSuperAdmin" ng-model="$ctrl.display.acl_bypass" style="display: none;">
+        <i class="crm-i fa-lock text-success" ng-if="!$ctrl.display.acl_bypass"></i>
+        <i class="crm-i fa-unlock text-danger" ng-if="$ctrl.display.acl_bypass"></i>
+        <span>{{ $ctrl.display.acl_bypass ? ts('Bypass Permissions') : ts('Enforce Permissions') }}</span>
+      </label>
+    </div>
+    <div class="help-block bg-warning" ng-if="$ctrl.display.acl_bypass">
+      <i class="crm-i fa-unlock"></i>
+      {{:: ts('Anyone who can view this display will be able to see all results, regardless of their permission level.') }}
+    </div>
   </div>
+
 </fieldset>

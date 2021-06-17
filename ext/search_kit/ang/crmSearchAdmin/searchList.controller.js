@@ -13,6 +13,7 @@
 
     _.each(savedSearches, function(search) {
       search.entity_title = searchMeta.getEntity(search.api_entity).title_plural;
+      search.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(search.display_acl_bypass, true);
       search.afform_count = 0;
     });
 

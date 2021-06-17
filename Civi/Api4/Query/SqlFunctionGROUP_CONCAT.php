@@ -51,12 +51,18 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string $value
+   * @param string $dataType
    * @return string|array
    */
-  public function formatOutputValue($value) {
+  public function formatOutputValue($value, &$dataType) {
     $exprArgs = $this->getArgs();
+    // By default, values are split into an array and formatted according to the field's dataType
     if (!$exprArgs[2]['prefix']) {
       $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
+    }
+    // If using custom separator, unset $dataType to preserve raw string
+    else {
+      $dataType = NULL;
     }
     return $value;
   }
