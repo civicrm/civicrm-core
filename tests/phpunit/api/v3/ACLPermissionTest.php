@@ -672,13 +672,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityAccessCiviCRMEnough($version) {
+  public function testGetActivityAccessCiviCRMEnough($version): void {
     $this->_apiversion = $version;
     $activity = $this->activityCreate();
     $this->setPermissions(['access CiviCRM']);
     $this->callAPIFailure('Activity', 'getsingle', [
       'check_permissions' => 1,
       'id' => $activity['id'],
+      'return' => 'id',
     ], 'Expected one Activity but found 0');
     $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
@@ -701,7 +702,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityCheckPermissionsByComponent($version) {
+  public function testGetActivityCheckPermissionsByComponent($version): void {
     $this->_apiversion = $version;
     $activity = $this->activityCreate(['activity_type_id' => 'Contribution']);
     $activity2 = $this->activityCreate(['activity_type_id' => 'Pledge Reminder']);
@@ -710,15 +711,14 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'aclWhereHookAllResults',
     ]);
     $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
-    $this->callAPISuccessGetSingle('Activity', [
-      'check_permissions' => 1,
-      'id' => ['IN' => [$activity['id'], $activity2['id']]],
-    ]);
     $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => ['IN' => [$activity['id'], $activity2['id']]],
     ], 1);
-
+    $this->callAPISuccessGetCount('Activity', [
+      'check_permissions' => 1,
+      'id' => ['IN' => [$activity['id'], $activity2['id']]],
+    ], 1);
   }
 
   /**
@@ -730,7 +730,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityCheckPermissionsByCaseComponent($version) {
+  public function testGetActivityCheckPermissionsByCaseComponent(int $version): void {
     $this->_apiversion = $version;
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $activity = $this->activityCreate(['activity_type_id' => 'Open Case']);
@@ -744,10 +744,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'access CiviContribute',
       'access all cases and activities',
     ]);
-    $this->callAPISuccessGetSingle('Activity', [
+    $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => ['IN' => [$activity['id'], $activity2['id']]],
-    ]);
+    ], 1);
     $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => ['IN' => [$activity['id'], $activity2['id']]],
@@ -766,7 +766,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testGetActivityByACL($version) {
+  public function testGetActivityByACL(int $version): void {
     $this->_apiversion = $version;
     $this->setPermissions(['access CiviCRM']);
     $activity = $this->activityCreate();
@@ -775,10 +775,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       $this,
       'aclWhereHookAllResults',
     ]);
-    $this->callAPISuccessGetSingle('Activity', [
+    $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => $activity['id'],
-    ]);
+    ], 1);
     $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => $activity['id'],
@@ -786,10 +786,12 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * To leverage ACL permission to view an activity you must be able to see any of the contacts.
-   * FIXME: Api4
+   * To leverage ACL permission to view an activity you must be able to see any
+   * of the contacts. FIXME: Api4
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testGetActivityByAclCannotViewAllContacts() {
+  public function testGetActivityByAclCannotViewAllContacts(): void {
     $activity = $this->activityCreate(['assignee_contact_id' => $this->individualCreate()]);
     $contacts = $this->getActivityContacts($activity);
     $this->setPermissions(['access CiviCRM']);
@@ -872,10 +874,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'aclWhereHookAllResults',
     ]);
     $this->contactDelete($contacts['source_contact_id']);
-    $this->callAPISuccess('Activity', 'getsingle', [
+    $this->callAPISuccessGetCount('Activity', [
       'check_permissions' => 1,
       'id' => $activity['id'],
-    ]);
+    ], 1);
   }
 
   /**
@@ -889,7 +891,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testActivitiesGetMultipleIdsCheckPermissions($version) {
+  public function testActivitiesGetMultipleIdsCheckPermissions($version): void {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $activity = $this->activityCreate();
@@ -904,8 +906,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'id' => ['IN' => [$activity['id'], $activity2['id']]],
       'check_permissions' => TRUE,
     ];
-    $result = $this->callAPISuccess('activity', 'get', $params);
-    $this->assertEquals(2, $result['count']);
+    $this->callAPISuccessGetCount('Activity', $params, 2);
   }
 
   /**
@@ -920,7 +921,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @dataProvider versionThreeAndFour
    */
-  public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL($version) {
+  public function testActivitiesGetMultipleIdsCheckPermissionsLimitedACL(int $version): void {
     $this->_apiversion = $version;
     $this->createLoggedInUser();
     $activity = $this->activityCreate();
@@ -992,10 +993,11 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
     $activityContacts = $this->callAPISuccess('ActivityContact', 'get', [
       'activity_id' => $activity['id'],
-    ]);
+      'return' => ['record_type_id', 'contact_id'],
+    ])['values'];
 
     $activityRecordTypes = $this->callAPISuccess('ActivityContact', 'getoptions', ['field' => 'record_type_id']);
-    foreach ($activityContacts['values'] as $activityContact) {
+    foreach ($activityContacts as $activityContact) {
       $type = $activityRecordTypes['values'][$activityContact['record_type_id']];
       switch ($type) {
         case 'Activity Source':
