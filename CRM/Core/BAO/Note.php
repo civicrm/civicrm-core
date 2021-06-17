@@ -565,17 +565,4 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     }
   }
 
-  /**
-   * Whitelist of possible values for the entity_table field
-   * @return array
-   */
-  public static function entityTables() {
-    return array(
-      'civicrm_relationship' => 'Relationship',
-      'civicrm_contact' => 'Contact',
-      'civicrm_participant' => 'Participant',
-      'civicrm_contribution' => 'Contribution',
-    );
-  }
-
 }

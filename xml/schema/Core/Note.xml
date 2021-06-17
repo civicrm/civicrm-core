@@ -31,7 +31,7 @@
     <required>true</required>
     <comment>Name of table where item being referenced is stored.</comment>
     <pseudoconstant>
-      <callback>CRM_Core_BAO_Note::entityTables</callback>
+      <optionGroupName>note_used_for</optionGroupName>
     </pseudoconstant>
     <add>1.1</add>
   </field>
