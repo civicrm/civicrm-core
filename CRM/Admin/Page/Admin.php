@@ -28,8 +28,6 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
   public function run() {
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
-    $this->assign('registerSite', htmlspecialchars('https://civicrm.org/register-your-site?src=iam&sid=' . CRM_Utils_System::getSiteID()));
-
     $groups = [
       'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
