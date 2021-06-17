@@ -530,6 +530,10 @@ ORDER BY   gc.contact_id, g.children
     if (empty($apiParams['having'])) {
       $apiParams['select'] = array_slice($apiParams['select'], 0, 1);
     }
+    // Order is irrelevant unless using limit or offset
+    if (empty($apiParams['limit']) && empty($apiParams['offset'])) {
+      unset($apiParams['orderBy']);
+    }
     /* @var $api \Civi\Api4\Generic\DAOGetAction */
     $api = Request::create($savedSearch['api_entity'], 'get', $apiParams);
     $query = new Api4SelectQuery($api);
