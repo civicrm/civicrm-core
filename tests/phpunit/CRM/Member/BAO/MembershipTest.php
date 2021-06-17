@@ -40,7 +40,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
-    $this->membershipStatusDelete($this->_membershipStatusID);
     $this->_membershipStatusID = $this->_membershipTypeID = NULL;
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -906,10 +905,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(2, $relatedMembershipsCount, "Related membership count should still be 2, but found $relatedMembershipsCount");
     $this->assertMembershipExists($relatedMembership1['id']);
     $this->assertMembershipExists($relatedMembership2['id']);
-
-    // Clean up: Delete everything!
-    $this->membershipDelete($membership['id']);
-    $this->membershipStatusDelete($otherStatusID);
   }
 
   public function testRelatedMembershipWithContactReferenceCustomField() {

@@ -32,6 +32,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_group',
       'civicrm_prevnext_cache',
     ]);
+    if ($this->hookClass) {
+      // Do this here to flush the entityTables cache on teardown.
+      // it might be a bit expensive to add to every single test
+      // so a bit selectively.
+      $this->hookClass->reset();
+      CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
+    }
     parent::tearDown();
   }
 
@@ -1447,6 +1454,48 @@ WHERE
     $cidRefs['civicrm_mailing'][1] = 'scheduled_id';
     $cidRefs['civicrm_mailing'][2] = 'approver_id';
     return $cidRefs;
+  }
+
+  /**
+   * Test that declaring a custom join for search kit does not break merge.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMergeWithDeclaredSearchJoin(): void {
+    $this->hookClass->setHook('civicrm_entityTypes', [
+      $this,
+      'hookEntityTypes',
+    ]);
+    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate(['api.Im.create' => ['name' => 'chat_handle']]);
+    $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2]);
+  }
+
+  /**
+   * Implements hook_civicrm_entityTypes().
+   *
+   * Declare a callback to hookLinkCallBack function.
+   */
+  public function hookEntityTypes(&$entityTypes): void {
+    $entityTypes['CRM_Core_DAO_IM']['links_callback'][] = [$this, 'hookLinkCallBack'];
+  }
+
+  /**
+   * Callback to alter the link to im
+   *
+   * Declare a pseudo-fk between name and IM.name
+   * so it can be joined in SearchKit. This is obviously
+   * artificial but is intended to mimic the pseudo-joins
+   * extensions might use to leverage search kit.
+   *
+   * @param string $className
+   * @param array $links
+   *
+   * @noinspection PhpUnusedParameterInspection
+   */
+  public function hookLinkCallBack(string $className, array &$links): void {
+    $links[] = new CRM_Core_Reference_Basic('civicrm_im', 'name', 'civicrm_contact', 'first_name');
   }
 
 }
