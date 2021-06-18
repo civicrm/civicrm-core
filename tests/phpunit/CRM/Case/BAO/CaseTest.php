@@ -1201,4 +1201,35 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertArrayHasKey($caseId, CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']));
   }
 
+  /**
+   * Test a high number of assigned case roles.
+   */
+  public function testGoingTo11() {
+    $loggedInUser = $this->createLoggedInUser();
+    $individual = $this->individualCreate();
+    $caseObj = $this->createCase($individual, $loggedInUser);
+    $caseId = $caseObj->id;
+
+    // Create lots of assigned roles
+    for ($i = 1; $i <= 30; $i++) {
+      // create a new type
+      $relationship_type_id = $this->callAPISuccess('RelationshipType', 'create', [
+        'name_a_b' => "has as Wizard level $i",
+        'name_b_a' => "is Wizard level $i for",
+      ])['id'];
+
+      // Now make a new person and give them the role
+      $contact_id = $this->individualCreate([], 0, TRUE);
+      $this->callAPISuccess('Relationship', 'create', [
+        'case_id' => $caseId,
+        'contact_id_a' => $individual,
+        'contact_id_b' => $contact_id,
+        'relationship_type_id' => $relationship_type_id,
+      ]);
+    }
+
+    // Note the stock case type adds a manager role for the logged in user so it's 31 not 30.
+    $this->assertCount(31, CRM_Case_BAO_Case::getCaseRoles($individual, $caseId), 'Why not just make ten louder?');
+  }
+
 }
