@@ -368,4 +368,32 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroupId);
   }
 
+  /**
+   * Test that as per the form that if the extends column is passed as
+   * - ['ParticipantEventType', [4]] Where 4 = Meeting Event Type that we can create a custom group correctly
+   */
+  public function testParticipantEntityCustomGroup() {
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
+    $result = array_shift($customGroup['values']);
+    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertEquals('Participant', $result['extends']);
+    $this->customGroupDelete($result['id']);
+  }
+
+  /**
+   * Test that without any fields we can change the entity type of the custom group and fields are correctly updated
+   */
+  public function testChangeEntityCustomGroup() {
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
+    $result = array_shift($customGroup['values']);
+    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertEquals('Participant', $result['extends']);
+    $customGroup = $this->callAPISuccess($this->_entity, 'create', ['id' => $customGroup['id'], 'extends' => ['Individual', []]]);
+    $result = array_shift($customGroup['values']);
+    $this->assertTrue(empty($result['extends_entity_column_id']));
+    $this->assertTrue(empty($result['extends_entity_column_value']));
+    $this->assertEquals('Individual', $result['extends']);
+    $this->customGroupDelete($result['id']);
+  }
+
 }

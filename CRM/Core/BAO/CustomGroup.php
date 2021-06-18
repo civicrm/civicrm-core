@@ -51,7 +51,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
-      $registeredSubTypes = self::getSubTypes()[$params['extends']];
+      $b = self::getMungedEntity($params['extends'], $params['extends_entity_column_id'] ?? NULL);
+      $registeredSubTypes = self::getSubTypes()[$b];
       if (is_array($extendsChildType)) {
         foreach ($extendsChildType as $childType) {
           if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
@@ -2226,6 +2227,24 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
 
     CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($sel2);
     return $sel2;
+  }
+
+  /**
+   * Get the munged entity.
+   *
+   * This is the entity eg. Relationship or the name of the sub entity
+   * e.g ParticipantRole.
+   *
+   * @param string $extends
+   * @param int|null $extendsEntityColumn
+   *
+   * @return string
+   */
+  protected static function getMungedEntity($extends, $extendsEntityColumn = NULL) {
+    if (!$extendsEntityColumn || $extendsEntityColumn === 'null') {
+      return $extends;
+    }
+    return CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name')[$extendsEntityColumn];
   }
 
 }
