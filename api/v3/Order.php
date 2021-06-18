@@ -160,10 +160,6 @@ function civicrm_api3_order_create(array $params): array {
         CRM_Core_Error::deprecatedWarning('This should be unreachable & tests show it is never tested.');
         civicrm_api3('PledgePayment', 'create', $paymentParams);
       }
-      if ($entity === 'participant') {
-        civicrm_api3('ParticipantPayment', 'create', $paymentParams);
-      }
-
     }
   }
   return civicrm_api3_create_success($contribution['values'] ?? [], $params, 'Order', 'create');
