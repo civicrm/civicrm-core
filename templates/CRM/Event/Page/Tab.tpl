@@ -7,7 +7,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $action eq 1 or $action eq 2 or $action eq 8} {* add, update or view *}
+{if !empty($showFeeBlock)}
+  {include file="CRM/Event/Form/FeeBlock.tpl"}
+{elseif $action eq 1 or $action eq 2 or $action eq 8} {* add, update or view *}
     {include file="CRM/Event/Form/Participant.tpl"}
 {elseif $action eq 4}
     {include file="CRM/Event/Form/ParticipantView.tpl"}
