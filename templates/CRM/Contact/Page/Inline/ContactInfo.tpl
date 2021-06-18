@@ -27,27 +27,27 @@
       </div>
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Job Title{/ts}</div>
-        <div class="crm-content crm-contact-job_title">{$job_title}</div>
+        <div class="crm-content crm-contact-job_title">{if isset($job_title)}{$job_title}{/if}</div>
       </div>
       {/if}
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Nickname{/ts}</div>
-        <div class="crm-content crm-contact-nick_name">{$nick_name}</div>
+        <div class="crm-content crm-contact-nick_name">{if isset($nick_name)}{$nick_name}{/if}</div>
       </div>
 
       {if $contact_type eq 'Organization'}
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Legal Name{/ts}</div>
-        <div class="crm-content crm-contact-legal_name">{$legal_name}</div>
+        <div class="crm-content crm-contact-legal_name">{if isset($legal_name)}{$legal_name}{/if}</div>
       </div>
       <div class="crm-summary-row">
         <div class="crm-label">{ts}SIC Code{/ts}</div>
-        <div class="crm-content crm-contact-sic_code">{$sic_code}</div>
+        <div class="crm-content crm-contact-sic_code">{if isset($sic_code)}{$sic_code}{/if}</div>
       </div>
       {/if}
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Source{/ts}</div>
-        <div class="crm-content crm-contact_source">{$source}</div>
+        <div class="crm-content crm-contact_source">{if isset($source)}{$source}{/if}</div>
       </div>
 
     </div>
