@@ -335,7 +335,25 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($isMonetary) {
         $this->assign('feeBlockPaid', TRUE);
       }
-      return CRM_Event_Form_EventFees::preProcess($this);
+      // @todo these lines were moved here from a previously shared function. Likely not all are relevant.
+      //as when call come from register.php
+      if (!$this->_eventId) {
+        $this->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $this);
+      }
+
+      $this->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
+      $this->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $this);
+
+      $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->_eventId);
+
+      //CRM-6907 set event specific currency.
+      if ($this->_eventId &&
+        ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'currency'))
+      ) {
+        CRM_Core_Config::singleton()->defaultCurrency = $currency;
+      }
+      // End previously shared.
+      return;
     }
 
     $this->assignUrlPath();
@@ -370,7 +388,23 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       if ($this->_submitValues['event_id']) {
         $this->_eventId = $this->_submitValues['event_id'];
       }
-      CRM_Event_Form_EventFees::preProcess($this);
+      // @todo these lines were moved here from a previously shared function. Likely not all are relevant.
+      //as when call come from register.php
+      if (!$this->_eventId) {
+        $this->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $this);
+      }
+      $this->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
+      $this->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $this);
+
+      $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->_eventId);
+
+      //CRM-6907 set event specific currency.
+      if ($this->_eventId &&
+        ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'currency'))
+      ) {
+        CRM_Core_Config::singleton()->defaultCurrency = $currency;
+      }
+      // End previously shared.
       $this->buildEventFeeForm($this);
       CRM_Event_Form_EventFees::setDefaultValues($this);
     }

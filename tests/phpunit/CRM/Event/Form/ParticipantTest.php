@@ -350,7 +350,19 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
       $form->_isPaidEvent = TRUE;
-      CRM_Event_Form_EventFees::preProcess($form);
+      // @todo these lines were moved here from a previously shared function. Likely not all are relevant.
+      $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
+      $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
+
+      $form->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($form->_eventId);
+
+      //CRM-6907 set event specific currency.
+      if ($form->_eventId &&
+        ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
+      ) {
+        CRM_Core_Config::singleton()->defaultCurrency = $currency;
+      }
+      // End previously shared.
       $form->assignProcessors();
       $form->buildEventFeeForm($form);
     }
