@@ -218,8 +218,6 @@ trait Api3TestTrait {
    *   - array
    *   - object
    *
-   * @throws \CRM_Core_Exception
-   *
    * @return array|int
    */
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
@@ -229,7 +227,7 @@ trait Api3TestTrait {
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
       $unfilteredResult = $this->civicrm_api($entity, 'get', ['version' => $this->_apiversion]);
-      throw new \CRM_Core_Exception(
+      $this->fail(
         'Invalid getsingle result' . print_r($result, TRUE)
         . "\n entity: $entity . \n params \n " . print_r($params, TRUE)
         . "\n entities retrieved with blank params \n" . print_r($unfilteredResult, TRUE)
