@@ -31,8 +31,8 @@
       default: {text: ''}
     });
 
-    var ctrl = this;
-    ctrl.records = _.map(
+    var $ctrl = this;
+    $ctrl.records = _.map(
       [].concat(prefetch.records, _.map(prefetch.translations || [], simpleKeys)),
       function(r) {
         r._is_translation = (r.tx_language !== undefined);
@@ -46,7 +46,7 @@
      * @param variant - One of null 'legacy', 'current', 'draft'. (If null, then 'current'.)
      * @returns {string}
      */
-    ctrl.editUrl = function(record, variant) {
+    $ctrl.editUrl = function(record, variant) {
       if (variant === 'legacy') {
         return CRM.url('civicrm/admin/messageTemplates/add', {action: 'update', id: record.id, reset: 1});
       }
@@ -60,14 +60,14 @@
       return url;
     };
 
-    ctrl.delete = function (record) {
+    $ctrl.delete = function (record) {
       var q = crmApi4('MessageTemplate', 'delete', {where: [['id', '=', record.id]]}).then(function(){
         $route.reload();
       });
       return crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, q);
     };
 
-    ctrl.toggle = function (record) {
+    $ctrl.toggle = function (record) {
       var wasActive = !!record.is_active;
       var q = crmApi4('MessageTemplate', 'update', {where: [['id', '=', record.id]], values: {is_active: !wasActive}})
         .then(function(resp){
