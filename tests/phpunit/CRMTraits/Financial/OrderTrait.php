@@ -218,7 +218,7 @@ trait CRMTraits_Financial_OrderTrait {
    */
   protected function createEventOrder($orderParams = []) {
     $this->ids['Contribution'][0] = $this->callAPISuccess('Order', 'create', array_merge($this->getParticipantOrderParams(), $orderParams))['id'];
-    $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
+    $this->ids['Participant'][0] = $this->callAPISuccessGetValue('ParticipantPayment', ['options' => ['limit' => 1], 'return' => 'participant_id', 'contribution_id' => $this->ids['Contribution'][0]]);
   }
 
   /**
