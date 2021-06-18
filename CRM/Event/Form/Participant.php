@@ -325,9 +325,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $this->setCustomDataTypes();
 
-    if ($this->_mode) {
-      $this->assign('participantMode', $this->_mode);
-    }
+    $this->assign('participantMode', $this->_mode);
 
     if ($this->_showFeeBlock) {
       $this->assign('showFeeBlock', TRUE);
