@@ -102,6 +102,7 @@ function civicrm_api3_order_create(array $params): array {
             }
             $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
             $entityParams['status_id'] = $entityParams['participant_status_id'];
+            $params['contribution_mode'] = 'participant';
             break;
 
           case 'membership':
@@ -116,7 +117,6 @@ function civicrm_api3_order_create(array $params): array {
         if ($supportedEntity) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
-          $params['contribution_mode'] = $entity;
           $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];
           foreach ($lineItems['line_item'] as &$items) {
             $items['entity_id'] = $entityResult['id'];
