@@ -26,7 +26,13 @@ class CRM_Logging_Schema {
   private $logs = [];
   private $tables = [];
 
+  /**
+   * Name of the database where the logging data is stored.
+   *
+   * @var string
+   */
   private $db;
+
   private $useDBPrefix = TRUE;
 
   private $reports = [
@@ -113,8 +119,7 @@ class CRM_Logging_Schema {
    * Populate $this->tables and $this->logs with current db state.
    */
   public function __construct() {
-    $dao = new CRM_Contact_DAO_Contact();
-    $civiDBName = $dao->_database;
+    $civiDBName = $this->getCiviCRMDatabaseName();
 
     $dao = CRM_Core_DAO::executeQuery("
 SELECT TABLE_NAME
@@ -157,17 +162,8 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     $this->tables = array_keys($this->logTableSpec);
     $nonStandardTableNameString = $this->getNonStandardTableNameFilterString();
 
-    if (defined('CIVICRM_LOGGING_DSN')) {
-      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_LOGGING_DSN);
-      $dsn = DB::parseDSN($dsn);
-      $this->useDBPrefix = (CIVICRM_LOGGING_DSN != CIVICRM_DSN);
-    }
-    else {
-      $dsn = CRM_Utils_SQL::autoSwitchDSN(CIVICRM_DSN);
-      $dsn = DB::parseDSN($dsn);
-      $this->useDBPrefix = FALSE;
-    }
-    $this->db = $dsn['database'];
+    $this->db = $this->getDatabaseNameFromDSN(defined('CIVICRM_LOGGING_DSN') ? CIVICRM_LOGGING_DSN : CIVICRM_DSN);
+    $this->useDBPrefix = $this->db !== $civiDBName;
 
     $dao = CRM_Core_DAO::executeQuery("
 SELECT TABLE_NAME
@@ -1065,6 +1061,33 @@ COLS;
       return array_diff($this->tables, array_keys($this->logs));
     }
     return [];
+  }
+
+  /**
+   * Get the name of the database from the dsn string.
+   *
+   * @param string $dsnString
+   *
+   * @return string
+   */
+  protected function getDatabaseNameFromDSN($dsnString): string {
+    $dsn = CRM_Utils_SQL::autoSwitchDSN($dsnString);
+    $dsn = DB::parseDSN($dsn);
+    return $dsn['database'];
+  }
+
+  /**
+   * Get the database name for the CiviCRM connection.
+   *
+   * Note that we want to get it from the database connection,
+   * not the dsn, because there is at least one extension
+   * (https://github.com/totten/rpow) that 'meddles' with
+   * the DSN string.
+   *
+   * @return string
+   */
+  protected function getCiviCRMDatabaseName(): string {
+    return (new CRM_Contact_DAO_Contact())->_database;
   }
 
 }
