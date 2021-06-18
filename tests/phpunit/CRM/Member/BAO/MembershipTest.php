@@ -26,9 +26,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-
-    $this->_contactID = $this->organizationCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
+    $this->_membershipTypeID = $this->membershipTypeCreate();
     // add a random number to avoid silly conflicts with old data
     $this->_membershipStatusID = $this->membershipStatusCreate('test status' . random_int(1, 1000));
   }
@@ -37,16 +35,14 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
-    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_membershipStatusID);
-    $this->contactDelete($this->_contactID);
-
-    $this->_contactID = $this->_membershipStatusID = $this->_membershipTypeID = NULL;
+    $this->_membershipStatusID = $this->_membershipTypeID = NULL;
     $this->quickCleanUpFinancialEntities();
-    $this->restoreMembershipTypes();
     parent::tearDown();
   }
 
@@ -713,29 +709,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'payment_instrument_id' => 'Credit Card',
     ]);
 
-    $params[] = [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $membershipTypeID2,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd'),
-      'start_date' => date('Ymd'),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'source' => 'Payment',
-    ];
-    $params[] = [
-      'contact_id' => $this->individualCreate(),
-      'membership_type_id' => $membershipTypeID2,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd'),
-      'start_date' => date('Ymd'),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'source' => 'Payment',
-    ];
-
-    foreach ($params as $key => $param) {
-      $this->callAPISuccess('membership', 'create', $param);
-    }
-
     $contribution = $this->callAPISuccess('Order', 'create', [
       'total_amount' => 150,
       'contribution_recur_id' => $contributionRecur['id'],
@@ -748,7 +721,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'line_items' => [
         [
           'line_item' => [
-            0 => [
+            [
               'price_field_id' => $priceField['id'],
               'price_field_value_id' => $priceFieldValueId[1],
               'label' => 'Parent',
@@ -759,7 +732,20 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
               'financial_type_id' => $financialTypeId,
               'entity_table' => 'civicrm_membership',
             ],
-            1 => [
+          ],
+          'params' => [
+            'contact_id' => $this->individualCreate(),
+            'membership_type_id' => $membershipTypeID2,
+            'contribution_recur_id' => $contributionRecur['id'],
+            'join_date' => date('Ymd'),
+            'start_date' => date('Ymd'),
+            'end_date' => date('Ymd', strtotime('+1 year')),
+            'source' => 'Payment',
+          ],
+        ],
+        [
+          'line_item' => [
+            [
               'price_field_id' => $priceField['id'],
               'price_field_value_id' => $priceFieldValueId[2],
               'label' => 'Child',
@@ -771,32 +757,26 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_membership',
             ],
           ],
+          'params' => [
+            'contact_id' => $this->individualCreate(),
+            'membership_type_id' => $membershipTypeID2,
+            'contribution_recur_id' => $contributionRecur['id'],
+            'join_date' => date('Ymd'),
+            'start_date' => date('Ymd'),
+            'end_date' => date('Ymd', strtotime('+1 year')),
+            'source' => 'Payment',
+          ],
         ],
       ],
     ]);
-    $params[] = [
-      'contact_id' => $parentContactId,
-      'membership_type_id' => $membershipTypeID1,
-      'contribution_recur_id' => $contributionRecur['id'],
-      'join_date' => date('Ymd'),
-      'start_date' => date('Ymd'),
-      'end_date' => date('Ymd', strtotime('+1 year')),
-      'skipLineItem' => TRUE,
-      'source' => 'Payment',
-    ];
 
-    $this->callAPISuccess('contribution', 'repeattransaction', [
+    $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
     ]);
     $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $contributions);
     $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
-    // @todo this fails depending on what tests it is run with due some bad stuff in Membership.create
-    // It needs to be addressed but might involve the switch to ORDER. Membership BAO does bad line item stuff.
-    // $this->callAPISuccessGetCount('LineItem', [], 6);
-    $this->membershipTypeDelete(['id' => $membershipTypeID1]);
-    $this->membershipTypeDelete(['id' => $membershipTypeID2]);
     $this->validateAllPayments();
     $this->validateAllContributions();
   }
