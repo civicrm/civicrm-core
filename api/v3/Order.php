@@ -76,7 +76,6 @@ function civicrm_api3_order_create(array $params): array {
   $entity = NULL;
   $entityIds = [];
   $params['contribution_status_id'] = 'Pending';
-  $priceSetID = NULL;
 
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
@@ -124,14 +123,12 @@ function civicrm_api3_order_create(array $params): array {
         }
       }
 
-      if (empty($priceSetID)) {
-        $item = reset($lineItems['line_item']);
-        $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
-          'return' => 'price_set_id',
-          'id' => $item['price_field_id'],
-        ]);
-        $params['line_item'][$priceSetID] = [];
-      }
+      $item = reset($lineItems['line_item']);
+      $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
+        'return' => 'price_set_id',
+        'id' => $item['price_field_id'],
+      ]);
+      $params['line_item'][$priceSetID] = [];
       $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
   }
