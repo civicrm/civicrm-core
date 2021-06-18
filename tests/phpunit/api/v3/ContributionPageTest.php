@@ -176,8 +176,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->setUpContributionPage();
     $submitParams = $this->getBasicSubmitParams();
 
-    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page']]);
+    $this->callAPISuccess('ContributionPage', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page'], 'return' => ['non_deductible_amount']]);
     //assert non-deductible amount
     $this->assertEquals(5.00, $contribution['non_deductible_amount']);
   }
@@ -199,7 +199,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page']]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'return' => ['non_deductible_amount', 'total_amount'],
+    ]);
 
     $this->assertEquals($this->formatMoneyInput(0), $contribution['non_deductible_amount']);
     $this->assertEquals($this->formatMoneyInput(0), $contribution['total_amount']);
@@ -295,9 +298,10 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $contribution = $this->callAPISuccess('contribution', 'getsingle', [
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'contribution_page_id' => $this->_ids['contribution_page'],
       'contribution_status_id' => 1,
+      'return' => ['trxn_id', 'total_amount', 'fee_amount', 'net_amount'],
     ]);
     $this->assertEquals('create_first_success', $contribution['trxn_id']);
     $this->assertEquals(10, $contribution['total_amount']);
@@ -349,7 +353,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams = $this->getSubmitParamsContributionPlusMembership(TRUE);
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['contribution_page_id' => $this->_ids['contribution_page']]);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id'], 'return' => 'membership_id']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_table' => 'civicrm_membership',
       'entity_id' => $membershipPayment['id'],
@@ -521,16 +525,16 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ];
 
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
-    $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page'], 'return' => 'contribution_status_id']);
     $this->assertCount(2, $contributions['values']);
     foreach ($contributions['values'] as $val) {
       $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $val['contribution_status_id']);
     }
 
     //Membership should be in Pending state.
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['membership_id', 'contribution_id']]);
     $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
-    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => ['status_id', 'contact_id']]);
     $pendingStatus = $this->callAPISuccessGetSingle('MembershipStatus', ['return' => ['id'], 'name' => 'Pending']);
     $this->assertEquals($membership['status_id'], $pendingStatus['id']);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
@@ -584,11 +588,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
     $submitParams = $this->getSubmitParamsContributionPlusMembership();
     $this->callAPIAndDocument('contribution_page', 'submit', $submitParams, __FUNCTION__, __FILE__, 'submit contribution page');
-    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']])['values'];
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page'], 'return' => 'contact_id'])['values'];
     $this->assertCount(2, $contributions);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', []);
+    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
     $this->assertArrayKeyExists($membershipPayment['contribution_id'], $contributions);
-    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
     $mut->checkMailLog([
       'Gruff',
@@ -618,9 +622,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(2, $contributions);
     $this->assertEquals('88.00', $contributions[0]['total_amount']);
     $this->assertEquals('50.00', $contributions[1]['total_amount']);
-    $membershipPayment = $this->callAPISuccess('MembershipPayment', 'getsingle', []);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['return' => ['membership_id', 'contribution_id']]);
     $this->assertEquals($contributions[1]['id'], $membershipPayment['contribution_id']);
-    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[1]['contact_id']);
   }
 
@@ -647,7 +651,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ]);
     $this->assertCount(2, $contributions['values']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', []);
+    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle', ['return' => ['contribution_id', 'membership_id']]);
     $this->assertArrayHasKey($membershipPayment['contribution_id'], $contributions['values']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
@@ -1779,18 +1783,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $lineItem1 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Shoe-eating Goat',
+      'return' => ['line_total', 'tax_amount'],
     ]);
 
     // Retrieve the lineItem that belongs to the Printing Rights and check the tax_amount CiviCRM Core calculated for it
     $lineItem2 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Printing Rights',
+      'return' => ['line_total', 'tax_amount'],
     ]);
 
     // Retrieve the lineItem that belongs to the Another Line Item and check the tax_amount CiviCRM Core calculated for it
     $lineItem3 = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contribution['id'],
       'label' => 'Another Line Item',
+      'return' => ['line_total', 'tax_amount'],
     ]);
 
     $this->assertEquals($lineItem1['line_total'] + $lineItem2['line_total'] + $lineItem3['line_total'], round(10 + 180 * 16.95 + 110 * 2.95, 2), 'Line Item Total is incorrect.');
@@ -1946,13 +1953,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   private function validateSeparateMembershipPaymentContributions(int $contributionPageID, $contributionAmount = 88): void {
-    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $contributionPageID])['values'];
+    $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $contributionPageID, 'return' => 'contact_id'])['values'];
     $this->assertCount(2, $contributions);
-    $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
+    $lines = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1, 'return' => 'line_total'])['values'];
     $this->assertEquals($contributionAmount, $lines[0]['line_total']);
-    $membershipPayment = $this->callAPISuccess('membership_payment', 'getsingle');
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['return' => ['contribution_id', 'membership_id']]);
     $this->assertArrayKeyExists($membershipPayment['contribution_id'], $contributions);
-    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
+    $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[$membershipPayment['contribution_id']]['contact_id']);
   }
 
