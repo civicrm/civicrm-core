@@ -700,7 +700,19 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       'financial_trxn_card_type_id',
       'financial_trxn_pan_truncation',
     ];
-    $values = [];
+    $values = $customJoins = [];
+
+    // If a custom field was passed as a param,
+    // we'll take it into account.
+    $customSearchFields = [];
+    if (!empty($params)) {
+      foreach ($params as $name => $param) {
+        if (substr($name, 0, 6) == 'custom') {
+          $searchFields[] = $name;
+        }
+      }
+    }
+
     foreach ($searchFields as $field) {
       if (isset($params[$field])) {
         $values[$field] = $params[$field];
@@ -722,6 +734,25 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $date = CRM_Utils_Date::relativeToAbsolute($relativeDate[0], $relativeDate[1]);
           $values['receive_date_low'] = $date['from'];
           $values['receive_date_high'] = $date['to'];
+        }
+
+        // Add left joins as they're needed to consider
+        // conditions over custom fields.
+        if (substr($field, 0, 6) == 'custom') {
+          $customFieldParams = ['id' => explode('_', $field)[1]];
+          $customFieldDefaults = [];
+          $customField = CRM_Core_BAO_CustomField::retrieve($customFieldParams, $customFieldDefaults);
+
+          $customGroupParams = ['id' => $customField->custom_group_id];
+          $customGroupDefaults = [];
+          $customGroup = CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroupDefaults);
+
+          $columnName = $customField->column_name;
+          $tableName = $customGroup->table_name;
+
+          if (!array_key_exists($tableName, $customJoins)) {
+            $customJoins[$tableName] = "LEFT JOIN $tableName ON $tableName.entity_id = civicrm_contribution.id";
+          }
         }
       }
     }
@@ -747,6 +778,10 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
         FALSE
       ), NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE
     );
+
+    if (count($customJoins) > 0) {
+      $from .= " " . implode(" ", $customJoins);
+    }
 
     if (!empty($query->_where[0])) {
       $where = implode(' AND ', $query->_where[0]) .
