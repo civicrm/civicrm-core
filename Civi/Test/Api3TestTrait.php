@@ -243,9 +243,7 @@ trait Api3TestTrait {
   }
 
   /**
-   * This function exists to wrap api getValue function & check the result
-   * so we can ensure they succeed & throw exceptions without litterering the test with checks
-   * There is a type check in this
+   * This function wraps the getValue api and checks the result.
    *
    * @param string $entity
    * @param array $params
@@ -259,7 +257,6 @@ trait Api3TestTrait {
    *   - object
    *
    * @return array|int
-   * @throws \CRM_Core_Exception
    */
   public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += [
@@ -267,7 +264,7 @@ trait Api3TestTrait {
     ];
     $result = $this->civicrm_api($entity, 'getvalue', $params);
     if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
-      throw new \CRM_Core_Exception('Invalid getvalue result' . print_r($result, TRUE));
+      $this->fail('Invalid getvalue result' . print_r($result, TRUE));
     }
     if ($type) {
       if ($type === 'integer') {
