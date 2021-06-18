@@ -148,69 +148,69 @@
     var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/Edit'}); // See: templates/CRM/msgtplui/Edit.hlp
-    var ctrl = this;
+    var $ctrl = this;
     var args = $location.search();
 
-    ctrl.records = prefetch;
+    $ctrl.records = prefetch;
     if (args.lang) {
-      ctrl.lang = args.lang;
-      ctrl.tab = args.status === 'draft' ? 'txDraft' : 'txActive';
+      $ctrl.lang = args.lang;
+      $ctrl.tab = args.status === 'draft' ? 'txDraft' : 'txActive';
     }
     else {
-      ctrl.lang = null;
-      ctrl.tab = 'main';
+      $ctrl.lang = null;
+      $ctrl.tab = 'main';
     }
 
-    ctrl.switchTab = function switchTab(tgt) {
-      ctrl.tab = tgt;
+    $ctrl.switchTab = function switchTab(tgt) {
+      $ctrl.tab = tgt;
       $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top}, 200);
     };
 
-    ctrl.hasDraft = function hasDraft() {
-      return ctrl.lang && ctrl.records.txDraft && ctrl.records.txDraft.translations && ctrl.records.txDraft.translations.length > 0;
+    $ctrl.hasDraft = function hasDraft() {
+      return $ctrl.lang && $ctrl.records.txDraft && $ctrl.records.txDraft.translations && $ctrl.records.txDraft.translations.length > 0;
     };
-    ctrl.createDraft = function createDraft(src) {
-      copyTranslations(src, ctrl.records.txDraft);
-      ctrl.switchTab('txDraft');
+    $ctrl.createDraft = function createDraft(src) {
+      copyTranslations(src, $ctrl.records.txDraft);
+      $ctrl.switchTab('txDraft');
     };
-    ctrl.deleteDraft = function deleteDraft() {
-      copyTranslations({}, ctrl.records.txDraft);
-      ctrl.switchTab('txActive');
+    $ctrl.deleteDraft = function deleteDraft() {
+      copyTranslations({}, $ctrl.records.txDraft);
+      $ctrl.switchTab('txActive');
     };
-    ctrl.activateDraft = function activateDraft() {
-      copyTranslations(ctrl.records.txDraft, ctrl.records.txActive);
-      copyTranslations({}, ctrl.records.txDraft);
-      ctrl.switchTab('txActive');
+    $ctrl.activateDraft = function activateDraft() {
+      copyTranslations($ctrl.records.txDraft, $ctrl.records.txActive);
+      copyTranslations({}, $ctrl.records.txDraft);
+      $ctrl.switchTab('txActive');
     };
 
-    ctrl.save = function save() {
+    $ctrl.save = function save() {
       var requests = {};
-      if (ctrl.lang) {
-        requests.txActive = reqReplaceTranslations(ctrl.records.main.id, ctrl.lang, 'active', _.pick(ctrl.records.txActive, TRANSLATED));
-        requests.txDraft = reqReplaceTranslations(ctrl.records.main.id, ctrl.lang, 'draft', _.pick(ctrl.records.txDraft, TRANSLATED));
+      if ($ctrl.lang) {
+        requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', _.pick($ctrl.records.txActive, TRANSLATED));
+        requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', _.pick($ctrl.records.txDraft, TRANSLATED));
       }
       else {
         requests.main = ['MessageTemplate', 'update', {
-          where: [['id', '=', ctrl.records.main.id]],
-          values: ctrl.records.main
+          where: [['id', '=', $ctrl.records.main.id]],
+          values: $ctrl.records.main
         }];
       }
       return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, crmApi4(requests)));
     };
-    ctrl.cancel = function() {
+    $ctrl.cancel = function() {
       window.location = '#/workflow';
     };
-    ctrl.delete = function() {
+    $ctrl.delete = function() {
       var requests = {};
-      if (ctrl.lang) {
-        requests.txActive = reqDeleteTranslations(ctrl.records.main.id, ctrl.lang, 'active');
-        requests.txDraft = reqDeleteTranslations(ctrl.records.main.id, ctrl.lang, 'draft');
+      if ($ctrl.lang) {
+        requests.txActive = reqDeleteTranslations($ctrl.records.main.id, $ctrl.lang, 'active');
+        requests.txDraft = reqDeleteTranslations($ctrl.records.main.id, $ctrl.lang, 'draft');
       }
       else {
-        requests.main = ['MessageTemplate', 'delete', {where: [['id', '=', ctrl.records.main.id]]}];
+        requests.main = ['MessageTemplate', 'delete', {where: [['id', '=', $ctrl.records.main.id]]}];
       }
       return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, crmApi4(requests)))
-        .then(ctrl.cancel);
+        .then($ctrl.cancel);
     };
   });
 
