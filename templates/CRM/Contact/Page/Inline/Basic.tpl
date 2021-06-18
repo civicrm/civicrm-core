@@ -5,11 +5,13 @@
          title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
     </div>
     <div class="crm-content" id="tags">
+      {if !empty($contactTag)}
       {foreach from=$contactTag item=tagName key=tagId}
         <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description|escape}">
           {$tagName}
         </span>
       {/foreach}
+      {/if}
     </div>
   </div>
   <div class="crm-summary-row">

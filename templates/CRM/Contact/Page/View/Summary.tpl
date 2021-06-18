@@ -23,10 +23,10 @@
       <ul id="actions">
         {crmRegion name="contact-actions-ribbon"}
         {assign var='urlParams' value="reset=1"}
-        {if $searchKey}
+        {if !empty($searchKey)}
           {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
         {/if}
-        {if $context}
+        {if !empty($context)}
           {assign var='urlParams' value=$urlParams|cat:"&context=$context"}
         {/if}
 
@@ -110,11 +110,11 @@
     <div id="mainTabContainer">
       <ul class="crm-contact-tabs-list">
         {foreach from=$allTabs item=tabValue}
-          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
+          <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if isset($tabValue.count)} crm-count-{$tabValue.count}{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{if !empty($tabValue.template)}#contact-{$tabValue.id}{else}{$tabValue.url}{/if}" title="{$tabValue.title|escape}">
               <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
               <span>{$tabValue.title}</span>
-              {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
+              {if empty($tabValue.hideCount)}<em>{if isset($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
             </a>
           </li>
         {/foreach}

@@ -20,7 +20,7 @@
         <div class="crm-label">{ts}Website{/ts}</div>
         <div class="crm-content"></div>
       </div>
-    {/if}
+    {else}
     {foreach from=$website item=item}
       {if !empty($item.url)}
       <div class="crm-summary-row">
@@ -29,5 +29,6 @@
       </div>
       {/if}
     {/foreach}
+    {/if}
   </div>
 </div>
