@@ -370,7 +370,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
     $result = $this->callAPISuccessGetCount('Address', $params, 0);
-    $this->assertEquals(0, $result['count']);
+    $this->assertEquals(0, $result);
   }
 
   /**
