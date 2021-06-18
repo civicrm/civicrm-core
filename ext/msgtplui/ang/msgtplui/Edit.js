@@ -17,6 +17,9 @@
    *   An API call which replaces the translations ([entity,action,params]).
    */
   function reqReplaceTranslations(id, lang, status, values) {
+    if (angular.equals({}, values)) {
+      return reqDeleteTranslations(id, lang, status);
+    }
     var records = [];
     angular.forEach(values, function(value, key) {
       records.push({"entity_field":key, "string":value});
@@ -86,6 +89,19 @@
     }, {});
   }
 
+  function copyTranslations(src, dest) {
+    dest.translations = [];
+    TRANSLATED.forEach(function(fld) {
+      if (src[fld] === undefined) {
+        delete dest[fld];
+      }
+      else {
+        dest[fld] = src[fld];
+        dest.translations.push({entity_field: fld, string: src[fld]});
+      }
+    });
+  }
+
   angular.module('msgtplui').config(function($routeProvider) {
       $routeProvider.when('/edit', {
         controller: 'MsgtpluiEdit',
@@ -144,6 +160,28 @@
       ctrl.lang = null;
       ctrl.tab = 'main';
     }
+
+    ctrl.switchTab = function switchTab(tgt) {
+      ctrl.tab = tgt;
+      $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top}, 200);
+    };
+
+    ctrl.hasDraft = function hasDraft() {
+      return ctrl.lang && ctrl.records.txDraft && ctrl.records.txDraft.translations && ctrl.records.txDraft.translations.length > 0;
+    };
+    ctrl.createDraft = function createDraft(src) {
+      copyTranslations(src, ctrl.records.txDraft);
+      ctrl.switchTab('txDraft');
+    };
+    ctrl.deleteDraft = function deleteDraft() {
+      copyTranslations({}, ctrl.records.txDraft);
+      ctrl.switchTab('txActive');
+    };
+    ctrl.activateDraft = function activateDraft() {
+      copyTranslations(ctrl.records.txDraft, ctrl.records.txActive);
+      copyTranslations({}, ctrl.records.txDraft);
+      ctrl.switchTab('txActive');
+    };
 
     ctrl.save = function save() {
       var requests = {};

@@ -20,6 +20,7 @@
       <!-- TODO: Pretty name -->
     </div>
 
+    <a name="msgtplui-tabs"></a>
     <div class="panel panel-info">
       <ul class="panel-heading nav nav-tabs">
         <li role="presentation" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
@@ -28,7 +29,7 @@
         <li role="presentation" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
           <a class="text-success" crm-icon="fa-file" ng-click="$ctrl.tab = 'txActive'">{{ts('Current')}}</a>
         </li>
-        <li role="presentation" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="!!$ctrl.lang">
+        <li role="presentation" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="$ctrl.hasDraft()">
           <a class="text-warning" crm-icon="fa-file" ng-click="$ctrl.tab = 'txDraft'">{{ts('Draft')}}</a>
         </li>
         <li role="presentation" ng-class="{active: $ctrl.tab == 'original'}">
@@ -37,13 +38,21 @@
       </ul>
       <div class="panel-body">
         <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], disabled: $ctrl.tab==='original'}"></msgtplui-edit-content>
+        <div class="text-center">
+          <div class="btn-group">
+            <button type="button" class="btn btn-success" ng-if="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft()" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])"><i class="fa fa-clone"/> {{ts('Create draft')}}</button>
+            <button type="button" class="btn btn-warning" ng-if="$ctrl.tab.match('txActive|original') && $ctrl.hasDraft()" crm-confirm="{title: ts('Create draft?'), message: ts('There is already an existing draft. If you continue, it will be reset as a new draft.')}" on-yes="$ctrl.createDraft($ctrl.records[$ctrl.tab])"><i class="fa fa-clone"/> {{ts('Create draft')}}</button>
+            <button type="button" class="btn btn-success" ng-if="$ctrl.tab === 'txDraft'" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft?')}" on-yes="$ctrl.activateDraft()"><i class="fa fa-rocket"/> {{ts('Activate draft')}}</button>
+            <button type="button" class="btn btn-danger" ng-if="$ctrl.tab === 'txDraft'" crm-confirm="{type: 'delete', obj: {}, title: ts('Delete draft?'), message: ts('Are you sure you want to delete this draft?')}" on-yes="$ctrl.deleteDraft()"><i class="fa fa-trash"/> {{ts('Delete draft')}}</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="btn-group pull-right">
       <button type="button" class="btn btn-primary" ng-click="$ctrl.save()">{{ ts('Save') }}</button>
       <button type="button" class="btn btn-primary" ng-click="$ctrl.cancel()">{{ ts('Cancel') }}</button>
-      <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}, message: ts('Are you sure want to delete this translation (%1)?', {1: $ctrl.lang})}" on-yes="$ctrl.delete()" ng-if="!!$ctrl.lang">{{ ts('Delete') }}</button>
+      <button type="button" class="btn btn-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Delete translation?'), message: ts('Are you sure want to delete this translation (%1)? This will remove any current and draft versions.', {1: $ctrl.lang})}" on-yes="$ctrl.delete()" ng-if="!!$ctrl.lang">{{ ts('Delete') }}</button>
     </div>
 
     <div class="clearfix"></div>
