@@ -2934,14 +2934,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIAndDocument('Contact', 'Create', $params, __FUNCTION__, __FILE__, $description, $subFile);
     $this->assertEquals(0, $result['values'][$result['id']]['api.entity_tag.create']['is_error']);
-
-    $tablesToTruncate = [
-      'civicrm_contact',
-      'civicrm_activity',
-      'civicrm_entity_tag',
-      'civicrm_tag',
-    ];
-    $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
   /**
