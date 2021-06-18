@@ -3407,6 +3407,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $entityID[] = $entityId;
     if (!empty($additionalParticipantId)) {
       $entityID += $additionalParticipantId;
+      // build line item array if necessary
+      if ($additionalParticipantId) {
+        CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable));
+      }
     }
     // prevContribution appears to mean - original contribution object- ie copy of contribution from before the update started that is being updated
     if (empty($params['prevContribution'])) {
@@ -3414,11 +3418,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $statusId = $params['contribution']->contribution_status_id;
-
-    // build line item array if its not set in $params
-    if (empty($params['line_item']) || $additionalParticipantId) {
-      CRM_Price_BAO_LineItem::getLineItemArray($params, $entityID, str_replace('civicrm_', '', $entityTable), $isRelatedId);
-    }
 
     if ($contributionStatus != 'Failed' &&
       !($contributionStatus == 'Pending' && !$params['contribution']->is_pay_later)
