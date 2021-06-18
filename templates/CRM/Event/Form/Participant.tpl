@@ -162,11 +162,6 @@
 
 {* Main event form template *}
 {else}
-  {if $participantMode == 'test' }
-    {assign var=registerMode value="TEST"}
-    {elseif $participantMode == 'live'}
-    {assign var=registerMode value="LIVE"}
-  {/if}
   <div class="crm-block crm-form-block crm-participant-form-block">
     {if $newCredit AND $action EQ 1 AND $participantMode EQ null}
       <div class="action-link css_right crm-link-credit-card-mode">
@@ -179,9 +174,9 @@
       </div>
     {/if}
     <div class="view-content">
-      {if $participantMode}
+      {if !empty($participantMode)}
         <div class="help">
-          {ts 1=$displayName 2=$registerMode}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+          {ts 1=$displayName 2=$participantMode|upper}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
         </div>
       {/if}
       <div id="eventFullMsg" class="messages status no-popup" style="display:none;"></div>
