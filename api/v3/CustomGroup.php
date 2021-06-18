@@ -40,6 +40,29 @@ function civicrm_api3_custom_group_create($params) {
 
     return civicrm_api3_create_error("First item in params['extends'] must be a class name (e.g. 'Contact').");
   }
+  if (!isset($params['extends_entity_column_value']) && isset($params['extends'][1])) {
+    $extendsEntity = $params['extends'][0] ?? NULL;
+    $participantEntities = [
+      'ParticipantRole',
+      'ParticipantEventName',
+      'ParticipantEventType',
+    ];
+    $params['extends_entity_column_id'] = 'null';
+    if (in_array($extendsEntity, $participantEntities)
+    ) {
+      $params['extends_entity_column_id'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
+    }
+    $params['extends_entity_column_value'] = $params['extends'][1];
+    if (in_array($extendsEntity, $participantEntities)) {
+      $params['extends'] = 'Participant';
+    }
+    else {
+      $params['extends'] = $extendsEntity;
+    }
+  }
+  elseif (isset($params['extends']) && (!isset($params['extends'][1]) || empty($params['extends'][1]))) {
+    $params['extends'] = $params['extends'][0];
+  }
   if (isset($params['extends_entity_column_value']) && !is_array($params['extends_entity_column_value'])) {
     // BAO fails if this is a string, but API getFields says this must be a string, so we'll do a double backflip
     $params['extends_entity_column_value'] = CRM_Utils_Array::explodePadded($params['extends_entity_column_value']);

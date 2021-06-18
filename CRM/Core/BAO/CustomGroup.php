@@ -45,37 +45,29 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->title = $params['title'];
     }
 
-    $extends = CRM_Utils_Array::value('extends', $params, []);
-    $extendsEntity = $extends[0] ?? NULL;
-
-    $participantEntities = [
-      'ParticipantRole',
-      'ParticipantEventName',
-      'ParticipantEventType',
-    ];
-
-    if (in_array($extendsEntity, $participantEntities)) {
-      $group->extends = 'Participant';
-    }
-    else {
-      $group->extends = $extendsEntity;
-    }
-
-    $group->extends_entity_column_id = 'null';
-    if (in_array($extendsEntity, $participantEntities)
-    ) {
-      $group->extends_entity_column_id = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $extendsEntity, 'value', 'name');
-    }
-
-    // this is format when form get submit.
-    $extendsChildType = $extends[1] ?? NULL;
+    $extendsChildType = NULL;
     // lets allow user to pass direct child type value, CRM-6893
     if (!empty($params['extends_entity_column_value'])) {
       $extendsChildType = $params['extends_entity_column_value'];
     }
     if (!CRM_Utils_System::isNull($extendsChildType)) {
+      $b = self::getMungedEntity($params['extends'], $params['extends_entity_column_id'] ?? NULL);
+      $registeredSubTypes = self::getSubTypes()[$b];
+      if (is_array($extendsChildType)) {
+        foreach ($extendsChildType as $childType) {
+          if (!array_key_exists($childType, $registeredSubTypes) && !in_array($childType, $registeredSubTypes, TRUE)) {
+            throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entitiy');
+          }
+        }
+      }
+      else {
+        if (!array_key_exists($extendsChildType, $registeredSubTypes) && !in_array($extendsChildType, $registeredSubTypes, TRUE)) {
+          throw new CRM_Core_Exception('Supplied Sub type is not valid for the specified entitiy');
+        }
+        $extendsChildType = [$extendsChildType];
+      }
       $extendsChildType = implode(CRM_Core_DAO::VALUE_SEPARATOR, $extendsChildType);
-      if (CRM_Utils_Array::value(0, $extends) == 'Relationship') {
+      if ($params['extends'] == 'Relationship') {
         $extendsChildType = str_replace(['_a_b', '_b_a'], [
           '',
           '',
@@ -107,6 +99,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       'is_active',
       'is_multiple',
       'icon',
+      'extends_entity_column_id',
+      'extends',
     ];
     $current_db_version = CRM_Core_BAO_Domain::version();
     $is_public_version = version_compare($current_db_version, '4.7.19', '>=');
@@ -200,7 +194,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
         $params['id'],
         'table_name'
       );
-      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($extendsEntity));
+      CRM_Core_BAO_SchemaHandler::changeFKConstraint($table, self::mapTableName($params['extends']));
     }
     $transaction->commit();
 
@@ -2198,6 +2192,59 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
       $groupTree['info'] = ['tables' => $customValueTables];
     }
     return [$multipleFieldGroups, $groupTree];
+  }
+
+  public static function getSubTypes(): array {
+    $sel2 = [];
+    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
+
+    $eventType = CRM_Core_OptionGroup::values('event_type');
+    $grantType = CRM_Core_OptionGroup::values('grant_type');
+    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
+    $participantRole = CRM_Core_OptionGroup::values('participant_role');
+
+    asort($activityType);
+    asort($eventType);
+    asort($grantType);
+    asort($membershipType);
+    asort($participantRole);
+
+    $sel2['Event'] = $eventType;
+    $sel2['Grant'] = $grantType;
+    $sel2['Activity'] = $activityType;
+    $sel2['Campaign'] = $campaignTypes;
+    $sel2['Membership'] = $membershipType;
+    $sel2['ParticipantRole'] = $participantRole;
+    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+    $sel2['ParticipantEventType'] = $eventType;
+    $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
+    $sel2['Relationship'] = CRM_Custom_Form_Group::getRelationshipTypes();
+
+    $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
+    $sel2['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
+    $sel2['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
+
+    CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($sel2);
+    return $sel2;
+  }
+
+  /**
+   * Get the munged entity.
+   *
+   * This is the entity eg. Relationship or the name of the sub entity
+   * e.g ParticipantRole.
+   *
+   * @param string $extends
+   * @param int|null $extendsEntityColumn
+   *
+   * @return string
+   */
+  protected static function getMungedEntity($extends, $extendsEntityColumn = NULL) {
+    if (!$extendsEntityColumn || $extendsEntityColumn === 'null') {
+      return $extends;
+    }
+    return CRM_Core_OptionGroup::values('custom_data_type', FALSE, FALSE, FALSE, NULL, 'name')[$extendsEntityColumn];
   }
 
 }

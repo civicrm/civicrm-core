@@ -176,38 +176,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $this->assign('contactTypes', json_encode($contactTypes));
 
     $sel1 = ["" => ts("- select -")] + CRM_Core_SelectValues::customGroupExtends();
-    $sel2 = [];
-    $activityType = CRM_Core_PseudoConstant::activityType(FALSE, TRUE, FALSE, 'label', TRUE);
-
-    $eventType = CRM_Core_OptionGroup::values('event_type');
-    $grantType = CRM_Core_OptionGroup::values('grant_type');
-    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
-    $participantRole = CRM_Core_OptionGroup::values('participant_role');
-
     ksort($sel1);
-    asort($activityType);
-    asort($eventType);
-    asort($grantType);
-    asort($membershipType);
-    asort($participantRole);
-
-    $sel2['Event'] = $eventType;
-    $sel2['Grant'] = $grantType;
-    $sel2['Activity'] = $activityType;
-    $sel2['Campaign'] = $campaignTypes;
-    $sel2['Membership'] = $membershipType;
-    $sel2['ParticipantRole'] = $participantRole;
-    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
-    $sel2['ParticipantEventType'] = $eventType;
-    $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
-    $sel2['Relationship'] = self::getRelationshipTypes();
-
-    $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
-    $sel2['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
-    $sel2['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
-
-    CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($sel2);
+    $sel2 = CRM_Core_BAO_CustomGroup::getSubTypes();
 
     foreach ($sel2 as $main => $sub) {
       if (!empty($sel2[$main])) {
@@ -443,7 +413,8 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
       $params['created_date'] = date('YmdHis');
     }
 
-    $group = CRM_Core_BAO_CustomGroup::create($params);
+    $result = civicrm_api3('CustomGroup', 'create', $params);
+    $group = $result['values'][$result['id']];
 
     // reset the cache
     Civi::cache('fields')->flush();
@@ -451,14 +422,14 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group->title]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group['title']]), ts('Saved'), 'success');
     }
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group->id . '&action=' . ($action ? 'add' : 'browse'));
+      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group['id'] . '&action=' . ($action ? 'add' : 'browse'));
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
-        [1 => $group->title]
+        [1 => $group['title']]
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);

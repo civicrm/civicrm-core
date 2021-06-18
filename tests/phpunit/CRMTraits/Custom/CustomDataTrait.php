@@ -46,7 +46,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   public function createCustomGroup($params = []) {
     $params = array_merge([
       'title' => 'Custom Group',
-      'extends' => [$this->entity ?? 'Contact'],
+      'extends' => $this->entity ?? 'Contact',
       'weight' => 5,
       'style' => 'Inline',
       'max_multiple' => 0,
