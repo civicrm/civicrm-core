@@ -351,6 +351,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
    */
   public function getTabs() {
     $allTabs = [];
+    $getCountParams = [];
     $weight = 10;
 
     foreach (CRM_Core_Component::getEnabledComponents() as $name => $component) {
@@ -361,12 +362,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
         // FIXME: not very elegant, probably needs better approach
         // allow explicit id, if not defined, use keyword instead
-        if (array_key_exists('id', $elem)) {
-          $i = $elem['id'];
-        }
-        else {
-          $i = $component->getKeyword();
-        }
+        $i = $elem['id'] ?? $component->getKeyword();
         $u = $elem['url'];
 
         //appending isTest to url for test soft credit CRM-3891.
@@ -380,10 +376,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
           'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q),
           'title' => $elem['title'],
           'weight' => $elem['weight'],
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
+          'count' => NULL,
           'class' => 'livePage',
           'icon' => $component->getIcon(),
         ];
+        $getCountParams[$i] = [$u, $this->_contactId];
       }
     }
 
@@ -396,8 +393,9 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
         $allTabs[] = $tab + [
           'url' => CRM_Utils_System::url("civicrm/contact/view/{$tab['id']}", "reset=1&cid={$this->_contactId}"),
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($tab['id'], $this->_contactId),
+          'count' => NULL,
         ];
+        $getCountParams[$tab['id']] = [$tab['id'], $this->_contactId];
         $weight = $tab['weight'] + 10;
       }
     }
@@ -417,17 +415,25 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
         'title' => $group['title'],
         'weight' => $weight,
-        'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
+        'count' => NULL,
         'hideCount' => !$group['is_multiple'],
         'class' => 'livePage',
         'icon' => 'crm-i ' . ($group['icon'] ?: 'fa-gear'),
       ];
+      $getCountParams[$id] = [$id, $this->_contactId, $group['table_name']];
       $weight += 10;
     }
 
     // Allow other modules to add or remove tabs
     $context = ['contact_id' => $this->_contactId];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
+
+    // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
+    foreach ($allTabs as &$tab) {
+      if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
+        $tab['count'] = call_user_func_array(['CRM_Contact_BAO_Contact', 'getCountComponent'], $getCountParams[$tab['id']]);
+      }
+    }
 
     // now sort the tabs based on weight
     usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
