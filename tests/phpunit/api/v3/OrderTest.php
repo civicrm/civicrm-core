@@ -566,13 +566,15 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateOrderIfTotalAmountDoesMatchLineItemsAmountsAndTaxSupplied(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
     $params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2018-01-01',
-      'total_amount' => 50,
+      'total_amount' => 36.75,
       'financial_type_id' => $this->_financialTypeId,
       'contribution_status_id' => 'Pending',
-      'tax_amount' => 15,
+      'tax_amount' => 1.75,
       'line_items' => [
         0 => [
           'line_item' => [
@@ -584,9 +586,9 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'qty' => 1,
               'unit_price' => 35,
               'line_total' => 35,
-              'financial_type_id' => 1,
+              'financial_type_id' => $this->ids['FinancialType']['taxable'],
               'entity_table' => 'civicrm_contribution',
-              'tax_amount' => 15,
+              'tax_amount' => 1.75,
             ],
           ],
         ],
