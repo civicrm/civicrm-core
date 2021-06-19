@@ -21,6 +21,7 @@ return [
     'crmRouteBinder',
     'crmUi',
     'crmUtil',
+    'crmDialog',
     'msgtpluiEditContent',
     'ngRoute',
     'ngSanitize',
@@ -34,4 +35,5 @@ return [
     'edit system workflow message templates',
     'access CiviMail',
   ],
+  'settingsFactory' => ['CRM_Msgtplui_Settings', 'getAll'],
 ];

@@ -40,7 +40,7 @@
       </td>
       <td>
         <span ng-if="!record.tx_language">
-          <a class="" crm-icon="fa-plus" ng-click="crmUiAlert({title: 'Not implemented', text: '', type: 'error'})">{{ts('Translate')}}</a>
+          <a class="" crm-icon="fa-plus" ng-click="$ctrl.addTranslation(record)">{{ts('Translate')}}</a>
         </span>
       </td>
     </tr>

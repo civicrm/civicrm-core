@@ -1,0 +1,22 @@
+<div id="bootstrap-theme" crm-dialog="addTranslationDlg" ng-controller="MsgtpluiGenericCtrl">
+
+  <form name="addTranslationForm">
+    <div class="form-group">
+      <label>{{:: ts('Message Template')}}</label>
+      <input class="form-control" ng-model="model.msgtpl.msg_title" disabled>
+    </div>
+
+    <label>{{:: ts('Locale')}} <span class="crm-marker">*</span></label>
+
+    <div class="radio" ng-repeat="lang in model.langs | orderBy:['label']">
+      <label>
+        <input type="radio" ng-model="model.selected" ng-value="lang.name" name="lang"/>
+        {{:: lang.label}}
+      </label>
+    </div>
+
+    <crm-dialog-button text="ts('Add')" icons="{primary: 'fa-plus'}" on-click="addTranslationDlg.close()" disabled="!addTranslationForm.$valid" />
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="addTranslationDlg.cancel()" />
+  </form>
+
+</div>

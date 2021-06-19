@@ -16,7 +16,7 @@
     return newRec;
   }
 
-  angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location) {
+  angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location, dialogService) {
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/User'}); // See: templates/CRM/msgtplui/User.hlp
     $scope.crmUrl = CRM.url;
@@ -40,6 +40,15 @@
       }
     );
 
+    function findTranslations(record) {
+      return _.reduce($ctrl.records, function(existing, rec){
+        if (rec._is_translation && record.id === rec.id) {
+          existing[rec.tx_language] = record;
+        }
+        return existing;
+      }, {});
+    }
+
     /**
      *
      * @param record
@@ -58,6 +67,29 @@
         url = url + '&status=draft';
       }
       return url;
+    };
+
+    $ctrl.addTranslation = function(record) {
+      var existing = findTranslations(record);
+      var available = _.reduce(CRM.msgtplui.uiLanguages, function(acc, label, name) {
+        if (!existing[name]) acc.push({label: label, name: name});
+        return acc;
+      }, []);
+      var model = {
+        msgtpl: record,
+        selected: (_.head(available)||{}).name,
+        langs: available
+      };
+      var options = CRM.utils.adjustDialogDefaults({
+        autoOpen: false,
+        height: '50%',
+        width: '50%',
+        title: ts('Add Translation')
+      });
+      return dialogService.open('addTranslationDlg', '~/msgtplui/AddTranslation.html', model, options)
+        .then(function(){
+          window.location = $ctrl.editUrl({id: record.id, tx_language: model.selected});
+        });
     };
 
     $ctrl.delete = function (record) {
