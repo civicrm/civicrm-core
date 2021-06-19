@@ -163,6 +163,23 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   protected $isLocationTypesOnPostAssert = TRUE;
 
   /**
+   * Has the test class been verified as 'getsafe'.
+   *
+   * If a class is getsafe it means that where
+   * callApiSuccess is called 'return' is specified or 'return' =>'id'
+   * can be added by that function. This is part of getting away
+   * from open-ended get calls.
+   *
+   * Eventually we want to not be doing these in our test classes & start
+   * to work to not do them in our main code base. Note they mainly
+   * cause issues for activity.get and contact.get as these are where the
+   * too many joins limit is most likely to be hit.
+   *
+   * @var bool
+   */
+  protected $isGetSafe = FALSE;
+
+  /**
    * Class used for hooks during tests.
    *
    * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
