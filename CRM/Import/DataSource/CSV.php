@@ -253,10 +253,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * See also dev/core#2127 - avoid breaking strings ending in à or any other
    * unicode character sharing the same 0xA0 byte as a non-breaking space.
    *
-   * @param string $string
+   * @param string $string Allow null values from empty rows
    * @return string The trimmed string
    */
-  public static function trimNonBreakingSpaces(string $string): string {
+  public static function trimNonBreakingSpaces(?string $string): string {
     $encoding = mb_detect_encoding($string, NULL, TRUE);
     if ($encoding === FALSE) {
       // This could mean a couple things. One is that the string is
