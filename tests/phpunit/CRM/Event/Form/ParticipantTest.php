@@ -526,9 +526,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
+      $this->getPriceFieldKey() => $this->getPriceFieldValueID(),
+      'priceSetId' => $this->getPriceSetID(),
       'event_id' => $this->getEventID(),
       'record_contribution' => TRUE,
-      'amount' => 100,
       'amount_level' => 'blah',
       'financial_type_id' => 1,
     ]);
