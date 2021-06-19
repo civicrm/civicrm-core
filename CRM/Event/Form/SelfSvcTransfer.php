@@ -513,14 +513,19 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       ->addWhere('id', '=', $fromParticipantID)
       ->execute()
       ->first();
-
+    $participantPayments = civicrm_api3('ParticipantPayment', 'get', [
+      'return' => 'id',
+      'participant_id' => $fromParticipantID,
+    ])['values'];
     unset($toParticipantValues['id']);
     $toParticipantValues['contact_id'] = $toContactID;
     $toParticipantValues['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered');
     $toParticipantValues['register_date'] = date("Y-m-d");
     //first create the new participant row -don't set registered_by yet or email won't be sent
     $participant = CRM_Event_BAO_Participant::create($toParticipantValues);
-
+    foreach ($participantPayments as $payment) {
+      civicrm_api3('ParticipantPayment', 'create', ['id' => $payment['id'], 'participant_id' => $participant->id]);
+    }
     //send a confirmation email to the new participant
     $this->participantTransfer($participant);
     //now update registered_by_id
@@ -531,7 +536,8 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $line_items = CRM_Price_BAO_LineItem::getLineItems($fromParticipantID);
     foreach ($line_items as $id => $item) {
       //Remove contribution id from older participant line item.
-      CRM_Core_DAO::singleValueQuery("UPDATE civicrm_line_item SET contribution_id = NULL WHERE id = %1", [1 => [$id, 'Integer']]);
+      CRM_Core_DAO::singleValueQuery('UPDATE civicrm_line_item SET contribution_id = NULL WHERE id = %1', [1 => [$id, 'Integer']]);
+
       $item['entity_id'] = $participant->id;
       $item['id'] = NULL;
       $item['entity_table'] = "civicrm_participant";
