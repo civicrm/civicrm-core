@@ -994,6 +994,15 @@ WHERE civicrm_event.is_active = 1
     $copyEvent->save();
 
     if ($blockCopyOfCustomValue) {
+      foreach ($params['custom'] as &$values) {
+        foreach ($values as &$value) {
+          // Ensure we don't copy over the template's id if it is passed in
+          // This is a bit hacky but it's unclear what the
+          // right behaviour is given the whole 'custom'
+          // field is form layer formatting that is reaching the BAO.
+          $value['id'] = NULL;
+        }
+      }
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
     }
 
