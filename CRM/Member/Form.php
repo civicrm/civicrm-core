@@ -490,6 +490,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    *
    * @return array
+   * @throws \API_Exception
    */
   protected function setPriceSetParameters(array $formValues): array {
     // process price set and get total amount and line items.
@@ -498,12 +499,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $priceSetDetails = $this->getPriceSetDetails($formValues);
     $this->_priceSet = $priceSetDetails[$this->_priceSetId];
     $this->order = new CRM_Financial_BAO_Order();
-    $this->order->setPriceSelectionFromUnfilteredInput($formValues);
-    $this->order->setPriceSetID($this->getPriceSetID($formValues));
     $this->order->setForm($this);
-    if ($priceSetDetails[$this->order->getPriceSetID()]['is_quick_config'] && isset($formValues['total_amount'])) {
-      // Amount overrides only permitted on quick config.
-      // Possibly Order object should enforce this...
+    $this->order->setPriceSelectionFromUnfilteredInput($formValues);
+    if (isset($formValues['total_amount'])) {
       $this->order->setOverrideTotalAmount((float) $formValues['total_amount']);
     }
     $this->order->setOverrideFinancialTypeID((int) $formValues['financial_type_id']);

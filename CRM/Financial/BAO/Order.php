@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\PriceField;
+use Civi\Api4\PriceSet;
 
 /**
  *
@@ -23,6 +24,8 @@ use Civi\Api4\PriceField;
  * As of writing it is in the process of having appropriate functions built up.
  * It should **NOT** be accessed directly outside of tested core methods as it
  * may change.
+ *
+ * @internal
  */
 class CRM_Financial_BAO_Order {
 
@@ -88,6 +91,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Get form object.
    *
+   * @internal use in tested core code only.
+   *
    * @return \CRM_Core_Form|NULL
    */
   public function getForm(): ?CRM_Core_Form {
@@ -96,6 +101,8 @@ class CRM_Financial_BAO_Order {
 
   /**
    * Set form object.
+   *
+   * @internal use in tested core code only.
    *
    * @param \CRM_Core_Form|NULL $form
    */
@@ -142,6 +149,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Get Set override for total amount of the order.
    *
+   * @internal use in tested core code only.
+   *
    * @return float|false
    */
   public function getOverrideTotalAmount() {
@@ -154,14 +163,20 @@ class CRM_Financial_BAO_Order {
   /**
    * Set override for total amount.
    *
+   * @internal use in tested core code only.
+   *
    * @param float $overrideTotalAmount
    */
   public function setOverrideTotalAmount(float $overrideTotalAmount): void {
-    $this->overrideTotalAmount = $overrideTotalAmount;
+    if ($this->supportsOverrideAmount()) {
+      $this->overrideTotalAmount = $overrideTotalAmount;
+    }
   }
 
   /**
    * Get override for total amount.
+   *
+   * @internal use in tested core code only.
    *
    * @return int| FALSE
    */
@@ -175,6 +190,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Set override for financial type ID.
    *
+   * @internal use in tested core code only.
+   *
    * @param int $overrideFinancialTypeID
    */
   public function setOverrideFinancialTypeID(int $overrideFinancialTypeID) {
@@ -184,14 +201,25 @@ class CRM_Financial_BAO_Order {
   /**
    * Getter for price set id.
    *
+   * @internal use in tested core code only.
+   *
    * @return int
+   *
+   * @throws \API_Exception
    */
   public function getPriceSetID(): int {
+    if (!$this->priceSetID) {
+      foreach ($this->getPriceOptions() as $fieldID => $valueID) {
+        $this->setPriceSetIDFromSelectedField($fieldID);
+      }
+    }
     return $this->priceSetID;
   }
 
   /**
    * Setter for price set id.
+   *
+   * @internal use in tested core code only.
    *
    * @param int $priceSetID
    */
@@ -200,7 +228,35 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Set price set id to the default.
+   *
+   * @param string $component [membership|contribution]
+   *
+   * @throws \API_Exception
+   * @internal use in tested core code only.
+   */
+  public function setPriceSetToDefault(string $component): void {
+    $this->priceSetID = PriceSet::get(FALSE)
+      ->addWhere('name', '=', ($component === 'membership' ? 'default_membership_type_amount' : 'default_contribution_amount'))
+      ->execute()
+      ->first()['id'];
+  }
+
+  /**
+   * Is overriding the total amount valid for this price set.
+   *
+   * @internal tested. core code use only.
+   *
+   * @return bool
+   */
+  public function supportsOverrideAmount(): bool {
+    return (bool) $this->getPriceSetMetadata()['is_quick_config'];
+  }
+
+  /**
    * Set price set ID based on the contribution page id.
+   *
+   * @internal use in tested core code only.
    *
    * @param int $contributionPageID
    *
@@ -213,6 +269,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Set price set ID based on the event id.
    *
+   * @internal use in tested core code only.
+   *
    * @param int $eventID
    *
    * @throws \CiviCRM_API3_Exception
@@ -223,6 +281,9 @@ class CRM_Financial_BAO_Order {
 
   /**
    * Set the price set id based on looking up the entity.
+   *
+   * @internal use in tested core code only.
+   *
    * @param string $entity
    * @param int $id
    *
@@ -234,6 +295,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Getter for price selection.
    *
+   * @internal use in tested core code only.
+   *
    * @return array
    */
   public function getPriceSelection(): array {
@@ -242,6 +305,8 @@ class CRM_Financial_BAO_Order {
 
   /**
    * Setter for price selection.
+   *
+   * @internal use in tested core code only.
    *
    * @param array $priceSelection
    */
@@ -254,6 +319,8 @@ class CRM_Financial_BAO_Order {
    *
    * ie. the 'price_' is stripped off the key name and the field ID
    * is cast to an integer.
+   *
+   * @internal use in tested core code only.
    *
    * @return array
    */
@@ -269,6 +336,8 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the metadata for the given field.
    *
+   * @internal use in tested core code only.
+   *
    * @param int $id
    *
    * @return array
@@ -280,27 +349,40 @@ class CRM_Financial_BAO_Order {
   /**
    * Get the metadata for the fields in the price set.
    *
+   * @internal use in tested core code only.
+   *
    * @return array
    */
   public function getPriceFieldsMetadata(): array {
     if (empty($this->priceFieldMetadata)) {
       $this->getPriceSetMetadata();
-      if ($this->getForm()) {
-        CRM_Utils_Hook::buildAmount($this->form->getFormContext(), $this->form, $this->priceFieldMetadata);
-      }
     }
     return $this->priceFieldMetadata;
   }
 
   /**
+   * Set the metadata for the order.
+   *
+   * @param array $metadata
+   */
+  protected function setPriceFieldMetadata($metadata) {
+    $this->priceFieldMetadata = $metadata;
+    if ($this->getForm()) {
+      CRM_Utils_Hook::buildAmount($this->form->getFormContext(), $this->form, $this->priceFieldMetadata);
+    }
+  }
+
+  /**
    * Get the metadata for the fields in the price set.
+   *
+   * @internal use in tested core code only.
    *
    * @return array
    */
   public function getPriceSetMetadata(): array {
     if (empty($this->priceSetMetadata)) {
       $priceSetMetadata = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($this->getPriceSetID());
-      $this->priceFieldMetadata = $priceSetMetadata['fields'];
+      $this->setPriceFieldMetadata($priceSetMetadata['fields']);
       unset($priceSetMetadata['fields']);
       $this->priceSetMetadata = $priceSetMetadata;
     }
@@ -309,6 +391,8 @@ class CRM_Financial_BAO_Order {
 
   /**
    * Get the financial type id for the order.
+   *
+   * @internal use in tested core code only.
    *
    * This may differ to the line items....
    *
@@ -319,12 +403,16 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Set the price field selection from an array of params containing price fields.
+   * Set the price field selection from an array of params containing price
+   * fields.
    *
-   * This function takes the sort of 'anything & everything' parameters that come in from the
-   * form layer and filters them before assigning them to the priceSelection property.
+   * This function takes the sort of 'anything & everything' parameters that
+   * come in from the form layer and filters them before assigning them to the
+   * priceSelection property.
    *
    * @param array $input
+   *
+   * @throws \API_Exception
    */
   public function setPriceSelectionFromUnfilteredInput(array $input): void {
     foreach ($input as $fieldName => $value) {
@@ -335,6 +423,23 @@ class CRM_Financial_BAO_Order {
         }
       }
     }
+    if (empty($this->priceSelection) && isset($input['total_amount'])
+      && is_numeric($input['total_amount']) && !empty($input['financial_type_id'])) {
+      $this->priceSelection['price_' . $this->getDefaultPriceField()] = $input['total_amount'];
+      $this->setOverrideFinancialTypeID($input['financial_type_id']);
+    }
+  }
+
+  /**
+   * Get the id of the price field to use when just an amount is provided.
+   *
+   * @throws \API_Exception
+   */
+  public function getDefaultPriceField() {
+    return PriceField::get(FALSE)
+      ->addWhere('name', '=', 'contribution_amount')
+      ->addWhere('price_set.name', '=', 'default_contribution_amount')
+      ->execute()->first()['id'];
   }
 
   /**
@@ -418,10 +523,10 @@ class CRM_Financial_BAO_Order {
       $params['total_amount'] = $this->getOverrideTotalAmount();
     }
 
+    // Dummy value to prevent e-notice in getLine. We calculate tax in this class.
+    $params['financial_type_id'] = 0;
     foreach ($this->getPriceOptions() as $fieldID => $valueID) {
-      if (!isset($this->priceSetID)) {
-        $this->setPriceSetID(PriceField::get()->addSelect('price_set_id')->addWhere('id', '=', $fieldID)->execute()->first()['price_set_id']);
-      }
+      $this->setPriceSetIDFromSelectedField($fieldID);
       $throwAwayArray = [];
       // @todo - still using getLine for now but better to bring it to this class & do a better job.
       $newLines = CRM_Price_BAO_PriceSet::getLine($params, $throwAwayArray, $this->getPriceSetID(), $this->getPriceFieldSpec($fieldID), $fieldID)[1];
@@ -512,6 +617,21 @@ class CRM_Financial_BAO_Order {
       return 0;
     }
     return $taxRates[$financialTypeID];
+  }
+
+  /**
+   * @param $fieldID
+   *
+   * @throws \API_Exception
+   */
+  protected function setPriceSetIDFromSelectedField($fieldID): void {
+    if (!isset($this->priceSetID)) {
+      $this->setPriceSetID(PriceField::get(FALSE)
+        ->addSelect('price_set_id')
+        ->addWhere('id', '=', $fieldID)
+        ->execute()
+        ->first()['price_set_id']);
+    }
   }
 
 }
