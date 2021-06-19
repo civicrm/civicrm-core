@@ -17,12 +17,12 @@
    *   An API call which replaces the translations ([entity,action,params]).
    */
   function reqReplaceTranslations(id, lang, status, values) {
-    if (angular.equals({}, values)) {
+    if (!values._exists) {
       return reqDeleteTranslations(id, lang, status);
     }
     var records = [];
-    angular.forEach(values, function(value, key) {
-      records.push({"entity_field":key, "string":value});
+    angular.forEach(TRANSLATED, function(key) {
+      records.push({"entity_field":key, "string":values[key]});
     });
     return ['Translation', 'replace', {
       records: records,
@@ -69,12 +69,14 @@
   }
 
   function respMergeTranslations(prefetch) {
-    angular.forEach(prefetch, function(results) {
+    angular.forEach(prefetch, function(results, queryName) {
+      var forceExists = (queryName === 'txActive');
       angular.forEach(results, function(result) {
         if (result.translations) {
           angular.forEach(result.translations, function(tx) {
             result[tx.entity_field] = tx.string;
           });
+          result._exists = forceExists || (result.translations.length > 0);
         }
       });
     });
@@ -90,14 +92,14 @@
   }
 
   function copyTranslations(src, dest) {
-    dest.translations = [];
+    dest._exists = false; // Starting assumption - prove otherwise in a moment.
     TRANSLATED.forEach(function(fld) {
-      if (src[fld] === undefined) {
-        delete dest[fld];
+      if (src[fld] !== undefined) {
+        dest._exists = true;
+        dest[fld] = src[fld];
       }
       else {
-        dest[fld] = src[fld];
-        dest.translations.push({entity_field: fld, string: src[fld]});
+        delete dest[fld];
       }
     });
   }
@@ -127,11 +129,13 @@
 
             if (args.lang) {
               requests.txActive = ['MessageTemplate', 'get', {
+                select: TRANSLATED,
                 where: [['id', '=', args.id]],
                 chain: {translations: reqChainTranslations(args.lang, 'active')}
               }];
 
               requests.txDraft = ['MessageTemplate', 'get', {
+                select: TRANSLATED,
                 where: [['id', '=', args.id]],
                 chain: {translations: reqChainTranslations(args.lang, 'draft')}
               }];
@@ -167,7 +171,7 @@
     };
 
     $ctrl.hasDraft = function hasDraft() {
-      return $ctrl.lang && $ctrl.records.txDraft && $ctrl.records.txDraft.translations && $ctrl.records.txDraft.translations.length > 0;
+      return $ctrl.lang && $ctrl.records.txDraft && $ctrl.records.txDraft._exists;
     };
     $ctrl.createDraft = function createDraft(src) {
       copyTranslations(src, $ctrl.records.txDraft);
@@ -186,8 +190,8 @@
     $ctrl.save = function save() {
       var requests = {};
       if ($ctrl.lang) {
-        requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', _.pick($ctrl.records.txActive, TRANSLATED));
-        requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', _.pick($ctrl.records.txDraft, TRANSLATED));
+        requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', $ctrl.records.txActive);
+        requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', $ctrl.records.txDraft);
       }
       else {
         requests.main = ['MessageTemplate', 'update', {
