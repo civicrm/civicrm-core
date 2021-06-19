@@ -186,6 +186,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $lineTotal += (float) ($lineItem['line_total'] ?? 0);
       }
     }
+    if (($params['tax_amount'] ?? '') === 'null') {
+      CRM_Core_Error::deprecatedWarning('tax_amount should be not passed in (preferable) or a float');
+    }
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
       $params['tax_amount'] = $taxAmount;
