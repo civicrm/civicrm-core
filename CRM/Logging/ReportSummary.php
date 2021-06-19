@@ -139,6 +139,34 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
           'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
         ],
       ],
+      'log_civicrm_event' => [
+        'fk' => 'created_id',
+        'log_type' => 'Event',
+      ],
+      'log_civicrm_tag' => [
+        'fk' => 'created_id',
+        'log_type' => 'Tag',
+      ],
+      'log_civicrm_group' => [
+        'fk' => 'created_id',
+        'log_type' => 'Group',
+      ],
+      'log_civicrm_contribution_page' => [
+        'fk' => 'created_id',
+        'log_type' => 'Contribution Page',
+      ],
+      'log_civicrm_uf_group' => [
+        'fk' => 'created_id',
+        'log_type' => 'Profile',
+      ],
+      'log_civicrm_survey' => [
+        'fk' => 'created_id',
+        'log_type' => 'Survey',
+      ],
+      'log_civicrm_campaign' => [
+        'fk' => 'created_id',
+        'log_type' => 'Campaign',
+      ],
     ];
 
     $logging = new CRM_Logging_Schema();

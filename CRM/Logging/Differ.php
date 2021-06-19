@@ -105,6 +105,48 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
           $contactIdClause = "AND id = (select case_id FROM civicrm_case_contact WHERE contact_id = %3 LIMIT 1)";
           break;
 
+        case 'civicrm_batch':
+          $contactIdClause = "AND (created_id = %3 OR modified_id = %3)";
+          break;
+
+        case 'civicrm_group_organization':
+          $contactIdClause = "AND (organization_id = %3)";
+          break;
+
+        case 'civicrm_dedupe_exception':
+          $contactIdClause = "AND (contact_id1 = %3 OR contact_id2 = %3)";
+          break;
+
+        case 'civicrm_campaign':
+        case 'civicrm_survey':
+          $contactIdClause = "AND (created_id = %3 OR last_modified_id = %3)";
+          break;
+
+        case 'civicrm_event_carts':
+          $contactIdClause = "AND (user_id = %3)";
+          break;
+
+        case 'civicrm_membership_type':
+          $contactIdClause = "AND (member_of_contact_id = %3)";
+          break;
+
+        case 'civicrm_custom_group':
+        case 'civicrm_file':
+        case 'civicrm_tag':
+        case 'civicrm_print_label':
+        case 'civicrm_group':
+        case 'civicrm_contribution_page':
+        case 'civicrm_payment_token':
+        case 'civicrm_report_instance':
+        case 'civicrm_uf_group':
+        case 'civicrm_event':
+          $contactIdClause = "AND (created_id = %3)";
+          break;
+
+        case 'civicrm_mailing':
+          $contactIdClause = "AND (created_id = %3 OR scheduled_id = %3 OR approver_id = %3)";
+          break;
+
         default:
           if (array_key_exists($table, $addressCustomTables)) {
             $join = "INNER JOIN `{$this->db}`.`log_civicrm_address` et ON et.id = lt.entity_id";
