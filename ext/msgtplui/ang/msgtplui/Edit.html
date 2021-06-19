@@ -16,7 +16,7 @@
       <label for="msgtpl_language">
         {{:: ts('Locale') }} <span class="crm-marker">*</span>
       </label>
-      <input ng-model="$ctrl.lang" class="form-control" id="msgtpl_language" required title="{{:: ts('Required') }}" ng-disabled="true" />
+      <input ng-model="$ctrl.locales[$ctrl.lang] || $ctrl.lang" class="form-control" id="msgtpl_language" required title="{{:: ts('Required') }}" ng-disabled="true" />
       <!-- TODO: Pretty name -->
     </div>
 
