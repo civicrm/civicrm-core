@@ -45,4 +45,4 @@ CREATE TABLE `civicrm_search_display` (
   UNIQUE INDEX `UI_saved_search__id_name`(saved_search_id, name),
   CONSTRAINT FK_civicrm_search_display_saved_search_id FOREIGN KEY (`saved_search_id`) REFERENCES `civicrm_saved_search`(`id`) ON DELETE CASCADE
 )
-ENGINE=InnoDB;
+ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
