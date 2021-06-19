@@ -2120,7 +2120,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     ];
 
     $form = new CRM_Contribute_Form_Contribution();
-    $this->assertSame([], $form->formRule($fields, [], $form));
+    $this->assertSame([], $form::formRule($fields, [], $form));
   }
 
   /**
