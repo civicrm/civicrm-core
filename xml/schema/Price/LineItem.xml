@@ -227,4 +227,12 @@
      <type>Text</type>
    </html>
   </field>
+  <field>
+    <name>membership_num_terms</name>
+    <title>Number of membership terms purchased</title>
+    <type>int unsigned</type>
+    <default>NULL</default>
+    <comment>Number of terms for this membership (only supported in Order->Payment flow). If the field is NULL it means unknown and it will be assumed to be 1 during payment.create if entity_table is civicrm_membership</comment>
+    <add>5.40</add>
+  </field>
 </table>
