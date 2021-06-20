@@ -1,50 +1,56 @@
 <div crm-ui-debug="options"></div>
 
-<ng-form name="contentForm" crm-ui-id-scope>
+<ng-form name="contentForm" crm-ui-id-scope ng-init="accordions={subject: true, msg_html: true, msg_text: false}">
 
-  <div crm-ui-accordion="{title: ts('Subject'), collapsed: false}">
-    <input crm-mailing-token on-select="$emit('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1">
-    <div
-      ng-model="options.record.msg_subject"
-      crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
-      crm-monaco-insert-rx="insert:msg_subject"
-    ></div>
-    <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
-  </div>
-
-  <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
-    <div class="btn-toolbar" role="toolbar" aria-label="...">
-      <div class="btn-group-sm" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_html')">{{ts('Full Window')}}</button>
-        <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_html')">{{ts('Preview')}}</button>
+  <uib-accordion close-others="oneAtATime">
+    <div uib-accordion-group class="panel-default" heading="{{::ts('Subject')}}" is-open="accordions.subject">
+      <div class="btn-toolbar" role="toolbar" aria-label="...">
+        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('Subject Tokens')}}">
+          <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1">
+        </div>
       </div>
-      <div class="btn-group-sm" role="group" aria-label="...">
-        <input crm-mailing-token on-select="$emit('insert:msg_html', token.name)" tabindex="-1" style="z-index:1">
-      </div>
-    </div>
-    <div
-      ng-model="options.record.msg_html"
-      crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
-      crm-monaco-insert-rx="insert:msg_html"
-    ></div>
-  </div>
-
-  <div crm-ui-accordion="{title: ts('Text Content'), collapsed: true}">
-    <div class="btn-toolbar" role="toolbar" aria-label="...">
-      <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_text')">{{ts('Full Window')}}</button>
-        <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_text')">{{ts('Preview')}}</button>
-      </div>
-      <div class="btn-group" role="group" aria-label="...">
-        <input crm-mailing-token on-select="$emit('insert:msg_text', token.name)" tabindex="-1" style="z-index:1">
-      </div>
+      <div
+        ng-model="options.record.msg_subject"
+        crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
+        crm-monaco-insert-rx="insert:msg_subject"
+      ></div>
+      <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
     </div>
 
-    <div
-      ng-model="options.record.msg_text"
-      crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
-      crm-monaco-insert-rx="insert:msg_text"
-    ></div>
-  </div>
+    <div uib-accordion-group class="panel-default" heading="{{::ts('HTML Content')}}" is-open="accordions.msg_html">
+      <div class="btn-toolbar" role="toolbar" aria-label="...">
+        <div class="btn-gropu btn-group-sm" role="group" aria-label="...">
+          <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_html')">{{::ts('Full Window')}}</button>
+          <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_html')">{{::ts('Preview')}}</button>
+        </div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('HTML Tokens')}}">
+          <input crm-mailing-token on-select="$broadcast('insert:msg_html', token.name)" tabindex="-1" style="z-index:1">
+        </div>
+      </div>
+      <br/>
+      <div
+        ng-model="options.record.msg_html"
+        crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
+        crm-monaco-insert-rx="insert:msg_html"
+      ></div>
+    </div>
+
+    <div uib-accordion-group class="panel-default" heading="{{::ts('Text Content')}}" is-open="accordions.msg_text">
+      <div class="btn-toolbar" role="toolbar" aria-label="...">
+        <div class="btn-group btn-group-sm" role="group" aria-label="...">
+          <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_text')">{{::ts('Full Window')}}</button>
+          <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_text')">{{::ts('Preview')}}</button>
+        </div>
+        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('Text Tokens')}}">
+          <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1">
+        </div>
+      </div>
+      <div
+        ng-model="options.record.msg_text"
+        crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
+        crm-monaco-insert-rx="insert:msg_text"
+      ></div>
+    </div>
+  </uib-accordion>
 
 </ng-form>
