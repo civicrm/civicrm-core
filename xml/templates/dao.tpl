@@ -7,7 +7,7 @@
  * {$generated}
  * (GenCodeChecksum:{$genCodeChecksum})
  */
-{$useHelper}
+{if isset($useHelper)}{$useHelper}{/if}
 /**
  * Database access object for the {$table.entity} entity.
  */
