@@ -173,17 +173,18 @@ class FkJoinTest extends UnitTestCase {
       ->addValue('name', uniqid('join3'))
       ->execute()
       ->first()['name'];
-
+    // Create using pseudoconstant syntax (:name)
     $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
       ->addChain('tag2', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag2]))
       ->execute()
       ->first()['id'];
+    // Create using fk syntax (.name)
     $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Bbb')
-      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
-      ->addChain('tag3', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag3]))
+      ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id.name' => $tag1]))
+      ->addChain('tag3', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id.name' => $tag3]))
       ->execute()
       ->first()['id'];
     $cid3 = Contact::create(FALSE)
