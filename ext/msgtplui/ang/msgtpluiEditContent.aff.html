@@ -3,18 +3,10 @@
 <ng-form name="content_form">
 
   <div crm-ui-accordion="{title: ts('Subject'), collapsed: false}">
-    <input
-      ng-if="options.record.msg_subject.search('\n') < 0"
-      ng-model="options.record.msg_subject"
-      class="form-control" id="msgtpl_subject"
-      required
-      title="{{:: ts('Required') }}"
-      ng-disabled="options.disabled" />
-
     <msgtplui-monaco
-      ng-if="options.record.msg_subject.search('\n') >= 0"
-      options="{disabled: options.disabled, record: options.record, field: 'msg_subject', language: 'smarty', crmHeightPct: 0.25}">
+      options="{disabled: options.disabled, record: options.record, field: 'msg_subject', language: 'smarty', crmHeightPct: 0.15}">
     </msgtplui-monaco>
+    <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
   </div>
 
   <div crm-ui-accordion="{title: ts('HTML Content'), collapsed: false}">
