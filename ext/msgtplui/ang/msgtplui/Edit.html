@@ -37,7 +37,8 @@
         </li>
       </ul>
       <div class="panel-body">
-        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], disabled: $ctrl.tab==='original'}"></msgtplui-edit-content>
+        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], disabled: true}" ng-if="$ctrl.tab==='original'"></msgtplui-edit-content>
+        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab]}" ng-if="$ctrl.tab!=='original'"></msgtplui-edit-content>
         <div class="text-center">
           <div class="btn-group">
             <button type="button" class="btn btn-success" ng-if="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft()" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])"><i class="fa fa-clone"/> {{ts('Create draft')}}</button>
