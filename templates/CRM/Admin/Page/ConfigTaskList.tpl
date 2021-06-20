@@ -111,7 +111,7 @@
         <td colspan="2">{ts}Organize your contacts{/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Tags (Categories){/ts}</a></td>
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/tag" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Tags{/ts}</a></td>
         <td>{ts}Tags can be assigned to any contact record, and are a convenient way to find contacts. You can create as many tags as needed to organize and segment your records.{/ts}</td>
     </tr>
     <tr class="even">
