@@ -3,7 +3,7 @@
 <menu>
   <item>
     <path>civicrm/tag</path>
-    <title>Tags (Categories)</title>
+    <title>Tags</title>
     <desc>Tags are useful for segmenting the contacts in your database into categories (e.g. Staff Member, Donor, Volunteer, etc.). Create and edit available tags here.</desc>
     <page_callback>CRM_Tag_Page_Tag</page_callback>
     <access_arguments>administer CiviCRM;manage tags</access_arguments>
