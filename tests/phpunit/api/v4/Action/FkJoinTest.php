@@ -161,51 +161,51 @@ class FkJoinTest extends UnitTestCase {
   }
 
   public function testBridgeJoinTags() {
-    $tag1 = Tag::create()->setCheckPermissions(FALSE)
+    $tag1 = Tag::create(FALSE)
       ->addValue('name', uniqid('join1'))
       ->execute()
       ->first()['name'];
-    $tag2 = Tag::create()->setCheckPermissions(FALSE)
+    $tag2 = Tag::create(FALSE)
       ->addValue('name', uniqid('join2'))
       ->execute()
       ->first()['name'];
-    $tag3 = Tag::create()->setCheckPermissions(FALSE)
+    $tag3 = Tag::create(FALSE)
       ->addValue('name', uniqid('join3'))
       ->execute()
       ->first()['name'];
 
-    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
       ->addChain('tag2', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag2]))
       ->execute()
       ->first()['id'];
-    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Bbb')
       ->addChain('tag1', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag1]))
       ->addChain('tag3', EntityTag::create()->setValues(['entity_id' => '$id', 'tag_id:name' => $tag3]))
       ->execute()
       ->first()['id'];
-    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+    $cid3 = Contact::create(FALSE)
       ->addValue('first_name', 'Ccc')
       ->execute()
       ->first()['id'];
 
-    $required = Contact::get()->setCheckPermissions(FALSE)
+    $required = Contact::get(FALSE)
       ->addJoin('Tag', TRUE, 'EntityTag')
       ->addSelect('first_name', 'tag.name')
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->execute();
     $this->assertCount(4, $required);
 
-    $optional = Contact::get()->setCheckPermissions(FALSE)
+    $optional = Contact::get(FALSE)
       ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag2, $tag3]])
       ->addSelect('first_name', 'tag.name')
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->execute();
     $this->assertCount(5, $optional);
 
-    $grouped = Contact::get()->setCheckPermissions(FALSE)
+    $grouped = Contact::get(FALSE)
       ->addJoin('Tag', FALSE, 'EntityTag', ['tag.name', 'IN', [$tag1, $tag3]])
       ->addSelect('first_name', 'COUNT(tag.name) AS tag_count')
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
@@ -215,7 +215,7 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals(2, (int) $grouped[$cid2]['tag_count']);
     $this->assertEquals(0, (int) $grouped[$cid3]['tag_count']);
 
-    $reverse = Tag::get()->setCheckPermissions(FALSE)
+    $reverse = Tag::get(FALSE)
       ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
       ->addGroupBy('id')
       ->addSelect('name', 'COUNT(contact.id) AS contacts')
@@ -226,7 +226,7 @@ class FkJoinTest extends UnitTestCase {
   }
 
   public function testBridgeJoinRelationshipContactActivity() {
-    $cid1 = Contact::create()->setCheckPermissions(FALSE)
+    $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
       ->addChain('activity', Activity::create()
         ->addValue('activity_type_id:name', 'Meeting')
@@ -235,7 +235,7 @@ class FkJoinTest extends UnitTestCase {
       )
       ->execute()
       ->first()['id'];
-    $cid2 = Contact::create()->setCheckPermissions(FALSE)
+    $cid2 = Contact::create(FALSE)
       ->addValue('first_name', 'Bbb')
       ->addChain('activity', Activity::create()
         ->addValue('activity_type_id:name', 'Phone Call')
@@ -247,7 +247,7 @@ class FkJoinTest extends UnitTestCase {
       )
       ->execute()
       ->first()['id'];
-    $cid3 = Contact::create()->setCheckPermissions(FALSE)
+    $cid3 = Contact::create(FALSE)
       ->addValue('first_name', 'Ccc')
       ->addChain('activity', Activity::create()
         ->addValue('activity_type_id:name', 'Meeting')
