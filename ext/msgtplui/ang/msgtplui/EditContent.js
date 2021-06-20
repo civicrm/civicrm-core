@@ -22,11 +22,15 @@
       };
 
       $ctrl.openFull = function(fld) {
-        crmUiAlert({type: 'error', title: ts('TODO'), text: ts('Not yet implemented')});
+        crmUiAlert({type: 'error', title: ts('TODO: openFull'), text: ts('Not yet implemented')});
       };
 
       $ctrl.openPreview = function(fld) {
-        crmUiAlert({type: 'error', title: ts('TODO'), text: ts('Not yet implemented')});
+        crmUiAlert({type: 'error', title: ts('TODO: openPreview'), text: ts('Not yet implemented')});
+      };
+
+      $ctrl.insertToken = function(fld) {
+        crmUiAlert({type: 'error', title: ts('TODO: insertToken'), text: ts('Not yet implemented')});
       };
 
     }

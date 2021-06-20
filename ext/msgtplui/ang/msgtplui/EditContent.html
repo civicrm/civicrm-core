@@ -1,56 +1,69 @@
 <div crm-ui-debug="options"></div>
 
-<ng-form name="contentForm" crm-ui-id-scope ng-init="accordions={subject: true, msg_html: true, msg_text: false}">
+<ng-form name="contentForm" crm-ui-id-scope ng-init="accordions={msg_subject: true, msg_html: true, msg_text: false}">
 
-  <uib-accordion close-others="oneAtATime">
-    <div uib-accordion-group class="panel-default" heading="{{::ts('Subject')}}" is-open="accordions.subject">
-      <div class="btn-toolbar" role="toolbar" aria-label="...">
-        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('Subject Tokens')}}">
-          <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1">
-        </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href="" ng-click="accordions.msg_subject = !accordions.msg_subject">{{::ts('Subject')}}</a>
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Subject: Toolbar')}}">
+        <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1">
       </div>
-      <div
-        ng-model="options.record.msg_subject"
-        crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
-        crm-monaco-insert-rx="insert:msg_subject"
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_subject">
+      <div ng-model="options.record.msg_subject"
+           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
+           crm-monaco-insert-rx="insert:msg_subject"
       ></div>
       <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
     </div>
+  </div>
 
-    <div uib-accordion-group class="panel-default" heading="{{::ts('HTML Content')}}" is-open="accordions.msg_html">
-      <div class="btn-toolbar" role="toolbar" aria-label="...">
-        <div class="btn-gropu btn-group-sm" role="group" aria-label="...">
-          <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_html')">{{::ts('Full Window')}}</button>
-          <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_html')">{{::ts('Preview')}}</button>
-        </div>
-        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('HTML Tokens')}}">
-          <input crm-mailing-token on-select="$broadcast('insert:msg_html', token.name)" tabindex="-1" style="z-index:1">
-        </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href="" ng-click="accordions.msg_html = !accordions.msg_html">{{::ts('HTML Content')}}</a>
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}">
+        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_html')">
+          <span class="fa fa-window-restore" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_html')">
+          <span class="fa fa-eye" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_html')" crm-icon="fa-plus">
+          {{::ts('Token')}}
+        </button>
       </div>
-      <br/>
-      <div
-        ng-model="options.record.msg_html"
-        crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
-        crm-monaco-insert-rx="insert:msg_html"
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_html">
+      <div ng-model="options.record.msg_html"
+           crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
+           crm-monaco-insert-rx="insert:msg_html"
       ></div>
     </div>
+  </div>
 
-    <div uib-accordion-group class="panel-default" heading="{{::ts('Text Content')}}" is-open="accordions.msg_text">
-      <div class="btn-toolbar" role="toolbar" aria-label="...">
-        <div class="btn-group btn-group-sm" role="group" aria-label="...">
-          <button type="button" class="btn btn-default" ng-click="$ctrl.openFull('msg_text')">{{::ts('Full Window')}}</button>
-          <button type="button" class="btn btn-default" ng-click="$ctrl.openPreview('msg_text')">{{::ts('Preview')}}</button>
-        </div>
-        <div class="btn-group btn-group-sm" role="group" aria-label="{{::ts('Text Tokens')}}">
-          <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1">
-        </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href="" ng-click="accordions.msg_text = !accordions.msg_text">{{::ts('Text Content')}}</a>
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}">
+        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_text')">
+          <span class="fa fa-window-restore" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_text')">
+          <span class="fa fa-eye" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_text')" crm-icon="fa-plus">
+          {{::ts('Token')}}
+        </button>
+        <!--          <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1">-->
       </div>
-      <div
-        ng-model="options.record.msg_text"
-        crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
-        crm-monaco-insert-rx="insert:msg_text"
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_text">
+      <div ng-model="options.record.msg_text"
+           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
+           crm-monaco-insert-rx="insert:msg_text"
       ></div>
     </div>
-  </uib-accordion>
+  </div>
+
 
 </ng-form>
