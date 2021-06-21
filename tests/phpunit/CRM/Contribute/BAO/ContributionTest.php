@@ -820,8 +820,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         $e->getMessage()
       );
     }
-
-    $this->assertEquals(3, $params['line_items'][0]['line_item'][0]['financial_type_id']);
     $params['total_amount'] = 300;
 
     CRM_Contribute_BAO_Contribution::checkLineItems($params);

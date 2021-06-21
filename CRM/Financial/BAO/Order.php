@@ -59,6 +59,29 @@ class CRM_Financial_BAO_Order {
   protected $overrideFinancialTypeID;
 
   /**
+   * Financial type id to use for any lines where is is not provided.
+   *
+   * @var int
+   */
+  protected $defaultFinancialTypeID;
+
+  /**
+   * @return int
+   */
+  public function getDefaultFinancialTypeID(): int {
+    return $this->defaultFinancialTypeID;
+  }
+
+  /**
+   * Set the default financial type id to be used when the line has none.
+   *
+   * @param int|null $defaultFinancialTypeID
+   */
+  public function setDefaultFinancialTypeID(?int $defaultFinancialTypeID): void {
+    $this->defaultFinancialTypeID = $defaultFinancialTypeID;
+  }
+
+  /**
    * Override for the total amount of the order.
    *
    * When there is a single line item the order total may be overriden.
@@ -632,6 +655,109 @@ class CRM_Financial_BAO_Order {
         ->execute()
         ->first()['price_set_id']);
     }
+  }
+
+  /**
+   * Set the line item.
+   *
+   * This function augments the line item where possible. The calling code
+   * should not attempt to set taxes. This function allows minimal values
+   * to be passed for the default price sets - ie if only membership_type_id is
+   * specified the price_field_id and price_value_id will be determined.
+   *
+   * @param array $lineItem
+   * @param int|string $index
+   *
+   * @throws \API_Exception
+   * @internal tested core code usage only.
+   * @internal use in tested core code only.
+   *
+   */
+  public function setLineItem(array $lineItem, $index): void {
+    if (!empty($lineItem['price_field_id']) && !isset($this->priceSetID)) {
+      $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+    }
+    if (!isset($lineItem['financial_type_id'])) {
+      $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
+    }
+    if (!is_numeric($lineItem['financial_type_id'])) {
+      $lineItem['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItem['financial_type_id']);
+    }
+    $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];
+    if (!empty($lineItem['membership_type_id'])) {
+      $lineItem['entity_table'] = 'civicrm_membership';
+      if (empty($lineItem['price_field_id']) && empty($lineItem['price_field_value_id'])) {
+        // If only the membership type is passed in we use the default price field.
+        if (!isset($this->priceSetID)) {
+          $this->setPriceSetToDefault('membership');
+        }
+        $lineItem = $this->fillMembershipLine($lineItem);
+      }
+    }
+    $this->lineItems[$index] = $lineItem;
+  }
+
+  /**
+   * Set a value on a line item.
+   *
+   * @internal only use in core tested code.
+   *
+   * @param string $name
+   * @param mixed $value
+   * @param string|int $index
+   */
+  public function setLineItemValue(string $name, $value, $index): void {
+    $this->lineItems[$index][$name] = $value;
+  }
+
+  /**
+   * @param int|string $index
+   *
+   * @return string
+   */
+  public function getLineItemEntity($index):string {
+    // @todo - ensure entity_table is set in setLineItem, go back to enotices here.
+    return str_replace('civicrm_', '', ($this->lineItems[$index]['entity_table'] ?? 'contribution'));
+  }
+
+  /**
+   * Get the ordered line item.
+   *
+   * @param string|int $index
+   *
+   * @return array
+   */
+  public function getLineItem($index): array {
+    return $this->lineItems[$index];
+  }
+
+  /**
+   * Fills in additional data for the membership line.
+   *
+   * The minimum requirement is the membership_type_id and that priceSetID is set.
+   *
+   * @param array $lineItem
+   *
+   * @return array
+   */
+  protected function fillMembershipLine(array $lineItem): array {
+    $fields = $this->getPriceFieldsMetadata();
+    $field = reset($fields);
+    if (!isset($lineItem['price_field_value_id'])) {
+      foreach ($field['options'] as $option) {
+        if ((int) $option['membership_type_id'] === (int) $lineItem['membership_type_id']) {
+          $lineItem['price_field_id'] = $field['id'];
+          $lineItem['price_field_value_id'] = $option['id'];
+          $lineItem['qty'] = 1;
+        }
+      }
+    }
+    $option = $field['options'][$lineItem['price_field_value_id']];
+    $lineItem['unit_price'] = $lineItem['line_total'] ?? $option['amount'];
+    $lineItem['label'] = $lineItem['label'] ?? $option['label'];
+    $lineItem['field_title'] = $lineItem['field_title'] ?? $option['label'];
+    $lineItem['financial_type_id'] = $lineItem['financial_type_id'] ?: ($this->getDefaultFinancialTypeID() ?? $option['financial_type_id']);
+    return $lineItem;
   }
 
 }
