@@ -18,7 +18,7 @@
 
   angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location, dialogService) {
     var ts = $scope.ts = CRM.ts('msgtplui');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/User'}); // See: templates/CRM/msgtplui/User.hlp
+    var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/User'}); // See: templates/CRM/Msgtplui/User.hlp
     $scope.crmUrl = CRM.url;
     $scope.crmUiAlert = crmUiAlert;
     $scope.location = $location;

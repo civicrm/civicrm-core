@@ -151,7 +151,7 @@
   angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch) {
     var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/msgtplui/Edit'}); // See: templates/CRM/msgtplui/Edit.hlp
+    var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/Edit'}); // See: templates/CRM/Msgtplui/Edit.hlp
     var $ctrl = this;
     var args = $location.search();
 
