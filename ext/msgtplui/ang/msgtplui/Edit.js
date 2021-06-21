@@ -148,7 +148,7 @@
     }
   );
 
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch) {
+  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch) {
     var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/Edit'}); // See: templates/CRM/Msgtplui/Edit.hlp
@@ -177,15 +177,18 @@
     $ctrl.createDraft = function createDraft(src) {
       copyTranslations(src, $ctrl.records.txDraft);
       $ctrl.switchTab('txDraft');
+      crmStatus({success: ts('Creating draft...')}, $q.resolve())
     };
     $ctrl.deleteDraft = function deleteDraft() {
       copyTranslations({}, $ctrl.records.txDraft);
       $ctrl.switchTab('txActive');
+      crmStatus({error: ts('Removed draft.')}, $q.reject())
     };
     $ctrl.activateDraft = function activateDraft() {
       copyTranslations($ctrl.records.txDraft, $ctrl.records.txActive);
       copyTranslations({}, $ctrl.records.txDraft);
       $ctrl.switchTab('txActive');
+      crmStatus({success: ts('Activated draft.')}, $q.resolve())
     };
 
     $ctrl.save = function save() {
