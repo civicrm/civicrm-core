@@ -521,7 +521,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $this->ids['Contact']['contactID1'],
       'contribution_recur_id' => $ContributionRecur1['id'],
-      'is_template' => 1
+      'is_template' => 1,
     ]);
     $params = [
       'to_financial_account_id' => 1,
