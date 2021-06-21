@@ -5,9 +5,8 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_subject = !accordions.msg_subject">{{::ts('Subject')}}</a>
-      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Subject: Toolbar')}}">
-        <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1">
-      </div>
+      <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_subject">
+      <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_subject">
       <div ng-model="$ctrl.options.record.msg_subject"
@@ -21,17 +20,20 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_html = !accordions.msg_html">{{::ts('HTML Content')}}</a>
-      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}">
+      <input crm-mailing-token on-select="$broadcast('insert:msg_html', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_html">
+      &nbsp;
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_html')">
           <span class="fa fa-window-restore" aria-hidden="true"></span>
         </button>
         <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_html')">
           <span class="fa fa-eye" aria-hidden="true"></span>
         </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_html')" crm-icon="fa-plus">
-          {{::ts('Token')}}
-        </button>
+        <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_html')" crm-icon="fa-plus">-->
+        <!--  {{::ts('Token')}}-->
+        <!--</button>-->
       </div>
+      <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_html">
       <div ng-model="$ctrl.options.record.msg_html"
@@ -44,18 +46,20 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_text = !accordions.msg_text">{{::ts('Text Content')}}</a>
-      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}">
+      <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_text">
+      &nbsp;
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_text')">
           <span class="fa fa-window-restore" aria-hidden="true"></span>
         </button>
         <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_text')">
           <span class="fa fa-eye" aria-hidden="true"></span>
         </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_text')" crm-icon="fa-plus">
-          {{::ts('Token')}}
-        </button>
-        <!--          <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1">-->
+        <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_text')" crm-icon="fa-plus">-->
+        <!--  {{::ts('Token')}}-->
+        <!--</button>-->
       </div>
+      <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_text">
       <div ng-model="$ctrl.options.record.msg_text"
