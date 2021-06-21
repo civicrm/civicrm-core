@@ -57,7 +57,6 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
       ],
     ];
-
     if (
       (CRM_Core_Permission::check('edit contributions') || $context !== 'contribution') &&
       ($paymentProcessorObj->supports('ChangeSubscriptionAmount')
