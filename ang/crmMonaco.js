@@ -94,4 +94,19 @@
     };
   });
 
+  angular.module('crmMonaco').directive('crmMonacoInsertRx', function() {
+    return {
+      require: 'crmMonaco',
+      link: function(scope, element, attrs, crmMonaco) {
+        scope.$on(attrs.crmMonacoInsertRx, function(e, tokenName) {
+          var editor = crmMonaco.editor;
+          var id = { major: 1, minor: 1 };
+          var op = {identifier: id, range: editor.getSelection(), text: tokenName, forceMoveMarkers: true};
+          editor.executeEdits("tokens", [op]);
+          editor.focus();
+        });
+      }
+    };
+  });
+
 })(angular, CRM.$, CRM._);
