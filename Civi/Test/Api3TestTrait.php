@@ -224,6 +224,9 @@ trait Api3TestTrait {
     $params += [
       'version' => $this->_apiversion,
     ];
+    if (!empty($this->isGetSafe) && !isset($params['return'])) {
+      $params['return'] = 'id';
+    }
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
       $unfilteredResult = $this->civicrm_api($entity, 'get', ['version' => $this->_apiversion]);

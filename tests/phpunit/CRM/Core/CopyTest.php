@@ -5,11 +5,31 @@
  */
 class CRM_Core_CopyTest extends CiviUnitTestCase {
 
-  public function testEventCopy() {
+  /**
+   * Has the test class been verified as 'getsafe'.
+   *
+   * If a class is getsafe it means that where
+   * callApiSuccess is called 'return' is specified or 'return' =>'id'
+   * can be added by that function. This is part of getting away
+   * from open-ended get calls.
+   *
+   * @var bool
+   */
+  protected $isGetSafe = TRUE;
 
-    $event = $this->eventCreate();
+  use CRMTraits_Custom_CustomDataTrait;
+
+  public function testEventCopy(): void {
+
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
+    $event = $this->eventCreate([$this->getCustomFieldName('text') => 'blah']);
     $eventId = $event['id'];
     $eventRes = $event['values'][$eventId];
+    $params[$this->getCustomFieldName('text') . '_1'] = 'blah';
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
+      $eventId,
+      'Event'
+    );
     $eventCopy = CRM_Event_BAO_Event::copy($eventId);
 
     $identicalParams = [
@@ -28,11 +48,12 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
       'is_active',
       'is_show_location',
       'is_email_confirm',
+      $this->getCustomFieldName('text'),
     ];
 
     // same format for better comparison
-    $eventData = civicrm_api3('Event', 'getsingle', ['id' => $eventId]);
-    $eventCopy = civicrm_api3('Event', 'getsingle', ['id' => $eventCopy->id]);
+    $eventData = $this->callAPISuccessGetSingle('Event', ['id' => $eventId, 'return' => array_merge($identicalParams, ['title'])]);
+    $eventCopy = $this->callAPISuccessGetSingle('Event', ['id' => $eventCopy->id, 'return' => array_merge($identicalParams, ['title'])]);
 
     foreach ($identicalParams as $name) {
       $this->assertEquals($eventCopy[$name], $eventData[$name], "{$name} should be equals between source and copy");
@@ -93,7 +114,7 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
         $ploc[$field] = $eventData[$field] . $locSuffix;
       }
 
-      $res = $this->callAPISuccess('Event', 'create', $ploc);
+      $this->callAPISuccess('Event', 'create', $ploc);
     }
 
     // now that the data is different, do the copy
