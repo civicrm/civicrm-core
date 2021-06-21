@@ -76,21 +76,19 @@ function civicrm_api3_order_create(array $params): array {
   $entity = NULL;
   $entityIds = [];
   $params['contribution_status_id'] = 'Pending';
-  $priceSetID = NULL;
+  $order = new CRM_Financial_BAO_Order();
+  $order->setDefaultFinancialTypeID($params['financial_type_id'] ?? NULL);
 
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
-    foreach ($params['line_items'] as $lineItems) {
-      $entityParams = $lineItems['params'] ?? [];
-      if (!empty($entityParams) && !empty($lineItems['line_item'])) {
-        $item = reset($lineItems['line_item']);
-        if (!empty($item['membership_type_id'])) {
-          $entity = 'membership';
-        }
-        else {
-          $entity = str_replace('civicrm_', '', $item['entity_table']);
-        }
+    foreach ($params['line_items'] as $index => $lineItems) {
+      foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+        $lineIndex = $index . '+' . $innerIndex;
+        $order->setLineItem($lineItem, $lineIndex);
       }
+
+      $entityParams = $lineItems['params'] ?? [];
+      $entity = $order->getLineItemEntity($lineIndex);
 
       if ($entityParams) {
         $supportedEntity = TRUE;
@@ -118,23 +116,20 @@ function civicrm_api3_order_create(array $params): array {
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
           $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];
-          foreach ($lineItems['line_item'] as &$items) {
-            $items['entity_id'] = $entityResult['id'];
+          foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+            $lineIndex = $index . '+' . $innerIndex;
+            $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
           }
         }
       }
-
-      if (empty($priceSetID)) {
-        $item = reset($lineItems['line_item']);
-        $priceSetID = (int) civicrm_api3('PriceField', 'getvalue', [
-          'return' => 'price_set_id',
-          'id' => $item['price_field_id'],
-        ]);
-        $params['line_item'][$priceSetID] = [];
-      }
-      $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
+    $priceSetID = $order->getPriceSetID();
+    $params['line_item'][$priceSetID] = $order->getLineItems();
   }
+  else {
+    $order->setPriceSetToDefault('contribution');
+  }
+
   $contributionParams = $params;
   // If this is nested we need to set sequential to 0 as sequential handling is done
   // in create_success & id will be miscalculated...
@@ -149,7 +144,7 @@ function civicrm_api3_order_create(array $params): array {
   }
 
   $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
-  $contribution['values'][$contribution['id']]['line_item'] = $params['line_item'][$priceSetID] ?? [];
+  $contribution['values'][$contribution['id']]['line_item'] = $order->getLineItems();
 
   // add payments
   if ($entity && !empty($contribution['id'])) {
