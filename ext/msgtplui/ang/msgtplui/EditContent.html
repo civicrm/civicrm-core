@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_subject">
-      <div ng-model="options.record.msg_subject"
+      <div ng-model="$ctrl.options.record.msg_subject"
            crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
            crm-monaco-insert-rx="insert:msg_subject"
       ></div>
@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_html">
-      <div ng-model="options.record.msg_html"
+      <div ng-model="$ctrl.options.record.msg_html"
            crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_html"
       ></div>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_text">
-      <div ng-model="options.record.msg_text"
+      <div ng-model="$ctrl.options.record.msg_text"
            crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_text"
       ></div>

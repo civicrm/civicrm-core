@@ -7,9 +7,6 @@
     controller: function ($scope, $element, crmStatus, crmUiAlert) {
       var ts = $scope.ts = CRM.ts('msgtplui');
       var $ctrl = this;
-      $ctrl.$onInit = function () {
-        $scope.options = $ctrl.options;
-      };
 
       $ctrl.monacoOptions = function (opts) {
         return angular.extend({}, {
