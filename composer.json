@@ -42,7 +42,7 @@
     }
   },
   "require": {
-    "php": "~7.2",
+    "php": "~7.2 || ~8",
     "cache/integration-tests": "~0.17.0",
     "dompdf/dompdf" : "~1.0.0",
     "firebase/php-jwt": ">=3 <6",
