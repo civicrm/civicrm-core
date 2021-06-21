@@ -7,9 +7,13 @@
   angular.module('crmMonaco').directive('crmMonaco', function($timeout, $parse) {
     return {
       restrict: 'AE',
-      require: 'ngModel',
+      require: ['ngModel', 'crmMonaco'],
       template: '<div class="crm-monaco-container"></div>',
-      link: function($scope, $el, $attr, ngModel) {
+      controller: function() {
+        this.editor = null; // Filled in by link().
+      },
+      link: function($scope, $el, $attr, controllers) {
+        var ngModel = controllers[0], crmMonaco = controllers[1];
         var heightPct = 0.70;
         var editor;
         require.config({paths: CRM.crmMonaco.paths});
@@ -78,9 +82,12 @@
           editor.onDidFocusEditorWidget(bodyScrollSuspend);
           editor.onDidBlurEditorWidget(bodyScrollRestore);
 
+          crmMonaco.editor = editor;
+
           $scope.$on('$destroy', function () {
             bodyScrollRestore();
             if (editor) editor.dispose();
+            delete crmMonaco.editor;
           });
         });
       }
