@@ -511,6 +511,28 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 5,
       'financial_type_id' => "Donation",
     ]);
+    // Create a template contribution.
+    $TemplateContribution = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'Donation',
+      'total_amount' => 11,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contribution_recur_id' => $ContributionRecur1['id'],
+      'is_template' => 1
+    ]);
+    $params = [
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $TemplateContribution['id'],
+      'payment_instrument_id' => 1,
+      'card_type_id' => 1,
+      'total_amount' => 11,
+    ];
+    CRM_Core_BAO_FinancialTrxn::create($params);
+    // Create a normal contribution
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 'Donation',
       'total_amount' => 11,
@@ -591,6 +613,13 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'expected_count' => 0,
         'expected_contact' => [],
         'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
+      ],
+      // Case 4: Search for contributions with is_template = 1
+      'in_progress_search' => [
+        'form_value' => ['contribution_is_template' => 1],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Joe Miller II'],
+        'expected_qill' => "Is a Template Contribution = \"1\"",
       ],
       'trxn_id_search' => [
         'form_value' => ['contribution_recur_trxn_id' => 'a transaction'],
