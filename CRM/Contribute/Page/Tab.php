@@ -58,7 +58,7 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
       ],
     ];
-    if (!empty($templateContribution['id'])) {
+    if (!empty($templateContribution['id']) && !empty($templateContribution['is_template'])) {
       // Use constant CRM_Core_Action::PREVIEW as there is no such thing as view template.
       // And reusing view will mangle the actions.
       $links[CRM_Core_Action::PREVIEW] = [
