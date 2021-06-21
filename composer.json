@@ -216,7 +216,7 @@
         "ignore": [".*", "*.json", "*.md", "Makefile", "*/*"]
       },
       "monaco-editor": {
-        "url": "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.16.2.tgz",
+        "url": "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.25.2.tgz",
         "path": "bower_components/monaco-editor",
         "ignore": ["dev", "esm"]
       },
