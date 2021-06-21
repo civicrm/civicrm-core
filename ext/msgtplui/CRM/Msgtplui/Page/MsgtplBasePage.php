@@ -17,7 +17,7 @@ class CRM_Msgtplui_Page_MsgtplBasePage extends CRM_Core_Page {
     /** @var \Civi\Angular\AngularLoader $loader */
     CRM_Utils_System::setTitle(ts('Message Templates'));
     $loader = \Civi::service('angularjs.loader');
-    $loader->setModules(['msgtplui']);
+    $loader->addModules(['msgtplui']);
     $loader->useApp(array(
       'defaultRoute' => '/user',
     ));
