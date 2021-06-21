@@ -159,7 +159,7 @@
     $ctrl.records = prefetch;
     if (args.lang) {
       $ctrl.lang = args.lang;
-      $ctrl.tab = args.status === 'draft' ? 'txDraft' : 'txActive';
+      $ctrl.tab = (args.status === 'draft' && $ctrl.records.txDraft && $ctrl.records.txDraft._exists) ? 'txDraft' : 'txActive';
     }
     else {
       $ctrl.lang = null;

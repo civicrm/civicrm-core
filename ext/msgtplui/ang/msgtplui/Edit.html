@@ -22,18 +22,31 @@
 
     <a name="msgtplui-tabs"></a>
     <div class="panel panel-info">
-      <ul class="panel-heading nav nav-tabs">
-        <li role="presentation" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
-          <a class="text-success" crm-icon="fa-file" ng-click="$ctrl.tab = 'main'">{{ts('Current')}}</a>
+<!--    <div class="panel" ng-class="{'panel-info': $ctrl.tab === 'original', 'panel-warning': $ctrl.tab === 'txDraft', 'panel-success': $ctrl.tab.match('main|txActive')}">-->
+      <ul class="panel-heading nav nav-pills">
+        <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
+          <a class="nav-link text-success" ng-click="$ctrl.tab = 'main'">
+            <span crm-icon="fa-file"></span>
+            {{::ts('Current')}}
+          </a>
         </li>
-        <li role="presentation" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
-          <a class="text-success" crm-icon="fa-file" ng-click="$ctrl.tab = 'txActive'">{{ts('Current')}}</a>
+        <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
+          <a class="nav-link text-success" ng-click="$ctrl.tab = 'txActive'">
+            <span crm-icon="fa-file"></span>
+            {{::ts('Current')}}
+          </a>
         </li>
-        <li role="presentation" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="$ctrl.hasDraft()">
-          <a class="text-warning" crm-icon="fa-file" ng-click="$ctrl.tab = 'txDraft'">{{ts('Draft')}}</a>
+        <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="$ctrl.hasDraft()">
+          <a class="nav-link text-warning" ng-click="$ctrl.tab = 'txDraft'">
+            <span crm-icon="fa-file"></span>
+            {{::ts('Draft')}}
+          </a>
         </li>
-        <li role="presentation" ng-class="{active: $ctrl.tab == 'original'}">
-          <a class="text-info" crm-icon="fa-file" ng-click="$ctrl.tab = 'original'">{{ts('Original')}}</a>
+        <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}">
+          <a class="nav-link text-default" ng-click="$ctrl.tab = 'original'">
+            <span crm-icon="fa-file"></span>
+            {{::ts('Original')}}
+          </a>
         </li>
       </ul>
       <div class="panel-body">
