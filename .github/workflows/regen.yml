@@ -81,6 +81,8 @@ jobs:
           php GenCode.php
           cd ..
           $GITHUB_WORKSPACE/civicrm-cv/bin/cv core:install --cms-base-url=http://civi.localhost
+          # In this environment in this particular repo, we are under a workspace folder that contains the literal "civicrm-core" in the path, which makes civicrm.config.php think we are a composer install, so it gets the paths wrong.
+          echo '<?php define("CIVICRM_CONFDIR", "/home/runner/work/civicrm-core/civicrm-core/drupal/sites/default");' > settings_location.php
       - name: regen
         run: |
           cd $GITHUB_WORKSPACE/drupal/sites/all/modules/civicrm/bin
