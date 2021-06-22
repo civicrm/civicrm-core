@@ -371,7 +371,7 @@ class CRM_Financial_Page_AJAX {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_" . $financialItem->id . "' name='mark_x_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Form_BatchTransaction::links(),
+            (new CRM_Financial_Form_BatchTransaction())->links(),
             NULL,
             [
               'id' => $financialItem->id,
@@ -389,7 +389,7 @@ class CRM_Financial_Page_AJAX {
           $js = "enableActions('y')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_" . $financialItem->id . "' name='mark_y_" . $financialItem->id . "' value='1' onclick={$js}></input>";
           $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
-            CRM_Financial_Page_BatchTransaction::links(),
+            (new CRM_Financial_Page_BatchTransaction())->links(),
             NULL,
             [
               'id' => $financialItem->id,
@@ -427,6 +427,7 @@ class CRM_Financial_Page_AJAX {
       if ($financialItem->contact_id) {
         $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(!empty($row[$financialItem->id]['contact_sub_type']) ? $row[$financialItem->id]['contact_sub_type'] : CRM_Utils_Array::value('contact_type', $row[$financialItem->id]), FALSE, $financialItem->contact_id);
       }
+      // @todo: Is this right? Shouldn't it be adding to the array as we loop?
       $financialitems = $row;
     }
 
