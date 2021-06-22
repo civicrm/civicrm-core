@@ -1,0 +1,38 @@
+<div id="bootstrap-theme" crm-dialog="expandedEditDlg" ng-controller="MsgtpluiGenericCtrl">
+
+  <form name="expandedEditForm">
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-form navbar-right">
+          <div class="form-group">
+            <button type="button" class="btn btn-default" ng-click="model.openPreview()">
+              <span class="fa fa-eye" aria-hidden="true"></span>
+              {{::ts('Preview')}}
+            </button>
+
+            <!-- class='fa-code' is unhappy here. At least in Firefox. -->
+            <input class="form-control crm-action-menu"
+                   tabindex="-1"
+                   style="z-index:1"
+                   crm-ui-select="{placeholder: ts('Token'), data: model.tokenList, width: '12em', dropdownAutoWidth: true}"
+                   on-crm-ui-select="$broadcast('insert:expanded', selection)"
+            />
+
+            <button type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
+              <span class="fa fa-times" aria-hidden="true"></span>
+              {{::ts('Close')}}
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div ng-model="model.record[model.field]"
+         crm-monaco="model.monacoOptions"
+         crm-monaco-insert-rx="insert:expanded"
+    ></div>
+  </form>
+
+</div>

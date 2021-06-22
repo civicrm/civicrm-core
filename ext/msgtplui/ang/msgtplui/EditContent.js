@@ -4,7 +4,7 @@
       options: '='
     },
     templateUrl: '~/msgtplui/EditContent.html',
-    controller: function ($scope, $element, crmStatus, crmUiAlert) {
+    controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService) {
       var ts = $scope.ts = CRM.ts('msgtplui');
       var $ctrl = this;
 
@@ -18,8 +18,24 @@
         }, opts);
       };
 
-      $ctrl.openFull = function(fld) {
-        crmUiAlert({type: 'error', title: ts('TODO: openFull'), text: ts('Not yet implemented')});
+      $ctrl.openFull = function(fld, monacoOptions) {
+        var model = {
+          monacoOptions: $ctrl.monacoOptions(angular.extend({crmHeightPct: 0.80}, monacoOptions)),
+          openPreview: function() { return $ctrl.openPreview(model.field); },
+          record: $ctrl.options.record,
+          field: fld,
+          tokenList: $ctrl.options.tokenList
+        };
+        var options = CRM.utils.adjustDialogDefaults({
+          // show: {effect: 'slideDown'},
+          dialogClass: 'msgtplui-expanded',
+          autoOpen: false,
+          height: '90%',
+          width: '90%'
+        });
+        return dialogService.open('expandedEditDlg', '~/msgtplui/ExpandedEdit.html', model, options)
+          // Nothing to do but hide warnings. The field was edited live.
+          .then(function(){}, function(){});
       };
 
       $ctrl.openPreview = function(fld) {
