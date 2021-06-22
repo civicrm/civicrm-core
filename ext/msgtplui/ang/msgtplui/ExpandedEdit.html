@@ -11,7 +11,7 @@
         </div>
         <div class="navbar-form navbar-right">
           <div class="form-group">
-            <button type="button" class="btn btn-default" ng-click="model.openPreview()">
+            <button type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
               <span class="fa fa-eye" aria-hidden="true"></span>
               {{::ts('Preview')}}
             </button>

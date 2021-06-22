@@ -1,10 +1,11 @@
 (function (angular, $, _) {
   angular.module('msgtplui').component('msgtpluiEditContent', {
     bindings: {
+      onPreview: '&',
       options: '='
     },
     templateUrl: '~/msgtplui/EditContent.html',
-    controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService) {
+    controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService, $rootScope) {
       var ts = $scope.ts = CRM.ts('msgtplui');
       var $ctrl = this;
 
@@ -22,7 +23,9 @@
         var model = {
           title: title,
           monacoOptions: $ctrl.monacoOptions(angular.extend({crmHeightPct: 0.80}, monacoOptions)),
-          openPreview: function() { return $ctrl.openPreview(model.field); },
+          openPreview: function(options) {
+            return $ctrl.openPreview(options);
+          },
           record: $ctrl.options.record,
           field: fld,
           tokenList: $ctrl.options.tokenList
@@ -39,8 +42,8 @@
           .then(function(){}, function(){});
       };
 
-      $ctrl.openPreview = function(fld) {
-        crmUiAlert({type: 'error', title: ts('TODO: openPreview'), text: ts('Not yet implemented')});
+      $ctrl.openPreview = function(options) {
+        $rootScope.$emit('previewMsgTpl', options);
       };
 
     }

@@ -150,12 +150,19 @@
     }
   );
 
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList) {
+  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService) {
     var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/Edit'}); // See: templates/CRM/Msgtplui/Edit.hlp
     var $ctrl = this;
     var args = $location.search();
+
+    var revisionTypes = {
+      main: {name: 'main', label: ts('Main')},
+      txActive: {name: 'txActive', label: ts('Current translation')},
+      txDraft: {name: 'txDraft', label: ts('Draft translation')},
+      original: {name: 'original', label: ts('Original')}
+    };
 
     $ctrl.locales = CRM.msgtplui.uiLanguages;
     $ctrl.records = prefetch;
@@ -223,6 +230,48 @@
       return block(crmStatus({start: ts('Deleting...'), success: ts('Deleted')}, crmApi4(requests)))
         .then($ctrl.cancel);
     };
+
+    // Ex: $rootScope.$emit('previewMsgTpl', {revisionName: 'txDraft', formatName: 'msg_text'})
+    function onPreview(event, args) {
+
+      var defaults = {
+        exampleName: 'fix-this-example',
+        examples: [{id: 0, name: 'fix-this-example', label: ts('Fix this example')}],
+        formatName: 'msg_html',
+        formats: [
+          {id: 0, name: 'msg_html', label: ts('HTML')},
+          {id: 1, name: 'msg_text', label: ts('Text')}
+        ],
+        revisionName: $ctrl.tab,
+        revisions: _.reduce($ctrl.records, function(acc, rec, key){
+          acc.push(angular.extend({id: acc.length, rec: rec}, revisionTypes[key]));
+          return acc;
+        }, []),
+        title: ts('Preview')
+      };
+      var model = angular.extend({}, defaults, args);
+      model.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
+      model.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
+      model.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
+      delete model.exampleName;
+      delete model.revisionName;
+      delete model.formatName;
+
+      var options = CRM.utils.adjustDialogDefaults({
+        dialogClass: 'msgtplui-dialog',
+        autoOpen: false,
+        height: '90%',
+        width: '90%'
+      });
+      return dialogService.open('previewMsgDlg', '~/msgtplui/Preview.html', model, options)
+        // Nothing to do but hide warnings. The field was edited live.
+        .then(function(){}, function(){});
+
+    }
+    $rootScope.$on('previewMsgTpl', onPreview);
+    $rootScope.$on('$destroy', function (){
+      $rootScope.$off('previewMsgTpl', onPreview);
+    });
   });
 
 })(angular, CRM.$, CRM._);

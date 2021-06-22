@@ -1,0 +1,44 @@
+<div id="bootstrap-theme" crm-dialog="previewMsgDlg" ng-controller="MsgtpluiGenericCtrl">
+
+  <form name="previewMsgForm">
+
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-brand">
+            {{::model.title}}
+          </div>
+        </div>
+        <div class="navbar-form navbar-right">
+          <div class="form-group">
+            <button type="button" class="btn btn-default" ng-click="previewMsgDlg.close()">
+              <span class="fa fa-times" aria-hidden="true"></span>
+              {{::ts('Close')}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="well-sm">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label class="control-label">{{::ts('Revision')}}</label>
+          <select class="form-control" ng-options="item.id as item.label for item in model.revisions" ng-model="model.revisionId"></select>
+        </div>
+        <div class="form-group">
+          <label class="control-label">{{::ts('Example')}}</label>
+          <select class="form-control" ng-options="item.id as item.label for item in model.examples" ng-model="model.exampleId"></select>
+        </div>
+        <div class="form-group">
+          <label class="control-label">{{::ts('Format')}}</label>
+          <select class="form-control" ng-options="item.id as item.label for item in model.formats" ng-model="model.formatId"></select>
+        </div>
+      </div>
+
+      <pre>{{model|json}}</pre>
+
+    </div>
+  </form>
+
+</div>

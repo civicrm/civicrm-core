@@ -38,7 +38,7 @@
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
           <span class="fa fa-expand" aria-hidden="true"></span>
         </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_html')">
+        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
           <span class="fa fa-eye" aria-hidden="true"></span>
         </button>
         <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_html')" crm-icon="fa-plus">-->
@@ -70,7 +70,7 @@
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})">
           <span class="fa fa-expand" aria-hidden="true"></span>
         </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_text')">
+        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_text'})">
           <span class="fa fa-eye" aria-hidden="true"></span>
         </button>
         <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_text')" crm-icon="fa-plus">-->
