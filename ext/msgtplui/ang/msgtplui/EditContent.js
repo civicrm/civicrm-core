@@ -9,9 +9,13 @@
       var ts = $scope.ts = CRM.ts('msgtplui');
       var $ctrl = this;
 
+      $ctrl.isDisabled = function() {
+        return $ctrl.options.disabled;
+      };
+
       $ctrl.monacoOptions = function (opts) {
         return angular.extend({}, {
-          readOnly: $ctrl.options.disabled,
+          readOnly: $ctrl.isDisabled(),
           wordWrap: 'wordWrapColumn',
           wordWrapColumn: 100,
           wordWrapMinified: false,

@@ -10,7 +10,7 @@
              style="z-index:1"
              crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_subject', selection)"
-             ng-show="accordions.msg_subject"
+             ng-show="accordions.msg_subject && !$ctrl.isDisabled()"
       />
       <div class="clearfix"></div>
     </div>
@@ -31,7 +31,7 @@
              style="z-index:1"
              crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_html', selection)"
-             ng-show="accordions.msg_html"
+             ng-show="accordions.msg_html && !$ctrl.isDisabled()"
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
@@ -63,7 +63,7 @@
              style="z-index:1"
              crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_text', selection)"
-             ng-show="accordions.msg_text"
+             ng-show="accordions.msg_text && !$ctrl.isDisabled()"
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
