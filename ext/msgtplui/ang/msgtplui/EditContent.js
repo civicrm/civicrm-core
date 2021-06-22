@@ -26,10 +26,6 @@
         crmUiAlert({type: 'error', title: ts('TODO: openPreview'), text: ts('Not yet implemented')});
       };
 
-      $ctrl.insertToken = function(fld) {
-        crmUiAlert({type: 'error', title: ts('TODO: insertToken'), text: ts('Not yet implemented')});
-      };
-
     }
   });
 })(angular, CRM.$, CRM._);

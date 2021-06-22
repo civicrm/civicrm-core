@@ -83,7 +83,6 @@
     return prefetch;
   }
 
-
   function pickFirsts(prefetch) {
     return _.reduce(prefetch, function(all, record, key){
       all[key] = record[0] || undefined;
@@ -142,13 +141,16 @@
             }
 
             return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts));
+          },
+          tokenList: function () {
+            return CRM.crmMailing.mailTokens;
           }
         }
       });
     }
   );
 
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch) {
+  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList) {
     var block = $scope.block = crmBlocker();
     var ts = $scope.ts = CRM.ts('msgtplui');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/Edit'}); // See: templates/CRM/Msgtplui/Edit.hlp
@@ -157,6 +159,7 @@
 
     $ctrl.locales = CRM.msgtplui.uiLanguages;
     $ctrl.records = prefetch;
+    $ctrl.tokenList = tokenList;
     if (args.lang) {
       $ctrl.lang = args.lang;
       $ctrl.tab = (args.status === 'draft' && $ctrl.records.txDraft && $ctrl.records.txDraft._exists) ? 'txDraft' : 'txActive';

@@ -5,7 +5,13 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_subject = !accordions.msg_subject">{{::ts('Subject')}}</a>
-      <input crm-mailing-token on-select="$broadcast('insert:msg_subject', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_subject">
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_subject', selection)"
+             ng-show="accordions.msg_subject"
+      />
       <div class="clearfix"></div>
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_subject">
@@ -20,7 +26,13 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_html = !accordions.msg_html">{{::ts('HTML Content')}}</a>
-      <input crm-mailing-token on-select="$broadcast('insert:msg_html', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_html">
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_html', selection)"
+             ng-show="accordions.msg_html"
+      />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_html')">
@@ -46,7 +58,13 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <a href="" ng-click="accordions.msg_text = !accordions.msg_text">{{::ts('Text Content')}}</a>
-      <input crm-mailing-token on-select="$broadcast('insert:msg_text', token.name)" tabindex="-1" style="z-index:1" class="pull-right" ng-show="accordions.msg_text">
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_text', selection)"
+             ng-show="accordions.msg_text"
+      />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
         <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_text')">
