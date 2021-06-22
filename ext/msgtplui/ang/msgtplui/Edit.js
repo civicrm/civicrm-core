@@ -157,13 +157,6 @@
     var $ctrl = this;
     var args = $location.search();
 
-    var revisionTypes = {
-      main: {name: 'main', label: ts('Main')},
-      txActive: {name: 'txActive', label: ts('Current translation')},
-      txDraft: {name: 'txDraft', label: ts('Draft translation')},
-      original: {name: 'original', label: ts('Original')}
-    };
-
     $ctrl.locales = CRM.msgtplui.uiLanguages;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
@@ -176,6 +169,13 @@
       $ctrl.tab = 'main';
     }
 
+    var revisionTypes = [
+      {name: 'original', label: ts('Original')},
+      {name: 'main', label: ts('Standard')},
+      {name: 'txActive', label: ts('%1 - Current translation', {1: $ctrl.locales[$ctrl.lang]})},
+      {name: 'txDraft', label: ts('%1 - Draft translation', {1: $ctrl.locales[$ctrl.lang]})}
+    ];
+
     $ctrl.switchTab = function switchTab(tgt) {
       $ctrl.tab = tgt;
       $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top}, 200);
@@ -183,6 +183,14 @@
 
     $ctrl.hasDraft = function hasDraft() {
       return $ctrl.lang && $ctrl.records.txDraft && $ctrl.records.txDraft._exists;
+    };
+    $ctrl.hasRevType = function hasRevType(name) {
+      switch (name) {
+        case 'txDraft': return $ctrl.hasDraft();
+        case 'txActive': return !!$ctrl.lang;
+        case 'original': return !!$ctrl.records.original;
+        case 'main': return !$ctrl.lang; // !!$ctrl.records.main;
+      }
     };
     $ctrl.createDraft = function createDraft(src) {
       copyTranslations(src, $ctrl.records.txDraft);
@@ -243,8 +251,10 @@
           {id: 1, name: 'msg_text', label: ts('Text')}
         ],
         revisionName: $ctrl.tab,
-        revisions: _.reduce($ctrl.records, function(acc, rec, key){
-          acc.push(angular.extend({id: acc.length, rec: rec}, revisionTypes[key]));
+        revisions: _.reduce(revisionTypes, function(acc, revType){
+          if ($ctrl.hasRevType(revType.name)) {
+            acc.push(angular.extend({id: acc.length, rec: $ctrl.records[revType.name]}, revType));
+          }
           return acc;
         }, []),
         title: ts('Preview')
@@ -253,6 +263,9 @@
       model.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
       model.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
       model.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
+      model.cycle = function(idFld, listFld, delta){
+        model[idFld] = (model[idFld] + delta) % model[listFld].length;
+      };
       delete model.exampleName;
       delete model.revisionName;
       delete model.formatName;
