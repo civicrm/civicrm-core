@@ -50,7 +50,7 @@ class SystemTest extends UnitTestCase {
     $this->assertCount(1, $check);
 
     // Ensure cron check has not run
-    $this->assertCount(0, StatusPreference::get()->setCheckPermissions(FALSE)->addWhere('name', '=', 'checkLastCron')->execute());
+    $this->assertCount(0, StatusPreference::get(FALSE)->addWhere('name', '=', 'checkLastCron')->execute());
 
     // Will run on non-prod site with $includeDisabled.
     // Giving a more-specific name will run all checks with less-specific names too
@@ -60,7 +60,7 @@ class SystemTest extends UnitTestCase {
     $this->assertEquals('Ok', $check['hook_civicrm_check']['title']);
 
     // We know the cron check has run because it would have left a record marked 'new'
-    $record = StatusPreference::get()->setCheckPermissions(FALSE)->addWhere('name', '=', 'checkLastCron')->execute()->first();
+    $record = StatusPreference::get(FALSE)->addWhere('name', '=', 'checkLastCron')->execute()->first();
     $this->assertEquals('new', $record['prefs']);
 
     // Restore env

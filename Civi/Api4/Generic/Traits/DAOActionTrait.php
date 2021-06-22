@@ -165,6 +165,35 @@ trait DAOActionTrait {
   }
 
   /**
+   * @inheritDoc
+   */
+  protected function formatWriteValues(&$record) {
+    $this->resolveFKValues($record);
+    parent::formatWriteValues($record);
+  }
+
+  /**
+   * Looks up an id based on some other property of an fk entity
+   *
+   * @param array $record
+   */
+  private function resolveFKValues(array &$record): void {
+    foreach ($record as $key => $value) {
+      if (substr_count($key, '.') !== 1) {
+        continue;
+      }
+      [$fieldName, $fkField] = explode('.', $key);
+      $field = $this->entityFields()[$fieldName] ?? NULL;
+      if (!$field || empty($field['fk_entity'])) {
+        continue;
+      }
+      $fkDao = CoreUtil::getBAOFromApiName($field['fk_entity']);
+      $record[$fieldName] = \CRM_Core_DAO::getFieldValue($fkDao, $value, 'id', $fkField);
+      unset($record[$key]);
+    }
+  }
+
+  /**
    * @param array $params
    * @param int $entityId
    *
