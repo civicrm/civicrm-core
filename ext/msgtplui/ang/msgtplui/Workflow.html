@@ -24,18 +24,18 @@
       <td ng-if="$ctrl.supportsTranslation()">{{record.tx_language_label || ts('Standard')}}</td>
       <td>
         <span ng-if="!record.tx_language || !!record.tx_statuses.active">
-          <a class="text-success" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
+          <a class="text-success" crm-icon="fa-file-text" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
         </span>
         <span ng-if="!(!record.tx_language || !!record.tx_statuses.active)">
-          <span class="text-danger" crm-icon="fa-file">{{ts('Current')}}</span>
+          <span class="text-danger" crm-icon="fa-file-text">{{ts('Current')}}</span>
         </span>
       </td>
       <td ng-if="$ctrl.supportsTranslation()">
         <span ng-if="!!record.tx_statuses.draft">
-          <a class="text-warning" crm-icon="fa-file" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
+          <a class="text-warning" crm-icon="fa-file-text-o" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
         </span>
         <span ng-if="!record.tx_statuses.draft">
-          <span class="text-muted" crm-icon="fa-file">{{ts('Draft')}}</span>
+          <span class="text-muted" crm-icon="fa-file-text-o">{{ts('Draft')}}</span>
         </span>
       </td>
       <td ng-if="$ctrl.supportsTranslation()">

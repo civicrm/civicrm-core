@@ -26,25 +26,25 @@
       <ul class="panel-heading nav nav-pills">
         <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'main'}" ng-if="!$ctrl.lang">
           <a class="nav-link text-success" ng-click="$ctrl.tab = 'main'">
-            <span crm-icon="fa-file"></span>
+            <span crm-icon="fa-file-text"></span>
             {{::ts('Current')}}
           </a>
         </li>
         <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txActive'}" ng-if="!!$ctrl.lang">
           <a class="nav-link text-success" ng-click="$ctrl.tab = 'txActive'">
-            <span crm-icon="fa-file"></span>
+            <span crm-icon="fa-file-text"></span>
             {{::ts('Current')}}
           </a>
         </li>
         <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'txDraft'}" ng-if="$ctrl.hasDraft()">
           <a class="nav-link text-warning" ng-click="$ctrl.tab = 'txDraft'">
-            <span crm-icon="fa-file"></span>
+            <span crm-icon="fa-file-text-o"></span>
             {{::ts('Draft')}}
           </a>
         </li>
         <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}">
           <a class="nav-link text-default" ng-click="$ctrl.tab = 'original'">
-            <span crm-icon="fa-file"></span>
+            <span crm-icon="fa-file-text"></span>
             {{::ts('Original')}}
           </a>
         </li>
