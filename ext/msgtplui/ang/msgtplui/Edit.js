@@ -178,7 +178,8 @@
 
     $ctrl.switchTab = function switchTab(tgt) {
       $ctrl.tab = tgt;
-      $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top}, 200);
+      // Experimenting with action buttons in the tab-bar. This makes the scroll unnecessary.
+      // $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top - $('#civicrm-menu').height()}, 200);
     };
 
     $ctrl.hasDraft = function hasDraft() {
