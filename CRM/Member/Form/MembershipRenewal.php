@@ -553,6 +553,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         $paymentParams = array_merge($paymentParams, $contributionRecurParams);
       }
 
+      $paymentParams['invoiceID'] = $paymentParams['invoice_id'];
+
       $payment = $this->_paymentProcessor['object'];
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
