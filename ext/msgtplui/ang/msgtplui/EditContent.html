@@ -35,12 +35,8 @@
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
-        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
-          <span class="fa fa-expand" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
-          <span class="fa fa-eye" aria-hidden="true"></span>
-        </button>
+        <button crm-icon="fa-expand" type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})"></button>
+        <button crm-icon="fa-eye" type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})"></button>
         <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_html')" crm-icon="fa-plus">-->
         <!--  {{::ts('Token')}}-->
         <!--</button>-->
@@ -67,12 +63,8 @@
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
-        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})">
-          <span class="fa fa-expand" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_text'})">
-          <span class="fa fa-eye" aria-hidden="true"></span>
-        </button>
+        <button crm-icon="fa-expand" type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})"></button>
+        <button crmicon="fa-eye" type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_text'})"></button>
         <!--<button type="button" class="btn btn-default" title="{{::ts('Insert token')}}" ng-click="$ctrl.insertToken('msg_text')" crm-icon="fa-plus">-->
         <!--  {{::ts('Token')}}-->
         <!--</button>-->

@@ -11,8 +11,7 @@
         </div>
         <div class="navbar-form navbar-right">
           <div class="form-group">
-            <button type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
-              <span class="fa fa-eye" aria-hidden="true"></span>
+            <button crm-icon="fa-eye" type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
               {{::ts('Preview')}}
             </button>
 
@@ -24,8 +23,7 @@
                    on-crm-ui-select="$broadcast('insert:expanded', selection)"
             />
 
-            <button type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
-              <span class="fa fa-times" aria-hidden="true"></span>
+            <button crm-icon="fa-times" type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
               {{::ts('Close')}}
             </button>
 
