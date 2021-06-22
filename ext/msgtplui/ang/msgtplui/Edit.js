@@ -196,12 +196,12 @@
     $ctrl.createDraft = function createDraft(src) {
       copyTranslations(src, $ctrl.records.txDraft);
       $ctrl.switchTab('txDraft');
-      crmStatus({success: ts('Creating draft...')}, $q.resolve());
+      crmStatus({success: ts('Beginning draft...')}, $q.resolve());
     };
     $ctrl.deleteDraft = function deleteDraft() {
       copyTranslations({}, $ctrl.records.txDraft);
       $ctrl.switchTab('txActive');
-      crmStatus({error: ts('Removed draft.')}, $q.reject());
+      crmStatus({error: ts('Abandoned draft.')}, $q.reject()).then(function(){},function(){});
     };
     $ctrl.activateDraft = function activateDraft() {
       copyTranslations($ctrl.records.txDraft, $ctrl.records.txActive);
