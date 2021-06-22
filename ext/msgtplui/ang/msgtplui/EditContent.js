@@ -18,8 +18,9 @@
         }, opts);
       };
 
-      $ctrl.openFull = function(fld, monacoOptions) {
+      $ctrl.openFull = function(title, fld, monacoOptions) {
         var model = {
+          title: title,
           monacoOptions: $ctrl.monacoOptions(angular.extend({crmHeightPct: 0.80}, monacoOptions)),
           openPreview: function() { return $ctrl.openPreview(model.field); },
           record: $ctrl.options.record,
@@ -28,7 +29,7 @@
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},
-          dialogClass: 'msgtplui-expanded',
+          dialogClass: 'msgtplui-dialog',
           autoOpen: false,
           height: '90%',
           width: '90%'

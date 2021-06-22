@@ -35,7 +35,7 @@
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
-        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_html', {language: 'html'})">
+        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
           <span class="fa fa-expand" aria-hidden="true"></span>
         </button>
         <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_html')">
@@ -67,7 +67,7 @@
       />
       &nbsp;
       <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
-        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull('msg_text', {language: 'smarty'})">
+        <button type="button" class="btn btn-default" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})">
           <span class="fa fa-expand" aria-hidden="true"></span>
         </button>
         <button type="button" class="btn btn-default" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview('msg_text')">

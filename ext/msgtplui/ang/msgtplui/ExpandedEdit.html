@@ -4,6 +4,11 @@
 
     <nav class="navbar navbar-default">
       <div class="container-fluid">
+        <div class="navbar-header">
+          <div class="navbar-brand">
+            {{::model.title}}
+          </div>
+        </div>
         <div class="navbar-form navbar-right">
           <div class="form-group">
             <button type="button" class="btn btn-default" ng-click="model.openPreview()">
