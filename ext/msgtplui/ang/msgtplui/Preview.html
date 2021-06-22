@@ -53,10 +53,25 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <pre>Subject: {{model.revisions[model.revisionId].rec.msg_subject|json}}</pre>
-      <pre>Body: {{model.revisions[model.revisionId].rec[model.formats[model.formatId].name]|json}}</pre>
+        <hr/>
+
+        <div class="form-group">
+          <label class="control-label col-sm-2">{{::ts('Subject')}}</label>
+          <p class="col-sm-9">{{model.revisions[model.revisionId].rec.msg_subject}}</p>
+        </div>
+
+        <div class="form-group" ng-if="model.formats[model.formatId].name === 'msg_text'">
+          <pre class="col-sm-12">{{model.revisions[model.revisionId].rec.msg_text}}</pre>
+        </div>
+
+        <div class="form-group" ng-if="model.formats[model.formatId].name === 'msg_html'">
+          <div class="jumbotron well col-sm-12">
+            <iframe crm-ui-iframe="model.revisions[model.revisionId].rec.msg_html"></iframe>
+          </div>
+        </div>
+
+      </div>
 
     </div>
   </form>
