@@ -56,7 +56,8 @@
         </div>
       </div>
 
-      <pre>{{model|json}}</pre>
+      <pre>Subject: {{model.revisions[model.revisionId].rec.msg_subject|json}}</pre>
+      <pre>Body: {{model.revisions[model.revisionId].rec[model.formats[model.formatId].name]|json}}</pre>
 
     </div>
   </form>
