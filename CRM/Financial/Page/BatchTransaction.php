@@ -44,6 +44,14 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
   /**
    * Get action Links.
    *
+   * @todo:
+   * While this function only references static self::$_links, we can't make
+   * the function static because we need to match CRM_Core_Page_Basic. Possibly
+   * the intent was caching, but there's nothing very time-consuming in here
+   * that needs it so do we even need $_links? The variable is public - a quick
+   * look doesn't seem like it's used on its own, but it's hard to fully check
+   * that.
+   *
    * @return array
    *   (reference) of action links
    */
