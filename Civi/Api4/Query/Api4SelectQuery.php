@@ -51,6 +51,11 @@ class Api4SelectQuery {
   protected $apiFieldSpec;
 
   /**
+   * @var array[]
+   */
+  protected $specialFieldSpec;
+
+  /**
    * @var array
    */
   protected $aclFields = [];
@@ -94,6 +99,17 @@ class Api4SelectQuery {
     foreach ($this->api->entityFields() as $field) {
       $field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($field['name'], $field);
+    }
+
+    if ($this->getEntity() === 'Contact' && $this->getCheckPermissions() && empty($this->apiFieldSpec['is_deleted'])) {
+      $is_deleted_field = civicrm_api4('Contact', 'getFields', [
+        'where' => [
+          ['name', '=', 'is_deleted'],
+        ],
+        'checkPermissions' => FALSE,
+      ])[0];
+      $is_deleted_field['sql_name'] = '`' . self::MAIN_TABLE_ALIAS . '`.`' . $is_deleted_field['column_name'] . '`';
+      $this->addSpecField('is_deleted', $is_deleted_field);
     }
 
     $tableName = CoreUtil::getTableName($this->getEntity());
@@ -419,7 +435,7 @@ class Api4SelectQuery {
 
     // For WHERE clause, expr must be the name of a field.
     if ($type === 'WHERE') {
-      $field = $this->getField($expr, TRUE);
+      $field = $this->getField($expr, TRUE, TRUE);
       FormattingUtil::formatInputValue($value, $expr, $field, $operator);
       $fieldAlias = $field['sql_name'];
     }
@@ -589,11 +605,12 @@ class Api4SelectQuery {
    * @param string $expr
    * @param bool $strict
    *   In strict mode, this will throw an exception if the field doesn't exist
+   * @param bool $checkSpecialFieldsSpecs
    *
    * @return array|null
    * @throws \API_Exception
    */
-  public function getField($expr, $strict = FALSE) {
+  public function getField($expr, $strict = FALSE, $checkSpecialFieldsSpecs = FALSE) {
     // If the expression contains a pseudoconstant filter like activity_type_id:label,
     // strip it to look up the base field name, then add the field:filter key to apiFieldSpec
     $col = strpos($expr, ':');
@@ -603,11 +620,16 @@ class Api4SelectQuery {
       $this->autoJoinFK($fieldName);
     }
     $field = $this->apiFieldSpec[$fieldName] ?? NULL;
-    if ($strict && !$field) {
+    $specialField = $this->specialFieldSpec[$fieldName] ?? NULL;
+    if ($strict && !$field && (!$checkSpecialFieldsSpecs || $checkSpecialFieldsSpecs && !$specialField)) {
       throw new \API_Exception("Invalid field '$fieldName'");
     }
     if ($field) {
       $this->apiFieldSpec[$expr] = $field;
+    }
+    elseif ($specialField && $strict) {
+      $this->apiFieldSpec[$expr] = $specialField;
+      return $specialField;
     }
     return $field;
   }
@@ -670,6 +692,17 @@ class Api4SelectQuery {
         $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
+      if ($entity === 'Contact' && $this->getCheckPermissions() && empty($this->apiFieldSpec[$alias . '.' . 'is_deleted'])) {
+        $is_deleted_field = civicrm_api4('Contact', 'getFields', [
+          'where' => [
+            ['name', '=', 'is_deleted'],
+          ],
+          'checkPermissions' => FALSE,
+        ])[0];
+        $is_deleted_field['sql_name'] = '`' . $alias . '`.`' . $is_deleted_field['column_name'] . '`';
+        $this->addSpecField($alias . '.' . 'is_deleted', $is_deleted_field);
+      }
+
       $tableName = CoreUtil::getTableName($entity);
       // Save join info to be retrieved by $this->getExplicitJoin()
       $this->explicitJoins[$alias] = [
@@ -1087,6 +1120,10 @@ class Api4SelectQuery {
   private function addSpecField($path, $field) {
     // Only add field to spec if we have permission
     if ($this->getCheckPermissions() && !empty($field['permission']) && !\CRM_Core_Permission::check($field['permission'])) {
+      // Add the field if it is the is_deleted field into the special Field specs array so it can be used in where clauses.
+      if ($field['name'] === 'is_deleted' && $field['entity'] === 'Contact') {
+        $this->specialFieldSpec[$path] = $field;
+      }
       $this->apiFieldSpec[$path] = FALSE;
       return;
     }

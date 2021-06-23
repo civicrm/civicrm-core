@@ -119,4 +119,42 @@ FROM civicrm_pledge a',
     }
   }
 
+  public function testIsDeletedPermission(): void {
+    $contact = $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => TRUE,
+      'select' => ['id', 'display_name', 'is_deleted'],
+      'where' => [['first_name', '=', 'phoney']],
+    ]);
+    $query = new Api4SelectQuery($api);
+    $query->run();
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => TRUE,
+      'select' => ['id', 'display_name'],
+      'where' => [['first_name', '=', 'phoney'], ['is_deleted', '=', 0]],
+    ]);
+    $query = new Api4SelectQuery($api);
+    try {
+      $query->run();
+    }
+    catch (\API_Exception $e) {
+      $this->fail('An Exception Should not have been raised');
+    }
+    $api = Request::create('Email', 'get', [
+      'version' => 4,
+      'checkPermissions' => TRUE,
+      'where' => [['contact.first_name', '=', 'phoney'], ['contact_id.is_deleted', '=', 0]],
+    ]);
+    $query = new Api4SelectQuery($api);
+    try {
+      $query->run();
+    }
+    catch (\API_Exception $e) {
+      $this->fail('An Exception Should not have been raised');
+    }
+  }
+
 }
