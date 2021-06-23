@@ -25,10 +25,10 @@
     var url,
       frag = path.split('?');
     // Encode url path only if slashes in placeholder were also encoded
-    if (tplURL[mode].indexOf('civicrm/placeholder-url-path') >= 0) {
-      url = tplURL[mode].replace('civicrm/placeholder-url-path', frag[0]);
+    if (tplURL[mode].indexOf(CRM.config.basePage + '/placeholder-url-path') >= 0) {
+      url = tplURL[mode].replace(CRM.config.basePage + '/placeholder-url-path', frag[0]);
     } else {
-      url = tplURL[mode].replace('civicrm%2Fplaceholder-url-path', encodeURIComponent(frag[0]));
+      url = tplURL[mode].replace(CRM.config.basePage + '%2Fplaceholder-url-path', encodeURIComponent(frag[0]));
     }
 
     if (_.isEmpty(query)) {
@@ -65,7 +65,7 @@
   CRM.api4 = function(entity, action, params, index) {
     return new Promise(function(resolve, reject) {
       if (typeof entity === 'string') {
-        $.post(CRM.url('civicrm/ajax/api4/' + entity + '/' + action), {
+        $.post(CRM.url(CRM.config.basePage + '/ajax/api4/' + entity + '/' + action), {
           params: JSON.stringify(params),
           index: index
         })
@@ -76,7 +76,7 @@
             reject(data.responseJSON);
           });
       } else {
-        $.post(CRM.url('civicrm/ajax/api4'), {
+        $.post(CRM.url(CRM.config.basePage + '/ajax/api4'), {
           calls: JSON.stringify(entity)
         })
           .done(function(data) {
@@ -112,7 +112,7 @@
       status = action;
     }
     var ajax = $.ajax({
-      url: CRM.url('civicrm/ajax/rest'),
+      url: CRM.url(CRM.config.basePage + '/ajax/rest'),
       dataType: 'json',
       data: params,
       type: params.action.indexOf('get') === 0 ? 'GET' : 'POST'
@@ -153,7 +153,7 @@
         }
         return settings.success.call(this, result, settings);
       },
-      ajaxURL: 'civicrm/ajax/rest'
+      ajaxURL: CRM.config.basePage + '/ajax/rest'
     };
     action = action.toLowerCase();
     // Default success handler

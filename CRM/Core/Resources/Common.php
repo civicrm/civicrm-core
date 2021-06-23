@@ -204,6 +204,10 @@ class CRM_Core_Resources_Common {
       "js/wysiwyg/crm.wysiwyg.js",
     ];
 
+    $basePage = $settings->get('wpBasePage');
+    if (empty($basePage)) {
+      $basePage = 'civicrm';
+    }
     // Dynamic localization script
     $items[] = Civi::service('asset_builder')->getUrl('crm-l10n.js', [
       'cid' => $contactID,
@@ -216,6 +220,7 @@ class CRM_Core_Resources_Common {
       'dateInputFormat' => $settings->get('dateInputFormat'),
       'timeInputFormat' => $settings->get('timeInputFormat'),
       'moneyFormat' => CRM_Utils_Money::format(1234.56),
+      'basePage' => $basePage,
     ]);
 
     // add wysiwyg editor
