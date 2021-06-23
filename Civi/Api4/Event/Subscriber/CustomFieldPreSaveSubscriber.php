@@ -10,19 +10,15 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Event\Subscriber;
 
 use Civi\Api4\Generic\AbstractAction;
 
 class CustomFieldPreSaveSubscriber extends Generic\PreSaveSubscriber {
 
+  /**
+   * @var string
+   */
   public $supportedOperation = 'create';
 
   public function modify(&$field, AbstractAction $request) {
