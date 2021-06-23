@@ -458,7 +458,7 @@
               default:
                 format = 'raw';
             }
-            if (name === 'limit') {
+            if (name === 'limit' && $scope.action === 'get') {
               defaultVal = 25;
             }
             if (name === 'debug') {
