@@ -40,10 +40,6 @@
       }
     );
 
-    $ctrl.supportsTranslation = function() {
-      return CRM.msgtplui.uiLanguages && _.size(CRM.msgtplui.uiLanguages) > 1;
-    };
-
     function findTranslations(record) {
       return _.reduce($ctrl.records, function(existing, rec){
         if (rec._is_translation && record.id === rec.id) {

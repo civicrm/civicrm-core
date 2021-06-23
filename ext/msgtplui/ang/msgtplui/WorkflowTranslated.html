@@ -1,0 +1,50 @@
+<div id="bootstrap-theme">
+  <div crm-ui-debug="$ctrl"></div>
+
+  <div ng-include="'~/msgtplui/ListNav.html'"></div>
+
+  <div class="form-inline">
+    <label for="msgtpl-filter-text">{{:: ts('Filter') }}</label>
+    <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
+  </div>
+
+  <table>
+    <thead>
+    <tr>
+      <th>{{ts('Title')}}</th>
+      <th>{{ts('Locale')}}</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
+      <td>{{record.msg_title}}</td>
+      <td>{{record.tx_language_label || ts('Standard')}}</td>
+      <td>
+        <span ng-if="!record.tx_language || !!record.tx_statuses.active">
+          <a class="text-success" crm-icon="fa-file-text" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
+        </span>
+        <span ng-if="!(!record.tx_language || !!record.tx_statuses.active)">
+          <span class="text-danger" crm-icon="fa-file-text">{{ts('Current')}}</span>
+        </span>
+      </td>
+      <td>
+        <span ng-if="!!record.tx_statuses.draft">
+          <a class="text-warning" crm-icon="fa-file-text-o" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
+        </span>
+        <span ng-if="!record.tx_statuses.draft">
+          <span class="text-muted" crm-icon="fa-file-text-o">{{ts('Draft')}}</span>
+        </span>
+      </td>
+      <td>
+        <span ng-if="!record.tx_language">
+          <a class="" crm-icon="fa-plus" ng-click="$ctrl.addTranslation(record)">{{ts('Translate')}}</a>
+        </span>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>

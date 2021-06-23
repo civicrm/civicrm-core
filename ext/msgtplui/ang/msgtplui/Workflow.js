@@ -6,7 +6,10 @@
         reloadOnSearch: false,
         controller: 'MsgtpluiListCtrl',
         controllerAs: '$ctrl',
-        templateUrl: '~/msgtplui/Workflow.html',
+        templateUrl: function() {
+          var supportsTranslation = CRM.msgtplui.uiLanguages && _.size(CRM.msgtplui.uiLanguages) > 1;
+          return supportsTranslation ? '~/msgtplui/WorkflowTranslated.html' : '~/msgtplui/Workflow.html';
+        },
         resolve: {
           prefetch: function(crmApi4, crmStatus) {
             var q = crmApi4({
