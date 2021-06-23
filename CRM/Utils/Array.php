@@ -984,6 +984,34 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Rotate a matrix, converting from row-oriented array to a column-oriented array.
+   *
+   * @param iterable $rows
+   *   Ex: [['a'=>10,'b'=>'11'], ['a'=>20,'b'=>21]]
+   *   Formula: [scalar $rowId => [scalar $colId => mixed $value]]
+   * @param bool $unique
+   *   Only return unique values.
+   * @return array
+   *   Ex: ['a'=>[10,20], 'b'=>[11,21]]
+   *   Formula: [scalar $colId => [scalar $rowId => mixed $value]]
+   *   Note: In unique mode, the $rowId is not meaningful.
+   */
+  public static function asColumns(iterable $rows, bool $unique = FALSE) {
+    $columns = [];
+    foreach ($rows as $rowKey => $row) {
+      foreach ($row as $columnKey => $value) {
+        if (FALSE === $unique) {
+          $columns[$columnKey][$rowKey] = $value;
+        }
+        elseif (!in_array($value, $columns[$columnKey] ?? [])) {
+          $columns[$columnKey][] = $value;
+        }
+      }
+    }
+    return $columns;
+  }
+
+  /**
    * Rewrite the keys in an array.
    *
    * @param array $array
