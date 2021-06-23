@@ -102,7 +102,7 @@
 {/htxt}
 {htxt id="is-template"}
     <p>{ts}Template contributions are used with recurring contribution to generate follow up contributions.{/ts}</p>
-    <p>{ts}You can change the template contribution and the changes will occur as soon as new contribution is generated within the recurring serie.{/ts}</p>
+    <p>{ts}You can change the template contribution and the changes will occur as soon as new contribution is generated within the recurring series.{/ts}</p>
 {/htxt}
 
 {htxt id="processor-id-title"}
