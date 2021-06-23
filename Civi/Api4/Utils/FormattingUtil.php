@@ -10,13 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4\Utils;
 
 use Civi\Api4\Query\SqlExpression;
@@ -25,12 +18,18 @@ require_once 'api/v3/utils.php';
 
 class FormattingUtil {
 
+  /**
+   * @var string[]
+   */
   public static $pseudoConstantContexts = [
     'name' => 'validate',
     'abbr' => 'abbreviate',
     'label' => 'get',
   ];
 
+  /**
+   * @var string[]
+   */
   public static $pseudoConstantSuffixes = ['name', 'abbr', 'label', 'color', 'description', 'icon'];
 
   /**
