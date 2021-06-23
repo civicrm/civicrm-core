@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Case
  * @searchable none
+ * @since 5.37
  * @package Civi\Api4
  */
 class CaseType extends Generic\DAOEntity {

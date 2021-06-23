@@ -16,6 +16,7 @@ namespace Civi\Api4;
  * LocationType entity.
  *
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class LocationType extends Generic\DAOEntity {

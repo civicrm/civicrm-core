@@ -26,6 +26,7 @@ namespace Civi\Api4;
  * @ui_join_filters account_relationship
  *
  * @searchable bridge
+ * @since 5.37
  * @package Civi\Api4
  */
 class EntityFinancialAccount extends Generic\DAOEntity {

@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * @see \Civi\Api4\Generic\AbstractEntity
  *
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class Entity extends Generic\AbstractEntity {
@@ -113,6 +114,11 @@ class Entity extends Generic\AbstractEntity {
           'name' => 'see',
           'data_type' => 'Array',
           'description' => 'Any @see annotations from docblock',
+        ],
+        [
+          'name' => 'since',
+          'data_type' => 'String',
+          'description' => 'Version this API entity was added',
         ],
         [
           'name' => 'bridge',

@@ -23,6 +23,7 @@ namespace Civi\Api4;
  * UFMatch entity - links civicrm contacts with users created externally
  *
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class UFMatch extends Generic\DAOEntity {

@@ -29,6 +29,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\DashboardContact
  * @searchable none
+ * @since 5.25
  * @package Civi\Api4
  */
 class Dashboard extends Generic\DAOEntity {

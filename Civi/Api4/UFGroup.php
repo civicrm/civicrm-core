@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/profiles/
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class UFGroup extends Generic\DAOEntity {

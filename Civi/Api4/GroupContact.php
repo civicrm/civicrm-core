@@ -28,6 +28,7 @@ namespace Civi\Api4;
  *
  * @searchable bridge
  * @see \Civi\Api4\Group
+ * @since 5.19
  * @package Civi\Api4
  */
 class GroupContact extends Generic\DAOEntity {

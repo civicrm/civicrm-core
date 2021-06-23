@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/case-management/what-is-civicase/
  * @searchable primary
+ * @since 5.37
  * @package Civi\Api4
  */
 class CiviCase extends Generic\DAOEntity {

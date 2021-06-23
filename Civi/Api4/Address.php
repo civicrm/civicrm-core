@@ -31,6 +31,7 @@ namespace Civi\Api4;
  * @ui_join_filters location_type_id
  *
  * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Address extends Generic\DAOEntity {

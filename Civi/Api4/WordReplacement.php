@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * This entity stores global string replacements for the CiviCRM UI.
  *
  * @searchable secondary
+ * @since 5.39
  * @package Civi\Api4
  */
 class WordReplacement extends Generic\DAOEntity {

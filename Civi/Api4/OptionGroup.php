@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\OptionValue
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class OptionGroup extends Generic\DAOEntity {

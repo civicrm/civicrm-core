@@ -22,6 +22,7 @@ namespace Civi\Api4;
  * Participant entity, stores the participation record of a contact in an event.
  *
  * @searchable primary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Participant extends Generic\DAOEntity {

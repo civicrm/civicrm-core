@@ -29,6 +29,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
  * @searchable primary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Contact extends Generic\DAOEntity {

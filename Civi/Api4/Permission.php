@@ -26,6 +26,7 @@ namespace Civi\Api4;
  * on top of permissions!) or during install/uninstall processes.
  *
  * @searchable none
+ * @since 5.34
  * @package Civi\Api4
  */
 class Permission extends Generic\AbstractEntity {

@@ -23,6 +23,7 @@ namespace Civi\Api4;
  * This api exposes CiviCRM ACLEntityRole.
  *
  * @see https://docs.civicrm.org/user/en/latest/initial-set-up/permissions-and-access-control
+ * @since 5.39
  * @package Civi\Api4
  */
 class ACLEntityRole extends Generic\DAOEntity {

@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @searchable bridge
  * @see \Civi\Api4\Case
+ * @since 5.37
  * @package Civi\Api4
  */
 class CaseActivity extends Generic\DAOEntity {

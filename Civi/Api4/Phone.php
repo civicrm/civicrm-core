@@ -27,6 +27,7 @@ namespace Civi\Api4;
  * Creating a new phone of a contact, requires at minimum a contact's ID and phone number
  *
  * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Phone extends Generic\DAOEntity {

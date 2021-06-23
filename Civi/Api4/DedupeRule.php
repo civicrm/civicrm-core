@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @searchable none
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/contacts/
+ * @since 5.39
  * @package Civi\Api4
  */
 class DedupeRule extends Generic\DAOEntity {
