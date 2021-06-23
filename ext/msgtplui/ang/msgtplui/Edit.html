@@ -44,12 +44,12 @@
               {{::ts('Original')}}
             </a>
           </li>
-          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft()">
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && !$ctrl.hasDraft() && $ctrl.allowDraft()">
             <a crm-icon="fa-plus" class="nav-link text-success" ng-click="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
               {{::ts('Create draft')}}
             </a>
           </li>
-          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && $ctrl.hasDraft()">
+          <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && $ctrl.hasDraft() && $ctrl.allowDraft()">
             <a crm-icon="fa-plus" class="nav-link text-warning" crm-confirm="{title: ts('Create draft?'), message: ts('There is already an existing draft. If you continue, it will be replaced with a clean draft.')}" on-yes="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
               {{::ts('Create draft')}}
             </a>

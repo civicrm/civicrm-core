@@ -181,9 +181,11 @@
       // Experimenting with action buttons in the tab-bar. This makes the scroll unnecessary.
       // $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top - $('#civicrm-menu').height()}, 200);
     };
-
+    $ctrl.allowDraft = function allowDraft() {
+      return !!$ctrl.lang;
+    };
     $ctrl.hasDraft = function hasDraft() {
-      return $ctrl.lang && $ctrl.records.txDraft && $ctrl.records.txDraft._exists;
+      return $ctrl.allowDraft() && $ctrl.records.txDraft && $ctrl.records.txDraft._exists;
     };
     $ctrl.hasRevType = function hasRevType(name) {
       switch (name) {
