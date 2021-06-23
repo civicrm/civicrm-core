@@ -1,4 +1,4 @@
-<div id="bootstrap-theme" crm-dialog="previewMsgDlg" ng-controller="MsgtpluiGenericCtrl">
+<div id="bootstrap-theme" crm-dialog="previewMsgDlg" ng-controller="MsgtpluiPreviewCtrl as $ctrl">
 
   <form name="previewMsgForm">
 
@@ -24,10 +24,10 @@
         <div class="form-group">
           <label class="control-label col-sm-2">{{::ts('Revision')}}</label>
           <div class="input-group col-sm-9">
-            <select class="form-control" ng-options="item.id as item.label for item in model.revisions" ng-model="model.revisionId"></select>
+            <select class="form-control" ng-options="item.id as item.label for item in model.revisions" ng-model="$ctrl.revisionId"></select>
             <div class="input-group-btn">
-              <button class="btn btn-default" ng-click="model.cycle('revisionId', 'revisions', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="model.cycle('revisionId', 'revisions', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('revisionId', 'revisions', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('revisionId', 'revisions', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
@@ -35,10 +35,10 @@
         <div class="form-group">
           <label class="control-label col-sm-2">{{::ts('Example')}}</label>
           <div class="input-group col-sm-9">
-            <select class="form-control" ng-options="item.id as item.label for item in model.examples" ng-model="model.exampleId"></select>
+            <select class="form-control" ng-options="item.id as item.label for item in model.examples" ng-model="$ctrl.exampleId"></select>
             <div class="input-group-btn">
-              <button class="btn btn-default" ng-click="model.cycle('exampleId', 'examples', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="model.cycle('exampleId', 'examples', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('exampleId', 'examples', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('exampleId', 'examples', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
@@ -46,28 +46,32 @@
         <div class="form-group">
           <label class="control-label col-sm-2">{{::ts('Format')}}</label>
           <div class="input-group col-sm-9">
-            <select class="form-control" ng-options="item.id as item.label for item in model.formats" ng-model="model.formatId"></select>
+            <select class="form-control" ng-options="item.id as item.label for item in model.formats" ng-model="$ctrl.formatId"></select>
             <div class="input-group-btn">
-              <button class="btn btn-default" ng-click="model.cycle('formatId', 'formats', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="model.cycle('formatId', 'formats', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('formatId', 'formats', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-click="$ctrl.cycle('formatId', 'formats', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
 
         <hr/>
 
-        <div class="form-group">
+        <div class="form-group text-center" ng-if="!!$ctrl.preview.loading">
+          {{::ts('Loading...')}}
+        </div>
+
+        <div class="form-group" ng-if="!$ctrl.preview.loading">
           <label class="control-label col-sm-2">{{::ts('Subject')}}</label>
-          <p class="col-sm-9">{{model.revisions[model.revisionId].rec.msg_subject}}</p>
+          <p class="col-sm-9">{{$ctrl.preview.msg_subject}}</p>
         </div>
 
-        <div class="form-group" ng-if="model.formats[model.formatId].name === 'msg_text'">
-          <pre class="col-sm-12">{{model.revisions[model.revisionId].rec.msg_text}}</pre>
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_text'">
+          <pre class="col-sm-12">{{$ctrl.preview.msg_text}}</pre>
         </div>
 
-        <div class="form-group" ng-if="model.formats[model.formatId].name === 'msg_html'">
+        <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_html'">
           <div class="jumbotron well col-sm-12">
-            <iframe crm-ui-iframe="model.revisions[model.revisionId].rec.msg_html"></iframe>
+            <iframe crm-ui-iframe="$ctrl.preview.msg_html"></iframe>
           </div>
         </div>
 

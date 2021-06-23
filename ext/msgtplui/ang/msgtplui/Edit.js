@@ -242,7 +242,6 @@
 
     // Ex: $rootScope.$emit('previewMsgTpl', {revisionName: 'txDraft', formatName: 'msg_text'})
     function onPreview(event, args) {
-
       var defaults = {
         exampleName: 'fix-this-example',
         examples: [{id: 0, name: 'fix-this-example', label: ts('Fix this example')}],
@@ -261,16 +260,6 @@
         title: ts('Preview')
       };
       var model = angular.extend({}, defaults, args);
-      model.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
-      model.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
-      model.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
-      model.cycle = function(idFld, listFld, delta){
-        model[idFld] = (model[idFld] + delta) % model[listFld].length;
-      };
-      delete model.exampleName;
-      delete model.revisionName;
-      delete model.formatName;
-
       var options = CRM.utils.adjustDialogDefaults({
         dialogClass: 'msgtplui-dialog',
         autoOpen: false,
@@ -280,7 +269,6 @@
       return dialogService.open('previewMsgDlg', '~/msgtplui/Preview.html', model, options)
         // Nothing to do but hide warnings. The field was edited live.
         .then(function(){}, function(){});
-
     }
     $rootScope.$on('previewMsgTpl', onPreview);
     $rootScope.$on('$destroy', function (){
