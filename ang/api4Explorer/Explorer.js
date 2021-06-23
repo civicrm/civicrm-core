@@ -879,6 +879,7 @@
         description: entityInfo.description,
         comment: entityInfo.comment,
         type: entityInfo.type,
+        since: entityInfo.since,
         see: entityInfo.see
       });
     }

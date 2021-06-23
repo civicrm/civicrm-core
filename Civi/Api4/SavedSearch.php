@@ -26,6 +26,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/user/en/latest/organising-your-data/smart-groups/
  * @searchable none
+ * @since 5.24
  * @package Civi\Api4
  */
 class SavedSearch extends Generic\DAOEntity {

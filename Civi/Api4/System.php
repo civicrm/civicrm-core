@@ -22,6 +22,7 @@ namespace Civi\Api4;
  * A collection of system maintenance/diagnostic utilities.
  *
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class System extends Generic\AbstractEntity {

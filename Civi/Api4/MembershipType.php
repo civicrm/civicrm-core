@@ -16,6 +16,7 @@ namespace Civi\Api4;
  * MembershipType entity.
  *
  * @searchable secondary
+ * @since 5.27
  * @package Civi\Api4
  */
 class MembershipType extends Generic\DAOEntity {

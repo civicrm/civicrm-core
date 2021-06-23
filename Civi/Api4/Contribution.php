@@ -16,6 +16,7 @@ namespace Civi\Api4;
  * Contribution entity.
  *
  * @searchable primary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Contribution extends Generic\DAOEntity {

@@ -22,6 +22,7 @@ namespace Civi\Api4;
  * LineItem entity.
  *
  * @searchable secondary
+ * @since 5.31
  * @package Civi\Api4
  */
 class LineItem extends Generic\DAOEntity {

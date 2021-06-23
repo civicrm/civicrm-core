@@ -23,6 +23,7 @@ namespace Civi\Api4;
  *
  * @see \Civi\Api4\Tag
  * @searchable bridge
+ * @since 5.19
  * @package Civi\Api4
  */
 class EntityTag extends Generic\DAOEntity {

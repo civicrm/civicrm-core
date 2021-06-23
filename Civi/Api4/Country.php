@@ -22,6 +22,7 @@ namespace Civi\Api4;
  * Country entity.
  *
  * @searchable secondary
+ * @since 5.22
  * @package Civi\Api4
  */
 class Country extends Generic\DAOEntity {

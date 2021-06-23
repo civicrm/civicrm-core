@@ -29,6 +29,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/dev/en/latest/financial/financialentities/#financial-transactions
  *
  * @searchable secondary
+ * @since 5.40
  * @package Civi\Api4
  */
 class FinancialTrxn extends Generic\DAOEntity {

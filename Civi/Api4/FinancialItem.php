@@ -26,7 +26,7 @@ namespace Civi\Api4;
  * If your interest is really in payments you should use that api.
  *
  * @see https://docs.civicrm.org/dev/en/latest/financial/financialentities/#financial-items
- *
+ * @since 5.40
  * @package Civi\Api4
  */
 class FinancialItem extends Generic\DAOEntity {

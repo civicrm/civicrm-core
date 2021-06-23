@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * @see https://docs.civicrm.org/user/en/latest/events/what-is-civievent/
  *
  * @searchable primary
+ * @since 5.19
  * @package Civi\Api4
  */
 class Event extends Generic\DAOEntity {

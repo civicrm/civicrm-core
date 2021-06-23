@@ -29,6 +29,7 @@ namespace Civi\Api4;
  *
  * @searchable bridge
  * @see \Civi\Api4\Activity
+ * @since 5.19
  * @package Civi\Api4
  */
 class ActivityContact extends Generic\DAOEntity {

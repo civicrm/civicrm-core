@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/sysadmin/en/latest/setup/multisite/
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class Domain extends Generic\DAOEntity {

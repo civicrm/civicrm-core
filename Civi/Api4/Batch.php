@@ -24,6 +24,7 @@ namespace Civi\Api4;
  *
  * @searchable secondary
  * @see https://docs.civicrm.org/user/en/latest/pledges/everyday-tasks/#batch-entry-of-pledges
+ * @since 5.37
  * @package Civi\Api4
  */
 class Batch extends Generic\DAOEntity {

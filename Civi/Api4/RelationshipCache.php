@@ -25,6 +25,7 @@ namespace Civi\Api4;
  * @searchable secondary
  * @see \Civi\Api4\Relationship
  * @ui_join_filters near_relation
+ * @since 5.29
  * @package Civi\Api4
  */
 class RelationshipCache extends Generic\AbstractEntity {

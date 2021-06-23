@@ -23,6 +23,7 @@ namespace Civi\Api4;
  *
  * This is a collection of MsgTemplate, for reuse in import, export, etc.
  * @searchable none
+ * @since 5.26
  * @package Civi\Api4
  */
 class MessageTemplate extends Generic\DAOEntity {

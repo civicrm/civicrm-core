@@ -23,6 +23,7 @@ namespace Civi\Api4;
  * IM entity.
  *
  * @searchable secondary
+ * @since 5.19
  * @package Civi\Api4
  */
 class IM extends Generic\DAOEntity {

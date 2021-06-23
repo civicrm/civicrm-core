@@ -27,6 +27,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterMenu/
  * @searchable none
+ * @since 5.19
  * @package Civi\Api4
  */
 class Route extends \Civi\Api4\Generic\AbstractEntity {

@@ -23,6 +23,7 @@ namespace Civi\Api4;
  * PledgePayment entity.
  *
  * @searchable secondary
+ * @since 5.35
  * @package Civi\Api4
  */
 class PledgePayment extends Generic\DAOEntity {
