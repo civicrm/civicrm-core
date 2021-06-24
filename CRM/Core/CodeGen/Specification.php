@@ -514,7 +514,7 @@ class CRM_Core_CodeGen_Specification {
     if (isset($fields[$name])) {
       $fields[$name]['autoincrement'] = $auto;
     }
-    $fields[$name]['autoincrement'] = $auto;
+
     $primaryKey = [
       'name' => $name,
       'autoincrement' => $auto,
