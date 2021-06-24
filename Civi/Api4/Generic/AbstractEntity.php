@@ -132,35 +132,41 @@ abstract class AbstractEntity {
    * @return array
    */
   public static function getInfo() {
-    $info = [
-      'name' => static::getEntityName(),
-      'title' => static::getEntityTitle(),
-      'title_plural' => static::getEntityTitle(TRUE),
-      'type' => [self::stripNamespace(get_parent_class(static::class))],
-      'paths' => static::getEntityPaths(),
-      'class' => static::class,
-      'id_field' => 'id',
-      // Entities without a @searchable annotation will default to secondary,
-      // which makes them visible in SearchKit but not at the top of the list.
-      'searchable' => 'secondary',
-    ];
-    // Add info for entities with a corresponding DAO
-    $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
-    if ($dao) {
-      $info['paths'] = $dao::getEntityPaths();
-      $info['icon'] = $dao::$_icon;
-      $info['label_field'] = $dao::$_labelField;
-      $info['dao'] = $dao;
+    $cache = \Civi::cache('metadata');
+    $entityName = static::getEntityName();
+    $info = $cache->get("api4.$entityName.info");
+    if (!$info) {
+      $info = [
+        'name' => $entityName,
+        'title' => static::getEntityTitle(),
+        'title_plural' => static::getEntityTitle(TRUE),
+        'type' => [self::stripNamespace(get_parent_class(static::class))],
+        'paths' => static::getEntityPaths(),
+        'class' => static::class,
+        'id_field' => 'id',
+        // Entities without a @searchable annotation will default to secondary,
+        // which makes them visible in SearchKit but not at the top of the list.
+        'searchable' => 'secondary',
+      ];
+      // Add info for entities with a corresponding DAO
+      $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
+      if ($dao) {
+        $info['paths'] = $dao::getEntityPaths();
+        $info['icon'] = $dao::$_icon;
+        $info['label_field'] = $dao::$_labelField;
+        $info['dao'] = $dao;
+      }
+      foreach (ReflectionUtils::getTraits(static::class) as $trait) {
+        $info['type'][] = self::stripNamespace($trait);
+      }
+      $reflection = new \ReflectionClass(static::class);
+      $info = array_merge($info, ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]));
+      if ($dao) {
+        $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
+      }
+      unset($info['package'], $info['method']);
+      $cache->set("api4.$entityName.info", $info);
     }
-    foreach (ReflectionUtils::getTraits(static::class) as $trait) {
-      $info['type'][] = self::stripNamespace($trait);
-    }
-    $reflection = new \ReflectionClass(static::class);
-    $info = array_merge($info, ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => $info['name']]));
-    if ($dao) {
-      $info['description'] = $dao::getEntityDescription() ?? $info['description'] ?? NULL;
-    }
-    unset($info['package'], $info['method']);
     return $info;
   }
 
