@@ -228,6 +228,8 @@ class Api4SelectQuery {
       foreach ($wildFields as $wildField) {
         $pos = array_search($wildField, array_values($select));
         // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
+        // Note that not every table has an id field - at least not in all extensions.
+        // autoJoinFK will handle this so we can be 'sloppy' here.
         $idField = substr($wildField, 0, strrpos($wildField, '.')) . '.id';
         $this->autoJoinFK($idField);
         $matches = $this->selectMatchingFields($wildField);
@@ -959,6 +961,12 @@ class Api4SelectQuery {
       return;
     }
     $lastLink = array_pop($joinPath);
+    if (!$lastLink) {
+      // This function is called with the 'guessed' $key of 'table.id'. However,
+      // it is possible for extensions to not define id for tables so
+      // we return here rather than call a function on NULL further down.
+      return;
+    }
 
     // Custom field names are already prefixed
     $isCustom = $lastLink instanceof CustomGroupJoinable;
