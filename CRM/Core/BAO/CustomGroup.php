@@ -142,13 +142,15 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->created_id = $params['created_id'] ?? NULL;
       $group->created_date = $params['created_date'] ?? NULL;
 
-      // we do this only once, so name never changes
-      if (isset($params['name'])) {
-        $group->name = CRM_Utils_String::munge($params['name'], '_', 64);
+      // Process name only during create, so it never changes
+      if (!empty($params['name'])) {
+        $group->name = CRM_Utils_String::munge($params['name']);
       }
       else {
-        $group->name = CRM_Utils_String::munge($group->title, '_', 64);
+        $group->name = CRM_Utils_String::munge($group->title);
       }
+
+      self::validateCustomGroupName($group);
 
       if (isset($params['table_name'])) {
         $tableName = $params['table_name'];
@@ -223,6 +225,22 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    */
   public static function retrieve(&$params, &$defaults) {
     return CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomGroup', $params, $defaults);
+  }
+
+  /**
+   * Ensure group name does not conflict with an existing field
+   *
+   * @param CRM_Core_DAO_CustomGroup $group
+   */
+  public static function validateCustomGroupName(CRM_Core_DAO_CustomGroup $group) {
+    $extends = in_array($group->extends, CRM_Contact_BAO_ContactType::basicTypes(TRUE)) ? 'Contact' : $group->extends;
+    $extendsDAO = CRM_Core_DAO_AllCoreTables::getFullName($extends);
+    if ($extendsDAO) {
+      $fields = array_column($extendsDAO::fields(), 'name');
+      if (in_array($group->name, $fields)) {
+        $group->name .= '0';
+      }
+    }
   }
 
   /**

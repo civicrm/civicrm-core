@@ -651,4 +651,40 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals($extractedGetParams[$fieldName], '2017-06-13');
   }
 
+  /**
+   * @return array
+   */
+  public function getGroupNames(): array {
+    $data = [
+      ['Individual', 'first_name', FALSE],
+      ['Organization', 'first_name', FALSE],
+      ['Contact', 'not_first_name', TRUE],
+      ['Contact', 'gender_id', FALSE],
+      ['Activity', 'activity_type_id', FALSE],
+      ['Campaign', 'activity_type_id', TRUE],
+      ['Campaign', 'campaign_type_id', FALSE],
+    ];
+    // Add descriptive keys to data
+    $dataSet = [];
+    foreach ($data as $item) {
+      $dataSet[$item[0] . '.' . $item[1]] = $item;
+    }
+    return $dataSet;
+  }
+
+  /**
+   * @param string $extends
+   * @param string $name
+   * @param bool $isAllowed
+   * @dataProvider getGroupNames
+   */
+  public function testAllowedGroupNames(string $extends, string $name, bool $isAllowed) {
+    $group = new CRM_Core_DAO_CustomGroup();
+    $group->name = $name;
+    $group->extends = $extends;
+    $expectedName = $isAllowed ? $name : $name . '0';
+    CRM_Core_BAO_CustomGroup::validateCustomGroupName($group);
+    $this->assertEquals($expectedName, $group->name);
+  }
+
 }

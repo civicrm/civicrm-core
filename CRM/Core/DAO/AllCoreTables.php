@@ -311,13 +311,13 @@ class CRM_Core_DAO_AllCoreTables {
   /**
    * Given a brief-name, determine the full class-name.
    *
-   * @param string $daoName
+   * @param string $briefName
    *   Ex: 'Contact'.
    * @return string|CRM_Core_DAO|NULL
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
-  public static function getFullName($daoName) {
-    return CRM_Utils_Array::value($daoName, self::daoToClass());
+  public static function getFullName($briefName) {
+    return self::daoToClass()[$briefName] ?? NULL;
   }
 
   /**
