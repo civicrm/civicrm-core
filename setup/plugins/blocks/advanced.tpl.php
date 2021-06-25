@@ -12,14 +12,14 @@ endif; ?>
     <tr>
       <th><?php echo ts('CMS Database'); ?></th>
       <td>
-        <code><?php echo htmlentities('mysql://' . $model->cmsDb['username'] . ':HIDDEN@' . $model->cmsDb['server'] . '/' . $model->cmsDb['database']); ?></code>
+        <code><?php echo htmlentities(\Civi\Setup\DbUtil::encodeDsn(array_merge($model->cmsDb, ['password' => 'HIDDEN']))); ?></code>
       </td>
     </tr>
     <tr>
       <th><?php echo ts('CiviCRM Database'); ?></th>
       <td class="advanced-db">
         <div class="ro">
-          <code><?php echo htmlentities('mysql://' . $model->db['username'] . ':HIDDEN@' . $model->db['server'] . '/' . $model->db['database']); ?></code>
+          <code><?php echo htmlentities(\Civi\Setup\DbUtil::encodeDsn(array_merge($model->db, ['password' => 'HIDDEN']))); ?></code>
           <a href="" onclick="csj$('.advanced-db .ro').hide(); csj$('.advanced-db .rw').show(); return false;" title="<?php echo htmlentities(ts('Edit')) ?>"><i class="fa fa-pencil"></i></a>
         </div>
         <div class="rw" style="display: none;">
@@ -40,6 +40,7 @@ endif; ?>
           <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@localhost/civicrm')); ?></p>
           <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@127.0.0.1:3306/otherdb')); ?></p>
           <p><?php echo ts('<strong>Example</strong>: <code>%1</code>', array(1 => 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb')); ?></p>
+          <p><?php echo ts('Tip: This uses URL notation. If the credentials require any special characters (e.g. "&" or "#"), then apply URL encoding (e.g. "%26" or "%23").'); ?></p>
         </div>
       </td>
     </tr>

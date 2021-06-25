@@ -10,7 +10,7 @@ class DbUtil {
    * @return array
    */
   public static function parseDsn($dsn) {
-    $parsed = parse_url($dsn);
+    $parsed = array_map('urldecode', parse_url($dsn));
     // parse_url parses 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb' like:
     // [
     //   'host'   => 'unix(',
@@ -37,18 +37,20 @@ class DbUtil {
   }
 
   /**
-   * @todo Is this used anywhere? It doesn't support SSL as-is.
-   * Convert an datasource from array notation to URL notation.
+   * Convert a datasource from array notation to URL notation.
+   *
+   * FIXME: Doesn't support SSL
    *
    * @param array $db
    * @return string
    */
   public static function encodeDsn($db) {
+    $escapedHostPort = implode(':', array_map('urlencode', explode(':', $db['server'])));
     return sprintf('mysql://%s:%s@%s/%s',
-      $db['username'],
-      $db['password'],
-      $db['server'],
-      $db['database']
+      urlencode($db['username']),
+      urlencode($db['password']),
+      $escapedHostPort,
+      urlencode($db['database'])
     );
   }
 
