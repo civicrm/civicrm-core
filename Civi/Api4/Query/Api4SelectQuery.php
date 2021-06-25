@@ -806,16 +806,13 @@ class Api4SelectQuery {
    * @throws \API_Exception
    */
   private function getBridgeRefs(string $bridgeEntity, string $joinEntity): array {
-    /* @var \Civi\Api4\Generic\DAOEntity $bridgeEntityClass */
-    $bridgeEntityClass = CoreUtil::getApiClass($bridgeEntity);
-    $bridgeInfo = $bridgeEntityClass::getInfo();
-    $bridgeFields = $bridgeInfo['bridge'] ?? [];
+    $bridgeFields = CoreUtil::getInfoItem($bridgeEntity, 'bridge') ?? [];
     // Sanity check - bridge entity should declare exactly 2 FK fields
     if (count($bridgeFields) !== 2) {
       throw new \API_Exception("Illegal bridge entity specified: $bridgeEntity. Expected 2 bridge fields, found " . count($bridgeFields));
     }
     /* @var \CRM_Core_DAO $bridgeDAO */
-    $bridgeDAO = $bridgeInfo['dao'];
+    $bridgeDAO = CoreUtil::getInfoItem($bridgeEntity, 'dao');
     $bridgeTable = $bridgeDAO::getTableName();
 
     // Get the 2 bridge reference columns as CRM_Core_Reference_* objects

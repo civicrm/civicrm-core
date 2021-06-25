@@ -28,7 +28,7 @@ class CoreUtil {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
       return 'CRM_Core_BAO_CustomValue';
     }
-    $dao = self::getApiClass($entityName)::getInfo()['dao'] ?? NULL;
+    $dao = self::getInfoItem($entityName, 'dao');
     if (!$dao) {
       return NULL;
     }
@@ -50,6 +50,17 @@ class CoreUtil {
     // Because "Case" is a reserved php keyword
     $className = 'Civi\Api4\\' . ($entityName === 'Case' ? 'CiviCase' : $entityName);
     return class_exists($className) ? $className : NULL;
+  }
+
+  /**
+   * Get item from an entity's getInfo array
+   *
+   * @param string $entityName
+   * @param string $keyToReturn
+   * @return mixed
+   */
+  public static function getInfoItem(string $entityName, string $keyToReturn) {
+    return self::getApiClass($entityName)::getInfo()[$keyToReturn] ?? NULL;
   }
 
   /**
