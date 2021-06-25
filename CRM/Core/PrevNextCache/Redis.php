@@ -188,7 +188,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
 
   public function getCount($cacheKey) {
     $allKey = $this->key($cacheKey, 'all');
-    return $this->redis->zSize($allKey);
+    return $this->redis->zCard($allKey);
   }
 
   /**
