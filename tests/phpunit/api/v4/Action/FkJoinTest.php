@@ -308,7 +308,35 @@ class FkJoinTest extends UnitTestCase {
     $this->assertNull($result[3]['rel.id']);
     $this->assertEquals($cid3, $result[4]['contact.id']);
     $this->assertNull($result[3]['rel.id']);
+  }
 
+  public function testJoinToEmployerId() {
+    $employer = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'TesterCo')
+      ->execute()->first()['id'];
+    $employee = Contact::create(FALSE)
+      ->addValue('employer_id', $employer)
+      ->addValue('first_name', 'TesterMan')
+      ->execute()->first()['id'];
+    $email = Email::create(FALSE)
+      ->addValue('email', 'tester@test.com')
+      ->addValue('contact_id', $employee)
+      ->execute()->first()['id'];
+
+    $contactGet = Contact::get(FALSE)
+      ->addWhere('id', '=', $employee)
+      ->addSelect('employer_id', 'employer_id.display_name')
+      ->execute()->first();
+    $this->assertEquals($employer, $contactGet['employer_id']);
+    $this->assertEquals('TesterCo', $contactGet['employer_id.display_name']);
+
+    $emailGet = Email::get(FALSE)
+      ->addWhere('id', '=', $email)
+      ->addSelect('contact_id.employer_id', 'contact_id.employer_id.display_name')
+      ->execute()->first();
+    $this->assertEquals($employer, $emailGet['contact_id.employer_id']);
+    $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
   }
 
 }
