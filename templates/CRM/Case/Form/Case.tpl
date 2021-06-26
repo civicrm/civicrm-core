@@ -34,12 +34,12 @@
             <div class="help">{$activityTypeDescription}</div>
         </tr>
     {/if}
-{if $clientName}
+{if !empty($clientName)}
     <tr class="crm-case-form-block-clientName">
       <td class="label font-size12pt">{ts}Client{/ts}</td>
       <td class="font-size12pt bold view-value">{$clientName}</td>
     </tr>
-{elseif !$clientName and $action eq 1}
+{elseif empty($clientName) and $action eq 1}
     {if $context eq 'standalone'}
       <td class="label">{$form.client_id.label}</td>
       <td class="view-value">{$form.client_id.html}</td>
@@ -64,7 +64,7 @@
 {* This shows ACTIVITY custom fields, as opposed to CASE custom fields, so is not a duplicate of the other custom data block below. *}
 {if $groupTree}
     <tr>
-       <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl"}</td>
+       <td colspan="2">{include file="CRM/Custom/Form/CustomData.tpl" skipTitle=0}</td>
     </tr>
 {/if}
 
