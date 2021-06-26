@@ -27,7 +27,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @param CRM_Core_Form $form
    */
-  public static function buildPremium(&$form) {
+  public static function buildPremium($form) {
     //premium section
     $form->add('hidden', 'hidden_Premium', 1);
     $sel1 = $sel2 = [];
