@@ -74,10 +74,10 @@ if (!defined('CIVI_SETUP')) {
     // ??why is frontEnd=0??
     $params['frontEnd'] = 0;
     $params['baseURL'] = addslashes(rtrim($m->cmsBaseUrl, '/'));
-    $params['dbUser'] = addslashes($m->db['username']);
-    $params['dbPass'] = addslashes($m->db['password']);
-    $params['dbHost'] = addslashes($m->db['server']);
-    $params['dbName'] = addslashes($m->db['database']);
+    $params['dbUser'] = addslashes(urlencode($m->db['username']));
+    $params['dbPass'] = addslashes(urlencode($m->db['password']));
+    $params['dbHost'] = addslashes(implode(':', array_map('urlencode', explode(':', $m->db['server']))));
+    $params['dbName'] = addslashes(urlencode($m->db['database']));
     // The '&' prefix is awkward, but we don't know what's already in the file.
     // At the time of writing, it has ?new_link=true. If that is removed,
     // then need to update this.
@@ -86,10 +86,10 @@ if (!defined('CIVI_SETUP')) {
     // need to use %20 for spaces.
     $params['dbSSL'] = empty($m->db['ssl_params']) ? '' : addslashes('&' . http_build_query($m->db['ssl_params'], '', '&', PHP_QUERY_RFC3986));
     $params['cms'] = addslashes($m->cms);
-    $params['CMSdbUser'] = addslashes($m->cmsDb['username']);
-    $params['CMSdbPass'] = addslashes($m->cmsDb['password']);
-    $params['CMSdbHost'] = addslashes($m->cmsDb['server']);
-    $params['CMSdbName'] = addslashes($m->cmsDb['database']);
+    $params['CMSdbUser'] = addslashes(urlencode($m->cmsDb['username']));
+    $params['CMSdbPass'] = addslashes(urlencode($m->cmsDb['password']));
+    $params['CMSdbHost'] = addslashes(implode(':', array_map('urlencode', explode(':', $m->cmsDb['server']))));
+    $params['CMSdbName'] = addslashes(urlencode($m->cmsDb['database']));
     // The '&' prefix is awkward, but we don't know what's already in the file.
     // At the time of writing, it has ?new_link=true. If that is removed,
     // then need to update this.
