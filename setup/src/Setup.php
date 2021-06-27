@@ -12,7 +12,7 @@ use Civi\Setup\Event\UninstallDatabaseEvent;
 use Civi\Setup\Event\UninstallFilesEvent;
 use Civi\Setup\Exception\InitException;
 use Psr\Log\NullLogger;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\Core\CiviEventDispatcher;
 
 class Setup {
 
@@ -70,7 +70,8 @@ class Setup {
     self::$instance = new Setup();
     self::$instance->model = new \Civi\Setup\Model();
     self::$instance->model->setValues($modelValues);
-    self::$instance->dispatcher = new EventDispatcher();
+    self::$instance->dispatcher = new CiviEventDispatcher();
+    self::$instance->dispatcher->setDispatchPolicy(['/^civi\.setup\./' => 'run', '/./' => 'fail']);
     self::$instance->log = $log ? $log : new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
