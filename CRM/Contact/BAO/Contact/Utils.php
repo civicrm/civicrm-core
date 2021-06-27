@@ -177,7 +177,7 @@ WHERE  id IN ( $idString )
     }
 
     if (!$ts) {
-      $ts = time();
+      $ts = CRM_Utils_Time::time();
     }
 
     if (!$live) {

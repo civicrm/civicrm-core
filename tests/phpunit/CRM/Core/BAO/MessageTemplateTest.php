@@ -139,6 +139,10 @@ London, 90210
    * @throws \CiviCRM_API3_Exception
    */
   public function testContactTokens(): void {
+    // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+
     $this->createCustomGroupWithFieldsOfAllTypes([]);
     $tokenData = $this->getAllContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
@@ -173,6 +177,10 @@ Default Domain Name
     $this->assertEquals($expected_parts[0], $returned_parts[0]);
     $this->assertApproxEquals($expected_parts[1], $returned_parts[1], 2);
     $this->assertEquals($expected_parts[2], $returned_parts[2]);
+
+    // reset time
+    putenv('TIME_FUNC');
+    CRM_Utils_Time::resetTime();
   }
 
   /**
