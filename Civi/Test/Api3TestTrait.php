@@ -322,7 +322,7 @@ trait Api3TestTrait {
       $v4Params['language'] = $language;
     }
     $toRemove = ['option.', 'return', 'api.', 'format.'];
-    $chains = $joins = $custom = [];
+    $chains = $custom = [];
     foreach ($v3Params as $key => $val) {
       foreach ($toRemove as $remove) {
         if (strpos($key, $remove) === 0) {
@@ -425,12 +425,6 @@ trait Api3TestTrait {
           // Ensure id field is returned as v3 always expects it
           if ($v4Entity != 'Setting' && !in_array('id', $v4Params['select'])) {
             $v4Params['select'][] = 'id';
-          }
-          // Convert join syntax
-          foreach ($v4Params['select'] as $idx => $select) {
-            if (strstr($select, '_id.')) {
-              $joins[$select] = $v4Params['select'][$idx] = str_replace('_id.', '.', $select);
-            }
           }
         }
         if ($options['limit'] && $v4Entity != 'Setting') {
@@ -597,10 +591,6 @@ trait Api3TestTrait {
       // Run chains
       foreach ($chains as $key => $params) {
         $result[$index][$key] = $this->runApi4LegacyChain($key, $params, $v4Entity, $row, $sequential);
-      }
-      // Convert join format
-      foreach ($joins as $api3Key => $api4Key) {
-        $result[$index][$api3Key] = $result[$index][$api4Key] ?? NULL;
       }
       // Resolve custom field names
       foreach ($custom as $group => $fields) {
