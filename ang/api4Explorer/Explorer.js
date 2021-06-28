@@ -134,17 +134,33 @@
     // Note: this function expects fieldList to be select2-formatted already
     function addJoins(fieldList, addWildcard, addPseudoconstant) {
       // Add entities specified by the join param
-      _.each(getExplicitJoins(), function(joinEntity, joinAlias) {
-        var wildCard = addWildcard ? [{id: joinAlias + '.*', text: joinAlias + '.*', 'description': 'All core ' + joinEntity + ' fields'}] : [],
-          joinFields = _.cloneDeep(entityFields(joinEntity));
+      _.each(getExplicitJoins(), function(join) {
+        var wildCard = addWildcard ? [{id: join.alias + '.*', text: join.alias + '.*', 'description': 'All core ' + join.entity + ' fields'}] : [],
+          joinFields = _.cloneDeep(entityFields(join.entity));
         if (joinFields) {
+          // Add fields from bridge entity
+          if (join.bridge) {
+            var bridgeFields = _.cloneDeep(entityFields(join.bridge)),
+              bridgeEntity = getEntity(join.bridge),
+              joinFieldNames = _.pluck(joinFields, 'name');
+            _.each(bridgeFields, function(field) {
+              if (
+                // Only include bridge fields that link back to the original entity
+                (!bridgeEntity.bridge[field.name] || field.fk_entity !== join.entity) &&
+                // Exclude fields with the same name as those in the original entity
+                !_.includes(joinFieldNames, field.name)
+              ) {
+                joinFields.push(field);
+              }
+            });
+          }
           if (addPseudoconstant) {
             addPseudoconstants(joinFields, addPseudoconstant);
           }
           fieldList.push({
-            text: joinEntity + ' AS ' + joinAlias,
-            description: 'Explicit join to ' + joinEntity,
-            children: wildCard.concat(formatForSelect2(joinFields, [], 'name', ['description'], joinAlias + '.'))
+            text: join.entity + ' AS ' + join.alias,
+            description: 'Explicit join to ' + join.entity,
+            children: wildCard.concat(formatForSelect2(joinFields, [], 'name', ['description'], join.alias + '.'))
           });
         }
       });
@@ -326,7 +342,7 @@
         path = alias.split('.');
       // First check explicit joins
       if (joins[alias]) {
-        return joins[alias];
+        return joins[alias].entity;
       }
       // Then lookup implicit links
       _.each(path, function(node) {
@@ -1329,7 +1345,12 @@
       var j = join[0].split(' AS '),
         joinEntity = _.trim(j[0]),
         joinAlias = _.trim(j[1]) || joinEntity.toLowerCase();
-      joins[joinAlias] = joinEntity;
+      joins[joinAlias] = {
+        entity: joinEntity,
+        alias: joinAlias,
+        side: join[1] || 'LEFT',
+        bridge: _.isString(join[2]) ? join[2] : null
+      };
     }, {});
   }
 
@@ -1352,7 +1373,8 @@
         return comboName;
       }
       var linkName = fieldNames.shift(),
-        newEntity = getExplicitJoins()[linkName] || _.findWhere(links[entity], {alias: linkName}).entity;
+        join = getExplicitJoins()[linkName],
+        newEntity = join ? join.entity : _.findWhere(links[entity], {alias: linkName}).entity;
       return get(newEntity, fieldNames);
     }
   }
