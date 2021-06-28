@@ -42,6 +42,12 @@
 
 {/htxt} 
 
+{htxt id="id-count-text"}
+<p>{ts}A single SMS message is typically 160 characters in length. If you want to send a message that is longer than 160 characters, it is split into multiple segments.{/ts}</p>
+<p>{ts}The cost of sending SMS message is typically <em>per segment</em>.{/ts}</p>
+<p>{ts}Certain characters like emoji or curly quotes can shorten the segment size to 96 characters, increasing the cost per message.{/ts}</p>
+{/htxt}
+
 {htxt id="id-message-text-title"}
 {ts}Rich Text{/ts}
 {/htxt}
