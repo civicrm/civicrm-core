@@ -49,7 +49,11 @@
                &nbsp; {$row.total_amount|crmMoney:$row.currency}
             </a>
           {if $row.amount_level }<br/>({$row.amount_level}){/if}
-          {if $row.contribution_recur_id}<br/>{ts}(Recurring){/ts}{/if}
+          {if $row.contribution_recur_id && $row.is_template}
+            <br/>{ts}(Recurring Template){/ts}
+          {elseif $row.contribution_recur_id }
+            <br/>{ts}(Recurring){/ts}
+          {/if}
         </td>
       {foreach from=$columnHeaders item=column}
         {assign var='columnName' value=$column.field_name}

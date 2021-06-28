@@ -96,6 +96,15 @@
     <p>{ts}Once you have finished your testing, it is a good idea to clean up by finding your test records and deleting them.{/ts}</p>
 {/htxt}
 
+
+{htxt id="is-template-title"}
+{ts}Template Records{/ts}
+{/htxt}
+{htxt id="is-template"}
+    <p>{ts}Template contributions are used with recurring contribution to generate follow up contributions.{/ts}</p>
+    <p>{ts}You can change the template contribution and the changes will occur as soon as new contribution is generated within the recurring series.{/ts}</p>
+{/htxt}
+
 {htxt id="processor-id-title"}
 {ts}Processor ID{/ts}
 {/htxt}

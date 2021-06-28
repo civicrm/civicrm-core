@@ -214,6 +214,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
 
     $clauses[] = "civicrm_participant.status_id in ( 1 )";
     $clauses[] = "civicrm_contribution.is_test = 0";
+    $clauses[] = "civicrm_contribution.is_template = 0";
     $onLine = CRM_Utils_Array::value('paid_online',
       $this->_formValues
     );

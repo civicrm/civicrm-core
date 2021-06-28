@@ -169,6 +169,7 @@ LEFT JOIN  civicrm_contribution contrib_1 ON contrib_1.contact_id = contact_a.id
            $from
 WHERE      contrib_1.contact_id = contact_a.id
 AND        contrib_1.is_test = 0
+AND        contrib_1.is_template = 0
            $where
 GROUP BY   contact_a.id
            $having
@@ -237,6 +238,7 @@ count(contrib_1.id) AS donation_count
 
     if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       $clauses[] = "contrib_2.is_test = 0";
+      $clauses[] = "contrib_2.is_template = 0";
 
       if (!empty($this->start_date_2)) {
         $clauses[] = CRM_Core_DAO::composeQuery('contrib_2.receive_date >= %1', [1 => [$this->start_date_2, 'String']]);
@@ -293,7 +295,7 @@ count(contrib_1.id) AS donation_count
 REPLACE   INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
-WHERE    c.is_test = 0
+WHERE    c.is_test = 0 AND c.is_template = 0
          $excludeClause
 GROUP BY c.contact_id
          $havingClause
@@ -308,7 +310,7 @@ GROUP BY c.contact_id
 REPLACE  INTO {$this->_xgTableName}
 SELECT   DISTINCT contact_id AS contact_id
 FROM     civicrm_contribution c
-WHERE    c.is_test = 0
+WHERE    c.is_test = 0 AND c.is_template = 0
 AND      c.receive_date < {$this->start_date_1}
 ";
         CRM_Core_DAO::executeQuery($query);
