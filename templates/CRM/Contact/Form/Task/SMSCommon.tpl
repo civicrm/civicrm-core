@@ -63,7 +63,7 @@ function maxLengthMessage()
    var len = CRM.$('#sms_text_message').val().length;
    var maxLength = {/literal}{$max_sms_length}{literal};
    if (len > maxLength) {
-      CRM.$('#sms_text_message').crmError({/literal}'{ts escape="js"}SMS body exceeding limit of {$max_sms_length} characters{/ts}'{literal});
+      CRM.$('#sms_text_message').crmError({/literal}'{ts escape="js" 1=$max_sms_length}SMS body exceeding limit of %1 characters{/ts}'{literal});
       return false;
    }
 return true;
