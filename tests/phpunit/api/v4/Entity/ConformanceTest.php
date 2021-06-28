@@ -23,6 +23,8 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Entity;
 use api\v4\UnitTestCase;
 use Civi\Api4\Event\ValidateValuesEvent;
+use Civi\Api4\Service\Spec\CustomFieldSpec;
+use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\HookInterface;
 
@@ -193,6 +195,19 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
 
     $this->assertArrayHasKey('data_type', $fields['id'], $errMsg);
     $this->assertEquals('Integer', $fields['id']['data_type']);
+
+    // Ensure that the getFields (FieldSpec) format is generally consistent.
+    foreach ($fields as $field) {
+      $isNotNull = function($v) {
+        return $v !== NULL;
+      };
+      $class = empty($field['custom_field_id']) ? FieldSpec::class : CustomFieldSpec::class;
+      $spec = (new $class($field['name'], $field['entity']))->loadArray($field, TRUE);
+      $this->assertEquals(
+        array_filter($field, $isNotNull),
+        array_filter($spec->toArray(), $isNotNull)
+      );
+    }
   }
 
   /**
