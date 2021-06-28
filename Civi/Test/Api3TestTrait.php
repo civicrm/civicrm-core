@@ -403,7 +403,7 @@ trait Api3TestTrait {
         // This is a per field hack (bad) but we can't solve everything at once
         // & a cleverer way turned out to be too much for this round.
         // Being in the test class it's tested....
-        $v3Params['option_group.name'] = $v3Params['option_group_id'];
+        $v3Params['option_group_id.name'] = $v3Params['option_group_id'];
         unset($v3Params['option_group_id']);
       }
       if (isset($field['pseudoconstant'], $v3Params[$name]) && $field['type'] === \CRM_Utils_Type::T_INT && !is_numeric($v3Params[$name]) && is_string($v3Params[$name])) {

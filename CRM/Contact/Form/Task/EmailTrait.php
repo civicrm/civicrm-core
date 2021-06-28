@@ -529,11 +529,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $emails = Email::get()
       ->addWhere('id', 'IN', $emailIDs)
       ->setCheckPermissions(FALSE)
-      ->setSelect(['contact_id', 'email', 'contact.sort_name', 'contact.display_name'])->execute();
+      ->setSelect(['contact_id', 'email', 'contact_id.sort_name', 'contact_id.display_name'])->execute();
     $emailStrings = [];
     foreach ($emails as $email) {
       $this->contactEmails[$email['id']] = $email;
-      $emailStrings[] = '"' . $email['contact.sort_name'] . '" <' . $email['email'] . '>';
+      $emailStrings[] = '"' . $email['contact_id.sort_name'] . '" <' . $email['email'] . '>';
     }
     return implode(',', $emailStrings);
   }
@@ -552,7 +552,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $urls = [];
     foreach ($emailIDs as $email) {
       $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $this->contactEmails[$email]['contact_id']], TRUE);
-      $urls[] = "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact.display_name'] . '</a>';
+      $urls[] = "<a href='{$contactURL}'>" . $this->contactEmails[$email]['contact_id.display_name'] . '</a>';
     }
     return implode(', ', $urls);
   }

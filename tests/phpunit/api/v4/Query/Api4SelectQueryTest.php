@@ -54,7 +54,7 @@ class Api4SelectQueryTest extends UnitTestCase {
     $api = Request::create('Phone', 'get', [
       'version' => 4,
       'checkPermissions' => FALSE,
-      'select' => ['id', 'phone', 'contact.display_name', 'contact.first_name'],
+      'select' => ['id', 'phone', 'contact_id.display_name', 'contact_id.first_name'],
       'where' => [['phone', '=', $phoneNum]],
     ]);
     $query = new Api4SelectQuery($api);
@@ -62,7 +62,7 @@ class Api4SelectQueryTest extends UnitTestCase {
 
     $this->assertCount(1, $results);
     $firstResult = array_shift($results);
-    $this->assertEquals($contact['display_name'], $firstResult['contact.display_name']);
+    $this->assertEquals($contact['display_name'], $firstResult['contact_id.display_name']);
   }
 
   /**

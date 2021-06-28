@@ -156,7 +156,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     if ($this->_id) {
       $this->locationBlock = Event::get()
         ->addWhere('id', '=', $this->_id)
-        ->setSelect(['loc_block.*', 'loc_block_id'])
+        ->setSelect(['loc_block_id.*', 'loc_block_id'])
         ->execute()->first();
       $this->_oldLocBlockId = $this->locationBlock['loc_block_id'];
     }
@@ -249,8 +249,8 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
         }
         $params[$block][$index]['location_type_id'] = $defaultLocationTypeID;
         $fieldKey = (int) $index === 1 ? '_id' : '_2_id';
-        if ($isUpdateToExistingLocationBlock && !empty($this->locationBlock['loc_block.' . $block . $fieldKey])) {
-          $params[$block][$index]['id'] = $this->locationBlock['loc_block.' . $block . $fieldKey];
+        if ($isUpdateToExistingLocationBlock && !empty($this->locationBlock['loc_block_id.' . $block . $fieldKey])) {
+          $params[$block][$index]['id'] = $this->locationBlock['loc_block_id.' . $block . $fieldKey];
         }
       }
     }

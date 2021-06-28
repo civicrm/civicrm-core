@@ -430,13 +430,13 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
         $emails = Email::get()
           ->addWhere('id', 'IN', $emailIDs)
           ->setCheckPermissions(FALSE)
-          ->setSelect(['contact_id', 'email', 'contact.sort_name', 'contact.display_name'])->execute();
+          ->setSelect(['contact_id', 'email', 'contact_id.sort_name', 'contact_id.display_name'])->execute();
         $emailStrings = $contactUrlStrings = [];
         foreach ($emails as $email) {
-          $emailStrings[] = '"' . $email['contact.sort_name'] . '" <' . $email['email'] . '>';
+          $emailStrings[] = '"' . $email['contact_id.sort_name'] . '" <' . $email['email'] . '>';
           // generate the contact url to put in Activity
           $contactURL = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'force' => 1, 'cid' => $email['contact_id']], TRUE);
-          $contactUrlStrings[] = "<a href='{$contactURL}'>" . $email['contact.display_name'] . '</a>';
+          $contactUrlStrings[] = "<a href='{$contactURL}'>" . $email['contact_id.display_name'] . '</a>';
         }
         $cc_emails = implode(',', $emailStrings);
         $values['cc_receipt'] = $cc_emails;

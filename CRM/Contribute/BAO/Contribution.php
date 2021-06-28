@@ -1318,13 +1318,13 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return (bool) ContributionRecur::get(FALSE)->addWhere('id', '=', $recurringContributionID)->addSelect('is_email_receipt')->execute()->first()['is_email_receipt'];
     }
     $contributionPage = Contribution::get(FALSE)
-      ->addSelect('contribution_page.is_email_receipt')
+      ->addSelect('contribution_page_id.is_email_receipt')
       ->addWhere('contribution_page_id', 'IS NOT NULL')
       ->addWhere('id', '=', $contributionID)
       ->execute()->first();
 
     if (!empty($contributionPage)) {
-      return (bool) $contributionPage['contribution_page.is_email_receipt'];
+      return (bool) $contributionPage['contribution_page_id.is_email_receipt'];
     }
     // This would be the case for backoffice (where is_email_receipt is not passed in) or events, where Event::sendMail will filter
     // again anyway.

@@ -29,16 +29,16 @@ class SpecFormatter {
     if (!empty($data['custom_group_id'])) {
       $field = new CustomFieldSpec($data['name'], $entity, $dataTypeName);
       if (strpos($entity, 'Custom_') !== 0) {
-        $field->setName($data['custom_group.name'] . '.' . $data['name']);
+        $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
       }
       else {
-        $field->setTableName($data['custom_group.table_name']);
+        $field->setTableName($data['custom_group_id.table_name']);
       }
       $field->setColumnName($data['column_name']);
       $field->setCustomFieldId($data['id'] ?? NULL);
-      $field->setCustomGroupName($data['custom_group.name']);
+      $field->setCustomGroupName($data['custom_group_id.name']);
       $field->setTitle($data['label']);
-      $field->setLabel($data['custom_group.title'] . ': ' . $data['label']);
+      $field->setLabel($data['custom_group_id.title'] . ': ' . $data['label']);
       $field->setHelpPre($data['help_pre'] ?? NULL);
       $field->setHelpPost($data['help_post'] ?? NULL);
       if (self::customFieldHasOptions($data)) {

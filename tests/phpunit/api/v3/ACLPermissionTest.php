@@ -1077,7 +1077,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $tag2 = $this->tagCreate(['name' => uniqid('other'), 'created_id' => $other])['id'];
     $this->setPermissions(['access CiviCRM']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
-    $createdFirstName = $version === 4 ? 'created.first_name' : 'created_id.first_name';
+    $createdFirstName = 'created_id.first_name';
     $result = $this->callAPISuccess('Tag', 'get', [
       'check_permissions' => 1,
       'return' => ['id', $createdFirstName],

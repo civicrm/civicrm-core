@@ -228,7 +228,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
     $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
     $updateTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::update()
-      ->addWhere('client.guid', '=', $client['guid'])
+      ->addWhere('client_id.guid', '=', $client['guid'])
       ->setValues(['access_token' => 'own-token-revised'])
       ->execute();
     $this->assertCount(1, $updateTokensWithLimitedAccess);
@@ -257,7 +257,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
     $this->usePerms(['manage my OAuth contact tokens', 'view my contact']);
     $updateTokensForWrongContact = Civi\Api4\OAuthContactToken::update()
-      ->addWhere('contact.id', '=', $notLoggedInContactID)
+      ->addWhere('contact_id.id', '=', $notLoggedInContactID)
       // ^ sneaky way to update a different contact?
       ->setValues(['access_token' => "stranger-token-revised"])
       ->execute();
@@ -271,7 +271,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
     $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
     $deleteTokensWithLimitedAccess = Civi\Api4\OAuthContactToken::delete()
-      ->setWhere([['client.guid', '=', $client['guid']]])
+      ->setWhere([['client_id.guid', '=', $client['guid']]])
       ->execute();
 
     $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
@@ -309,7 +309,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
     $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
     $getTokens = Civi\Api4\OAuthContactToken::get()
-      ->addWhere('client.provider', '=', $client['provider'])
+      ->addWhere('client_id.provider', '=', $client['provider'])
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
     $this->assertCount(1, $getTokens);
@@ -317,14 +317,14 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
 
     $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
     $getTokens = Civi\Api4\OAuthContactToken::get()
-      ->addWhere('client.provider', '=', $client['provider'])
+      ->addWhere('client_id.provider', '=', $client['provider'])
       ->addWhere('scopes', 'CONTAINS', 'nada')
       ->execute();
     $this->assertCount(0, $getTokens);
 
     $this->usePerms(['manage all OAuth contact tokens', 'view all contacts']);
     $getTokens = Civi\Api4\OAuthContactToken::get()
-      ->addWhere('client.provider', '=', 'some-other-provider')
+      ->addWhere('client_id.provider', '=', 'some-other-provider')
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
     $this->assertCount(0, $getTokens);

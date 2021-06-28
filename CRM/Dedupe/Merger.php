@@ -655,14 +655,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   protected static function getMultiValueCidRefs() {
     $fields = \Civi\Api4\CustomField::get(FALSE)
-      ->addSelect('custom_group.table_name', 'column_name', 'serialize')
+      ->addSelect('custom_group_id.table_name', 'column_name', 'serialize')
       ->addWhere('data_type', '=', 'ContactReference')
       ->addWhere('serialize', 'IS NOT EMPTY')
       ->execute();
 
     $map = [];
     foreach ($fields as $field) {
-      $map[$field['custom_group.table_name']][$field['column_name']] = $field['serialize'];
+      $map[$field['custom_group_id.table_name']][$field['column_name']] = $field['serialize'];
     }
     return $map;
   }

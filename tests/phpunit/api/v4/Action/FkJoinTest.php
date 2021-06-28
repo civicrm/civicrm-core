@@ -107,10 +107,10 @@ class FkJoinTest extends UnitTestCase {
     $contacts = Contact::get(FALSE)
       ->addWhere('id', '=', $this->getReference('test_contact_1')['id'])
       ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
-      ->addSelect('id', 'address.country.iso_code')
+      ->addSelect('id', 'address.country_id.iso_code')
       ->execute();
     $this->assertCount(1, $contacts);
-    $this->assertEquals('US', $contacts[0]['address.country.iso_code']);
+    $this->assertEquals('US', $contacts[0]['address.country_id.iso_code']);
   }
 
   public function testExcludeJoin() {
@@ -292,8 +292,8 @@ class FkJoinTest extends UnitTestCase {
 
     $result = Activity::get(FALSE)
       ->addSelect('id', 'contact.id', 'rel.id')
-      ->addJoin('Contact', FALSE, 'ActivityContact', ['contact.record_type_id:name', '=', "'Activity Targets'"])
-      ->addJoin('Contact AS rel', FALSE, 'RelationshipCache', ['rel.far_contact_id', '=', 'contact.id'], ['rel.near_relation:name', '=', '"Child of"'])
+      ->addJoin('Contact', 'LEFT', 'ActivityContact', ['contact.record_type_id:name', '=', "'Activity Targets'"])
+      ->addJoin('Contact AS rel', 'LEFT', 'RelationshipCache', ['rel.far_contact_id', '=', 'contact.id'], ['rel.near_relation:name', '=', '"Child of"'])
       ->addWhere('contact.id', 'IN', [$cid1, $cid2, $cid3])
       ->addOrderBy('id')
       ->execute();

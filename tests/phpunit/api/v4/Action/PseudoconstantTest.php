@@ -234,26 +234,26 @@ class PseudoconstantTest extends BaseCustomValueTest {
       ->execute()->first()['id'];
 
     $emails = Email::get()
-      ->addSelect('location_type_id:name', 'contact.gender_id:label', 'email', 'contact_id')
+      ->addSelect('location_type_id:name', 'contact_id.gender_id:label', 'email', 'contact_id')
       ->addWhere('contact_id', 'IN', [$cid1, $cid2, $cid3])
-      ->addWhere('contact.gender_id:label', 'IN', ['Male', 'Female'])
+      ->addWhere('contact_id.gender_id:label', 'IN', ['Male', 'Female'])
       ->execute()->indexBy('contact_id');
     $this->assertCount(2, $emails);
     $this->assertEquals('Work', $emails[$cid1]['location_type_id:name']);
     $this->assertEquals('Home', $emails[$cid2]['location_type_id:name']);
-    $this->assertEquals('Male', $emails[$cid1]['contact.gender_id:label']);
-    $this->assertEquals('Female', $emails[$cid2]['contact.gender_id:label']);
+    $this->assertEquals('Male', $emails[$cid1]['contact_id.gender_id:label']);
+    $this->assertEquals('Female', $emails[$cid2]['contact_id.gender_id:label']);
 
     $emails = Email::get()
-      ->addSelect('location_type_id:name', 'contact.gender_id:label', 'email', 'contact_id')
+      ->addSelect('location_type_id:name', 'contact_id.gender_id:label', 'email', 'contact_id')
       ->addWhere('contact_id', 'IN', [$cid1, $cid2, $cid3])
       ->addWhere('location_type_id:name', 'IN', ['Home'])
       ->execute()->indexBy('contact_id');
     $this->assertCount(2, $emails);
     $this->assertEquals('Home', $emails[$cid2]['location_type_id:name']);
     $this->assertEquals('Home', $emails[$cid3]['location_type_id:name']);
-    $this->assertEquals('Female', $emails[$cid2]['contact.gender_id:label']);
-    $this->assertNull($emails[$cid3]['contact.gender_id:label']);
+    $this->assertEquals('Female', $emails[$cid2]['contact_id.gender_id:label']);
+    $this->assertNull($emails[$cid3]['contact_id.gender_id:label']);
   }
 
   public function testTagOptions() {

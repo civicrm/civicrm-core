@@ -200,16 +200,16 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
   public function readNameByActSubjectJoin_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.subject', '=', $strs['api'])
-      ->addSelect('contact.first_name')
+      ->addWhere('activity_id.subject', '=', $strs['api'])
+      ->addSelect('contact_id.first_name')
       ->execute();
-    return $get->first()['contact.first_name'];
+    return $get->first()['contact_id.first_name'];
   }
 
   public function readNameByActSubjectChain_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.subject', '=', $strs['api'])
+      ->addWhere('activity_id.subject', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([
         'the_contact' => [
@@ -252,16 +252,16 @@ class ContactInterchangeTest extends UnitTestCase implements TransactionalInterf
   public function readNameByActDetailsJoin_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.details', '=', $strs['api'])
-      ->addSelect('contact.first_name')
+      ->addWhere('activity_id.details', '=', $strs['api'])
+      ->addSelect('contact_id.first_name')
       ->execute();
-    return $get->first()['contact.first_name'];
+    return $get->first()['contact_id.first_name'];
   }
 
   public function readNameByActDetailsChain_4($cid, $strs) {
     $get = ActivityContact::get()
       ->addWhere('record_type_id:label', '=', 'Activity Source')
-      ->addWhere('activity.details', '=', $strs['api'])
+      ->addWhere('activity_id.details', '=', $strs['api'])
       ->setSelect(['activity_id', 'contact_id'])
       ->setChain([
         'the_contact' => [

@@ -522,13 +522,13 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'contribution_page_id',
         'contact_id',
         'contribution_recur_id',
-        'contribution_recur.is_email_receipt',
-        'contribution_page.title',
-        'contribution_page.is_email_receipt',
-        'contribution_page.receipt_from_name',
-        'contribution_page.receipt_from_email',
-        'contribution_page.cc_receipt',
-        'contribution_page.bcc_receipt',
+        'contribution_recur_id.is_email_receipt',
+        'contribution_page_id.title',
+        'contribution_page_id.is_email_receipt',
+        'contribution_page_id.receipt_from_name',
+        'contribution_page_id.receipt_from_email',
+        'contribution_page_id.cc_receipt',
+        'contribution_page_id.bcc_receipt',
       ])
       ->execute()->first();
 
@@ -537,10 +537,10 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       ->addWhere('entity_table', '=', 'civicrm_membership')
       ->addSelect('id')->execute()->first());
 
-    if ($contribution['contribution_recur.is_email_receipt'] || $contribution['contribution_page.is_email_receipt']) {
-      if ($contribution['contribution_page.receipt_from_email']) {
-        $receiptFromName = $contribution['contribution_page.receipt_from_name'];
-        $receiptFromEmail = $contribution['contribution_page.receipt_from_email'];
+    if ($contribution['contribution_recur_id.is_email_receipt'] || $contribution['contribution_page_id.is_email_receipt']) {
+      if ($contribution['contribution_page_id.receipt_from_email']) {
+        $receiptFromName = $contribution['contribution_page_id.receipt_from_name'];
+        $receiptFromEmail = $contribution['contribution_page_id.receipt_from_email'];
       }
       else {
         [$receiptFromName, $receiptFromEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
@@ -570,8 +570,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'toEmail' => $email,
       ];
       //CRM-13811
-      $templatesParams['cc'] = $contribution['contribution_page.cc_receipt'];
-      $templatesParams['bcc'] = $contribution['contribution_page.cc_receipt'];
+      $templatesParams['cc'] = $contribution['contribution_page_id.cc_receipt'];
+      $templatesParams['bcc'] = $contribution['contribution_page_id.cc_receipt'];
       if ($recur->id) {
         // in some cases its just recurringNotify() thats called for the first time and these urls don't get set.
         // like in PaypalPro, & therefore we set it here additionally.
