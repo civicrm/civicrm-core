@@ -1039,16 +1039,23 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       $callerClass = $dbt[1]['class'] ?? NULL;
       $oldMethod = "{$callerClass}::{$callerFunction}";
     }
-    self::deprecatedWarning("Deprecated function $oldMethod, use $newMethod.");
+    $message = "Deprecated function $oldMethod, use $newMethod.";
+    Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
+    trigger_error($message, E_USER_DEPRECATED);
   }
 
   /**
    * Output a deprecated notice about a deprecated call path, rather than deprecating a whole function.
+   *
    * @param string $message
    */
   public static function deprecatedWarning($message) {
     // Even though the tag is no longer used within the log() function,
     // \Civi\API\LogObserver instances may still be monitoring it.
+    $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+    $callerFunction = $dbt[2]['function'] ?? NULL;
+    $callerClass = $dbt[2]['class'] ?? NULL;
+    $message .= " Caller: {$callerClass}::{$callerFunction}";
     Civi::log()->warning($message, ['civi.tag' => 'deprecated']);
     trigger_error($message, E_USER_DEPRECATED);
   }
