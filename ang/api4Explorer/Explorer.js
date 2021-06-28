@@ -351,6 +351,16 @@
           }
         }
       });
+      _.each(params.join, function(join) {
+        // Add alias if not specified
+        if (!_.contains(join[0], 'AS')) {
+          join[0] += ' AS ' + join[0].toLowerCase();
+        }
+        // Remove EntityBridge from join if empty
+        if (!join[2]) {
+          join.splice(2, 1);
+        }
+      });
       _.each(objectParams, function(defaultVal, key) {
         if (params[key]) {
           var newParam = {};
@@ -358,7 +368,7 @@
             var val = _.cloneDeep(item[1]);
             // Remove blank items from "chain" array
             if (_.isArray(val)) {
-              _.eachRight(item[1], function(v, k) {
+              _.eachRight(item[1], function(v) {
                 if (v) {
                   return false;
                 }
@@ -751,6 +761,10 @@
           _.each(param, function(chain, name) {
             code += newLine + "->addChain('" + name + "', " + formatOOP(chain[0], chain[1], chain[2], 2 + indent);
             code += (chain.length > 3 ? ',' : '') + (!_.isEmpty(chain[2]) ? newLine : ' ') + (chain.length > 3 ? phpFormat(chain[3]) : '') + ')';
+          });
+        } else if (key === 'join') {
+          _.each(param, function(join) {
+            code += newLine + "->addJoin(" + phpFormat(join).slice(1, -1) + ')';
           });
         }
         else if (key !== 'checkPermissions') {
@@ -1326,6 +1340,8 @@
 
   function getExplicitJoins() {
     return _.transform(params.join, function(joins, join) {
+      // Fix capitalization of AS
+      join[0] = join[0].replace(/ as /i, ' AS ');
       var j = join[0].split(' AS '),
         joinEntity = _.trim(j[0]),
         joinAlias = _.trim(j[1]) || joinEntity.toLowerCase();
