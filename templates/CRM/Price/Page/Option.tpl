@@ -58,7 +58,7 @@
           </thead>
           <tbody>
           {foreach from=$customOption item=row}
-            <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+            <tr id="price_field_value-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
               <td class="crm-price-option-label crm-editable" data-field="label">{$row.label}</td>
               <td class="crm-price-option-value">{$row.amount|crmMoney}</td>
               <td class="crm-price-option-non-deductible-amount">{$row.non_deductible_amount|crmMoney}</td>

@@ -28,7 +28,7 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td>{$row.entity}</td>
           <td>{$row.object_table}</td>
           <td>{$row.action}</td>

@@ -27,7 +27,7 @@
               <th></th>
             </tr>
             {foreach from=$rows item=row}
-            <tr class="{cycle values="odd-row,even-row"} {$row.class} crm-mapping">
+            <tr class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-mapping">
                 <td class="crm-mapping-name">{$row.name}</td>
                 <td class="crm-mapping-description">{$row.description}</td>
                 <td class="crm-mapping-mapping_type">{$row.mapping_type}</td>

@@ -29,7 +29,7 @@
         <th></th>
         </thead>
        {foreach from=$rows item=row}
-         <tr id="mailing_component-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+         <tr id="mailing_component-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
            <td class="crm-editable" data-field="name">{$row.name}</td>
            <td>{$row.component_type}</td>
            <td>{$row.subject}</td>

@@ -34,7 +34,7 @@
 
       {counter start=0 skip=1 print=false}
       {foreach from=$rows item=row}
-      <tr class="{cycle values="odd-row,even-row"} {$row.class} crm-activity crm-activity_status-{$row.activity_status_id} crm-activity-type_{$row.activity_type_id}" id="crm-activity_{$row.activity_id}">
+      <tr class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-activity crm-activity_status-{$row.activity_status_id} crm-activity-type_{$row.activity_type_id}" id="crm-activity_{$row.activity_id}">
         <td class="crm-activity-type crm-activity-type_{$row.activity_type_id}">{$row.activity_type}</td>
         <td class="crm-activity-subject">{$row.subject}</td>
         <td class="crm-activity-source_contact_name">

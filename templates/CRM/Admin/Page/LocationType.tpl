@@ -34,7 +34,7 @@
       </tr>
     </thead>
     {foreach from=$rows item=row}
-    <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
+    <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if} crm-entity {if NOT $row.is_active} disabled{/if}">
         <td class="crmf-name">{$row.name}</td>
         <td class="crmf-display_name crm-editable">{$row.display_name}</td>
         <td class="crmf-vcard_name crm-editable">{if !empty($row.vcard_name)}{$row.vcard_name}{/if}</td>

@@ -29,7 +29,7 @@
         <th></th>
       </thead>
       {foreach from=$rows item=row}
-       <tr id="participant_status_type-{$row.id}" class="crm-entity crm-participant_{$row.id} {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+       <tr id="participant_status_type-{$row.id}" class="crm-entity crm-participant_{$row.id} {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td class="crmf-label crm-editable" data-field="label">{$row.label}</td>
           <td class="crmf-name">{$row.name} ({$row.id})</td>
           <td class="crmf-class {if empty($row.is_reserved)} crm-editable {/if}" data-type="select">{$row.class}</td>

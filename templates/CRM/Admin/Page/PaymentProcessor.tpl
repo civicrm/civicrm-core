@@ -34,7 +34,7 @@
             <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="payment_processor-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
             <td class="crmf-id center">{$row.id}</td>
             <td class="crmf-test_id center">{$row.test_id}</td>
             <td class="crmf-name">{$row.name}</td>

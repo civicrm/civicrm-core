@@ -39,7 +39,7 @@
           <th></th>
         </tr>
         {foreach from=$rows item=row}
-        <tr id="optionGroup-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+        <tr id="optionGroup-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-admin-optionGroup-title">{if $row.title}{$row.title}{else}( {ts}none{/ts} ){/if}</td>
           <td class="crm-admin-optionGroup-name">{$row.name}</td>
           <td class="crm-admin-optionGroup-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>

@@ -48,7 +48,7 @@
           </tr>
           </thead>
           {foreach from=$rows item=row}
-            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"} {$row.class}">
+            <tr id="row_{$row.id}" class="crm-labelFormat {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
               <td class="crm-labelFormat-name">{$row.label}</td>
               <td class="crm-labelFormat-name">{$row.groupName}</td>
               <td class="crm-labelFormat-order nowrap">{$row.weight}</td>

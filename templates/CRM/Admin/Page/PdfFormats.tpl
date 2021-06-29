@@ -47,7 +47,7 @@
         </tr>
         </thead>
         {foreach from=$rows item=row}
-        <tr id="row_{$row.id}" class="crm-pdfFormat {cycle values="odd-row,even-row"} {$row.class}">
+        <tr id="row_{$row.id}" class="crm-pdfFormat {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}">
             <td class="crm-pdfFormat-name">{$row.name}</td>
             <td class="crm-pdfFormat-description">{$row.description}</td>
             <td class="crm-pdfFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
