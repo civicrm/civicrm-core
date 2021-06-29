@@ -417,9 +417,7 @@ abstract class AbstractAction implements \ArrayAccess {
    * Returns schema fields for this entity & action.
    *
    * Here we bypass the api wrapper and run the getFields action directly.
-   * This is because we DON'T want the wrapper to check permissions as this is an internal op,
-   * but we DO want permissions to be checked inside the getFields request so e.g. the api_key
-   * field can be conditionally included.
+   * This is because we DON'T want the wrapper to check permissions as this is an internal op.
    * @see \Civi\Api4\Action\Contact\GetFields
    *
    * @throws \API_Exception
@@ -433,7 +431,7 @@ abstract class AbstractAction implements \ArrayAccess {
       }
       $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
         'version' => 4,
-        'checkPermissions' => $this->checkPermissions,
+        'checkPermissions' => FALSE,
         'action' => $this->getActionName(),
         'where' => [['type', 'IN', $allowedTypes]],
       ]);
