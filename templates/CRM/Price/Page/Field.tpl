@@ -58,7 +58,7 @@
       </tr>
       </thead>
       {foreach from=$priceField key=fid item=row}
-      <tr id="price_field-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+      <tr id="price_field-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"}{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
         <td class="crm-editable" data-field="label">{$row.label}</td>
         <td>{$row.html_type_display}</td>
         <td class="nowrap">{$row.weight}</td>

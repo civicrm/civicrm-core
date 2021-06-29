@@ -69,7 +69,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if !$row.is_reserved }
-              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
                 <td class="crmf-frontend_title crm-editable">{$row.frontend_title}</td>
                 <td>
@@ -114,7 +114,7 @@
             <tbody>
             {foreach from=$rows item=row}
             {if $row.is_reserved}
-              <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
+              <tr id="UFGroup-{$row.id}" class="crm-entity{if !empty($row.class)} {$row.class}{/if}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
                 <td>{$row.frontend_title}</td>
                 <td>
