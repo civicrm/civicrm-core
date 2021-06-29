@@ -70,6 +70,9 @@ class Joiner {
       if ($joinEntity && !$query->checkEntityAccess($joinEntity)) {
         throw new UnauthorizedException('Cannot join to ' . $joinEntity);
       }
+      if ($link->isDeprecated()) {
+        \CRM_Core_Error::deprecatedWarning("Deprecated join alias '$alias' used in APIv4 get. Should be changed to '{$alias}_id'");
+      }
 
       $bao = $joinEntity ? CoreUtil::getBAOFromApiName($joinEntity) : NULL;
       $conditions = $link->getConditionsForJoin($baseTableAlias);

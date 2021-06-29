@@ -57,10 +57,10 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
 
     // Can also be fetched via join
     $email = Email::get()
-      ->addSelect('contact.api_key')
+      ->addSelect('contact_id.api_key')
       ->addWhere('id', '=', $contact['email']['id'])
       ->execute()->first();
-    $this->assertEquals($key, $email['contact.api_key']);
+    $this->assertEquals($key, $email['contact_id.api_key']);
     $this->assertFalse($isSafe($email), "Should reveal secret details ($key): " . var_export($email, 1));
 
     // Remove permission and we should not see the key
@@ -76,12 +76,12 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
 
     // Also not available via join
     $email = Email::get()
-      ->addSelect('contact.api_key')
+      ->addSelect('contact_id.api_key')
       ->addWhere('id', '=', $contact['email']['id'])
       ->setDebug(TRUE)
       ->execute();
-    $this->assertContains('contact.api_key', $email->debug['undefined_fields']);
-    $this->assertArrayNotHasKey('contact.api_key', $email[0]);
+    $this->assertContains('contact_id.api_key', $email->debug['undefined_fields']);
+    $this->assertArrayNotHasKey('contact_id.api_key', $email[0]);
     $this->assertTrue($isSafe($email[0]), "Should NOT reveal secret details ($key): " . var_export($email[0], 1));
 
     $result = Contact::get()
@@ -137,14 +137,14 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     $result = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->addSelect('email')
-      ->addSelect('contact.api_key')
+      ->addSelect('contact_id.api_key')
       ->execute()
       ->first();
     $this->assertFalse($isSafe($result), "Should reveal secret details ($key): " . var_export($result, 1));
 
     $result = Email::get(TRUE)
       ->addWhere('contact_id', '=', $contact['id'])
-      ->addSelect('contact.api_key')
+      ->addSelect('contact_id.api_key')
       ->execute()
       ->first();
     $this->assertTrue($isSafe($result), "Should NOT reveal secret details ($key): " . var_export($result, 1));

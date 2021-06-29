@@ -28,9 +28,9 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
     $event_rows = [];
 
     $participants = \Civi\Api4\Participant::get(FALSE)
-      ->addSelect('id', 'contact_id', 'status_id:name', 'status_id:label', 'event.id', 'event.title', 'event.start_date', 'event.end_date')
+      ->addSelect('id', 'contact_id', 'status_id:name', 'status_id:label', 'event_id', 'event_id.title', 'event_id.start_date', 'event_id.end_date')
       ->addWhere('contact_id', '=', $this->_contactId)
-      ->addOrderBy('event.start_date', 'DESC')
+      ->addOrderBy('event_id.start_date', 'DESC')
       ->execute()
       ->indexBy('id');
 
@@ -39,10 +39,10 @@ class CRM_Event_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
       $p['participant_id'] = $p['id'];
       $p['status'] = $p['status_id:name'];
       $p['participant_status'] = $p['status_id:label'];
-      $p['event_id'] = $p['event.id'];
-      $p['event_title'] = $p['event.title'];
-      $p['event_start_date'] = $p['event.start_date'];
-      $p['event_end_date'] = $p['event.end_date'];
+      $p['event_id'] = $p['event_id'];
+      $p['event_title'] = $p['event_id.title'];
+      $p['event_start_date'] = $p['event_id.start_date'];
+      $p['event_end_date'] = $p['event_id.end_date'];
 
       $event_rows[] = $p;
     }

@@ -236,7 +236,7 @@ trait DAOActionTrait {
           $field['id'],
           $customParams,
           $value,
-          $field['custom_group.extends'],
+          $field['custom_group_id.extends'],
           // todo check when this is needed
           NULL,
           $entityId,
@@ -270,13 +270,13 @@ trait DAOActionTrait {
     if (!isset($info[$fieldName])) {
       $info = [];
       $fields = CustomField::get(FALSE)
-        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group.extends')
-        ->addWhere('custom_group.name', '=', $groupName)
+        ->addSelect('id', 'name', 'html_type', 'data_type', 'custom_group_id.extends')
+        ->addWhere('custom_group_id.name', '=', $groupName)
         ->execute()->indexBy('name');
       foreach ($fields as $name => $field) {
         $field['custom_field_id'] = $field['id'];
         $field['name'] = $groupName . '.' . $name;
-        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group.extends']);
+        $field['entity'] = CustomGroupJoinable::getEntityFromExtends($field['custom_group_id.extends']);
         $info[$name] = $field;
       }
       \Civi::cache('metadata')->set($cacheKey, $info);

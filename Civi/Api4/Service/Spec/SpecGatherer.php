@@ -128,9 +128,9 @@ class SpecGatherer {
       $extends = $customInfo['extends'];
     }
     $customFields = CustomField::get(FALSE)
-      ->addWhere('custom_group.extends', 'IN', $extends)
-      ->addWhere('custom_group.is_multiple', '=', '0')
-      ->setSelect(['custom_group.name', 'custom_group.title', '*'])
+      ->addWhere('custom_group_id.extends', 'IN', $extends)
+      ->addWhere('custom_group_id.is_multiple', '=', '0')
+      ->setSelect(['custom_group_id.name', 'custom_group_id.title', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {
@@ -145,8 +145,8 @@ class SpecGatherer {
    */
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get(FALSE)
-      ->addWhere('custom_group.name', '=', $customGroup)
-      ->setSelect(['custom_group.name', 'custom_group.table_name', 'custom_group.title', '*'])
+      ->addWhere('custom_group_id.name', '=', $customGroup)
+      ->setSelect(['custom_group_id.name', 'custom_group_id.table_name', 'custom_group_id.title', '*'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {

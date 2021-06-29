@@ -438,7 +438,7 @@ class CRM_Financial_BAO_Order {
   public function getDefaultPriceField() {
     return PriceField::get(FALSE)
       ->addWhere('name', '=', 'contribution_amount')
-      ->addWhere('price_set.name', '=', 'default_contribution_amount')
+      ->addWhere('price_set_id.name', '=', 'default_contribution_amount')
       ->execute()->first()['id'];
   }
 

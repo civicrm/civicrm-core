@@ -70,7 +70,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $updateToken = Civi\Api4\OAuthSysToken::update()
-      ->setWhere([['client.guid', '=', "example-id-$random"]])
+      ->setWhere([['client_id.guid', '=', "example-id-$random"]])
       ->setValues(['access_token' => "revised-access-token-$random"])
       ->execute();
 
@@ -141,7 +141,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $usePerms(['manage OAuth client']);
     try {
       Civi\Api4\OAuthSysToken::update()
-        ->setWhere([['client.guid', '=', "example-id-$random"]])
+        ->setWhere([['client_id.guid', '=', "example-id-$random"]])
         ->setValues(['access_token' => "revised-access-token-$random"])
         ->execute();
       $this->fail('Expected exception - User should not be able to write secret values.');
@@ -191,7 +191,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()
-      ->addWhere('client.provider', '=', 'test_example_1')
+      ->addWhere('client_id.provider', '=', 'test_example_1')
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
     $this->assertEquals(1, count($getTokens));
@@ -199,14 +199,14 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()
-      ->addWhere('client.provider', '=', 'test_example_1')
+      ->addWhere('client_id.provider', '=', 'test_example_1')
       ->addWhere('scopes', 'CONTAINS', 'nada')
       ->execute();
     $this->assertEquals(0, count($getTokens));
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()
-      ->addWhere('client.provider', '=', 'test_example_2')
+      ->addWhere('client_id.provider', '=', 'test_example_2')
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
     $this->assertEquals(0, count($getTokens));

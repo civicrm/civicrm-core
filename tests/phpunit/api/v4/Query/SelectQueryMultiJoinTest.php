@@ -37,7 +37,7 @@ class SelectQueryMultiJoinTest extends UnitTestCase {
 
   public function testManyToOneSelect() {
     $results = Email::get()
-      ->addSelect('contact.display_name')
+      ->addSelect('contact_id.display_name')
       ->execute()
       ->indexBy('id');
 
@@ -49,7 +49,7 @@ class SelectQueryMultiJoinTest extends UnitTestCase {
     $secondContactEmailIds = [$thirdEmail['id'], $fourthEmail['id']];
 
     foreach ($results as $id => $email) {
-      $displayName = $email['contact.display_name'];
+      $displayName = $email['contact_id.display_name'];
       if (in_array($id, $firstContactEmailIds)) {
         $this->assertEquals('First Contact', $displayName);
       }

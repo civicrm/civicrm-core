@@ -75,29 +75,29 @@ class ContactTypeTest extends UnitTestCase {
 
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', 'IN', [$indiv, $org, $hh])
-      ->addSelect('id', 'contact_id', 'contact.*', 'contact.prefix_id:label')
+      ->addSelect('id', 'contact_id', 'contact_id.*', 'contact_id.prefix_id:label')
       ->execute()
       ->indexBy('contact_id');
 
-    $this->assertArrayHasKey('contact.first_name', $emails[$indiv]);
-    $this->assertArrayNotHasKey('contact.first_name', $emails[$org]);
-    $this->assertArrayNotHasKey('contact.first_name', $emails[$hh]);
+    $this->assertArrayHasKey('contact_id.first_name', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact_id.first_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact_id.first_name', $emails[$hh]);
 
-    $this->assertEquals('Dr.', $emails[$indiv]['contact.prefix_id:label']);
-    $this->assertArrayNotHasKey('contact.prefix_id:label', $emails[$org]);
-    $this->assertArrayNotHasKey('contact.prefix_id:label', $emails[$hh]);
+    $this->assertEquals('Dr.', $emails[$indiv]['contact_id.prefix_id:label']);
+    $this->assertArrayNotHasKey('contact_id.prefix_id:label', $emails[$org]);
+    $this->assertArrayNotHasKey('contact_id.prefix_id:label', $emails[$hh]);
 
-    $this->assertArrayHasKey('contact.organization_name', $emails[$org]);
-    $this->assertArrayNotHasKey('contact.organization_name', $emails[$indiv]);
-    $this->assertArrayNotHasKey('contact.organization_name', $emails[$hh]);
+    $this->assertArrayHasKey('contact_id.organization_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact_id.organization_name', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact_id.organization_name', $emails[$hh]);
 
-    $this->assertArrayHasKey('contact.sic_code', $emails[$org]);
-    $this->assertArrayNotHasKey('contact.sic_code', $emails[$indiv]);
-    $this->assertArrayNotHasKey('contact.sic_code', $emails[$hh]);
+    $this->assertArrayHasKey('contact_id.sic_code', $emails[$org]);
+    $this->assertArrayNotHasKey('contact_id.sic_code', $emails[$indiv]);
+    $this->assertArrayNotHasKey('contact_id.sic_code', $emails[$hh]);
 
-    $this->assertArrayHasKey('contact.household_name', $emails[$hh]);
-    $this->assertArrayNotHasKey('contact.household_name', $emails[$org]);
-    $this->assertArrayNotHasKey('contact.household_name', $emails[$indiv]);
+    $this->assertArrayHasKey('contact_id.household_name', $emails[$hh]);
+    $this->assertArrayNotHasKey('contact_id.household_name', $emails[$org]);
+    $this->assertArrayNotHasKey('contact_id.household_name', $emails[$indiv]);
 
   }
 

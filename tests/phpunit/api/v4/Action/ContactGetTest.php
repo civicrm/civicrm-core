@@ -96,7 +96,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       $msg = $e->getMessage();
     }
     $this->assertRegExp(';Expected to find one Contact record;', $msg);
-    $limit1 = Contact::get(FALSE)->setLimit(1)->execute();
+    $limit1 = Contact::get(FALSE)->addWhere('last_name', '=', $last_name)->setLimit(1)->execute();
     $this->assertCount(1, (array) $limit1);
     $this->assertCount(1, $limit1);
     $this->assertTrue(!empty($limit1->single()['sort_name']));

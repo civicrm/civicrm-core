@@ -91,13 +91,13 @@ class PermissionCheckTest extends UnitTestCase {
       0)
       ->execute()->first();
     $participant = Participant::get()
-      ->addSelect('contact.first_name', 'event.title')
-      ->addWhere('event.id', '=', $event['id'])
+      ->addSelect('contact_id.first_name', 'event_id.title')
+      ->addWhere('event_id.id', '=', $event['id'])
       ->execute()
       ->first();
 
-    $this->assertEquals('ABC123 Event', $participant['event.title']);
-    $this->assertEquals($name, $participant['contact.first_name']);
+    $this->assertEquals('ABC123 Event', $participant['event_id.title']);
+    $this->assertEquals($name, $participant['contact_id.first_name']);
 
     // Remove access to view events
     $config->userPermissionClass->permissions = [
@@ -107,14 +107,14 @@ class PermissionCheckTest extends UnitTestCase {
       'view event participants',
     ];
     $participant = Participant::get()
-      ->addSelect('contact.first_name')
-      ->addSelect('event.title')
+      ->addSelect('contact_id.first_name')
+      ->addSelect('event_id.title')
       ->addWhere('id', '=', $contact['participant']['id'])
       ->execute()
       ->first();
 
-    $this->assertTrue(empty($participant['event.title']));
-    $this->assertEquals($name, $participant['contact.first_name']);
+    $this->assertTrue(empty($participant['event_id.title']));
+    $this->assertEquals($name, $participant['contact_id.first_name']);
 
   }
 

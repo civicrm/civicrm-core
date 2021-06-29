@@ -78,10 +78,10 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
 
     $locationBlock = Event::get()
       ->addWhere('id', '=', $eventID)
-      ->setSelect(['loc_block.*', 'loc_block_id'])
+      ->setSelect(['loc_block_id.*', 'loc_block_id'])
       ->execute()->first();
 
-    $address = $this->callAPISuccessGetSingle('Address', ['id' => $locationBlock['loc_block.address_id']]);
+    $address = $this->callAPISuccessGetSingle('Address', ['id' => $locationBlock['loc_block_id.address_id']]);
 
     $this->assertEquals([
       'id' => $address['id'],
@@ -101,9 +101,9 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
       'manual_geo_code' => '0',
     ], $address);
 
-    $this->callAPISuccessGetSingle('Email', ['id' => $locationBlock['loc_block.email_id'], 'email' => 'john.smith@example.org']);
-    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block.phone_id'], 'phone' => '303443689']);
-    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block.phone_2_id'], 'phone' => '9833910234']);
+    $this->callAPISuccessGetSingle('Email', ['id' => $locationBlock['loc_block_id.email_id'], 'email' => 'john.smith@example.org']);
+    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block_id.phone_id'], 'phone' => '303443689']);
+    $this->callAPISuccessGetSingle('Phone', ['id' => $locationBlock['loc_block_id.phone_2_id'], 'phone' => '9833910234']);
 
     // Cleanup.
     CRM_Core_BAO_Location::deleteLocBlock($locationBlock['loc_block_id']);
@@ -255,12 +255,12 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
     $firstEmail = $emails->first();
     $locationBlock = Event::get()
       ->addWhere('id', '=', $eventID)
-      ->setSelect(['loc_block.*', 'loc_block_id'])
+      ->setSelect(['loc_block_id.*', 'loc_block_id'])
       ->execute()->first();
     $this->ids['LocBlock'][0] = $locationBlock['loc_block_id'];
-    $this->assertEquals($firstEmail['id'], $locationBlock['loc_block.email_id']);
+    $this->assertEquals($firstEmail['id'], $locationBlock['loc_block_id.email_id']);
     $secondEmail = $emails->last();
-    $this->assertEquals($secondEmail['id'], $locationBlock['loc_block.email_2_id']);
+    $this->assertEquals($secondEmail['id'], $locationBlock['loc_block_id.email_2_id']);
     return $emails;
   }
 
