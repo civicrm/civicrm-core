@@ -34,10 +34,9 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
-    $this->setContactIDs();
+    CRM_Case_Form_Task_PDFLetterCommon::preProcess($this);
   }
 
   /**
@@ -46,21 +45,21 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
    * @return array
    */
   public function setDefaultValues() {
-    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
+    return CRM_Case_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    CRM_Case_Form_Task_PDFLetterCommon::buildQuickForm($this);
   }
 
   /**
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
+    CRM_Case_Form_Task_PDFLetterCommon::postProcess($this);
   }
 
   /**
@@ -69,12 +68,7 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
    * @return array
    */
   public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    foreach ($this->_entityIds as $key => $caseId) {
-      $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseId, 'case_type_id');
-      $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
-    }
-    return $tokens;
+    return CRM_Case_Form_Task_PDFLetterCommon::listTokens();
   }
 
 }
