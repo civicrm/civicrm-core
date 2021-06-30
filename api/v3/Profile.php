@@ -500,7 +500,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
   if (isset($profileFields[$profileID])) {
     return $profileFields[$profileID];
   }
-  $fields = civicrm_api3('uf_field', 'get', ['uf_group_id' => $profileID]);
+  $fields = civicrm_api3('uf_field', 'get', ['uf_group_id' => $profileID, 'options' => ['limit' => 0]]);
   $entities = [];
   foreach ($fields['values'] as $field) {
     if (!$field['is_active']) {
