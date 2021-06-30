@@ -493,7 +493,8 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
     $this->_from .= "
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
-                        {$this->_aliases['civicrm_contribution']}.is_test = 0
+                        {$this->_aliases['civicrm_contribution']}.is_test = 0 AND
+                        {$this->_aliases['civicrm_contribution']}.is_template = 0
              {$softCreditJoin}
              LEFT  JOIN civicrm_financial_type  {$this->_aliases['civicrm_financial_type']}
                      ON {$this->_aliases['civicrm_contribution']}.financial_type_id ={$this->_aliases['civicrm_financial_type']}.id

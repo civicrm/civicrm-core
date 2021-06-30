@@ -387,7 +387,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
     $this->_from = "FROM  civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom}
               INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
                     ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
-                         {$this->_aliases['civicrm_contribution']}.is_test = 0
+                         {$this->_aliases['civicrm_contribution']}.is_test = 0 AND
+                         {$this->_aliases['civicrm_contribution']}.is_template = 0
               LEFT JOIN civicrm_membership_payment payment
                     ON ( {$this->_aliases['civicrm_contribution']}.id = payment.contribution_id )
               LEFT JOIN civicrm_membership {$this->_aliases['civicrm_membership']}

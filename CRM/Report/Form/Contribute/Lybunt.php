@@ -307,6 +307,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
         INNER JOIN $this->contactTempTable restricted_contacts
           ON restricted_contacts.cid = {$this->_aliases['civicrm_contribution']}.contact_id
           AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+          AND {$this->_aliases['civicrm_contribution']}.is_template = 0
         INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
           ON restricted_contacts.cid = {$this->_aliases['civicrm_contact']}.id";
 
@@ -326,6 +327,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       }
       $this->_from .= " ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id
          AND {$this->_aliases['civicrm_contribution']}.is_test = 0
+         AND {$this->_aliases['civicrm_contribution']}.is_template = 0
          AND " . $this->whereClauseLastYear("{$this->_aliases['civicrm_contribution']}.receive_date") . "
        {$this->_aclFrom} ";
       $this->selectivelyAddLocationTablesJoinsToFilterQuery();
