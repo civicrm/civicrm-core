@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "439af216e22a835897b747b0773da717",
+    "content-hash": "d3072858bd39b61c20a204de8000e68f",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -3977,11 +3977,6 @@
                 "zetacomponents/unit-test": "*"
             },
             "type": "library",
-            "extra": {
-                "patches_applied": {
-                    "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
-                }
-            },
             "autoload": {
                 "classmap": [
                     "src"
@@ -4034,6 +4029,10 @@
             ],
             "description": "The component allows you construct and/or parse Mail messages conforming to  the mail standard. It has support for attachments, multipart messages and HTML  mail. It also interfaces with SMTP to send mail or IMAP, POP3 or mbox to  retrieve e-mail.",
             "homepage": "https://github.com/zetacomponents",
+            "support": {
+                "issues": "https://github.com/zetacomponents/Mail/issues",
+                "source": "https://github.com/zetacomponents/Mail/tree/1.9.2"
+            },
             "time": "2020-06-13T12:38:26+00:00"
         }
     ],
