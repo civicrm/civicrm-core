@@ -150,14 +150,40 @@
         <div><label for="edit_role_contact_id">{ts}Change To{/ts}:</label></div>
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
-
+      <div id="caseRoles-selector-show-active">
+        {* add checkbox to show only active role on case, default value is unchecked (it show all roles) *}
+        {if $caseDetails.status_class eq 'Opened'}{assign var=statusclass value='0'}{else}{assign var=statusclass value='1'}{/if}
+        <label><input type="checkbox" id="role_inactive" name="role_inactive[]">{ts}Show Inactive relationships{/ts}</label>
+      </div>
+      {literal}
+        <script type="text/javascript">
+            (function($) {
+                var statusClass = {/literal}{$statusclass}{literal};
+                // for closed cases, 'Show Inactive relationships' checkbox is checked on page load.
+                if (statusClass) {
+                  CRM.$("#role_inactive").prop("checked", true);
+                }
+                // hide the inactive role when checkbox is checked
+                $('input[type=checkbox][id=role_inactive]').change(function() {
+                  if (this.checked == true) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
+                  } else if (this.checked == false) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
+                  }
+                });
+            })(CRM.$);
+        </script>
+      {/literal}
       <table id="caseRoles-selector-{$caseID}"  class="report-layout crm-ajax-table" data-page-length="10">
         <thead>
           <tr>
             <th data-data="relation">{ts}Case Role{/ts}</th>
-            <th data-data="name">{ts}Name{/ts}</th>
+            <th data-data="sort_name">{ts}Name{/ts}</th>
             <th data-data="phone">{ts}Phone{/ts}</th>
             <th data-data="email">{ts}Email{/ts}</th>
+            <th data-data="end_date">{ts}End Date{/ts}</th>
             {if $relId neq 'client' and $hasAccessToAllCases}
               <th data-data="actions" data-orderable="false">{ts}Actions{/ts}</th>
             {/if}
@@ -170,7 +196,17 @@
             var caseId = {/literal}{$caseID}{literal};
             CRM.$('table#caseRoles-selector-' + caseId).data({
               "ajax": {
-                "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal}
+                "url": {/literal}'{crmURL p="civicrm/ajax/caseroles" h=0 q="snippet=4&caseID=$caseId&cid=$contactID&userID=$userID"}'{literal},
+                "complete" : function(){
+                  if (CRM.$('input[type=checkbox][id=role_inactive]').prop('checked')) {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').hide();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').show();
+                  }
+                  else {
+                    CRM.$('[id^=caseRoles-selector] tbody tr').not('.disabled').show();
+                    CRM.$('[id^=caseRoles-selector] tbody tr.disabled').hide();
+                  }
+                }
               }
             });
           })(CRM.$);

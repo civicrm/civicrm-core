@@ -78,12 +78,18 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $statuses = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($this->_caseID, 'name');
     $caseType = CRM_Case_BAO_Case::getCaseType($this->_caseID);
+    $statusClass = civicrm_api3('OptionValue', 'getsingle', [
+      'option_group_id' => "case_status",
+      'value' => $values['case_status_id'],
+      'return' => 'grouping',
+    ]);
 
     $this->_caseDetails = [
       'case_type' => $caseType,
       'case_status' => $statuses[$values['case_status_id']] ?? NULL,
       'case_subject' => $values['subject'] ?? NULL,
       'case_start_date' => $values['case_start_date'],
+      'status_class' => $statusClass['grouping'],
     ];
     $this->_caseType = $caseTypeName;
     $this->assign('caseDetails', $this->_caseDetails);
@@ -286,7 +292,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     self::activityForm($this, $aTypes);
 
     //get case related relationships (Case Role)
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID);
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($this->_contactID, $this->_caseID, NULL, FALSE);
 
     //save special label because we unset it in the loop
     $managerLabel = empty($managerRoleId) ? '' : $caseRoles[$managerRoleId];
@@ -467,7 +473,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     //build reporter select
     $reporters = ["" => ts(' - any reporter - ')];
     foreach ($caseRelationships as $key => & $value) {
-      $reporters[$value['cid']] = $value['name'] . " ( {$value['relation']} )";
+      $reporters[$value['cid']] = $value['sort_name'] . " ( {$value['relation']} )";
     }
     $form->add('select', 'reporter_id', ts('Reporter/Role'), $reporters, FALSE, ['id' => 'reporter_id_' . $form->_caseID]);
 

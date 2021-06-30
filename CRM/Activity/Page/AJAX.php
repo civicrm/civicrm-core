@@ -88,7 +88,7 @@ class CRM_Activity_Page_AJAX {
       0, 0, 0, NULL, NULL, FALSE
     );
 
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID, NULL, FALSE);
 
     // Now build 'Other Relationships' array by removing relationships that are already listed under Case Roles
     // so they don't show up twice.
@@ -136,7 +136,7 @@ class CRM_Activity_Page_AJAX {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
-    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID);
+    $caseRelationships = CRM_Case_BAO_Case::getCaseRoles($contactID, $caseID, NULL, FALSE);
     $caseTypeName = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($caseTypeName, 'CaseRoles');
@@ -162,9 +162,11 @@ class CRM_Activity_Page_AJAX {
         $rel = [];
         $rel['relation'] = $value;
         $rel['relation_type'] = $id;
-        $rel['name'] = '(not assigned)';
+        $rel['sort_name'] = '(not assigned)';
         $rel['phone'] = '';
         $rel['email'] = '';
+        $rel['is_active'] = '';
+        $rel['end_date'] = '';
         $rel['source'] = 'caseRoles';
         $caseRelationships[] = $rel;
       }
@@ -172,7 +174,7 @@ class CRM_Activity_Page_AJAX {
         foreach ($value as $clientRole) {
           $relClient = [];
           $relClient['relation'] = ts('Client');
-          $relClient['name'] = $clientRole['sort_name'];
+          $relClient['sort_name'] = $clientRole['sort_name'];
           $relClient['phone'] = $clientRole['phone'];
           $relClient['email'] = $clientRole['email'];
           $relClient['cid'] = $clientRole['contact_id'];
@@ -196,6 +198,12 @@ class CRM_Activity_Page_AJAX {
 
     // set user name, email and edit columns links
     foreach ($caseRelationships as $key => &$row) {
+      // add disabled class if role is inactive
+      if (isset($row['is_active'])) {
+        if ($row['is_active'] == '0') {
+          $row['DT_RowClass'] = 'disabled';
+        }
+      }
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
       if (!empty($row['relation_type']) && !empty($row['relationship_direction']) && $row['relation_type'] . '_' . $row['relationship_direction'] == $managerRoleId) {
@@ -203,13 +211,26 @@ class CRM_Activity_Page_AJAX {
       }
       // view user links
       if (!empty($row['cid'])) {
-        $row['name'] = '<a class="view-contact" title="' . ts('View Contact') . '" href=' . CRM_Utils_System::url('civicrm/contact/view',
-            'action=view&reset=1&cid=' . $row['cid']) . '>' . $row['name'] . '</a>';
+        $row['sort_name'] = '<a class="view-contact" title="' . ts('View Contact') . '" href=' . CRM_Utils_System::url('civicrm/contact/view',
+            'action=view&reset=1&cid=' . $row['cid']) . '>' . $row['sort_name'] . '</a>';
       }
       // email column links/icon
       if ($row['email']) {
         $row['email'] = '<a class="crm-hover-button crm-popup" href="' . CRM_Utils_System::url('civicrm/activity/email/add', 'reset=1&action=add&atype=3&cid=' . $row['cid']) . '&caseid=' . $caseID . '" title="' . ts('Send an Email') . '"><i class="crm-i fa-envelope" aria-hidden="true"></i></a>';
       }
+
+      // view end date if set
+      if (!empty($row['end_date'])) {
+        $row['end_date'] = CRM_Utils_Date::customFormat($row['end_date']);
+        // add disabled class if end date is less than equal to current date.
+        if (CRM_Utils_Date::overdue($row['end_date'])) {
+          $row['DT_RowClass'] = 'disabled';
+        }
+      }
+      else {
+        $row['end_date'] = '';
+      }
+
       // edit links
       $row['actions'] = '';
       if ($hasAccessToAllCases) {
@@ -217,12 +238,14 @@ class CRM_Activity_Page_AJAX {
         $contactType = $contactType == 'Contact' ? '' : $contactType;
         switch ($row['source']) {
           case 'caseRel':
-            $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
-              '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
-              '</a>' .
-              '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
-              '<span class="icon delete-icon"></span>' .
-              '</a>';
+            if (empty($row['end_date'])) {
+              $row['actions'] = '<a href="#editCaseRoleDialog" title="' . ts('Reassign %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-rel_id="' . $row['rel_id'] . '"data-key="' . CRM_Core_Key::get('civicrm/ajax/relation') . '">' .
+                '<i class="crm-i fa-pencil" aria-hidden="true"></i>' .
+                '</a>' .
+                '<a href="#deleteCaseRoleDialog" title="' . ts('Remove %1', [1 => $typeLabel]) . '" class="crm-hover-button case-miniform" data-contact_type="' . $contactType . '" data-rel_type="' . $row['relation_type'] . '_' . $row['relationship_direction'] . '" data-cid="' . $row['cid'] . '" data-key="' . CRM_Core_Key::get('civicrm/ajax/delcaserole') . '">' .
+                '<span class="icon delete-icon"></span>' .
+                '</a>';
+            }
             break;
 
           case 'caseRoles':
