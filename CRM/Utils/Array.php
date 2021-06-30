@@ -1059,6 +1059,40 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Remove a key from an array.
+   *
+   * This is a helper for when the calling function does not know how many layers deep
+   * the path array is so cannot easily check.
+   *
+   * @param array $values
+   * @param array $path
+   * @param bool $cleanup
+   *   If removed item leaves behind an empty array, should you remove the empty array?
+   * @return bool
+   *   TRUE if anything has been removed. FALSE if no changes were required.
+   */
+  public static function pathUnset(&$values, $path, $cleanup = FALSE) {
+    if (count($path) === 1) {
+      if (isset($values[$path[0]])) {
+        unset($values[$path[0]]);
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+    else {
+      $next = array_shift($path);
+      $r = static::pathUnset($values[$next], $path, $cleanup);
+      if ($cleanup && $values[$next] === []) {
+        $r = TRUE;
+        unset($values[$next]);
+      }
+      return $r;
+    }
+  }
+
+  /**
    * Set a single value in an array tree.
    *
    * @param array $values
