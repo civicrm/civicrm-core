@@ -35,7 +35,7 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
-    {if $invoicing}
+    {if $invoicing && empty($is_template)}
       <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
           <i class="crm-i fa-print" aria-hidden="true"></i>
@@ -69,10 +69,12 @@
     <td class="label">{ts}Source{/ts}</td>
     <td>{$source}</td>
   </tr>
+  {if empty($is_template)}
   <tr>
     <td class="label">{ts}Received{/ts}</td>
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
+  {/if}
   {if $displayLineItems}
     <tr>
       <td class="label">{ts}Contribution Amount{/ts}</td>
@@ -136,11 +138,13 @@
       <td>{$to_financial_account}</td>
     </tr>
   {/if}
+  {if empty($is_template)}
   <tr>
     <td class="label">{ts}Contribution Status{/ts}</td>
     <td {if $contribution_status_id eq 3} class="font-red bold"{/if}>{$contribution_status}
       {if $contribution_status_id eq 2} {if $is_pay_later}: {ts}Pay Later{/ts} {else} : {ts}Incomplete Transaction{/ts} {/if}{/if}</td>
   </tr>
+  {/if}
 
   {if $cancel_date}
     <tr>
@@ -227,10 +231,12 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  {if empty($is_template)}
   <tr>
     <td class="label">{ts}Payment Details{/ts}</td>
     <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
   </tr>
+  {/if}
   {if $addRecordPayment}
     <tr>
       <td class='label'>{ts}Payment Summary{/ts}</td>

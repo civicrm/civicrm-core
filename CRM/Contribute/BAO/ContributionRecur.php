@@ -404,6 +404,89 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * Create a template contribution based on the first contribution of an
+   * recurring contribution.
+   * When a template contribution already exists this function will not try to create
+   * a new one.
+   * This way we make sure only one template contribution exists.
+   *
+   * @param int $id
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @return int|NULL the ID of the newly created template contribution.
+   */
+  public static function ensureTemplateContributionExists(int $id) {
+    // Check if a template contribution already exists.
+    $templateContributions = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_template', '=', 1)
+      // we need this line otherwise the is test contribution don't work.
+      ->addWhere('is_test', 'IN', [0, 1])
+      ->addOrderBy('receive_date', 'DESC')
+      ->setLimit(1)
+      ->execute();
+    if ($templateContributions->count()) {
+      // A template contribution already exists.
+      // Skip the creation of a new one.
+      return $templateContributions->first()['id'];
+    }
+
+    // Retrieve the most recently added contribution
+    $mostRecentContribution = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_template', '=', 0)
+      // we need this line otherwise the is test contribution don't work.
+      ->addWhere('is_test', 'IN', [0, 1])
+      ->addOrderBy('receive_date', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
+    if (!$mostRecentContribution) {
+      // No first contribution is found.
+      return NULL;
+    }
+
+    $order = new CRM_Financial_BAO_Order();
+    $order->setTemplateContributionID($mostRecentContribution['id']);
+    $order->setOverrideFinancialTypeID($overrides['financial_type_id'] ?? NULL);
+    $order->setOverridableFinancialTypeID($mostRecentContribution['financial_type_id']);
+    $order->setOverrideTotalAmount($mostRecentContribution['total_amount'] ?? NULL);
+    $order->setIsPermitOverrideFinancialTypeForMultipleLines(FALSE);
+    $line_items = $order->getLineItems();
+    $mostRecentContribution['line_item'][$order->getPriceSetID()] = $line_items;
+
+    // If the template contribution was made on-behalf then add the
+    // relevant values to ensure the activity reflects that.
+    $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($mostRecentContribution['id']);
+
+    $templateContributionParams = [];
+    $templateContributionParams['is_test'] = $mostRecentContribution['is_test'];
+    $templateContributionParams['is_template'] = '1';
+    $templateContributionParams['skipRecentView'] = TRUE;
+    $templateContributionParams['contribution_recur_id'] = $id;
+    $templateContributionParams['line_item'] = $mostRecentContribution['line_item'];
+    $templateContributionParams['status_id'] = 'Template';
+    foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
+      if (isset($mostRecentContribution[$fieldName])) {
+        $templateContributionParams[$fieldName] = $mostRecentContribution[$fieldName];
+      }
+    }
+    if (!empty($relatedContact['individual_id'])) {
+      $templateContributionParams['on_behalf'] = TRUE;
+      $templateContributionParams['source_contact_id'] = $relatedContact['individual_id'];
+    }
+    $templateContributionParams['source'] = $templateContributionParams['source'] ?? ts('Recurring contribution');
+    $templateContribution = civicrm_api3('Contribution', 'create', $templateContributionParams);
+    $temporaryObject = new CRM_Contribute_BAO_Contribution();
+    $temporaryObject->copyCustomFields($mostRecentContribution['id'], $templateContribution['id']);
+    // Add new soft credit against current $contribution.
+    CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($templateContributionParams['contribution_recur_id'], $templateContribution['id']);
+    return $templateContribution['id'];
+  }
+
+  /**
    * Get the contribution to be used as the template for later contributions.
    *
    * Later we might merge in data stored against the contribution recur record rather than just return the contribution.
