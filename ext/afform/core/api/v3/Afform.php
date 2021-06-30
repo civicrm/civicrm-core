@@ -88,7 +88,14 @@ function _civicrm_api3_afform_get_spec(&$fields) {
  *   API request.
  */
 function _civicrm_api3_afform_getlist_params(&$request) {
-  $fieldsToReturn = ['name', 'title', 'type', 'description'];
+  $fieldsToReturn = [
+    'name',
+    'title',
+    'type',
+    'description',
+    $request['id_field'],
+    $request['label_field'],
+  ];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
 }
 
