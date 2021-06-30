@@ -1,5 +1,5 @@
 <?php
-// Autoloader data for Api4 explorer.
+// Autoloader data for Api4 Explorer Angular module.
 return [
   'ext' => 'civicrm',
   'js' => [
@@ -13,5 +13,7 @@ return [
     'ang/api4Explorer',
   ],
   'basePages' => [],
+  'bundles' => ['bootstrap3'],
+  'permissions' => ['access debug output', 'edit groups', 'administer reserved groups'],
   'requires' => ['crmUi', 'crmUtil', 'ngRoute', 'crmRouteBinder', 'ui.sortable', 'api4', 'ngSanitize', 'dialogService', 'checklist-model'],
 ];
