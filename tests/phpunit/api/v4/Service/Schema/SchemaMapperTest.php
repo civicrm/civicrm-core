@@ -46,34 +46,6 @@ class SchemaMapperTest extends UnitTestCase {
     $this->assertNotEmpty($map->getPath('civicrm_phone', 'location'));
   }
 
-  public function testWillHavePathWithDoubleJump() {
-    $activity = new Table('activity');
-    $activityContact = new Table('activity_contact');
-    $middleLink = new Joinable('activity_contact', 'activity_id');
-    $contactLink = new Joinable('contact', 'id');
-    $activity->addTableLink('id', $middleLink);
-    $activityContact->addTableLink('contact_id', $contactLink);
-
-    $map = new SchemaMap();
-    $map->addTables([$activity, $activityContact]);
-
-    $this->assertNotEmpty($map->getPath('activity', 'contact'));
-  }
-
-  public function testPathWithTripleJoin() {
-    $first = new Table('first');
-    $second = new Table('second');
-    $third = new Table('third');
-    $first->addTableLink('id', new Joinable('second', 'id'));
-    $second->addTableLink('id', new Joinable('third', 'id'));
-    $third->addTableLink('id', new Joinable('fourth', 'id'));
-
-    $map = new SchemaMap();
-    $map->addTables([$first, $second, $third]);
-
-    $this->assertNotEmpty($map->getPath('first', 'fourth'));
-  }
-
   public function testCircularReferenceWillNotBreakIt() {
     $contactTable = new Table('contact');
     $carTable = new Table('car');

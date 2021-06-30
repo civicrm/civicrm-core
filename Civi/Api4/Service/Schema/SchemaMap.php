@@ -36,7 +36,7 @@ class SchemaMap {
       return $path;
     }
 
-    $this->findPaths($table, $targetTableAlias, 1, $path);
+    $this->findPaths($table, $targetTableAlias, $path);
 
     return $path;
   }
@@ -88,49 +88,19 @@ class SchemaMap {
   }
 
   /**
-   * Recursive function to traverse the schema looking for a path
+   * Traverse the schema looking for a path
    *
    * @param Table $table
    *   The current table to base fromm
    * @param string $target
    *   The target joinable table alias
-   * @param int $depth
-   *   The current level of recursion which reflects the number of joins needed
    * @param \Civi\Api4\Service\Schema\Joinable\Joinable[] $path
    *   (By-reference) The possible paths to the target table
-   * @param \Civi\Api4\Service\Schema\Joinable\Joinable[] $currentPath
-   *   For internal use only to track the path to reach the target table
    */
-  private function findPaths(Table $table, $target, $depth, &$path, $currentPath = []
-  ) {
-    static $visited = [];
-
-    // reset if new call
-    if ($depth === 1) {
-      $visited = [];
-    }
-
-    $canBeShorter = empty($path) || count($currentPath) + 1 < count($path);
-    $tooFar = $depth > self::MAX_JOIN_DEPTH;
-    $beenHere = in_array($table->getName(), $visited);
-
-    if ($tooFar || $beenHere || !$canBeShorter) {
-      return;
-    }
-
-    // prevent circular reference
-    $visited[] = $table->getName();
-
-    foreach ($table->getExternalLinks() as $link) {
+  private function findPaths(Table $table, $target, &$path) {
+    foreach ($table->getTableLinks() as $link) {
       if ($link->getAlias() === $target) {
-        $path = array_merge($currentPath, [$link]);
-      }
-      else {
-        $linkTable = $this->getTableByName($link->getTargetTable());
-        if ($linkTable) {
-          $nextStep = array_merge($currentPath, [$link]);
-          $this->findPaths($linkTable, $target, $depth + 1, $path, $nextStep);
-        }
+        $path[] = $link;
       }
     }
   }
