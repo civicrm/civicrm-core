@@ -497,9 +497,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $paymentParticipant = [
       'contribution_id' => $contribution['id'],
     ];
-    $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
-    $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
-    $this->assertEquals('Registered', $participant['values'][$participant['id']]['participant_status']);
+    $this->callAPISuccessGetCount('ParticipantPayment', $paymentParticipant, 2);
+    $this->callAPISuccessGetCount('Participant', ['status_id' => 'Registered'], 2);
   }
 
   /**
@@ -588,9 +587,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $paymentParticipant = [
       'contribution_id' => $contribution['id'],
     ];
-    $participantPayment = $this->callAPISuccess('ParticipantPayment', 'getsingle', $paymentParticipant);
-    $participant = $this->callAPISuccess('participant', 'get', ['id' => $participantPayment['participant_id']]);
-    $this->assertEquals('Registered', $participant['values'][$participant['id']]['participant_status']);
+    $this->callAPISuccessGetCount('ParticipantPayment', $paymentParticipant, 2);
+    $this->callAPISuccessGetCount('participant', ['status_id' => 'Registered'], 2);
   }
 
   /**

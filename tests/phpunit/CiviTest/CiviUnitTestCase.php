@@ -3551,7 +3551,6 @@ VALUES
    * @throws \CRM_Core_Exception
    */
   protected function getParticipantOrderParams(): array {
-    $this->_contactId = $this->individualCreate();
     $event = $this->eventCreate();
     $this->_eventId = $event['id'];
     $eventParams = [
@@ -3561,23 +3560,13 @@ VALUES
     ];
     $this->callAPISuccess('event', 'create', $eventParams);
     $priceFields = $this->createPriceSet('event', $this->_eventId);
-    $participantParams = [
-      'financial_type_id' => 4,
-      'event_id' => $this->_eventId,
-      'role_id' => 1,
-      'status_id' => 14,
-      'fee_currency' => 'USD',
-      'contact_id' => $this->_contactId,
-    ];
-    $participant = $this->callAPISuccess('Participant', 'create', $participantParams);
     $orderParams = [
       'total_amount' => 300,
       'currency' => 'USD',
-      'contact_id' => $this->_contactId,
+      'contact_id' => $this->individualCreate(),
       'financial_type_id' => 4,
       'contribution_status_id' => 'Pending',
       'contribution_mode' => 'participant',
-      'participant_id' => $participant['id'],
     ];
     foreach ($priceFields['values'] as $key => $priceField) {
       $orderParams['line_items'][] = [
@@ -3594,7 +3583,14 @@ VALUES
             'entity_table' => 'civicrm_participant',
           ],
         ],
-        'params' => $participant,
+        'params' => [
+          'financial_type_id' => 4,
+          'event_id' => $this->_eventId,
+          'role_id' => 1,
+          'status_id' => 14,
+          'fee_currency' => 'USD',
+          'contact_id' => $this->individualCreate(),
+        ],
       ];
     }
     return $orderParams;
