@@ -122,11 +122,14 @@
     }
 
     // Replaces contents of fieldList array with current fields formatted for select2
-    function getFieldList(fieldList, action, addPseudoconstant) {
+    function getFieldList(fieldList, action, addPseudoconstant, addWriteJoins) {
       var fieldInfo = _.cloneDeep(_.findWhere(getEntity().actions, {name: action}).fields);
       fieldList.length = 0;
       if (addPseudoconstant) {
         addPseudoconstants(fieldInfo, addPseudoconstant);
+      }
+      if (addWriteJoins) {
+        addWriteJoinFields(fieldInfo);
       }
       formatForSelect2(fieldInfo, fieldList, 'name', ['description', 'required', 'default_value']);
     }
@@ -191,6 +194,19 @@
           newField.name += ':' + suffix;
           fieldList.splice(pos, 0, newField);
         });
+      });
+    }
+
+    // Adds join fields for create actions
+    // Note: this function transforms a raw list a-la getFields; not a select2-formatted list
+    function addWriteJoinFields(fieldList) {
+      _.eachRight(fieldList, function(field, pos) {
+        var fkNameField = field.fk_entity && getField('name', field.fk_entity, $scope.action);
+        if (fkNameField) {
+          var newField = _.cloneDeep(fkNameField);
+          newField.name = field.name + '.' + newField.name;
+          fieldList.splice(pos, 0, newField);
+        }
       });
     }
 
@@ -263,12 +279,13 @@
     $scope.fieldList = function(param) {
       return function() {
         var fields = [];
-        getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name']);
+        getFieldList(fields, $scope.action === 'getFields' ? ($scope.params.action || 'get') : $scope.action, ['name'], true);
         // Disable fields that are already in use
         _.each($scope.params[param] || [], function(val) {
-          var usedField = val[0].replace(':name', '');
+          var usedField = val[0].replace(/[:.]name/, '');
           (_.findWhere(fields, {id: usedField}) || {}).disabled = true;
           (_.findWhere(fields, {id: usedField + ':name'}) || {}).disabled = true;
+          (_.findWhere(fields, {id: usedField + '.name'}) || {}).disabled = true;
         });
         return {results: fields};
       };
@@ -1194,7 +1211,8 @@
                 $el.removeClass('loading').crmSelect2({data: options, multiple: multi});
               });
             } else if (field.fk_entity) {
-              $el.crmEntityRef({entity: field.fk_entity, select:{multiple: multi}, static: field.fk_entity === 'Contact' ? ['user_contact_id'] : []});
+              var apiParams = field.id_field ? {id_field: field.id_field} : {};
+              $el.crmEntityRef({entity: field.fk_entity, api: apiParams, select: {multiple: multi}, static: field.fk_entity === 'Contact' ? ['user_contact_id'] : []});
             } else if (dataType === 'Boolean') {
               $el.attr('placeholder', ts('- select -')).crmSelect2({allowClear: false, multiple: multi, placeholder: ts('- select -'), data: [
                 {id: 'true', text: ts('Yes')},
@@ -1374,9 +1392,14 @@
     var suffix = fieldName.split(':')[1];
     fieldName = fieldName.split(':')[0];
     var fieldNames = fieldName.split('.');
-    var field = get(entity, fieldNames);
+    var field = _.cloneDeep(get(entity, fieldNames));
     if (field && suffix) {
       field.pseudoconstant = suffix;
+    }
+    // When joining to a 'name' field, value fields should render an appropriate entityRef
+    if (field && field.type === 'Field' && field.name === 'name' && _.includes(fieldName, '.')) {
+      field.fk_entity = field.entity;
+      field.id_field = 'name';
     }
     return field;
 
