@@ -63,6 +63,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
     $params['state_province'] = 'NSW';
     $params['country'] = 'AUS';
     $this->processor->doPayment($params);
+    unset($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequests(), $this->getRequestBodies());
   }
 
@@ -88,6 +89,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
     $params['country'] = 'AUS';
     try {
       $this->processor->doPayment($params);
+      unset($params);
       $this->fail('Test was meant to throw an exception');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

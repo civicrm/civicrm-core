@@ -1262,6 +1262,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     try {
       $params = $this->prepareParamsForPaymentProcessor($value);
       $result = $payment->doPayment($params, 'event');
+      unset($result['amount'], $result['total_amount']);
       return [$result, $value];
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

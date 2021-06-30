@@ -65,6 +65,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
     $params['contributionType_accounting_code'] = 4200;
     $params['installments'] = 1;
     $this->processor->doPayment($params);
+    unset($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequests(), $this->getRequestBodies());
   }
 
@@ -94,6 +95,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
     $params['frequency_unit'] = 'month';
     $params['frequency_interval'] = 1;
     $this->processor->doPayment($params);
+    unset($params);
     $this->assertEquals($this->getExpectedRecuringPaymentRequests(), $this->getRequestBodies());
   }
 
@@ -121,6 +123,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
     $params['installments'] = 1;
     try {
       $this->processor->doPayment($params);
+      unset($params);
       $this->fail('Test was meant to throw an exception');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {

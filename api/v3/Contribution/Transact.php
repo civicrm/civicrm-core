@@ -59,6 +59,7 @@ function civicrm_api3_contribution_transact($params) {
 
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
   $params = $paymentProcessor['object']->doPayment($params);
+  unset($params['amount'], $params['total_amount']);
 
   $params['payment_instrument_id'] = $paymentProcessor['object']->getPaymentInstrumentID();
 

@@ -54,6 +54,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
     $params['state_province'] = 'IL';
     $params['country'] = 'US';
     $this->processor->doPayment($params);
+    unset($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequests(), $this->getRequestBodies());
   }
 

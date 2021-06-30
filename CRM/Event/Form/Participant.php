@@ -1143,6 +1143,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $paymentParams['fee_amount'] = NULL;
       try {
         $result = $payment->doPayment($paymentParams);
+        unset($result['amount'], $result['total_amount']);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         // @todo un comment the following line out when we are creating a contribution before we get to this point

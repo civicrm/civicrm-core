@@ -46,6 +46,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $params = $this->getBillingParams();
     $params['amount'] = 5.24;
     $this->processor->doPayment($params);
+    unset($params);
     $this->assertEquals($this->getExpectedSinglePaymentRequest(), $this->getRequestBodies()[0]);
   }
 
@@ -153,6 +154,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     // turn verifySSL off
     Civi::settings()->set('verifySSL', '0');
     $this->processor->doPayment($params);
+    unset($params);
     // turn verifySSL on
     Civi::settings()->set('verifySSL', '0');
 
@@ -295,6 +297,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $smarty->assign('subscriptionType', 'create');
 
     $this->processor->doPayment($params);
+    unset($params);
 
     // if subscription was successful, processor_id / subscription-id must not be null
     $this->assertDBNotNull('CRM_Contribute_DAO_ContributionRecur', $recur['id'], 'processor_id',
