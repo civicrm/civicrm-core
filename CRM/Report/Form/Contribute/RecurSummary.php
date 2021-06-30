@@ -282,7 +282,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $amountSql = "
   SELECT SUM(cc.total_amount) as amount FROM `civicrm_contribution` cc
   INNER JOIN civicrm_contribution_recur cr ON (cr.id = cc.contribution_recur_id AND cr.payment_instrument_id = {$paymentInstrumentId})
-  WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND ";
+  WHERE cc.contribution_status_id = 1 AND cc.is_test = 0 AND cc.is_template = 0 AND ";
       $amountSql .= str_replace("start_date", "cc.`receive_date`", $startedDateSql);
       $amountDao = CRM_Core_DAO::executeQuery($amountSql);
       $amountDao->fetch();

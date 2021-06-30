@@ -380,7 +380,10 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
    * @return mixed|string
    */
   public function whereContribution($replaceAliasWith = 'contribution1') {
-    $clauses = array("is_test" => "{$this->_aliases['civicrm_contribution']}.is_test = 0");
+    $clauses = array(
+      "is_test" => "{$this->_aliases['civicrm_contribution']}.is_test = 0",
+      "is_template" => "{$this->_aliases['civicrm_contribution']}.is_template = 0",
+    );
 
     foreach ($this->_columns['civicrm_contribution']['filters'] as $fieldName => $field) {
       $clause = NULL;

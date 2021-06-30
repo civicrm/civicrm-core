@@ -462,7 +462,7 @@ GROUP BY {$this->_aliases['civicrm_contribution_soft']}.contact_id, constituentn
 
   public function where() {
     parent::where();
-    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
+    $this->_where .= " AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 ";
   }
 
   /**

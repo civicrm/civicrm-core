@@ -496,6 +496,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $expected = preg_replace('/\s+/', ' ', 'COLLATE ' . $inUseCollation . ' AS
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
          AND contribution_civireport.is_test = 0
+         AND contribution_civireport.is_template = 0
          AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
          WHERE contact_civireport.id NOT IN (
       SELECT cont_exclude.contact_id
@@ -857,6 +858,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
              INNER JOIN civicrm_contribution   contribution_civireport
                      ON contact_civireport.id = contribution_civireport.contact_id AND
                         contribution_civireport.is_test = 0
+                         AND contribution_civireport.is_template = 0
              LEFT JOIN civicrm_contribution_soft contribution_soft_civireport
                        ON contribution_soft_civireport.contribution_id = contribution_civireport.id AND contribution_soft_civireport.id = (SELECT MIN(id) FROM civicrm_contribution_soft cs WHERE cs.contribution_id = contribution_civireport.id)
              LEFT  JOIN civicrm_financial_type  financial_type_civireport

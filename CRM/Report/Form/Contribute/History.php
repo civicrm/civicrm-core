@@ -376,7 +376,8 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         FROM civicrm_contact  {$this->_aliases['civicrm_contact']}
              INNER JOIN civicrm_contribution   {$this->_aliases['civicrm_contribution']}
                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id AND
-                        {$this->_aliases['civicrm_contribution']}.is_test = 0 ";
+                        {$this->_aliases['civicrm_contribution']}.is_test = 0 AND
+                        {$this->_aliases['civicrm_contribution']}.is_template = 0";
 
     $relContacAlias = 'contact_relationship';
     $this->_relationshipFrom = " INNER JOIN civicrm_relationship {$this->_aliases['civicrm_relationship']}
@@ -592,12 +593,12 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     if (!empty($this->_referenceYear['other_year'])) {
       (CRM_Utils_Array::value('other_year_op', $this->_params) ==
         'calendar') ? $other_receive_date = 'YEAR (contri.receive_date)' : $other_receive_date = self::fiscalYearOffset('contri.receive_date');
-      $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id NOT IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE  cont.id = contri.contact_id AND {$other_receive_date} = {$this->_referenceYear['other_year']} AND contri.is_test = 0 ) ";
+      $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id NOT IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE  cont.id = contri.contact_id AND {$other_receive_date} = {$this->_referenceYear['other_year']} AND contri.is_test = 0 AND contri.is_template = 0 ) ";
     }
     if (!empty($this->_referenceYear['this_year'])) {
       (CRM_Utils_Array::value('this_year_op', $this->_params) ==
         'calendar') ? $receive_date = 'YEAR (contri.receive_date)' : $receive_date = self::fiscalYearOffset('contri.receive_date');
-      $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE cont.id = contri.contact_id AND {$receive_date} = {$this->_referenceYear['this_year']} AND contri.is_test = 0 ) ";
+      $addWhere .= " AND {$this->_aliases['civicrm_contact']}.id IN ( SELECT DISTINCT cont.id FROM civicrm_contact cont, civicrm_contribution contri WHERE cont.id = contri.contact_id AND {$receive_date} = {$this->_referenceYear['this_year']} AND contri.is_test = 0 AND contri.is_template = 0 ) ";
     }
     $this->limit();
     $getContacts = "SELECT {$this->_aliases['civicrm_contact']}.id as cid, SUM({$this->_aliases['civicrm_contribution']}.total_amount) as civicrm_contribution_total_amount_sum {$this->_from} {$this->_where} {$addWhere} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_having} {$this->_limit}";
@@ -686,7 +687,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
     $sqlContribution = "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
       implode(',', $contactIds) .
-      ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
+      ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->_statusClause} {$this->_groupBy} ";
 
     $dao = CRM_Core_DAO::executeQuery($sqlContribution);
     $contributionSum = 0;

@@ -326,7 +326,10 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   public function where() {
     $this->_statusClause = "";
-    $clauses = [$this->_aliases['civicrm_contribution'] . '.is_test = 0'];
+    $clauses = [
+      $this->_aliases['civicrm_contribution'] . '.is_test = 0',
+      $this->_aliases['civicrm_contribution'] . '.is_template = 0',
+    ];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -336,7 +339,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 (SELECT distinct cont.id FROM civicrm_contact cont, civicrm_contribution contri
  WHERE  cont.id = contri.contact_id AND " .
               self::fiscalYearOffset('contri.receive_date') .
-              " = {$this->_params['yid_value']} AND contri.is_test = 0 )";
+              " = {$this->_params['yid_value']} AND contri.is_test = 0 AND contri.is_template = 0 )";
           }
           elseif (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE
           ) {
@@ -440,7 +443,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         $sql = "" .
           "{$this->_select} {$this->_from} WHERE {$this->_aliases['civicrm_contact']}.id IN (" .
           implode(',', $contactIds) .
-          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 {$this->_statusClause} {$this->_groupBy} ";
+          ") AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0 {$this->_statusClause} {$this->_groupBy} ";
       }
 
       $current_year = $this->_params['yid_value'];
