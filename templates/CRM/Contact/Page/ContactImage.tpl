@@ -7,10 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{* This form is for displaying contact Image *}
-<div class="crm-contact_image crm-contact_image-block">
-  {$imageURL}
-</div>
-{if $action eq 0 or $action eq 2}
-  <div class='crm-contact_image-block crm-contact_image crm-contact_image-delete'>{$deleteURL}</div>
-{/if}
+{crmRegion name="contact-summary-image"}
+  <div class="crm-contact_image crm-contact_image-block">
+    {$imageURL}
+  </div>
+  {if $action eq 0 or $action eq 2}
+    <div class='crm-contact_image-block crm-contact_image crm-contact_image-delete'>{$deleteURL}</div>
+  {/if}
+{/crmRegion}
