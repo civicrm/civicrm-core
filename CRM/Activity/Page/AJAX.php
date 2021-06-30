@@ -178,6 +178,7 @@ class CRM_Activity_Page_AJAX {
           $relClient['phone'] = $clientRole['phone'];
           $relClient['email'] = $clientRole['email'];
           $relClient['cid'] = $clientRole['contact_id'];
+          $relClient['end_date'] = '';
           $relClient['source'] = 'contact';
           $caseRelationships[] = $relClient;
         }
