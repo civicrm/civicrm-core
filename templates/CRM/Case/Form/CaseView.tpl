@@ -151,18 +151,12 @@
         <div><input name="edit_role_contact_id" placeholder="{ts}- select contact -{/ts}" class="huge" /></div>
       </div>
       <div id="caseRoles-selector-show-active">
-        {* add checkbox to show only active role on case, default value is unchecked (it show all roles) *}
-        {if $caseDetails.status_class eq 'Opened'}{assign var=statusclass value='0'}{else}{assign var=statusclass value='1'}{/if}
-        <label><input type="checkbox" id="role_inactive" name="role_inactive[]">{ts}Show Inactive relationships{/ts}</label>
+        {* Add checkbox to show inactive roles. For open cases, default value is unchecked, i.e. show active roles. For closed cases default is checked. *}
+        <label><input type="checkbox" id="role_inactive" name="role_inactive[]"{if $caseDetails.status_class neq 'Opened'} checked="checked"{/if}>{ts}Show Inactive relationships{/ts}</label>
       </div>
       {literal}
         <script type="text/javascript">
             (function($) {
-                var statusClass = {/literal}{$statusclass}{literal};
-                // for closed cases, 'Show Inactive relationships' checkbox is checked on page load.
-                if (statusClass) {
-                  CRM.$("#role_inactive").prop("checked", true);
-                }
                 // hide the inactive role when checkbox is checked
                 $('input[type=checkbox][id=role_inactive]').change(function() {
                   if (this.checked == true) {
