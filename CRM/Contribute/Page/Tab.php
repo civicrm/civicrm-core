@@ -57,6 +57,18 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         'qs' => "reset=1&id=%%crid%%&cid=%%cid%%&context={$context}",
       ],
     ];
+
+    $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($recurID);
+    if (!empty($templateContribution['id']) && $paymentProcessorObj->supportsEditRecurringContribution()) {
+      // Use constant CRM_Core_Action::PREVIEW as there is no such thing as view template.
+      // And reusing view will mangle the actions.
+      $links[CRM_Core_Action::PREVIEW] = [
+        'name' => ts('View Template'),
+        'title' => ts('View Template Contribution'),
+        'url' => 'civicrm/contact/view/contribution',
+        'qs' => "reset=1&id={$templateContribution['id']}&cid=%%cid%%&action=view&context={$context}&force_create_template=1",
+      ];
+    }
     if (
       (CRM_Core_Permission::check('edit contributions') || $context !== 'contribution') &&
       ($paymentProcessorObj->supports('ChangeSubscriptionAmount')
