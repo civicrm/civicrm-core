@@ -42,9 +42,9 @@
             <td>{$row.data_type}</td>
             <td>{$row.html_type}</td>
             <td class="nowrap">{$row.weight}</td>
-            <td class="crm-editable" data-type="boolean" data-field="is_required">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td class="crm-editable" data-type="boolean" data-field="is_searchable">{if $row.is_searchable eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_required">{if !empty($row.is_required)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td class="crm-editable" data-type="boolean" data-field="is_searchable">{if !empty($row.is_searchable)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
+            <td>{if !empty($row.is_active)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
