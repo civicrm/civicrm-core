@@ -11,6 +11,8 @@
 
 namespace Civi\Api4\Query;
 
+use Civi\API\Exception\UnauthorizedException;
+
 /**
  * Sql column expression
  */
@@ -26,8 +28,11 @@ class SqlField extends SqlExpression {
   }
 
   public function render(array $fieldList): string {
-    if (empty($fieldList[$this->expr])) {
+    if (!isset($fieldList[$this->expr])) {
       throw new \API_Exception("Invalid field '{$this->expr}'");
+    }
+    if ($fieldList[$this->expr] === FALSE) {
+      throw new UnauthorizedException("Unauthorized field '{$this->expr}'");
     }
     return $fieldList[$this->expr]['sql_name'];
   }
