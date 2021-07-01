@@ -127,7 +127,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $row->tokens($entity, $field, $actionSearchResult->$field);
     }
     elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+      $row->customToken($entity, $cfID, $actionSearchResult->event_id);
     }
     else {
       $row->tokens($entity, $field, '');

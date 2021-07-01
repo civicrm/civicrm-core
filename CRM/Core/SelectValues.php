@@ -539,22 +539,28 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function eventTokens() {
-    return [
-      '{event.event_id}' => ts('Event ID'),
-      '{event.title}' => ts('Event Title'),
-      '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date'),
-      '{event.event_type}' => ts('Event Type'),
-      '{event.summary}' => ts('Event Summary'),
-      '{event.contact_email}' => ts('Event Contact Email'),
-      '{event.contact_phone}' => ts('Event Contact Phone'),
-      '{event.description}' => ts('Event Description'),
-      '{event.location}' => ts('Event Location'),
-      '{event.fee_amount}' => ts('Event Fees'),
-      '{event.info_url}' => ts('Event Info URL'),
-      '{event.registration_url}' => ts('Event Registration URL'),
-      '{event.balance}' => ts('Event Balance'),
-    ];
+    static $tokens = NULL;
+
+    if (!$tokens) {
+      $tokens = array_merge([
+        '{event.event_id}' => ts('Event ID'),
+        '{event.title}' => ts('Event Title'),
+        '{event.start_date}' => ts('Event Start Date'),
+        '{event.end_date}' => ts('Event End Date'),
+        '{event.event_type}' => ts('Event Type'),
+        '{event.summary}' => ts('Event Summary'),
+        '{event.contact_email}' => ts('Event Contact Email'),
+        '{event.contact_phone}' => ts('Event Contact Phone'),
+        '{event.description}' => ts('Event Description'),
+        '{event.location}' => ts('Event Location'),
+        '{event.fee_amount}' => ts('Event Fees'),
+        '{event.info_url}' => ts('Event Info URL'),
+        '{event.registration_url}' => ts('Event Registration URL'),
+        '{event.balance}' => ts('Event Balance'),
+      ], CRM_Utils_Token::getCustomFieldTokens('Event', TRUE));
+
+    }
+    return $tokens;
   }
 
   /**
@@ -676,37 +682,18 @@ class CRM_Core_SelectValues {
   public static function participantTokens() {
     static $tokens = NULL;
     if (!$tokens) {
-      $exportFields = CRM_Event_BAO_Participant::exportableFields();
+      $tokens = array_merge([
+        '{participant.participant_id}' => ts('Participant ID'),
+        '{participant.status}' => ts('Participant Status'),
+        '{participant.role}' => ts('Participant Role'),
+        '{participant.register_date}' => ts('Registration Date'),
+        '{participant.source}' => ts('Source'),
+        '{participant.fee_level}' => ts('Fee Level'),
+        '{participant.fee_amount}' => ts('Fee Amount'),
+        '{participant.is_pay_later}' => ts('Is Pay Later'),
+        '{participant.must_wait}' => ts('On Waiting List'),
+      ], CRM_Utils_Token::getCustomFieldTokens('Participant', TRUE));
 
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      // skipping some tokens for time being.
-      $skipTokens = [
-        'event_id',
-        'participant_is_pay_later',
-        'participant_is_test',
-        'participant_contact_id',
-        'participant_fee_currency',
-        'participant_campaign_id',
-        'participant_status',
-        'participant_discount_name',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
-
-      foreach ($values as $key => $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{participant.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
-        }
-        else {
-          $tokens["{participant.$val}"] = $exportFields[$val]['title'];
-        }
-      }
     }
     return $tokens;
   }
