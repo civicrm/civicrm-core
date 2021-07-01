@@ -19,6 +19,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
 
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   /**
    * Set up for test.
    *
@@ -407,33 +409,19 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'is_deceased' => 1,
     ]);
 
-    // We delete latest membership payment and line item.
-    $lineItemId = $this->callAPISuccessGetValue('LineItem', [
-      'contribution_id' => $contribution['id'],
-      'entity_id' => $membershipId2,
-      'entity_table' => 'civicrm_membership',
-      'return' => 'id',
-    ]);
-
-    // No api to delete membership payment.
-    CRM_Core_DAO::executeQuery('
-      DELETE FROM civicrm_membership_payment
-      WHERE contribution_id = %1
-        AND membership_id = %2
-    ', [
-      1 => [$contribution['id'], 'Integer'],
-      2 => [$membershipId2, 'Integer'],
-    ]);
-
-    $this->callAPISuccess('LineItem', 'delete', [
-      'id' => $lineItemId,
-    ]);
-
     // set membership recurring to null.
     $this->callAPISuccess('Membership', 'create', [
       'id' => $membershipId2,
       'contribution_recur_id' => NULL,
     ]);
+
+    $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution['id']]);
+    unset($params['line_items'][1]);
+    $params['total_amount'] = 100;
+    $params['line_items'][0]['params']['id'] = $membershipId1;
+    $params['api.Payment.create']['total_amount'] = 100;
+
+    $order = $this->callAPISuccess('Order', 'create', $params);
 
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 5);
@@ -446,7 +434,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
     // record next subsequent payment (6th payment).
     $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'original_contribution_id' => $contributionId,
+      'original_contribution_id' => $order['id'],
       'contribution_status_id' => 'Completed',
       'total_amount' => '100',
     ]);
@@ -485,6 +473,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $lineItemParams = [
       'entity_id' => $membershipId,
       'entity_table' => 'civicrm_membership',
+      'contribution_id' => ['>' => 0],
     ];
     $this->callAPISuccessGetCount('LineItem', $lineItemParams, $count);
     $this->callAPISuccessGetCount('MembershipPayment', $memPayParams, $count);
