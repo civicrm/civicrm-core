@@ -288,7 +288,8 @@
         "Fix handling of libxml_disable_entity_loader": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/phpword-libxml-fix-global-handling.patch"
       },
       "zetacomponents/mail": {
-        "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
+        "CiviCRM Custom Patches for ZetaCompoents mail": "https://raw.githubusercontent.com/civicrm/civicrm-core/9d93748a36c7c5d44422911db1c98fb2f7067b34/tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch",
+        "Allow single quotes to be used in return path": "https://github.com/zetacomponents/Mail/pull/86.patch"
       }
     },
     "compile-includes": ["ext/greenwich/composer.compile.json"],
