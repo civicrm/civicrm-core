@@ -90,13 +90,6 @@ function _civicrm_api3_custom_field_create_spec(&$params) {
     'title' => 'Option Values',
     'description' => "Pass an array of options (value => label) to create this field's option values",
   ];
-  // TODO: Why expose this to the api at all?
-  $params['option_type'] = [
-    'title' => 'Option Type',
-    'description' => 'This (boolean) field tells the BAO to create an option group for the field if the field type is appropriate',
-    'api.default' => 1,
-    'type' => CRM_Utils_Type::T_BOOLEAN,
-  ];
   $params['data_type']['api.default'] = 'String';
   $params['is_active']['api.default'] = 1;
 }

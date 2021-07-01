@@ -2003,9 +2003,15 @@ WHERE  id IN ( %1, %2 )
 
     // create any option group & values if required
     $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
-    if ($htmlType != 'Text' && in_array($dataType, $allowedOptionTypes)) {
+    if ($htmlType !== 'Text' && in_array($dataType, $allowedOptionTypes, TRUE)) {
       //CRM-16659: if option_value then create an option group for this custom field.
-      if ($params['option_type'] == 1 && (empty($params['option_group_id']) || !empty($params['option_value']))) {
+      // An option_type of 2 would be a 'message' from the form layer not to handle
+      // the option_values key. If not set then it is not ignored.
+      $optionsType = (int) ($params['option_type'] ?? 0);
+      if (($optionsType !== 2 && empty($params['id']))
+        && (empty($params['option_group_id']) || !empty($params['option_value'])
+        )
+      ) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
         $optionGroup->name = "{$params['column_name']}_" . date('YmdHis');
