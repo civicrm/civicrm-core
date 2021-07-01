@@ -58,4 +58,136 @@ class CRM_Activity_Page_AJAXTest extends CiviUnitTestCase {
     $this->assertNotEquals($activity['id'], $caseActivities[$newActivityId]['id']);
   }
 
+  /**
+   * Check if the selected filters are saved.
+   */
+  public function testPreserveFilters() {
+    \Civi::settings()->set('preserve_activity_tab_filter', '1');
+
+    // Simulate visiting activity tab with all the filters set to something
+    $_GET = $_REQUEST = [
+      'snippet' => '4',
+      'context' => 'activity',
+      // Need a logged in user since the filter is per-contact, but this
+      // cid is the visited contact so could be anything, but might as well
+      // use this one.
+      'cid' => $this->loggedInUser,
+      'draw' => '5',
+      'columns' => [
+        0 => [
+          'data' => 'activity_type',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'true',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        1 => [
+          'data' => 'subject',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'true',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        2 => [
+          'data' => 'source_contact_name',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'true',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        3 => [
+          'data' => 'target_contact_name',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'false',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        4 => [
+          'data' => 'assignee_contact_name',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'false',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        5 => [
+          'data' => 'activity_date_time',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'true',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        6 => [
+          'data' => 'status_id',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'true',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+        7 => [
+          'data' => 'links',
+          'name' => '',
+          'searchable' => 'true',
+          'orderable' => 'false',
+          'search' => [
+            'value' => '',
+            'regex' => 'false',
+          ],
+        ],
+      ],
+      'start' => '0',
+      'length' => '25',
+      'search' => [
+        'value' => '',
+        'regex' => 'false',
+      ],
+      // Meeting
+      'activity_type_id' => [0 => '1'],
+      // Phone call
+      'activity_type_exclude_id' => [0 => '2'],
+      'activity_date_time_relative' => 'this.month',
+      'activity_date_time_low' => '',
+      'activity_date_time_high' => '',
+      // Completed
+      'activity_status_id' => '2',
+    ];
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Check that the filter is what we expect
+      $this->assertEquals([
+        'activity_type_filter_id' => [0 => 1],
+        'activity_type_exclude_filter_id' => [0 => 2],
+        'activity_status_id' => '2',
+        'status_id' => [0 => '2'],
+        'activity_date_time_relative' => 'this.month',
+      ], \Civi::contactSettings()->get('activity_tab_filter'));
+    }
+
+    // clean up
+    \Civi::settings()->set('preserve_activity_tab_filter', '0');
+    $_GET = $_REQUEST = [];
+  }
+
 }
