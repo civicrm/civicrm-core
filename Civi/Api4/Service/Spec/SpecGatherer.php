@@ -159,10 +159,13 @@ class SpecGatherer {
    * @param string $entityName
    *
    * @return array
+   * @throws \API_Exception
    */
-  private function getDAOFields($entityName) {
+  private function getDAOFields(string $entityName): array {
     $bao = CoreUtil::getBAOFromApiName($entityName);
-
+    if (!$bao) {
+      throw new \API_Exception('Entity not loaded' . $entityName);
+    }
     return $bao::getSupportedFields();
   }
 
