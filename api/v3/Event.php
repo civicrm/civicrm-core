@@ -204,7 +204,14 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
  * @param array $request
  */
 function _civicrm_api3_event_getlist_params(&$request) {
-  $fieldsToReturn = ['start_date', 'event_type_id', 'title', 'summary'];
+  $fieldsToReturn = [
+    'start_date',
+    'event_type_id',
+    'title',
+    'summary',
+    $request['id_field'],
+    $request['label_field'],
+  ];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'start_date DESC';
   if (empty($request['params']['id'])) {

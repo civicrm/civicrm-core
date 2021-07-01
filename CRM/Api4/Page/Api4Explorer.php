@@ -40,9 +40,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
       'groupOptions' => array_column((array) $groupOptions, 'options', 'name'),
     ];
     Civi::resources()
-      ->addBundle('bootstrap3')
       ->addVars('api4', $vars)
-      ->addPermissions(['access debug output', 'edit groups', 'administer reserved groups'])
       ->addScriptFile('civicrm', 'bower_components/js-yaml/dist/js-yaml.min.js')
       ->addScriptFile('civicrm', 'bower_components/marked/marked.min.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js')

@@ -744,6 +744,8 @@ function _civicrm_api3_activity_getlist_params(&$request) {
     'activity_type_id',
     'subject',
     'source_contact_id',
+    $request['id_field'],
+    $request['label_field'],
   ];
   $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
   $request['params']['options']['sort'] = 'activity_date_time DESC';
