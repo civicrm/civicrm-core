@@ -55,7 +55,7 @@
     <tr>
       {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="relation_active_period_date" hideRelativeLabel=1}
     </tr>
-    {if $relationshipGroupTree}
+    {if !empty($relationshipGroupTree)}
       <tr>
       <td colspan="2">
         {include file="CRM/Custom/Form/Search.tpl" groupTree=$relationshipGroupTree showHideLinks=false}

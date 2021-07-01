@@ -178,7 +178,7 @@ campaignTrClass='' campaignTdClass=''}
   </td>
 </tr>
 
-{if $contributionGroupTree}
+{if !empty($contributionGroupTree)}
 <tr>
   <td colspan="2">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionGroupTree showHideLinks=false}</td>

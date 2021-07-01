@@ -44,7 +44,7 @@
   </td>
 </tr>
 {/foreach}
-{if $grantGroupTree}
+{if !empty($grantGroupTree)}
 <tr>
     <td colspan="3">
     {include file="CRM/Custom/Form/Search.tpl" groupTree=$grantGroupTree showHideLinks=false}</td>

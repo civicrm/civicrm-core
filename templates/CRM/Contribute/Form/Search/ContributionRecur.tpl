@@ -70,7 +70,7 @@
           {$form.contribution_recur_trxn_id.html}
         </td>
       </tr>
-      {if $contributionRecurGroupTree}
+      {if !empty($contributionRecurGroupTree)}
         <tr>
           <td colspan="4">
             {include file="CRM/Custom/Form/Search.tpl" groupTree=$contributionRecurGroupTree showHideLinks=false}

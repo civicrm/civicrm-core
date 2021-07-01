@@ -118,7 +118,7 @@
       </td>
     </tr>
 
-    {if $addressGroupTree}
+    {if !empty($addressGroupTree)}
       <tr>
         <td colspan="2">
           {include file="CRM/Custom/Form/Search.tpl" groupTree=$addressGroupTree showHideLinks=false}

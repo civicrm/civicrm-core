@@ -117,7 +117,7 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
 campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
 
-{if $activityGroupTree}
+{if !empty($activityGroupTree)}
   <tr id="activityCustom">
     <td id="activityCustomData" colspan="4">
       {include file="CRM/Custom/Form/Search.tpl" groupTree=$activityGroupTree showHideLinks=false}
