@@ -60,7 +60,7 @@
 {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
 campaignTrClass='' campaignTdClass=''}
 
-{if $membershipGroupTree}
+{if !empty($membershipGroupTree)}
 <tr>
   <td colspan="4">
   {include file="CRM/Custom/Form/Search.tpl" groupTree=$membershipGroupTree showHideLinks=false}
