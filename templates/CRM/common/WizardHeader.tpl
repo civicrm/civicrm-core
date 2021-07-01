@@ -27,33 +27,21 @@
                 {else} {* This is a sub-step *}
                     {assign var="stepClass" value="past-sub-step"}
                 {/if}
-                {if $wizard.style.hideStepNumbers}
-                    {assign var="stepPrefix" value=$wizard.style.subStepPrefixPast}
-                {else}
-                    {assign var="stepPrefix" value=$wizard.style.stepPrefixPast|cat:$wizard.steps[step].stepNumber|cat:". "}
-                {/if}
+                {assign var="stepPrefix" value=$wizard.style.stepPrefixPast|cat:$wizard.steps[step].stepNumber|cat:". "}
             {elseif $wizard.currentStepNumber == $wizard.steps[step].stepNumber}
                 {if $wizard.steps[step].step}
                     {assign var="stepClass" value="current-step"}
                 {else}
                     {assign var="stepClass" value="current-sub-step"}
                 {/if}
-                {if $wizard.style.hideStepNumbers}
-                    {assign var="stepPrefix" value=$wizard.style.subStepPrefixCurrent}
-                {else}
-                    {assign var="stepPrefix" value=$wizard.style.stepPrefixCurrent|cat:$wizard.steps[step].stepNumber|cat:". "}
-                {/if}
+                {assign var="stepPrefix" value=$wizard.style.stepPrefixCurrent|cat:$wizard.steps[step].stepNumber|cat:". "}
             {else}
                 {if $wizard.steps[step].step}
                     {assign var="stepClass" value="future-step"}
                 {else}
                     {assign var="stepClass" value="future-sub-step"}
                 {/if}
-                {if $wizard.style.hideStepNumbers}
-                    {assign var="stepPrefix" value=$wizard.style.subStepPrefixFuture}
-                {else}
-                    {assign var="stepPrefix" value=$wizard.style.stepPrefixFuture|cat:$wizard.steps[step].stepNumber|cat:". "}
-                {/if}
+                {assign var="stepPrefix" value=$wizard.style.stepPrefixFuture|cat:$wizard.steps[step].stepNumber|cat:". "}
             {/if}
             {if !$wizard.steps[step].valid}
                 {assign var="stepClass" value="$stepClass not-valid"}

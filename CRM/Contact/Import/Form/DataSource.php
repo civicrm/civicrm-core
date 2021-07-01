@@ -89,12 +89,12 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->_dataSourceIsValid = TRUE;
       $this->assign('showDataSourceFormPane', TRUE);
       $dataSourcePath = explode('_', $this->_dataSource);
-      $templateFile = "CRM/Contact/Import/Form/" . $dataSourcePath[3] . ".tpl";
-      $this->assign('dataSourceFormTemplateFile', $templateFile);
+      $templateFile = 'CRM/Contact/Import/Form/' . $dataSourcePath[3] . ".tpl";
     }
     elseif ($this->_dataSource) {
       $this->invalidConfig('Invalid data source');
     }
+    $this->assign('dataSourceFormTemplateFile', $templateFile ?? NULL);
   }
 
   /**
@@ -201,9 +201,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       'fieldSeparator' => $config->fieldSeparator,
     ];
 
-    if ($loadeMapping = $this->get('loadedMapping')) {
-      $this->assign('loadedMapping', $loadeMapping);
-      $defaults['savedMapping'] = $loadeMapping;
+    $this->assign('loadedMapping', $this->get('loadedMapping'));
+    if ($this->get('loadedMapping')) {
+      $defaults['savedMapping'] = $this->get('loadedMapping');
     }
 
     return $defaults;
