@@ -31,7 +31,7 @@ if ( document.getElementsByName("saveMapping")[0].checked ) {
     document.getElementsByName("saveMapping")[0].checked = false;
 }
 {/literal}
-{if $isCheked}
+{if $isSaveMappingSelected}
     document.getElementsByName("saveMapping")[0].checked = true;
 {/if}
 </script>

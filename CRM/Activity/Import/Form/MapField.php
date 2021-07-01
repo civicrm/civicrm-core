@@ -71,6 +71,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function buildQuickForm() {
     // To save the current mappings.
+    $this->assign('loadedMapping', $this->get('savedMapping'));
     if (!$this->get('savedMapping')) {
       $saveDetailsName = ts('Save this field mapping');
       $this->applyFilter('saveMappingName', 'trim');
@@ -84,7 +85,6 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       // Get an array of the name values for mapping fields associated with this mapping_id.
       $mappingName = CRM_Core_BAO_Mapping::getMappingFieldValues($savedMapping, 'name');
 
-      $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);
 
       $params = ['id' => $savedMapping];

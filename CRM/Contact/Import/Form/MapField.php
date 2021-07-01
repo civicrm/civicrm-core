@@ -439,18 +439,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
     $template = CRM_Core_Smarty::singleton();
-    if (!empty($fields['saveMapping'])) {
-      $template->assign('isCheked', TRUE);
-    }
-
+    $template->assign('isSaveMappingSelected', !empty($fields['saveMapping']));
+    $template->assign('mappingDetailsError', !empty($errors));
     if (!empty($errors)) {
-      $_flag = 1;
-      $assignError = new CRM_Core_Page();
-      $assignError->assign('mappingDetailsError', $_flag);
       return $errors;
-    }
-    else {
-      return TRUE;
     }
   }
 
