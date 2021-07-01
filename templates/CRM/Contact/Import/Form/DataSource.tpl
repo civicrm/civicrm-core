@@ -83,7 +83,7 @@
          </tr>
         { /if}
 
-        {if $form.disableUSPS}
+        {if isset($form.disableUSPS)}
          <tr  class="crm-import-datasource-form-block-disableUSPS">
               <td class="label"></td>
               <td>{$form.disableUSPS.html} <label for="disableUSPS">{$form.disableUSPS.label}</label></td>
