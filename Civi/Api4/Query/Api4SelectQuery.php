@@ -271,7 +271,7 @@ class Api4SelectQuery {
   private function selectMatchingFields($pattern) {
     // Only core & custom fields can be selected
     $availableFields = array_filter($this->apiFieldSpec, function($field) {
-      return in_array($field['type'], ['Field', 'Custom'], TRUE);
+      return is_array($field) && in_array($field['type'], ['Field', 'Custom'], TRUE);
     });
     return SelectUtil::getMatchingFields($pattern, array_keys($availableFields));
   }
@@ -752,7 +752,7 @@ class Api4SelectQuery {
     // If we're not explicitly referencing the ID (or some other FK field) of the joinEntity, search for a default
     if (!$explicitFK) {
       foreach ($this->apiFieldSpec as $name => $field) {
-        if ($field['entity'] !== $joinEntity && $field['fk_entity'] === $joinEntity) {
+        if (is_array($field) && $field['entity'] !== $joinEntity && $field['fk_entity'] === $joinEntity) {
           $conditions[] = $this->treeWalkClauses([$name, '=', "$alias.id"], 'ON');
         }
         elseif (strpos($name, "$alias.") === 0 && substr_count($name, '.') === 1 && $field['fk_entity'] === $this->getEntity()) {
