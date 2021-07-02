@@ -229,7 +229,7 @@ class Afform extends Generic\AbstractEntity {
    */
   public static function getInfo() {
     $info = parent::getInfo();
-    $info['id_field'] = 'name';
+    $info['primary_key'] = ['name'];
     return $info;
   }
 

@@ -419,8 +419,8 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
    */
   private function getExtraEntityFields(string $entityName): array {
     if (!isset($this->_extraEntityFields[$entityName])) {
-      $id = CoreUtil::getInfoItem($entityName, 'id_field');
-      $this->_extraEntityFields[$entityName] = [$id];
+      $id = CoreUtil::getInfoItem($entityName, 'primary_key');
+      $this->_extraEntityFields[$entityName] = $id;
       foreach (CoreUtil::getInfoItem($entityName, 'paths') ?? [] as $path) {
         $matches = [];
         preg_match_all('#\[(\w+)]#', $path, $matches);

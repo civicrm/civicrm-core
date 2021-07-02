@@ -89,8 +89,8 @@ class Api4SelectQuery {
     $this->api = $apiGet;
 
     // Always select ID of main table unless grouping by something else
-    $id = CoreUtil::getInfoItem($this->getEntity(), 'id_field');
-    $this->forceSelectId = !$this->isAggregateQuery() || $this->getGroupBy() === [$id];
+    $keys = CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
+    $this->forceSelectId = !$this->isAggregateQuery() || array_intersect($this->getGroupBy(), $keys);
 
     // Build field lists
     foreach ($this->api->entityFields() as $field) {
@@ -205,8 +205,8 @@ class Api4SelectQuery {
     }
     else {
       if ($this->forceSelectId) {
-        $id = CoreUtil::getInfoItem($this->getEntity(), 'id_field');
-        $select = array_merge([$id], $select);
+        $keys = CoreUtil::getInfoItem($this->getEntity(), 'primary_key');
+        $select = array_merge($keys, $select);
       }
 
       // Expand the superstar 'custom.*' to select all fields in all custom groups
@@ -233,7 +233,7 @@ class Api4SelectQuery {
         // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
         $fkField = substr($wildField, 0, strrpos($wildField, '.'));
         $fkEntity = $this->getField($fkField)['fk_entity'] ?? NULL;
-        $id = $fkEntity ? CoreUtil::getInfoItem($fkEntity, 'id_field') : 'id';
+        $id = $fkEntity ? CoreUtil::getInfoItem($fkEntity, 'primary_key')[0] : 'id';
         $this->autoJoinFK($fkField . ".$id");
         $matches = $this->selectMatchingFields($wildField);
         array_splice($select, $pos, 1, $matches);
