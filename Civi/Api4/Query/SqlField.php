@@ -34,6 +34,10 @@ class SqlField extends SqlExpression {
     if ($fieldList[$this->expr] === FALSE) {
       throw new UnauthorizedException("Unauthorized field '{$this->expr}'");
     }
+    if (!empty($fieldList[$this->expr]['sql_renderer'])) {
+      $renderer = $fieldList[$this->expr]['sql_renderer'];
+      return $renderer($fieldList[$this->expr]);
+    }
     return $fieldList[$this->expr]['sql_name'];
   }
 

@@ -133,11 +133,16 @@ class FieldSpec {
    */
   public $outputFormatters;
 
+  /**
+   * @var callable
+   */
+  public $sqlRenderer;
 
   /**
    * @var callable[]
    */
   public $sqlFilters;
+
 
   /**
    * Aliases for the valid data types
@@ -428,6 +433,16 @@ class FieldSpec {
       $this->outputFormatters = [];
     }
     $this->outputFormatters[] = $outputFormatter;
+
+    return $this;
+  }
+
+  /**
+   * @param callable $sqlRenderer
+   * @return $this
+   */
+  public function setSqlRenderer($sqlRenderer) {
+    $this->sqlRenderer = $sqlRenderer;
 
     return $this;
   }
