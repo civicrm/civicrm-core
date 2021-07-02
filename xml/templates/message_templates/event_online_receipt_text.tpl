@@ -108,7 +108,7 @@ You were registered by: {$payer.name}
 {if $value neq 'skip'}
 {if !empty($isPrimary)}
 {if $lineItem|@count GT 1} {* Header for multi participant registration cases. *}
-{ts 1=$priceset+1}Participant %1{/ts} {$part.$priceset.info}
+{ts 1=$priceset+1}Participant %1{/ts} {if !empty($part.$priceset)}{$part.$priceset.info}{/if}
 
 {/if}
 {/if}
