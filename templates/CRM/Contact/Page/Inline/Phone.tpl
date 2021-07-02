@@ -26,15 +26,15 @@
       </div>
     {/if}
     {foreach from=$phone item=item}
-      {if $item.phone || $item.phone_ext}
-        <div class="crm-summary-row {if $item.is_primary eq 1}primary{/if}">
+      {if !empty($item.phone) || !empty($item.phone_ext)}
+        <div class="crm-summary-row {if !empty($item.is_primary)}primary{/if}">
           <div class="crm-label">
             {privacyFlag field=do_not_sms condition=$privacy.do_not_sms}
             {privacyFlag field=do_not_phone condition=$privacy.do_not_phone}
             {$item.location_type} {$item.phone_type}
           </div>
           <div class="crm-content crm-contact_phone">
-            {$item.phone}{if $item.phone_ext}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
+            {$item.phone}{if !empty($item.phone_ext)}&nbsp;&nbsp;{ts}ext.{/ts} {$item.phone_ext}{/if}
           </div>
         </div>
       {/if}
