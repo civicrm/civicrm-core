@@ -263,7 +263,11 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
    * @param int $maxDays
    *   Consider mailings that were completed not more than $maxDays ago.
    */
-  public static function updateEmailResetDate($minDays = 3, $maxDays = 7) {
+  public static function updateEmailResetDate(int $minDays = 3, int $maxDays = 7) {
+
+    if ($minDays < 0 || $maxDays < 0 || $maxDays <= $minDays) {
+      throw new \InvalidArgumentException("minDays and maxDays must be >=0 and maxDays > minDays");
+    }
 
     $temporaryTable = CRM_Utils_SQL_TempTable::build()
       ->setCategory('mailingemail')
