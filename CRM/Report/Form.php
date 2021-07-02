@@ -3250,6 +3250,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
         // let $this->_alterDisplay translate any integer ids to human-readable values.
         $rows[0] = $dao->toArray();
         $this->alterDisplay($rows);
+        $this->alterCustomDataDisplay($rows);
         $row = $rows[0];
 
         // add totals for all permutations of section values
