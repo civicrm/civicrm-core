@@ -78,7 +78,9 @@
       <td class="label">{ts}Contribution Amount{/ts}</td>
       <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
         {if $contribution_recur_id}
-          <strong>{ts}Recurring Contribution{/ts}</strong>
+          <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+            {ts}View Recurring Contribution{/ts}
+          </a>
           <br/>
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
@@ -89,8 +91,8 @@
       <td class="label">{ts}Total Amount{/ts}</td>
       <td><strong>{$total_amount|crmMoney:$currency}</strong>
         {if $contribution_recur_id}
-          <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-            <strong>{ts}Recurring Contribution{/ts}</strong>
+          <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+            {ts}View Recurring Contribution{/ts}
           </a>
           <br/>
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
