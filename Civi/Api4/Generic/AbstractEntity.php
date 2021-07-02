@@ -152,6 +152,7 @@ abstract class AbstractEntity {
       $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
       if ($dao) {
         $info['paths'] = $dao::getEntityPaths();
+        $info['primary_key'] = $dao::$_primaryKey;
         $info['icon'] = $dao::$_icon;
         $info['label_field'] = $dao::$_labelField;
         $info['dao'] = $dao;
