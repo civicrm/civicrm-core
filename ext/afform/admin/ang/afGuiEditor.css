@@ -268,7 +268,7 @@ body.af-gui-dragging {
   color: #0071bd;
 }
 
-#afGuiEditor [ui-sortable] {
+#afGuiEditor-canvas [ui-sortable] {
   min-height: 60px;
   margin-top: 10px;
 }
@@ -291,7 +291,9 @@ body.af-gui-dragging {
   max-height: 400px;
   overflow-y: auto;
 }
-
+#afGuiEditor .af-gui-entity-palette-select-list label {
+  margin-top: 10px;
+}
 #afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div {
   cursor: move;
   padding-left: 10px;

@@ -25,7 +25,7 @@
         <label>{{:: ts('Calculated Fields') }}</label>
         <div ui-sortable="$ctrl.editor.getSortableOptions()" ui-sortable-update="buildPaletteLists" ng-model="calcFieldList">
           <div ng-repeat="field in calcFieldList" ng-class="{disabled: fieldInUse(field.name)}">
-            <div class="af-gui-palette-item">{{:: field.defn.label }}></div>
+            <div class="af-gui-palette-item">{{:: field.defn.label }}</div>
           </div>
         </div>
       </div>

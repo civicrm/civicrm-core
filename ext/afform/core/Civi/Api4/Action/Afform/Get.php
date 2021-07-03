@@ -103,16 +103,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     }
     $customApi = CustomGroup::get()
       ->setCheckPermissions(FALSE)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'max_multiple'])
+      ->addSelect('name', 'title', 'help_pre', 'help_post', 'extends', 'max_multiple')
       ->addWhere('is_multiple', '=', 1)
       ->addWhere('is_active', '=', 1);
     if ($groupNames) {
       $customApi->addWhere('name', 'IN', $groupNames);
     }
     if ($getLayout) {
-      $customApi->addSelect('help_pre')->addSelect('help_post');
-      $customApi->addChain('fields', CustomField::get()
-        ->setCheckPermissions(FALSE)
+      $customApi->addSelect('help_pre', 'help_post');
+      $customApi->addChain('fields', CustomField::get(FALSE)
         ->addSelect('name')
         ->addWhere('custom_group_id', '=', '$id')
         ->addWhere('is_active', '=', 1)
