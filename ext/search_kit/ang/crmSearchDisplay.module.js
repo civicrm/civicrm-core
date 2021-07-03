@@ -8,22 +8,23 @@
 
       // Replace tokens keyed to rowData.
       // If rowMeta is provided, values will be formatted; if omitted, raw values will be provided.
-      function replaceTokens(str, rowData, rowMeta) {
+      function replaceTokens(str, rowData, rowMeta, index) {
         if (!str) {
           return '';
         }
         _.each(rowData, function(value, key) {
           if (str.indexOf('[' + key + ']') >= 0) {
             var column = rowMeta && _.findWhere(rowMeta, {key: key}),
-              replacement = column ? formatRawValue(column, value) : value;
+              val = column ? formatRawValue(column, value) : value,
+              replacement = angular.isArray(val) ? val[index || 0] : val;
             str = str.replace(new RegExp(_.escapeRegExp('[' + key + ']', 'g')), replacement);
           }
         });
         return str;
       }
 
-      function getUrl(link, rowData) {
-        var url = replaceTokens(link, rowData);
+      function getUrl(link, rowData, index) {
+        var url = replaceTokens(link, rowData, null, index);
         if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
           url = CRM.url(url);
         }
@@ -31,10 +32,25 @@
       }
 
       // Returns display value for a single column in a row
-      function formatDisplayValue(rowData, key, rowMeta) {
-        var column = _.findWhere(rowMeta, {key: key}),
-          displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, rowMeta) : formatRawValue(column, rowData[key]);
-        return displayValue;
+      function formatDisplayValue(rowData, key, columns) {
+        var column = _.findWhere(columns, {key: key}),
+          displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, columns) : formatRawValue(column, rowData[key]);
+        return angular.isArray(displayValue) ? displayValue.join(', ') : displayValue;
+      }
+
+      // Returns value and url for a column formatted as link(s)
+      function formatLinks(rowData, key, columns) {
+        var column = _.findWhere(columns, {key: key}),
+          value = formatRawValue(column, rowData[key]),
+          values = angular.isArray(value) ? value : [value],
+          links = [];
+        _.each(values, function(value, index) {
+          links.push({
+            value: value,
+            url: getUrl(column.link.path, rowData, index)
+          });
+        });
+        return links;
       }
 
       // Formats raw field value according to data type
@@ -44,7 +60,7 @@
         if (_.isArray(value)) {
           return _.map(value, function(val) {
             return formatRawValue(column, val);
-          }).join(', ');
+          });
         }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
           result = CRM.utils.formatDate(value, null, type === 'Timestamp');
@@ -88,6 +104,7 @@
 
       return {
         formatDisplayValue: formatDisplayValue,
+        formatLinks: formatLinks,
         getApiParams: getApiParams,
         getResults: getResults,
         replaceTokens: replaceTokens,

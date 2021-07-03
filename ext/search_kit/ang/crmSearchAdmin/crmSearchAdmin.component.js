@@ -671,18 +671,11 @@
         if (info.fn && info.fn.name === 'COUNT') {
           return value;
         }
-        // Output user-facing name/label fields as a link, if possible
-        if (info.field && info.field.fieldName === searchMeta.getEntity(info.field.entity).label_field && !info.fn && typeof value === 'string') {
-          var link = getEntityUrl(row, info);
-          if (link) {
-            return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + formatFieldValue(info.field, value) + '</a>';
-          }
-        }
-        return formatFieldValue(info.field, value);
+        return formatFieldValue(row, info, value);
       };
 
       // Attempts to construct a view url for a given entity
-      function getEntityUrl(row, info) {
+      function getEntityUrl(row, info, index) {
         var entity = searchMeta.getEntity(info.field.entity),
           path = _.result(_.findWhere(entity.paths, {action: 'view'}), 'path');
         // Only proceed if the path metadata exists for this entity
@@ -696,27 +689,28 @@
             if (fieldName === 'id' && info.field.name !== info.field.fieldName) {
               fieldName = info.field.name.substr(0, info.field.name.lastIndexOf('.'));
             }
-            fieldName = prefix + fieldName;
-            if (row[fieldName]) {
-              replacements.push(row[fieldName]);
+            var replacement = row[prefix + fieldName];
+            if (replacement) {
+              replacements.push(_.isArray(replacement) ? replacement[index] : replacement);
             }
           });
           // Only proceed if the row contains all the necessary data to resolve tokens
           if (tokens.length === replacements.length) {
-            _.each(tokens, function(token, index) {
-              path = path.replace(token, replacements[index]);
+            _.each(tokens, function(token, key) {
+              path = path.replace(token, replacements[key]);
             });
             return {url: CRM.url(path), title: path.title};
           }
         }
       }
 
-      function formatFieldValue(field, value) {
-        var type = field.data_type,
-          result = value;
+      function formatFieldValue(row, info, value, index) {
+        var type = info.field.data_type,
+          result = value,
+          link;
         if (_.isArray(value)) {
-          return _.map(value, function(val) {
-            return formatFieldValue(field, val);
+          return _.map(value, function(val, idx) {
+            return formatFieldValue(row, info, val, idx);
           }).join(', ');
         }
         if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
@@ -727,6 +721,13 @@
         }
         else if (type === 'Money' && typeof value === 'number') {
           result = CRM.formatMoney(value);
+        }
+        // Output user-facing name/label fields as a link, if possible
+        if (info.field.fieldName === searchMeta.getEntity(info.field.entity).label_field && !info.fn) {
+          link = getEntityUrl(row, info, index || 0);
+        }
+        if (link) {
+          return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + _.escape(result) + '</a>';
         }
         return _.escape(result);
       }
