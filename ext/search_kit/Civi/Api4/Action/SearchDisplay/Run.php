@@ -213,10 +213,22 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
     // Array is either associative `OP => VAL` or sequential `IN (...)`
     if (is_array($value)) {
       $value = array_filter($value, [$this, 'hasValue']);
-      // Use IN if array does not contain operators as keys
+      // If array does not contain operators as keys, assume array of values
       if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
-        $clause[] = [$fieldName, 'IN', $value];
+        // Use IN for regular fields
+        if (empty($field['serialize'])) {
+          $clause[] = [$fieldName, 'IN', $value];
+        }
+        // Use an OR group of CONTAINS for array fields
+        else {
+          $orGroup = [];
+          foreach ($value as $val) {
+            $orGroup[] = [$fieldName, 'CONTAINS', $val];
+          }
+          $clause[] = ['OR', $orGroup];
+        }
       }
+      // Operator => Value array
       else {
         foreach ($value as $operator => $val) {
           $clause[] = [$fieldName, $operator, $val];

@@ -3,6 +3,7 @@ namespace api\v4\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
+use Civi\Api4\ContactType;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\UFMatch;
@@ -27,11 +28,19 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
    * Test running a searchDisplay with various filters.
    */
   public function testRunDisplay() {
+    foreach (['Tester', 'Bot'] as $type) {
+      ContactType::create(FALSE)
+        ->addValue('parent_id.name', 'Individual')
+        ->addValue('label', $type)
+        ->addValue('name', $type)
+        ->execute();
+    }
+
     $lastName = uniqid(__FUNCTION__);
     $sampleData = [
-      ['first_name' => 'One', 'last_name' => $lastName],
-      ['first_name' => 'Two', 'last_name' => $lastName],
-      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'One', 'last_name' => $lastName, 'contact_sub_type' => ['Tester', 'Bot']],
+      ['first_name' => 'Two', 'last_name' => $lastName, 'contact_sub_type' => ['Tester']],
+      ['first_name' => 'Three', 'last_name' => $lastName, 'contact_sub_type' => ['Bot']],
       ['first_name' => 'Four', 'last_name' => $lastName],
     ];
     Contact::save(FALSE)->setRecords($sampleData)->execute();
@@ -43,7 +52,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
         'api_entity' => 'Contact',
         'api_params' => [
           'version' => 4,
-          'select' => ['id', 'first_name', 'last_name'],
+          'select' => ['id', 'first_name', 'last_name', 'contact_sub_type:label'],
           'where' => [],
         ],
       ],
@@ -72,6 +81,12 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
               'dataType' => 'String',
               'type' => 'field',
             ],
+            [
+              'key' => 'contact_sub_type:label',
+              'label' => 'Type',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
           ],
           'sort' => [
             ['id', 'ASC'],
@@ -97,6 +112,14 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertCount(2, $result);
     $this->assertEquals('Three', $result[0]['first_name']);
     $this->assertEquals('Two', $result[1]['first_name']);
+
+    $params['filters'] = ['contact_sub_type:label' => ['Tester', 'Bot']];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(3, $result);
+
+    $params['filters'] = ['contact_sub_type' => ['Tester']];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
   }
 
   /**
