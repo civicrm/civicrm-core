@@ -33,8 +33,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone {
    * @throws \CRM_Core_Exception
    */
   public static function create($params) {
-    // Ensure mysql phone function exists
-    CRM_Core_DAO::checkSqlFunctionsExist();
     CRM_Core_BAO_Block::handlePrimary($params, get_class());
     return self::writeRecord($params);
   }
@@ -214,8 +212,6 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
     if (!$optionId) {
       return;
     }
-    // Ensure mysql phone function exists
-    CRM_Core_DAO::checkSqlFunctionsExist();
 
     $tables = [
       'civicrm_phone',
@@ -243,8 +239,6 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
    * @return bool
    */
   public static function del($id) {
-    // Ensure mysql phone function exists
-    CRM_Core_DAO::checkSqlFunctionsExist();
     return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Phone', $id);
   }
 
