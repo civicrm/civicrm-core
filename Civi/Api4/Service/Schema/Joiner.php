@@ -73,6 +73,11 @@ class Joiner {
       if ($link->isDeprecated()) {
         \CRM_Core_Error::deprecatedWarning("Deprecated join alias '$alias' used in APIv4 get. Should be changed to '{$alias}_id'");
       }
+      // Serialized joins are rendered by Api4SelectQuery::renderSerializedJoin
+      if ($link->getSerialize()) {
+        // Virtual join, don't actually add this table
+        break;
+      }
 
       $bao = $joinEntity ? CoreUtil::getBAOFromApiName($joinEntity) : NULL;
       $conditions = $link->getConditionsForJoin($baseTableAlias);

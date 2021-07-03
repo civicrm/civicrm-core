@@ -154,7 +154,7 @@ class SchemaMapBuilder {
     }
     $fieldData = \CRM_Utils_SQL_Select::from('civicrm_custom_field f')
       ->join('custom_group', 'INNER JOIN civicrm_custom_group g ON g.id = f.custom_group_id')
-      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'f.data_type', 'label', 'column_name', 'option_group_id'])
+      ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'f.data_type', 'label', 'column_name', 'option_group_id', 'serialize'])
       ->where('g.extends IN (@entity)', ['@entity' => $customInfo['extends']])
       ->where('g.is_active')
       ->where('f.is_active')
@@ -185,6 +185,9 @@ class SchemaMapBuilder {
 
       if ($fieldData->data_type === 'ContactReference') {
         $joinable = new Joinable('civicrm_contact', 'id', $fieldData->name);
+        if ($fieldData->serialize) {
+          $joinable->setSerialize((int) $fieldData->serialize);
+        }
         $customTable->addTableLink($fieldData->column_name, $joinable);
       }
     }

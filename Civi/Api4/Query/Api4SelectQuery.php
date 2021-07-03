@@ -990,6 +990,7 @@ class Api4SelectQuery {
       return;
     }
     $lastLink = array_pop($joinPath);
+    $previousLink = array_pop($joinPath);
 
     // Custom field names are already prefixed
     $isCustom = $lastLink instanceof CustomGroupJoinable;
@@ -1000,7 +1001,15 @@ class Api4SelectQuery {
     // Cache field info for retrieval by $this->getField()
     foreach ($lastLink->getEntityFields() as $fieldObject) {
       $fieldArray = $fieldObject->toArray();
-      $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
+      // Set sql name of field, using column name for real joins
+      if (!$lastLink->getSerialize()) {
+        $fieldArray['sql_name'] = '`' . $lastLink->getAlias() . '`.`' . $fieldArray['column_name'] . '`';
+      }
+      // For virtual joins on serialized fields, the callback function will need the sql name of the serialized field
+      // @see self::renderSerializedJoin()
+      else {
+        $fieldArray['sql_name'] = '`' . $previousLink->getAlias() . '`.`' . $lastLink->getBaseColumn() . '`';
+      }
       $this->addSpecField($prefix . $fieldArray['name'], $fieldArray);
     }
   }
@@ -1017,6 +1026,27 @@ class Api4SelectQuery {
       $this->joins[$tableAlias] = $side;
       $this->query->join($tableAlias, "$side JOIN `$tableName` `$tableAlias` ON " . implode(' AND ', $conditions));
     }
+  }
+
+  /**
+   * Performs a virtual join with a serialized field using FIND_IN_SET
+   *
+   * @param array $field
+   * @return string
+   */
+  public static function renderSerializedJoin(array $field): string {
+    $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
+    $id = CoreUtil::getInfoItem($field['entity'], 'primary_key')[0];
+    $searchFn = "FIND_IN_SET(`{$field['table_name']}`.`$id`, REPLACE({$field['sql_name']}, '$sep', ','))";
+    return "(
+      SELECT GROUP_CONCAT(
+        `{$field['column_name']}`
+        ORDER BY $searchFn
+        SEPARATOR '$sep'
+      )
+      FROM `{$field['table_name']}`
+      WHERE $searchFn
+    )";
   }
 
   /**

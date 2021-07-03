@@ -60,14 +60,14 @@ class CustomContactRefTest extends BaseCustomValueTest {
       ->first()['id'];
 
     $favPeopleId1 = Contact::create(FALSE)
-      ->addValue('first_name', 'Favorite1')
+      ->addValue('first_name', 'FirstFav')
       ->addValue('last_name', 'People1')
       ->addValue('contact_type', 'Individual')
       ->execute()
       ->first()['id'];
 
     $favPeopleId2 = Contact::create(FALSE)
-      ->addValue('first_name', 'Favorite2')
+      ->addValue('first_name', 'SecondFav')
       ->addValue('last_name', 'People2')
       ->addValue('contact_type', 'Individual')
       ->execute()
@@ -78,22 +78,49 @@ class CustomContactRefTest extends BaseCustomValueTest {
       ->addValue('last_name', 'Tester')
       ->addValue('contact_type', 'Individual')
       ->addValue('MyContactRef.FavPerson', $favPersonId)
-      ->addValue('MyContactRef.FavPeople', [$favPeopleId1, $favPeopleId2])
+      ->addValue('MyContactRef.FavPeople', [$favPeopleId2, $favPeopleId1])
       ->execute()
       ->first()['id'];
 
-    $contact = Contact::get(FALSE)
+    $contactId2 = Contact::create(FALSE)
+      ->addValue('first_name', 'Bea')
+      ->addValue('last_name', 'Tester')
+      ->addValue('contact_type', 'Individual')
+      ->addValue('MyContactRef.FavPeople', [$favPeopleId2])
+      ->execute()
+      ->first()['id'];
+
+    $result = Contact::get(FALSE)
       ->addSelect('display_name')
       ->addSelect('MyContactRef.FavPerson.first_name')
       ->addSelect('MyContactRef.FavPerson.last_name')
       ->addSelect('MyContactRef.FavPeople')
+      ->addSelect('MyContactRef.FavPeople.last_name')
       ->addWhere('MyContactRef.FavPerson.first_name', '=', $firstName)
       ->execute()
-      ->first();
+      ->single();
 
-    $this->assertEquals($firstName, $contact['MyContactRef.FavPerson.first_name']);
-    $this->assertEquals('Person', $contact['MyContactRef.FavPerson.last_name']);
-    $this->assertEquals([$favPeopleId1, $favPeopleId2], $contact['MyContactRef.FavPeople']);
+    $this->assertEquals($firstName, $result['MyContactRef.FavPerson.first_name']);
+    $this->assertEquals('Person', $result['MyContactRef.FavPerson.last_name']);
+    // Ensure serialized values are returned in order
+    $this->assertEquals([$favPeopleId2, $favPeopleId1], $result['MyContactRef.FavPeople']);
+    // Values returned from virtual join should be in the same order
+    $this->assertEquals(['People2', 'People1'], $result['MyContactRef.FavPeople.last_name']);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'First')
+      ->execute()
+      ->single();
+
+    $this->assertEquals($contactId1, $result['id']);
+
+    $result = Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('MyContactRef.FavPeople.first_name', 'CONTAINS', 'Second')
+      ->execute();
+
+    $this->assertCount(2, $result);
   }
 
   public function testCurrentUser() {
