@@ -31,7 +31,7 @@
       {assign var="showEdit" value=0}
       <tr>
         <td id="{$cd_edit.name}_{$index}" class="section-shown form-item">
-          <div class="crm-accordion-wrapper {if $cd_edit.collapse_display eq 0 or $skipTitle} {else}collapsed{/if}">
+          <div class="crm-accordion-wrapper{if !empty($cd_edit.collapse_display) && empty($skipTitle)} collapsed{/if}">
             {if !$skipTitle}
               <div class="crm-accordion-header">
                 {$cd_edit.title}

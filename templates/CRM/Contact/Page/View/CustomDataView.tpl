@@ -12,9 +12,9 @@
 {foreach from=$viewCustomData item=customValues key=customGroupId}
   {assign var="cgcount" value=1}
   {assign var="count" value=$customGroupCount%2}
-  {if ($count eq $side) or $skipTitle }
+  {if ($count eq $side) or !empty($skipTitle)}
     {foreach from=$customValues item=cd_edit key=cvID}
-      <div class="customFieldGroup crm-collapsible{if $cd_edit.collapse_display} collapsed{/if} ui-corner-all {$cd_edit.name} crm-custom-set-block-{$customGroupId}">
+      <div class="customFieldGroup crm-collapsible{if !empty($cd_edit.collapse_display)} collapsed{/if} ui-corner-all {$cd_edit.name} crm-custom-set-block-{$customGroupId}">
         <div class="collapsible-title">
           {$cd_edit.title}
         </div>
