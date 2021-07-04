@@ -24,6 +24,16 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       */
       public static $_tableName = '{$table.name}';
 
+   {* Only print this variable if it's different than the default in CRM_Core_DAO *}
+   {if count($table.primaryKey.field) !== 1 || $table.primaryKey.field.0 !== 'id'}
+     /**
+      * Primary key field(s).
+      *
+      * @var string[]
+      */
+      public static $_primaryKey = [{if $table.primaryKey.field}'{"', '"|implode:$table.primaryKey.field}'{/if}];
+   {/if}
+
    {if $table.icon}
      /**
       * Icon associated with this entity.

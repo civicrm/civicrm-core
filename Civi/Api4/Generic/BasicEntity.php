@@ -141,7 +141,7 @@ abstract class BasicEntity extends AbstractEntity {
    */
   public static function getInfo() {
     $info = parent::getInfo();
-    $info['id_field'] = static::$idField;
+    $info['primary_key'] = (array) static::$idField;
     return $info;
   }
 

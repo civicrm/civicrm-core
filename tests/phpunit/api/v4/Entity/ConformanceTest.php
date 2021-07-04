@@ -164,7 +164,8 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
     $this->assertNotEmpty($info['title_plural']);
     $this->assertNotEmpty($info['type']);
     $this->assertNotEmpty($info['description']);
-    $this->assertNotEmpty($info['id_field']);
+    $this->assertIsArray($info['primary_key']);
+    $this->assertNotEmpty($info['primary_key']);
     $this->assertRegExp(';^\d\.\d+$;', $info['since']);
     $this->assertContains($info['searchable'], ['primary', 'secondary', 'bridge', 'none']);
     // Bridge must be between exactly 2 entities

@@ -143,7 +143,7 @@ abstract class AbstractEntity {
         'type' => [self::stripNamespace(get_parent_class(static::class))],
         'paths' => static::getEntityPaths(),
         'class' => static::class,
-        'id_field' => 'id',
+        'primary_key' => ['id'],
         // Entities without a @searchable annotation will default to secondary,
         // which makes them visible in SearchKit but not at the top of the list.
         'searchable' => 'secondary',
@@ -152,6 +152,7 @@ abstract class AbstractEntity {
       $dao = \CRM_Core_DAO_AllCoreTables::getFullName($info['name']);
       if ($dao) {
         $info['paths'] = $dao::getEntityPaths();
+        $info['primary_key'] = $dao::$_primaryKey;
         $info['icon'] = $dao::$_icon;
         $info['label_field'] = $dao::$_labelField;
         $info['dao'] = $dao;

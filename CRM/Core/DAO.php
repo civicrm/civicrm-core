@@ -33,6 +33,13 @@ require_once 'CRM/Core/I18n.php';
 class CRM_Core_DAO extends DB_DataObject {
 
   /**
+   * Primary key field(s).
+   *
+   * @var string[]
+   */
+  public static $_primaryKey = ['id'];
+
+  /**
    * How many times has this instance been cloned.
    *
    * @var int

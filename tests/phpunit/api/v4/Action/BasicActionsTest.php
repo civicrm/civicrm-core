@@ -37,7 +37,7 @@ class BasicActionsTest extends UnitTestCase {
   public function testGetInfo() {
     $info = MockBasicEntity::getInfo();
     $this->assertEquals('MockBasicEntity', $info['name']);
-    $this->assertEquals('identifier', $info['id_field']);
+    $this->assertEquals(['identifier'], $info['primary_key']);
   }
 
   public function testCrud() {
