@@ -846,7 +846,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of contribution related section
 
         unset($value['membership_type']);
-
+        $membershipParams = [
+          'start_date' => $value['membership_start_date'] ?? NULL,
+          'end_date' => $value['membership_end_date'] ?? NULL,
+          'join_date' => $value['membership_join_date'] ?? NULL,
+          'campaign_id' => $value['member_campaign_id'] ?? NULL,
+        ];
         $value['is_renew'] = FALSE;
         if (!empty($params['member_option']) && CRM_Utils_Array::value($key, $params['member_option']) == 2) {
 
@@ -873,17 +878,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $this->setCurrentRowMembershipID($membership->id);
         }
         else {
-          $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeId,
-            $value['membership_join_date'] ?? NULL, $value['membership_start_date'] ?? NULL, $value['membership_end_date'] ?? NULL
-          );
-          $value['join_date'] = $value['membership_join_date'] ?? $calcDates['join_date'];
-          $value['start_date'] = $value['membership_start_date'] ?? $calcDates['start_date'];
-          $value['end_date'] = $value['membership_end_date'] ?? $calcDates['end_date'];
-
-          unset($value['membership_start_date']);
-          unset($value['membership_end_date']);
-          $membership = CRM_Member_BAO_Membership::create($value);
-          $this->setCurrentRowMembershipID($membership->id);
+          // @todo - specify the relevant fields - don't copy all over
+          $membershipParams = array_merge($value, $membershipParams);
+          $membership = CRM_Member_BAO_Membership::create($membershipParams);
         }
 
         //process premiums

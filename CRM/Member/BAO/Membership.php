@@ -257,7 +257,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // To skip status calculation we should use 'skipStatusCal'.
     // eg pay later membership, membership update cron CRM-3984
 
-    if (empty($params['is_override']) && empty($params['skipStatusCal'])) {
+    if (empty($params['skipStatusCal'])) {
       $fieldsToLoad = [];
       foreach (['start_date', 'end_date', 'join_date'] as $dateField) {
         if (!empty($params[$dateField]) && $params[$dateField] !== 'null' && strpos($params[$dateField], date('Ymd', CRM_Utils_Time::strtotime(trim($params[$dateField])))) !== 0) {
@@ -275,9 +275,23 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
           $params[$fieldToLoad] = $membership[$fieldToLoad];
         }
       }
-      $params['start_date'] = $params['start_date'] ?: 'null';
-      $params['end_date'] = $params['end_date'] ?: 'null';
-      $params['join_date'] = $params['join_date'] ?: 'null';
+      if (empty($params['id'])
+        && (empty($params['start_date']) || empty($params['join_date']) || (empty($params['end_date']) && !$isLifeTime))) {
+        // This is a new membership, calculate the membership dates.
+        $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
+          $params['membership_type_id'],
+          $params['join_date'] ?? NULL,
+          $params['start_date'] ?? NULL,
+          $params['end_date'] ?? NULL,
+          $params['num_terms'] ?? 1
+        );
+      }
+      else {
+        $calcDates = [];
+      }
+      $params['start_date'] = $params['start_date'] ?? ($calcDates['start_date'] ?? 'null');
+      $params['end_date'] = $params['end_date'] ?? ($calcDates['end_date'] ?? 'null');
+      $params['join_date'] = $params['join_date'] ?? ($calcDates['join_date'] ?? 'null');
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
       $excludeIsAdmin = $params['exclude_is_admin'] ?? FALSE;
@@ -287,13 +301,15 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
-        'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
-      );
-      if (empty($calcStatus)) {
-        throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
+      if (empty($params['is_override'])) {
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
+          'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
+        );
+        if (empty($calcStatus)) {
+          throw new CRM_Core_Exception(ts("The membership cannot be saved because the status cannot be calculated for start_date: {$params['start_date']} end_date {$params['end_date']} join_date {$params['join_date']} as at " . CRM_Utils_Time::date('Y-m-d H:i:s')));
+        }
+        $params['status_id'] = $calcStatus['id'];
       }
-      $params['status_id'] = $calcStatus['id'];
     }
 
     // data cleanup only: all verifications on number of related memberships are done upstream in:
