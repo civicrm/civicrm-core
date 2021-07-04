@@ -2,6 +2,7 @@
 
 namespace Civi\AfformAdmin;
 
+use Civi\Api4\Utils\CoreUtil;
 use CRM_AfformAdmin_ExtensionUtil as E;
 
 class AfformAdminMeta {
@@ -104,7 +105,26 @@ class AfformAdminMeta {
       }
       $params['values']['state_province_id'] = \Civi::settings()->get('defaultContactStateProvince');
     }
-    return (array) civicrm_api4($entityName, 'getFields', $params, 'name');
+    $fields = (array) civicrm_api4($entityName, 'getFields', $params);
+
+    // Add implicit joins to search fields
+    if ($params['action'] === 'search') {
+      foreach (array_reverse($fields, TRUE) as $index => $field) {
+        if (!empty($field['fk_entity']) && !$field['options']) {
+          $fkLabelField = CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
+          if ($fkLabelField) {
+            // Add the label field from the other entity to this entity's list of fields
+            $newField = civicrm_api4($field['fk_entity'], 'getFields', [
+              'where' => [['name', '=', $fkLabelField]],
+            ])->first();
+            $newField['name'] = $field['name'] . '.' . $newField['name'];
+            $newField['label'] = $field['label'] . ' ' . $newField['label'];
+            array_splice($fields, $index, 0, [$newField]);
+          }
+        }
+      }
+    }
+    return array_column($fields, NULL, 'name');
   }
 
   /**
