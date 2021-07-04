@@ -70,31 +70,15 @@ abstract class AbstractSaveAction extends AbstractAction {
   protected $reload = FALSE;
 
   /**
-   * @var string
-   */
-  private $idField;
-
-  /**
-   * BatchAction constructor.
-   * @param string $entityName
-   * @param string $actionName
-   * @param string $idField
-   */
-  public function __construct($entityName, $actionName, $idField = 'id') {
-    // $idField should be a string but some apis (e.g. CustomValue) give us an array
-    $this->idField = array_values((array) $idField)[0];
-    parent::__construct($entityName, $actionName);
-  }
-
-  /**
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateValues() {
+    $idField = $this->getIdField();
     // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
     $unmatched = [];
     foreach ($this->records as $record) {
-      if (empty($record[$this->idField])) {
+      if (empty($record[$idField])) {
         $unmatched = array_unique(array_merge($unmatched, $this->checkRequiredFields($record)));
       }
     }
@@ -104,23 +88,23 @@ abstract class AbstractSaveAction extends AbstractAction {
 
     if ($this->checkPermissions) {
       foreach ($this->records as $record) {
-        $action = empty($record[$this->idField]) ? 'create' : 'update';
+        $action = empty($record[$idField]) ? 'create' : 'update';
         if (!CoreUtil::checkAccessDelegated($this->getEntityName(), $action, $record, \CRM_Core_Session::getLoggedInContactID() ?: 0)) {
           throw new UnauthorizedException("ACL check failed");
         }
       }
     }
 
-    $e = new ValidateValuesEvent($this, $this->records, new \CRM_Utils_LazyArray(function() {
-      $existingIds = array_column($this->records, $this->idField);
+    $e = new ValidateValuesEvent($this, $this->records, new \CRM_Utils_LazyArray(function() use ($idField) {
+      $existingIds = array_column($this->records, $idField);
       $existing = civicrm_api4($this->getEntityName(), 'get', [
         'checkPermissions' => $this->checkPermissions,
-        'where' => [[$this->idField, 'IN', $existingIds]],
-      ], $this->idField);
+        'where' => [[$idField, 'IN', $existingIds]],
+      ], $idField);
 
       $result = [];
       foreach ($this->records as $k => $new) {
-        $old = isset($new[$this->idField]) ? $existing[$new[$this->idField]] : NULL;
+        $old = isset($new[$idField]) ? $existing[$new[$idField]] : NULL;
         $result[$k] = ['old' => $old, 'new' => $new];
       }
       return $result;
@@ -135,7 +119,7 @@ abstract class AbstractSaveAction extends AbstractAction {
    * @return string
    */
   protected function getIdField() {
-    return $this->idField;
+    return CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')[0];
   }
 
   /**

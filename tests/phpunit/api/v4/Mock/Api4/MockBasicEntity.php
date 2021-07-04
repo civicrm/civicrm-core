@@ -96,12 +96,8 @@ class MockBasicEntity extends Generic\BasicEntity {
    * @return Generic\BasicBatchAction
    */
   public static function batchFrobnicate($checkPermissions = TRUE) {
-    return (new Generic\BasicBatchAction(__CLASS__, __FUNCTION__, ['identifier', 'number'], function($item) {
-      return [
-        'identifier' => $item['identifier'],
-        'frobnication' => $item['number'] * $item['number'],
-      ];
-    }))->setCheckPermissions($checkPermissions);
+    return (new Action\MockBasicEntity\BatchFrobnicate(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
 }

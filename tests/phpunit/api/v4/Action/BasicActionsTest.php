@@ -48,18 +48,26 @@ class BasicActionsTest extends UnitTestCase {
     $result = MockBasicEntity::get()->execute();
     $this->assertCount(1, $result);
 
-    $id2 = MockBasicEntity::create()->addValue('foo', 'two')->execute()->first()['identifier'];
+    $id2 = MockBasicEntity::create()
+      ->addValue('foo', 'two')
+      ->addValue('group:label', 'First')
+      ->execute()->first()['identifier'];
 
     $result = MockBasicEntity::get()->selectRowCount()->execute();
     $this->assertEquals(2, $result->count());
 
+    // Updating a single record should support identifier either in the values or the where clause
+    // Test both styles of update
     MockBasicEntity::update()->addWhere('identifier', '=', $id2)->addValue('foo', 'new')->execute();
+    MockBasicEntity::update()->addValue('identifier', $id2)->addValue('color', 'red')->execute();
 
     $result = MockBasicEntity::get()->addOrderBy('identifier', 'DESC')->setLimit(1)->execute();
     // The object's count() method will account for all results, ignoring limit, while the array results are limited
     $this->assertCount(2, $result);
     $this->assertCount(1, (array) $result);
     $this->assertEquals('new', $result->first()['foo']);
+    $this->assertEquals('red', $result->first()['color']);
+    $this->assertEquals('one', $result->first()['group']);
 
     $result = MockBasicEntity::save()
       ->addRecord(['identifier' => $id1, 'foo' => 'one updated', 'weight' => '5'])
@@ -252,7 +260,7 @@ class BasicActionsTest extends UnitTestCase {
     }
 
     $result = MockBasicEntity::get()
-      ->addSelect('*e', 'weig*ht')
+      ->addSelect('s*e', 'weig*ht')
       ->execute()
       ->first();
     $this->assertEquals(['shape', 'size', 'weight'], array_keys($result));
