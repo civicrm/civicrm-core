@@ -451,7 +451,7 @@
       function _loadResultsCallback() {
         // Multiply limit to read 2 pages at once & save ajax requests
         var params = _.merge(_.cloneDeep(ctrl.savedSearch.api_params), {debug: true, limit: ctrl.limit * 2});
-        // Select the ids of implicitly joined entities (helps with displaying links)
+        // Select the join field of implicitly joined entities (helps with displaying links)
         _.each(params.select, function(fieldName) {
           if (_.includes(fieldName, '.') && !_.includes(fieldName, ' AS ')) {
             var info = searchMeta.parseExpr(fieldName);
@@ -463,10 +463,13 @@
             }
           }
         });
-        // Select the ids of explicitly joined entities (helps with displaying links)
+        // Select primary key of explicitly joined entities (helps with displaying links)
         _.each(params.join, function(join) {
-          var idField = join[0].split(' AS ')[1] + '.id';
-          if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
+          var entity = join[0].split(' AS ')[0],
+            alias = join[0].split(' AS ')[1],
+            primaryKeys = searchMeta.getEntity(entity).primary_key,
+            idField = alias + '.' + primaryKeys[0];
+          if (primaryKeys.length && !_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
             params.select.push(idField);
           }
         });
