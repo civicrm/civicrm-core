@@ -124,6 +124,25 @@ class CRM_Utils_SQL {
   }
 
   /**
+   * Disable STRICT_TRANS_TABLE SQL Mode
+   *
+   * @return bool
+   */
+  public static function disableStrictTransTable() {
+    $sqlModes = self::getSqlModes();
+
+    if (!empty($sqlModes) && in_array('STRICT_TRANS_TABLES', $sqlModes)) {
+      if ($key = array_search('STRICT_TRANS_TABLES', $sqlModes)) {
+        unset($sqlModes[$key]);
+        CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
+      }
+      return TRUE;
+    }
+
+    return FALSE;
+  }
+
+  /**
    * CHeck if ONLY_FULL_GROUP_BY is in the global sql_modes
    * @return bool
    */

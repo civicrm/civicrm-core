@@ -652,8 +652,40 @@ class CRM_Core_DAO extends DB_DataObject {
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
       }
+      // If we are in MariaDB disable Strict Trans Table SQL mode to prevent hard fail in multilingual mode
+      $version = self::getDatabaseVersion();
+      if (stripos($version, 'mariadb') !== FALSE && CRM_Core_I18n::isMultiLingual()) {
+        CRM_Utils_SQL::disableStrictTransTable();
+      }
 
       $result = $this->insert();
+
+      // If in mariadb and multilingual mode replicate what MySQL does by copying the newly created contents of any required fields to the same fields in the other languages.
+      if (stripos($version, 'mariadb') !== FALSE && CRM_Core_I18n::isMultiLingual()) {
+        $required_fields = [];
+        $update = '';
+        foreach (CRM_Core_I18n_SchemaStructure::columns()[$this->tableName()] as $field => $type) {
+          if (strpos($type, 'NOT NULL') !== FALSE) {
+            $required_fields[] = $field;
+          }
+        }
+        foreach ($required_fields as $field) {
+          if (!empty($update)) {
+            $update .= ',';
+          }
+          foreach (CRM_Core_I18n::getMultilingual() as $locale) {
+            $update .= ' ' . $field . '_' . $locale . ' = ' . $this->{$field};
+          }
+        }
+        if (!empty($update)) {
+          CRM_Core_DAO::executeQuery('UPDATE ' . $this->tableName() . ' SET ' . $update . ' WHERE id = ' . $this->id, [], TRUE, NULL, FALSE, FALSE);
+        }
+        $sqlModes = CRM_Utils_SQL::getSqlModes();
+        if (!empty($sqlModes)) {
+          $sqlModes[] = 'STRICT_TRANS_TABLES';
+          CRM_Core_DAO::executeQuery("SET SESSION sql_mode = '" . implode(',', $sqlModes) . "'");
+        }
+      }
 
       if ($hook) {
         $event = new \Civi\Core\DAO\Event\PostUpdate($this, $result);
