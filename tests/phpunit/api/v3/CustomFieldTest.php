@@ -192,7 +192,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check with data type - Options with option_values
    */
-  public function testCustomFieldCreateWithEmptyOptionGroup() {
+  public function testCustomFieldCreateWithEmptyOptionGroup(): void {
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'select_test_group']);
     $params = [
       'custom_group_id' => $customGroup['id'],
@@ -205,9 +205,9 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
     $this->assertNotNull($customField['id']);
-    $optionGroupID = $this->callAPISuccess('custom_field', 'getvalue', [
+    $optionGroupID = $this->callAPISuccess('CustomField', 'getvalue', [
       'id' => $customField['id'],
       'return' => 'option_group_id',
     ]);
@@ -238,10 +238,10 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_searchable' => 0,
       'is_active' => 1,
     ];
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
     $this->assertNotNull($customField['id']);
     $params['label'] = 'ààà';
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->callAPISuccess('CustomField', 'create', $params);
     $this->assertNotNull($customField['id']);
   }
 
