@@ -123,7 +123,6 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
             $value, $relationshipName
           );
         }
-        $membershipType[$dao->id]['maxRelated'] = $membershipType[$dao->id]['max_related'] ?? NULL;
       }
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !CRM_Core_Permission::check('edit contributions of type ' . CRM_Contribute_PseudoConstant::financialType($dao->financial_type_id))) {
         unset($links[CRM_Core_Action::UPDATE], $links[CRM_Core_Action::ENABLE], $links[CRM_Core_Action::DISABLE]);
@@ -134,24 +133,22 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
       // form all action links
       $action = array_sum(array_keys($this->links()));
 
-      // update enable/disable links depending on if it is is_reserved or is_active
-      if (!isset($dao->is_reserved)) {
-        if ($dao->is_active) {
-          $action -= CRM_Core_Action::ENABLE;
-        }
-        else {
-          $action -= CRM_Core_Action::DISABLE;
-        }
-        $membershipType[$dao->id]['order'] = $membershipType[$dao->id]['weight'];
-        $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
-          ['id' => $dao->id],
-          ts('more'),
-          FALSE,
-          'membershipType.manage.action',
-          'MembershipType',
-          $dao->id
-        );
+      // update enable/disable links depending on if it is_active
+      if ($dao->is_active) {
+        $action -= CRM_Core_Action::ENABLE;
       }
+      else {
+        $action -= CRM_Core_Action::DISABLE;
+      }
+      $membershipType[$dao->id]['order'] = $membershipType[$dao->id]['weight'];
+      $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
+        ['id' => $dao->id],
+        ts('more'),
+        FALSE,
+        'membershipType.manage.action',
+        'MembershipType',
+        $dao->id
+      );
     }
 
     $returnURL = CRM_Utils_System::url('civicrm/admin/member/membershipType', "reset=1&action=browse");

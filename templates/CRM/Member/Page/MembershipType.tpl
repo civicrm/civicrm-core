@@ -45,7 +45,7 @@
           <td class="crmf-duration_interval_unit">{$row.duration_interval} {$row.duration_unit}</td>
           <td class="crmf-auto_renew">{if $row.auto_renew EQ 2}{ts}Required{/ts}{elseif $row.auto_renew EQ 1}{ts}Optional{/ts}{else}{ts}No{/ts}{/if}</td>
           <td class="crmf-relationship_type">{$row.relationshipTypeName}</td>
-          <td class="crmf-max_related" align="right">{$row.maxRelated}</td>
+          <td class="crmf-max_related" align="right">{$row.max_related}</td>
           <td class="crmf-visibility crm-editable" data-type="select">{$row.visibility}</td>
           <td class="nowrap crmf-weight">{$row.weight}</td>
           <td class="crmf-is_active">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
