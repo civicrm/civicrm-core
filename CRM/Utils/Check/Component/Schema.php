@@ -125,7 +125,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       }
       foreach ($group['form_values'] as $formValues) {
         if (isset($formValues[0]) && (strpos($formValues[0], 'custom_') === 0)) {
-          list(, $customFieldID) = explode('_', $formValues[0]);
+          [, $customFieldID] = explode('_', $formValues[0]);
           if (!in_array((int) $customFieldID, $customFieldIds, TRUE)) {
             $problematicSG[CRM_Contact_BAO_SavedSearch::getName($group['id'], 'id')] = [
               'title' => CRM_Contact_BAO_SavedSearch::getName($group['id'], 'title'),
@@ -201,6 +201,32 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       $messages[] = $msg;
     }
     return $messages;
+  }
+
+  /**
+   * Check the function to populate phone_numeric exists.
+   *
+   * @return array|\CRM_Utils_Check_Message[]
+   */
+  public function checkPhoneFunctionExists():array {
+    $dao = CRM_Core_DAO::executeQuery("SHOW function status WHERE db = database() AND name = 'civicrm_strip_non_numeric'");
+    if (!$dao->fetch()) {
+      $msg = new CRM_Utils_Check_Message(
+        __FUNCTION__,
+        ts("Your database is missing a function to populate the 'Phone number' field with a numbers-only version of the phone."),
+        ts('Missing Phone numeric function'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-server'
+      );
+      $msg->addAction(
+        ts('Rebuild triggers (also re-builds the phone number function)'),
+        ts('Create missing function now? This may take few minutes.'),
+        'api3',
+        ['System', 'flush', ['triggers' => TRUE]]
+      );
+      return [$msg];
+    }
+    return [];
   }
 
 }
