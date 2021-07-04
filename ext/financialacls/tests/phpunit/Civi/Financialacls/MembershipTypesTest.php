@@ -16,13 +16,39 @@ class MembershipTypesTest extends BaseTestClass {
    * Test buildMembershipTypes.
    */
   public function testMembershipTypesHook(): void {
-    $types = MembershipType::save(FALSE)->setRecords([
-      ['name' => 'Forbidden', 'financial_type_id:name' => 'Member Dues'],
-      ['name' => 'Go for it', 'financial_type_id:name' => 'Donation'],
-    ])->setDefaults(['period_type' => 'rolling', 'member_of_contact_id' => 1])->execute()->indexBy('name');
-    $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
+    $types = $this->setUpMembershipTypesACLLimited();
     $permissionedTypes = \CRM_Member_BAO_Membership::buildMembershipTypeValues(new \CRM_Member_Form_Membership());
     $this->assertEquals([$types['Go for it']['id']], array_keys($permissionedTypes));
+  }
+
+  /**
+   * Test the membership type page loads correctly.
+   */
+  public function testMembershipTypePage(): void {
+    $page = new \CRM_Member_Page_MembershipType();
+    $types = $this->setUpMembershipTypesACLLimited();
+    $page->browse();
+    $assigned = \CRM_Core_Smarty::singleton()->get_template_vars();
+    $this->assertArrayNotHasKey($types['Forbidden']['id'], $assigned['rows']);
+    $this->assertArrayHasKey($types['Go for it']['id'], $assigned['rows']);
+  }
+
+  /**
+   * @return \Civi\Api4\Generic\Result
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function setUpMembershipTypesACLLimited(): \Civi\Api4\Generic\Result {
+    $types = MembershipType::save(FALSE)
+      ->setRecords([
+        ['name' => 'Forbidden', 'financial_type_id:name' => 'Member Dues', 'weight' => 1],
+        ['name' => 'Go for it', 'financial_type_id:name' => 'Donation', 'weight' => 2],
+      ])
+      ->setDefaults(['period_type' => 'rolling', 'member_of_contact_id' => 1])
+      ->execute()
+      ->indexBy('name');
+    $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
+    return $types;
   }
 
 }
