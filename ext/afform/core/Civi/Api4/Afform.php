@@ -44,7 +44,7 @@ class Afform extends Generic\AbstractEntity {
    * @return Action\Afform\Update
    */
   public static function update($checkPermissions = TRUE) {
-    return (new Action\Afform\Update('Afform', __FUNCTION__, 'name'))
+    return (new Action\Afform\Update('Afform', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -53,7 +53,7 @@ class Afform extends Generic\AbstractEntity {
    * @return Action\Afform\Save
    */
   public static function save($checkPermissions = TRUE) {
-    return (new Action\Afform\Save('Afform', __FUNCTION__, 'name'))
+    return (new Action\Afform\Save('Afform', __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
@@ -89,7 +89,7 @@ class Afform extends Generic\AbstractEntity {
    * @return Generic\BasicBatchAction
    */
   public static function revert($checkPermissions = TRUE) {
-    return (new BasicBatchAction('Afform', __FUNCTION__, ['name'], function($item, BasicBatchAction $action) {
+    return (new BasicBatchAction('Afform', __FUNCTION__, function($item, BasicBatchAction $action) {
       $scanner = \Civi::service('afform_scanner');
       $files = [
         \CRM_Afform_AfformScanner::METADATA_FILE,

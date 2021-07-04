@@ -12,6 +12,8 @@
 
 namespace Civi\Api4\Generic;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Base class for all batch actions (Update, Delete, Replace).
  *
@@ -30,23 +32,6 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
   protected $where = [];
 
   /**
-   * @var array
-   */
-  private $select;
-
-  /**
-   * BatchAction constructor.
-   * @param string $entityName
-   * @param string $actionName
-   * @param string|array $select
-   *   One or more fields to load for each item.
-   */
-  public function __construct($entityName, $actionName, $select = 'id') {
-    $this->select = (array) $select;
-    parent::__construct($entityName, $actionName);
-  }
-
-  /**
    * Get a list of records for this batch.
    *
    * @return array
@@ -56,7 +41,7 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
   }
 
   /**
-   * Get a query which resolves the list of records for this batch.
+   * Get an API action object which resolves the list of records for this batch.
    *
    * This is similar to `getBatchRecords()`, but you may further refine the
    * API call (e.g. selecting different fields or data-pages) before executing.
@@ -72,16 +57,20 @@ abstract class AbstractBatchAction extends AbstractQueryAction {
       'offset' => $this->offset,
     ];
     if (empty($this->reload)) {
-      $params['select'] = $this->select;
+      $params['select'] = $this->getSelect();
     }
     return \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4] + $params);
   }
 
   /**
-   * @return array
+   * Determines what fields will be returned by getBatchRecords
+   *
+   * Defaults to an entity's primary key(s), typically ['id']
+   *
+   * @return string[]
    */
   protected function getSelect() {
-    return $this->select;
+    return CoreUtil::getInfoItem($this->getEntityName(), 'primary_key');
   }
 
 }

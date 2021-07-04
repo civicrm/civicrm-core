@@ -43,13 +43,19 @@ class BasicBatchAction extends AbstractBatchAction {
    *
    * @param string $entityName
    * @param string $actionName
-   * @param string|array $select
-   *   One or more fields to select from each matching item.
    * @param callable $doer
    */
-  public function __construct($entityName, $actionName, $select = 'id', $doer = NULL) {
-    parent::__construct($entityName, $actionName, $select);
+  public function __construct($entityName, $actionName, $doer = NULL) {
+    parent::__construct($entityName, $actionName);
     $this->doer = $doer;
+    // Accept doer as 4th param for now, but emit deprecated warning
+    $this->doer = func_get_args()[3] ?? NULL;
+    if ($this->doer) {
+      \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $doer as 4th param; it should be the 3rd as the $select param has been removed');
+    }
+    else {
+      $this->doer = $doer;
+    }
   }
 
   /**

@@ -30,12 +30,18 @@ class BasicSaveAction extends AbstractSaveAction {
    *
    * @param string $entityName
    * @param string $actionName
-   * @param string $idField
    * @param callable $setter
    */
-  public function __construct($entityName, $actionName, $idField = 'id', $setter = NULL) {
-    parent::__construct($entityName, $actionName, $idField);
-    $this->setter = $setter;
+  public function __construct($entityName, $actionName, $setter = NULL) {
+    parent::__construct($entityName, $actionName);
+    // Accept setter as 4th param for now, but emit deprecated warning
+    $this->setter = func_get_args()[3] ?? NULL;
+    if ($this->setter) {
+      \CRM_Core_Error::deprecatedWarning(__CLASS__ . ' constructor received $setter as 4th param; it should be the 3rd as the $select param has been removed');
+    }
+    else {
+      $this->setter = $setter;
+    }
   }
 
   /**

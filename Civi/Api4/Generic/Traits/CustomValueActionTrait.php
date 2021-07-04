@@ -24,7 +24,7 @@ trait CustomValueActionTrait {
 
   public function __construct($customGroup, $actionName) {
     $this->customGroup = $customGroup;
-    parent::__construct('CustomValue', $actionName, ['id', 'entity_id']);
+    parent::__construct('CustomValue', $actionName);
   }
 
   /**

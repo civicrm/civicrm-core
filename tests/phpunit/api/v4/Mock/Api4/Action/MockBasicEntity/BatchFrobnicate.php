@@ -10,20 +10,29 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\CustomValue;
+/**
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC https://civicrm.org/licensing
+ */
+
+
+namespace Civi\Api4\Action\MockBasicEntity;
 
 /**
- * Update one or more records with new values. Use the where clause to select them.
+ * This class demonstrates how the getRecords method of Basic\Get can be overridden.
  */
-class Update extends \Civi\Api4\Generic\DAOUpdateAction {
-  use \Civi\Api4\Generic\Traits\CustomValueActionTrait;
+class BatchFrobnicate extends \Civi\Api4\Generic\BasicBatchAction {
 
-  /**
-   * Ensure entity_id is returned by getBatchRecords()
-   * @return string[]
-   */
+  protected function doTask($item) {
+    return [
+      'identifier' => $item['identifier'],
+      'frobnication' => $item['number'] * $item['number'],
+    ];
+  }
+
   protected function getSelect() {
-    return ['id', 'entity_id'];
+    return ['identifier', 'number'];
   }
 
 }
