@@ -230,6 +230,9 @@
   name        : Bob Silvern
   jira        : bobs0
 
+- github      : bugfolder
+  name        : Robert J. Lang
+
 - github      : calbasi
   name        : Joan Cervan Andreu
   organization: calbasi.net
