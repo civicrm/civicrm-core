@@ -15,6 +15,8 @@
  * @package CiviCRM_APIv3
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Add or update a Contribution.
  *
@@ -40,18 +42,14 @@ function civicrm_api3_contribution_create($params) {
   }
   $params['skipCleanMoney'] = TRUE;
 
-  if (!empty($params['check_permissions']) && CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-    if (empty($params['id'])) {
-      $op = CRM_Core_Action::ADD;
-    }
-    else {
-      if (empty($params['financial_type_id'])) {
-        $params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['id'], 'financial_type_id');
-      }
-      $op = CRM_Core_Action::UPDATE;
-    }
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types, $op);
-    if (!array_key_exists($params['financial_type_id'], $types)) {
+  if (!empty($params['check_permissions'])) {
+    // Check acls on this entity. Note that we pass in financial type id, if we have it
+    // since we know this is checked by acls. In v4 we do something more generic.
+    if (!Contribution::checkAccess()
+      ->setAction(empty($params['id']) ? 'create' : 'update')
+      ->addValue('id', $params['id'] ?? NULL)
+      ->addValue('financial_type_id', $params['financial_type_id'] ?? NULL)
+      ->execute()->first()['access']) {
       throw new API_Exception('You do not have permission to create this contribution');
     }
   }
