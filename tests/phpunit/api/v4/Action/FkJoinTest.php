@@ -224,6 +224,11 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
     $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
     $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
+    EntityTag::get(FALSE)
+      ->addWhere('entity_id', 'IN', [$cid1, $cid2, $cid3])
+      ->addChain('delete', Tag::delete(FALSE)
+        ->addWhere('id', '=', '$tag_id'))
+      ->execute();
   }
 
   public function testBridgeJoinRelationshipContactActivity() {
@@ -308,6 +313,7 @@ class FkJoinTest extends UnitTestCase {
     $this->assertNull($result[3]['rel.id']);
     $this->assertEquals($cid3, $result[4]['contact.id']);
     $this->assertNull($result[3]['rel.id']);
+    Relationship::delete()->addWhere('contact_id_b', 'IN', [$cid1, $cid2])->execute();
   }
 
   public function testJoinToEmployerId() {

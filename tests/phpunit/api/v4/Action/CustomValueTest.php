@@ -249,6 +249,10 @@ class CustomValueTest extends BaseCustomValueTest {
     $result = CustomValue::get($group)->execute();
     // check that there are no custom values present
     $this->assertEquals(0, count($result));
+    CustomField::delete(FALSE)->addWhere('id', '=', $textField['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $multiField['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $colorField['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }

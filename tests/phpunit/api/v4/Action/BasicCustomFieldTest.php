@@ -38,7 +38,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    CustomField::create(FALSE)
+    $customField = CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
@@ -81,12 +81,14 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->first();
 
     $this->assertEquals('Blue', $contact['MyIndividualFields.FavColor']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
   public function testWithTwoFields() {
 
     // First custom set
-    CustomGroup::create(FALSE)
+    $customGroup1 = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
@@ -102,7 +104,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute();
 
     // Second custom set
-    CustomGroup::create(FALSE)
+    $customGroup2 = CustomGroup::create(FALSE)
       ->addValue('name', 'MyContactFields2')
       ->addValue('extends', 'Contact')
       ->addChain('field1', CustomField::create()
@@ -222,6 +224,14 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertNotContains($contactId1, array_keys((array) $search));
     $this->assertNotContains($contactId2, array_keys((array) $search));
+    CustomField::get()
+      ->addChain('delete', CustomField::delete()
+        ->addWhere('id', '=', '$id'))
+      ->execute();
+    CustomGroup::get()
+      ->addChain('delete', CustomGroup::delete()
+        ->addWhere('id', '=', '$id'))
+      ->execute();
   }
 
   public function testRelationshipCacheCustomFields() {
@@ -233,7 +243,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    CustomField::create(FALSE)
+    $customField = CustomField::create(FALSE)
       ->addValue('label', 'PetName')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
@@ -268,6 +278,8 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertCount(2, $results);
     $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }

@@ -42,7 +42,7 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    CustomField::create(FALSE)
+    $customField1 = CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('options', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
@@ -50,21 +50,21 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $CustomField2 = CustomField::create(FALSE)
       ->addValue('label', 'FavAnimal')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $customField3 = CustomField::create(FALSE)
       ->addValue('label', 'FavLetter')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $customField4 = CustomField::create(FALSE)
       ->addValue('label', 'FavFood')
       ->addValue('custom_group_id', $customGroupId)
       ->addValue('html_type', 'Text')
@@ -100,6 +100,11 @@ class CustomValuePerformanceTest extends BaseCustomValueTest {
     // FIXME: This count is artificially high due to the line
     // $this->entity = Tables::getBriefName(Tables::getClassForTable($targetTable));
     // In class Joinable. TODO: Investigate why.
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField1[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField2[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField3[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField4[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroupId)->execute();
   }
 
 }

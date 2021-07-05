@@ -36,7 +36,7 @@ class CustomContactRefTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    CustomField::create(FALSE)
+    $customField = CustomField::create(FALSE)
       ->addValue('label', 'FavPerson')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Autocomplete-Select')
@@ -68,6 +68,8 @@ class CustomContactRefTest extends BaseCustomValueTest {
 
     $this->assertEquals('Favorite', $contact['MyContactRef.FavPerson.first_name']);
     $this->assertEquals('Person', $contact['MyContactRef.FavPerson.last_name']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
   public function testCurrentUser() {
@@ -79,7 +81,7 @@ class CustomContactRefTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    CustomField::create(FALSE)
+    $customField = CustomField::create(FALSE)
       ->addValue('label', 'FavPerson')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Autocomplete-Select')
@@ -102,6 +104,8 @@ class CustomContactRefTest extends BaseCustomValueTest {
       ->first();
 
     $this->assertEquals($currentUser, $contact['MyContactRef.FavPerson']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }

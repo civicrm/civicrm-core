@@ -215,6 +215,9 @@ class PseudoconstantTest extends BaseCustomValueTest {
       ->addOrderBy('myPseudoconstantTest.Technicolor:label', 'DESC')
       ->execute()->first()['id'];
     $this->assertEquals($cid1, $result);
+    $customGroup = CustomGroup::get(FALSE)->addWhere('name', '=', 'myPseudoconstantTest')->execute()->first();
+    CustomField::delete(FALSE)->addWhere('custom_group_id', '=', $customGroup['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
   public function testJoinOptions() {

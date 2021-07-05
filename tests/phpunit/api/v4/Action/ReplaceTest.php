@@ -111,14 +111,14 @@ class ReplaceTest extends UnitTestCase {
       ->execute()
       ->first();
 
-    CustomField::create()
+    $customField1 = CustomField::create()
       ->addValue('label', 'Custom1')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'String')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $customField2 = CustomField::create(FALSE)
       ->addValue('label', 'Custom2')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'String')
@@ -181,6 +181,9 @@ class ReplaceTest extends UnitTestCase {
     $this->assertEquals('new two', $newRecords->last()['Custom2']);
     $this->assertEquals('changed one', $newRecords[$cid1Records[0]['id']]['Custom1']);
     $this->assertEquals('changed two', $newRecords[$cid1Records[0]['id']]['Custom2']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField1[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField2[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }

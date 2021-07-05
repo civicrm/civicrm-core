@@ -105,6 +105,8 @@ class SpecGathererTest extends UnitTestCase {
     $options = array_column($customField->getOptions([], ['id', 'name', 'label']), NULL, 'id');
     $this->assertEquals('Green', $options['g']['name']);
     $this->assertEquals('Pink', $options['p']['label']);
+    CustomField::delete(FALSE)->addWhere('custom_group_id', '=', $customGroupId)->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroupId)->execute();
   }
 
 }

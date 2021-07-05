@@ -42,39 +42,39 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colora');
     $foodField = uniqid('fooda');
 
-    $customGroupId = CustomGroup::create(FALSE)
+    $customGroup1Id = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create(FALSE)
+    $customField1 = CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup1Id)
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $customField2 = CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup1Id)
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create(FALSE)
+    $customGroup2Id = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create(FALSE)
+    $customField3 = CustomField::create(FALSE)
       ->addValue('label', 'Salary')
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup2Id)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
@@ -101,6 +101,11 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $this->assertEquals('Red', $result["$group.$colorField:label"]);
     $this->assertEquals('Corn', $result["$group.$foodField:label"]);
     $this->assertEquals(50000, $result['FinancialStuff.Salary']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField1[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField2[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField3[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup1Id)->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup2Id)->execute();
   }
 
   public function testWithCustomDataForMultipleContacts() {
@@ -108,39 +113,39 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $colorField = uniqid('colorb');
     $foodField = uniqid('foodb');
 
-    $customGroupId = CustomGroup::create(FALSE)
+    $customGroup1Id = CustomGroup::create(FALSE)
       ->addValue('name', $group)
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create(FALSE)
+    $customField1 = CustomField::create(FALSE)
       ->addValue('label', $colorField)
       ->addValue('name', $colorField)
       ->addValue('option_values', ['r' => 'Red', 'g' => 'Green', 'b' => 'Blue'])
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup1Id)
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
       ->execute();
 
-    CustomField::create(FALSE)
+    $customField2 = CustomField::create(FALSE)
       ->addValue('label', $foodField)
       ->addValue('name', $foodField)
       ->addValue('option_values', ['1' => 'Corn', '2' => 'Potatoes', '3' => 'Cheese'])
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup1Id)
       ->addValue('html_type', 'Select')
       ->addValue('data_type', 'String')
       ->execute();
 
-    $customGroupId = CustomGroup::create(FALSE)
+    $customGroup2Id = CustomGroup::create(FALSE)
       ->addValue('name', 'FinancialStuff')
       ->addValue('extends', 'Contact')
       ->execute()
       ->first()['id'];
 
-    CustomField::create(FALSE)
+    $customField3 = CustomField::create(FALSE)
       ->addValue('label', 'Salary')
-      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('custom_group_id', $customGroup2Id)
       ->addValue('html_type', 'Number')
       ->addValue('data_type', 'Money')
       ->execute();
@@ -182,6 +187,11 @@ class CreateWithOptionGroupTest extends BaseCustomValueTest {
     $this->assertEquals('Blue', $blueCheese["$group.$colorField:label"]);
     $this->assertEquals('Cheese', $blueCheese["$group.$foodField:label"]);
     $this->assertEquals(500000, $blueCheese['FinancialStuff.Salary']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField1[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField2[0]['id'])->execute();
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField3[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup1Id)->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup2Id)->execute();
   }
 
 }
