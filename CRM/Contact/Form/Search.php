@@ -368,6 +368,15 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
       $className = $this->_modeValue['taskClassName'];
       $taskParams['ssID'] = $this->_ssID ?? NULL;
+      if ($this instanceof CRM_Contact_Form_Search_Custom) {
+        // We set the $objectType for the searchTasks hook if it differs from 'contact'.
+        // 'contact' is the default task list so no need to replace this with a custom task list.
+        $customSearchClass = new $this->_customSearchClass($this->_formValues);
+        if ($customSearchClass instanceof CRM_Contact_Form_Search_Custom_Base) {
+          $className = $customSearchClass->getTasklistClass();
+          $className::$objectType = $customSearchClass->getObjectTypeForTaskList();
+        }
+      }
       $this->_taskList += $className::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
     }
 
