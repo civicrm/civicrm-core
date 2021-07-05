@@ -74,6 +74,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       if (!$contributionRecur->find(TRUE)) {
         throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
       }
+      // do a subscription check
+      if ($contributionRecur->processor_id != $input['subscription_id']) {
+        throw new CRM_Core_Exception('Unrecognized subscription.');
+      }
 
       // check if first contribution is completed, else complete first contribution
       $first = TRUE;
@@ -113,18 +117,9 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function recur($input, $recur, $contribution, $first) {
 
-    // do a subscription check
-    if ($recur->processor_id != $input['subscription_id']) {
-      throw new CRM_Core_Exception('Unrecognized subscription.');
-    }
-
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
 
     $now = date('YmdHis');
-
-    $contribution->invoice_id = md5(uniqid(rand(), TRUE));
-    $contribution->total_amount = $input['amount'];
-    $contribution->trxn_id = $input['trxn_id'];
 
     $isFirstOrLastRecurringPayment = FALSE;
     if ($input['response_code'] == 1) {
