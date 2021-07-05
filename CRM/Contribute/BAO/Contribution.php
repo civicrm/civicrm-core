@@ -194,7 +194,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $params['tax_amount'] = $taxAmount;
       $params['total_amount'] = $taxAmount + $lineTotal;
     }
-    if (isset($params['tax_amount']) && $params['tax_amount'] != $taxAmount && empty($params['skipLineItem'])) {
+    if (isset($params['tax_amount']) && empty($params['skipLineItem'])
+      && !CRM_Utils_Money::equals($params['tax_amount'], $taxAmount, ($params['currency'] ?? Civi::settings()->get('defaultCurrency')))
+    ) {
       CRM_Core_Error::deprecatedWarning('passing in incorrect tax amounts is deprecated');
     }
 
@@ -4399,9 +4401,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
     foreach ($params['line_items'] as &$lineItems) {
       foreach ($lineItems['line_item'] as &$item) {
-        if (empty($item['financial_type_id'])) {
-          $item['financial_type_id'] = $params['financial_type_id'];
-        }
         $lineItemAmount += $item['line_total'] + ($item['tax_amount'] ?? 0.00);
       }
     }

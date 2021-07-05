@@ -4344,24 +4344,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
     ], $generalParams, $recurParams));
 
-    $this->callAPISuccess('membership', 'create', [
-      'contact_id' => $newContact['id'],
-      'contribution_recur_id' => $contributionRecur['id'],
-      'financial_type_id' => 'Member Dues',
-      'membership_type_id' => $membershipType['id'],
-      'num_terms' => 1,
-      'skipLineItem' => TRUE,
-    ]);
-
-    CRM_Price_BAO_LineItem::getLineItemArray($this->_params, NULL, 'membership', $membershipType['id']);
-    $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
+    $originalContribution = $this->callAPISuccess('Order', 'create', array_merge(
       $this->_params,
       [
         'contact_id' => $newContact['id'],
         'contribution_recur_id' => $contributionRecur['id'],
         'financial_type_id' => 'Member Dues',
-        'contribution_status_id' => 1,
+        'api.Payment.create' => ['total_amount' => 100, 'payment_instrument_id' => 'Credit card'],
         'invoice_id' => 2345,
+        'line_items' => [
+          [
+            'line_item' => [
+              [
+                'membership_type_id' => $membershipType['id'],
+                'financial_type_id' => 'Member Dues',
+                'line_total' => $generalParams['total_amount'] ?? 100,
+              ],
+            ],
+            'params' => [
+              'contact_id' => $newContact['id'],
+              'contribution_recur_id' => $contributionRecur['id'],
+              'membership_type_id' => $membershipType['id'],
+              'num_terms' => 1,
+            ],
+          ],
+        ],
       ], $generalParams)
     );
     $lineItem = $this->callAPISuccess('LineItem', 'getsingle', []);
