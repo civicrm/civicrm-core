@@ -45,6 +45,7 @@ class BaseTestClass extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
+      'access CiviMember',
       'edit contributions',
       'delete in CiviContribute',
       'view contributions of type Donation',
