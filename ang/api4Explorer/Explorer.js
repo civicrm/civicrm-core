@@ -2,8 +2,6 @@
 
   // Schema metadata
   var schema = CRM.vars.api4.schema;
-  // FK schema data
-  var links = CRM.vars.api4.links;
   // Cache list of entities
   var entities = [];
   // Cache list of actions
@@ -12,7 +10,6 @@
   var fieldOptions = {};
   // Api params
   var params;
-
 
   angular.module('api4Explorer').config(function($routeProvider) {
     $routeProvider.when('/explorer/:api4entity?/:api4action?', {
@@ -168,17 +165,17 @@
         }
       });
       // Add implicit joins based on schema links
-      _.each(links[$scope.entity], function(link) {
-        var linkFields = _.cloneDeep(entityFields(link.entity)),
-          wildCard = addWildcard ? [{id: link.alias + '.*', text: link.alias + '.*', 'description': 'All core ' + link.entity + ' fields'}] : [];
-        if (linkFields) {
+      _.each(entityFields($scope.entity, $scope.action), function(field) {
+        if (field.fk_entity) {
+          var linkFields = _.cloneDeep(entityFields(field.fk_entity)),
+            wildCard = addWildcard ? [{id: field.name + '.*', text: field.name + '.*', 'description': 'All core ' + field.fk_entity + ' fields'}] : [];
           if (addPseudoconstant) {
             addPseudoconstants(linkFields, addPseudoconstant);
           }
           fieldList.push({
-            text: link.alias,
-            description: 'Implicit join to ' + link.entity,
-            children: wildCard.concat(formatForSelect2(linkFields, [], 'name', ['description'], link.alias + '.'))
+            text: field.name,
+            description: 'Implicit join to ' + field.fk_entity,
+            children: wildCard.concat(formatForSelect2(linkFields, [], 'name', ['description'], field.name + '.'))
           });
         }
       });
@@ -361,13 +358,13 @@
       if (joins[alias]) {
         return joins[alias].entity;
       }
-      // Then lookup implicit links
+      // Then lookup implicit joins
       _.each(path, function(node) {
-        var link = _.find(links[entity], {alias: node});
-        if (!link) {
+        var field = getField(node, entity, $scope.action);
+        if (!field || !field.fk_entity) {
           return false;
         }
-        entity = link.entity;
+        entity = field.fk_entity;
       });
       return entity;
     }
@@ -476,10 +473,15 @@
       $scope.fieldsAndJoinsAndFunctionsAndWildcards.unshift({id: '*', text: '*', 'description': 'All core ' + $scope.entity + ' fields'});
     };
 
+    // Select2 formatter: Add 'strikethrough' class to deprecated items
+    $scope.formatResultCssClass = function(result) {
+      return result.deprecated ? 'strikethrough' : '';
+    };
+
     function selectAction() {
       $scope.action = $routeParams.api4action;
       if (!actions.length) {
-        formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params']);
+        formatForSelect2(getEntity().actions, actions, 'name', ['description', 'params', 'deprecated']);
       }
       if ($scope.action) {
         var actionInfo = _.findWhere(actions, {id: $scope.action});
@@ -958,7 +960,7 @@
       if ($scope.entity && $routeParams.api4action !== newVal && !_.isUndefined(newVal)) {
         $location.url('/explorer/' + $scope.entity + '/' + newVal);
       } else if (newVal) {
-        setHelp($scope.entity + '::' + newVal, _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see']));
+        setHelp($scope.entity + '::' + newVal, _.pick(_.findWhere(getEntity().actions, {name: newVal}), ['description', 'comment', 'see', 'deprecated']));
       }
     });
 
@@ -1413,7 +1415,7 @@
       }
       var linkName = fieldNames.shift(),
         join = getExplicitJoins()[linkName],
-        newEntity = join ? join.entity : _.findWhere(links[entity], {alias: linkName}).entity;
+        newEntity = join ? join.entity : _.findWhere(entityFields(entity, action), {name: linkName}).fk_entity;
       return get(newEntity, fieldNames);
     }
   }

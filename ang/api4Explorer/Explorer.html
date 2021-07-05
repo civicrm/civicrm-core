@@ -10,10 +10,10 @@
         <div class="panel-heading">
           <div class="form-inline">
             <span ng-mouseenter="help('entity', paramDoc('$entity'))" ng-mouseleave="help()">
-              <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="::{placeholder: ts('Entity'), data: entities}" />
+              <input class="collapsible-optgroups form-control" ng-model="entity" ng-disabled="!entities.length" ng-class="{loading: !entities.length}" crm-ui-select="::{placeholder: ts('Entity'), data: entities, formatResultCssClass: formatResultCssClass}" />
             </span>
             <span ng-mouseenter="help('action', paramDoc('$action'))" ng-mouseleave="help()">
-              <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="::{placeholder: ts('Action'), data: actions}" />
+              <input class="collapsible-optgroups form-control" ng-model="action" ng-disabled="!entity || !actions.length" ng-class="{loading: entity && !actions.length}" crm-ui-select="::{placeholder: ts('Action'), data: actions, formatResultCssClass: formatResultCssClass}" />
             </span>
             <input class="form-control api4-index" type="search" ng-model="index" ng-mouseenter="help('index', paramDoc('$index'))" ng-mouseleave="help()" placeholder="{{:: ts('Index') }}" />
             <button class="btn btn-success pull-right" crm-icon="fa-bolt" ng-disabled="!entity || !action || loading" ng-click="execute()" ng-mouseenter="help(ts('Execute'), executeDoc())" ng-mouseleave="help()">{{:: ts('Execute') }}</button>

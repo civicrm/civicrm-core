@@ -68,8 +68,6 @@ class SchemaMapBuilder {
         $this->addCustomFields($map, $table, $data['name']);
       }
     }
-
-    $this->addBackReferences($map);
   }
 
   /**
@@ -95,49 +93,6 @@ class SchemaMapBuilder {
       $joinable = new Joinable($tableName, $fkKey, $field);
       $joinable->setJoinType($joinable::JOIN_TYPE_MANY_TO_ONE);
       $table->addTableLink($field, $joinable);
-    }
-  }
-
-  /**
-   * Loop through existing links and provide link from the other side
-   *
-   * @param SchemaMap $map
-   */
-  private function addBackReferences(SchemaMap $map) {
-    foreach ($map->getTables() as $table) {
-      foreach ($table->getTableLinks() as $link) {
-        $target = $map->getTableByName($link->getTargetTable());
-        $tableName = $link->getBaseTable();
-        // Exclude custom field tables
-        if (strpos($link->getTargetTable(), 'civicrm_value_') !== 0 && strpos($link->getBaseTable(), 'civicrm_value_') !== 0) {
-          $plural = str_replace('civicrm_', '', $this->getPlural($tableName));
-          $joinable = new Joinable($tableName, $link->getBaseColumn(), $plural);
-          $joinable->setJoinType($joinable::JOIN_TYPE_ONE_TO_MANY);
-          $target->addTableLink($link->getTargetColumn(), $joinable);
-        }
-      }
-    }
-  }
-
-  /**
-   * Simple implementation of pluralization.
-   * Could be replaced with symfony/inflector
-   *
-   * @param string $singular
-   *
-   * @return string
-   */
-  private function getPlural($singular) {
-    $last_letter = substr($singular, -1);
-    switch ($last_letter) {
-      case 'y':
-        return substr($singular, 0, -1) . 'ies';
-
-      case 's':
-        return $singular . 'es';
-
-      default:
-        return $singular . 's';
     }
   }
 

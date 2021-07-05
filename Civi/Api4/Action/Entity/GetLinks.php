@@ -15,11 +15,15 @@ namespace Civi\Api4\Action\Entity;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * Get a list of FK links between entities
+ * Get a list of FK links between entities.
+ *
+ * This action is deprecated; the API no longer uses these links to determine available joins.
+ * @deprecated
  */
 class GetLinks extends \Civi\Api4\Generic\BasicGetAction {
 
   public function getRecords() {
+    \CRM_Core_Error::deprecatedWarning('APIv4 Entity::getLinks is deprecated.');
     $result = [];
     /** @var \Civi\Api4\Service\Schema\SchemaMap $schema */
     $schema = \Civi::container()->get('schema_map');
