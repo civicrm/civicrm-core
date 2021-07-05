@@ -3509,7 +3509,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
       'currency' => 'USD',
       'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_mode' => 'membership',
       'source' => 'Membership Signup and Renewal',
     ];
 

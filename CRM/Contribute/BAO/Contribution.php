@@ -3380,7 +3380,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return null|\CRM_Core_BAO_FinancialTrxn
    */
   public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = $isRelatedId = FALSE;
+    $skipRecords = $update = $return = FALSE;
     $isUpdate = !empty($params['prevContribution']);
 
     $additionalParticipantId = [];
@@ -3401,10 +3401,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     else {
       $entityId = $params['contribution']->id;
       $entityTable = 'civicrm_contribution';
-    }
-
-    if (CRM_Utils_Array::value('contribution_mode', $params) == 'membership') {
-      $isRelatedId = TRUE;
     }
 
     $entityID[] = $entityId;
