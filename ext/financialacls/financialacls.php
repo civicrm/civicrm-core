@@ -305,17 +305,39 @@ function _financialacls_civi_api4_authorizeContribution(\Civi\Api4\Event\Authori
   if (!financialacls_is_acl_limiting_enabled()) {
     return;
   }
-  if ($e->getActionName() === 'delete' && $e->getEntityName() === 'Contribution') {
-    $contributionID = $e->getRecord()['id'];
-    // First check contribution financial type
-    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'financial_type_id', CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id'));
-    // Now check permissioned line items & permissioned contribution
-    if (!CRM_Core_Permission::check('delete contributions of type ' . $financialType, $e->getUserID()) ||
-      !CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
-    ) {
+  if ($e->getEntityName() === 'Contribution') {
+    $contributionID = $e->getRecord()['id'] ?? NULL;
+    $financialTypeID = $e->getRecord()['financial_type_id'] ?? CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionID, 'financial_type_id');
+    if (!CRM_Core_Permission::check(_financialacls_getRequiredPermission($financialTypeID, $e->getActionName()), $e->getUserID())) {
       $e->setAuthorized(FALSE);
     }
+    if ($e->getActionName() === 'delete') {
+      // First check contribution financial type
+      // Now check permissioned line items & permissioned contribution
+      if (!CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($contributionID, 'delete', FALSE, $e->getUserID())
+      ) {
+        $e->setAuthorized(FALSE);
+      }
+    }
   }
+}
+
+/**
+ * Get the permission required to perform this action on this financial type.
+ *
+ * @param int $financialTypeID
+ * @param string $action
+ *
+ * @return string
+ */
+function _financialacls_getRequiredPermission(int $financialTypeID, string $action): string {
+  $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_DAO_Contribution', 'financial_type_id', $financialTypeID);
+  $actionMap = [
+    'create' => 'add',
+    'update' => 'edit',
+    'delete' => 'delete',
+  ];
+  return $actionMap[$action] . ' contributions of type ' . $financialType;
 }
 
 /**
