@@ -72,12 +72,8 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
     $recent = CRM_Case_BAO_Case::getCases($allCases, ['type' => 'recent'], 'dashboard', TRUE);
 
     $this->assign('casesSummary', $summary);
-    if (!empty($upcoming)) {
-      $this->assign('upcomingCases', TRUE);
-    }
-    if (!empty($recent)) {
-      $this->assign('recentCases', TRUE);
-    }
+    $this->assign('upcomingCases', !empty($upcoming));
+    $this->assign('recentCases', !empty($recent));
 
     $controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Search',
       ts('Case'), CRM_Core_Action::BROWSE,
