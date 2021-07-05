@@ -82,7 +82,7 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'type', 'title_plural', 'description', 'label_field', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters', 'searchable')
+      ->addSelect('name', 'title', 'type', 'primary_key', 'title_plural', 'description', 'label_field', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters', 'searchable')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
