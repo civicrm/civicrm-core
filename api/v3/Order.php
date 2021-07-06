@@ -107,9 +107,13 @@ function civicrm_api3_order_create(array $params): array {
 
           case 'membership':
             $entityParams['status_id'] = 'Pending';
+            if (!empty($params['contribution_recur_id'])) {
+              $entityParams['contribution_recur_id'] = $params['contribution_recur_id'];
+            }
             $entityParams['skipLineItem'] = TRUE;
             $entityResult = civicrm_api3('Membership', 'create', $entityParams);
             break;
+
         }
 
         foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {

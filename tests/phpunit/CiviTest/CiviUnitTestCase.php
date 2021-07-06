@@ -28,6 +28,7 @@
 
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\LineItem;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
@@ -1058,10 +1059,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    *   id of created contribution
-   * @throws \CRM_Core_Exception
    */
-  public function contributionCreate($params) {
-
+  public function contributionCreate(array $params): int {
     $params = array_merge([
       'domain_id' => 1,
       'receive_date' => date('Ymd'),
@@ -2551,10 +2550,8 @@ VALUES
    *
    * @param array $recurParams (Optional)
    * @param array $contributionParams (Optional)
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []) {
+  public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []): void {
     $this->ids['campaign'][0] = $this->callAPISuccess('Campaign', 'create', ['title' => 'get the money'])['id'];
     $contributionParams = array_merge([
       'total_amount' => '200',
@@ -2595,9 +2592,9 @@ VALUES
    *
    * @param array $params Optionally modify params for membership/recur (duration_unit/frequency_unit)
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  public function setupMembershipRecurringPaymentProcessorTransaction($params = []) {
+  public function setupMembershipRecurringPaymentProcessorTransaction($params = []): void {
     $membershipParams = $recurParams = [];
     if (!empty($params['duration_unit'])) {
       $membershipParams['duration_unit'] = $params['duration_unit'];
@@ -2619,41 +2616,32 @@ VALUES
       ]);
     }
 
-    $this->ids['membership'] = $this->callAPISuccess('Membership', 'create', [
-      'contact_id' => $this->_contactID,
-      'membership_type_id' => $this->ids['membership_type'],
-      'format.only_id' => TRUE,
-      'source' => 'Payment',
-      'skipLineItem' => TRUE,
-    ]);
     $this->setupRecurringPaymentProcessorTransaction($recurParams, [
       'line_items' => [
         [
           'line_item' => [
             [
-              'entity_table' => 'civicrm_membership',
-              'entity_id' => $this->ids['membership'],
               'label' => 'General',
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
               'financial_type_id' => 1,
-              'price_field_id' => $this->callAPISuccess('price_field', 'getvalue', [
-                'return' => 'id',
-                'label' => 'Membership Amount',
-                'options' => ['limit' => 1, 'sort' => 'id DESC'],
-              ]),
-              'price_field_value_id' => $this->callAPISuccess('price_field_value', 'getvalue', [
-                'return' => 'id',
-                'label' => 'General',
-                'options' => ['limit' => 1, 'sort' => 'id DESC'],
-              ]),
+              'membership_type_id' => $this->ids['membership_type'],
             ],
+          ],
+          'params' => [
+            'contact_id' => $this->_contactID,
+            'membership_type_id' => $this->ids['membership_type'],
+            'source' => 'Payment',
           ],
         ],
       ],
     ]);
-    $this->callAPISuccess('Membership', 'create', ['id' => $this->ids['membership'], 'contribution_recur_id' => $this->_contributionRecurID]);
+    $this->ids['membership'] = LineItem::get()
+      ->addWhere('contribution_id', '=', $this->ids['Contribution'][0])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addSelect('entity_id')
+      ->execute()->first()['entity_id'];
   }
 
   /**

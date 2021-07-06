@@ -24,6 +24,16 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   protected $_customFieldID;
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blockinng.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * Set up function.
    */
   public function setUp(): void {
