@@ -50,17 +50,17 @@
             </a>
           </li>
           <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab.match('txActive|original') && $ctrl.hasDraft() && $ctrl.allowDraft()">
-            <a crm-icon="fa-plus" class="nav-link text-warning" crm-confirm="{title: ts('Create draft?'), message: ts('There is already an existing draft. If you continue, it will be replaced with a clean draft.')}" on-yes="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
+            <a crm-icon="fa-plus" class="nav-link text-warning" crm-confirm="{title: ts('Create draft?'), message: ts('There is already an existing draft. If you continue, it will be replaced with a clean draft. (Note: Changes will not take full effect until you save.)')}" on-yes="$ctrl.createDraft($ctrl.records[$ctrl.tab])">
               {{::ts('Create draft')}}
             </a>
           </li>
           <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab === 'txDraft'">
-            <a crm-icon="fa-trash" class="nav-link text-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Abandon draft?'), message: ts('Are you sure you want to abandon this draft?')}" on-yes="$ctrl.deleteDraft()">
+            <a crm-icon="fa-trash" class="nav-link text-danger" crm-confirm="{type: 'delete', obj: {}, title: ts('Abandon draft?'), message: ts('Are you sure you want to abandon this draft? (Note: Changes will not take full effect until you save.)')}" on-yes="$ctrl.deleteDraft()">
               {{ts('Abandon draft')}}
             </a>
           </li>
           <li role="presentation" class="navitem pull-right" ng-show="$ctrl.tab === 'txDraft'">
-            <a crm-icon="fa-rocket" class="nav-link text-success" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft?')}" on-yes="$ctrl.activateDraft()">
+            <a crm-icon="fa-rocket" class="nav-link text-success" crm-confirm="{title: ts('Activate draft?'), message: ts('Are you sure you want to activate this draft? (Note: Changes will not take full effect until you save.)')}" on-yes="$ctrl.activateDraft()">
               {{::ts('Activate draft')}}
             </a>
           </li>
