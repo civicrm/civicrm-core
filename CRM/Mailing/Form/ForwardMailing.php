@@ -75,10 +75,6 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
         'name' => ts('Forward'),
         'isDefault' => TRUE,
       ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ],
     ]);
   }
 
