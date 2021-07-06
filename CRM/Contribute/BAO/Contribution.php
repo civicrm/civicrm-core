@@ -468,7 +468,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    */
   public static function getNumTermsByContributionAndMembershipType($membershipTypeID, $contributionID) {
     $numTerms = CRM_Core_DAO::singleValueQuery("
-      SELECT membership_num_terms FROM civicrm_line_item li
+      SELECT v.membership_num_terms FROM civicrm_line_item li
       LEFT JOIN civicrm_price_field_value v ON li.price_field_value_id = v.id
       WHERE contribution_id = %1 AND membership_type_id = %2",
       [1 => [$contributionID, 'Integer'], 2 => [$membershipTypeID, 'Integer']]
