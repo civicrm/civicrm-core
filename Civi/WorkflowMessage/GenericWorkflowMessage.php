@@ -13,6 +13,7 @@
 namespace Civi\WorkflowMessage;
 
 use Civi\Schema\Traits\MagicGetterSetterTrait;
+use Civi\WorkflowMessage\Traits\FinalHelperTrait;
 use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
 
 /**
@@ -29,6 +30,9 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
 
   // Implement __call() - Public and protected properties are automatically given a default getter/setter. These may be overridden/customized.
   use MagicGetterSetterTrait;
+
+  // Implement assertValid(), renderTemplate(), sendTemplate() - Sugary stub methods that delegate to real APIs.
+  use FinalHelperTrait;
 
   /**
    * WorkflowMessage constructor.

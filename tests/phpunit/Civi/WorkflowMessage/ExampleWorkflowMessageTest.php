@@ -259,4 +259,49 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue(!isset($envelope['myProtectedInt']));
   }
 
+  public function testImpromptuRender() {
+    $rand = rand(0, 1000);
+    $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
+    /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
+    $ex = WorkflowMessage::create('some_impromptu_wf', [
+      'tokenContext' => ['contactId' => $cid],
+    ]);
+    $rendered = $ex->renderTemplate([
+      'messageTemplate' => [
+        'msg_subject' => 'Hello {contact.display_name}',
+      ],
+    ]);
+    $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
+  }
+
+  public function testRenderStoredTemplate() {
+    $rand = rand(0, 1000);
+    $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
+    /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
+    $ex = WorkflowMessage::create('petition_sign', [
+      'tokenContext' => ['contactId' => $cid],
+      'tplParams' => [
+        'greeting' => 'Greetings yo',
+        'petition' => ['title' => 'The Fake Petition'],
+        'petitionTitle' => 'The Fake Petition',
+        'survey_id' => NULL,
+      ],
+    ]);
+    $rendered = $ex->renderTemplate();
+    $this->assertStringContainsString('Foo Bar' . $rand, $rendered['subject']);
+    $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['html']);
+    $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['text']);
+  }
+
+  //public function testImpromptuTokens() {
+  //  /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
+  //  $ex = WorkflowMessage::create('some_impromptu_wf', [
+  //    'envelope' => [
+  //      'contactId' => 123,
+  //    ],
+  //  ]);
+  //  $tokens = $ex->getTokens();
+  //  $this->assertEquals('First ZZName', $tokens['contact.first_name']['label']);
+  //}
+
 }
