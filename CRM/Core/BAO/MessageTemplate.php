@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\TokenProcessor;
-
 /**
  *
  * @package CRM
@@ -583,21 +581,16 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @return array
    */
   public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns): array {
-    CRM_Core_Smarty::singleton()->pushScope($smartyAssigns);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['smarty' => !$disableSmarty]);
-    $tokenProcessor->addMessage('html', $mailContent['html'], 'text/html');
-    $tokenProcessor->addMessage('text', $mailContent['text'], 'text/plain');
-    $tokenProcessor->addMessage('subject', $mailContent['subject'], 'text/plain');
-    $tokenProcessor->addRow($contactID ? ['contactId' => $contactID] : []);
-    $tokenProcessor->evaluate();
-    foreach ($tokenProcessor->getRows() as $row) {
-      $mailContent['html'] = $row->render('html');
-      $mailContent['text'] = $row->render('text');
-      $mailContent['subject'] = $row->render('subject');
+    $tokenContext = ['smarty' => !$disableSmarty];
+    if ($contactID) {
+      $tokenContext['contactId'] = $contactID;
     }
-    CRM_Core_Smarty::singleton()->popScope();
-    $mailContent['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $mailContent['subject']));
-    return $mailContent;
+    $result = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $tokenContext, $smartyAssigns);
+    if (isset($mailContent['subject'])) {
+      $result['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $result['subject']));
+    }
+    $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
+    return array_merge($nullSet, $mailContent, $result);
   }
 
 }
