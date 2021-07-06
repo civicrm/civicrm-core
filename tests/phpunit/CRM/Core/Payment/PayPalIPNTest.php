@@ -129,7 +129,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution1['contribution_status_id']);
     $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution1['contribution_source'], 0, 20) === 'Online Contribution:');
+    $this->assertEquals('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
@@ -207,7 +207,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentInputMembershipRecurSuccess() {
+  public function testIPNPaymentInputMembershipRecurSuccess(): void {
     $durationUnit = 'year';
     $this->setupMembershipRecurringPaymentProcessorTransaction(['duration_unit' => $durationUnit, 'frequency_unit' => $durationUnit]);
     $membershipPayment = $this->callAPISuccessGetSingle('membership_payment', []);
