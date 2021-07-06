@@ -26,6 +26,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\OptionGroup;
@@ -151,7 +152,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Should financials be checked after the test but before tear down.
    *
    * Ideally all tests (or at least all that call any financial api calls ) should do this but there
-   * are some test data issues and some real bugs currently blockinng.
+   * are some test data issues and some real bugs currently blocking.
    *
    * @var bool
    */
@@ -3639,10 +3640,10 @@ VALUES
   /**
    * Validate all created contributions.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function validateAllContributions(): void {
-    $contributions = $this->callAPISuccess('Contribution', 'get', ['return' => ['tax_amount', 'total_amount']])['values'];
+    $contributions = Contribution::get(FALSE)->setSelect(['total_amount', 'tax_amount'])->execute();
     foreach ($contributions as $contribution) {
       $lineItems = $this->callAPISuccess('LineItem', 'get', [
         'contribution_id' => $contribution['id'],
