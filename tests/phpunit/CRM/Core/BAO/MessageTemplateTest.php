@@ -161,37 +161,36 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $client_id = $this->individualCreate();
     $contact_id = $this->individualCreate();
 
-    $tplParams = [
-      'isCaseActivity' => 1,
-      'client_id' => $client_id,
-      // activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
-      'activityTypeName' => 'Follow up',
-      'activity' => [
-        'fields' => [
+    $msg = \Civi\WorkflowMessage\WorkflowMessage::create('case_activity', [
+      'modelProps' => [
+        'contactId' => $contact_id,
+        'isCaseActivity' => 1,
+        'clientId' => $client_id,
+        // activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
+        'activityTypeName' => 'Follow up',
+        'activityFields' => [
           [
             'label' => 'Case ID',
             'type' => 'String',
             'value' => '1234',
           ],
         ],
+        'activitySubject' => 'Test 123',
+        'idHash' => substr(sha1(CIVICRM_SITE_KEY . '1234'), 0, 7),
       ],
-      'activitySubject' => 'Test 123',
-      'idHash' => substr(sha1(CIVICRM_SITE_KEY . '1234'), 0, 7),
-    ];
+    ]);
 
-    [, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate(
-      [
-        'valueName' => 'case_activity',
-        'contactId' => $contact_id,
-        'tplParams' => $tplParams,
-        'from' => 'admin@example.com',
-        'toName' => 'Demo',
-        'toEmail' => 'admin@example.com',
-        'attachments' => NULL,
-      ]
-    );
+    $this->assertEquals([], \Civi\Test\Invasive::get([$msg, '_extras']));
 
-    $this->assertEquals('[case #' . $tplParams['idHash'] . '] Test 123', $subject);
+    [, $subject, $message] = $msg->sendTemplate([
+      'valueName' => 'case_activity',
+      'from' => 'admin@example.com',
+      'toName' => 'Demo',
+      'toEmail' => 'admin@example.com',
+      'attachments' => NULL,
+    ]);
+
+    $this->assertEquals('[case #' . $msg->getIdHash() . '] Test 123', $subject);
     $this->assertStringContainsString('Your Case Role', $message);
     $this->assertStringContainsString('Case ID : 1234', $message);
   }
