@@ -9,7 +9,7 @@
 *}
 {* Links for scheduling/logging meetings and calls and Sending Email *}
 
-{if $contact_id }
+{if !empty($contact_id) }
 {assign var = "contactId" value= $contact_id }
 {/if}
 

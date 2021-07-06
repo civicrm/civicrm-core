@@ -26,18 +26,18 @@
 {foreach from=$groupTree item=cd_edit key=group_id}
     <p></p>
     <fieldset>{if $preview_type eq 'group'}<legend>{$smarty.capture.legend}</legend>{/if}
-    {if $cd_edit.help_pre}<div class="messages help">{$cd_edit.help_pre}</div><br />{/if}
+    {if !empty($cd_edit.help_pre)}<div class="messages help">{$cd_edit.help_pre}</div><br />{/if}
     <table class="form-layout-compressed">
     {foreach from=$cd_edit.fields item=element key=field_id}
       {if $element.is_view eq 0}{* fix for CRM-2699 *}
-        {if $element.help_pre}
+        {if !empty($element.help_pre)}
             <tr><td class="label"></td><td class="description">{$element.help_pre}</td></tr>
         {/if}
-  {if $element.options_per_line }
+  {if !empty($element.options_per_line)}
         {*assign var="element_name" value=$element.custom_group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
         {assign var="element_name" value=$element.element_name}
         <tr>
-         <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
+         <td class="label">{$form.$element_name.label}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
          <td>
             {assign var="count" value="1"}
                 <table class="form-layout-compressed">
@@ -62,11 +62,10 @@
          </td>
         </tr>
   {else}
-        {assign var="name" value=`$element.name`}
-        {*assign var="element_name" value=$group_id|cat:_|cat:$field_id|cat:_|cat:$element.name*}
-        {assign var="element_name" value=$element.element_name}
+        {capture assign="name"}{if !empty($element.name)}{$element.name}{/if}{/capture}
+        {capture assign="element_name"}{if !empty($element.element_name)}{$element.element_name}{/if}{/capture}
         <tr>
-          <td class="label">{$form.$element_name.label}{if $element.help_post}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
+          <td class="label">{$form.$element_name.label}{if !empty($element.help_post)}{help id=$element.id file="CRM/Custom/Form/CustomField.hlp" title=$form.$element_name.label}{/if}</td>
         <td>
           {$form.$element_name.html}&nbsp;
       {if $element.html_type eq 'Autocomplete-Select'}
@@ -79,7 +78,7 @@
      {/if}
     {/foreach}
     </table>
-    {if $cd_edit.help_post}<br /><div class="messages help">{$cd_edit.help_post}</div>{/if}
+    {if !empty($cd_edit.help_post)}<br /><div class="messages help">{$cd_edit.help_post}</div>{/if}
     </fieldset>
 {/foreach}
 {/strip}

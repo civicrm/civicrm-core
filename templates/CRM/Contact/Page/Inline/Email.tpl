@@ -26,7 +26,7 @@
   {/if}
   {foreach from=$email key="blockId" item=item}
     {if $item.email}
-    <div class="crm-summary-row {if $item.is_primary eq 1}primary{/if}">
+    <div class="crm-summary-row {if !empty($item.is_primary)}{ts}primary{/ts}{/if}">
       <div class="crm-label">
         {$item.location_type} {ts}Email{/ts}
         {privacyFlag field=do_not_email condition=$privacy.do_not_email}{privacyFlag field=on_hold condition=$item.on_hold}
@@ -46,14 +46,14 @@
           {$item.email}
         {/if}
         {if $item.on_hold == 2}&nbsp;({ts}On Hold - Opt Out{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{elseif $item.on_hold}&nbsp;({ts}On Hold{/ts})&nbsp;{ts}{$item.hold_date|truncate:10:''|crmDate}{/ts}{/if}{if $item.is_bulkmail}&nbsp;({ts}Bulk{/ts}){/if}
-        {if $item.signature_text OR $item.signature_html}
+        {if !empty($item.signature_text) OR !empty($item.signature_html)}
         <span class="signature-link description">
           <a href="#" title="{ts}Signature{/ts}" onClick="showHideSignature( '{$blockId}' ); return false;">{ts}(signature){/ts}</a>
         </span>
         {/if}
         <div id="Email_Block_{$blockId}_signature" class="hiddenElement">
-          <strong>{ts}Signature HTML{/ts}</strong><br />{$item.signature_html}<br /><br />
-        <strong>{ts}Signature Text{/ts}</strong><br />{$item.signature_text|nl2br}</div>
+          <strong>{ts}Signature HTML{/ts}</strong><br />{if !empty($item.signature_html)}{$item.signature_html}{/if}<br /><br />
+        <strong>{ts}Signature Text{/ts}</strong><br />{if !empty($item.signature_text)}{$item.signature_text|nl2br}{/if}</div>
       </div>
     </div>
     {/if}
