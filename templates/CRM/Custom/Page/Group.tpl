@@ -45,7 +45,7 @@
           <td class="crmf-title crm-editable">{$row.title}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.extends eq 'Contact'}{ts}All Contact Types{/ts}{else}{$row.extends_display}{/if}</td>
-          <td>{$row.extends_entity_column_value}</td>
+          <td>{if !empty($row.extends_entity_column_value)}{$row.extends_entity_column_value}{/if}</td>
           <td class="nowrap">{$row.weight}</td>
           <td>{$row.style_display}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
