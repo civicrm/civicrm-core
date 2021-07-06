@@ -717,6 +717,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   private function processMembership(array $params) {
     $batchTotal = 0;
@@ -737,7 +738,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
           }
         }
-        $membershipOrganizationID = $value['membership_type'][0];
         $value = $this->standardiseRow($value);
 
         // update contact information
@@ -764,57 +764,21 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'Gift');
           }
         }
-
         $batchTotal += $value['total_amount'];
-
         $value['batch_id'] = $this->_batchId;
         $value['skipRecentView'] = TRUE;
 
-        // make entry in line item for contribution
+        $order = new CRM_Financial_BAO_Order();
+        // We use the override total amount because we are dealing with a
+        // possibly tax_inclusive total, which is assumed for the override total.
+        $order->setOverrideTotalAmount($value['total_amount']);
+        $order->setLineItem([
+          'membership_type_id' => $value['membership_type_id'],
+          'financial_type_id' => $value['financial_type_id'],
+        ], $key);
 
-        $editedFieldParams = [
-          'price_set_id' => $priceSetId,
-          'name' => $membershipOrganizationID,
-        ];
-
-        $editedResults = [];
-        CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
-
-        if (!empty($editedResults)) {
-          unset($this->_priceSet['fields']);
-          $this->_priceSet['fields'][$editedResults['id']] = $priceSets['fields'][$editedResults['id']];
-          unset($this->_priceSet['fields'][$editedResults['id']]['options']);
-          $fid = $editedResults['id'];
-          $editedFieldParams = [
-            'price_field_id' => $editedResults['id'],
-            'membership_type_id' => $value['membership_type_id'],
-          ];
-
-          $editedResults = [];
-          CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
-          $this->_priceSet['fields'][$fid]['options'][$editedResults['id']] = $priceSets['fields'][$fid]['options'][$editedResults['id']];
-          if (!empty($value['total_amount'])) {
-            $this->_priceSet['fields'][$fid]['options'][$editedResults['id']]['amount'] = $value['total_amount'];
-          }
-
-          $fieldID = key($this->_priceSet['fields']);
-          $value['price_' . $fieldID] = $editedResults['id'];
-
-          $lineItem = [];
-          CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
-            $value, $lineItem[$priceSetId]
-          );
-
-          //CRM-11529 for backoffice transactions
-          //when financial_type_id is passed in form, update the
-          //lineitems with the financial type selected in form
-          if (!empty($value['financial_type_id']) && !empty($lineItem[$priceSetId])) {
-            foreach ($lineItem[$priceSetId] as &$values) {
-              $values['financial_type_id'] = $value['financial_type_id'];
-            }
-          }
-
-          $value['lineItems'] = $lineItem;
+        if (!empty($order->getLineItems())) {
+          $value['lineItems'] = [$order->getPriceSetID() => $order->getPriceFieldIndexedLineItems()];
           $value['processPriceSet'] = TRUE;
         }
         // end of contribution related section
