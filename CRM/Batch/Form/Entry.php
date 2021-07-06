@@ -737,38 +737,18 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
           }
         }
+        $membershipOrganizationID = $value['membership_type'][0];
+        $value = $this->standardiseRow($value);
 
         // update contact information
         $this->updateContactInfo($value);
-
-        $membershipTypeId = $value['membership_type_id'] = $value['membership_type'][1];
-
-        if (!empty($value['membership_source'])) {
-          $value['source'] = $value['membership_source'];
-        }
-
-        unset($value['membership_source']);
-
-        //Get the membership status
-        if (!empty($value['membership_status'])) {
-          $value['status_id'] = $value['membership_status'];
-          unset($value['membership_status']);
-        }
 
         //check for custom data
         $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
           $key,
           'Membership',
-          $membershipTypeId
+          $value['membership_type_id']
         );
-
-        if (!empty($value['financial_type'])) {
-          $value['financial_type_id'] = $value['financial_type'];
-        }
-
-        if (!empty($value['payment_instrument'])) {
-          $value['payment_instrument_id'] = $value['payment_instrument'];
-        }
 
         // handle soft credit
         if (!empty($params['soft_credit_contact_id'][$key]) && !empty($params['soft_credit_amount'][$key])) {
@@ -784,14 +764,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             $value['soft_credit'][$key]['soft_credit_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', 'Gift');
           }
         }
-        if (!empty($value['total_amount'])) {
-          $value['total_amount'] = (float) $value['total_amount'];
-        }
 
         $batchTotal += $value['total_amount'];
-
-        unset($value['financial_type']);
-        unset($value['payment_instrument']);
 
         $value['batch_id'] = $this->_batchId;
         $value['skipRecentView'] = TRUE;
@@ -800,7 +774,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         $editedFieldParams = [
           'price_set_id' => $priceSetId,
-          'name' => $value['membership_type'][0],
+          'name' => $membershipOrganizationID,
         ];
 
         $editedResults = [];
@@ -845,7 +819,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         // end of contribution related section
 
-        unset($value['membership_type']);
         $membershipParams = [
           'start_date' => $value['membership_start_date'] ?? NULL,
           'end_date' => $value['membership_end_date'] ?? NULL,
@@ -1270,6 +1243,39 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   private function getFromEmailAddress(): string {
     $domainEmail = CRM_Core_BAO_Domain::getNameAndEmail();
     return "$domainEmail[0] <$domainEmail[1]>";
+  }
+
+  /**
+   * Standardise the values in the row from profile-weirdness to civi-standard.
+   *
+   * The row uses odd field names such as financial_type rather than financial
+   * type id. We standardise at this point.
+   *
+   * @param array $row
+   *
+   * @return array
+   */
+  private function standardiseRow(array $row): array {
+    $renameFieldMapping = [
+      'financial_type' => 'financial_type_id',
+      'payment_instrument' => 'payment_instrument_id',
+      'membership_source' => 'source',
+      'membership_status' => 'status_id',
+    ];
+    foreach ($renameFieldMapping as $weirdProfileName => $betterName) {
+      // Check if isset as some like payment instrument and source are optional.
+      if (isset($row[$weirdProfileName]) && empty($row[$betterName])) {
+        $row[$betterName] = $row[$weirdProfileName];
+        unset($row[$weirdProfileName]);
+      }
+    }
+
+    // The latter format would be normal here - it's unclear if it is sometimes in the former format.
+    $row['membership_type_id'] = $row['membership_type_id'] ?? $row['membership_type'][1];
+    unset($row['membership_type']);
+    // total_amount is required.
+    $row['total_amount'] = (float) $row['total_amount'];
+    return $row;
   }
 
 }
