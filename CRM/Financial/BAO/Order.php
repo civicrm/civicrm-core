@@ -177,10 +177,12 @@ class CRM_Financial_BAO_Order {
    * @return float|false
    */
   public function getOverrideTotalAmount() {
-    if (count($this->getPriceOptions()) !== 1) {
+    // The override amount is only valid for quick config price sets where more
+    // than one field has not been selected.
+    if (!$this->overrideTotalAmount || !$this->supportsOverrideAmount() || count($this->getPriceOptions()) > 1) {
       return FALSE;
     }
-    return $this->overrideTotalAmount ?? FALSE;
+    return $this->overrideTotalAmount;
   }
 
   /**
@@ -191,9 +193,7 @@ class CRM_Financial_BAO_Order {
    * @param float $overrideTotalAmount
    */
   public function setOverrideTotalAmount(float $overrideTotalAmount): void {
-    if ($this->supportsOverrideAmount()) {
-      $this->overrideTotalAmount = $overrideTotalAmount;
-    }
+    $this->overrideTotalAmount = $overrideTotalAmount;
   }
 
   /**
@@ -217,7 +217,7 @@ class CRM_Financial_BAO_Order {
    *
    * @param int $overrideFinancialTypeID
    */
-  public function setOverrideFinancialTypeID(int $overrideFinancialTypeID) {
+  public function setOverrideFinancialTypeID(int $overrideFinancialTypeID): void {
     $this->overrideFinancialTypeID = $overrideFinancialTypeID;
   }
 
@@ -480,6 +480,22 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get line items in a 'traditional' indexing format.
+   *
+   * This ensures the line items are indexed by
+   * price field id - as required by the contribution BAO.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getPriceFieldIndexedLineItems(): array {
+    $lines = [];
+    foreach ($this->getLineItems() as $item) {
+      $lines[$item['price_field_id']] = $item;
+    }
+    return $lines;
+  }
+
+  /**
    * Get line items that specifically relate to memberships.
    *
    * return array
@@ -566,14 +582,7 @@ class CRM_Financial_BAO_Order {
       }
       $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
       if ($this->getOverrideTotalAmount() !== FALSE) {
-        if ($taxRate) {
-          // Total is tax inclusive.
-          $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-          $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
-        }
-        else {
-          $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
-        }
+        $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
       }
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
@@ -674,8 +683,16 @@ class CRM_Financial_BAO_Order {
    *
    */
   public function setLineItem(array $lineItem, $index): void {
-    if (!empty($lineItem['price_field_id']) && !isset($this->priceSetID)) {
-      $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+    if (!isset($this->priceSetID)) {
+      if (!empty($lineItem['price_field_id'])) {
+        $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+      }
+      else {
+        // we are using either the default membership or default contribution
+        // If membership type is passed in we use the default price field.
+        $component = !empty($lineItem['membership_type_id']) ? 'membership' : 'contribution';
+        $this->setPriceSetToDefault($component);
+      }
     }
     if (!isset($lineItem['financial_type_id'])) {
       $lineItem['financial_type_id'] = $this->getDefaultFinancialTypeID();
@@ -683,14 +700,15 @@ class CRM_Financial_BAO_Order {
     if (!is_numeric($lineItem['financial_type_id'])) {
       $lineItem['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $lineItem['financial_type_id']);
     }
-    $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];
+    if ($this->getOverrideTotalAmount()) {
+      $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
+    }
+    else {
+      $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];
+    }
     if (!empty($lineItem['membership_type_id'])) {
       $lineItem['entity_table'] = 'civicrm_membership';
       if (empty($lineItem['price_field_id']) && empty($lineItem['price_field_value_id'])) {
-        // If only the membership type is passed in we use the default price field.
-        if (!isset($this->priceSetID)) {
-          $this->setPriceSetToDefault('membership');
-        }
         $lineItem = $this->fillMembershipLine($lineItem);
       }
     }
@@ -742,22 +760,45 @@ class CRM_Financial_BAO_Order {
    */
   protected function fillMembershipLine(array $lineItem): array {
     $fields = $this->getPriceFieldsMetadata();
-    $field = reset($fields);
-    if (!isset($lineItem['price_field_value_id'])) {
-      foreach ($field['options'] as $option) {
-        if ((int) $option['membership_type_id'] === (int) $lineItem['membership_type_id']) {
-          $lineItem['price_field_id'] = $field['id'];
-          $lineItem['price_field_value_id'] = $option['id'];
-          $lineItem['qty'] = 1;
+    foreach ($fields as $field) {
+      if (!isset($lineItem['price_field_value_id'])) {
+        foreach ($field['options'] as $option) {
+          if ((int) $option['membership_type_id'] === (int) $lineItem['membership_type_id']) {
+            $lineItem['price_field_id'] = $field['id'];
+            $lineItem['price_field_value_id'] = $option['id'];
+            $lineItem['qty'] = 1;
+          }
         }
       }
+      if (isset($lineItem['price_field_value_id'], $field['options'][$lineItem['price_field_value_id']])) {
+        $option = $field['options'][$lineItem['price_field_value_id']];
+      }
     }
-    $option = $field['options'][$lineItem['price_field_value_id']];
     $lineItem['unit_price'] = $lineItem['line_total'] ?? $option['amount'];
     $lineItem['label'] = $lineItem['label'] ?? $option['label'];
     $lineItem['field_title'] = $lineItem['field_title'] ?? $option['label'];
     $lineItem['financial_type_id'] = $lineItem['financial_type_id'] ?: ($this->getDefaultFinancialTypeID() ?? $option['financial_type_id']);
     return $lineItem;
+  }
+
+  /**
+   * Add total_amount and tax_amount to the line from the override total.
+   *
+   * @param int $financialTypeID
+   * @param array $lineItem
+   *
+   * @return void
+   */
+  protected function addTotalsToLineBasedOnOverrideTotal(int $financialTypeID, array &$lineItem): void {
+    $taxRate = $this->getTaxRate($financialTypeID);
+    if ($taxRate) {
+      // Total is tax inclusive.
+      $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
+      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+    }
+    else {
+      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
+    }
   }
 
 }
