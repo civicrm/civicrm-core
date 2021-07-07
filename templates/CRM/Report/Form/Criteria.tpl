@@ -24,7 +24,7 @@
   {foreach from=$table item=field key=fieldName}
     {literal}var val = "dnc";{/literal}
     {assign var=fieldOp     value=$fieldName|cat:"_op"}
-    {if !($field.operatorType & 4) && !$field.no_display && $form.$fieldOp.html}
+    {if !(!empty($field.operatorType) && $field.operatorType & 4) && empty($field.no_display) && !empty($form.$fieldOp.html)}
       {literal}var val = document.getElementById("{/literal}{$fieldOp}{literal}").value;{/literal}
     {/if}
     {literal}showHideMaxMinVal( "{/literal}{$fieldName}{literal}", val );{/literal}
@@ -52,7 +52,7 @@
     $('.crm-report-criteria-groupby input:checkbox').click(function() {
       $('#fields_' + this.id.substr(10)).prop('checked', this.checked);
     });
-    {/literal}{if $displayToggleGroupByFields}{literal}
+    {/literal}{if !empty($displayToggleGroupByFields)}{literal}
       $('.crm-report-criteria-field input:checkbox').click(function() {
         $('#group_bys_' + this.id.substr(7)).prop('checked', this.checked);
       });

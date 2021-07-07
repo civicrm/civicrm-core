@@ -7,8 +7,8 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !$printOnly} {* NO print section starts *}
-  {if $criteriaForm}
+{if empty($printOnly)} {* NO print section starts *}
+  {if !empty($criteriaForm)}
     <div class="crm-report-criteria"> {* criteria section starts *}
       <div id="mainTabContainer">
         {*tab navigation bar*}
@@ -18,7 +18,7 @@
               <a title="{$tab.title|escape}" href="#report-tab-{$tab.div_label}">{$tab.title}</a>
             </li>
           {/foreach}
-          {if $instanceForm OR $instanceFormError}
+          {if !empty($instanceForm) OR !empty($instanceFormError)}
             <li id="tab_settings" class="ui-corner-all">
               <a title="{ts}Title and Format{/ts}" href="#report-tab-format">{ts}Title and Format{/ts}</a>
             </li>
@@ -35,7 +35,7 @@
         {include file="CRM/Report/Form/Criteria.tpl"}
 
         {*settings*}
-        {if $instanceForm OR $instanceFormError}
+        {if !empty($instanceForm) OR !empty($instanceFormError)}
           {include file="CRM/Report/Form/Tabs/Instance.tpl"}
         {/if}
       </div> {* end mainTabContainer *}
@@ -51,7 +51,7 @@
     CRM.$(function($) {
       var tabSettings = {
         collapsible: true,
-        active: {/literal}{if $rows}false{else}0{/if}{literal}
+        active: {/literal}{if !empty($rows)}false{else}0{/if}{literal}
       };
       // If a tab contains an error, open it
       if ($('.civireport-criteria .crm-error', '#mainTabContainer').length) {

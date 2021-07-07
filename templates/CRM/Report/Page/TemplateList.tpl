@@ -28,7 +28,7 @@
                   <tr id="row_{counter}" class="crm-report-templateList">
                     <td class="crm-report-templateList-title" style="width:35%;">
                       <a href="{$row.url}" title="{ts}Create report from this template{/ts}"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> <strong>{$row.title}</strong></a>
-                      {if $row.instanceUrl}
+                      {if !empty($row.instanceUrl)}
                         <div style="font-size:10px;text-align:right;margin-top:3px;">
                           <a href="{$row.instanceUrl}">{ts}Existing Report(s){/ts}</a>
                         </div>
