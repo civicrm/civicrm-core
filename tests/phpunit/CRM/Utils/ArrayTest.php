@@ -6,6 +6,37 @@
  */
 class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
+  public function testAsColumns() {
+    $rowsNum = [
+      ['a' => 10, 'b' => 11],
+      ['a' => 20, 'b' => 21],
+      ['a' => 20, 'b' => 29],
+    ];
+
+    $rowsAssoc = [
+      '!' => ['a' => 10, 'b' => 11],
+      '@' => ['a' => 20, 'b' => 21],
+      '#' => ['a' => 20, 'b' => 29],
+    ];
+
+    $this->assertEquals(
+      ['a' => [10, 20, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsNum)
+    );
+    $this->assertEquals(
+      ['a' => [10, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsNum, TRUE)
+    );
+    $this->assertEquals(
+      ['a' => ['!' => 10, '@' => 20, '#' => 20], 'b' => ['!' => 11, '@' => 21, '#' => 29]],
+      CRM_Utils_Array::asColumns($rowsAssoc)
+    );
+    $this->assertEquals(
+      ['a' => [10, 20], 'b' => [11, 21, 29]],
+      CRM_Utils_Array::asColumns($rowsAssoc, TRUE)
+    );
+  }
+
   public function testIndexArray() {
     $inputs = [];
     $inputs[] = [
