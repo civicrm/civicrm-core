@@ -28,6 +28,14 @@ use api\v4\UnitTestCase;
 class CaseTest extends UnitTestCase {
 
   public function setUp(): void {
+    $this->cleanup([
+      'tablesToTruncate' => [
+        'civicrm_case',
+        'civicrm_case_activity',
+        'civicrm_case_contact',
+        'civicrm_case_type',
+      ],
+    ]);
     parent::setUp();
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->loadDataSet('CaseType');

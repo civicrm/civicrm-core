@@ -71,6 +71,8 @@ class CreateCustomValueTest extends BaseCustomValueTest {
     $createdOptionValues = array_combine($values, $labels);
 
     $this->assertEquals($optionValues, $createdOptionValues);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }

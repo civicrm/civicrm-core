@@ -49,6 +49,8 @@ class CoreUtilTest extends UnitTestCase {
 
     $this->assertEquals('Custom_' . $multiGroup['name'], CoreUtil::getApiNameFromTableName($multiGroup['table_name']));
     $this->assertEquals($multiGroup['table_name'], CoreUtil::getTableName('Custom_' . $multiGroup['name']));
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $singleGroup['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $multiGroup['id'])->execute();
   }
 
   public function testGetApiClass() {
@@ -70,7 +72,8 @@ class CoreUtilTest extends UnitTestCase {
       ->execute()->first();
 
     $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
-
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $singleGroup['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $multiGroup['id'])->execute();
   }
 
 }

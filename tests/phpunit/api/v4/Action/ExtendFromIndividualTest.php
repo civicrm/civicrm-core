@@ -37,7 +37,7 @@ class ExtendFromIndividualTest extends BaseCustomValueTest {
       ->execute()
       ->first();
 
-    CustomField::create(FALSE)
+    $customField = CustomField::create(FALSE)
       ->addValue('label', 'FavColor')
       ->addValue('custom_group_id', $customGroup['id'])
       ->addValue('html_type', 'Text')
@@ -60,6 +60,8 @@ class ExtendFromIndividualTest extends BaseCustomValueTest {
       ->first();
 
     $this->assertEquals('Red', $contact['MyContactFields.FavColor']);
+    CustomField::delete(FALSE)->addWhere('id', '=', $customField[0]['id'])->execute();
+    CustomGroup::delete(FALSE)->addWhere('id', '=', $customGroup['id'])->execute();
   }
 
 }
