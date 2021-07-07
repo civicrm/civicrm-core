@@ -408,19 +408,7 @@ WHERE  contribution_id = {$id}
    * @return string
    */
   public function getCurrency($submittedValues = []) {
-    $config = CRM_Core_Config::singleton();
-
-    $currentCurrency = CRM_Utils_Array::value('currency',
-      $this->_values,
-      $config->defaultCurrency
-    );
-
-    // use submitted currency if present else use current currency
-    $result = CRM_Utils_Array::value('currency',
-      $submittedValues,
-      $currentCurrency
-    );
-    return $result;
+    return $submittedValues['currency'] ?? $this->_values['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
   }
 
   public function preProcessPledge() {

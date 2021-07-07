@@ -98,7 +98,10 @@
 
       var payment_instrument_id = $('#payment_instrument_id').val();
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName`&currency=`$currency`&`$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
+      var currency = '{$currency}';
+      currency = currency == '' ? $('#currency').val() : currency;
+
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName``$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {
@@ -111,15 +114,18 @@
           }
         }
       }
-      dataUrl =  dataUrl + "&payment_instrument_id=" + payment_instrument_id;
+      dataUrl =  dataUrl + "&payment_instrument_id=" + payment_instrument_id + "&currency=" + currency;
 
       // Processors like pp-express will hide the form submit buttons, so re-show them when switching
       $('.crm-submit-buttons', $form).show().find('input').prop('disabled', true);
       CRM.loadPage(dataUrl, {target: '#billing-payment-block'});
     }
 
-    $('[name=payment_processor_id]').on('change.paymentBlock', function() {
-        buildPaymentBlock($(this).val());
+    $('[name=payment_processor_id], #currency').on('change.paymentBlock', function() {
+      var payment_processor_id = $('[name=payment_processor_id]:checked').val() == undefined ? $('[name=payment_processor_id]').val() : $('[name=payment_processor_id]:checked').val();
+      if (payment_processor_id != undefined) {
+        buildPaymentBlock(payment_processor_id);
+      }
     });
 
     $('#payment_instrument_id').on('change.paymentBlock', function() {
