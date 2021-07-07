@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !$rows}
+{if empty($rows)}
   <p>{ts}None found.{/ts}</p>
 {else}
     {if !empty($pager) and $pager->_response and $pager->_response.numPages > 1}
@@ -98,7 +98,7 @@
                     {assign var=fieldHover value=$field|cat:"_hover"}
                     {assign var=fieldClass value=$field|cat:"_class"}
                     <td class="crm-report-{$field}{if $header.type eq 1024 OR $header.type eq 1 OR $header.type eq 512} report-contents-right{elseif $row.$field eq 'Subtotal'} report-label{/if}">
-                        {if $row.$fieldLink}
+                        {if !empty($row.$fieldLink)}
                             <a title="{$row.$fieldHover|escape}" href="{$row.$fieldLink}"  {if !empty($row.$fieldClass)} class="{$row.$fieldClass}"{/if}>
                         {/if}
 
@@ -130,7 +130,7 @@
                             {$row.$field}
                         {/if}
 
-                        {if $row.$fieldLink}</a>{/if}
+                        {if !empty($row.$fieldLink)}</a>{/if}
                     </td>
                 {/foreach}
             </tr>

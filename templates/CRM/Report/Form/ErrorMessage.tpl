@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $outputMode eq 'html' && !$rows}
+{if !empty($outputMode) && $outputMode eq 'html' && empty($rows)}
   <div class="messages status no-popup">
     {icon icon="fa-info-circle"}{/icon} {ts}None found.{/ts}
   </div>

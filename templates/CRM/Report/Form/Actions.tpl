@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if !$printOnly} {* NO print section starts *}
+{if empty($printOnly)} {* NO print section starts *}
 
   {* build the print pdf buttons *}
     <div class="crm-tasks">
@@ -19,7 +19,7 @@
             <table class="form-layout-compressed">
               <tr>
                 {include file="CRM/common/tasks.tpl" location="botton"}
-                {if $instanceUrl}
+                {if !empty($instanceUrl)}
                   <td>&nbsp;&nbsp;<i class="crm-i fa-chevron-right" aria-hidden="true"></i> <a href="{$instanceUrl}">{ts}Existing report(s) from this template{/ts}</a></td>
                 {/if}
               </tr>
@@ -27,13 +27,13 @@
           </td>
           <td>
             <table class="form-layout-compressed" align="right">
-              {if $chartSupported}
+              {if !empty($chartSupported)}
                 <tr>
                   <td>{$form.charts.html|crmAddClass:big}</td>
                   <td align="right">{$form.$chart.html}</td>
                 </tr>
               {/if}
-              {if $form.groups}
+              {if !empty($form.groups)}
                 <tr>
                   <td>
                     {$form.groups.html}{$form.$group.html}
@@ -71,7 +71,7 @@
       // Disable print/pdf output of charts
       $('select[name=charts]', 'form.crm-report-form').change(function() {
         var viewType = $(this).val(),
-          flashChartType = '{/literal}{if $chartType}{$chartType}{else}{/if}{literal}';
+          flashChartType = '{/literal}{if !empty($chartType)}{$chartType}{else}{/if}{literal}';
         $('#_qf_Summary_submit_pdf, #_qf_Summary_submit_print').prop('disabled', (viewType && flashChartType != viewType));
       });
     });
