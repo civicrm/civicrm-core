@@ -23,7 +23,7 @@
 
     function pricesetParticipantCount( ) {
 
-      cj("input,#priceset select,#priceset").each(function () {
+      CRM.$('input','#priceset','select','#priceset').each(function () {
 
         if ( cj(this).attr('price') ) {
             switch( cj(this).attr('type') ) {
@@ -170,7 +170,7 @@
     var optionPart = option[1].split(optionSep);
   if ( optionPart[1] ) {
       addCount    = parseInt( optionPart[1] );
-      var textval = parseInt( cj(object).attr('value') );
+      var textval = parseInt( CRM.$(object).val() );
       var curval  = textval * addCount;
         if ( textval >= 0 ) {
       pPartiCount    = pPartiCount + curval - parseInt(pPartiRef[ele]);
