@@ -924,7 +924,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $creds['user_login'] = $params['cms_name'];
       $creds['user_password'] = $user_data['user_pass'];
       $creds['remember'] = TRUE;
+<<<<<<< HEAD
 
+=======
+>>>>>>> add password to wp_signon
       // @todo handle a wp_signon failure
       wp_signon($creds, FALSE);
     }
