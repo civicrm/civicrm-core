@@ -24,7 +24,7 @@
         {*include the graph*}
         {include file="CRM/Report/Form/Layout/Graph.tpl"}
 
-    {if $printOnly}
+    {if !empty($printOnly)}
         <h1>{$reportTitle}</h1>
         <div id="report-date">{$reportDate}</div>
     {/if}

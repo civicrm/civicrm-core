@@ -9,10 +9,10 @@
 *}
 {strip}
   <div class="action-link">
-    {if $templateUrl}
+    {if !empty($templateUrl)}
       <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
     {/if}
-    {if $reportUrl}
+    {if !empty($reportUrl)}
       <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
     {/if}
   </div>
@@ -53,10 +53,10 @@
     </div>
 
     <div class="action-link">
-      {if $templateUrl}
+      {if !empty($templateUrl)}
         <a href="{$templateUrl}" class="button"><span><i class="crm-i fa-plus-circle" aria-hidden="true"></i> {$newButton}</span></a>
       {/if}
-      {if $reportUrl}
+      {if !empty($reportUrl)}
         <a href="{$reportUrl}" class="button"><span>{ts}View All Reports{/ts}</span></a>
       {/if}
     </div>
@@ -65,11 +65,11 @@
     <div class="crm-content-block">
       <div class="messages status no-popup">
         {icon icon="fa-info-circle"}{/icon}
-        {if $myReports}
+        {if !empty($myReports)}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}
           {ts 1=$compName}No %1 reports have been created.{/ts} &nbsp;
-          {if $templateUrl}
+          {if !empty($templateUrl)}
             {ts 1=$templateUrl}You can create reports by selecting from the <a href="%1">list of report templates here.</a>{/ts}
           {else}
             {ts}Contact your site administrator for help creating reports.{/ts}

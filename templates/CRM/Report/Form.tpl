@@ -49,7 +49,7 @@
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
   </div>
 {/if}
-{if $outputMode == 'print'}
+{if !empty($outputMode) && $outputMode == 'print'}
   <script type="text/javascript">
     window.print();
   </script>

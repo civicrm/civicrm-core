@@ -8,13 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 {if !empty($top)}
-  {if $printOnly}
+  {if !empty($printOnly)}
     <h1>{$reportTitle}</h1>
-    <div id="report-date">{$reportDate}</div>
+    <div id="report-date">{if !empty($reportDate)}{$reportDate}{/if}</div>
   {/if}
-  {if $statistics}
+  {if !empty($statistics)}
     <table class="report-layout statistics-table">
-      {if !empty($statistics.groups)} 
+      {if !empty($statistics.groups)}
         {foreach from=$statistics.groups item=row}
           <tr>
             <th class="statistics" scope="row">{$row.title}</th>

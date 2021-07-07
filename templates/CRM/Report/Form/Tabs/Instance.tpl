@@ -58,19 +58,23 @@
       <td class="report-label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
       <td>{$form.parent_id.html|crmAddClass:huge}</td>
     </tr>
+    {if !empty($form.drilldown_id)}
     <tr class="crm-report-instanceForm-form-block-drilldown">
       <td class="report-label">{$form.drilldown_id.label}</td>
       <td>{$form.drilldown_id.html}</td>
     </tr>
+    {/if}
     {if $config->userFramework neq 'Joomla'}
       <tr class="crm-report-instanceForm-form-block-permission">
         <td class="report-label" width="20%">{$form.permission.label} {help id="id-report_perms" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
         <td>{$form.permission.html|crmAddClass:huge}</td>
       </tr>
+      {if !empty($form.grouprole)}
       <tr class="crm-report-instanceForm-form-block-role">
         <td class="report-label" width="20%">{$form.grouprole.label}</td>
         <td>{$form.grouprole.html|crmAddClass:huge}</td>
       </tr>
+      {/if}
     {/if}
     <tr class="crm-report-instanceForm-form-block-add-to-my-reports">
       <td class="report-label">{$form.add_to_my_reports.label} {help id="id-add_to_my_reports" file="CRM/Report/Form/Tabs/Settings.hlp"}</td>
@@ -119,7 +123,7 @@
   });
 </script>
 {/literal}
-{if $is_navigation}
+{if !empty($is_navigation)}
   <script type="text/javascript">
     document.getElementById('is_navigation').checked = true;
     showHideByValue('is_navigation','','navigation_menu','table-row','radio',false);
