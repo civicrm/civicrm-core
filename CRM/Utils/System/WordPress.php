@@ -922,7 +922,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!current_user_can('create_users')) {
       $creds = [];
       $creds['user_login'] = $params['cms_name'];
+      $creds['user_password'] = $user_data['user_pass'];
       $creds['remember'] = TRUE;
+
+      // @todo handle a wp_signon failure
       wp_signon($creds, FALSE);
     }
 
@@ -1460,14 +1463,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     // Re-add current CiviCRM plugin filters.
     add_action('user_register', [$civicrm->users, 'update_user']);
     add_action('profile_update', [$civicrm->users, 'update_user']);
-  }
-
-  /**
-   * Depending on configuration, either let the admin enter the password
-   * when creating a user or let the user do it via email link.
-   */
-  public function showPasswordFieldWhenAdminCreatesUser() {
-    return !$this->isUserRegistrationPermitted();
   }
 
 }
