@@ -7,6 +7,8 @@
   <comment>Define location specific properties</comment>
   <add>2.0</add>
   <log>true</log>
+  <title>Location</title>
+  <icon>fa-map-o</icon>
   <field>
     <name>id</name>
     <title>Location Block ID</title>
@@ -75,7 +77,7 @@
     <title>IM ID</title>
     <type>int unsigned</type>
     <html>
-      <label>IM</label>
+      <label>Instant Messenger</label>
     </html>
     <add>2.0</add>
   </field>
@@ -88,10 +90,10 @@
   </foreignKey>
   <field>
     <name>address_2_id</name>
-    <title>IM 2 ID</title>
+    <title>Address 2 ID</title>
     <type>int unsigned</type>
     <html>
-      <label>IM 2</label>
+      <label>Address 2</label>
     </html>
     <add>2.0</add>
   </field>
@@ -137,7 +139,7 @@
   <field>
     <name>im_2_id</name>
     <type>int unsigned</type>
-    <title>Instant Messenger 2 ID</title>
+    <title>IM 2 ID</title>
     <html>
       <label>Instant Messenger 2</label>
     </html>
