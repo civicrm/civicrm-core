@@ -494,6 +494,7 @@ abstract class AbstractAction implements \ArrayAccess {
         if ($field) {
           $optionFields[$fieldName] = [
             'val' => $record[$expr],
+            'expr' => $expr,
             'field' => $field,
             'suffix' => substr($expr, $suffix + 1),
             'depends' => $field['input_attrs']['control_field'] ?? NULL,
@@ -508,7 +509,7 @@ abstract class AbstractAction implements \ArrayAccess {
     });
     // Replace pseudoconstants. Note this is a reverse lookup as we are evaluating input not output.
     foreach ($optionFields as $fieldName => $info) {
-      $options = FormattingUtil::getPseudoconstantList($info['field'], $info['suffix'], $record, 'create');
+      $options = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create');
       $record[$fieldName] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
     }
   }

@@ -319,7 +319,7 @@ class Api4SelectQuery {
         $suffix = strstr($item, ':');
         if ($suffix && $expr->getType() === 'SqlField') {
           $field = $this->getField($item);
-          $options = FormattingUtil::getPseudoconstantList($field, substr($suffix, 1));
+          $options = FormattingUtil::getPseudoconstantList($field, $item);
           if ($options) {
             asort($options);
             $column = "FIELD($column,'" . implode("','", array_keys($options)) . "')";

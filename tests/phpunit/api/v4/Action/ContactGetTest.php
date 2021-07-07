@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Contact;
+use Civi\Api4\Relationship;
 
 /**
  * @group headless
@@ -192,6 +193,70 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       ->execute()->indexBy('id');
     $this->assertCount(1, $result);
     $this->assertArrayHasKey($jan['id'], (array) $result);
+  }
+
+  public function testGetRelatedWithSubType() {
+    $org = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'Run Amok')
+      ->execute()->single()['id'];
+
+    $ind = Contact::create(FALSE)
+      ->addValue('first_name', 'Guy')
+      ->addValue('last_name', 'Amok')
+      ->addValue('contact_sub_type', ['Student'])
+      ->addChain('relationship', Relationship::create()
+        ->addValue('contact_id_a', '$id')
+        ->addValue('contact_id_b', $org)
+        ->addValue("relationship_type_id:name", "Employee of")
+      )
+      ->execute()->single()['id'];
+
+    // We can retrieve contact sub-type directly
+    $result = Contact::get()
+      ->addSelect('contact_sub_type:label')
+      ->addWhere('id', '=', $ind)
+      ->execute()->single();
+    $this->assertEquals(['Student'], $result['contact_sub_type:label']);
+
+    // Ensure we can also retrieve it indirectly via join
+    $params = [
+      'select' => [
+        'id',
+        'display_name',
+        'contact_type',
+        'Contact_RelationshipCache_Contact_01.id',
+        'Contact_RelationshipCache_Contact_01.far_relation:label',
+        'Contact_RelationshipCache_Contact_01.display_name',
+        'Contact_RelationshipCache_Contact_01.contact_sub_type:label',
+        'Contact_RelationshipCache_Contact_01.contact_type',
+      ],
+      'where' => [
+        ['contact_type:name', '=', 'Organization'],
+        ['Contact_RelationshipCache_Contact_01.contact_sub_type:name', 'CONTAINS', 'Student'],
+        ['id', '=', $org],
+      ],
+      'join' => [
+        [
+          'Contact AS Contact_RelationshipCache_Contact_01',
+          'INNER',
+          'RelationshipCache',
+          ['id', '=', 'Contact_RelationshipCache_Contact_01.far_contact_id'],
+          ['Contact_RelationshipCache_Contact_01.near_relation:name', 'IN', ['Employee of']],
+        ],
+      ],
+      'checkPermissions' => TRUE,
+      'limit' => 50,
+      'offset' => 0,
+      'debug' => TRUE,
+    ];
+
+    $results = civicrm_api4('Contact', 'get', $params);
+    $result = $results->single();
+    $this->assertEquals('Run Amok', $result['display_name']);
+    $this->assertEquals('Guy Amok', $result['Contact_RelationshipCache_Contact_01.display_name']);
+    $this->assertEquals('Employer of', $result['Contact_RelationshipCache_Contact_01.far_relation:label']);
+    $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
 }
