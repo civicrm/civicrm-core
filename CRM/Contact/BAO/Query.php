@@ -3984,7 +3984,7 @@ WHERE  $smartGroupClause
    */
   public function modifiedDates($values) {
     $this->_useDistinct = TRUE;
-
+    CRM_Core_Error::deprecatedWarning('function should not be reachable');
     // CRM-11281, default to added date if not set
     $fieldTitle = ts('Added Date');
     $fieldName = 'created_date';
