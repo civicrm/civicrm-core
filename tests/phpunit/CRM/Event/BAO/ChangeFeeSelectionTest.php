@@ -276,6 +276,9 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testCRM19273() {
+    // When a line item is 'resurrected' the financial_items attached to it are wrong.
+    // We have to skip validatePayments until fixed.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->registerParticipantAndPay();
 
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;

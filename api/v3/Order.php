@@ -143,7 +143,7 @@ function civicrm_api3_order_create(array $params): array {
   }
 
   $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
-  $contribution['values'][$contribution['id']]['line_item'] = $order->getLineItems();
+  $contribution['values'][$contribution['id']]['line_item'] = array_values($order->getLineItems());
 
   return civicrm_api3_create_success($contribution['values'] ?? [], $params, 'Order', 'create');
 }
