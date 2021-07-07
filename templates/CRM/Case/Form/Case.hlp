@@ -16,7 +16,7 @@
   {ts}Details{/ts}
 {/htxt}
 {htxt id="id-details"}
-{if $params.activityTypeFile EQ 'OpenCase'}
+{if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
     <ul>
     <li>{ts}Introduce yourself and your role within our organization.{/ts}</li>
     <li>{ts}&quot;All of the information that you provide to us or any of our representatives and service providers will be held in strictest confidence. It will not be used for any purpose other than to help you, and for any other purpose that you authorize in writing, or which is required by law.&quot;{/ts}</li>
@@ -34,7 +34,7 @@
   {ts}Title{/ts}
 {/htxt}
 {htxt id="id-activity_subject"}
-{if $params.activityTypeFile EQ 'OpenCase'}
+{if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
   {ts}Provide a one-line summary of what this case is about.{/ts}
 {/if}
 {/htxt}
@@ -43,7 +43,7 @@
   {ts}Case Type{/ts}
 {/htxt}
 {htxt id="id-case_type"}
-{if $params.activityTypeFile EQ 'OpenCase'}
+{if !empty($params.activityTypeFile) && $params.activityTypeFile EQ 'OpenCase'}
   {ts}Offer the appropriate service from the list. If the service requires coordination, contact the Director.{/ts}
 {/if}
 {/htxt}
