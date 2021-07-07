@@ -19,8 +19,6 @@ namespace Civi\Api4;
  * Creating a new address requires at minimum a contact's ID and location type ID
  * and other attributes (although optional) like street address, city, country etc.
  *
- * @ui_join_filters location_type_id
- *
  * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
