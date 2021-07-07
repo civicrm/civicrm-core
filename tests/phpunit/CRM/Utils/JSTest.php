@@ -177,6 +177,12 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\na();",
     ];
+    $cases[] = [
+      // Quoted code-template which includes comment on newline. The '//' is part of the string.
+      // Ex: bower_components/monaco-editor/min/vs/loader.js @ ~v0.25
+      "var tpl=`\r\n//quoted comment`;",
+      "var tpl=`\r\n//quoted comment`;",
+    ];
     return $cases;
   }
 
