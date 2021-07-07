@@ -99,7 +99,7 @@ class CustomValue {
    * @throws \API_Exception
    */
   public static function replace($customGroup, $checkPermissions = TRUE) {
-    return (new Generic\BasicReplaceAction("Custom_$customGroup", __FUNCTION__, ['id', 'entity_id']))
+    return (new Generic\BasicReplaceAction("Custom_$customGroup", __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 
