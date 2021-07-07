@@ -132,7 +132,7 @@ class Admin {
     foreach ($schema as &$entity) {
       if ($entity['searchable'] !== 'bridge') {
         foreach (array_reverse($entity['fields'], TRUE) as $index => $field) {
-          if (!empty($field['fk_entity']) && !$field['options'] && empty($field['serialize']) && !empty($schema[$field['fk_entity']]['label_field'])) {
+          if (!empty($field['fk_entity']) && !$field['options'] && !empty($schema[$field['fk_entity']]['label_field'])) {
             $isCustom = strpos($field['name'], '.');
             // Custom fields: append "Contact ID" to original field label
             if ($isCustom) {

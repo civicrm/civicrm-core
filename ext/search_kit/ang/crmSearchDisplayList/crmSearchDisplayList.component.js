@@ -61,6 +61,14 @@
         return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
       };
 
+      this.getLinks = function(rowData, col) {
+        rowData._links = rowData._links || {};
+        if (!(col.key in rowData._links)) {
+          rowData._links[col.key] = searchDisplayUtils.formatLinks(rowData, col.key, ctrl.settings.columns);
+        }
+        return rowData._links[col.key];
+      };
+
     }
   });
 

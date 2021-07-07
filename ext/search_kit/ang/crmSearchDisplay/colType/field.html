@@ -2,6 +2,10 @@
 <span ng-if="::!col.link" ng-class="{'crm-editable-enabled': col.editable && !$ctrl.editing && row[col.editable.id]}" ng-click="col.editable && !$ctrl.editing && ($ctrl.editing = [rowIndex, col.key])">
   {{:: $ctrl.formatFieldValue(row, col) }}
 </span>
-<a ng-if="::col.link" target="{{:: col.link.target }}" href="{{:: displayUtils.getUrl(col.link.path, row) }}">
-  {{:: $ctrl.formatFieldValue(row, col) }}
-</a>
+<span ng-if="::col.link">
+  <span ng-repeat="link in $ctrl.getLinks(row, col)">
+    <a target="{{:: col.link.target }}" href="{{:: link.url }}">
+      {{:: link.value }}</a><span ng-if="!$last">,
+    </span>
+  </span>
+</span>

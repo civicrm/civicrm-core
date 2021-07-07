@@ -71,6 +71,11 @@ class Joinable {
   protected $entity;
 
   /**
+   * @var int
+   */
+  protected $serialize;
+
+  /**
    * @var bool
    */
   protected $deprecated = FALSE;
@@ -232,6 +237,24 @@ class Joinable {
   }
 
   /**
+   * @return int|NULL
+   */
+  public function getSerialize():? int {
+    return $this->serialize;
+  }
+
+  /**
+   * @param int|NULL $serialize
+   *
+   * @return $this
+   */
+  public function setSerialize(?int $serialize) {
+    $this->serialize = $serialize;
+
+    return $this;
+  }
+
+  /**
    * @return int
    */
   public function getJoinType() {
@@ -280,6 +303,14 @@ class Joinable {
     /** @var \Civi\Api4\Service\Spec\SpecGatherer $gatherer */
     $gatherer = \Civi::container()->get('spec_gatherer');
     $spec = $gatherer->getSpec($this->entity, 'get', FALSE);
+    // Serialized fields require a specialized join
+    if ($this->serialize) {
+      foreach ($spec as $field) {
+        // The callback function expects separated values as output
+        $field->setSerialize(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED);
+        $field->setSqlRenderer(['Civi\Api4\Query\Api4SelectQuery', 'renderSerializedJoin']);
+      }
+    }
     return $spec;
   }
 
