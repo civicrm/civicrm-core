@@ -15,10 +15,12 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use CRM_Ckeditor4_ExtensionUtil as E;
+
 /**
  * Form for configuring CKEditor options.
  */
-class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
+class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
 
   const CONFIG_FILEPATH = '[civicrm.files]/persist/crm-ckeditor-';
 
@@ -79,7 +81,7 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
       ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)
-      ->addScriptFile('civicrm', 'js/wysiwyg/admin.ckeditor-configurator.js', 10)
+      ->addScriptFile('ckeditor4', 'js/admin.ckeditor-configurator.js', 10)
       ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/css/fontello.css')
       ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/css/samples.css')
       ->addVars('ckConfig', [
@@ -162,7 +164,7 @@ class CRM_Admin_Form_CKEditorConfig extends CRM_Core_Form {
       . preg_replace('~\R~u', "\n", $params['config']);
 
     // Generate a whitelist of allowed config params
-    $allOptions = json_decode(file_get_contents(\Civi::paths()->getPath('[civicrm.root]/js/wysiwyg/ck-options.json')), TRUE);
+    $allOptions = json_decode(file_get_contents(E::path('js/ck-options.json')), TRUE);
     // These two aren't really blacklisted they're just in a different part of the form
     $blackList = array_diff($this->blackList, ['skin', 'extraPlugins']);
     // All options minus blacklist = whitelist

@@ -160,8 +160,6 @@
       <td class="label">{$form.editor_id.label} {help id="editor_id"}</td>
       <td>
         {$form.editor_id.html}
-        &nbsp;
-        {$form.ckeditor_config.html}
       </td>
     </tr>
     <tr class="crm-preferences-display-form-block-ajaxPopupsEnabled">
@@ -252,11 +250,6 @@
         }
 
         $("#contactEditBlocks, #contactEditOptions").on('sortupdate', getSorting);
-
-        function showCKEditorConfig() {
-          $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');
-        }
-        $('select[name=editor_id]').each(showCKEditorConfig).change(showCKEditorConfig);
       });
     </script>
   {/literal}

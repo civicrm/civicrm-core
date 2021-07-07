@@ -3480,7 +3480,8 @@ INSERT INTO `civicrm_extension` (`id`, `type`, `full_name`, `name`, `label`, `fi
  (3,'module','eventcart','Event cart','Event cart','eventcart',NULL,1),
  (4,'module','financialacls','Financial ACLs','Financial ACLs','financialacls',NULL,1),
  (5,'module','contributioncancelactions','Contribution cancel actions','Contribution cancel actions','contributioncancelactions',NULL,1),
- (6,'module','recaptcha','reCAPTCHA','reCAPTCHA','recaptcha',NULL,1);
+ (6,'module','recaptcha','reCAPTCHA','reCAPTCHA','recaptcha',NULL,1),
+ (7,'module','ckeditor4','CKEditor4','CKEditor4','ckeditor4',NULL,1);
 /*!40000 ALTER TABLE `civicrm_extension` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -5899,7 +5900,7 @@ INSERT INTO `civicrm_option_value` (`id`, `option_group_id`, `label`, `value`, `
  (309,30,'ics','15','ics',NULL,0,0,15,NULL,0,0,1,NULL,NULL,NULL,NULL,NULL),
  (310,30,'pptx','16','pptx',NULL,0,0,16,NULL,0,0,1,NULL,NULL,NULL,NULL,NULL),
  (311,33,'Textarea','1','Textarea',NULL,0,NULL,1,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
- (312,33,'CKEditor','2','CKEditor',NULL,0,NULL,2,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
+ (312,33,'CKEditor 4','2','CKEditor',NULL,0,NULL,2,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
  (313,32,'Search Builder','1','Search Builder',NULL,0,0,1,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
  (314,32,'Import Contact','2','Import Contact',NULL,0,0,2,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
  (315,32,'Import Activity','3','Import Activity',NULL,0,0,3,NULL,0,1,1,NULL,NULL,NULL,NULL,NULL),
