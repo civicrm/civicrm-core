@@ -188,6 +188,8 @@ SELECT acl.*
    * @param int $contactID
    *
    * @return bool
+   *
+   * @deprecated
    */
   public static function check($str, $contactID) {
     \CRM_Core_Error::deprecatedWarning(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated.');
