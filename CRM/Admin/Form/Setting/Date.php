@@ -32,6 +32,7 @@ class CRM_Admin_Form_Setting_Date extends CRM_Admin_Form_Setting {
     'dateInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'timeInputFormat' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
     'fiscalYearStart' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
+    'datetzdefault' => CRM_Core_BAO_Setting::LOCALIZATION_PREFERENCES_NAME,
   ];
 
   /**
