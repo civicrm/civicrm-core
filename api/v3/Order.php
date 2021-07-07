@@ -73,8 +73,7 @@ function _civicrm_api3_order_get_spec(array &$params) {
  */
 function civicrm_api3_order_create(array $params): array {
   civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
-  $entity = NULL;
-  $entityIds = [];
+
   $params['contribution_status_id'] = 'Pending';
   $order = new CRM_Financial_BAO_Order();
   $order->setDefaultFinancialTypeID($params['financial_type_id'] ?? NULL);
@@ -115,7 +114,7 @@ function civicrm_api3_order_create(array $params): array {
         if ($supportedEntity) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
-          $entityIds[] = $params[$entity . '_id'] = $entityResult['id'];
+          $params[$entity . '_id'] = $entityResult['id'];
           foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
             $lineIndex = $index . '+' . $innerIndex;
             $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
@@ -146,22 +145,6 @@ function civicrm_api3_order_create(array $params): array {
   $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
   $contribution['values'][$contribution['id']]['line_item'] = $order->getLineItems();
 
-  // add payments
-  if ($entity && !empty($contribution['id'])) {
-    foreach ($entityIds as $entityId) {
-      $paymentParams = [
-        'contribution_id' => $contribution['id'],
-        $entity . '_id' => $entityId,
-      ];
-      // if entity is pledge then build pledge param
-      if ($entity === 'pledge') {
-        $paymentParams += $entityParams;
-        // Pledges are not stored as entity_id in the line_item table.
-        CRM_Core_Error::deprecatedWarning('This should be unreachable & tests show it is never tested.');
-        civicrm_api3('PledgePayment', 'create', $paymentParams);
-      }
-    }
-  }
   return civicrm_api3_create_success($contribution['values'] ?? [], $params, 'Order', 'create');
 }
 
