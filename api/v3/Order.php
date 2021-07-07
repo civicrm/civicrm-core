@@ -86,12 +86,10 @@ function civicrm_api3_order_create(array $params): array {
         $order->setLineItem($lineItem, $lineIndex);
       }
 
-      $entityParams = $lineItems['params'] ?? [];
-      $entity = $order->getLineItemEntity($lineIndex);
+      $entityParams = $lineItems['params'] ?? NULL;
 
-      if ($entityParams) {
-        $supportedEntity = TRUE;
-        switch ($entity) {
+      if ($entityParams && $order->getLineItemEntity($lineIndex) !== 'contribution') {
+        switch ($order->getLineItemEntity($lineIndex)) {
           case 'participant':
             if (isset($entityParams['participant_status_id'])
               && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
@@ -99,28 +97,26 @@ function civicrm_api3_order_create(array $params): array {
             }
             $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
             $entityParams['status_id'] = $entityParams['participant_status_id'];
+            $entityParams['skipLineItem'] = TRUE;
+            $entityResult = civicrm_api3('Participant', 'create', $entityParams);
+            // @todo - once membership is cleaned up & financial validation tests are extended
+            // we can look at removing this - some weird handling in removeFinancialAccounts
             $params['contribution_mode'] = 'participant';
+            $params['participant_id'] = $entityResult['id'];
             break;
 
           case 'membership':
             $entityParams['status_id'] = 'Pending';
-            break;
-
-          default:
-            // Don't create any related entities. We might want to support eg. Pledge one day?
-            $supportedEntity = FALSE;
+            $entityParams['skipLineItem'] = TRUE;
+            $entityResult = civicrm_api3('Membership', 'create', $entityParams);
             break;
         }
-        if ($supportedEntity) {
-          $entityParams['skipLineItem'] = TRUE;
-          $entityResult = civicrm_api3($entity, 'create', $entityParams);
-          $params[$entity . '_id'] =  $entityResult['id'];
-          foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+
+        foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
           $lineIndex = $index . '+' . $innerIndex;
           $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
         }
       }
-    }
     }
     $priceSetID = $order->getPriceSetID();
     $params['line_item'][$priceSetID] = $order->getLineItems();
