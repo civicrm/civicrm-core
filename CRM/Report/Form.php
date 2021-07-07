@@ -1879,6 +1879,8 @@ class CRM_Report_Form extends CRM_Core_Form {
         $result = [
           'mhas' => ts('Is one of'),
           'mnot' => ts('Is not one of'),
+          'nll' => ts('Is empty (Null)'),
+          'nnll' => ts('Is not empty (Null)'),
         ];
         return $result;
 
