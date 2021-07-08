@@ -160,22 +160,11 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       return;
     }
 
-    // Process all filters that are included in SELECT clause. These filters are implicitly allowed.
-    foreach ($this->getSelectAliases() as $fieldName) {
-      if (isset($filters[$fieldName])) {
-        $value = $filters[$fieldName];
-        unset($filters[$fieldName]);
+    // Process all filters that are included in SELECT clause or are allowed by the Afform.
+    $allowedFilters = array_merge($this->getSelectAliases(), $this->getAfformFilters());
+    foreach ($filters as $fieldName => $value) {
+      if (in_array($fieldName, $allowedFilters, TRUE)) {
         $this->applyFilter($fieldName, $value);
-      }
-    }
-
-    // Other filters may be allowed if display is embedded in an afform.
-    if ($filters) {
-      foreach ($this->getAfformFilters() as $fieldName) {
-        if (isset($filters[$fieldName])) {
-          $value = $filters[$fieldName];
-          $this->applyFilter($fieldName, $value);
-        }
       }
     }
   }
@@ -327,6 +316,10 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Returns a list of filter fields and directive filters
+   *
+   * Automatically applies directive filters
+   *
    * @return array
    */
   private function getAfformFilters() {
@@ -335,16 +328,23 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       return [];
     }
     // Get afform field filters
-    $filters = array_column(\CRM_Utils_Array::findAll(
+    $filterKeys = array_column(\CRM_Utils_Array::findAll(
       $afform['layout'] ?? [],
       ['#tag' => 'af-field']
     ), 'name');
-    // Get filters passed into search display directive
+    // Get filters passed into search display directive from Afform markup
     $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
     if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
-      $filters = array_unique(array_merge($filters, array_keys(\CRM_Utils_JS::getRawProps($filterAttr))));
+      foreach (\CRM_Utils_JS::decode($filterAttr) as $filterKey => $filterVal) {
+        $filterKeys[] = $filterKey;
+        // Automatically apply filters from the markup if they have a value
+        // (if it's a javascript variable it will have come back from decode() as NULL and we'll ignore it).
+        if ($this->hasValue($filterVal)) {
+          $this->applyFilter($filterKey, $filterVal);
+        }
+      }
     }
-    return $filters;
+    return $filterKeys;
   }
 
   /**
