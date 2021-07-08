@@ -121,7 +121,12 @@
         return true;
       },
       model: function() {
-        return [$scope.mailing, $scope.attachments.getAutosaveSignature()];
+        //modified date is unset so that it gets ignored in comparison
+        //its value is overwritten with the save response from the server and may differ from the local value,
+        //which would result in an unnecessary auto-save
+        var mailing = angular.copy($scope.mailing);
+        mailing.modified_date = undefined;
+        return [mailing, $scope.attachments.getAutosaveSignature()];
       },
       form: function() {
         return $scope.crmMailing;
