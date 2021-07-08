@@ -91,6 +91,8 @@ class CRM_Upgrade_Incremental_php_FiveForty extends CRM_Upgrade_Incremental_Base
    */
   public static function addContributionProductFK(CRM_Queue_TaskContext $ctx): bool {
     if (!self::checkFKExists('civicrm_contribution_product', 'FK_civicrm_contribution_product_product_id')) {
+      // dev/core#2680 Clear out any rows with problematic product_ids from the civicrm_contribution_product table.
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_contribution_product WHERE product_id NOT IN (SELECT id FROM civicrm_product)");
       CRM_Core_DAO::executeQuery("
         ALTER TABLE `civicrm_contribution_product`
           ADD CONSTRAINT `FK_civicrm_contribution_product_product_id`
