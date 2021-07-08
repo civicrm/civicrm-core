@@ -74,5 +74,12 @@
     {
       "payment_processor_type_id:name": "Dummy"
     }
+  ],
+  "Batch": [
+    {
+      "title": "Batch 433397",
+      "name": "Batch_433397",
+      "status_id": "1"
+    }
   ]
 }

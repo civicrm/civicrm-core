@@ -53,6 +53,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
       'civicrm_group',
       'civicrm_event',
       'civicrm_participant',
+      'civicrm_batch',
     ];
     $this->dropByPrefix('civicrm_value_myfavorite');
     $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
