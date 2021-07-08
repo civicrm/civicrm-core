@@ -59,7 +59,7 @@
    <div class="content">{$form.saveTemplateName.html|crmAddClass:huge}</div>
 </div>
 
-{if ! $noAttach}
+{if empty($noAttach)}
     {include file="CRM/Form/attachment.tpl"}
 {/if}
 

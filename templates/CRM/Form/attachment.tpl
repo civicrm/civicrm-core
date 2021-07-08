@@ -27,13 +27,13 @@
         </td>
     </tr>
 {elseif $action NEQ 4}
-    {if $context EQ 'pcpCampaign'}
+    {if !empty($context) && $context EQ 'pcpCampaign'}
       {capture assign=attachTitle}{ts}Include a Picture or an Image{/ts}{/capture}
     {else}
       {capture assign=attachTitle}{ts}Attachment(s){/ts}{/capture}
     {/if}
-    {if !$noexpand}
-    <div class="crm-accordion-wrapper {if $context NEQ 'pcpCampaign' AND !$currentAttachmentInfo}collapsed{/if}">
+    {if empty($noexpand)}
+    <div class="crm-accordion-wrapper {if (empty($context) || $context NEQ 'pcpCampaign') AND empty($currentAttachmentInfo)}collapsed{/if}">
        <div class="crm-accordion-header">
           {$attachTitle}
       </div><!-- /.crm-accordion-header -->
@@ -42,7 +42,7 @@
     <div id="attachments">
       <table class="form-layout-compressed">
       {if $form.attachFile_1}
-        {if $context EQ 'pcpCampaign'}
+        {if !empty($context) && $context EQ 'pcpCampaign'}
             <div class="description">{ts}You can upload a picture or image to include on your page. Your file should be in .jpg, .gif, or .png format. Recommended image size is 250 x 250 pixels. Images over 360 pixels wide will be automatically resized to fit.{/ts}</div>
         {/if}
         <tr>
