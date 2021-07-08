@@ -11,15 +11,15 @@
     {ts}In addition to the settings on this screen, there are a number of settings you can add to your sites's settings file (civicrm.settings.php) to provide additional debugging information.{/ts} {docURL page="dev/tools/debugging/#changing-file-based-settings"}
 </div>
 <div class="crm-block crm-form-block crm-debugging-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-         <table class="form-layout">
-            {if $form.userFrameworkLogging}
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+    <table class="form-layout">
+        {if !empty($form.userFrameworkLogging)}
             <tr class="crm-debugging-form-block-userFrameworkLogging">
                 <td class="label">{$form.userFrameworkLogging.label}</td>
                 <td>{$form.userFrameworkLogging.html}<br />
                 <span class="description">{ts}Set this value to <strong>Yes</strong> if you want CiviCRM error/debugging messages to appear in the Drupal error logs{/ts} {help id='userFrameworkLogging'}</span></td>
             </tr>
-            {/if}
+        {/if}
             <tr class="crm-debugging-form-block-debug">
                 <td class="label">{$form.debug_enabled.label}</td>
                 <td>{$form.debug_enabled.html}<br />
@@ -45,7 +45,7 @@
                 <td>{$form.assetCache.html}<br />
                 <span class="description">{ts}Store computed JS/CSS content in cache files? (Note: In "Auto" mode, the "Debug" setting will determine whether to activate the cache.){/ts}</span></td>
             </tr>
-        </table>
-        <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
-<div class="spacer"></div>
+    </table>
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+    <div class="spacer"></div>
 </div>
