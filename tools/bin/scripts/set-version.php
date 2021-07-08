@@ -74,7 +74,8 @@ updateFile("sql/test_data_second_domain.mysql", function ($content) use ($newVer
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-foreach (findCoreInfoXml() as $infoXml) {
+$infoXmls = findCoreInfoXml();
+foreach ($infoXmls as $infoXml) {
   updateXmlFile($infoXml, function (DOMDocument $dom) use ($newVersion) {
     foreach ($dom->getElementsByTagName('version') as $tag) {
       /** @var \DOMNode $tag */
@@ -85,7 +86,7 @@ foreach (findCoreInfoXml() as $infoXml) {
 
 if ($doCommit) {
   $files = array_filter(
-    ['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile],
+    array_merge(['xml/version.xml', 'sql/civicrm_generated.mysql', 'sql/test_data_second_domain.mysql', $phpFile, @$sqlFile], $infoXmls),
     'file_exists'
   );
   $filesEsc = implode(' ', array_map('escapeshellarg', $files));
