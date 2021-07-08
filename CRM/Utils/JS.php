@@ -109,6 +109,10 @@ class CRM_Utils_JS {
    * @return string
    */
   public static function stripComments($script) {
+    // This function is a little naive, and some expressions may trip it up. Opt-out if anything smells fishy.
+    if (preg_match(';`\r?\n//;', $script)) {
+      return $script;
+    }
     return preg_replace("#^\\s*//[^\n]*$(?:\r\n|\n)?#m", "", $script);
   }
 
