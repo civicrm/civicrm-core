@@ -161,11 +161,12 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of contact created
-   *
-   * @throws \CiviCRM_API3_Exception
    */
-  private function _contactCreate($params): int {
-    $result = civicrm_api3('contact', 'create', $params);
+  private function _contactCreate(array $params): int {
+    $version = $this->_apiversion;
+    $this->_apiversion = 3;
+    $result = $this->callAPISuccess('contact', 'create', $params);
+    $this->_apiversion = $version;
     return (int) $result['id'];
   }
 

@@ -27,6 +27,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_TaxTrait;
+  use CRMTraits_Financial_PriceSetTrait;
 
   protected $_individualId;
   protected $_contribution;
@@ -2384,8 +2385,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRepeatTransactionLineItems(): void {
-    // @todo - figure out why this test is not valid.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // CRM-19309
     $originalContribution = $this->setUpRepeatTransaction([], 'multiple');
     $this->callAPISuccess('contribution', 'repeattransaction', [
@@ -4384,13 +4383,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Set up a repeat transaction.
    *
    * @param array $recurParams
-   * @param mixed $flag
+   * @param string $flag
    * @param array $contributionParams
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
-  protected function setUpRepeatTransaction($recurParams, $flag, $contributionParams = []) {
+  protected function setUpRepeatTransaction(array $recurParams, $flag, array $contributionParams = []) {
     $paymentProcessorID = $this->paymentProcessorCreate();
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge([
       'contact_id' => $this->_individualId,
@@ -4407,36 +4405,17 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = '';
     if ($flag === 'multiple') {
       // CRM-19309 create a contribution + also add in line_items (plural):
-      $params = array_merge($this->_params, $contributionParams);
-      $originalContribution = $this->callAPISuccess('contribution', 'create', array_merge(
-          $params,
-          [
-            'contribution_recur_id' => $contributionRecur['id'],
-            'skipLineItem' => 1,
-            'api.line_item.create' => [
-              [
-                'price_field_id' => 1,
-                'qty' => 2,
-                'line_total' => '20',
-                'unit_price' => '10',
-                'financial_type_id' => 1,
-              ],
-              [
-                'price_field_id' => 1,
-                'qty' => 1,
-                'line_total' => '80',
-                'unit_price' => '80',
-                'financial_type_id' => 2,
-              ],
-            ],
-          ]
-        )
-      );
+      $this->createContributionWithTwoLineItemsAgainstPriceSet([
+        'contact_id' => $this->_individualId,
+        'contribution_recur_id' => $contributionRecur['id'],
+      ]);
+      $originalContribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_recur_id' => $contributionRecur['id'], 'return' => 'id']);
     }
     elseif ($flag === 'single') {
       $params = array_merge($this->_params, ['contribution_recur_id' => $contributionRecur['id']]);
       $params = array_merge($params, $contributionParams);
-      $originalContribution = $this->callAPISuccess('contribution', 'create', $params);
+      $params['api.Payment.create'] = ['total_amount' => $params['total_amount']];
+      $originalContribution = $this->callAPISuccess('Order', 'create', $params);
     }
     $originalContribution['contribution_recur_id'] = $contributionRecur['id'];
     $originalContribution['payment_processor_id'] = $paymentProcessorID;
