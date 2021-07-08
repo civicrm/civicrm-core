@@ -164,7 +164,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     $url = \Civi::service('asset_builder')->getUrl('invalid.json');
     try {
       $guzzleClient = new \GuzzleHttp\Client();
-      $guzzleResponse = $guzzleClient->request('GET', $url, array('timeout' => 1));
+      $guzzleResponse = $guzzleClient->request('GET', $url, array('timeout' => 2));
       $this->fail('Expecting ClientException... but it was not thrown!');
     }
     catch (\GuzzleHttp\Exception\ClientException $e) {
