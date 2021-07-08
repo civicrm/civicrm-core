@@ -63,6 +63,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $_preserveDefault = TRUE;
 
   /**
+   * Renew option for current row.
+   *
+   * This is as set on the form.
+   *
+   * @var int
+   */
+  protected $currentRowIsRenewOption;
+
+  /**
    * Contact fields.
    *
    * @var array
@@ -85,6 +94,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @var int
    */
   protected $currentRowContributionID;
+
+  /**
+   * Row being processed.
+   *
+   * @var array
+   */
+  protected $currentRow = [];
 
   /**
    * Get the contribution id for the current row.
@@ -733,12 +749,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           continue;
         }
         $value['contact_id'] = $params['primary_contact_id'][$key];
-        foreach ($value as $fieldKey => $fieldValue) {
-          if (isset($this->_fields[$fieldKey]) && $this->_fields[$fieldKey]['data_type'] === 'Money') {
-            $value[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
-          }
-        }
         $value = $this->standardiseRow($value);
+        $this->currentRow = $value;
+        $this->currentRowIsRenewOption = (int) ($params['member_option'][$key] ?? 1);
 
         // update contact information
         $this->updateContactInfo($value);
@@ -789,12 +802,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'join_date' => $value['membership_join_date'] ?? NULL,
           'campaign_id' => $value['member_campaign_id'] ?? NULL,
         ];
-        $value['is_renew'] = FALSE;
-        if (!empty($params['member_option']) && CRM_Utils_Array::value($key, $params['member_option']) == 2) {
 
+        if ($this->currentRowIsRenew()) {
           // The following parameter setting may be obsolete.
           $this->_params = $params;
-          $value['is_renew'] = TRUE;
 
           $formDates = [
             'end_date' => $value['membership_end_date'] ?? NULL,
@@ -865,10 +876,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *   true if mail was sent successfully
    * @throws \CRM_Core_Exception|\API_Exception
    *
-   * @deprecated
-   *   This function is shared with Batch_Entry which has limited overlap
-   *   & needs rationalising.
-   *
    */
   protected function emailReceipt($form, &$formValues, $membership): bool {
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
@@ -888,12 +895,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $form->assign('contributionStatus', CRM_Contribute_PseudoConstant::contributionStatus($formValues['contribution_status_id'], 'name'));
     }
 
-    if (!empty($formValues['is_renew'])) {
-      $form->assign('receiptType', 'membership renewal');
-    }
-    else {
-      $form->assign('receiptType', 'membership signup');
-    }
+    $form->assign('receiptType', $this->currentRowIsRenew() ? 'membership renewal' : 'membership signup');
     $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
     $form->assign('formValues', $formValues);
 
@@ -1220,6 +1222,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return array
    */
   private function standardiseRow(array $row): array {
+    foreach ($row as $fieldKey => $fieldValue) {
+      if (isset($this->_fields[$fieldKey]) && $this->_fields[$fieldKey]['data_type'] === 'Money') {
+        $row[$fieldKey] = CRM_Utils_Rule::cleanMoney($fieldValue);
+      }
+    }
     $renameFieldMapping = [
       'financial_type' => 'financial_type_id',
       'payment_instrument' => 'payment_instrument_id',
@@ -1240,6 +1247,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // total_amount is required.
     $row['total_amount'] = (float) $row['total_amount'];
     return $row;
+  }
+
+  /**
+   * Is the current row a renewal.
+   *
+   * @return bool
+   */
+  private function currentRowIsRenew(): bool {
+    return $this->currentRowIsRenewOption === 2;
   }
 
 }
