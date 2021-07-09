@@ -81,5 +81,14 @@
       "name": "Batch_433397",
       "status_id": "1"
     }
+  ],
+  "Product": [
+    {
+      "name": "Test Product",
+      "price": "10.00",
+      "sku": "Test SKU",
+      "financial_type_id:name": "Donation",
+      "min_contribution": "10.00"
+    }
   ]
 }
