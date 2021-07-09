@@ -60,10 +60,9 @@
       <div class="crm-public-form-item crm-section additional_participants-section" id="noOfparticipants">
         <div class="label">{$form.additional_participants.label} <span class="crm-marker" title="{ts}This field is required.{/ts}">*</span></div>
         <div class="content">
-          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}{ts}(including yourself){/ts}{/if}
+          {$form.additional_participants.html}{if $contact_id || $contact_id == NULL}&nbsp;{ts}(including yourself){/ts}{/if}
           <br/>
-          <span
-            class="description">{ts}Fill in your registration information on this page. If you are registering additional people, you will be able to enter their registration information after you complete this page and click &quot;Review your registration&quot;.{/ts}</span>
+          <div class="description" id="additionalParticipantsDescription" style="display: none;">{ts}Fill in your registration information on this page. You will be able to enter their registration information for additional people after you complete this page and click &quot;Review your registration&quot;.{/ts}</div>
         </div>
         <div class="clear"></div>
       </div>
@@ -167,6 +166,23 @@
     pcpAnonymous();
   {/if}
   {literal}
+
+  function additionalParticipantsChange() {
+    toggleAdditionalParticipantsDescription();
+    allowParticipant();
+  }
+
+  function toggleAdditionalParticipantsDescription() {
+    if (cj('#additional_participants').val()) {
+      cj("#additionalParticipantsDescription").show();
+    } else {
+      cj("#additionalParticipantsDescription").hide();
+    }
+  }
+
+  window.onload = function() {
+    toggleAdditionalParticipantsDescription();
+  };
 
   function allowParticipant() {
     {/literal}{if $allowGroupOnWaitlist}{literal}
