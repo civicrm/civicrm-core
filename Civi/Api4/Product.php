@@ -10,22 +10,14 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-
 namespace Civi\Api4;
 
 /**
- * EntityBatch entity.
+ * Product entity.
  *
  * @since 5.41
- * @searchable none
  * @package Civi\Api4
  */
-class EntityBatch extends Generic\DAOEntity {
+class Product extends Generic\DAOEntity {
 
 }

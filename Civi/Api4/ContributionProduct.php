@@ -15,6 +15,7 @@ namespace Civi\Api4;
 /**
  * Contribution Product entity.
  *
+ * @since 5.41
  * @package Civi\Api4
  */
 class ContributionProduct extends Generic\DAOEntity {
