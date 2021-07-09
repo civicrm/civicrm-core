@@ -31,6 +31,18 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
 
+    $force_create_template = CRM_Utils_Request::retrieve('force_create_template', 'Boolean', $this, FALSE, FALSE);
+    if ($force_create_template && !empty($values['contribution_recur_id']) && empty($values['is_template'])) {
+      // Create a template contribution.
+      $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($values['contribution_recur_id']);
+      if (!empty($templateContributionId)) {
+        $id = $templateContributionId;
+        $params = ['id' => $id];
+        $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
+      }
+    }
+    $this->assign('is_template', $values['is_template']);
+
     if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && $this->_action & CRM_Core_Action::VIEW) {
       $financialTypeID = CRM_Contribute_PseudoConstant::financialType($values['financial_type_id']);
       CRM_Financial_BAO_FinancialType::checkPermissionedLineItems($id, 'view');
@@ -172,16 +184,20 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('totalTaxAmount', $values['tax_amount']);
     }
 
+    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);
-
     // Check if this is default domain contact CRM-10482
     if (CRM_Contact_BAO_Contact::checkDomainContact($values['contact_id'])) {
       $displayName .= ' (' . ts('default organization') . ')';
     }
 
-    // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
+    if (empty($values['is_template'])) {
+      CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
+    }
+    else {
+      CRM_Utils_System::setTitle(ts('View Template Contribution from') . ' ' . $displayName);
+    }
 
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/contribution',
