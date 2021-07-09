@@ -122,6 +122,14 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
     $this->options = [
       [
         'key' => 'action',
+        'components' => ['contribution'],
+        'options' => [
+          'transact' => ts('Contribution Page'),
+          'setup' => ts('Setup a Personal Campaign Page'),
+        ],
+      ],
+      [
+        'key' => 'action',
         'components' => ['event'],
         'options' => [
           'info' => ts('Event Info Page'),
