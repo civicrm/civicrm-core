@@ -32,21 +32,21 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
   /**
    * The option group name.
    *
-   * @var array
+   * @var string
    */
   public static $_gName = NULL;
 
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
-   * @var array
+   * @var string
    */
   public static $_gLabel = NULL;
 
   /**
    * The option group id.
    *
-   * @var array
+   * @var int
    */
   public static $_gId = NULL;
 
@@ -69,14 +69,14 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     // If an id arg is passed instead of a group name in the path
     elseif (!self::$_gName && !empty($_GET['gid'])) {
-      self::$_gId = $_GET['gid'];
+      self::$_gId = (int) $_GET['gid'];
       self::$_gName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'name');
       self::$_isLocked = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'is_locked');
-      $breadCrumb = array(
+      $breadCrumb = [
         'title' => ts('Option Groups'),
         'url' => CRM_Utils_System::url('civicrm/admin/options', 'reset=1'),
-      );
-      CRM_Utils_System::appendBreadCrumb(array($breadCrumb));
+      ];
+      CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
     }
     if (!self::$_gName) {
       self::$_gName = $this->get('gName');
@@ -87,7 +87,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     }
     $this->set('gName', self::$_gName);
     if (!self::$_gId) {
-      self::$_gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'id', 'name');
+      self::$_gId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gName, 'id', 'name');
     }
 
     self::$_gLabel = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', self::$_gId, 'title');
@@ -101,21 +101,19 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
       // set breadcrumb to append to admin/access
-      $breadCrumb = array(
-        array(
+      $breadCrumb = [
+        [
           'title' => ts('Access Control'),
-          'url' => CRM_Utils_System::url('civicrm/admin/access',
-            'reset=1'
-          ),
-        ),
-      );
+          'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
+        ],
+      ];
       CRM_Utils_System::appendBreadCrumb($breadCrumb);
     }
     else {
-      CRM_Utils_System::setTitle(ts("%1 Options", array(1 => self::$_gLabel)));
+      CRM_Utils_System::setTitle(ts("%1 Options", [1 => self::$_gLabel]));
     }
-    if (in_array(self::$_gName,
-      array(
+    $this->assign('showIsDefault', in_array(self::$_gName,
+      [
         'from_email_address',
         'email_greeting',
         'postal_greeting',
@@ -127,17 +125,14 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         'payment_instrument',
         'soft_credit_type',
         'website_type',
-      )
-    )) {
-      $this->assign('showIsDefault', TRUE);
-    }
+      ]
+    ));
 
     if (self::$_gName == 'participant_role') {
       $this->assign('showCounted', TRUE);
     }
     $this->assign('isLocked', self::$_isLocked);
     $this->assign('allowLoggedIn', Civi::settings()->get('allow_mail_from_logged_in_contact'));
-    $config = CRM_Core_Config::singleton();
     if (self::$_gName == 'activity_type') {
       $this->assign('showComponent', TRUE);
     }
@@ -160,42 +155,42 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
    *   (reference) of action links
    */
   public function &links() {
-    if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+    if (!self::$_links) {
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DISABLE => array(
+          'title' => ts('Edit %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Disable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::ENABLE => array(
+          'title' => ts('Disable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Enable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DELETE => array(
+          'title' => ts('Enable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/options/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%',
-          'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
-        ),
-      );
+          'title' => ts('Delete %1 Type', [1 => self::$_gName]),
+        ],
+      ];
 
       if (self::$_gName == 'custom_search') {
-        $runLink = array(
-          CRM_Core_Action::FOLLOWUP => array(
+        $runLink = [
+          CRM_Core_Action::FOLLOWUP => [
             'name' => ts('Run'),
             'url' => 'civicrm/contact/search/custom',
             'qs' => 'reset=1&csid=%%value%%',
-            'title' => ts('Run %1', array(1 => self::$_gName)),
+            'title' => ts('Run %1', [1 => self::$_gName]),
             'class' => 'no-popup',
-          ),
-        );
+          ],
+        ];
         self::$_links = $runLink + self::$_links;
       }
     }
@@ -217,7 +212,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     if (!self::$_gName) {
       return parent::browse();
     }
-    $groupParams = array('name' => self::$_gName);
+    $groupParams = ['name' => self::$_gName];
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'component_id,weight');
     $gName = self::$_gName;
     $returnURL = CRM_Utils_System::url("civicrm/admin/options/$gName",
@@ -229,7 +224,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
     );
 
     // retrieve financial account name for the payment method page
-    if ($gName = "payment_instrument") {
+    if ($gName === "payment_instrument") {
       foreach ($optionValue as $key => $option) {
         $optionValue[$key]['financial_account'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($key, NULL, 'civicrm_option_value', 'financial_account_id.name');
       }
