@@ -351,7 +351,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           ts('How many people are you registering?'),
           $additionalOptions,
           NULL,
-          ['onChange' => "allowParticipant()"]
+          ['onChange' => "additionalParticipantsChange()"]
         );
         $isAdditionalParticipants = TRUE;
       }
@@ -486,7 +486,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $buttonParams['name'] = ts('Register');
       }
       else {
-        $buttonParams['name'] = ts('Review your registration');
+        $buttonParams['name'] = ts('Review');
         $buttonParams['icon'] = 'fa-chevron-right';
       }
 
