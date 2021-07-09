@@ -457,7 +457,7 @@ FROM
         'is_active' => $dao->is_active,
         'is_default' => $dao->is_default,
         'icon' => $dao->icon,
-        'color' => $dao->icon,
+        'color' => $dao->color,
       ];
     }
     return $values;
