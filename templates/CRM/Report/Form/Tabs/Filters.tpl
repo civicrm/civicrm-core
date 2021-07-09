@@ -8,27 +8,21 @@
  +--------------------------------------------------------------------+
 *}
 
-  <div id="report-tab-set-filters" class="civireport-criteria">
-    <table class="report-layout">
+<div id="report-tab-set-filters" class="civireport-criteria">
+  <div class="report-layout">
       {assign var="counter" value=1}
-      {foreach from=$filters item=table key=tableName}
-        {assign  var="filterCount" value=$table|@count}
+      {foreach from=$filterGroups item=filterGroup}
         {* Wrap custom field sets in collapsed accordion pane. *}
-        {if !empty($filterGroups.$tableName.group_title) and $filterCount gte 1}
-          {* we should close table that contains other filter elements before we start building custom group accordion
-           *}
-          {if $counter eq 1}
-    </table>
-            {assign var="counter" value=0}
-          {/if}
+        {if $filterGroup.use_accordion_for_field_selection}
           <div class="crm-accordion-wrapper crm-accordion collapsed">
             <div class="crm-accordion-header">
-              {$filterGroups.$tableName.group_title}
+              {$filterGroup.group_title}
             </div><!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
-              <table class="report-layout">
         {/if}
-        {foreach from=$table item=field key=fieldName}
+        <table class="report-layout">
+        {foreach from=$filterGroup.tables item=table key=tableName}
+          {foreach from=$table item=field key=fieldName}
                 {assign var=fieldOp     value=$fieldName|cat:"_op"}
                 {assign var=filterVal   value=$fieldName|cat:"_value"}
                 {assign var=filterMin   value=$fieldName|cat:"_min"}
@@ -51,17 +45,13 @@
                     </td>
                   </tr>
                 {/if}
+          {/foreach}
         {/foreach}
-        {if !empty($filterGroups.$tableName.group_title)}
-              </table>
+        </table>
+        {if $filterGroup.use_accordion_for_field_selection}
             </div><!-- /.crm-accordion-body -->
           </div><!-- /.crm-accordion-wrapper -->
-          {assign var=closed value="1"} {*-- ie table tags are closed-- *}
-        {else}
-          {assign var=closed     value="0"} {*-- ie table tags are not closed-- *}
         {/if}
       {/foreach}
-    {if $closed eq 0 }
-      </table>
-    {/if}
   </div>
+</div>

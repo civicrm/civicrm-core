@@ -684,7 +684,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('mode', 'instance');
     }
     elseif (!$this->noController) {
-      list($optionValueID, $optionValue) = CRM_Report_Utils_Report::getValueIDFromUrl();
+      [$optionValueID, $optionValue] = CRM_Report_Utils_Report::getValueIDFromUrl();
       $instanceCount = CRM_Report_Utils_Report::getInstanceCount($optionValue);
       if (($instanceCount > 0) && $optionValueID) {
         $this->assign('instanceUrl',
@@ -1325,28 +1325,35 @@ class CRM_Report_Form extends CRM_Core_Form {
    */
   public function addFilters() {
     $filters = $filterGroups = [];
-    $count = 1;
 
     foreach ($this->_filters as $table => $attributes) {
-      if (isset($this->_columns[$table]['group_title'])) {
-        // The presence of 'group_title' is secret code for 'is_a_custom_table'
-        // which magically means to 'display in an accordian'
-        // here we make this explicit.
-        $filterGroups[$table] = [
-          'group_title' => $this->_columns[$table]['group_title'],
-          'use_accordian_for_field_selection' => TRUE,
-
-        ];
+      $groupingKey = $this->_columns[$table]['grouping'] ?? '';
+      $filterGroups[$groupingKey]['tables'][$table] = [];
+      // If a prior table hasn't set group title then set it.
+      if (empty($filterGroups[$groupingKey]['group_title'])) {
+        $filterGroups[$groupingKey]['group_title'] = $this->_columns[$table]['group_title'] ?? '';
       }
+      // The presence of 'group_title' is secret code for 'display in an accordion'
+      // here we make this explicit.
+      if (!isset($filterGroups[$groupingKey]['use_accordion_for_field_selection'])) {
+        if (isset($this->_columns[$table]['use_accordion_for_field_selection'])) {
+          $filterGroups[$groupingKey]['use_accordion_for_field_selection'] = $this->_columns[$table]['use_accordion_for_field_selection'];
+        }
+        else {
+          $filterGroups[$groupingKey]['use_accordion_for_field_selection'] = isset($this->_columns[$table]['group_title']);
+        }
+      }
+
       foreach ($attributes as $fieldName => $field) {
+        $filterGroups[$groupingKey]['tables'][$table][$fieldName] = $field;
+        // Filters is deprecated in favour of filterGroups.
+        $filters[$table][$fieldName] = $field;
         // get ready with option value pair
         // @ todo being able to specific options for a field (e.g a date field) in the field spec as an array rather than an override
         // would be useful
         $operations = $this->getOperationPair(
           CRM_Utils_Array::value('operatorType', $field),
           $fieldName);
-
-        $filters[$table][$fieldName] = $field;
 
         switch (CRM_Utils_Array::value('operatorType', $field)) {
           case CRM_Report_Form::OP_MONTH:
@@ -1446,15 +1453,16 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
       }
     }
-    if (!empty($filters)) {
+    if (!empty($filterGroups)) {
       $this->tabs['Filters'] = [
         'title' => ts('Filters'),
         'tpl' => 'Filters',
         'div_label' => 'set-filters',
       ];
     }
-    $this->assign('filters', $filters);
     $this->assign('filterGroups', $filterGroups);
+    // Filters is deprecated in favour of filterGroups.
+    $this->assign('filters', $filters);
   }
 
   /**
@@ -2271,7 +2279,7 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     if ($relative) {
-      list($from, $to) = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
+      [$from, $to] = $this->getFromTo($relative, $from, $to, $fromTime, $toTime);
     }
 
     if ($from) {
@@ -3396,7 +3404,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             $from = $this->_params["{$fieldName}_from"] ?? NULL;
             $to = $this->_params["{$fieldName}_to"] ?? NULL;
             if (!empty($this->_params["{$fieldName}_relative"])) {
-              list($from, $to) = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
+              [$from, $to] = CRM_Utils_Date::getFromTo($this->_params["{$fieldName}_relative"], NULL, NULL);
             }
             if (strlen($to) === 10) {
               // If we just have the date we assume the end of that day.
@@ -3891,7 +3899,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact_a') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+    [$this->_aclFrom, $this->_aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
   /**
@@ -5843,6 +5851,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
           }
         }
       }
+    }
+    if (isset($options['grouping'])) {
+      $columns[$tableName]['grouping'] = $options['grouping'];
+      $columns[$tableName]['group_title'] = $options['group_title'] ?? '';
     }
     return $columns;
   }
