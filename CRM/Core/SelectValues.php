@@ -542,6 +542,7 @@ class CRM_Core_SelectValues {
     return [
       '{event.event_id}' => ts('Event ID'),
       '{event.title}' => ts('Event Title'),
+      '{event.event_tz}' => ts('Event Timezone'),
       '{event.start_date}' => ts('Event Start Date'),
       '{event.end_date}' => ts('Event End Date'),
       '{event.event_type}' => ts('Event Type'),
@@ -1201,6 +1202,27 @@ class CRM_Core_SelectValues {
       'a_b' => ts('A to B'),
       'b_a' => ts('B to A'),
     ];
+  }
+
+  /**
+   * @return array
+   */
+  public static function timezone() {
+    $tzlist = &Civi::$statics[__CLASS__]['tzlist'];
+
+    if (is_null($tzlist)) {
+      $tzlist = [];
+      foreach (timezone_identifiers_list() as $tz) {
+        // Actual timezone keys for PHP are mapped to human parts.
+        $tzlist[$tz] = str_replace('_', ' ', $tz);
+      }
+
+      // Add 'Etc/UTC' specially, as timezone_identifiers_list() does
+      // not include it, but it is the IANA long name for 'UTC'
+      $tzlist['Etc/UTC'] = ts('Etc/UTC');
+    }
+
+    return $tzlist;
   }
 
 }

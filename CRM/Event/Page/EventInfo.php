@@ -79,6 +79,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
 
     $this->assign('isShowLocation', CRM_Utils_Array::value('is_show_location', $values['event']));
 
+    // Reset event time zone info
+    CRM_Event_BAO_Event::setOutputTimeZone($values['event'], $values['event']['event_tz']);
+
+    $values['event']['event_tz'] = CRM_Core_SelectValues::timezone()[$values['event']['event_tz']];
+
     // show event fees.
     if ($this->_id && !empty($values['event']['is_monetary'])) {
       CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values['event']);

@@ -2212,4 +2212,57 @@ class CRM_Utils_Date {
     return $dateObject->format($format);
   }
 
+  /**
+   * Convert a date string between time zones
+   *
+   * @param string $date - date string using $format
+   * @param string $tz_to - new time zone for date
+   * @param string $tz_from - current time zone for date
+   * @param string $format - format string specification as per DateTime::createFromFormat; defaults to 'Y-m-d H:i:s'
+   *
+   * @throws \CRM_Core_Exception
+   *
+   * @return string;
+   */
+  public static function convertTimeZone(string $date, string $tz_to = NULL, string $tz_from = NULL, $format = NULL) {
+    $tz_from = new DateTimeZone($tz_from ?: CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
+    $tz_to = new DateTimeZone($tz_to ?: CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
+
+    if ($tz_from == $tz_to) {
+      return $date;
+    }
+
+    if (is_null($format)) {
+      // Detect "mysql" format dates and adjust format accordingly
+      $format = preg_match('/^(\d{4})(\d{2}){0,5}$/', $date, $m) ? 'YmdHis' : 'Y-m-d H:i:s';
+    }
+
+    try {
+      $date_object = DateTime::createFromFormat($format, $date, $tz_from);
+
+      if (!$date_object) {
+        Civi::log()->warning(ts('Attempted to convert time zone with incorrect date format %1', ['%1' => $date]));
+
+        $dt_errors = DateTime::getLastErrors();
+
+        $date_object = new DateTime($date, $tz_from);
+      }
+
+      $date_object->setTimezone($tz_to);
+
+      return $date_object->format($format);
+    }
+    catch (Exception $e) {
+      if (!$date_object) {
+        throw new CRM_Core_Exception(ts(
+          'Failed to parse date with %1 errors and %2 warnings',
+          [
+            '%1' => $dt_errors['error_count'],
+            '%2' => $dt_errors['warning_count'],
+          ]
+        ), 0, ['format' => $format, 'date' => $date] + $dt_errors);
+      }
+    }
+  }
+
 }
