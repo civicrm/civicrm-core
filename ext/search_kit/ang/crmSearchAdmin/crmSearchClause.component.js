@@ -34,6 +34,7 @@
         _.each(ctrl.clauses, updateOperators);
       };
 
+      // Return a list of operators allowed for the field in a given clause
       this.getOperators = function(clause) {
         var field = ctrl.getField(clause[0]);
         if (!field || !field.operators) {
@@ -48,8 +49,13 @@
         return ctrl.operators[opKey];
       };
 
+      // Ensures a clause is using an operator that is allowed for the field
       function updateOperators(clause) {
-        if (!ctrl.skip && (!clause[1] || !_.includes(_.pluck(ctrl.getOperators(clause), 'key'), clause[1]))) {
+        // Recurse into AND/OR/NOT groups
+        if (ctrl.conjunctions[clause[0]]) {
+          _.each(clause[1], updateOperators);
+        }
+        else if (!ctrl.skip && (!clause[1] || !_.includes(_.pluck(ctrl.getOperators(clause), 'key'), clause[1]))) {
           clause[1] = ctrl.getOperators(clause)[0].key;
           ctrl.changeClauseOperator(clause);
         }
