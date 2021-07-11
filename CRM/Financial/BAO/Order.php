@@ -27,7 +27,7 @@ use Civi\Api4\PriceSet;
  *
  * @internal
  */
-class CRM_Financial_BAO_Order {
+class CRM_Financial_BAO_Order extends CRM_Core_DAO {
 
   /**
    * Price set id.
@@ -110,6 +110,124 @@ class CRM_Financial_BAO_Order {
    * @var array
    */
   protected $priceSetMetadata = [];
+
+  public static function create($params): array {
+    $params['contribution_status_id'] = 'Pending';
+    $order = new self();
+    $order->setDefaultFinancialTypeID($params['financial_type_id'] ?? NULL);
+
+    if (!empty($params['line_items']) && is_array($params['line_items'])) {
+      CRM_Contribute_BAO_Contribution::checkLineItems($params);
+      foreach ($params['line_items'] as $index => $lineItems) {
+        foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+          $lineIndex = $index . '+' . $innerIndex;
+          $order->setLineItem($lineItem, $lineIndex);
+        }
+
+        $entityParams = $lineItems['params'] ?? NULL;
+
+        if ($entityParams && $order->getLineItemEntity($lineIndex) !== 'contribution') {
+          switch ($order->getLineItemEntity($lineIndex)) {
+            case 'participant':
+              if (isset($entityParams['participant_status_id'])
+                && (!CRM_Event_BAO_ParticipantStatusType::getIsValidStatusForClass($entityParams['participant_status_id'], 'Pending'))) {
+                throw new CiviCRM_API3_Exception('Creating a participant via the Order API with a non "pending" status is not supported');
+              }
+              $entityParams['participant_status_id'] = $entityParams['participant_status_id'] ?? 'Pending from incomplete transaction';
+              $entityParams['status_id'] = $entityParams['participant_status_id'];
+              $entityParams['skipLineItem'] = TRUE;
+              $entityResult = civicrm_api3('Participant', 'create', $entityParams);
+              // @todo - once membership is cleaned up & financial validation tests are extended
+              // we can look at removing this - some weird handling in removeFinancialAccounts
+              $params['contribution_mode'] = 'participant';
+              $params['participant_id'] = $entityResult['id'];
+              break;
+
+            case 'membership':
+              $entityParams['status_id'] = 'Pending';
+              if (!empty($params['contribution_recur_id'])) {
+                $entityParams['contribution_recur_id'] = $params['contribution_recur_id'];
+              }
+              $entityParams['skipLineItem'] = TRUE;
+              $entityResult = civicrm_api3('Membership', 'create', $entityParams);
+              break;
+
+          }
+
+          foreach ($lineItems['line_item'] as $innerIndex => $lineItem) {
+            $lineIndex = $index . '+' . $innerIndex;
+            $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
+          }
+        }
+      }
+      $priceSetID = $order->getPriceSetID();
+      $params['line_item'][$priceSetID] = $order->getLineItems();
+    }
+    else {
+      $order->setPriceSetToDefault('contribution');
+    }
+
+    $contributionParams = $params;
+    // If this is nested we need to set sequential to 0 as sequential handling is done
+    // in create_success & id will be miscalculated...
+    $contributionParams['sequential'] = 0;
+    foreach ($contributionParams as $key => $value) {
+      // Unset chained keys so the code does not attempt to do this chaining twice.
+      // e.g if calling 'api.Payment.create' We want to finish creating the order first.
+      // it would probably be better to have a full whitelist of contributionParams
+      if (substr($key, 0, 3) === 'api') {
+        unset($contributionParams[$key]);
+      }
+    }
+
+    $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
+    $contribution['values'][$contribution['id']]['line_item'] = array_values($order->getLineItems());
+
+    return $contribution['values'] ?? [];
+  }
+
+  /**
+   * Returns all the column names of this table
+   *
+   * @return array
+   */
+  public static function &fields() {
+    if (!isset(Civi::$statics[__CLASS__]['fields'])) {
+      $fields = [];
+      $fields['contact_id'] = [
+        'name' => 'contact_id',
+        'title' => 'Contact ID',
+        'type' => CRM_Utils_Type::T_INT,
+        'api.required' => TRUE,
+      ];
+      $fields['total_amount'] = [
+        'name' => 'total_amount',
+        'title' => 'Total Amount',
+      ];
+      $fields['skipCleanMoney'] = [
+        'api.default' => TRUE,
+        'title' => 'Do not attempt to convert money values',
+        'type' => CRM_Utils_Type::T_BOOLEAN,
+      ];
+      $fields['financial_type_id'] = [
+        'name' => 'financial_type_id',
+        'title' => 'Financial Type',
+        'type' => CRM_Utils_Type::T_INT,
+        'api.required' => TRUE,
+        'table_name' => 'civicrm_contribution',
+        'entity' => 'Contribution',
+        'bao' => 'CRM_Contribute_BAO_Contribution',
+        'pseudoconstant' => [
+          'table' => 'civicrm_financial_type',
+          'keyColumn' => 'id',
+          'labelColumn' => 'name',
+        ],
+      ];
+      Civi::$statics[__CLASS__]['fields'] = $fields;
+    }
+
+    return Civi::$statics[__CLASS__]['fields'];
+  }
 
   /**
    * Get form object.
