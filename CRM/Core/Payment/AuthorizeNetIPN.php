@@ -300,7 +300,7 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       throw new CRM_Core_Exception('Could not find contributionRecur id');
     }
     if ($contactID != $contRecur->contact_id) {
-      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $ids['contact'], 2 => $contRecur->contact_id]);
+      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $contactID, 2 => $contRecur->contact_id]);
       CRM_Core_Error::debug_log_message($message);
     }
     return $contRecur;
