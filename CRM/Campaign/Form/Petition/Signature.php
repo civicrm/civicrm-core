@@ -152,6 +152,27 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     return $session->get('userID');
   }
 
+  /**
+   * Get the active UFGroups (profiles) on this form
+   * Many forms load one or more UFGroups (profiles).
+   * This provides a standard function to retrieve the IDs of those profiles from the form
+   * so that you can implement things such as "is is_captcha field set on any of the active profiles on this form?"
+   *
+   * NOT SUPPORTED FOR USE OUTSIDE CORE EXTENSIONS - Added for reCAPTCHA core extension.
+   *
+   * @return array
+   */
+  public function getUFGroupIDs() {
+    $ufGroupIDs = [];
+    if (!empty($this->_contactProfileId)) {
+      $ufGroupIDs[] = $this->_contactProfileId;
+    }
+    if (!empty($this->_activityProfileId)) {
+      $ufGroupIDs[] = $this->_activityProfileId;
+    }
+    return $ufGroupIDs;
+  }
+
   public function preProcess() {
     $this->bao = new CRM_Campaign_BAO_Petition();
     $this->_mode = self::MODE_CREATE;

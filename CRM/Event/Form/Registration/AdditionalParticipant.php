@@ -28,6 +28,26 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $additionalParticipantId = NULL;
 
   /**
+   * Get the active UFGroups (profiles) on this form
+   * Many forms load one or more UFGroups (profiles).
+   * This provides a standard function to retrieve the IDs of those profiles from the form
+   * so that you can implement things such as "is is_captcha field set on any of the active profiles on this form?"
+   *
+   * NOT SUPPORTED FOR USE OUTSIDE CORE EXTENSIONS - Added for reCAPTCHA core extension.
+   *
+   * @return array
+   */
+  public function getUFGroupIDs() {
+    $ufGroupIDs = [];
+    foreach (['pre', 'post'] as $keys) {
+      if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
+        $ufGroupIDs[] = $this->_values['additional_custom_' . $keys . '_id'];
+      }
+    }
+    return $ufGroupIDs;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @return void

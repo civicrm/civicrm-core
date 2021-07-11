@@ -821,13 +821,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   }
 
   /**
-   * Check if ReCAPTCHA has to be added on Contribution form forcefully.
-   */
-  protected function hasToAddForcefully() {
-    return CRM_Utils_ReCAPTCHA::hasToAddForcefully();
-  }
-
-  /**
    * Add onbehalf/honoree profile fields and native module fields.
    *
    * @param int $id
