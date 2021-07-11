@@ -251,7 +251,8 @@
         "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
       },
       "select2": {
-        "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
+        "url": "https://github.com/select2/select2/archive/refs/tags/4.0.13.zip",
+        "ignore": [".*", "docs", "src", "tests", "bower.json", "Gruntfile.js"]
       },
       "js-yaml": {
         "url": "https://github.com/nodeca/js-yaml/archive/3.13.1.zip",
