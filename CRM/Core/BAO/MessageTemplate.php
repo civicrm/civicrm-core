@@ -385,6 +385,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'contactId' => NULL,
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
+      // additional token params (passed to the TokenProcessor)
+      'tokenContext' => [],
       // the From: header
       'from' => NULL,
       // the recipient’s name
@@ -425,7 +427,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $params['subject'];
     }
 
-    $mailContent = self::renderMessageTemplate($mailContent, (bool) $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams']);
+    $mailContent = self::renderMessageTemplate($mailContent, (bool) $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams'], $params['tokenContext']);
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
@@ -577,12 +579,15 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @param bool $disableSmarty
    * @param int|NULL $contactID
    * @param array $smartyAssigns
+   *   Data to pass through to Smarty.
+   * @param array $tokenContext
+   *   Data to pass through to TokenProcessor.
    *
    * @return array
    */
-  public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns): array {
-    $tokenContext = ['smarty' => !$disableSmarty];
-    if ($contactID) {
+  public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns, array $tokenContext = []): array {
+    $tokenContext['smarty'] = !$disableSmarty;
+    if ($contactID && !isset($tokenContext['contactId'])) {
       $tokenContext['contactId'] = $contactID;
     }
     $result = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $tokenContext, $smartyAssigns);
