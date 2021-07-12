@@ -129,6 +129,8 @@ AND (
       $groupIDs = (array) $groupIDs;
     }
 
+    // Treat the default help text in Scheduled Jobs as equivalent to no limit.
+    $limit = (int) $limit;
     $processGroupIDs = self::getGroupsNeedingRefreshing($groupIDs, $limit);
 
     if (!empty($processGroupIDs)) {
