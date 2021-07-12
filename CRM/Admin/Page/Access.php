@@ -25,12 +25,8 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
    */
   public function run() {
     $urlParams = CRM_Utils_System::getCMSPermissionsUrlParams();
-    if (isset($urlParams['ufAccessURL'])) {
-      $this->assign('ufAccessURL', $urlParams['ufAccessURL']);
-    }
-    if (isset($urlParams['jAccessParams'])) {
-      $this->assign('jAccessParams', $urlParams['jAccessParams']);
-    }
+    $this->assign('ufAccessURL', $urlParams['ufAccessURL'] ?? NULL);
+    $this->assign('jAccessParams', $urlParams['jAccessParams'] ?? NULL);
     return parent::run();
   }
 
