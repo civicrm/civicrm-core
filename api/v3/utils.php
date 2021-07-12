@@ -382,7 +382,7 @@ function _civicrm_api3_get_BAO($name) {
   if ($name === 'Order') {
     // Order basically maps to contribution at the top level but
     // has enhanced access to other entities.
-    $name = 'Contribution';
+    return 'CRM_Financial_BAO_Order';
   }
   if ($name === 'Dedupe') {
     // Dedupe is a pseudoentity for PrevNextCache - but accessing dedupe related info
