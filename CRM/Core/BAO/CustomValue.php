@@ -250,8 +250,8 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
     $customGroups = [$id => $id];
     $defaultGroups = CRM_Core_Permission::customGroupAdmin() ? [$id] : [];
-    // FIXME: Per current onscreen help (Admin=>ACLs=>Add ACLs), CustomGroup ACLs treat VIEW and EDIT as the same. Skimming code, it appears that existing checks use VIEW.
-    $accessList = CRM_ACL_API::group(CRM_Core_Permission::VIEW, $userID, 'civicrm_custom_group', $customGroups, $defaultGroups);
+    $actionType = $action === 'get' ? CRM_Core_Permission::VIEW : CRM_Core_Permission::EDIT;
+    $accessList = CRM_ACL_API::group($actionType, $userID, 'civicrm_custom_group', $customGroups, $defaultGroups);
     if (empty($accessList)) {
       return FALSE;
     }

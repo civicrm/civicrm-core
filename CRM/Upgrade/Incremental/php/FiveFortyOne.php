@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveFortyOne */
+ * Upgrade logic for FiveFortyOne
+ */
 class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -25,10 +26,6 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
   }
 
   /**
@@ -43,33 +40,33 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
+  public function upgrade_5_41_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Change custom data ACLs from "View" to "Edit"', 'changeCustomACLViewToEdit');
+  }
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Prior to 5.41, there was no functional difference between View and Edit custom data permissions.
+   * To avoid unexpected privilege de-escalation post-upgrade, set all View ACLs to Edit.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function changeCustomACLViewToEdit(CRM_Queue_TaskContext $ctx) {
+    \Civi\Api4\ACL::update(FALSE)
+      ->addValue('operation', 'Edit')
+      ->addWhere('entity_table', '=', 'civicrm_acl_role')
+      ->addWhere('object_table', '=', 'civicrm_custom_group')
+      ->addWhere('operation', '=', 'View')
+      ->execute();
+    return TRUE;
+  }
 
 }
