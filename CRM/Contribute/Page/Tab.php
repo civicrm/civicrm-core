@@ -70,16 +70,13 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       ];
     }
 
-    $links[CRM_Core_Action::DISABLE] = [
-      'name' => ts('Cancel'),
-      'title' => ts('Cancel'),
-      'ref' => 'crm-enable-disable',
-    ];
-
     if ($paymentProcessorObj->supports('cancelRecurring')) {
-      unset($links[CRM_Core_Action::DISABLE]['extra'], $links[CRM_Core_Action::DISABLE]['ref']);
-      $links[CRM_Core_Action::DISABLE]['url'] = "civicrm/contribute/unsubscribe";
-      $links[CRM_Core_Action::DISABLE]['qs'] = "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}";
+      $links[CRM_Core_Action::DISABLE] = [
+        'name' => ts('Cancel'),
+        'title' => ts('Cancel'),
+        'url' => 'civicrm/contribute/unsubscribe',
+        'qs' => "reset=1&crid=%%crid%%&cid=%%cid%%&context={$context}",
+      ];
     }
 
     if ($paymentProcessorObj->supports('UpdateSubscriptionBillingInfo')) {
