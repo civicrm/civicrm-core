@@ -3635,7 +3635,7 @@ VALUES
     foreach ($contributions as $contribution) {
       $lineItems = $this->callAPISuccess('LineItem', 'get', [
         'contribution_id' => $contribution['id'],
-        'return' => ['tax_amount', 'line_total', 'entity_table', 'entity_id'],
+        'return' => ['tax_amount', 'line_total', 'entity_table', 'entity_id', 'qty'],
       ])['values'];
       $total = 0;
       $taxTotal = 0;
@@ -3647,17 +3647,19 @@ VALUES
         if ($lineItem['entity_table'] === 'civicrm_membership') {
           $memberships[] = $lineItem['entity_id'];
         }
-        if ($lineItem['entity_table'] === 'civicrm_participant') {
-          $participants[] = $lineItem['entity_id'];
+        if ($lineItem['entity_table'] === 'civicrm_participant' && $lineItem['qty'] > 0) {
+          $participants[$lineItem['entity_id']] = $lineItem['entity_id'];
         }
       }
       $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'membership_id'])['values'];
       $participantPayments = $this->callAPISuccess('ParticipantPayment', 'get', ['contribution_id' => $contribution['id'], 'return' => 'participant_id'])['values'];
       $this->assertCount(count($memberships), $membershipPayments);
-      // @todo not working yet.
-      // $this->assertCount(count($participants), $participantPayments);
+      $this->assertCount(count($participants), $participantPayments);
       foreach ($membershipPayments as $payment) {
         $this->assertContains($payment['membership_id'], $memberships);
+      }
+      foreach ($participantPayments as $payment) {
+        $this->assertContains($payment['participant_id'], $participants);
       }
       $this->assertEquals($taxTotal, (float) ($contribution['tax_amount'] ?? 0));
       $this->assertEquals($total + $taxTotal, $contribution['total_amount']);
