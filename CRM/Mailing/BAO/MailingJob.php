@@ -647,23 +647,20 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $recipient = $headers['To'];
       $result = NULL;
 
-      // disable error reporting on real mailings (but leave error reporting for tests), CRM-5744
-      if ($job_date) {
-        $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      try {
+        $result = $mailer->send($recipient, $headers, $body, $this->id);
+        $error = FALSE;
+      }
+      catch (Exception $e) {
+        $error = $e;
       }
 
-      $result = $mailer->send($recipient, $headers, $body, $this->id);
-
-      if ($job_date) {
-        unset($errorScope);
-      }
-
-      if (is_a($result, 'PEAR_Error') && !$mailing->sms_provider_id) {
+      if ($error && !$mailing->sms_provider_id) {
         // CRM-9191
-        $message = $result->getMessage();
+        $message = $error->getMessage();
         if ($this->isTemporaryError($message)) {
           // lets log this message and code
-          $code = $result->getCode();
+          $code = $error->getCode();
           CRM_Core_Error::debug_log_message("SMTP Socket Error or failed to set sender error. Message: $message, Code: $code");
 
           // these are socket write errors which most likely means smtp connection errors
@@ -695,17 +692,17 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
           'job_id' => $this->id,
           'hash' => $field['hash'],
         ];
-        $params = array_merge($params,
-          CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
-        );
+        $errorMessage = $error->getMessage();
+        $params = array_merge($params, CRM_Mailing_BAO_BouncePattern::match($errorMessage));
+        unset($errorMessage);
         CRM_Mailing_Event_BAO_Bounce::create($params);
       }
-      elseif (is_a($result, 'PEAR_Error') && $mailing->sms_provider_id) {
+      elseif ($error && $mailing->sms_provider_id) {
         // Handle SMS errors: CRM-15426
         $job_id = intval($this->id);
         $mailing_id = intval($mailing->id);
         CRM_Core_Error::debug_log_message("Failed to send SMS message. Vars: mailing_id: ${mailing_id}, job_id: ${job_id}. Error message follows.");
-        CRM_Core_Error::debug_log_message($result->getMessage());
+        CRM_Core_Error::debug_log_message($error->getMessage());
       }
       else {
         // Register the delivery event.
@@ -740,7 +737,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         }
       }
 
-      unset($result);
+      unset($error);
 
       // seems like a successful delivery or bounce, lets decrement error count
       // only if we have smtp connection errors

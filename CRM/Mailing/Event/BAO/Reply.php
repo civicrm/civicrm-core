@@ -181,13 +181,16 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     }
 
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', $eq->job_id, $queue_id, $eq->hash);
-    $config = CRM_Core_Config::singleton();
     $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $mailer->send($mailing->replyto_email, $h, $b);
-      unset($errorScope);
+      try {
+        $mailer->send($mailing->replyto_email, $h, $b);
+      }
+      catch (Exception $e) {
+        // Ignore the exception (for now).
+      }
+
     }
   }
 

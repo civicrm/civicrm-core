@@ -167,11 +167,14 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $body = $message->get();
     $headers = $message->headers();
 
-    $result = NULL;
+    $error = FALSE;
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
-      $result = $mailer->send($recipient, $headers, $body);
-      unset($errorScope);
+      try {
+        $mailer->send($recipient, $headers, $body);
+      }
+      catch (Exception $e) {
+        $error = $e;
+      }
     }
 
     $params = [
@@ -179,18 +182,16 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
       'job_id' => $job_id,
       'hash' => $queue->hash,
     ];
-    if (is_a($result, 'PEAR_Error')) {
+    if ($error) {
       // Register the bounce event.
-
-      $params = array_merge($params,
-        CRM_Mailing_BAO_BouncePattern::match($result->getMessage())
-      );
+      $errorMessage = $error->getMessage();
+      $params = array_merge($params, CRM_Mailing_BAO_BouncePattern::match($errorMessage));
+      unset($errorMessage);
       CRM_Mailing_Event_BAO_Bounce::create($params);
     }
     else {
       $successfulForward = TRUE;
       // Register the delivery event.
-
       CRM_Mailing_Event_BAO_Delivered::create($params);
     }
 
