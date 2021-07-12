@@ -492,14 +492,6 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     // get additional custom activity profile field data
     // to save with new signature activity record
     $surveyInfo = $this->bao->getSurveyInfo($this->_surveyId);
-    $customActivityFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-      $surveyInfo['activity_type_id']
-    );
-    $customActivityFields = CRM_Utils_Array::crmArrayMerge($customActivityFields,
-      CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-        NULL, NULL, TRUE
-      )
-    );
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       NULL,

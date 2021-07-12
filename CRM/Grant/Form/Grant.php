@@ -243,13 +243,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       $ids['note']['id'] = $this->_noteId;
     }
 
-    // build custom data getFields array
-    $customFieldsGrantType = CRM_Core_BAO_CustomField::getFields('Grant', FALSE, FALSE,
-      CRM_Utils_Array::value('grant_type_id', $params)
-    );
-    $customFields = CRM_Utils_Array::crmArrayMerge($customFieldsGrantType,
-      CRM_Core_BAO_CustomField::getFields('Grant', FALSE, FALSE, NULL, NULL, TRUE)
-    );
+    // build custom data array
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
       $this->_id,
       'Grant'
