@@ -8,6 +8,7 @@
  */
 class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
+  use CRMTraits_Financial_OrderTrait;
   /**
    * Options on the from Email address array.
    *
@@ -824,13 +825,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testTransferParticipantRegistration() {
+  public function testTransferParticipantRegistration(): void {
     //Register a contact to a sample event.
-    $this->createParticipantRecordsFromTwoFieldPriceSet();
-    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $this->createEventOrder();
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'id']);
     //Check line item count of the contribution id before transfer.
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
-    $this->assertEquals(count($lineItems), 2);
+    $this->assertCount(2, $lineItems);
     $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantPayment', $contribution['id'], 'participant_id', 'contribution_id');
     /* @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
@@ -839,7 +840,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     //Assert participant is transferred to $toContactId.
     $participant = $this->callAPISuccess('Participant', 'getsingle', [
-      'return' => ["transferred_to_contact_id"],
+      'return' => ['transferred_to_contact_id'],
       'id' => $participantId,
     ]);
     $this->assertEquals($participant['transferred_to_contact_id'], $toContactId);
@@ -852,7 +853,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
     //Check line item count of the contribution id remains the same.
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
-    $this->assertEquals(count($lineItems), 2);
+    $this->assertCount(2, $lineItems);
+    // There should be 2 participant payments on the contribution & 0 others existing.
+    $this->callAPISuccessGetCount('ParticipantPayment', ['contribution_id' => $contribution['id']], 2);
+    $this->callAPISuccessGetCount('ParticipantPayment', [], 2);
+    $this->callAPISuccessGetCount('ParticipantPayment', ['participant_id' => $toParticipant['id']], 1);
+    $this->callAPISuccessGetCount('ParticipantPayment', ['participant_id' => $participantId], 0);
   }
 
   /**
