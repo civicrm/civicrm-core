@@ -78,11 +78,10 @@ LEFT  JOIN civicrm_component comp
       $rows[$dao->component_name][$dao->value]['title'] = ts($dao->label);
       $rows[$dao->component_name][$dao->value]['description'] = ts($dao->description);
       $rows[$dao->component_name][$dao->value]['url'] = CRM_Utils_System::url('civicrm/report/' . trim($dao->value, '/'), 'reset=1');
-      if ($dao->instance_id) {
-        $rows[$dao->component_name][$dao->value]['instanceUrl'] = CRM_Utils_System::url('civicrm/report/list',
-          "reset=1&ovid={$dao->id}"
-        );
-      }
+      $rows[$dao->component_name][$dao->value]['instanceUrl'] = $dao->instance_id ? CRM_Utils_System::url(
+        'civicrm/report/list',
+        "reset=1&ovid=$dao->id"
+      ) : '';
     }
 
     return $rows;
