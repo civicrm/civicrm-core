@@ -365,6 +365,37 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   }
 
   /**
+   * Render a message template.
+   *
+   * This method is very similar to `sendTemplate()` - accepting most of the same arguments
+   * and emitting similar hooks. However, it specifically precludes the possibility of
+   * sending a message. It only renders.
+   *
+   * @param $params
+   *  Mixed render parameters. See sendTemplate() for more details.
+   * @return array
+   *   Rendered message, consistent of 'subject', 'text', 'html'
+   *   Ex: ['subject' => 'Hello Bob', 'text' => 'It\'s been so long since we sent you an automated notification!']
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @see sendTemplate()
+   */
+  public static function renderTemplate($params) {
+    $forbidden = ['from', 'toName', 'toEmail', 'cc', 'bcc', 'replyTo'];
+    $intersect = array_intersect($forbidden, array_keys($params));
+    if (!empty($intersect)) {
+      throw new \CRM_Core_Exception(sprintf("renderTemplate() received forbidden fields (%s)",
+        implode(',', $intersect)));
+    }
+
+    $mailContent = [];
+    // sendTemplate has had an obscure feature - if you omit `toEmail`, then it merely renders.
+    // At some point, we may want to invert the relation between renderTemplate/sendTemplate, but for now this is a smaller patch.
+    [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']] = static::sendTemplate($params);
+    return $mailContent;
+  }
+
+  /**
    * Send an email from the specified template based on an array of params.
    *
    * @param array $params
@@ -583,9 +614,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
   /**
    * Render the message template, resolving tokens and smarty tokens.
    *
-   * As with all BAO methods this should not be called directly outside
-   * of tested core code and is highly likely to change.
+   * This method has been deprecated in favor of two alternatives:
+   *  - Use CRM_Core_BAO_MessageTemplate::renderTemplate() if you want a high-level
+   *    trial-run of sendTemplate(). This will use the loaders, filters, hooks, etc
+   *    but stop short of delivery.
+   *  - Use CRM_Core_TokenSmarty::render() if you want a low-level utility to
+   *    render a template with the hybrid Token-Smarty template format.
    *
+   * @internal
+   * @deprecated
+   * @see CRM_Core_BAO_MessageTemplate::renderTemplate()
+   * @see CRM_Core_TokenSmarty::render()
    * @param array $mailContent
    * @param bool $disableSmarty
    * @param int|NULL $contactID

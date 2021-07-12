@@ -22,6 +22,29 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  public function testRenderTemplate() {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baab',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'valueName' => 'case_activity',
+      'tokenContext' => [
+        'contactId' => $contactId,
+      ],
+      'messageTemplate' => [
+        'msg_subject' => 'Hello testRenderTemplate {contact.display_name}!',
+        'msg_text' => 'Hello testRenderTemplate {contact.display_name}!',
+        'msg_html' => '<p>Hello testRenderTemplate {contact.display_name}!</p>',
+      ],
+    ]);
+    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['subject']);
+    $this->assertEquals('Hello testRenderTemplate Abba Baab!', $rendered['text']);
+    $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baab!</p>', $rendered['html']);
+  }
+
   public function testSendTemplate_RenderMode_OpenTemplate() {
     $contactId = $this->individualCreate([
       'first_name' => 'Abba',
