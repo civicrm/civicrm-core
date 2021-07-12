@@ -16,6 +16,23 @@
  */
 
 /**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_custom_search_get_spec(&$params) {
+  require_once 'api/v3/OptionValue.php';
+  _civicrm_api3_option_value_get_spec($params);
+  $params['option_group_id']['api.default'] = CRM_Core_DAO::getFieldValue(
+    'CRM_Core_DAO_OptionGroup', 'custom_search', 'id', 'name'
+  );
+  $params['name']['api.aliases'] = ['class_name'];
+}
+
+/**
  * Retrieve custom searches.
  *
  * @param array $params
