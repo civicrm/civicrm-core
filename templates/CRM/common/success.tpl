@@ -48,7 +48,7 @@
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>
-      {if $afterUpgradeMessage}
+      {if !empty($afterUpgradeMessage)}
         <h3>{ts}Important Notes{/ts}</h3>
         <p>{$afterUpgradeMessage}</p>
       {/if}
