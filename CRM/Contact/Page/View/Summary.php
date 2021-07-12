@@ -40,14 +40,20 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         trim($entitySubType, CRM_Core_DAO::VALUE_SEPARATOR)
       );
     }
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType,
+    // Custom groups with VIEW permission
+    $visibleGroups = CRM_Core_BAO_CustomGroup::getTree($entityType,
       NULL,
       $this->_contactId,
       NULL,
-      $entitySubType
+      $entitySubType,
+      NULL,
+      TRUE,
+      NULL,
+      FALSE,
+      CRM_Core_Permission::VIEW
     );
 
-    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->_contactId);
+    CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $visibleGroups, FALSE, NULL, NULL, NULL, $this->_contactId, CRM_Core_Permission::EDIT);
 
     // also create the form element for the activity links box
     $controller = new CRM_Core_Controller_Simple(
@@ -166,7 +172,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
                 $idValue = $blockVal['master_id'];
               }
             }
-            $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst($key), NULL, $idValue);
+            $groupTree = CRM_Core_BAO_CustomGroup::getTree(ucfirst($key), NULL, $idValue, NULL, [],
+              NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
             // we setting the prefix to dnc_ below so that we don't overwrite smarty's grouptree var.
             $defaults[$key][$blockId]['custom'] = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, "dnc_");
           }

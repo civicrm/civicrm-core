@@ -203,7 +203,7 @@ class CRM_Custom_Form_CustomData {
       $getCachedTree,
       $onlySubType,
       FALSE,
-      TRUE,
+      CRM_Core_Permission::EDIT,
       $singleRecord
     );
 

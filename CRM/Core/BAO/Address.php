@@ -85,7 +85,8 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         $addressCustom = $params['custom'];
       }
       else {
-        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL, FALSE, FALSE, $checkPermissions);
+        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL,
+          FALSE, FALSE, $checkPermissions ? CRM_Core_Permission::EDIT : FALSE);
 
         if (!empty($customFields)) {
           $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,

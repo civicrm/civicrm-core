@@ -83,18 +83,9 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url($doneURL, 'action=browse&selectedChild=custom_' . $this->_groupId), FALSE);
 
-    // Get permission detail - view or edit.
-    // use a contact id specific function which gives us much better granularity
-    // CRM-12646
-    $editCustomData = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
-    $this->assign('editCustomData', $editCustomData);
-
-    // Allow to edit own custom data CRM-5518.
-    $editOwnCustomData = FALSE;
-    if ($session->get('userID') == $this->_contactId) {
-      $editOwnCustomData = TRUE;
-    }
-    $this->assign('editOwnCustomData', $editOwnCustomData);
+    // Check permission to edit this contact
+    $editPermission = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
+    $this->assign('editPermission', $editPermission);
 
     if ($this->_action == CRM_Core_Action::BROWSE) {
 
@@ -137,7 +128,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
           CRM_Utils_System::setTitle(ts('View %1 Record', [1 => $groupTitle]));
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW, $this->_cgcount
           );
 
           $recId = $this->_recId;
@@ -146,10 +137,10 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         }
         else {
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW
           );
         }
-        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
+        CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId, TRUE);
       }
     }
     else {

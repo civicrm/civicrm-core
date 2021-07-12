@@ -49,7 +49,17 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     ];
 
     //Add custom fields to columns array for inclusion in export
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity',
+      [],
+      NULL,
+      NULL,
+      [],
+      NULL,
+      TRUE,
+      NULL,
+      FALSE,
+      CRM_Core_Permission::VIEW
+    );
 
     //use simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree);
@@ -180,7 +190,17 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     }
 
     // add custom group fields to SELECT and FROM clause
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity');
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity',
+      [],
+      NULL,
+      NULL,
+      [],
+      NULL,
+      TRUE,
+      NULL,
+      FALSE,
+      CRM_Core_Permission::VIEW
+    );
 
     foreach ($groupTree as $key) {
       if (!empty($key['extends']) && $key['extends'] === 'Activity') {

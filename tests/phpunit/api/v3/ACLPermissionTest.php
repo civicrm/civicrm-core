@@ -1123,7 +1123,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->addRecord(['entity_id' => $c2, $textField => '2'])
       ->execute();
 
-    $this->setPermissions(['access CiviCRM', 'view debug output']);
+    $this->setPermissions(['access CiviCRM', 'view debug output', 'access all custom data']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
 
     // Without "access deleted contacts" we won't see C2
@@ -1131,7 +1131,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertCount(1, $vals);
     $this->assertEquals($c1, $vals[0]['entity_id']);
 
-    $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output']);
+    $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output', 'access all custom data']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
     $this->cleanupCachedPermissions();
 

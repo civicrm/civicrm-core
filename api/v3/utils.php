@@ -1088,7 +1088,7 @@ function _civicrm_api3_object_to_array_unique_fields(&$dao, &$values) {
  *   ID of entity per $extends.
  */
 function _civicrm_api3_custom_format_params($params, &$values, $extends, $entityId = NULL) {
-  if (!empty($params['custom'])) {
+  if (!empty($params['custom']) && empty($params['check_permissions'])) {
     // The Import class does the formatting first - ideally it wouldn't but this early return
     // provides transitional support.
     return;
@@ -1115,7 +1115,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
       }
 
       CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $values['custom'],
-        $value, $extends, $customValueID, $entityId, FALSE, FALSE, TRUE
+        $value, $extends, $customValueID, $entityId, FALSE, !empty($params['check_permissions']), TRUE
       );
     }
   }
@@ -1432,7 +1432,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
     TRUE,
     NULL,
     TRUE,
-    $checkPermission
+    $checkPermission ? CRM_Core_Permission::VIEW : FALSE
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
   $customValues = [];
