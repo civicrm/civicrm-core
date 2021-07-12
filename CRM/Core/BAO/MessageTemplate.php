@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\MessageTemplate;
+use Civi\WorkflowMessage\WorkflowMessage;
 
 require_once 'Mail/mime.php';
 
@@ -408,6 +409,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    */
   public static function sendTemplate($params) {
     $defaults = [
+      // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
+      'model' => NULL,
       // option value name of the template
       'valueName' => NULL,
       // ID of the template
@@ -444,12 +447,15 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       // Disable Smarty?
       'disableSmarty' => FALSE,
     ];
-    $params = array_merge($defaults, $params);
 
-    // Core#644 - handle Email ID passed as "From".
-    if (isset($params['from'])) {
-      $params['from'] = CRM_Utils_Mail::formatFromAddress($params['from']);
-    }
+    // Allow WorkflowMessage to run any filters/mappings/cleanups.
+    $model = $params['model'] ?? WorkflowMessage::create($params['valueName'] ?? 'UNKNOWN');
+    $params = WorkflowMessage::exportAll(WorkflowMessage::importAll($model, $params));
+    unset($params['model']);
+    // Subsequent hooks use $params. Retaining the $params['model'] might be nice - but don't do it unless you figure out how to ensure data-consistency (eg $params['tplParams'] <=> $params['model']).
+    // If you want to expose the model via hook, consider interjecting a new Hook::alterWorkflowMessage($model) between `importAll()` and `exportAll()`.
+
+    $params = array_merge($defaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
     if (!is_int($params['messageTemplateID']) && !is_null($params['messageTemplateID'])) {
