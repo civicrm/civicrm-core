@@ -47,237 +47,233 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->caseActivityTypes[$typeDetail['id']] = $typeDetail['label'];
     }
 
-    $this->_columns = [
-      'civicrm_case' => [
-        'dao' => 'CRM_Case_DAO_Case',
-        'fields' => [
-          'id' => [
-            'title' => ts('Case ID'),
-            'no_display' => TRUE,
-            'required' => TRUE,
+    $this->_columns = array_merge(
+      $this->getColumns('Contact', [
+        'order_bys_defaults' => ['sort_name' => 'ASC'],
+        'fields_defaults' => ['sort_name'],
+        'fields_excluded' => ['id'],
+        'fields_required' => ['id'],
+        'filters_defaults' => ['is_deleted' => 0],
+      ]),
+      [
+        'civicrm_case' => [
+          'dao' => 'CRM_Case_DAO_Case',
+          'fields' => [
+            'id' => [
+              'title' => ts('Case ID'),
+              'no_display' => TRUE,
+              'required' => TRUE,
+            ],
+            'case_id' => [
+              'title' => ts('Case ID'),
+              'type' => CRM_Utils_Type::T_INT,
+            ],
+            'subject' => [
+              'title' => ts('Subject'),
+              'default' => TRUE,
+            ],
+            'start_date' => [
+              'title' => ts('Start Date'),
+              'type' => CRM_Utils_Type::T_DATE,
+            ],
+            'end_date' => [
+              'title' => ts('End Date'),
+              'type' => CRM_Utils_Type::T_DATE,
+            ],
+            'status_id' => ['title' => ts('Case Status')],
+            'case_type_id' => ['title' => ts('Case Type')],
+            'is_deleted' => [
+              'title' => ts('Deleted?'),
+              'default' => FALSE,
+              'type' => CRM_Utils_Type::T_BOOLEAN,
+            ],
           ],
-          'subject' => [
-            'title' => ts('Subject'),
-            'required' => TRUE,
+          'filters' => [
+            'start_date' => [
+              'title' => ts('Start Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+              'type' => CRM_Utils_Type::T_DATE,
+            ],
+            'end_date' => [
+              'title' => ts('End Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+              'type' => CRM_Utils_Type::T_DATE,
+            ],
+            'status_id' => [
+              'title' => ts('Case Status'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
+            ],
+            'case_type_id' => [
+              'title' => ts('Case Type'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
+            ],
+            'is_deleted' => [
+              'title' => ts('Deleted?'),
+              'type' => CRM_Utils_Type::T_BOOLEAN,
+              'default' => 0,
+            ],
           ],
-          'start_date' => [
-            'title' => ts('Start Date'),
-            'type' => CRM_Utils_Type::T_DATE,
-          ],
-          'end_date' => [
-            'title' => ts('End Date'),
-            'type' => CRM_Utils_Type::T_DATE,
-          ],
-          'status_id' => ['title' => ts('Case Status')],
-          'case_type_id' => ['title' => ts('Case Type')],
-          'is_deleted' => [
-            'title' => ts('Deleted?'),
-            'default' => FALSE,
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-          ],
-        ],
-        'filters' => [
-          'start_date' => [
-            'title' => ts('Start Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
-          ],
-          'end_date' => [
-            'title' => ts('End Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
-          ],
-          'status_id' => [
-            'title' => ts('Case Status'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
-          ],
-          'case_type_id' => [
-            'title' => ts('Case Type'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
-          ],
-          'is_deleted' => [
-            'title' => ts('Deleted?'),
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-            'default' => 0,
-          ],
-        ],
-        'order_bys' => [
-          'start_date' => [
-            'title' => ts('Start Date'),
-            'default_weight' => 1,
-          ],
-          'end_date' => [
-            'title' => ts('End Date'),
-          ],
-          'status_id' => [
-            'title' => ts('Status'),
-          ],
-        ],
-      ],
-      'civicrm_case_type' => [
-        'dao' => 'CRM_Case_DAO_Case',
-        'order_bys' => [
-          'case_type_title' => [
-            'title' => 'Case Type',
-            'name' => 'title',
-          ],
-        ],
-      ],
-      'civicrm_contact' => [
-        'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => [
-          'client_sort_name' => [
-            'name' => 'sort_name',
-            'title' => ts('Client Name'),
-            'required' => TRUE,
-          ],
-          'id' => [
-            'no_display' => TRUE,
-            'required' => TRUE,
+          'order_bys' => [
+            'start_date' => [
+              'title' => ts('Start Date'),
+              'default_weight' => 1,
+            ],
+            'end_date' => [
+              'title' => ts('End Date'),
+            ],
+            'status_id' => [
+              'title' => ts('Status'),
+            ],
           ],
         ],
-        'filters' => [
-          'sort_name' => ['title' => ts('Client Name')],
-        ],
-      ],
-      'civicrm_relationship' => [
-        'dao' => 'CRM_Contact_DAO_Relationship',
-        'fields' => [
-          'case_role' => [
-            'name' => 'relationship_type_id',
-            'title' => ts('Case Role(s)'),
+        'civicrm_case_type' => [
+          'dao' => 'CRM_Case_DAO_Case',
+          'order_bys' => [
+            'case_type_title' => [
+              'title' => 'Case Type',
+              'name' => 'title',
+            ],
           ],
         ],
-        'filters' => [
-          'case_role' => [
-            'name' => 'relationship_type_id',
-            'title' => ts('Case Role(s)'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => $this->rel_types,
+        'civicrm_relationship' => [
+          'dao' => 'CRM_Contact_DAO_Relationship',
+          'fields' => [
+            'case_role' => [
+              'name' => 'relationship_type_id',
+              'title' => ts('Case Role(s)'),
+            ],
           ],
-          'is_active' => [
-            'title' => ts('Active Role?'),
-            'type' => CRM_Utils_Type::T_BOOLEAN,
-          ],
-        ],
-      ],
-      'civicrm_email' => [
-        'dao' => 'CRM_Core_DAO_Email',
-        'fields' => [
-          'email' => [
-            'title' => ts('Email'),
-            'no_repeat' => TRUE,
-          ],
-        ],
-        'grouping' => 'contact-fields',
-      ],
-      'civicrm_phone' => [
-        'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => [
-          'phone' => [
-            'title' => ts('Phone'),
-            'no_repeat' => TRUE,
+          'filters' => [
+            'case_role' => [
+              'name' => 'relationship_type_id',
+              'title' => ts('Case Role(s)'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => $this->rel_types,
+            ],
+            'is_active' => [
+              'title' => ts('Active Role?'),
+              'type' => CRM_Utils_Type::T_BOOLEAN,
+            ],
           ],
         ],
-        'grouping' => 'contact-fields',
-      ],
-      'civicrm_address' => [
-        'dao' => 'CRM_Core_DAO_Address',
-        'fields' => [
-          'street_address' => NULL,
-          'state_province_id' => [
-            'title' => ts('State/Province'),
+        'civicrm_email' => [
+          'dao' => 'CRM_Core_DAO_Email',
+          'fields' => [
+            'email' => [
+              'title' => ts('Email'),
+              'no_repeat' => TRUE,
+            ],
           ],
-          'country_id' => ['title' => ts('Country')],
+          'grouping' => 'contact-fields',
         ],
-        'grouping' => 'contact-fields',
-        'filters' => [
-          'country_id' => [
-            'title' => ts('Country'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::country(),
+        'civicrm_phone' => [
+          'dao' => 'CRM_Core_DAO_Phone',
+          'fields' => [
+            'phone' => [
+              'title' => ts('Phone'),
+              'no_repeat' => TRUE,
+            ],
           ],
-          'state_province_id' => [
-            'title' => ts('State/Province'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ],
+          'grouping' => 'contact-fields',
         ],
-      ],
-      'civicrm_worldregion' => [
-        'dao' => 'CRM_Core_DAO_Worldregion',
-        'filters' => [
-          'worldregion_id' => [
-            'name' => 'id',
-            'title' => ts('World Region'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Core_PseudoConstant::worldRegion(),
+        'civicrm_address' => [
+          'dao' => 'CRM_Core_DAO_Address',
+          'fields' => [
+            'street_address' => NULL,
+            'state_province_id' => [
+              'title' => ts('State/Province'),
+            ],
+            'country_id' => ['title' => ts('Country')],
           ],
-        ],
-      ],
-      'civicrm_country' => [
-        'dao' => 'CRM_Core_DAO_Country',
-      ],
-      'civicrm_activity_last' => [
-        'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => [
-          'last_activity_activity_subject' => [
-            'name' => 'subject',
-            'title' => ts('Subject of the last activity in the case'),
-          ],
-          'last_activity_activity_type' => [
-            'name' => 'activity_type_id',
-            'title' => ts('Activity type of the last activity'),
-          ],
-          'last_activity_date_time' => [
-            'name' => 'activity_date_time',
-            'title' => ts('Last Action Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
+          'grouping' => 'contact-fields',
+          'filters' => [
+            'country_id' => [
+              'title' => ts('Country'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Core_PseudoConstant::country(),
+            ],
+            'state_province_id' => [
+              'title' => ts('State/Province'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Core_PseudoConstant::stateProvince(),
+            ],
           ],
         ],
-        'filters' => [
-          'last_activity_date_time' => [
-            'name' => 'activity_date_time',
-            'title' => ts('Last Action Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
+        'civicrm_worldregion' => [
+          'dao' => 'CRM_Core_DAO_Worldregion',
+          'filters' => [
+            'worldregion_id' => [
+              'name' => 'id',
+              'title' => ts('World Region'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+              'options' => CRM_Core_PseudoConstant::worldRegion(),
+            ],
           ],
         ],
-        'alias' => 'civireport_activity_last',
-      ],
-      'civicrm_activity_last_completed' => [
-        'dao' => 'CRM_Activity_DAO_Activity',
-        'fields' => [
-          'last_completed_activity_subject' => [
-            'name' => 'subject',
-            'title' => ts('Subject of the last completed activity in the case'),
+        'civicrm_country' => [
+          'dao' => 'CRM_Core_DAO_Country',
+        ],
+        'civicrm_activity_last' => [
+          'dao' => 'CRM_Activity_DAO_Activity',
+          'fields' => [
+            'last_activity_activity_subject' => [
+              'name' => 'subject',
+              'title' => ts('Subject of the last activity in the case'),
+            ],
+            'last_activity_activity_type' => [
+              'name' => 'activity_type_id',
+              'title' => ts('Activity type of the last activity'),
+            ],
+            'last_activity_date_time' => [
+              'name' => 'activity_date_time',
+              'title' => ts('Last Action Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+            ],
           ],
-          'last_completed_activity_type' => [
-            'name' => 'activity_type_id',
-            'title' => ts('Activity type of the last completed activity'),
+          'filters' => [
+            'last_activity_date_time' => [
+              'name' => 'activity_date_time',
+              'title' => ts('Last Action Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+            ],
           ],
-          'last_completed_date_time' => [
-            'name' => 'activity_date_time',
-            'title' => ts('Last Completed Action Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
+          'alias' => 'civireport_activity_last',
+        ],
+        'civicrm_activity_last_completed' => [
+          'dao' => 'CRM_Activity_DAO_Activity',
+          'fields' => [
+            'last_completed_activity_subject' => [
+              'name' => 'subject',
+              'title' => ts('Subject of the last completed activity in the case'),
+            ],
+            'last_completed_activity_type' => [
+              'name' => 'activity_type_id',
+              'title' => ts('Activity type of the last completed activity'),
+            ],
+            'last_completed_date_time' => [
+              'name' => 'activity_date_time',
+              'title' => ts('Last Completed Action Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+            ],
+          ],
+          'filters' => [
+            'last_completed_date_time' => [
+              'name' => 'activity_date_time',
+              'title' => ts('Last Completed Action Date'),
+              'operatorType' => CRM_Report_Form::OP_DATE,
+            ],
           ],
         ],
-        'filters' => [
-          'last_completed_date_time' => [
-            'name' => 'activity_date_time',
-            'title' => ts('Last Completed Action Date'),
-            'operatorType' => CRM_Report_Form::OP_DATE,
-          ],
-        ],
-      ],
-    ];
+      ]
+    );
 
     $this->_options = [
       'my_cases' => [
