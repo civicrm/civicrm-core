@@ -35,10 +35,26 @@ class CRM_Contact_Page_Inline_CustomData extends CRM_Core_Page {
     //custom groups Inline
     $entityType = CRM_Contact_BAO_Contact::getContactType($contactId);
     $entitySubType = CRM_Contact_BAO_Contact::getContactSubType($contactId);
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $contactId,
-      $cgId, $entitySubType
+    // Custom group with VIEW permission
+    $visibleGroups = CRM_Core_BAO_CustomGroup::getTree($entityType,
+      NULL,
+      $contactId,
+      NULL,
+      $entitySubType,
+      NULL,
+      TRUE,
+      NULL,
+      FALSE,
+      CRM_Core_Permission::VIEW
     );
-    $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contactId);
+    // Custom group with EDIT permission
+    $editableGroups = CRM_Core_BAO_CustomGroup::getTree($entityType,
+      NULL,
+      $contactId,
+      NULL,
+      $entitySubType
+    );
+    $details = CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $visibleGroups, FALSE, NULL, NULL, NULL, $contactId, $editableGroups);
     //get the fields of single custom group record
     if ($customRecId == 1) {
       $fields = reset($details[$cgId]);

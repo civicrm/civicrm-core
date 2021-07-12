@@ -94,7 +94,8 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $viewNote = CRM_Core_BAO_Note::getNote($this->getEntityId());
     $this->assign('viewNote', $viewNote);
 
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Relationship', NULL, $this->getEntityId(), 0, $relType);
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Relationship', NULL, $this->getEntityId(), 0, $relType,
+      NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->getEntityId());
 
     $rType = CRM_Utils_Array::value('rtype', $viewRelationship[$this->getEntityId()]);

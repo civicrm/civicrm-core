@@ -338,7 +338,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *   Do not restrict by subtype at all. (The parameter feels a bit cludgey but is only used from the
    *   api - through which it is properly tested - so can be refactored with some comfort.)
    *
-   * @param bool $checkPermission
+   * @param int $checkPermission
    * @param string|int $singleRecord
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    * @param bool $showPublicOnly
@@ -367,7 +367,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     $fromCache = TRUE,
     $onlySubType = NULL,
     $returnAll = FALSE,
-    $checkPermission = TRUE,
+    $checkPermission = CRM_Core_Permission::EDIT,
     $singleRecord = NULL,
     $showPublicOnly = FALSE
   ) {
@@ -529,7 +529,7 @@ WHERE civicrm_custom_group.is_active = 1
     if ($checkPermission) {
       // ensure that the user has access to these custom groups
       $strWhere .= " AND " .
-        CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW,
+        CRM_Core_Permission::customGroupClause($checkPermission,
           'civicrm_custom_group.'
         );
     }
@@ -1879,11 +1879,13 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
    * @param null $prefix
    * @param int $customValueId
    * @param int $entityId
+   * @param array $editableGroupTree
+   *   GroupTree array with EDIT permissions
    *
    * @return array|int
    * @throws \CRM_Core_Exception
    */
-  public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL) {
+  public static function buildCustomDataView(&$form, &$groupTree, $returnCount = FALSE, $gID = NULL, $prefix = NULL, $customValueId = NULL, $entityId = NULL, $editableGroupTree = []) {
     $details = [];
     foreach ($groupTree as $key => $group) {
       if ($key === 'info') {
@@ -1904,6 +1906,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
             $details[$groupID][$values['id']]['collapse_display'] = $group['collapse_display'] ?? NULL;
             $details[$groupID][$values['id']]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
             $details[$groupID][$values['id']]['style'] = $group['style'] ?? NULL;
+            $details[$groupID][$values['id']]['permission'] = empty($editableGroupTree[$key]) ? 'view' : 'edit';
             $details[$groupID][$values['id']]['fields'][$k] = [
               'field_title' => $properties['label'] ?? NULL,
               'field_type' => $properties['html_type'] ?? NULL,
@@ -1944,6 +1947,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
           $details[$groupID][0]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
           $details[$groupID][0]['style'] = $group['style'] ?? NULL;
           $details[$groupID][0]['fields'][$k] = ['field_title' => $properties['label'] ?? NULL];
+          $details[$groupID][$values['id']]['permission'] = empty($editableGroupTree[$key]) ? 'view' : 'edit';
         }
       }
     }

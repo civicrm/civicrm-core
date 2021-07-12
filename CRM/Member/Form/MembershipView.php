@@ -373,7 +373,8 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
 
       $memType = CRM_Core_DAO::getFieldValue("CRM_Member_DAO_Membership", $this->membershipID, "membership_type_id");
 
-      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->membershipID, 0, $memType);
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->membershipID, 0, $memType, NULL,
+        TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
       CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $this->membershipID);
 
       $isRecur = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->membershipID, 'contribution_recur_id');

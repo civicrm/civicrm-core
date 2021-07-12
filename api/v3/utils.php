@@ -1432,7 +1432,7 @@ function _civicrm_api3_custom_data_get(&$returnArray, $checkPermission, $entity,
     TRUE,
     NULL,
     TRUE,
-    $checkPermission
+    $checkPermission ? CRM_Core_Permission::VIEW : FALSE
   );
   $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1);
   $customValues = [];

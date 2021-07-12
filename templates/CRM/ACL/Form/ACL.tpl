@@ -76,7 +76,6 @@
          </td>
      </tr>
    </table>
-  <div class="status message">{ts}NOTE: For Custom Data ACLs, the 'View' and 'Edit' operations currently do the same thing. Either option grants the right to view AND / OR edit custom data fields (in all groups, or in a specific custom data group). Neither option grants access to administration of custom data fields.{/ts}</div>
   </div>
   <div id="id-event-acl">
    <table  class="form-layout-compressed">

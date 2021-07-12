@@ -340,7 +340,8 @@ function civicrm_api3_custom_value_gettree($params) {
       }
     }
   }
-  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, CRM_Utils_Array::value('check_permissions', $params, TRUE));
+  $permission = empty($params['check_permissions']) ? FALSE : CRM_Core_Permission::VIEW;
+  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, $permission);
   unset($tree['info']);
   $result = [];
   foreach ($tree as $group) {

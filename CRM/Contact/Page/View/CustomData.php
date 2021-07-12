@@ -137,7 +137,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
           $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupId);
           CRM_Utils_System::setTitle(ts('View %1 Record', [1 => $groupTitle]));
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, TRUE, $this->_cgcount
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW, $this->_cgcount
           );
 
           $recId = $this->_recId;
@@ -146,7 +146,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
         }
         else {
           $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityType, NULL, $this->_contactId,
-            $this->_groupId, $entitySubType
+            $this->_groupId, $entitySubType, NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW
           );
         }
         CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, $recId, $this->_contactId);
