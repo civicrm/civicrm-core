@@ -39,7 +39,7 @@
   <table class="form-layout-compressed">
   <tr>
     <td class="font-size12pt" style="width: 30%;">
-        {if $savedSearch.name}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
+        {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
         {ts count=$pager->_totalItems plural='%count Contacts'}%count Contact{/ts}
     </td>
 

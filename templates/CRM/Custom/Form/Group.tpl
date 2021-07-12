@@ -73,7 +73,7 @@
       {crmButton p='civicrm/admin/custom/group/field' q="action=browse&reset=1&gid=$gid" icon="th-list"}{ts}Custom Fields for this Set{/ts}{/crmButton}
     </div>
 {/if}
-{$initHideBlocks}
+{if !empty($initHideBlocks)}{$initHideBlocks}{/if}
 {literal}
 <script type="text/Javascript">
 CRM.$(function($) {

@@ -38,7 +38,7 @@
 
       <td style="height: 2.6em;">
         {$row.label}
-        {if $row.desc}
+        {if !empty($row.desc)}
           <br/><span class="description">{$row.desc}</span>
         {/if}
       </td>
