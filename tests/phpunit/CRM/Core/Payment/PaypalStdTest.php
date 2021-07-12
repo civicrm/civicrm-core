@@ -60,6 +60,7 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
     $params['currencyID'] = 'USD';
     try {
       $this->processor->doPayment($params);
+      unset($params);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $redirectValues = parse_url($e->errorData['url']);

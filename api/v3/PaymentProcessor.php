@@ -116,6 +116,7 @@ function civicrm_api3_payment_processor_pay($params) {
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {
     $result = $processor->doPayment($params);
+    unset($result['amount'], $result['total_amount']);
   }
   catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
     $code = $e->getErrorCode();

@@ -1192,6 +1192,7 @@ DESC limit 1");
         $payment = $this->_paymentProcessor['object'];
         try {
           $result = $payment->doPayment($paymentParams);
+          unset($result['amount'], $result['total_amount']);
           $formValues = array_merge($formValues, $result);
           $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['payment_status_id']);
           if (!empty($params['contribution_id']) && $paymentStatus === 'Completed') {

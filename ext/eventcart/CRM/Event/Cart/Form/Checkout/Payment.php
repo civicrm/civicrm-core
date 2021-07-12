@@ -550,6 +550,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     try {
       $result = $payment->doPayment($params);
+      unset($result['amount'], $result['total_amount']);
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       CRM_Core_Error::displaySessionError($result);

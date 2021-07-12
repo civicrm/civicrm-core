@@ -416,6 +416,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
         // force a reget of the payment processor in case the form changed it, CRM-7179
         $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
         $result = $payment->doPayment($paymentParams);
+        unset($result['amount'], $result['total_amount']);
       }
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         Civi::log()->error('Payment processor exception: ' . $e->getMessage());

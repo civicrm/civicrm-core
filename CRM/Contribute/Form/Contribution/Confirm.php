@@ -1721,7 +1721,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // If this is a single membership-related contribution, it won't have
       // be performed yet, so do it now.
       if ($isPaidMembership && !$isProcessSeparateMembershipTransaction) {
-        $paymentActionResult = $payment->doPayment($paymentParams, 'contribute');
+        $paymentActionResult = $payment->doPayment($paymentParams);
+        unset($paymentActionResult['amount'], $paymentActionResult['total_amount']);
         $paymentResults[] = ['contribution_id' => $paymentResult['contribution']->id, 'result' => $paymentActionResult];
       }
       // Do not send an email if Recurring transaction is done via Direct Mode
@@ -1877,7 +1878,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       else {
         $payment = $form->_paymentProcessor['object'];
       }
-      $result = $payment->doPayment($tempParams, 'contribute');
+      $result = $payment->doPayment($tempParams);
+      unset($result['amount'], $result['total_amount']);
       $form->set('membership_trx_id', $result['trxn_id']);
       $form->assign('membership_trx_id', $result['trxn_id']);
     }
@@ -2769,6 +2771,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             $form->postProcessHook();
           }
           $result = $payment->doPayment($paymentParams);
+          unset($result['amount'], $result['total_amount']);
           $form->_params = array_merge($form->_params, $result);
           $form->assign('trxn_id', CRM_Utils_Array::value('trxn_id', $result));
           if (!empty($result['trxn_id'])) {
