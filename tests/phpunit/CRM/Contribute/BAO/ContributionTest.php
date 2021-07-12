@@ -739,7 +739,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $this->_contactId,
       'financial_type_id' => 4,
       'contribution_status_id' => 'Pending',
-      'contribution_mode' => 'participant',
       'participant_id' => $participant->id,
       'sequential' => TRUE,
       'api.Payment.create' => ['total_amount' => 150],

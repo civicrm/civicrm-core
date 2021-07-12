@@ -3555,7 +3555,6 @@ VALUES
       'contact_id' => $this->individualCreate(),
       'financial_type_id' => 4,
       'contribution_status_id' => 'Pending',
-      'contribution_mode' => 'participant',
     ];
     foreach ($priceFields['values'] as $key => $priceField) {
       $orderParams['line_items'][] = [
