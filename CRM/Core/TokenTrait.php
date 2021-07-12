@@ -43,7 +43,7 @@ trait CRM_Core_TokenTrait {
     $activeTokens = [];
     // if message token contains '_\d+_', then treat as '_N_'
     foreach ($messageTokens[$this->entity] as $msgToken) {
-      if (array_key_exists($msgToken, $this->tokenNames)) {
+      if (array_key_exists($msgToken, $this->tokenNames) || array_key_exists($msgToken, $this->getAliasTokens())) {
         $activeTokens[] = $msgToken;
       }
       else {
@@ -89,6 +89,16 @@ trait CRM_Core_TokenTrait {
       $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens(ucfirst($this->getEntityName()));
     }
     return $this->customFieldTokens;
+  }
+
+  /**
+   * Returns a mapping of alias tokens to actual token.
+   * For example to support {activity.activity_id} in addition to {activity.id} we return ['activity_id => 'id]
+   *
+   * @return array
+   */
+  protected function getAliasTokens() {
+    return [];
   }
 
 }

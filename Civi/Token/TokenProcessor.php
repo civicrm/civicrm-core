@@ -112,6 +112,25 @@ class TokenProcessor {
   protected $next = 0;
 
   /**
+   * Get a mapping from entity_table to context (currently used by actionSchedule to map parameters)
+   *
+   * @param string $entityTable eg. civicrm_activity
+   *
+   * @return string|null
+   */
+  public static function getEntityTableToSchemaMapping($entityTable) {
+    $mapping = [
+      'civicrm_activity' => 'activityId',
+      'civicrm_contact' => 'contactId',
+      'civicrm_contribution' => 'contributionId',
+    ];
+    if (array_key_exists($entityTable, $mapping)) {
+      return $mapping[$entityTable];
+    }
+    return NULL;
+  }
+
+  /**
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
    * @param array $context
    */

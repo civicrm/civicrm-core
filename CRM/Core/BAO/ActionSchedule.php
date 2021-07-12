@@ -276,10 +276,13 @@ FROM civicrm_action_schedule cas
 
         $errors = [];
         try {
-          $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
+          $entityContextId = \Civi\Token\TokenProcessor::getEntityTableToSchemaMapping($mapping->getEntity());
+          $schema = ['contactId', $entityContextId];
+          $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping, $schema);
           $tokenProcessor->addRow()
             ->context('contactId', $dao->contactID)
-            ->context('actionSearchResult', (object) $dao->toArray());
+            ->context('actionSearchResult', (object) $dao->toArray())
+            ->context($entityContextId, $dao->id);
           foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
             if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
               CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
@@ -641,14 +644,17 @@ FROM civicrm_action_schedule cas
   /**
    * @param CRM_Core_DAO_ActionSchedule $schedule
    * @param \Civi\ActionSchedule\Mapping $mapping
+   * @param array $schema (eg. ['contactId', 'activityId'])
+   *
    * @return \Civi\Token\TokenProcessor
    */
-  protected static function createTokenProcessor($schedule, $mapping) {
+  protected static function createTokenProcessor($schedule, $mapping, $schema) {
     $tp = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
       'smarty' => TRUE,
+      'schema' => $schema,
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
