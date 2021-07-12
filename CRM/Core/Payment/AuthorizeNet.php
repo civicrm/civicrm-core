@@ -139,19 +139,16 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
         $newParams
       );
     }
-    foreach ($newParams as $field => $value) {
-      $this->_setParam($field, $value);
-    }
 
     if (!empty($params['is_recur']) && !empty($params['contributionRecurID'])) {
-      $this->doRecurPayment();
+      $this->doRecurPayment($newParams);
       $params['payment_status_id'] = array_search('Pending', $statuses);
       $params['payment_status'] = 'Pending';
       return $params;
     }
 
     $postFields = [];
-    $authorizeNetFields = $this->_getAuthorizeNetFields();
+    $authorizeNetFields = $this->_getAuthorizeNetFields($newParams);
 
     // Set up our call for hook_civicrm_paymentProcessor,
     // since we now have our parameters as assigned for the AIM back end.
@@ -213,13 +210,15 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+   * @param array|\Civi\Payment\PropertyBag $params
+   *
    * Submit an Automated Recurring Billing subscription.
    */
-  public function doRecurPayment() {
+  public function doRecurPayment($params) {
     $template = CRM_Core_Smarty::singleton();
 
-    $intervalLength = $this->_getParam('frequency_interval');
-    $intervalUnit = $this->_getParam('frequency_unit');
+    $intervalLength = $params['frequency_interval'] ?? '';
+    $intervalUnit = $params['frequency_unit'] ?? '';
     if ($intervalUnit === 'week') {
       $intervalLength *= 7;
       $intervalUnit = 'days';
@@ -253,11 +252,11 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $template->assign('apiLogin', $this->_getParam('apiLogin'));
     $template->assign('paymentKey', $this->_getParam('paymentKey'));
-    $template->assign('refId', substr($this->_getParam('invoiceID'), 0, 20));
+    $template->assign('refId', substr($params['invoiceID'] ?? '', 0, 20));
 
     //for recurring, carry first contribution id
-    $template->assign('invoiceNumber', $this->_getParam('contributionID'));
-    $firstPaymentDate = $this->_getParam('receive_date');
+    $template->assign('invoiceNumber', $params['contributionID'] ?? '');
+    $firstPaymentDate = $params['receive_date'] ?? '';
     if (!empty($firstPaymentDate)) {
       //allow for post dated payment if set in form
       $startDate = date_create($firstPaymentDate);
@@ -279,31 +278,31 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
 
     $template->assign('startDate', $startDate->format('Y-m-d'));
 
-    $installments = $this->_getParam('installments');
+    $installments = $params['installments'] ?? '';
 
     // for open ended subscription totalOccurrences has to be 9999
     $installments = empty($installments) ? 9999 : $installments;
     $template->assign('totalOccurrences', $installments);
 
-    $template->assign('amount', $this->_getParam('amount'));
+    $template->assign('amount', $params['amount'] ?? '');
 
-    $template->assign('cardNumber', $this->_getParam('credit_card_number'));
-    $exp_month = str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT);
-    $exp_year = $this->_getParam('year');
+    $template->assign('cardNumber', $params['credit_card_number'] ?? '');
+    $exp_month = str_pad($params['month'] ?? '', 2, '0', STR_PAD_LEFT);
+    $exp_year = $params['year'] ?? '';
     $template->assign('expirationDate', $exp_year . '-' . $exp_month);
 
     // name rather than description is used in the tpl - see http://www.authorize.net/support/ARB_guide.pdf
-    $template->assign('name', $this->_getParam('description', TRUE));
+    $template->assign('name', $this->makeXmlSafe($params['description'] ?? ''));
 
-    $template->assign('email', $this->_getParam('email'));
-    $template->assign('contactID', $this->_getParam('contactID'));
-    $template->assign('billingFirstName', $this->_getParam('billing_first_name'));
-    $template->assign('billingLastName', $this->_getParam('billing_last_name'));
-    $template->assign('billingAddress', $this->_getParam('street_address', TRUE));
-    $template->assign('billingCity', $this->_getParam('city', TRUE));
-    $template->assign('billingState', $this->_getParam('state_province'));
-    $template->assign('billingZip', $this->_getParam('postal_code', TRUE));
-    $template->assign('billingCountry', $this->_getParam('country'));
+    $template->assign('email', $params['email']) ?? '';
+    $template->assign('contactID', $params['contactID'] ?? '');
+    $template->assign('billingFirstName', $params['billing_first_name'] ?? '');
+    $template->assign('billingLastName', $params['billing_last_name'] ?? '');
+    $template->assign('billingAddress', $this->makeXmlSafe($params['street_address'] ?? ''));
+    $template->assign('billingCity', $this->makeXmlSafe($params['city'] ?? ''));
+    $template->assign('billingState', $params['state_province'] ?? '');
+    $template->assign('billingZip', $this->makeXmlSafe($params['postal_code'] ?? ''));
+    $template->assign('billingCountry', $params['country'] ?? '');
 
     $arbXML = $template->fetch('CRM/Contribute/Form/Contribution/AuthorizeNetARB.tpl');
 
@@ -325,7 +324,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
     }
 
     // update recur processor_id with subscriptionId
-    CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionRecur', $this->_getParam('contributionRecurID'),
+    CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_ContributionRecur', $params['contributionRecurID'] ?? '',
       'processor_id', $responseFields['subscriptionId']
     );
     //only impact of assigning this here is is can be used to cancel the subscription in an automated test
@@ -336,44 +335,39 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   }
 
   /**
+   * @param array|\Civi\Payment\PropertyBag $params
    * @return array
    */
-  public function _getAuthorizeNetFields() {
-    //Total amount is from the form contribution field
-    $amount = $this->_getParam('total_amount');
-    //CRM-9894 would this ever be the case??
-    if (empty($amount)) {
-      $amount = $this->_getParam('amount');
-    }
+  public function _getAuthorizeNetFields($params) {
     $fields = [];
     $fields['x_login'] = $this->_getParam('apiLogin');
     $fields['x_tran_key'] = $this->_getParam('paymentKey');
-    $fields['x_email_customer'] = $this->_getParam('emailCustomer');
-    $fields['x_first_name'] = $this->_getParam('billing_first_name');
-    $fields['x_last_name'] = $this->_getParam('billing_last_name');
-    $fields['x_address'] = $this->_getParam('street_address');
-    $fields['x_city'] = $this->_getParam('city');
-    $fields['x_state'] = $this->_getParam('state_province');
-    $fields['x_zip'] = $this->_getParam('postal_code');
-    $fields['x_country'] = $this->_getParam('country');
-    $fields['x_customer_ip'] = $this->_getParam('ip_address');
-    $fields['x_email'] = $this->_getParam('email');
-    $fields['x_invoice_num'] = $this->_getParam('invoiceID');
-    $fields['x_amount'] = $amount;
-    $fields['x_currency_code'] = $this->_getParam('currencyID');
-    $fields['x_description'] = $this->_getParam('description');
-    $fields['x_cust_id'] = $this->_getParam('contactID');
-    if ($this->_getParam('paymentType') == 'AIM') {
+    $fields['x_email_customer'] = $params['emailCustomer'] ?? '';
+    $fields['x_first_name'] = $params['billing_first_name'] ?? '';
+    $fields['x_last_name'] = $params['billing_last_name'] ?? '';
+    $fields['x_address'] = $params['street_address'] ?? '';
+    $fields['x_city'] = $params['city'] ?? '';
+    $fields['x_state'] = $params['state_province'] ?? '';
+    $fields['x_zip'] = $params['postal_code'] ?? '';
+    $fields['x_country'] = $params['country'] ?? '';
+    $fields['x_customer_ip'] = $params['ip_address'] ?? '';
+    $fields['x_email'] = $params['email'] ?? '';
+    $fields['x_invoice_num'] = $params['invoiceID'] ?? '';
+    $fields['x_amount'] = $params['total_amount'] ?? $params['amount'];
+    $fields['x_currency_code'] = $params['currencyID'] ?? '';
+    $fields['x_description'] = $params['description'] ?? '';
+    $fields['x_cust_id'] = $params['contactID'] ?? '';
+    if ($this->_getParam('paymentType') === 'AIM') {
       $fields['x_relay_response'] = 'FALSE';
       // request response in CSV format
       $fields['x_delim_data'] = 'TRUE';
       $fields['x_delim_char'] = ',';
       $fields['x_encap_char'] = '"';
       // cc info
-      $fields['x_card_num'] = $this->_getParam('credit_card_number');
-      $fields['x_card_code'] = $this->_getParam('cvv2');
-      $exp_month = str_pad($this->_getParam('month'), 2, '0', STR_PAD_LEFT);
-      $exp_year = $this->_getParam('year');
+      $fields['x_card_num'] = $params['credit_card_number'] ?? '';
+      $fields['x_card_code'] = $params['cvv2'] ?? '';
+      $exp_month = str_pad($params['month'] ?? '', 2, '0', STR_PAD_LEFT);
+      $exp_year = $params['year'] ?? '';
       $fields['x_exp_date'] = "$exp_month/$exp_year";
     }
 
@@ -483,9 +477,13 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   public function _getParam($field, $xmlSafe = FALSE) {
     $value = CRM_Utils_Array::value($field, $this->_params, '');
     if ($xmlSafe) {
-      $value = str_replace(['&', '"', "'", '<', '>'], '', $value);
+      $value = $this->makeXmlSafe($value);
     }
     return $value;
+  }
+
+  private function makeXmlSafe($value) {
+    return str_replace(['&', '"', "'", '<', '>'], '', $value) ?? '';
   }
 
   /**
