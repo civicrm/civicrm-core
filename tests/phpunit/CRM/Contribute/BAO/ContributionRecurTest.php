@@ -218,7 +218,6 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    * Test that is_template contribution is used where available
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */

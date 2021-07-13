@@ -2558,11 +2558,9 @@ VALUES
       'total_amount' => '200',
       'invoice_id' => $this->_invoiceID,
       'financial_type_id' => 'Donation',
-      'contribution_status_id' => 'Pending',
       'contact_id' => $this->_contactID,
       'contribution_page_id' => $this->_contributionPageID,
       'payment_processor_id' => $this->_paymentProcessorID,
-      'is_test' => 0,
       'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
       'amount_level' => 'expensive',
@@ -2818,11 +2816,9 @@ VALUES
     $paramsSet['financial_type_id'] = 'Event Fee';
     $paramsSet['extends'] = 1;
     $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
-    $priceSetId = $priceSet['id'];
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
+    if ($componentId) {
+      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSet['id']);
+    }
     $paramsField = array_merge([
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
@@ -2842,9 +2838,6 @@ VALUES
     ], $priceFieldOptions);
 
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
-    if ($componentId) {
-      CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentId, $priceSetId);
-    }
     return $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
   }
 

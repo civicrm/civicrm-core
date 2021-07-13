@@ -2497,7 +2497,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *   The count is out on how correct related entities wind up in this case.
    */
   protected static function repeatTransaction(array $input, array $contributionParams) {
-
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution(
       (int) $contributionParams['contribution_recur_id'],
       array_filter([

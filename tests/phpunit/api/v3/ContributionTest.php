@@ -2410,19 +2410,21 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
     $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
       'entity_id' => $originalContribution['id'],
-    ]));
+      'options' => ['sort' => 'qty'],
+    ]))['values'];
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
       'entity_id' => $originalContribution['id'] + 1,
-    ]));
+      'options' => ['sort' => 'qty'],
+    ]))['values'];
 
     // unset id and entity_id for all of them to be able to compare the lineItems:
-    unset($lineItem1['values'][0]['id'], $lineItem1['values'][0]['entity_id']);
-    unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
-    $this->assertEquals($lineItem1['values'][0], $lineItem2['values'][0]);
+    unset($lineItem1[0]['id'], $lineItem1[0]['entity_id']);
+    unset($lineItem2[0]['id'], $lineItem2[0]['entity_id']);
+    $this->assertEquals($lineItem1[0], $lineItem2[0]);
 
-    unset($lineItem1['values'][1]['id'], $lineItem1['values'][1]['entity_id']);
-    unset($lineItem2['values'][1]['id'], $lineItem2['values'][1]['entity_id']);
-    $this->assertEquals($lineItem1['values'][1], $lineItem2['values'][1]);
+    unset($lineItem1[1]['id'], $lineItem1[1]['entity_id']);
+    unset($lineItem2[1]['id'], $lineItem2[1]['entity_id']);
+    $this->assertEquals($lineItem1[1], $lineItem2[1]);
 
     // CRM-19309 so in future we also want to:
     // check that financial_line_items have been created for entity_id 3 and 4;
@@ -2892,9 +2894,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $lineItem1 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
       'entity_id' => $originalContribution['id'],
-    ]));
+    ]))['values'][0];
     $expectedLineItem = array_merge(
-      $lineItem1['values'][0], [
+      $lineItem1, [
         'line_total' => '100.00',
         'unit_price' => '100.00',
         'financial_type_id' => 2,
@@ -3001,7 +3003,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRepeatTransactionUpdatedFinancialTypeAndNotEquals() {
+  public function testRepeatTransactionUpdatedFinancialTypeAndNotEquals(): void {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
     // This will made the trick to get the not equals behaviour.
     $this->callAPISuccess('line_item', 'create', ['id' => 1, 'financial_type_id' => 4]);
