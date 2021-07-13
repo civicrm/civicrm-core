@@ -384,6 +384,7 @@ WHERE li.contribution_id = %1";
     if (!$entityId || !is_array($lineItems)
       || CRM_Utils_System::isNull($lineItems)
     ) {
+      CRM_Core_Error::deprecatedWarning('calling processPriceSet erroneously is deprecated');
       return;
     }
 
@@ -394,12 +395,17 @@ WHERE li.contribution_id = %1";
 
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
+          CRM_Core_Error::deprecatedWarning('Passing in incomplete line items is deprecated.');
           $line['entity_table'] = $entityTable;
         }
         if (empty($line['entity_id'])) {
+          if ($line['entity_table'] !== 'civicrm_contribution') {
+            CRM_Core_Error::deprecatedWarning('Passing in incomplete line items is deprecated.');
+          }
           $line['entity_id'] = $entityId;
         }
-        if (!empty($line['membership_type_id'])) {
+        if (!empty($line['membership_type_id']) && $line['entity_table'] !== 'civicrm_membership') {
+          CRM_Core_Error::deprecatedWarning('Passing in incomplete line items is deprecated.');
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {
@@ -412,6 +418,7 @@ WHERE li.contribution_id = %1";
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+          CRM_Core_Error::deprecatedWarning('Passing in incomplete line items is deprecated.');
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
@@ -522,6 +529,7 @@ WHERE li.contribution_id = %1";
           'line_total' => $totalAmount,
           'financial_type_id' => $financialType,
           'membership_type_id' => $values['membership_type_id'],
+          'entity_table' => 'civicrm_' . $entityTable,
         ];
         $lineItem['tax_amount'] = self::getTaxAmountForLineItem($lineItem);
         $params['line_item'][$values['setID']][$values['priceFieldID']] = $lineItem;
