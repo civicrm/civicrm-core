@@ -210,6 +210,75 @@ class CRM_Financial_BAO_Order {
   protected $lineItems = [];
 
   /**
+   * Array of entities ordered.
+   *
+   * @var array
+   */
+  protected $entityParameters = [];
+
+  /**
+   * Default price sets for component.
+   *
+   * @var array
+   */
+  protected $defaultPriceSets = [];
+
+  /**
+   * Cache of the default price field.
+   *
+   * @var array
+   */
+  protected $defaultPriceField;
+
+  /**
+   * Get parameters for the entities bought as part of this order.
+   *
+   * @return array
+   *
+   * @internal core tested code only.
+   *
+   */
+  public function getEntitiesToCreate(): array {
+    $entities = [];
+    foreach ($this->entityParameters as $entityToCreate) {
+      if (in_array($entityToCreate['entity'], ['participant', 'membership'], TRUE)) {
+        $entities[] = $entityToCreate;
+      }
+    }
+    return $entities;
+  }
+
+  /**
+   * Set parameters for the entities bought as part of this order.
+   *
+   * @param array $entityParameters
+   * @param int|string $key indexing reference
+   *
+   * @internal core tested code only.
+   *
+   */
+  public function setEntityParameters(array $entityParameters, $key): void {
+    $this->entityParameters[$key] = $entityParameters;
+  }
+
+  /**
+   * Add a line item to an entity.
+   *
+   * The v3 api supports more than on line item being stored against a given
+   * set of entity parameters. There is some doubt as to whether this is a
+   * good thing that should be supported in v4 or something that 'seemed
+   * like a good idea at the time' - but this allows the lines to be added from the
+   * v3 api.
+   *
+   * @param string $lineIndex
+   * @param string $entityKey
+   */
+  public function addLineItemToEntityParameters(string $lineIndex, string $entityKey): void {
+    $this->entityParameters[$entityKey]['entity'] = $this->getLineItemEntity($lineIndex);
+    $this->entityParameters[$entityKey]['line_references'][] = $lineIndex;
+  }
+
+  /**
    * Metadata for price fields.
    *
    * @var array
@@ -398,10 +467,7 @@ class CRM_Financial_BAO_Order {
    * @internal use in tested core code only.
    */
   public function setPriceSetToDefault(string $component): void {
-    $this->priceSetID = PriceSet::get(FALSE)
-      ->addWhere('name', '=', ($component === 'membership' ? 'default_membership_type_amount' : 'default_contribution_amount'))
-      ->execute()
-      ->first()['id'];
+    $this->priceSetID = $this->getDefaultPriceSetForComponent($component);
   }
 
   /**
@@ -575,7 +641,7 @@ class CRM_Financial_BAO_Order {
     }
     if (empty($this->priceSelection) && isset($input['total_amount'])
       && is_numeric($input['total_amount']) && !empty($input['financial_type_id'])) {
-      $this->priceSelection['price_' . $this->getDefaultPriceField()] = $input['total_amount'];
+      $this->priceSelection['price_' . $this->getDefaultPriceFieldID()] = $input['total_amount'];
       $this->setOverrideFinancialTypeID($input['financial_type_id']);
     }
   }
@@ -584,12 +650,17 @@ class CRM_Financial_BAO_Order {
    * Get the id of the price field to use when just an amount is provided.
    *
    * @throws \API_Exception
+   *
+   * @return int
    */
-  public function getDefaultPriceField() {
-    return PriceField::get(FALSE)
-      ->addWhere('name', '=', 'contribution_amount')
-      ->addWhere('price_set_id.name', '=', 'default_contribution_amount')
-      ->execute()->first()['id'];
+  public function getDefaultPriceFieldID():int {
+    if (!$this->defaultPriceField) {
+      $this->defaultPriceField = PriceField::get(FALSE)
+        ->addWhere('name', '=', 'contribution_amount')
+        ->addWhere('price_set_id.name', '=', 'default_contribution_amount')
+        ->execute()->first();
+    }
+    return $this->defaultPriceField['id'];
   }
 
   /**
@@ -853,6 +924,9 @@ class CRM_Financial_BAO_Order {
         $lineItem = $this->fillMembershipLine($lineItem);
       }
     }
+    if ($this->getPriceSetID() === $this->getDefaultPriceSetForComponent('contribution')) {
+      $this->fillDefaultContributionLine($lineItem);
+    }
     $this->lineItems[$index] = $lineItem;
   }
 
@@ -984,6 +1058,42 @@ class CRM_Financial_BAO_Order {
         'membership_num_terms',
       ])
       ->execute();
+  }
+
+  /**
+   * Get the default price set id for the given component.
+   *
+   * @param string $component
+   *
+   * @return int
+   * @throws \API_Exception
+   */
+  protected function getDefaultPriceSetForComponent(string $component): int {
+    if (!isset($this->defaultPriceSets[$component])) {
+      $this->defaultPriceSets[$component] = PriceSet::get(FALSE)
+        ->addWhere('name', '=', ($component === 'membership' ? 'default_membership_type_amount' : 'default_contribution_amount'))
+        ->execute()
+        ->first()['id'];
+    }
+    return $this->defaultPriceSets[$component];
+  }
+
+  /**
+   * Fill in values for a default contribution line item.
+   *
+   * @param array $lineItem
+   *
+   * @throws \API_Exception
+   */
+  protected function fillDefaultContributionLine(array &$lineItem): void {
+    $defaults = [
+      'qty' => 1,
+      'price_field_id' => $this->getDefaultPriceFieldID(),
+      'entity_table' => 'civicrm_contribution',
+      'unit_price' => $lineItem['line_total'],
+      'label' => ts('Contribution Amount'),
+    ];
+    $lineItem = array_merge($defaults, $lineItem);
   }
 
 }
