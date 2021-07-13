@@ -211,8 +211,6 @@ class CRM_Core_Permission {
    * @return bool
    */
   public static function customGroupAdmin() {
-    $admin = FALSE;
-
     // check if user has all powerful permission
     // or administer civicrm permission (CRM-1905)
     if (self::check('access all custom data')) {
@@ -226,7 +224,7 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    if (self::check('administer CiviCRM')) {
+    if (self::check('administer CiviCRM data')) {
       return TRUE;
     }
 
