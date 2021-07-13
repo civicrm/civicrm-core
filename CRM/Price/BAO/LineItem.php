@@ -400,6 +400,9 @@ WHERE li.contribution_id = %1";
           $line['entity_id'] = $entityId;
         }
         if (!empty($line['membership_type_id'])) {
+          if (($line['entity_table'] ?? '') !== 'civicrm_membership') {
+            CRM_Core_Error::deprecatedWarning('entity table should be already set');
+          }
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {
