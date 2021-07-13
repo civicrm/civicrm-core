@@ -1632,15 +1632,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
     $defaults = [];
     $contactObj = CRM_Contact_BAO_Contact::retrieve($contactParams, $defaults);
 
-    $modeUpdate = $modeFill = FALSE;
-
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE) {
-      $modeUpdate = TRUE;
-    }
-
-    if ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL) {
-      $modeFill = TRUE;
-    }
+    $modeFill = ($onDuplicate == CRM_Import_Parser::DUPLICATE_FILL);
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($params['contact_type'], NULL, $cid, 0, NULL);
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults, FALSE, FALSE);

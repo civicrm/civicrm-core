@@ -71,7 +71,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
 
     $statusId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'status_id', 'id');
     $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
-    $status = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_ParticipantStatusType', $statusId, 'name', 'id');
     if ($status == 'Transferred') {
       $transferId = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $participantID, 'transferred_to_contact_id', 'id');
       $pid = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $transferId, 'id', 'contact_id');
@@ -80,7 +79,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       $this->assign('transferId', $transferId);
       $this->assign('transferName', $transferName);
     }
-    $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
 
     // CRM-20879: Show 'Transfer or Cancel' option beside 'Change fee selection'
     //  only if logged in user have 'edit event participants' permission and
@@ -137,7 +135,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $eventNameCustomDataTypeID = array_search('ParticipantEventName', $customDataType);
     $eventTypeCustomDataTypeID = array_search('ParticipantEventType', $customDataType);
     $allRoleIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR, $values[$participantID]['role_id']);
-    $groupTree = [];
     $finalTree = [];
 
     foreach ($allRoleIDs as $k => $v) {
