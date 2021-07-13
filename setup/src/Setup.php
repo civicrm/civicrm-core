@@ -71,7 +71,11 @@ class Setup {
     self::$instance->model = new \Civi\Setup\Model();
     self::$instance->model->setValues($modelValues);
     self::$instance->dispatcher = new CiviEventDispatcher();
-    self::$instance->dispatcher->setDispatchPolicy(['/^civi\.setup\./' => 'run', '/./' => 'fail']);
+    self::$instance->dispatcher->setDispatchPolicy([
+      '/^civi\.setup\./' => 'run',
+      '/^civi\.setupui\./' => 'run',
+      '/./' => 'fail',
+    ]);
     self::$instance->log = $log ? $log : new NullLogger();
 
     $pluginDir = dirname(__DIR__) . '/plugins';
