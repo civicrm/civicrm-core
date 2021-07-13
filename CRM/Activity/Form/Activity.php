@@ -915,17 +915,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $params['activity_type_id'] = $this->_activityTypeId;
     }
 
-    if (!empty($params['hidden_custom']) &&
-      !isset($params['custom'])
-    ) {
-      $customFields = CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-        $this->_activityTypeId
-      );
-      $customFields = CRM_Utils_Array::crmArrayMerge($customFields,
-        CRM_Core_BAO_CustomField::getFields('Activity', FALSE, FALSE,
-          NULL, NULL, TRUE
-        )
-      );
+    if (!empty($params['hidden_custom']) && !isset($params['custom'])) {
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
         $this->_activityId,
         'Activity'
