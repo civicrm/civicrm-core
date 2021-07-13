@@ -667,7 +667,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
 
         CRM_Core_BAO_Address::checkContactSharedAddressFields($fields, $contactID);
-        $addCaptcha = FALSE;
         // fetch file preview when not submitted yet, like in online contribution Confirm and ThankYou page
         $viewOnlyFileValues = empty($profileContactType) ? [] : [$profileContactType => []];
         foreach ($fields as $key => $field) {
@@ -740,10 +739,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             );
             $this->_fields[$key] = $field;
           }
-          // CRM-11316 Is ReCAPTCHA enabled for this profile AND is this an anonymous visitor
-          if ($field['add_captcha'] && !$this->_userID) {
-            $addCaptcha = TRUE;
-          }
         }
 
         $this->assign($name, $fields);
@@ -753,10 +748,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         }
         elseif (count($viewOnlyFileValues)) {
           $this->assign('viewOnlyFileValues', $viewOnlyFileValues);
-        }
-
-        if ($addCaptcha && !$viewOnly) {
-          CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
         }
       }
     }

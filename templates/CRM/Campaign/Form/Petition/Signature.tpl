@@ -41,10 +41,6 @@
     {include file="CRM/UF/Form/Block.tpl" fields=$petitionActivityProfile hideFieldset=true}
   </div>
 
-  {if $isCaptcha}
-      {include file='CRM/common/ReCAPTCHA.tpl'}
-  {/if}
-
   <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
