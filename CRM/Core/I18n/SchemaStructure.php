@@ -58,7 +58,7 @@ class CRM_Core_I18n_SchemaStructure {
           'label' => "varchar(128) COMMENT 'Label for Membership Status'",
         ],
         'civicrm_survey' => [
-          'title' => "varchar(255) NOT NULL COMMENT 'Title of the Survey.'",
+          'title' => "varchar(255) COMMENT 'Title of the Survey.'",
           'instructions' => "text COMMENT 'Script instructions for volunteers to use for the survey.'",
           'thankyou_title' => "varchar(255) COMMENT 'Title for Thank-you page (header title tag, and display at the top of the page).'",
           'thankyou_text' => "text COMMENT 'text and html allowed. displayed above result on success page'",
@@ -67,7 +67,7 @@ class CRM_Core_I18n_SchemaStructure {
           'label' => "varchar(255) COMMENT 'localized label for display of this status type'",
         ],
         'civicrm_case_type' => [
-          'title' => "varchar(64) NOT NULL COMMENT 'Natural language name for Case Type'",
+          'title' => "varchar(64) COMMENT 'Natural language name for Case Type'",
           'description' => "varchar(255) COMMENT 'Description of the Case Type'",
         ],
         'civicrm_tell_friend' => [
@@ -78,17 +78,17 @@ class CRM_Core_I18n_SchemaStructure {
           'thankyou_text' => "text COMMENT 'Thank you message displayed on success page.'",
         ],
         'civicrm_custom_group' => [
-          'title' => "varchar(64) NOT NULL COMMENT 'Friendly Name.'",
+          'title' => "varchar(64) COMMENT 'Friendly Name.'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before fields in form.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after fields in form.'",
         ],
         'civicrm_custom_field' => [
-          'label' => "varchar(255) NOT NULL COMMENT 'Text for form field label (also friendly name for administering this custom property).'",
+          'label' => "varchar(255) COMMENT 'Text for form field label (also friendly name for administering this custom property).'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before this field.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after this field.'",
         ],
         'civicrm_option_value' => [
-          'label' => "varchar(512) NOT NULL COMMENT 'Option string as displayed to users - e.g. the label in an HTML OPTION tag.'",
+          'label' => "varchar(512) COMMENT 'Option string as displayed to users - e.g. the label in an HTML OPTION tag.'",
           'description' => "text COMMENT 'Optional description.'",
         ],
         'civicrm_group' => [
@@ -112,7 +112,7 @@ class CRM_Core_I18n_SchemaStructure {
           'frontend_title' => "varchar(255) DEFAULT NULL COMMENT 'Contribution Page Public title'",
         ],
         'civicrm_product' => [
-          'name' => "varchar(255) NOT NULL COMMENT 'Required product/premium name'",
+          'name' => "varchar(255) COMMENT 'Required product/premium name'",
           'description' => "text COMMENT 'Optional description of the product/premium.'",
           'options' => "text COMMENT 'Store comma-delimited list of color, size, etc. options for the product.'",
         ],
@@ -120,7 +120,7 @@ class CRM_Core_I18n_SchemaStructure {
           'title' => "varchar(127) COMMENT 'Payment Processor Descriptive Name.'",
         ],
         'civicrm_membership_type' => [
-          'name' => "varchar(128) NOT NULL COMMENT 'Name of Membership Type'",
+          'name' => "varchar(128) COMMENT 'Name of Membership Type'",
           'description' => "varchar(255) COMMENT 'Description of Membership Type'",
         ],
         'civicrm_membership_block' => [
@@ -130,7 +130,7 @@ class CRM_Core_I18n_SchemaStructure {
           'renewal_text' => "text COMMENT 'Text to display for member renewal'",
         ],
         'civicrm_price_set' => [
-          'title' => "varchar(255) NOT NULL COMMENT 'Displayed title for the Price Set.'",
+          'title' => "varchar(255) COMMENT 'Displayed title for the Price Set.'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before fields in form.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after fields in form.'",
         ],
@@ -138,7 +138,7 @@ class CRM_Core_I18n_SchemaStructure {
           'label' => "varchar(255) COMMENT 'dashlet title'",
         ],
         'civicrm_uf_group' => [
-          'title' => "varchar(64) NOT NULL COMMENT 'Form title.'",
+          'title' => "varchar(64) COMMENT 'Form title.'",
           'frontend_title' => "varchar(64) COMMENT 'Profile Form Public title'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before fields in form.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after fields in form.'",
@@ -148,10 +148,10 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_uf_field' => [
           'help_post' => "text COMMENT 'Description and/or help text to display after this field.'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before this field.'",
-          'label' => "varchar(255) NOT NULL COMMENT 'To save label for fields.'",
+          'label' => "varchar(255) COMMENT 'To save label for fields.'",
         ],
         'civicrm_price_field' => [
-          'label' => "varchar(255) NOT NULL COMMENT 'Text for form field label (also friendly name for administering this field).'",
+          'label' => "varchar(255) COMMENT 'Text for form field label (also friendly name for administering this field).'",
           'help_pre' => "text COMMENT 'Description and/or help text to display before this field.'",
           'help_post' => "text COMMENT 'Description and/or help text to display after this field.'",
         ],

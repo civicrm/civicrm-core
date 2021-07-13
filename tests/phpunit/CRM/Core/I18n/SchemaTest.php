@@ -114,4 +114,11 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     }
   }
 
+  public function testMultilingualCustomFieldCreation() {
+    $this->enableMultilingual();
+    CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
+    $id = $this->customGroupCreate()['id'];
+    $this->customFieldCreate(['custom_group_id' => $id]);
+  }
+
 }
