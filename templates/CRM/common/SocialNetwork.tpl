@@ -15,7 +15,7 @@
     {if $emailMode eq true}
         <a href="https://twitter.com/share?url={$url|escape:'url'}&amp;text={$title}" class="btn btn-default" role="button" target="_blank">{ts}Tweet{/ts}</a>
         <a href="https://facebook.com/sharer/sharer.php?u={$url|escape:'url'}" target="_blank" class="btn btn-default" role="button">{ts}Share on Facebook{/ts}</a>
-        <a href="ttps://www.linkedin.com/shareArticle?mini=true&amp;url={$url|escape:'url'}&amp;title={$title}" target="_blank" rel="noopener" class="btn btn-default">{ts}Share on LinkedIn{/ts}</a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url={$url|escape:'url'}&amp;title={$title}" target="_blank" rel="noopener" class="btn btn-default">{ts}Share on LinkedIn{/ts}</a>
     {else}
         <button onclick="window.open('https://twitter.com/intent/tweet?url={$url|escape:'url'}&amp;text={$title}','_blank')" type="button" class="btn btn-default crm-button" id="crm-tw"><i aria-hidden="true" class="crm-i fa-twitter"></i>&nbsp;&nbsp;{ts}Tweet{/ts}</button>
         <button onclick="window.open('https://facebook.com/sharer/sharer.php?u={$url|escape:'url'}','_blank')" type="button" class="btn btn-default crm-button" role="button" id="crm-fb"><i aria-hidden="true" class="crm-i fa-facebook"></i>&nbsp;&nbsp;{ts}Share on Facebook{/ts}</button>
