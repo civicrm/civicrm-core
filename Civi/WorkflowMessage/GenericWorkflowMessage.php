@@ -21,6 +21,8 @@ use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
  *
  * @method $this setContactId(int|null $contactId)
  * @method int|null getContactId()
+ * @method $this setContact(array|null $contact)
+ * @method array|null getContact()
  */
 class GenericWorkflowMessage implements WorkflowMessageInterface {
 
@@ -49,9 +51,41 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
   /**
    * The contact receiving this message.
    *
-   * @var int
+   * @var int|null
    * @scope tokenContext
+   * @fkEntity Contact
    */
   protected $contactId;
+
+  /**
+   * @var array|null
+   * @scope tokenContext
+   */
+  protected $contact;
+
+  /**
+   * Must provide either 'int $contactId' or 'array $contact'
+   *
+   * @param array $errors
+   * @see ReflectiveWorkflowTrait::validate()
+   */
+  protected function validateExtra_contact(array &$errors) {
+    if (empty($this->contactId) && empty($this->contact['id'])) {
+      $errors[] = [
+        'severity' => 'error',
+        'fields' => ['contactId', 'contact'],
+        'name' => 'missingContact',
+        'message' => ts('Message template requires one of these fields (%1)', ['contactId, contact']),
+      ];
+    }
+    if (!empty($this->contactId) && !empty($this->contact)) {
+      $errors[] = [
+        'severity' => 'warning',
+        'fields' => ['contactId', 'contact'],
+        'name' => 'missingContact',
+        'message' => ts('Passing both (%1) may lead to ambiguous behavior.', ['contactId, contact']),
+      ];
+    }
+  }
 
 }
