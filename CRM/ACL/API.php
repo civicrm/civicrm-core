@@ -156,12 +156,7 @@ class CRM_ACL_API {
       $contactID = CRM_Core_Session::getLoggedInContactID();
     }
 
-    if (!$contactID) {
-      // anonymous user
-      $contactID = 0;
-    }
-
-    return CRM_ACL_BAO_ACL::group($type, $contactID, $tableName, $allGroups, $includedGroups);
+    return CRM_ACL_BAO_ACL::group($type, (int) $contactID, $tableName, $allGroups, $includedGroups);
   }
 
   /**
