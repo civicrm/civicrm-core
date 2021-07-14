@@ -314,7 +314,7 @@ SELECT g.*
    * @param int $contactID
    * @param string $tableName
    * @param null $allGroups
-   * @param null $includedGroups
+   * @param null $additionalPermittedGroups
    *
    * @return array
    */
@@ -323,9 +323,9 @@ SELECT g.*
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL
+    $additionalPermittedGroups = []
   ) {
-    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, (array) $includedGroups)));
+    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, (array) $additionalPermittedGroups)));
     if (empty(Civi::$statics[__CLASS__]['permissioned_groups'])) {
       Civi::$statics[__CLASS__]['permissioned_groups'] = [];
     }
@@ -378,17 +378,11 @@ ORDER BY a.object_id
             break;
           }
         }
+        $ids = array_merge($ids, $additionalPermittedGroups);
         $cache->set($cacheKey, $ids);
       }
     }
 
-    if (empty($ids) && !empty($includedGroups) &&
-      is_array($includedGroups)
-    ) {
-      // This is pretty alarming - we 'sometimes' include all included groups
-      // seems problematic per https://lab.civicrm.org/dev/core/-/issues/1879
-      $ids = $includedGroups;
-    }
     if ($contactID) {
       $groupWhere = '';
       if (!empty($allGroups)) {
