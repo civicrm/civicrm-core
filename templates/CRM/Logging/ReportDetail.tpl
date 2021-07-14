@@ -9,6 +9,7 @@
 *}
 <div class="crm-block crm-content-block crm-report-form-block">
   {if $rows}
+    {* todo: Is `raw` ever assigned to the template and why would it make a difference as to whether this div is present? The revert confirmation is handled (awkwardly) lower down by javascript $revertConfirm *}
     {if $raw}
       <div class="status">
         <dl>

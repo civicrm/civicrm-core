@@ -103,9 +103,9 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     }
 
     $this->_columnHeaders = [
-      'field' => ['title' => ts('Field')],
-      'from' => ['title' => ts('Changed From')],
-      'to' => ['title' => ts('Changed To')],
+      'field' => ['title' => ts('Field'), 'type' => CRM_Utils_Type::T_STRING],
+      'from' => ['title' => ts('Changed From'), 'type' => CRM_Utils_Type::T_STRING],
+      'to' => ['title' => ts('Changed To'), 'type' => CRM_Utils_Type::T_STRING],
     ];
   }
 
