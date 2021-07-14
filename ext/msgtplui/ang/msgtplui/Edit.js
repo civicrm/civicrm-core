@@ -245,11 +245,11 @@
     // Ex: $rootScope.$emit('previewMsgTpl', {revisionName: 'txDraft', formatName: 'msg_text'})
     function onPreview(event, args) {
       var defaults = {
-        exampleName: 'fix-this-example',
-        examples: [
-          {id: 0, name: 'fix-this-example', label: ts('Fix this example')},
-          {id: 1, name: 'another-example', label: ts('Another example')}
-        ],
+        // exampleName: 'fix-this-example',
+        // examples: [
+        //   {id: 0, name: 'fix-this-example', title: ts('Fix this example')},
+        //   {id: 1, name: 'another-example', title: ts('Another example')}
+        // ],
         formatName: 'msg_html',
         formats: [
           {id: 0, name: 'msg_html', label: ts('HTML')},
@@ -264,16 +264,33 @@
         }, []),
         title: ts('Preview')
       };
-      var model = angular.extend({}, defaults, args);
-      var options = CRM.utils.adjustDialogDefaults({
-        dialogClass: 'msgtplui-dialog',
-        autoOpen: false,
-        height: '90%',
-        width: '90%'
+
+      crmApi4('WorkflowMessageExample', 'get', {
+        // FIXME: workflow name
+        where: [["tags", "CONTAINS", "preview"], ["workflow", "=", "case_activity"]],
+        limit: 25
+      }).then(function(workflowMessageExamples) {
+        defaults.exampleName = workflowMessageExamples.length > 0  ? workflowMessageExamples[0].name : null;
+        var i = 0;
+        angular.forEach(workflowMessageExamples, function(ex) {
+          ex.id = i++;
+        });
+        defaults.examples = workflowMessageExamples;
+
+        var model = angular.extend({}, defaults, args);
+        var options = CRM.utils.adjustDialogDefaults({
+          dialogClass: 'msgtplui-dialog',
+          autoOpen: false,
+          height: '90%',
+          width: '90%'
+        });
+        return dialogService.open('previewMsgDlg', '~/msgtplui/Preview.html', model, options)
+          // Nothing to do but hide warnings. The field was edited live.
+          .then(function(){}, function(){});
+      }, function(failure) {
+        // handle failure
       });
-      return dialogService.open('previewMsgDlg', '~/msgtplui/Preview.html', model, options)
-        // Nothing to do but hide warnings. The field was edited live.
-        .then(function(){}, function(){});
+
     }
     $rootScope.$on('previewMsgTpl', onPreview);
     $rootScope.$on('$destroy', function (){
