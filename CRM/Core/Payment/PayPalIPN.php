@@ -70,13 +70,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $recur, $contribution, $first) {
-    if (!isset($input['txnType'])) {
-      Civi::log()->debug('PayPalIPN: Could not find txn_type in input request');
-      echo "Failure: Invalid parameters<p>";
-      return;
-    }
-
-    if ($input['txnType'] === 'subscr_payment' &&
+    if ($this->getTrxnType() === 'subscr_payment' &&
       $input['paymentStatus'] !== 'Completed'
     ) {
       Civi::log()->debug('PayPalIPN: Ignore all IPN payments that are not completed');
@@ -94,9 +88,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $now = date('YmdHis');
 
     // set transaction type
-    $txnType = $this->getTrxnType();
     $contributionStatuses = array_flip(CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate'));
-    switch ($txnType) {
+    switch ($this->getTrxnType()) {
       case 'subscr_signup':
         $recur->create_date = $now;
         // sometimes subscr_signup response come after the subscr_payment and set to pending mode.
@@ -151,7 +144,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     $recur->save();
 
-    if ($txnType !== 'subscr_payment') {
+    if ($this->getTrxnType() !== 'subscr_payment') {
       return;
     }
 
@@ -336,7 +329,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function getInput(&$input) {
     $billingID = CRM_Core_BAO_LocationType::getBilling();
-    $input['txnType'] = $this->retrieve('txn_type', 'String', FALSE);
     $input['paymentStatus'] = $this->retrieve('payment_status', 'String', FALSE);
     $input['invoice'] = $this->retrieve('invoice', 'String', TRUE);
     $input['amount'] = $this->retrieve('mc_gross', 'Money', FALSE);
@@ -428,8 +420,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    */
   protected function getTrxnType() {
-    $txnType = $this->retrieve('txn_type', 'String');
-    return $txnType;
+    return $this->retrieve('txn_type', 'String');
   }
 
   /**
