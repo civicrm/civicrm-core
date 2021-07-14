@@ -13,6 +13,7 @@
 namespace Civi\WorkflowMessage;
 
 use Civi\Schema\Traits\MagicGetterSetterTrait;
+use Civi\WorkflowMessage\Traits\AddressingTrait;
 use Civi\WorkflowMessage\Traits\FinalHelperTrait;
 use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
 
@@ -35,6 +36,9 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
 
   // Implement assertValid(), renderTemplate(), sendTemplate() - Sugary stub methods that delegate to real APIs.
   use FinalHelperTrait;
+
+  // Implement setTo(), setReplyTo(), etc
+  use AddressingTrait;
 
   /**
    * WorkflowMessage constructor.
