@@ -156,10 +156,10 @@ function ckeditor4_civicrm_buildForm($formName, $form) {
         'value' => 1,
       ]
     );
+    CRM_Core_Region::instance('form-bottom')->add([
+      'template' => 'CRM/Admin/Form/Preferences/Ckeditor.tpl',
+    ]);
   }
-  CRM_Core_Region::instance('form-bottom')->add([
-    'template' => 'CRM/Admin/Form/Preferences/Ckeditor.tpl',
-  ]);
 }
 
 function ckeditor4_civicrm_coreResourceList(&$list, $region) {
