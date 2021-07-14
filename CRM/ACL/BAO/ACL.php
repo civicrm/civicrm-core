@@ -313,8 +313,12 @@ SELECT g.*
    * @param int $type
    * @param int $contactID
    * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
+   * @param array $allGroups
+   *   Array of groups keyed by group_id (values are ignored)
+   * @param array $forceGroups
+   *   Array of group ids (as values, keys are ignored)
+   *   Supplying these will short-circuit acl checks and force these groups to be returned.
+   *   But hooks will still be called first.
    *
    * @return array
    */
@@ -323,73 +327,68 @@ SELECT g.*
     $contactID = NULL,
     $tableName = 'civicrm_saved_search',
     $allGroups = NULL,
-    $includedGroups = NULL
+    $forceGroups = NULL
   ) {
-    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_merge((array) $allGroups, (array) $includedGroups)));
-    if (empty(Civi::$statics[__CLASS__]['permissioned_groups'])) {
-      Civi::$statics[__CLASS__]['permissioned_groups'] = [];
-    }
+    $userCacheKey = "{$contactID}_{$type}_{$tableName}_" . CRM_Core_Config::domainID() . '_' . md5(implode(',', array_keys((array) $allGroups)) . '_' . implode(',', array_keys((array) $forceGroups)));
+
     if (!empty(Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey])) {
       return Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey];
     }
 
-    if ($allGroups == NULL) {
-      $allGroups = CRM_Contact_BAO_Contact::buildOptions('group_id', 'get');
+    if ($forceGroups) {
+      $ids = $forceGroups;
     }
+    else {
+      if ($allGroups == NULL && $tableName === 'civicrm_saved_search') {
+        $allGroups = CRM_Contact_BAO_Contact::buildOptions('group_id', 'get');
+      }
+      $acls = CRM_ACL_BAO_Cache::build($contactID);
+      $ids = [];
+      if (!empty($acls)) {
+        $aclKeys = array_keys($acls);
+        $aclKeys = implode(',', $aclKeys);
 
-    $acls = CRM_ACL_BAO_Cache::build($contactID);
-
-    $ids = [];
-    if (!empty($acls)) {
-      $aclKeys = array_keys($acls);
-      $aclKeys = implode(',', $aclKeys);
-
-      $cacheKey = CRM_Utils_Cache::cleanKey("$type-$tableName-$aclKeys");
-      $cache = CRM_Utils_Cache::singleton();
-      $ids = $cache->get($cacheKey);
-      if (!is_array($ids)) {
-        $ids = [];
-        $query = "
-SELECT   a.operation, a.object_id
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = %1
-   AND   a.id        IN ( $aclKeys )
-GROUP BY a.operation,a.object_id
-ORDER BY a.object_id
-";
-        $params = [1 => [$tableName, 'String']];
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
-        while ($dao->fetch()) {
-          if ($dao->object_id) {
-            if (self::matchType($type, $dao->operation)) {
-              $ids[] = $dao->object_id;
-            }
-          }
-          else {
-            // this user has got the permission for all objects of this type
-            // check if the type matches
-            if (self::matchType($type, $dao->operation)) {
-              foreach ($allGroups as $id => $dontCare) {
-                $ids[] = $id;
+        $cacheKey = CRM_Utils_Cache::cleanKey("$type-$tableName-$aclKeys");
+        $cache = CRM_Utils_Cache::singleton();
+        $ids = $cache->get($cacheKey);
+        if (!is_array($ids)) {
+          $ids = [];
+          $query = "
+  SELECT   a.operation, a.object_id
+    FROM   civicrm_acl_cache c, civicrm_acl a
+   WHERE   c.acl_id       =  a.id
+     AND   a.is_active    =  1
+     AND   a.object_table = %1
+     AND   a.id        IN ( $aclKeys )
+  GROUP BY a.operation,a.object_id
+  ORDER BY a.object_id
+  ";
+          $params = [1 => [$tableName, 'String']];
+          $dao = CRM_Core_DAO::executeQuery($query, $params);
+          while ($dao->fetch()) {
+            if ($dao->object_id) {
+              if (self::matchType($type, $dao->operation)) {
+                $ids[] = $dao->object_id;
               }
             }
-            break;
+            else {
+              // this user has got the permission for all objects of this type
+              // check if the type matches
+              if (self::matchType($type, $dao->operation)) {
+                foreach ($allGroups as $id => $dontCare) {
+                  $ids[] = $id;
+                }
+              }
+              break;
+            }
           }
+          $cache->set($cacheKey, $ids);
         }
-        $cache->set($cacheKey, $ids);
       }
     }
 
-    if (empty($ids) && !empty($includedGroups) &&
-      is_array($includedGroups)
-    ) {
-      // This is pretty alarming - we 'sometimes' include all included groups
-      // seems problematic per https://lab.civicrm.org/dev/core/-/issues/1879
-      $ids = $includedGroups;
-    }
-    if ($contactID) {
+    // Contacts create hidden groups from search results. They should be able to retrieve their own.
+    if ($contactID && $tableName === 'civicrm_saved_search') {
       $groupWhere = '';
       if (!empty($allGroups)) {
         $groupWhere = " AND id IN (" . implode(',', array_keys($allGroups)) . ")";
@@ -403,7 +402,6 @@ ORDER BY a.object_id
         $ownHiddenGroups = explode(',', $ownHiddenGroupsList);
         $ids = array_merge((array) $ids, $ownHiddenGroups);
       }
-
     }
 
     CRM_Utils_Hook::aclGroup($type, $contactID, $tableName, $allGroups, $ids);
