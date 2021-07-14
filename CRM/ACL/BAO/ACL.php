@@ -91,11 +91,12 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    *
    * @throws \CRM_Core_Exception
    */
-  public static function getAllByContact(?int $contact_id): array {
+  public static function getAllByContact(int $contact_id): array {
     $result = [];
 
     /* First, the contact-specific ACLs, including ACL Roles */
-    if ($contact_id) {
+    // 0 would be the anonymous contact.
+    if ($contact_id > 0) {
       $query = " SELECT acl.*
       FROM civicrm_acl acl
       WHERE   acl.entity_table   = 'civicrm_contact'
