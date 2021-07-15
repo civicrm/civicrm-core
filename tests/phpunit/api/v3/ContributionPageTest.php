@@ -1088,7 +1088,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $dummyPP->setDoDirectPaymentResult(['payment_status_id' => 1, 'trxn_id' => 'create_first_success']);
     $submitParams = array_merge($this->getSubmitParamsContributionPlusMembership(TRUE), [
       'is_recur' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
     ]);

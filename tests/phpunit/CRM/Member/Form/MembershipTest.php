@@ -783,7 +783,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'id' => $this->ids['membership_type']['AnnualFixed'],
       'duration_unit' => 'month',
       'duration_interval' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
     ]);
     $params = $this->getBaseSubmitParams();
     // Change financial_type_id to test our override flows through to the line item.
@@ -1064,7 +1064,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'id' => $this->ids['membership_type']['AnnualFixed'],
       'duration_unit' => 'month',
       'duration_interval' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
     ]);
     $form = $this->getForm($this->getBaseSubmitParams());
     $this->createLoggedInUser();

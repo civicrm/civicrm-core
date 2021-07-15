@@ -268,7 +268,7 @@
   </field>
   <field>
     <name>auto_renew</name>
-    <type>boolean</type>
+    <type>tinyint</type>
     <default>0</default>
     <html>
       <type>Radio</type>

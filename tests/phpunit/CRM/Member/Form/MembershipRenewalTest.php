@@ -262,7 +262,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
       'duration_interval' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
     ]);
     $form = $this->getForm([
       'contact_id' => $this->_individualId,
@@ -359,7 +359,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
       'duration_interval' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
     ]);
     $this->createLoggedInUser();
     $form = $this->getForm(array_merge($this->getBaseSubmitParams(), ['is_recur' => 1, 'auto_renew' => '1']));
@@ -446,7 +446,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'id' => $this->membershipTypeAnnualFixedID,
       'duration_unit' => 'month',
       'duration_interval' => 1,
-      'auto_renew' => TRUE,
+      'auto_renew' => 1,
     ]);
     $this->createLoggedInUser();
     $form = $this->getForm(array_merge($this->getBaseSubmitParams(), [
