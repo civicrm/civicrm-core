@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
 use api\v4\Traits\TableDropperTrait;
+use Civi\Api4\CustomGroup;
 
 abstract class BaseCustomValueTest extends UnitTestCase {
 
@@ -34,15 +35,16 @@ abstract class BaseCustomValueTest extends UnitTestCase {
    */
   public function setUp(): void {
     $this->setUpOptionCleanup();
-    $cleanup_params = [
-      'tablesToTruncate' => [
-        'civicrm_custom_group',
-        'civicrm_custom_field',
-      ],
-    ];
+  }
 
-    $this->dropByPrefix('civicrm_value_my');
-    $this->cleanup($cleanup_params);
+  /**
+   * Delete all created options groups.
+   *
+   * @throws \API_Exception
+   */
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    parent::tearDown();
   }
 
 }
