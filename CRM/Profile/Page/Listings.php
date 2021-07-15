@@ -281,7 +281,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       $ufgroupDAO = new CRM_Core_DAO_UFGroup();
       $ufgroupDAO->id = $this->_gid;
       if (!$ufgroupDAO->find(TRUE)) {
-        CRM_Core_Error::statusBounce('Unable to find matching UF Group');
+        CRM_Core_Error::statusBounce(ts('Unable to find matching UF Group'));
       }
     }
 

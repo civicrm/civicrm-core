@@ -80,7 +80,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   public function buildQuickForm() {
     $ufGroupId = $this->get('ufGroupId');
     if (!$ufGroupId) {
-      CRM_Core_Error::statusBounce('ufGroupId is missing');
+      CRM_Core_Error::statusBounce(ts('ufGroupId is missing'));
     }
 
     $this->_title = ts('Update multiple participants') . ' - ' . CRM_Core_BAO_UFGroup::getTitle($ufGroupId);

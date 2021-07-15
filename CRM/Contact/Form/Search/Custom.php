@@ -37,7 +37,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
       ) = CRM_Contact_BAO_SearchCustom::details($csID, $ssID, $gID);
 
     if (!$this->_customSearchID) {
-      CRM_Core_Error::statusbounce('Could not get details for custom search.');
+      CRM_Core_Error::statusbounce(ts('Could not get details for custom search.'));
     }
 
     // stash this as a hidden element so we can potentially go there if the session

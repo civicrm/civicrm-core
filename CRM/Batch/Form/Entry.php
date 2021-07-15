@@ -314,7 +314,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $offset = 50;
     if ((count($this->_elementIndex) + $offset) > ini_get("max_input_vars")) {
       // Avoiding 'ts' for obscure messages.
-      CRM_Core_Error::statusBounce('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')');
+      CRM_Core_Error::statusBounce(ts('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = %1)', [1 => ini_get("max_input_vars")]));
     }
 
     $this->assign('fields', $this->_fields);
