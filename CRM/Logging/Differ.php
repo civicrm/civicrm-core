@@ -290,6 +290,7 @@ WHERE lt.log_conn_id = %1
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('title', FALSE),
           'priority_id' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
+          'record_type_id' => CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'get'),
         ];
 
         // for columns that appear in more than 1 table
