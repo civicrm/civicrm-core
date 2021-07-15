@@ -52,7 +52,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $this->getInput($input);
 
       // load post ids in $ids
-      $this->getIDs($ids, $input);
+      $this->getIDs($ids);
       $paymentProcessorID = $this->getPaymentProcessorID();
 
       // Check if the contribution exists
@@ -71,7 +71,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         throw new CRM_Core_Exception("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
       }
       // do a subscription check
-      if ($contributionRecur->processor_id != $input['subscription_id']) {
+      if ($contributionRecur->processor_id != $this->getRecurProcessorID()) {
         throw new CRM_Core_Exception('Unrecognized subscription.');
       }
 
@@ -167,7 +167,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    */
   public function getInput(&$input) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
-    $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
     $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
     $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
@@ -205,13 +204,12 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * Get ids from input.
    *
    * @param array $ids
-   * @param array $input
    *
    * @throws \CRM_Core_Exception
    */
-  public function getIDs(&$ids, $input) {
+  public function getIDs(&$ids): void {
     $ids['contribution'] = $this->getContributionID();
-    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
+    $contributionRecur = $this->getContributionRecurObject($this->getRecurProcessorID(), (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
     $ids['contributionRecur'] = (int) $contributionRecur->id;
   }
 
