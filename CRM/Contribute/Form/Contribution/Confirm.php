@@ -1105,9 +1105,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       $contribution = CRM_Contribute_BAO_Contribution::add($contributionParams);
 
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = $invoiceSettings['invoicing'] ?? NULL;
-      if ($invoicing) {
+      if (Civi::settings()->get('invoicing')) {
         $dataArray = [];
         // @todo - interrogate the line items passed in on the params array.
         // No reason to assume line items will be set on the form.
