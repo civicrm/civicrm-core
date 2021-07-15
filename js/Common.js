@@ -584,11 +584,12 @@ if (!CRM.vars) CRM.vars = {};
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
           url: CRM.url('civicrm/ajax/rest'),
-          quietMillis: 300,
-          data: function (input, page_num) {
+          delay: 300,
+          dataType: 'json',
+          data: function (input) {
             var params = getEntityRefApiParams($el);
-            params.input = input;
-            params.page_num = page_num;
+            params.input = input.term;
+            params.page_num = input.page;
             return {
               entity: $el.data('api-entity'),
               action: 'getlist',
@@ -603,10 +604,10 @@ if (!CRM.vars) CRM.vars = {};
         templateResult: CRM.utils.formatSelect2Result,
         templateSelection: formatEntityRefSelection,
         escapeMarkup: _.identity,
-        current: function(callback) {
+        initSelection: function(callback) {
           var
             multiple = !!$el.data('select-params').multiple,
-            val = $el.val(),
+            val = $el.val() || '',
             stored = ($el.data('entity-value') || []).concat(staticItems);
           if (val === '') {
             return;
@@ -662,7 +663,7 @@ if (!CRM.vars) CRM.vars = {};
       else {
         selectParams.language = {
           noResults: function() {
-            var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.formatInputTooShort.call(this);
+            var txt = $el.data('select-params').formatInputTooShort || $.fn.select2.defaults.inputTooShort.call(this);
             txt += entityRefFiltersMarkup($el) + staticItemMarkup() + renderEntityRefCreateLinks($el);
             return txt;
           },

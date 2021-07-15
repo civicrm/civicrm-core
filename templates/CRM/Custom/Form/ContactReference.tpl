@@ -21,9 +21,9 @@
       multiple: !!$field.attr('multiple'),
       ajax: {
         url: {/literal}"{$customUrls.$element_name}"{literal},
-        quietMillis: 300,
-        data: function(term) {
-          return {term: term};
+        delay: 300,
+        data: function(params) {
+          return {term: params.term};
         },
         results: function(response) {
           return {results: response};

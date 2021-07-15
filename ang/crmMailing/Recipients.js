@@ -203,18 +203,18 @@
           },
           ajax: {
             url: CRM.url('civicrm/ajax/rest'),
-            quietMillis: 300,
-            data: function(input, page_num) {
-              if (page_num <= 1) {
+            delay: 300,
+            data: function(input) {
+              if (input.page <= 1) {
                 rcpAjaxState = {
-                  input: input,
+                  input: input.term,
                   entity: 'civicrm_group',
                   type: 'include',
                   page_n: 0,
                 };
               }
 
-              rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
+              rcpAjaxState.page_i = input.page - rcpAjaxState.page_n;
               var filterParams = {};
               switch(rcpAjaxState.entity) {
               case 'civicrm_group':
@@ -226,7 +226,7 @@
                 break;
               }
               var params = {
-                input: input,
+                input: input.term,
                 page_num: rcpAjaxState.page_i,
                 params: filterParams,
               };
