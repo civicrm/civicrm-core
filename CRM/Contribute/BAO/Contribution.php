@@ -130,16 +130,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
       CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
     }
-    if (!$contributionStatusID) {
-      // Since the fee amount is expecting this (later on) ensure it is always set.
-      // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', [
-        'id' => $contributionID,
-        'return' => 'contribution_status_id',
-      ]);
-    }
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
-
     if (!$contributionID
       && !empty($params['membership_id'])
       && Civi::settings()->get('deferred_revenue_enabled')
@@ -222,7 +212,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     //add Account details
     $params['contribution'] = $contribution;
-    if (empty($params['is_post_payment_create'])) {
+    if (!self::isSkipRecordFinancialAccounts($params)) {
       // If this is being called from the Payment.create api/ BAO then that Entity
       // takes responsibility for the financial transactions. In fact calling Payment.create
       // to add payments & having it call completetransaction and / or contribution.create
@@ -230,10 +220,19 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // Note that leveraging this parameter for any other code flow is not supported and
       // is likely to break in future and / or cause serious problems in your data.
       // https://github.com/civicrm/civicrm-core/pull/14673
+      if (!$contributionStatusID) {
+        // Since the fee amount is expecting this (later on) ensure it is always set.
+        // It would only not be set for an update where it is unchanged.
+        $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', [
+          'id' => $contributionID,
+          'return' => 'contribution_status_id',
+        ]);
+      }
       self::recordFinancialAccounts($params);
     }
 
     if (self::isUpdateToRecurringContribution($params)) {
+      $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
         (!empty($params['contribution_recur_id']) ? $params['contribution_recur_id'] : $params['prevContribution']->contribution_recur_id),
         $contributionStatus,
@@ -1369,6 +1368,38 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'pledge_id' => $pledgePayment['pledge_id'],
       ])->addWhere('id', '=', $pledgePayment['id'])->execute();
     }
+  }
+
+  /**
+   * Is this an update which does not involve financial records.
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  protected static function isSkipRecordFinancialAccounts(array $params): bool {
+    if (!empty($params['is_post_payment_create'])) {
+      return TRUE;
+    }
+    $potentiallyFinancialFields = [
+      'total_amount',
+      'fee_amount',
+      'non_deductible_amount',
+      'net_amount',
+      'tax_amount',
+      'revenue_recognition_date',
+      'financial_type_id',
+      'payment_instrument_id',
+      'contribution_status_id',
+      'line_items',
+      'batch_id',
+    ];
+    foreach ($potentiallyFinancialFields as $fieldName) {
+      if (isset($params[$fieldName])) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
@@ -3655,7 +3686,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      CRM_Price_BAO_LineItem::processPriceSet($entityId, CRM_Utils_Array::value('line_item', $params), $params['contribution'], $entityTable, $isUpdate);
+      CRM_Price_BAO_LineItem::processPriceSet($entityId, $params['line_item'], $params['contribution'], $entityTable, $isUpdate);
     }
 
     // create batch entry if batch_id is passed and
