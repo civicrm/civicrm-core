@@ -12,7 +12,14 @@
 
 namespace Civi\Api4\Service\Spec;
 
+use Civi\Schema\Traits\BasicSpecTrait;
+
 class FieldSpec {
+
+  // BasicSpecTrait: name, title, description
+  use BasicSpecTrait;
+
+
   /**
    * @var mixed
    */
@@ -21,17 +28,7 @@ class FieldSpec {
   /**
    * @var string
    */
-  public $name;
-
-  /**
-   * @var string
-   */
   public $label;
-
-  /**
-   * @var string
-   */
-  public $title;
 
   /**
    * @var string
@@ -42,11 +39,6 @@ class FieldSpec {
    * @var string
    */
   public $entity;
-
-  /**
-   * @var string
-   */
-  public $description;
 
   /**
    * @var bool
@@ -187,24 +179,6 @@ class FieldSpec {
   /**
    * @return string
    */
-  public function getName() {
-    return $this->name;
-  }
-
-  /**
-   * @param string $name
-   *
-   * @return $this
-   */
-  public function setName($name) {
-    $this->name = $name;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
   public function getLabel() {
     return $this->label;
   }
@@ -216,24 +190,6 @@ class FieldSpec {
    */
   public function setLabel($label) {
     $this->label = $label;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getTitle() {
-    return $this->title;
-  }
-
-  /**
-   * @param string $title
-   *
-   * @return $this
-   */
-  public function setTitle($title) {
-    $this->title = $title;
 
     return $this;
   }
@@ -254,24 +210,6 @@ class FieldSpec {
    */
   public function getEntity() {
     return $this->entity;
-  }
-
-  /**
-   * @return string
-   */
-  public function getDescription() {
-    return $this->description;
-  }
-
-  /**
-   * @param string $description
-   *
-   * @return $this
-   */
-  public function setDescription($description) {
-    $this->description = $description;
-
-    return $this;
   }
 
   /**
