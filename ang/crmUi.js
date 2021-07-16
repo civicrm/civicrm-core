@@ -636,14 +636,16 @@
     // Use a select2 widget as a pick-list. Instead of updating ngModel, the select2 widget will fire an event.
     // This similar to ngModel+ngChange, except that value is never stored in a model. It is only fired in the event.
     // usage: <select crm-ui-select='{...}' on-crm-ui-select="alert("User picked this item: " + selection)"></select>
-    .directive('onCrmUiSelect', function ($parse) {
+    .directive('onCrmUiSelect', function () {
       return {
         priority: 10,
         link: function (scope, element, attrs) {
           element.on('select2-selecting', function(e) {
             e.preventDefault();
             element.select2('close').select2('val', '');
-            scope.$parent.$eval(attrs.onCrmUiSelect, {selection: e.val});
+            scope.$apply(function() {
+              scope.$eval(attrs.onCrmUiSelect, {selection: e.val});
+            });
           });
         }
       };
