@@ -234,7 +234,29 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   public function useHelloFirstNameStatus() {
     $this->schedule->subject = 'Hello, {contact.first_name}. @{contribution.status}. (via subject)';
     $this->schedule->body_html = '<p>Hello, {contact.first_name}. @{contribution.status}. (via body_html)</p>';
-    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status}. (via body_text)';
+    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status} (via body_text)';
+  }
+
+  public function testTokenRendering() {
+    $this->targetDate = '20150201000107';
+    \CRM_Utils_Time::setTime('2015-02-01 00:00:00');
+    $this->addAliceDues();
+    $this->scheduleForAny();
+    $this->startOnTime();
+    $this->schedule->save();
+    $this->schedule->body_text = '
+      first name = {contact.first_name}
+      receive_date = {contribution.receive_date}
+      contribution status id = {contribution.contribution_status_id}
+      legacy style status = {contribution.status}';
+    $this->schedule->save();
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $this->mut->checkMailLog([
+      'first name = Alice',
+      'receive_date = February 1st, 2015 12:00 AM',
+      'contribution status id = 1',
+      'legacy style status = Completed',
+    ]);
   }
 
 }

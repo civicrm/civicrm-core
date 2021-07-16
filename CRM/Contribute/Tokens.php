@@ -43,6 +43,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       'receipt_date',
       'thankyou_date',
       'tax_amount',
+      'contribution_status_id',
     ];
   }
 
@@ -63,6 +64,21 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get tokens supporting the syntax we are migrating to.
+   *
+   * In general these are tokens that were not previously supported
+   * so we can add them in the preferred way or that we have
+   * undertaken some, as yet to be written, db update.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/2650
+   *
+   * @return string[]
+   */
+  protected function getBasicTokens(): array {
+    return ['contribution_status_id' => ts('Contribution Status ID')];
+  }
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -73,6 +89,9 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
     $tokens['id'] = ts('Contribution ID');
     $tokens['payment_instrument'] = ts('Payment Instrument');
     $tokens['source'] = ts('Contribution Source');
+    // Per https://lab.civicrm.org/dev/core/-/issues/2650
+    // the intent is to deprecate this field in favour of
+    // {contribution.contribution_status_id:label}
     $tokens['status'] = ts('Contribution Status');
     $tokens['type'] = ts('Financial Type');
     $tokens = array_merge($tokens, CRM_Utils_Token::getCustomFieldTokens('Contribution'));
@@ -122,11 +141,17 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       return $row->format('text/plain')->tokens($entity, $field,
         \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
     }
-    elseif (isset($aliasTokens[$field])) {
+    if (isset($aliasTokens[$field])) {
       $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $aliasTokens[$field], $fieldValue);
     }
     elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
       $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+    }
+    elseif (in_array($field, array_keys($this->getBasicTokens()))) {
+      // For now we just ensure that the label fields do not override the
+      // id field here.
+      // Later we will add support for contribution_status_id:label
+      $row->tokens($entity, $field, $fieldValue);
     }
     else {
       $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
