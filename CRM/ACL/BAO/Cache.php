@@ -54,7 +54,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
    *
    * @return array
    */
-  public static function retrieve($id) {
+  protected static function retrieve($id) {
     $query = "
 SELECT acl_id
   FROM civicrm_acl_cache
@@ -81,7 +81,7 @@ SELECT acl_id
    * @param array $cache - key civicrm_acl.id - values is the details of the ACL.
    *
    */
-  public static function store($id, &$cache) {
+  protected static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
       $dao = new CRM_ACL_BAO_Cache();
       if ($id) {
