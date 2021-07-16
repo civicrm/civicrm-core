@@ -113,7 +113,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         if (empty($apiParams['having'])) {
           $apiParams['select'] = [];
         }
-        if (!in_array($this->return, $apiParams)) {
+        if (!in_array($this->return, $apiParams['select'], TRUE)) {
           $apiParams['select'][] = $this->return;
         }
         unset($apiParams['orderBy'], $apiParams['limit']);
