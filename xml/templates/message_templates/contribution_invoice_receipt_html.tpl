@@ -21,9 +21,9 @@
         </tr>
         <tr>
           {if $organization_name}
-            <td><font size="1" align="center">{$display_name}  ({$organization_name})</font></td>
+            <td><font size="1" align="center">{contact.display_name}  ({$organization_name})</font></td>
           {else}
-            <td><font size="1" align="center">{$display_name}</font></td>
+            <td><font size="1" align="center">{contact.display_name}</font></td>
           {/if}
           <td><font size="1" align="right">{$invoice_date}</font></td>
           <td style="white-space: nowrap">
@@ -188,7 +188,7 @@
               <table cellpadding="5" cellspacing="0"  width="100%" border="0">
                 <tr>
                   <td width="100%"><font size="1" align="right" style="font-weight:bold;">{ts}Customer:{/ts}</font></td>
-                  <td style="white-space: nowrap"><font size="1" align="right">{$display_name}</font></td>
+                  <td style="white-space: nowrap"><font size="1" align="right">{contact.display_name}</font></td>
                 </tr>
                 <tr>
                   <td><font size="1" align="right" style="font-weight:bold;">{ts}Invoice Number:{/ts}</font></td>
@@ -234,9 +234,9 @@
         </tr>
         <tr>
           {if $organization_name}
-            <td style="padding-left:17px;"><font size="1" align="center">{$display_name}  ({$organization_name})</font></td>
+            <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}  ({$organization_name})</font></td>
           {else}
-            <td style="padding-left:17px;"><font size="1" align="center">{$display_name}</font></td>
+            <td style="padding-left:17px;"><font size="1" align="center">{contact.display_name}</font></td>
           {/if}
           <td style="padding-left:30px;"><font size="1" align="right">{$invoice_date}</font></td>
           <td>
@@ -408,7 +408,7 @@
               <tr>
                 <td colspan="2"></td>
                 <td><font size="1" align="right" style="font-weight:bold;">{ts}Customer:{/ts}</font></td>
-                <td><font size="1" align="right">{$display_name}</font></td>
+                <td><font size="1" align="right">{contact.display_name}</font></td>
               </tr>
               <tr>
                 <td colspan="2"></td>
