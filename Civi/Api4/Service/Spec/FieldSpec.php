@@ -13,22 +13,20 @@
 namespace Civi\Api4\Service\Spec;
 
 use Civi\Schema\Traits\BasicSpecTrait;
+use Civi\Schema\Traits\GuiSpecTrait;
 
 class FieldSpec {
 
   // BasicSpecTrait: name, title, description
   use BasicSpecTrait;
 
+  // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
+  use GuiSpecTrait;
 
   /**
    * @var mixed
    */
   public $defaultValue;
-
-  /**
-   * @var string
-   */
-  public $label;
 
   /**
    * @var string
@@ -71,16 +69,6 @@ class FieldSpec {
   public $dataType;
 
   /**
-   * @var string
-   */
-  public $inputType;
-
-  /**
-   * @var array
-   */
-  public $inputAttrs = [];
-
-  /**
    * @var string[]
    */
   public $operators;
@@ -94,16 +82,6 @@ class FieldSpec {
    * @var int
    */
   public $serialize;
-
-  /**
-   * @var string
-   */
-  public $helpPre;
-
-  /**
-   * @var string
-   */
-  public $helpPost;
 
   /**
    * @var array
@@ -172,24 +150,6 @@ class FieldSpec {
    */
   public function setDefaultValue($defaultValue) {
     $this->defaultValue = $defaultValue;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getLabel() {
-    return $this->label;
-  }
-
-  /**
-   * @param string $label
-   *
-   * @return $this
-   */
-  public function setLabel($label) {
-    $this->label = $label;
 
     return $this;
   }
@@ -309,40 +269,6 @@ class FieldSpec {
   }
 
   /**
-   * @return string
-   */
-  public function getInputType() {
-    return $this->inputType;
-  }
-
-  /**
-   * @param string $inputType
-   * @return $this
-   */
-  public function setInputType($inputType) {
-    $this->inputType = $inputType;
-
-    return $this;
-  }
-
-  /**
-   * @return array
-   */
-  public function getInputAttrs() {
-    return $this->inputAttrs;
-  }
-
-  /**
-   * @param array $inputAttrs
-   * @return $this
-   */
-  public function setInputAttrs($inputAttrs) {
-    $this->inputAttrs = $inputAttrs;
-
-    return $this;
-  }
-
-  /**
    * @param string[] $operators
    * @return $this
    */
@@ -426,20 +352,6 @@ class FieldSpec {
     $this->readonly = (bool) $readonly;
 
     return $this;
-  }
-
-  /**
-   * @param string|NULL $helpPre
-   */
-  public function setHelpPre($helpPre) {
-    $this->helpPre = is_string($helpPre) && strlen($helpPre) ? $helpPre : NULL;
-  }
-
-  /**
-   * @param string|NULL $helpPost
-   */
-  public function setHelpPost($helpPost) {
-    $this->helpPost = is_string($helpPost) && strlen($helpPost) ? $helpPost : NULL;
   }
 
   /**
