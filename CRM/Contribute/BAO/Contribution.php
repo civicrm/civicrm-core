@@ -4581,11 +4581,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       // erm, yes because? but, hey, it's tested.
       return $lineItemDetails['line_total'];
     }
-    elseif (empty($lineItemDetails['line_total'])) {
-      // follow legacy code path
-      CRM_Core_Error::deprecatedWarning('Deprecated bit of code, please log a ticket explaining how you got here!');
-      return $params['total_amount'];
-    }
     else {
       return self::getMultiplier($params['contribution']->contribution_status_id, $context) * ((float) $lineItemDetails['line_total']);
     }
