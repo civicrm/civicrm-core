@@ -14,6 +14,7 @@ namespace Civi\Api4\Service\Spec;
 
 use Civi\Schema\Traits\BasicSpecTrait;
 use Civi\Schema\Traits\GuiSpecTrait;
+use Civi\Schema\Traits\SqlSpecTrait;
 
 class FieldSpec {
 
@@ -22,6 +23,9 @@ class FieldSpec {
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
   use GuiSpecTrait;
+
+  // SqlSpecTrait tableName, columnName, operators, sqlFilters
+  use SqlSpecTrait;
 
   /**
    * @var mixed
@@ -54,11 +58,6 @@ class FieldSpec {
   public $options;
 
   /**
-   * @var string
-   */
-  public $tableName;
-
-  /**
    * @var callable
    */
   private $optionsCallback;
@@ -67,11 +66,6 @@ class FieldSpec {
    * @var string
    */
   public $dataType;
-
-  /**
-   * @var string[]
-   */
-  public $operators;
 
   /**
    * @var string
@@ -89,11 +83,6 @@ class FieldSpec {
   public $permission;
 
   /**
-   * @var string
-   */
-  public $columnName;
-
-  /**
    * @var bool
    */
   public $readonly = FALSE;
@@ -102,17 +91,6 @@ class FieldSpec {
    * @var callable[]
    */
   public $outputFormatters;
-
-  /**
-   * @var callable
-   */
-  public $sqlRenderer;
-
-  /**
-   * @var callable[]
-   */
-  public $sqlFilters;
-
 
   /**
    * Aliases for the valid data types
@@ -269,16 +247,6 @@ class FieldSpec {
   }
 
   /**
-   * @param string[] $operators
-   * @return $this
-   */
-  public function setOperators($operators) {
-    $this->operators = $operators;
-
-    return $this;
-  }
-
-  /**
    * @param callable[] $outputFormatters
    * @return $this
    */
@@ -302,39 +270,6 @@ class FieldSpec {
   }
 
   /**
-   * @param callable $sqlRenderer
-   * @return $this
-   */
-  public function setSqlRenderer($sqlRenderer) {
-    $this->sqlRenderer = $sqlRenderer;
-
-    return $this;
-  }
-
-  /**
-   * @param callable[] $sqlFilters
-   * @return $this
-   */
-  public function setSqlFilters($sqlFilters) {
-    $this->sqlFilters = $sqlFilters;
-
-    return $this;
-  }
-
-  /**
-   * @param callable $sqlFilter
-   * @return $this
-   */
-  public function addSqlFilter($sqlFilter) {
-    if (!$this->sqlFilters) {
-      $this->sqlFilters = [];
-    }
-    $this->sqlFilters[] = $sqlFilter;
-
-    return $this;
-  }
-
-  /**
    * @param string $type
    * @return $this
    */
@@ -352,23 +287,6 @@ class FieldSpec {
     $this->readonly = (bool) $readonly;
 
     return $this;
-  }
-
-  /**
-   * @param string $tableName
-   * @return $this
-   */
-  public function setTableName($tableName) {
-    $this->tableName = $tableName;
-
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getTableName() {
-    return $this->tableName;
   }
 
   /**
@@ -436,23 +354,6 @@ class FieldSpec {
   public function setFkEntity($fkEntity) {
     $this->fkEntity = $fkEntity;
 
-    return $this;
-  }
-
-  /**
-   * @return string|NULL
-   */
-  public function getColumnName(): ?string {
-    return $this->columnName;
-  }
-
-  /**
-   * @param string|null $columnName
-   *
-   * @return $this
-   */
-  public function setColumnName(?string $columnName) {
-    $this->columnName = $columnName;
     return $this;
   }
 
