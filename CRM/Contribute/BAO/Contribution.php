@@ -1141,7 +1141,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
       }
 
-      $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
+      $financialAccount = CRM_Contribute_BAO_FinancialProcessor::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
 
       $currency = $params['prevContribution']->currency;
       if ($params['contribution']->currency) {
@@ -4383,37 +4383,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       ];
       self::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
     }
-  }
-
-  /**
-   * Get the financial account for the item associated with the new transaction.
-   *
-   * @param array $params
-   * @param int $default
-   *
-   * @return int
-   */
-  public static function getFinancialAccountForStatusChangeTrxn($params, $default) {
-
-    if (!empty($params['financial_account_id'])) {
-      return $params['financial_account_id'];
-    }
-
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['contribution_status_id'], 'name');
-    $preferredAccountsRelationships = [
-      'Refunded' => 'Credit/Contra Revenue Account is',
-      'Chargeback' => 'Chargeback Account is',
-    ];
-
-    if (array_key_exists($contributionStatus, $preferredAccountsRelationships)) {
-      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
-      return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-        $financialTypeID,
-        $preferredAccountsRelationships[$contributionStatus]
-      );
-    }
-
-    return $default;
   }
 
   /**
