@@ -271,6 +271,57 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option.
+   *
+   * @param string $workflowName
+   * @param string $old
+   * @param string $new
+   */
+  public function replaceTokenInTemplate(string $workflowName, string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_msg_template
+      SET
+        msg_text = REPLACE(msg_text, '$oldToken', '$newToken'),
+        msg_subject = REPLACE(msg_subject, '$oldToken', '$newToken'),
+        msg_html = REPLACE(msg_html, '$oldToken', '$newToken')
+      WHERE workflow_name = '$workflowName'
+    ");
+  }
+
+  /**
+   * Get warnings for users if the replaced string is still present.
+   *
+   * This might be the case when used in an IF and for now we will recommend
+   * manual intervention.
+   *
+   * @param string $workflowName
+   * @param string $old
+   * @param string $new
+   *
+   * @return string
+   */
+  public function getMessageTemplateWarning(string $workflowName, string $old, string $new) {
+    if (CRM_Core_DAO::singleValueQuery("
+      SELECT COUNT(*)
+      FROM civicrm_msg_template
+      WHERE workflow_name = '$workflowName'
+      AND (
+        msg_html LIKE '%$old%'
+        OR msg_subject LIKE '%$old%'
+        OR civicrm_msg_template.msg_text LIKE '%$old%'
+      )
+    ")) {
+      return ts('Please review your %1 message template and remove references to the token %2 as it has been replaced by %3', [
+        1 => $workflowName,
+        2 => '{' . $old . '}',
+        3 => '{' . $new . '}',
+      ]);
+    }
+    return '';
+  }
+
+  /**
    * Get the upgrade messages.
    */
   public function getUpgradeMessages() {

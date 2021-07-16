@@ -229,7 +229,23 @@ class CRM_Upgrade_Incremental_Base {
   public static function updateMessageTemplates($ctx, $version) {
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messageTemplateObject->updateTemplates();
+  }
 
+  /**
+   * Updated a message token within a template.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $workflowName
+   * @param string $old
+   * @param string $new
+   * @param $version
+   *
+   * @return bool
+   */
+  public static function updateMessageToken($ctx, string $workflowName, string $old, string $new, $version):bool {
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageObj->replaceTokenInTemplate($workflowName, $old, $new);
+    return TRUE;
   }
 
   /**
