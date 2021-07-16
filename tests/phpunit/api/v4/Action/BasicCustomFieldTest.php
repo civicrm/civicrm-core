@@ -30,8 +30,10 @@ use Civi\Api4\RelationshipCache;
  */
 class BasicCustomFieldTest extends BaseCustomValueTest {
 
-  public function testWithSingleField() {
-
+  /**
+   * @throws \API_Exception
+   */
+  public function testWithSingleField(): void {
     $customGroup = CustomGroup::create(FALSE)
       ->addValue('name', 'MyIndividualFields')
       ->addValue('extends', 'Individual')
