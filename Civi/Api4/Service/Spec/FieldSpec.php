@@ -15,6 +15,7 @@ namespace Civi\Api4\Service\Spec;
 use Civi\Schema\Traits\BasicSpecTrait;
 use Civi\Schema\Traits\DataTypeSpecTrait;
 use Civi\Schema\Traits\GuiSpecTrait;
+use Civi\Schema\Traits\OptionsSpecTrait;
 use Civi\Schema\Traits\SqlSpecTrait;
 
 class FieldSpec {
@@ -24,6 +25,9 @@ class FieldSpec {
 
   // DataTypeSpecTrait: dataType, serialize, fkEntity
   use DataTypeSpecTrait;
+
+  // OptionsSpecTrait: options, optionsCallback
+  use OptionsSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
   use GuiSpecTrait;
@@ -55,16 +59,6 @@ class FieldSpec {
    * @var bool
    */
   public $requiredIf;
-
-  /**
-   * @var array|bool
-   */
-  public $options;
-
-  /**
-   * @var callable
-   */
-  private $optionsCallback;
 
   /**
    * @var array
@@ -220,44 +214,6 @@ class FieldSpec {
   public function setReadonly($readonly) {
     $this->readonly = (bool) $readonly;
 
-    return $this;
-  }
-
-  /**
-   * @param array $values
-   * @param array|bool $return
-   * @param bool $checkPermissions
-   * @return array
-   */
-  public function getOptions($values = [], $return = TRUE, $checkPermissions = TRUE) {
-    if (!isset($this->options)) {
-      if ($this->optionsCallback) {
-        $this->options = ($this->optionsCallback)($this, $values, $return, $checkPermissions);
-      }
-      else {
-        $this->options = FALSE;
-      }
-    }
-    return $this->options;
-  }
-
-  /**
-   * @param array|bool $options
-   *
-   * @return $this
-   */
-  public function setOptions($options) {
-    $this->options = $options;
-    return $this;
-  }
-
-  /**
-   * @param callable $callback
-   *
-   * @return $this
-   */
-  public function setOptionsCallback($callback) {
-    $this->optionsCallback = $callback;
     return $this;
   }
 
