@@ -13,6 +13,7 @@
 namespace Civi\Api4\Service\Spec;
 
 use Civi\Schema\Traits\BasicSpecTrait;
+use Civi\Schema\Traits\DataTypeSpecTrait;
 use Civi\Schema\Traits\GuiSpecTrait;
 use Civi\Schema\Traits\SqlSpecTrait;
 
@@ -20,6 +21,9 @@ class FieldSpec {
 
   // BasicSpecTrait: name, title, description
   use BasicSpecTrait;
+
+  // DataTypeSpecTrait: dataType, serialize, fkEntity
+  use DataTypeSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
   use GuiSpecTrait;
@@ -63,21 +67,6 @@ class FieldSpec {
   private $optionsCallback;
 
   /**
-   * @var string
-   */
-  public $dataType;
-
-  /**
-   * @var string
-   */
-  public $fkEntity;
-
-  /**
-   * @var int
-   */
-  public $serialize;
-
-  /**
    * @var array
    */
   public $permission;
@@ -91,17 +80,6 @@ class FieldSpec {
    * @var callable[]
    */
   public $outputFormatters;
-
-  /**
-   * Aliases for the valid data types
-   *
-   * @var array
-   */
-  public static $typeAliases = [
-    'Int' => 'Integer',
-    'Link' => 'Url',
-    'Memo' => 'Text',
-  ];
 
   /**
    * @param string $name
@@ -187,50 +165,6 @@ class FieldSpec {
   }
 
   /**
-   * @return string
-   */
-  public function getDataType() {
-    return $this->dataType;
-  }
-
-  /**
-   * @param $dataType
-   *
-   * @return $this
-   * @throws \Exception
-   */
-  public function setDataType($dataType) {
-    if (array_key_exists($dataType, self::$typeAliases)) {
-      $dataType = self::$typeAliases[$dataType];
-    }
-
-    if (!in_array($dataType, $this->getValidDataTypes())) {
-      throw new \Exception(sprintf('Invalid data type "%s', $dataType));
-    }
-
-    $this->dataType = $dataType;
-
-    return $this;
-  }
-
-  /**
-   * @return int
-   */
-  public function getSerialize() {
-    return $this->serialize;
-  }
-
-  /**
-   * @param int|null $serialize
-   * @return $this
-   */
-  public function setSerialize($serialize) {
-    $this->serialize = $serialize;
-
-    return $this;
-  }
-
-  /**
    * @param array $permission
    * @return $this
    */
@@ -290,18 +224,6 @@ class FieldSpec {
   }
 
   /**
-   * Add valid types that are not not part of \CRM_Utils_Type::dataTypes
-   *
-   * @return array
-   */
-  private function getValidDataTypes() {
-    $extraTypes = ['Boolean', 'Text', 'Float', 'Url', 'Array', 'Blob', 'Mediumblob'];
-    $extraTypes = array_combine($extraTypes, $extraTypes);
-
-    return array_merge(\CRM_Utils_Type::dataTypes(), $extraTypes);
-  }
-
-  /**
    * @param array $values
    * @param array|bool $return
    * @param bool $checkPermissions
@@ -336,24 +258,6 @@ class FieldSpec {
    */
   public function setOptionsCallback($callback) {
     $this->optionsCallback = $callback;
-    return $this;
-  }
-
-  /**
-   * @return string
-   */
-  public function getFkEntity() {
-    return $this->fkEntity;
-  }
-
-  /**
-   * @param string $fkEntity
-   *
-   * @return $this
-   */
-  public function setFkEntity($fkEntity) {
-    $this->fkEntity = $fkEntity;
-
     return $this;
   }
 
