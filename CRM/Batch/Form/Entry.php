@@ -103,6 +103,11 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   protected $currentRow = [];
 
   /**
+   * @var array
+   */
+  protected $currentRowExistingMembership;
+
+  /**
    * Get the contribution id for the current row.
    *
    * @return int
@@ -129,6 +134,24 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   public function getCurrentRowMembershipID() {
     return $this->currentRowMembershipID;
+  }
+
+  /**
+   * Get the contact ID for the current row.
+   *
+   * @return int
+   */
+  public function getCurrentRowContactID(): int {
+    return $this->currentRow['contact_id'];
+  }
+
+  /**
+   * Get the membership type ID for the current row.
+   *
+   * @return int
+   */
+  public function getCurrentRowMembershipTypeID(): int {
+    return $this->currentRow['membership_type_id'];
   }
 
   /**
@@ -751,6 +774,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $value['contact_id'] = $params['primary_contact_id'][$key];
         $value = $this->standardiseRow($value);
         $this->currentRow = $value;
+        $this->currentRowExistingMembership = NULL;
         $this->currentRowIsRenewOption = (int) ($params['member_option'][$key] ?? 1);
 
         // update contact information
@@ -1005,12 +1029,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $ids = [];
     $isPayLater = NULL;
+    $currentMembership = $this->getCurrentMembership();
 
-    // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
-    // is the same as the parent org of an existing membership of the contact
-    $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
-      FALSE, NULL, TRUE
-    );
     if ($currentMembership) {
 
       // Do NOT do anything.
@@ -1035,9 +1055,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
         return CRM_Member_BAO_Membership::create($memParams);
       }
-
-      // Check and fix the membership if it is STALE
-      CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($currentMembership, $changeToday);
 
       // Now Renew the membership
       if (!$currentMembership['is_current_member']) {
@@ -1230,6 +1247,27 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   private function currentRowIsRenew(): bool {
     return $this->currentRowIsRenewOption === 2;
+  }
+
+  /**
+   * Get any current membership for the current row contact, for the same member organization.
+   *
+   * @return array|bool
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getCurrentMembership() {
+    if (!isset($this->currentRowExistingMembership)) {
+      // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
+      // is the same as the parent org of an existing membership of the contact
+      $this->currentRowExistingMembership = CRM_Member_BAO_Membership::getContactMembership($this->getCurrentRowContactID(), $this->getCurrentRowMembershipTypeID(),
+        FALSE, NULL, TRUE
+      );
+      // Check and fix the membership if it is STALE
+      CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($this->currentRowExistingMembership);
+    }
+    return $this->currentRowExistingMembership;
   }
 
 }
