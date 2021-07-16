@@ -28,15 +28,6 @@ use Civi\Api4\Contact;
  */
 class CreateWithOptionGroupTest extends BaseCustomValueTest {
 
-  /**
-   * Remove the custom tables
-   */
-  public function setUp(): void {
-    $this->dropByPrefix('civicrm_value_financial');
-    $this->dropByPrefix('civicrm_value_favorite');
-    parent::setUp();
-  }
-
   public function testGetWithCustomData() {
     $group = uniqid('fava');
     $colorField = uniqid('colora');

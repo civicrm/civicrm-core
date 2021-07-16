@@ -20,22 +20,10 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
-use api\v4\Traits\TableDropperTrait;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\CustomField;
 
 abstract class BaseCustomValueTest extends UnitTestCase {
-
-  use \api\v4\Traits\OptionCleanupTrait {
-    setUp as setUpOptionCleanup;
-  }
-  use TableDropperTrait;
-
-  /**
-   * Set up baseline for testing
-   */
-  public function setUp(): void {
-    $this->setUpOptionCleanup();
-  }
 
   /**
    * Delete all created options groups.
@@ -43,6 +31,7 @@ abstract class BaseCustomValueTest extends UnitTestCase {
    * @throws \API_Exception
    */
   public function tearDown(): void {
+    CustomField::delete(FALSE)->addWhere('id', '>', 0)->execute();
     CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
     parent::tearDown();
   }
