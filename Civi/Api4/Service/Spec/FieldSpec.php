@@ -45,6 +45,11 @@ class FieldSpec {
   public $defaultValue;
 
   /**
+   * Meta-type indicating how this field was defined/implemented.
+   *
+   * Ex: 'Field' (normal/standard DB field), 'Custom' (auxiliary DB field),
+   * 'Filter' (read-oriented filter option), 'Extra' (special/programmatic field).
+   *
    * @var string
    */
   public $type = 'Extra';
