@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Spec;
 
+use Civi\Schema\Traits\ArrayFormatTrait;
 use Civi\Schema\Traits\BasicSpecTrait;
 use Civi\Schema\Traits\DataTypeSpecTrait;
 use Civi\Schema\Traits\GuiSpecTrait;
@@ -34,6 +35,9 @@ class FieldSpec {
 
   // SqlSpecTrait tableName, columnName, operators, sqlFilters
   use SqlSpecTrait;
+
+  // ArrayFormatTrait: toArray():array, loadArray($array)
+  use ArrayFormatTrait;
 
   /**
    * @var mixed
@@ -215,34 +219,6 @@ class FieldSpec {
     $this->readonly = (bool) $readonly;
 
     return $this;
-  }
-
-  /**
-   * Gets all public variables, converted to snake_case
-   *
-   * @return array
-   */
-  public function toArray() {
-    // Anonymous class will only have access to public vars
-    $getter = new class {
-
-      function getPublicVars($object) {
-        return get_object_vars($object);
-      }
-
-    };
-
-    // If getOptions was never called, make options a boolean
-    if (!isset($this->options)) {
-      $this->options = isset($this->optionsCallback);
-    }
-
-    $ret = [];
-    foreach ($getter->getPublicVars($this) as $key => $val) {
-      $key = strtolower(preg_replace('/(?=[A-Z])/', '_$0', $key));
-      $ret[$key] = $val;
-    }
-    return $ret;
   }
 
 }
