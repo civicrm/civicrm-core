@@ -282,27 +282,6 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Determines if a column is eligible to use an aggregate function
-   * @param string $fieldName
-   * @param string $prefix
-   * @return bool
-   */
-  private function canAggregate($fieldName, $prefix = '') {
-    $apiParams = $this->savedSearch['api_params'];
-
-    // If the query does not use grouping, never
-    if (empty($apiParams['groupBy'])) {
-      return FALSE;
-    }
-    // If the column is used for a groupBy, no
-    if (in_array($prefix . $fieldName, $apiParams['groupBy'])) {
-      return FALSE;
-    }
-    // If the entity this column belongs to is being grouped by id, then also no
-    return !in_array($prefix . 'id', $apiParams['groupBy']);
-  }
-
-  /**
    * Returns field definition for a given field or NULL if not found
    * @param $fieldName
    * @return array|null
@@ -376,70 +355,28 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Adds additional useful fields to the select clause
+   * Adds additional fields to the select clause required to render the display
    *
    * @param array $apiParams
    */
   private function augmentSelectClause(&$apiParams): void {
-    foreach ($this->getExtraEntityFields($this->savedSearch['api_entity']) as $extraFieldName) {
-      if (!in_array($extraFieldName, $apiParams['select']) && !$this->canAggregate($extraFieldName)) {
-        $apiParams['select'][] = $extraFieldName;
-      }
-    }
-    $joinAliases = [];
-    // Select the ids, etc. of explicitly joined entities (helps with displaying links)
-    foreach ($apiParams['join'] ?? [] as $join) {
-      [$joinEntity, $joinAlias] = explode(' AS ', $join[0]);
-      $joinAliases[] = $joinAlias;
-      foreach ($this->getExtraEntityFields($joinEntity) as $extraField) {
-        $extraFieldName = $joinAlias . '.' . $extraField;
-        if (!in_array($extraFieldName, $apiParams['select']) && !$this->canAggregate($extraField, $joinAlias . '.')) {
-          $apiParams['select'][] = $extraFieldName;
-        }
-      }
-    }
-    // Select the ids of implicitly joined entities (helps with displaying links)
-    foreach ($apiParams['select'] as $fieldName) {
-      if (strstr($fieldName, '.') && !strstr($fieldName, ' AS ') && !strstr($fieldName, ':')) {
-        $idFieldName = $fieldNameWithoutPrefix = substr($fieldName, 0, strrpos($fieldName, '.'));
-        $idField = $this->getField($idFieldName);
-        $explicitJoin = '';
-        if (strstr($idFieldName, '.')) {
-          [$prefix, $fieldNameWithoutPrefix] = explode('.', $idFieldName, 2);
-          if (in_array($prefix, $joinAliases, TRUE)) {
-            $explicitJoin = $prefix . '.';
-          }
-        }
-        if (!in_array($idFieldName, $apiParams['select']) && !empty($idField['fk_entity']) && !$this->canAggregate($fieldNameWithoutPrefix, $explicitJoin)) {
-          $apiParams['select'][] = $idFieldName;
-        }
-      }
-    }
-    // Select value fields for in-place editing
+    $possibleTokens = '';
     foreach ($this->display['settings']['columns'] ?? [] as $column) {
+      // Collect display values in which a token is allowed
+      $possibleTokens .= ($column['rewrite'] ?? '') . ($column['link']['path'] ?? '');
+      if (!empty($column['links'])) {
+        $possibleTokens .= implode('', array_column($column['links'], 'path'));
+      }
+
+      // Select value fields for in-place editing
       if (isset($column['editable']['value']) && !in_array($column['editable']['value'], $apiParams['select'])) {
         $apiParams['select'][] = $column['editable']['value'];
       }
     }
-  }
-
-  /**
-   * Get list of extra fields needed for displaying links for a given entity
-   *
-   * @param string $entityName
-   * @return array
-   */
-  private function getExtraEntityFields(string $entityName): array {
-    if (!isset($this->_extraEntityFields[$entityName])) {
-      $id = CoreUtil::getInfoItem($entityName, 'primary_key');
-      $this->_extraEntityFields[$entityName] = $id;
-      foreach (CoreUtil::getInfoItem($entityName, 'paths') ?? [] as $path) {
-        $matches = [];
-        preg_match_all('#\[(\w+)]#', $path, $matches);
-        $this->_extraEntityFields[$entityName] = array_unique(array_merge($this->_extraEntityFields[$entityName], $matches[1] ?? []));
-      }
-    }
-    return $this->_extraEntityFields[$entityName];
+    // Add fields referenced via token
+    $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $possibleTokens, $tokens);
+    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $tokens[1]));
   }
 
 }
