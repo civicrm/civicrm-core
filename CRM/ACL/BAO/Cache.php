@@ -153,7 +153,7 @@ WHERE  modified_date IS NULL
       ],
     ];
     CRM_Core_DAO::singleValueQuery($query, $params);
-
+    unset(Civi::$statics['CRM_ACL_API']);
     // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
     // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
     if (CRM_Core_Transaction::isActive()) {

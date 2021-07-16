@@ -349,36 +349,7 @@ SELECT g.*
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!is_array($ids)) {
-        $ids = [];
-        $query = "
-SELECT   a.operation, a.object_id
-  FROM   civicrm_acl_cache c, civicrm_acl a
- WHERE   c.acl_id       =  a.id
-   AND   a.is_active    =  1
-   AND   a.object_table = %1
-   AND   a.id        IN ( $aclKeys )
-GROUP BY a.operation,a.object_id
-ORDER BY a.object_id
-";
-        $params = [1 => [$tableName, 'String']];
-        $dao = CRM_Core_DAO::executeQuery($query, $params);
-        while ($dao->fetch()) {
-          if ($dao->object_id) {
-            if (self::matchType($type, $dao->operation)) {
-              $ids[] = $dao->object_id;
-            }
-          }
-          else {
-            // this user has got the permission for all objects of this type
-            // check if the type matches
-            if (self::matchType($type, $dao->operation)) {
-              foreach ($allGroups as $id => $dontCare) {
-                $ids[] = $id;
-              }
-            }
-            break;
-          }
-        }
+        $ids = self::loadPermittedIDs((int) $contactID, $tableName, $type, $allGroups);
         $cache->set($cacheKey, $ids);
       }
     }
@@ -393,7 +364,7 @@ ORDER BY a.object_id
     if ($contactID) {
       $groupWhere = '';
       if (!empty($allGroups)) {
-        $groupWhere = " AND id IN (" . implode(',', array_keys($allGroups)) . ")";
+        $groupWhere = ' AND id IN (' . implode(',', array_keys($allGroups)) . ")";
       }
       // Contacts create hidden groups from search results. They should be able to retrieve their own.
       $ownHiddenGroupsList = CRM_Core_DAO::singleValueQuery("
@@ -472,6 +443,53 @@ ORDER BY a.object_id
     $acl = new CRM_ACL_DAO_ACL();
     $acl->id = $aclId;
     $acl->delete();
+  }
+
+  /**
+   * Load permitted acl IDs.
+   *
+   * @param int $contactID
+   * @param string $tableName
+   * @param int $type
+   * @param $allGroups
+   *
+   * @return array
+   */
+  protected static function loadPermittedIDs(int $contactID, string $tableName, int $type, $allGroups): array {
+    $ids = [];
+    $acls = CRM_ACL_BAO_Cache::build($contactID);
+    $aclKeys = array_keys($acls);
+    $aclKeys = implode(',', $aclKeys);
+    $query = "
+SELECT   a.operation, a.object_id
+  FROM   civicrm_acl_cache c, civicrm_acl a
+ WHERE   c.acl_id       =  a.id
+   AND   a.is_active    =  1
+   AND   a.object_table = %1
+   AND   a.id        IN ( $aclKeys )
+GROUP BY a.operation,a.object_id
+ORDER BY a.object_id
+";
+    $params = [1 => [$tableName, 'String']];
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    while ($dao->fetch()) {
+      if ($dao->object_id) {
+        if (self::matchType($type, $dao->operation)) {
+          $ids[] = $dao->object_id;
+        }
+      }
+      else {
+        // this user has got the permission for all objects of this type
+        // check if the type matches
+        if (self::matchType($type, $dao->operation)) {
+          foreach ($allGroups as $id => $dontCare) {
+            $ids[] = $id;
+          }
+        }
+        break;
+      }
+    }
+    return $ids;
   }
 
 }
