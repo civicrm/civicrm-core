@@ -3376,12 +3376,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Contribution object, line item array and params for trxn.
    *
    *
-   * @param array $financialTrxnValues
-   *
    * @return null|\CRM_Core_BAO_FinancialTrxn
    */
-  public static function recordFinancialAccounts(&$params, $financialTrxnValues = NULL) {
-    $skipRecords = $update = $return = FALSE;
+  public static function recordFinancialAccounts(&$params) {
+    $skipRecords = $return = FALSE;
     $isUpdate = !empty($params['prevContribution']);
 
     $additionalParticipantId = [];
@@ -3491,10 +3489,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['payment_processor_id'] = $params['payment_processor'];
       }
 
-      // consider external values passed for recording transaction entry
-      if (!empty($financialTrxnValues)) {
-        $trxnParams = array_merge($trxnParams, $financialTrxnValues);
-      }
       if (empty($trxnParams['payment_processor_id'])) {
         unset($trxnParams['payment_processor_id']);
       }
