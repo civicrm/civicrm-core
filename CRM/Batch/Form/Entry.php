@@ -998,9 +998,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $updateStatusId = FALSE;
     $changeToday = NULL;
     $is_test = FALSE;
-    $modifiedID = NULL;
     $numRenewTerms = 1;
-    $contributionRecurID = NULL;
     $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
     $statusFormat = '%Y-%m-%d';
@@ -1034,9 +1032,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
           'membership_activity_status' => $isPayLater ? 'Scheduled' : 'Completed',
         ], $memParams);
-        if ($contributionRecurID) {
-          $memParams['contribution_recur_id'] = $contributionRecurID;
-        }
 
         return CRM_Member_BAO_Membership::create($memParams);
       }
@@ -1156,11 +1151,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $memParams['is_test'] = $is_test;
       $memParams['is_pay_later'] = $isPayLater;
     }
-    // Putting this in an IF is precautionary as it seems likely that it would be ignored if empty, but
-    // perhaps shouldn't be?
-    if ($contributionRecurID) {
-      $memParams['contribution_recur_id'] = $contributionRecurID;
-    }
+
     //CRM-4555
     //if we decided status here and want to skip status
     //calculation in create( ); then need to pass 'skipStatusCal'.
@@ -1172,14 +1163,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     //since we are renewing,
     //make status override false.
     $memParams['is_override'] = FALSE;
-
-    //CRM-4027, create log w/ individual contact.
-    if ($modifiedID) {
-      // @todo this param is likely unused now.
-      $memParams['is_for_organization'] = TRUE;
-    }
-    $params['modified_id'] = $modifiedID ?? $contactID;
-
     $memParams['custom'] = $customFieldsFormatted;
     // Load all line items & process all in membership. Don't do in contribution.
     // Relevant tests in api_v3_ContributionPageTest.
