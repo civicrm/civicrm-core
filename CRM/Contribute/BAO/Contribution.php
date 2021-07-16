@@ -4386,37 +4386,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Checks if line items total amounts
-   * match the contribution total amount.
-   *
-   * @param array $params
-   *  array of order params.
-   *
-   * @throws \API_Exception
-   */
-  public static function checkLineItems(&$params) {
-    $totalAmount = $params['total_amount'] ?? NULL;
-    $lineItemAmount = 0;
-
-    foreach ($params['line_items'] as &$lineItems) {
-      foreach ($lineItems['line_item'] as &$item) {
-        $lineItemAmount += $item['line_total'] + ($item['tax_amount'] ?? 0.00);
-      }
-    }
-
-    if (!isset($totalAmount)) {
-      $params['total_amount'] = $lineItemAmount;
-    }
-    else {
-      $currency = $params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
-
-      if (!CRM_Utils_Money::equals($totalAmount, $lineItemAmount, $currency)) {
-        throw new CRM_Contribute_Exception_CheckLineItemsException();
-      }
-    }
-  }
-
-  /**
    * Get the financial account for the item associated with the new transaction.
    *
    * @param array $params
