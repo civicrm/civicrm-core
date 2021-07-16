@@ -396,10 +396,10 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $rType = substr(CRM_Utils_Array::value('relationship_type_id', $params), -3);
       $recentOther = [
         'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-          "action=update&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+          "action=update&reset=1&id={$relationship->id}&rtype={$rType}&context=home"
         ),
         'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-          "action=delete&reset=1&id={$relationship->id}&cid={$relationship->contact_id_a}&rtype={$rType}&context=home"
+          "action=delete&reset=1&id={$relationship->id}&rtype={$rType}&context=home"
         ),
       ];
     }
@@ -2083,7 +2083,7 @@ AND cc.sort_name LIKE '%$name%'";
         $relationship['relation'] = CRM_Utils_Array::value('case', $values, '') . CRM_Utils_System::href(
             $values['relation'],
             'civicrm/contact/view/rel',
-            "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
+            "action=view&reset=1&id={$values['id']}&rtype={$values['rtype']}");
 
         if (!empty($values['description'])) {
           $relationship['relation'] .= "<p class='description'>{$values['description']}</p>";

@@ -100,7 +100,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $rType = CRM_Utils_Array::value('rtype', $viewRelationship[$this->getEntityId()]);
     // add viewed contribution to recent items list
     $url = CRM_Utils_System::url('civicrm/contact/view/rel',
-      "action=view&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&context=home"
+      "action=view&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&context=home"
     );
 
     $session = CRM_Core_Session::singleton();
@@ -111,10 +111,10 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     ) {
       $recentOther = array(
         'editUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-          "action=update&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&rtype={$rType}&context=home"
+          "action=update&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&rtype={$rType}&context=home"
         ),
         'deleteUrl' => CRM_Utils_System::url('civicrm/contact/view/rel',
-          "action=delete&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&cid={$this->getContactId()}&rtype={$rType}&context=home"
+          "action=delete&reset=1&id={$viewRelationship[$this->getEntityId()]['id']}&rtype={$rType}&context=home"
         ),
       );
     }
@@ -196,6 +196,11 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
    * @throws \CRM_Core_Exception
    */
   public function run() {
+    // Lookup contact id based on relationship id and r_type (direction)
+    if (!empty($_GET['id']) && !empty($_GET['rtype'])) {
+      $otherContact = $_GET['rtype'] == 'a_b' ? 'contact_id_b' : 'contact_id_a';
+      $this->setContactId(CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', (int) $_GET['id'], $otherContact));
+    }
     $this->preProcessQuickEntityPage();
 
     $this->setContext();
@@ -249,13 +254,13 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
         CRM_Core_Action::VIEW => array(
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/rel',
-          'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
+          'qs' => 'action=view&reset=1&id=%%id%%&rtype=%%rtype%%&selectedChild=rel',
           'title' => ts('View Relationship'),
         ),
         CRM_Core_Action::UPDATE => array(
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/rel',
-          'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
+          'qs' => 'action=update&reset=1&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Edit Relationship'),
         ),
         CRM_Core_Action::ENABLE => array(
@@ -271,7 +276,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/rel',
-          'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%',
+          'qs' => 'action=delete&reset=1&id=%%id%%&rtype=%%rtype%%',
           'title' => ts('Delete Relationship'),
         ),
         // FIXME: Not sure what to put as the key.

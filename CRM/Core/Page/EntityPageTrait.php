@@ -109,6 +109,7 @@ trait CRM_Core_Page_EntityPageTrait {
   public function setContactId($contactId) {
     $this->_contactID = $contactId;
     $this->_contactId = $contactId;
+    $this->assign('contactId', $this->getContactId());
   }
 
   public function getAction() {
@@ -136,9 +137,9 @@ trait CRM_Core_Page_EntityPageTrait {
     $this->assign('action', $this->getAction());
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $this->setContactId(CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, CRM_Core_Session::getLoggedInContactID()));
-
-    $this->assign('contactId', $this->getContactId());
+    if (!$this->_contactID) {
+      $this->setContactId(CRM_Utils_Request::retrieve('cid', 'Positive', $this, FALSE, CRM_Core_Session::getLoggedInContactID()));
+    }
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, $this->getDefaultContext());
     $this->assign('context', $this->_context);
