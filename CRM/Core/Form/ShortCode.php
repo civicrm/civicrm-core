@@ -152,6 +152,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
           'edit' => ts('Edit'),
           'view' => ts('View'),
           'search' => ts('Search/Public Directory'),
+          'map' => ts('Map View'),
         ],
       ],
       [
