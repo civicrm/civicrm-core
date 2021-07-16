@@ -7,9 +7,9 @@
         <td>
           {foreach from=$extension.authors item=author}
             {capture assign=authorDetails}
-              {if $author.role}{$author.role|escape};{/if}
-              {if $author.email}<a href="mailto:{$author.email|escape}">{$author.email|escape}</a>;{/if}
-              {if $author.homepage}<a href="{$author.homepage|escape}">{$author.homepage|escape}</a>;{/if}
+              {if !empty($author.role)}{$author.role|escape};{/if}
+              {if !empty($author.email)}<a href="mailto:{$author.email|escape}">{$author.email|escape}</a>;{/if}
+              {if !empty($author.homepage)}<a href="{$author.homepage|escape}">{$author.homepage|escape}</a>;{/if}
             {/capture}
             {$author.name|escape} {if $authorDetails}({$authorDetails|trim:'; '}){/if}<br/>
           {/foreach}
