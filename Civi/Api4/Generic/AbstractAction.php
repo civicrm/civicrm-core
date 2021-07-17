@@ -14,7 +14,6 @@ namespace Civi\Api4\Generic;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
-use Civi\Schema\Traits\MagicGetterSetterTrait;
 
 /**
  * Base class for all api actions.
@@ -36,7 +35,7 @@ use Civi\Schema\Traits\MagicGetterSetterTrait;
  */
 abstract class AbstractAction implements \ArrayAccess {
 
-  use MagicGetterSetterTrait;
+  use \Civi\Schema\Traits\MagicGetterSetterTrait;
 
   /**
    * Api version number; cannot be changed.
