@@ -158,13 +158,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
 
-    // check if contribution is already completed, if so we ignore this ipn
-    if ($contribution->contribution_status_id == 1) {
-      CRM_Core_Error::debug_log_message("Returning since contribution has already been handled.");
-      echo 'Success: Contribution has already been handled<p>';
-      return FALSE;
-    }
-
     CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $contribution->id ?? NULL);
     return $isFirstOrLastRecurringPayment;
   }
