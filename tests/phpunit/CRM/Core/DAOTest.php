@@ -557,4 +557,45 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Contact_DAO_RelationshipCache::tableHasBeenAdded());
   }
 
+  /**
+   * Test that a timestamp field that allows null doesn't crash when updating
+   * with a blank date.
+   * An unpatched PEAR::DB_DataObject will fail when sql_mode has NO_ZERO_DATE.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function testUpdateTimestampWithBlankDate() {
+    // Arbitrarily using "Cache" since it has a desired type of timestamp field and is simple.
+    $dao = new CRM_Core_DAO_Cache();
+    $fields = $dao->fields();
+    $this->assertSame(CRM_Utils_Type::T_TIMESTAMP, $fields['expired_date']['type'], 'Oh somebody changed the type, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+    $this->assertFalse($fields['expired_date']['required'], 'Oh somebody changed the REQUIRED setting, so this test might not be testing the right type of timestamp anymore. Might need to change the test to have it use a different field.');
+
+    $dao->group_name = 'mytest';
+    $dao->path = 'mypath';
+    $dao->data = 'some data';
+    $dao->expired_date = '';
+    $dao->save();
+    $id = $dao->id;
+
+    // Now retrieve it and update it with a blank timestamp.
+    $dao = new CRM_Core_DAO_Cache();
+    $dao->id = $id;
+    $dao->find(TRUE);
+    // sanity check we got the right one since otherwise checking null might falsely be true
+    $this->assertEquals('mytest', $dao->group_name);
+    $this->assertNull($dao->expired_date);
+
+    $dao->data = 'some updated data';
+    $dao->expired_date = '';
+    // would crash here on update
+    $dao->save();
+
+    $dao = new CRM_Core_DAO_Cache();
+    $dao->id = $id;
+    $dao->find(TRUE);
+    $this->assertEquals('some updated data', $dao->data);
+    $this->assertNull($dao->expired_date);
+  }
+
 }
