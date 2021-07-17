@@ -116,13 +116,10 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $recur, $contribution, $first) {
-
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
     $now = date('YmdHis');
 
     $isFirstOrLastRecurringPayment = FALSE;
-    if ($input['response_code'] == 1) {
+    if ($this->isPaymentSuccessful()) {
       // Approved
       if ($first) {
         $recur->start_date = $now;
@@ -142,24 +139,23 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       }
     }
     else {
-      // Declined
-      // failed status
-      $recur->contribution_status_id = array_search('Failed', $contributionStatus);
-      $recur->cancel_date = $now;
-      $recur->save();
-
-      $message = ts('Subscription payment failed - %1', [1 => htmlspecialchars($input['response_reason_text'])]);
-      CRM_Core_Error::debug_log_message($message);
-
-      // the recurring contribution has declined a payment or has failed
-      // so we just fix the recurring contribution and not change any of
-      // the existing contributions
-      // CRM-9036
+      $this->failPayment($recur);
       return FALSE;
     }
 
     CRM_Contribute_BAO_Contribution::completeOrder($input, $recur->id, $contribution->id ?? NULL);
     return $isFirstOrLastRecurringPayment;
+  }
+
+  /**
+   * Is the notification for a successful payment.
+   *
+   * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function isPaymentSuccessful() {
+    return $this->retrieve('x_response_code', 'Integer') == 1;
   }
 
   /**
@@ -172,9 +168,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
   public function getInput(&$input) {
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
-    $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
-    $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
-    $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
     $input['trxn_id'] = $this->retrieve('x_trans_id', 'String', FALSE);
     $input['receive_date'] = $this->retrieve('receive_date', 'String', FALSE, date('YmdHis', strtotime('now')));
@@ -184,7 +177,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     }
     // Only assume trxn_id 'should' have been returned for success.
     // Per CRM-17611 it would also not be passed back for a decline.
-    elseif ($input['response_code'] == 1) {
+    elseif ($this->isPaymentSuccessful()) {
       $input['is_test'] = 1;
       $input['trxn_id'] = md5(uniqid(rand(), TRUE));
     }
@@ -327,6 +320,30 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       'payment_processor_type_id' => $paymentProcessorTypeID,
       'return' => 'id',
     ]);
+  }
+
+  /**
+   * Handle failed payment.
+   *
+   * The recurring contribution has declined a payment or has failed
+   * so we just fix the recurring contribution and not change any of
+   * the existing contributions
+   * CRM-9036
+   *
+   * @param \CRM_Contribute_BAO_ContributionRecur $recur
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function failPayment(CRM_Contribute_BAO_ContributionRecur $recur): void {
+    // Declined
+    // failed status
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $recur->contribution_status_id = array_search('Failed', $contributionStatus);
+    $recur->cancel_date = date('YmdHis');
+    $recur->save();
+
+    $message = ts('Subscription payment failed - %1', [1 => htmlspecialchars($this->retrieve('x_response_reason_text', 'String', FALSE))]);
+    CRM_Core_Error::debug_log_message($message);
   }
 
 }
