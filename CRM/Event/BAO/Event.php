@@ -2045,12 +2045,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *   Whether the user has permission for this event (or if eventId=NULL an array of permissions)
    * @throws \CiviCRM_API3_Exception
    */
-  public static function checkPermission($eventId = NULL, $permissionType = CRM_Core_Permission::VIEW) {
-    if (empty($eventId)) {
-      CRM_Core_Error::deprecatedFunctionWarning('CRM_Event_BAO_Event::getAllPermissions');
-      return self::getAllPermissions();
-    }
-
+  public static function checkPermission(int $eventId, $permissionType = CRM_Core_Permission::VIEW) {
     switch ($permissionType) {
       case CRM_Core_Permission::EDIT:
         // We also set the cached "view" permission to TRUE if "edit" is TRUE

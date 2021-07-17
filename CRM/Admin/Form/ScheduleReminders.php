@@ -59,7 +59,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     if ($isEvent) {
       $this->setComponentID(CRM_Utils_Request::retrieve('compId', 'Integer', $this));
-      if (!CRM_Event_BAO_Event::checkPermission($this->getComponentID(), CRM_Core_Permission::EDIT)) {
+      if (!CRM_Event_BAO_Event::checkPermission((int) $this->getComponentID(), CRM_Core_Permission::EDIT)) {
         throw new CRM_Core_Exception(ts('You do not have permission to access this page.'));
       }
     }

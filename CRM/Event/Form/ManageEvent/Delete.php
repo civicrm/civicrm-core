@@ -43,7 +43,7 @@ class CRM_Event_Form_ManageEvent_Delete extends CRM_Event_Form_ManageEvent {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'title');
     }
 
-    if (!CRM_Event_BAO_Event::checkPermission($this->_id, CRM_Core_Permission::DELETE)) {
+    if (!CRM_Event_BAO_Event::checkPermission((int) $this->_id, CRM_Core_Permission::DELETE)) {
       CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
   }
