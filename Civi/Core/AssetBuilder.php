@@ -195,7 +195,10 @@ class AssetBuilder {
       }
       catch (UnknownAssetException $e) {
         // unexpected error, log and continue
-        \Civi::log()->error('Unexpected error while rendering a file in the AssetBuilder: ' . $e->getMessage(), ['exception' => $e]);
+        // except during upgrade since this repeatedly logs about l10n for each individual upgrade task
+        if ($e->getMessage() !== 'Unrecognized asset name: crm-l10n.js' || !\CRM_Core_Config::isUpgradeMode()) {
+          \Civi::log()->error('Unexpected error while rendering a file in the AssetBuilder: ' . $e->getMessage(), ['exception' => $e]);
+        }
       }
     }
     return $fileName;
