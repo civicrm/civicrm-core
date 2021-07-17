@@ -24,9 +24,11 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
 
   /**
    * Build an array of ACLs for a specific ACLed user
+   *
    * @param int $id - contact_id of the ACLed user
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public static function &build($id) {
     if (!self::$_cache) {
@@ -44,7 +46,7 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_ACLCache {
       return self::$_cache[$id];
     }
 
-    self::$_cache[$id] = CRM_ACL_BAO_ACL::getAllByContact($id);
+    self::$_cache[$id] = CRM_ACL_BAO_ACL::getAllByContact((int) $id);
     self::store($id, self::$_cache[$id]);
     return self::$_cache[$id];
   }
