@@ -45,6 +45,7 @@ class RelationshipCache extends Generic\AbstractEntity {
    */
   public static function getInfo() {
     $info = parent::getInfo();
+    $info['bridge_title'] = ts('Relationship');
     $info['bridge'] = [
       'near_contact_id' => ['description' => ts('One or more contacts with a relationship to this contact')],
       'far_contact_id' => ['description' => ts('One or more contacts with a relationship to this contact')],
