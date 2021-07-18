@@ -35,6 +35,8 @@ use Civi\Api4\Utils\ReflectionUtils;
  */
 abstract class AbstractAction implements \ArrayAccess {
 
+  use \Civi\Schema\Traits\MagicGetterSetterTrait;
+
   /**
    * Api version number; cannot be changed.
    *
@@ -190,33 +192,6 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * Magic function to provide automatic getter/setter for params.
-   *
-   * @param $name
-   * @param $arguments
-   * @return static|mixed
-   * @throws \API_Exception
-   */
-  public function __call($name, $arguments) {
-    $param = lcfirst(substr($name, 3));
-    if (!$param || $param[0] == '_') {
-      throw new \API_Exception('Unknown api parameter: ' . $name);
-    }
-    $mode = substr($name, 0, 3);
-    if ($this->paramExists($param)) {
-      switch ($mode) {
-        case 'get':
-          return $this->$param;
-
-        case 'set':
-          $this->$param = $arguments[0];
-          return $this;
-      }
-    }
-    throw new \API_Exception('Unknown api parameter: ' . $name);
-  }
-
-  /**
    * Invoke api call.
    *
    * At this point all the params have been sent in and we initiate the api call & return the result.
@@ -251,12 +226,9 @@ abstract class AbstractAction implements \ArrayAccess {
    */
   public function getParams() {
     $params = [];
-    foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
-      $name = $property->getName();
-      // Skip variables starting with an underscore
-      if ($name[0] != '_') {
-        $params[$name] = $this->$name;
-      }
+    $magicProperties = $this->getMagicProperties();
+    foreach ($magicProperties as $name => $bool) {
+      $params[$name] = $this->$name;
     }
     return $params;
   }
@@ -310,14 +282,14 @@ abstract class AbstractAction implements \ArrayAccess {
    * @return bool
    */
   public function paramExists($param) {
-    return array_key_exists($param, $this->getParams());
+    return array_key_exists($param, $this->getMagicProperties());
   }
 
   /**
    * @return array
    */
   protected function getParamDefaults() {
-    return array_intersect_key($this->reflect()->getDefaultProperties(), $this->getParams());
+    return array_intersect_key($this->reflect()->getDefaultProperties(), $this->getMagicProperties());
   }
 
   /**
