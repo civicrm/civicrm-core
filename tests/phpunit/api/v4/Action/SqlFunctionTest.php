@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 
@@ -129,6 +130,50 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(100, $result[0]['MIN:total_amount']);
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
+  }
+
+  public function testComparisonFunctions() {
+    $cid = Contact::create(FALSE)
+      ->addValue('first_name', 'hello')
+      ->execute()->first()['id'];
+    $sampleData = [
+      ['subject' => 'abc', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 123, 'location' => 'abc'],
+      ['subject' => 'xyz', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'location' => 'abc', 'is_deleted' => 1],
+      ['subject' => 'def', 'activity_type_id:name' => 'Meeting', 'source_contact_id' => $cid, 'duration' => 456, 'location' => 'abc'],
+    ];
+    $aids = Activity::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute()->column('id');
+
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', $aids)
+      ->addSelect('IF(is_deleted, "Trash", "No Trash") AS trashed')
+      ->addSelect('NULLIF(subject, location) AS subject_is_location')
+      ->addSelect('NULLIF(duration, 456) AS duration_not_456')
+      ->addSelect('COALESCE(duration, location) AS duration_or_location')
+      ->addSelect('GREATEST(duration, 0200) AS duration_or_200')
+      ->addSelect('LEAST(duration, 300) AS 300_or_duration')
+      ->addSelect('ISNULL(duration) AS duration_isnull')
+      ->addOrderBy('id')
+      ->execute()->indexBy('id');
+
+    $this->assertCount(3, $result);
+    $this->assertEquals('No Trash', $result[$aids[0]]['trashed']);
+    $this->assertEquals('Trash', $result[$aids[1]]['trashed']);
+    $this->assertEquals('No Trash', $result[$aids[2]]['trashed']);
+    $this->assertEquals(NULL, $result[$aids[0]]['subject_is_location']);
+    $this->assertEquals('xyz', $result[$aids[1]]['subject_is_location']);
+    $this->assertEquals('def', $result[$aids[2]]['subject_is_location']);
+    $this->assertEquals(123, $result[$aids[0]]['duration_not_456']);
+    $this->assertEquals(NULL, $result[$aids[1]]['duration_not_456']);
+    $this->assertEquals(NULL, $result[$aids[2]]['duration_not_456']);
+    $this->assertEquals('123', $result[$aids[0]]['duration_or_location']);
+    $this->assertEquals('abc', $result[$aids[1]]['duration_or_location']);
+    $this->assertEquals(123, $result[$aids[0]]['300_or_duration']);
+    $this->assertEquals(300, $result[$aids[2]]['300_or_duration']);
+    $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
+    $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
+    $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
   }
 
 }

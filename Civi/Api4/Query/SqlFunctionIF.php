@@ -14,15 +14,13 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionNULLIF extends SqlFunction {
-
-  public $supportsExpansion = TRUE;
+class SqlFunctionIF extends SqlFunction {
 
   protected static $category = self::CATEGORY_COMPARISON;
 
   protected static $params = [
     [
-      'expr' => 2,
+      'expr' => 3,
       'optional' => FALSE,
     ],
   ];
@@ -31,7 +29,20 @@ class SqlFunctionNULLIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Null if');
+    return ts('If');
+  }
+
+  /**
+   * Prevent formatting based on first field
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @param string $dataType
+   * @return string|array
+   */
+  public function formatOutputValue($value, &$dataType) {
+    $dataType = NULL;
+    return $value;
   }
 
 }

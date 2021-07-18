@@ -28,7 +28,7 @@ class SqlFunctionCOUNT extends SqlFunction {
   ];
 
   /**
-   * Reformat result as array if using default separator
+   * Reformat result as integer
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string $value
