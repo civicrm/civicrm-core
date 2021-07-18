@@ -7,7 +7,7 @@
     <li ng-repeat="item in col.links" class="bg-{{:: item.style }}">
       <a href="{{:: displayUtils.getUrl(item.path, row) }}" target="{{:: item.target }}">
         <i ng-if=":: item.icon" class="crm-i {{:: item.icon }}"></i>
-        {{:: item.text }}
+        {{:: $ctrl.replaceTokens(item.text, row) }}
       </a>
     </li>
   </ul>

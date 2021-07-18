@@ -109,6 +109,10 @@
         return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
       };
 
+      this.replaceTokens = function(value, row, raw) {
+        return searchDisplayUtils.replaceTokens(value, row, raw ? null : ctrl.settings.columns);
+      };
+
       this.getLinks = function(rowData, col) {
         rowData._links = rowData._links || {};
         if (!(col.key in rowData._links)) {

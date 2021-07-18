@@ -366,6 +366,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
       $possibleTokens .= ($column['rewrite'] ?? '') . ($column['link']['path'] ?? '');
       if (!empty($column['links'])) {
         $possibleTokens .= implode('', array_column($column['links'], 'path'));
+        $possibleTokens .= implode('', array_column($column['links'], 'text'));
       }
 
       // Select value fields for in-place editing
