@@ -20,7 +20,6 @@ class SqlFunctionUPPER extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 1,
       'optional' => FALSE,
       'must_be' => ['SqlField', 'SqlString'],
     ],

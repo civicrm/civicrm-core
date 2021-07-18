@@ -21,7 +21,7 @@ class SqlFunctionCOUNT extends SqlFunction {
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
+      'max_expr' => 1,
       'must_be' => ['SqlField', 'SqlWild'],
       'cant_be' => [],
     ],

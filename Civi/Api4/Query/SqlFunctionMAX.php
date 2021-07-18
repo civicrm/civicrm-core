@@ -23,7 +23,6 @@ class SqlFunctionMAX extends SqlFunction {
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
       'must_be' => ['SqlField'],
     ],
   ];

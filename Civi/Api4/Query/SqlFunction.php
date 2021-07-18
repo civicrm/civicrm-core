@@ -53,8 +53,12 @@ abstract class SqlFunction extends SqlExpression {
         'expr' => [],
         'suffix' => NULL,
       ];
-      if ($param['expr'] && isset($prefix) || in_array('', $param['prefix']) || !$param['optional']) {
-        $this->args[$idx]['expr'] = $this->captureExpressions($arg, $param['expr'], $param['must_be'], $param['cant_be']);
+      if ($param['max_expr'] && isset($prefix) || in_array('', $param['prefix']) || !$param['optional']) {
+        $exprs = $this->captureExpressions($arg, $param['must_be'], $param['cant_be']);
+        if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
+          throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
+        }
+        $this->args[$idx]['expr'] = $exprs;
         $this->args[$idx]['suffix'] = $this->captureKeyword($param['suffix'], $arg);
       }
     }
@@ -82,13 +86,12 @@ abstract class SqlFunction extends SqlExpression {
    * Shifts 0 or more expressions off the argument string and returns them
    *
    * @param string $arg
-   * @param int $limit
    * @param array $mustBe
    * @param array $cantBe
    * @return array
    * @throws \API_Exception
    */
-  private function captureExpressions(&$arg, $limit, $mustBe, $cantBe) {
+  private function captureExpressions(&$arg, $mustBe, $cantBe) {
     $captured = [];
     $arg = ltrim($arg);
     while ($arg) {
@@ -98,7 +101,7 @@ abstract class SqlFunction extends SqlExpression {
       $this->fields = array_merge($this->fields, $expr->getFields());
       $captured[] = $expr;
       // Keep going if we have a comma indicating another expression follows
-      if (count($captured) < $limit && substr($arg, 0, 1) === ',') {
+      if (substr($arg, 0, 1) === ',') {
         $arg = ltrim(substr($arg, 1));
       }
       else {
@@ -227,7 +230,8 @@ abstract class SqlFunction extends SqlExpression {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
         'prefix' => [],
-        'expr' => 1,
+        'min_expr' => 1,
+        'max_expr' => 1,
         'suffix' => [],
         'optional' => FALSE,
         'must_be' => [],

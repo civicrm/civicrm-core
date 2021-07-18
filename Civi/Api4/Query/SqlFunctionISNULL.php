@@ -20,7 +20,6 @@ class SqlFunctionISNULL extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 1,
       'optional' => FALSE,
     ],
   ];

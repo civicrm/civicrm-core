@@ -20,7 +20,8 @@ class SqlFunctionIF extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 3,
+      'min_expr' => 3,
+      'max_expr' => 3,
       'optional' => FALSE,
     ],
   ];

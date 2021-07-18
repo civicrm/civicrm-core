@@ -20,7 +20,7 @@ class SqlFunctionCOALESCE extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 99,
+      'max_expr' => 99,
       'optional' => FALSE,
     ],
   ];

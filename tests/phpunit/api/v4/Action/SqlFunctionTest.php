@@ -34,7 +34,8 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertArrayHasKey('SUM', $functions);
     $this->assertArrayNotHasKey('', $functions);
     $this->assertArrayNotHasKey('SqlFunction', $functions);
-    $this->assertEquals(1, $functions['MAX']['params'][0]['expr']);
+    $this->assertEquals(1, $functions['MAX']['params'][0]['min_expr']);
+    $this->assertEquals(1, $functions['MAX']['params'][0]['max_expr']);
   }
 
   public function testGroupAggregates() {
@@ -174,6 +175,28 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
     $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
+  }
+
+  public function testIncorrectNumberOfArguments() {
+    try {
+      Activity::get(FALSE)
+        ->addSelect('IF(is_deleted) AS whoops')
+        ->execute();
+      $this->fail('Api should have thrown exception');
+    }
+    catch (\API_Exception $e) {
+      $this->assertEquals('Incorrect number of arguments for SQL function IF', $e->getMessage());
+    }
+
+    try {
+      Activity::get(FALSE)
+        ->addSelect('NULLIF(is_deleted, 1, 2) AS whoops')
+        ->execute();
+      $this->fail('Api should have thrown exception');
+    }
+    catch (\API_Exception $e) {
+      $this->assertEquals('Incorrect number of arguments for SQL function NULLIF', $e->getMessage());
+    }
   }
 
 }

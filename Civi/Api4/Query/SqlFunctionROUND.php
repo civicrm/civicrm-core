@@ -20,12 +20,10 @@ class SqlFunctionROUND extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 1,
       'optional' => FALSE,
       'must_be' => ['SqlField', 'SqlNumber'],
     ],
     [
-      'expr' => 1,
       'optional' => TRUE,
       'must_be' => ['SqlNumber'],
     ],
