@@ -23,20 +23,20 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
+      'max_expr' => 1,
       'must_be' => ['SqlField', 'sqlFunction'],
       'optional' => FALSE,
     ],
     [
       'prefix' => ['ORDER BY'],
-      'expr' => 1,
+      'max_expr' => 1,
       'suffix' => ['', 'ASC', 'DESC'],
       'must_be' => ['SqlField'],
       'optional' => TRUE,
     ],
     [
       'prefix' => ['SEPARATOR'],
-      'expr' => 1,
+      'max_expr' => 1,
       'must_be' => ['SqlString'],
       'optional' => TRUE,
       // @see self::formatOutput()

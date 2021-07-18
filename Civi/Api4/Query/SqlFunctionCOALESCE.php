@@ -20,7 +20,7 @@ class SqlFunctionCOALESCE extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 99,
+      'max_expr' => 99,
       'optional' => FALSE,
     ],
   ];
@@ -30,6 +30,19 @@ class SqlFunctionCOALESCE extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Coalesce');
+  }
+
+  /**
+   * Prevent reformatting
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @param string $dataType
+   * @return string|array
+   */
+  public function formatOutputValue($value, &$dataType) {
+    $dataType = NULL;
+    return $value;
   }
 
 }

@@ -21,14 +21,14 @@ class SqlFunctionCOUNT extends SqlFunction {
   protected static $params = [
     [
       'prefix' => ['', 'DISTINCT', 'ALL'],
-      'expr' => 1,
+      'max_expr' => 1,
       'must_be' => ['SqlField', 'SqlWild'],
       'cant_be' => [],
     ],
   ];
 
   /**
-   * Reformat result as array if using default separator
+   * Reformat result as integer
    *
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    * @param string $value

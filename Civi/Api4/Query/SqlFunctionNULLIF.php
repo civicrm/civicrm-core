@@ -22,11 +22,8 @@ class SqlFunctionNULLIF extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 1,
-      'optional' => FALSE,
-    ],
-    [
-      'expr' => 1,
+      'min_expr' => 2,
+      'max_expr' => 2,
       'optional' => FALSE,
     ],
   ];

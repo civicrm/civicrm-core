@@ -20,7 +20,6 @@ class SqlFunctionISNULL extends SqlFunction {
 
   protected static $params = [
     [
-      'expr' => 1,
       'optional' => FALSE,
     ],
   ];
@@ -30,6 +29,20 @@ class SqlFunctionISNULL extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Is null');
+  }
+
+  /**
+   * Reformat result as boolean
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @param string $dataType
+   * @return string|array
+   */
+  public function formatOutputValue($value, &$dataType) {
+    // Value is always TRUE or FALSE
+    $dataType = 'Boolean';
+    return $value;
   }
 
 }
