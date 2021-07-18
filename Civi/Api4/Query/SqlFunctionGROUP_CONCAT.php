@@ -59,9 +59,9 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     // By default, values are split into an array and formatted according to the field's dataType
     if (!$exprArgs[2]['prefix']) {
       $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
-      // If the first expression is another sqlFunction then unset $dataType to preserve raw string
-      if ($exprArgs[0]['expr'][0] instanceof SqlFunction) {
-        $dataType = NULL;
+      // If the first expression is another sqlFunction, allow it to control the dataType
+      if ($exprArgs[0]['expr'][0] instanceof SqlFunction && is_callable([$exprArgs[0]['expr'][0], 'formatOutputValue'])) {
+        $exprArgs[0]['expr'][0]->formatOutputValue(NULL, $dataType);
       }
     }
     // If using custom separator, unset $dataType to preserve raw string
