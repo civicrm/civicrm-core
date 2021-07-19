@@ -28,7 +28,7 @@
     <div class="view-content">
       {if !empty($participantMode)}
         <div class="help">
-          {ts 1=$displayName 2=$participantMode|upper}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
+          {ts 1=$displayName 2=$participantMode|crmUpper}Use this form to submit an event registration on behalf of %1. <strong>A %2 transaction will be submitted</strong> using the selected payment processor.{/ts}
         </div>
       {/if}
       <div id="eventFullMsg" class="messages status no-popup" style="display:none;"></div>
