@@ -22,6 +22,7 @@ namespace api\v4\Action;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\OptionGroup;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipCache;
 
@@ -86,6 +87,7 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
   }
 
   public function testWithTwoFields() {
+    $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();
 
     // First custom set
     CustomGroup::create(FALSE)
@@ -118,6 +120,9 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
         ->addValue('html_type', 'Text')
         ->addValue('data_type', 'String'))
       ->execute();
+
+    // Test that no new option groups have been created (these are text fields with no options)
+    $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
 
     $contactId1 = Contact::create(FALSE)
       ->addValue('first_name', 'Johann')
