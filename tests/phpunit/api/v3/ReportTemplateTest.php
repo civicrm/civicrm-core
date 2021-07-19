@@ -32,6 +32,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
+    (new CRM_Logging_Schema())->dropAllLogTables();
     parent::tearDown();
   }
 
@@ -313,10 +314,16 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (stripos($reportID, 'has existing issues') !== FALSE) {
       $this->markTestIncomplete($reportID);
     }
+    if (strpos($reportID, 'logging') === 0) {
+      Civi::settings()->set('logging', 1);
+    }
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookNoResults']);
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $reportID,
     ]);
+    if (strpos($reportID, 'logging') === 0) {
+      Civi::settings()->set('logging', 0);
+    }
   }
 
   /**
@@ -335,6 +342,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if (in_array($reportID, ['contribute/softcredit', 'contribute/bookkeeping'])) {
       $this->markTestIncomplete($reportID . ' has non enotices when calling statistics fn');
     }
+    if (strpos($reportID, 'logging') === 0) {
+      Civi::settings()->set('logging', 1);
+    }
     $description = "Get Statistics from a report (note there isn't much data to get in the test DB).";
     if ($reportID === 'contribute/summary') {
       $this->hookClass->setHook('civicrm_alterReportVar', [$this, 'alterReportVarHook']);
@@ -342,6 +352,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPIAndDocument('report_template', 'getstatistics', [
       'report_id' => $reportID,
     ], __FUNCTION__, __FILE__, $description, 'Getstatistics');
+    if (strpos($reportID, 'logging') === 0) {
+      Civi::settings()->set('logging', 0);
+    }
   }
 
   /**
