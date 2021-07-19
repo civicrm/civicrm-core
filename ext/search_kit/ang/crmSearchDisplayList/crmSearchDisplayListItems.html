@@ -1,7 +1,7 @@
 <li ng-repeat="(rowIndex, row) in $ctrl.results">
-  <div ng-repeat="col in $ctrl.settings.columns" title="{{:: displayUtils.replaceTokens(col.title, row, $ctrl.settings.columns) }}" class="{{:: col.break ? '' : 'crm-inline-block' }}">
+  <div ng-repeat="col in $ctrl.settings.columns" title="{{:: $ctrl.replaceTokens(col.title, row) }}" class="{{:: col.break ? '' : 'crm-inline-block' }}">
     <label ng-if=":: col.label && (col.type !== 'field' || col.forceLabel || row[col.key])">
-      {{:: displayUtils.replaceTokens(col.label, row, $ctrl.settings.columns) }}
+      {{:: $ctrl.replaceTokens(col.label, row) }}
     </label>
     <span ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'"></span>
   </div>
