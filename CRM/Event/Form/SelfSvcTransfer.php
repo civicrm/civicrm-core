@@ -22,7 +22,7 @@
  */
 class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
-   * from particpant id
+   * from participant id
    *
    * @var string
    *
@@ -36,14 +36,14 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   protected $_from_contact_id;
   /**
-   * last name of the particpant to transfer to
+   * last name of the participant to transfer to
    *
    * @var string
    *
    */
   protected $_to_contact_last_name;
   /**
-   * first name of the particpant to transfer to
+   * first name of the participant to transfer to
    *
    * @var string
    *
@@ -93,7 +93,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    */
   protected $_participant = [];
   /**
-   * particpant values
+   * participant values
    *
    * @var string
    */
