@@ -1,10 +1,6 @@
-<div class="btn-group btn-group-xs">
-  <button type="button" class="btn btn-default-outline dropdown-toggle" ng-click="$ctrl.initTokens()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    {{:: ts('Tokens') }} <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu dropdown-menu-right">
-    <li ng-repeat="(id, token) in $ctrl.tokens" >
-      <a href ng-click="$ctrl.insertToken(id)">{{ token.label }}</a>
-    </li>
-  </ul>
-</div>
+<span title="{{:: ts('Insert Tokens') }}">
+  <input class="form-control crm-action-menu fa-code collapsible-optgroups"
+         crm-ui-select="{placeholder: ' ', data: $ctrl.getTokens, width: '52px', containerCss: {minWidth: '52px'}, dropdownCss: {width: '250px'}}"
+         on-crm-ui-select="$ctrl.insertToken(selection)"
+  />
+</span>

@@ -27,7 +27,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
   /**
    * Test running a searchDisplay with various filters.
    */
-  public function testRunDisplay() {
+  public function testRunWithFilters() {
     foreach (['Tester', 'Bot'] as $type) {
       ContactType::create(FALSE)
         ->addValue('parent_id.name', 'Individual')
@@ -120,6 +120,84 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $params['filters'] = ['contact_sub_type' => ['Tester']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
+  }
+
+  /**
+   * Test return values are augmented by tokens.
+   */
+  public function testWithTokens() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName, 'source' => 'Unit test'],
+      ['first_name' => 'Two', 'last_name' => $lastName, 'source' => 'Unit test'],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'display_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'dataType' => 'Integer',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'display_name',
+              'label' => 'Display Name',
+              'dataType' => 'String',
+              'type' => 'field',
+              'link' => [
+                'path' => 'civicrm/test/token-[sort_name]',
+              ],
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(2, $result);
+    $this->assertNotEmpty($result->first()['display_name']);
+    // Assert that display name was added to the search due to the link token
+    $this->assertNotEmpty($result->first()['sort_name']);
+
+    // These items are not part of the search, but will be added via links
+    $this->assertArrayNotHasKey('contact_type', $result->first());
+    $this->assertArrayNotHasKey('source', $result->first());
+    $this->assertArrayNotHasKey('last_name', $result->first());
+
+    // Add links
+    $params['display']['settings']['columns'][] = [
+      'type' => 'links',
+      'label' => 'Links',
+      'links' => [
+        ['path' => 'civicrm/test-[source]-[contact_type]'],
+        ['path' => 'civicrm/test-[last_name]'],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals('Individual', $result->first()['contact_type']);
+    $this->assertEquals('Unit test', $result->first()['source']);
+    $this->assertEquals($lastName, $result->first()['last_name']);
   }
 
   /**

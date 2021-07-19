@@ -142,11 +142,14 @@
           if (join.bridge) {
             var bridgeFields = _.cloneDeep(entityFields(join.bridge)),
               bridgeEntity = getEntity(join.bridge),
-              joinFieldNames = _.pluck(joinFields, 'name');
+              joinFieldNames = _.pluck(joinFields, 'name'),
+              // Check if this is a symmetric bridge e.g. RelationshipCache joins Contact to Contact
+              bridgePair = _.keys(bridgeEntity.bridge),
+              symmetric = getField(bridgePair[0], join.bridge).entity === getField(bridgePair[1], join.bridge).entity;
             _.each(bridgeFields, function(field) {
               if (
                 // Only include bridge fields that link back to the original entity
-                (!bridgeEntity.bridge[field.name] || field.fk_entity !== join.entity) &&
+                (!bridgeEntity.bridge[field.name] || field.fk_entity !== join.entity || symmetric) &&
                 // Exclude fields with the same name as those in the original entity
                 !_.includes(joinFieldNames, field.name)
               ) {
