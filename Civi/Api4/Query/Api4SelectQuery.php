@@ -396,7 +396,7 @@ class Api4SelectQuery {
           foreach ($clause[1] as $subclause) {
             $sql_subclauses[] = $this->treeWalkClauses($subclause, $type, $depth + 1);
           }
-          return '(' . implode("\n" . $clause[0], $sql_subclauses) . ')';
+          return '(' . implode("\n" . $clause[0] . ' ', $sql_subclauses) . ')';
         }
 
       case 'NOT':

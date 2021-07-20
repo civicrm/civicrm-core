@@ -259,4 +259,14 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
+  /**
+   * @throws \API_Exception
+   */
+  public function testOrClause(): void {
+    Contact::get()
+      ->addClause('OR', ['first_name', '=', '🚂'], ['last_name', '=', '🚂'])
+      ->setCheckPermissions(FALSE)
+      ->execute();
+  }
+
 }
