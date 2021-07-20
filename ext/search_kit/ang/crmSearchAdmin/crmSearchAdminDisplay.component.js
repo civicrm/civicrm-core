@@ -264,12 +264,20 @@
         // Links to explicitly joined entities
         _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
           var join = searchMeta.getJoin(joinClause[0]),
-            joinEntity = searchMeta.getEntity(join.entity);
+            joinEntity = searchMeta.getEntity(join.entity),
+            bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
             link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
             link.join = join.alias;
             addTitle(link, join.label);
+            links.push(link);
+          });
+          _.each(bridgeEntity && bridgeEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+            link.join = join.alias;
+            addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
             links.push(link);
           });
         });
