@@ -264,7 +264,7 @@ class FkJoinTest extends UnitTestCase {
         ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
       )
       ->addChain('r2', Relationship::create()
-        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id' => 2])
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id' => 2, 'is_active' => FALSE])
       )
       ->execute()
       ->first()['id'];
@@ -308,6 +308,41 @@ class FkJoinTest extends UnitTestCase {
     $this->assertNull($result[3]['rel.id']);
     $this->assertEquals($cid3, $result[4]['contact.id']);
     $this->assertNull($result[3]['rel.id']);
+
+    // Ensure calculated fields such as is_current work correctly for both LEFT and INNER joins
+    foreach (['LEFT', 'INNER'] as $side) {
+      $result = civicrm_api4('Contact', 'get', [
+        'select' => [
+          'id',
+          'display_name',
+          'Contact_RelationshipCache_Contact_01.id',
+          'Contact_RelationshipCache_Contact_01.near_relation:label',
+          'Contact_RelationshipCache_Contact_01.is_current',
+          'Contact_RelationshipCache_Contact_01.relationship_id',
+          'Contact_RelationshipCache_Contact_01.orientation',
+        ],
+        'where' => [
+          ['Contact_RelationshipCache_Contact_01.id', '=', $cid3],
+        ],
+        'join' => [
+          [
+            'Contact AS Contact_RelationshipCache_Contact_01',
+            $side,
+            'RelationshipCache',
+            ['id', '=', 'Contact_RelationshipCache_Contact_01.far_contact_id'],
+          ],
+        ],
+        'orderBy' => ['id' => 'ASC'],
+        'checkPermissions' => TRUE,
+        'limit' => 50,
+        'offset' => 0,
+      ]);
+      $this->assertEquals($cid1, $result[0]['id']);
+      $this->assertEquals($cid2, $result[1]['id']);
+      $this->assertEquals($cid3, $result[1]['Contact_RelationshipCache_Contact_01.id']);
+      $this->assertEquals(TRUE, $result[0]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertEquals(FALSE, $result[1]['Contact_RelationshipCache_Contact_01.is_current']);
+    }
   }
 
   public function testJoinToEmployerId() {
