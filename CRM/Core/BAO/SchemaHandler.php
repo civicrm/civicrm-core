@@ -920,7 +920,7 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function databaseSupportsUTF8MB4(): bool {
     if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
-      \Civi::$statics[__CLASS__][__FUNCTION__] = stripos(self::getInUseCollation(), 'utf8mb4') === TRUE;
+      \Civi::$statics[__CLASS__][__FUNCTION__] = stripos(self::getInUseCollation(), 'utf8mb4') === 0;
     }
     return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
