@@ -1143,6 +1143,31 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Move an item in an array-tree (if it exists).
+   *
+   * @param array $values
+   *   Data-tree
+   * @param string[] $src
+   *   Old path for the existing item
+   * @param string[] $dest
+   *   New path
+   * @param bool $cleanup
+   * @return int
+   *   Number of items moved (0 or 1).
+   */
+  public static function pathMove(&$values, $src, $dest, $cleanup = FALSE) {
+    if (!static::pathIsset($values, $src)) {
+      return 0;
+    }
+    else {
+      $value = static::pathGet($values, $src);
+      static::pathSet($values, $dest, $value);
+      static::pathUnset($values, $src, $cleanup);
+      return 1;
+    }
+  }
+
+  /**
    * Convert a simple dictionary into separate key+value records.
    *
    * @param array $array
