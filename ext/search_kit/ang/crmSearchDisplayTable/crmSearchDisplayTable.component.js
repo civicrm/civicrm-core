@@ -13,44 +13,22 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, crmApi4, searchDisplayUtils) {
+    controller: function($scope, $element, crmApi4, searchDisplayBaseTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        // Mix in properties of searchDisplayBaseTrait
+        ctrl = angular.extend(this, searchDisplayBaseTrait);
 
-      this.page = 1;
-      this.rowCount = null;
       this.selectedRows = [];
       this.allRowsSelected = false;
 
       this.$onInit = function() {
-        this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
-        $scope.displayUtils = searchDisplayUtils;
-
-        // If search is embedded in contact summary tab, display count in tab-header
-        var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab) {
-          var unwatchCount = $scope.$watch('$ctrl.rowCount', function(rowCount) {
-            if (typeof rowCount === 'number') {
-              unwatchCount();
-              CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
-            }
-          });
-        }
-
-        if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
-        }
-        $scope.$watch('$ctrl.filters', onChangeFilters, true);
+        this.initializeDisplay($scope, $element);
       };
-
-      this.getResults = _.debounce(function() {
-        searchDisplayUtils.getResults(ctrl);
-      }, 100);
 
       // Refresh page after inline-editing a row
       this.refresh = function(row) {
         var rowId = row.id;
-        searchDisplayUtils.getResults(ctrl)
+        ctrl.getResults()
           .then(function() {
             // If edited row disappears (because edits cause it to not meet search criteria), deselect it
             var index = ctrl.selectedRows.indexOf(rowId);
@@ -60,13 +38,10 @@
           });
       };
 
-      function onChangeFilters() {
-        ctrl.page = 1;
-        ctrl.rowCount = null;
+      this.onChangeFilters = function() {
         ctrl.selectedRows.legth = 0;
         ctrl.allRowsSelected = false;
-        ctrl.getResults();
-      }
+      };
 
       /**
        * Returns crm-i icon class for a sortable column
@@ -102,23 +77,7 @@
         } else {
           ctrl.sort.push([col.key, dir]);
         }
-        ctrl.getResults();
-      };
-
-      this.formatFieldValue = function(rowData, col) {
-        return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
-      };
-
-      this.replaceTokens = function(value, row, raw) {
-        return searchDisplayUtils.replaceTokens(value, row, raw ? null : ctrl.settings.columns);
-      };
-
-      this.getLinks = function(rowData, col) {
-        rowData._links = rowData._links || {};
-        if (!(col.key in rowData._links)) {
-          rowData._links[col.key] = searchDisplayUtils.formatLinks(rowData, col.key, ctrl.settings.columns);
-        }
-        return rowData._links[col.key];
+        $scope.getResults();
       };
 
       $scope.selectAllRows = function() {
@@ -136,7 +95,7 @@
         }
         // If more than one page of results, use ajax to fetch all ids
         $scope.loadingAllRows = true;
-        var params = searchDisplayUtils.getApiParams(ctrl, 'id');
+        var params = ctrl.getApiParams('id');
         crmApi4('SearchDisplay', 'run', params, ['id']).then(function(ids) {
           $scope.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);

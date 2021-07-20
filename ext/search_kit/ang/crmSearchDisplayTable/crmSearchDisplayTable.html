@@ -1,6 +1,6 @@
 <div class="crm-search-display crm-search-display-table">
   <div class="form-inline" ng-if="$ctrl.settings.actions">
-    <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-tasks>
+    <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="getResults()"></crm-search-tasks>
   </div>
   <table>
     <thead>
@@ -19,7 +19,7 @@
         <td ng-if=":: $ctrl.settings.actions">
           <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(!loadingAllRows && row.id)">
         </td>
-        <td ng-repeat="col in $ctrl.settings.columns" ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'" title="{{:: displayUtils.replaceTokens(col.title, row, $ctrl.settings.columns) }}" class="{{:: col.alignment }}">
+        <td ng-repeat="col in $ctrl.settings.columns" ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'" title="{{:: $ctrl.replaceTokens(col.title, row) }}" class="{{:: col.alignment }}">
         </td>
         <td></td>
       </tr>

@@ -14,63 +14,18 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayList/crmSearchDisplayList.html',
-    controller: function($scope, $element, crmApi4, searchDisplayUtils) {
+    controller: function($scope, $element, searchDisplayBaseTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
-
-      this.page = 1;
-      this.rowCount = null;
+        // Mix in properties of searchDisplayBaseTrait
+        ctrl = angular.extend(this, searchDisplayBaseTrait);
 
       this.$onInit = function() {
-        this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
-        $scope.displayUtils = searchDisplayUtils;
-
-        // If search is embedded in contact summary tab, display count in tab-header
-        var contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        if (contactTab) {
-          var unwatchCount = $scope.$watch('$ctrl.rowCount', function(rowCount) {
-            if (typeof rowCount === 'number') {
-              unwatchCount();
-              CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
-            }
-          });
-        }
-
-        if (this.afFieldset) {
-          $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
-        }
-        $scope.$watch('$ctrl.filters', onChangeFilters, true);
+        this.initializeDisplay($scope, $element);
       };
-
-      this.getResults = _.debounce(function() {
-        searchDisplayUtils.getResults(ctrl);
-      }, 100);
 
       // Refresh current page
       this.refresh = function(row) {
-        searchDisplayUtils.getResults(ctrl);
-      };
-
-      function onChangeFilters() {
-        ctrl.page = 1;
-        ctrl.rowCount = null;
         ctrl.getResults();
-      }
-
-      this.formatFieldValue = function(rowData, col) {
-        return searchDisplayUtils.formatDisplayValue(rowData, col.key, ctrl.settings.columns);
-      };
-
-      this.replaceTokens = function(value, row, raw) {
-        return searchDisplayUtils.replaceTokens(value, row, raw ? null : ctrl.settings.columns);
-      };
-
-      this.getLinks = function(rowData, col) {
-        rowData._links = rowData._links || {};
-        if (!(col.key in rowData._links)) {
-          rowData._links[col.key] = searchDisplayUtils.formatLinks(rowData, col.key, ctrl.settings.columns);
-        }
-        return rowData._links[col.key];
       };
 
     }
