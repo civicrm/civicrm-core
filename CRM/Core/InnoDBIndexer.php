@@ -14,7 +14,7 @@
  * full-text indices on InnoDB classes.
  */
 class CRM_Core_InnoDBIndexer {
-  const IDX_PREFIX = "civicrm_fts_";
+  const IDX_PREFIX = 'civicrm_fts_';
 
   /**
    * @var CRM_Core_InnoDBIndexer
@@ -71,10 +71,8 @@ class CRM_Core_InnoDBIndexer {
    *
    * @param bool $oldValue
    * @param bool $newValue
-   * @param array $metadata
-   *   Specification of the setting (per *.settings.php).
    */
-  public static function onToggleFts($oldValue, $newValue, $metadata) {
+  public static function onToggleFts($oldValue, $newValue): void {
     if (empty($oldValue) && empty($newValue)) {
       return;
     }
@@ -162,19 +160,15 @@ class CRM_Core_InnoDBIndexer {
    */
   public function findActualFtsIndexNames($table) {
     $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    if (version_compare($mysqlVersion, '5.6', '<')) {
-      // If we're not on 5.6+, then there cannot be any InnoDB FTS indices!
-      // Also: information_schema.innodb_sys_indexes is only available on 5.6+.
-      return [];
-    }
-
-    // Note: this only works in MySQL 5.6,  but this whole system is intended to only work in MySQL 5.6
     // Note: In MYSQL 8 the Tables have been renamed from INNODB_SYS_TABLES and INNODB_SYS_INDEXES to INNODB_TABLES and INNODB_INDEXES
-    $innodbTable = "innodb_sys_tables";
+    $innodbTable = 'innodb_sys_tables';
     $innodbIndex = "innodb_sys_indexes";
-    if (version_compare($mysqlVersion, '8.0', '>=')) {
-      $innodbTable = "innodb_tables";
-      $innodbIndex = "innodb_indexes";
+    if (version_compare($mysqlVersion, '8.0', '>=')
+      // As of 10.4 mariadb is NOT adopting the mysql 8 table names
+      // - this means it's likely it never will.
+      && stripos($mysqlVersion, 'mariadb') === FALSE) {
+      $innodbTable = 'innodb_tables';
+      $innodbIndex = 'innodb_indexes';
     }
     $sql = "
       SELECT i.name as `index_name`
@@ -200,7 +194,7 @@ class CRM_Core_InnoDBIndexer {
    * @return array
    *   (string $indexName => string $sql)
    */
-  public function buildIndexSql($table) {
+  public function buildIndexSql($table): array {
     // array (string $idxName => string $sql)
     $sqls = [];
     if ($this->isActive && isset($this->indices[$table])) {
