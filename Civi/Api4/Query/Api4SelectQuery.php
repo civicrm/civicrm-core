@@ -903,14 +903,16 @@ class Api4SelectQuery {
     $bridgeFkFields = [$joinRef->getReferenceKey(), $joinRef->getTypeColumn(), $baseRef->getReferenceKey(), $baseRef->getTypeColumn()];
     $bridgeEntityClass = CoreUtil::getApiClass($bridgeEntity);
     foreach ($bridgeEntityClass::get($this->getCheckPermissions())->entityFields() as $name => $field) {
-      if ($field['type'] !== 'Field' || $name === 'id' || ($side === 'INNER' && in_array($name, $bridgeFkFields, TRUE))) {
+      if ($name === 'id' || ($side === 'INNER' && in_array($name, $bridgeFkFields, TRUE))) {
         continue;
       }
       // For INNER joins, these fields get a sql alias pointing to the bridge entity,
       // but an api alias pretending they belong to the join entity.
       $field['sql_name'] = '`' . ($side === 'LEFT' ? $alias : $bridgeAlias) . '`.`' . $field['column_name'] . '`';
       $this->addSpecField($alias . '.' . $name, $field);
-      $fakeFields[$field['column_name']] = '`' . $bridgeAlias . '`.`' . $field['column_name'] . '`';
+      if ($field['type'] === 'Field') {
+        $fakeFields[$field['column_name']] = '`' . $bridgeAlias . '`.`' . $field['column_name'] . '`';
+      }
     }
     return $fakeFields;
   }
