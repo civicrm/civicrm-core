@@ -22,6 +22,7 @@ namespace api\v4\Action;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\OptionGroup;
 use Civi\Api4\Relationship;
 use Civi\Api4\RelationshipCache;
 
@@ -268,6 +269,41 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertCount(2, $results);
     $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
+  }
+
+  /**
+   * Some types are creating a dummy option group even if we don't have
+   * any option values.
+   * @throws \API_Exception
+   */
+  public function testUndesiredOptionGroupCreation(): void {
+    $optionGroupCount = OptionGroup::get(FALSE)->selectRowCount()->execute()->count();
+
+    $customGroup = CustomGroup::create(FALSE)
+      ->addValue('name', 'MyIndividualFields')
+      ->addValue('extends', 'Individual')
+      ->execute()
+      ->first();
+
+    // This one doesn't make sense to have an option group.
+    CustomField::create(FALSE)
+      ->addValue('label', 'FavColor')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Number')
+      ->addValue('data_type', 'Money')
+      ->execute();
+
+    // This one might be ok if we planned to then use the autocreated option
+    // group, but if we go on to create our own after then we have an extra
+    // unused group.
+    CustomField::create(FALSE)
+      ->addValue('label', 'FavMovie')
+      ->addValue('custom_group_id', $customGroup['id'])
+      ->addValue('html_type', 'Select')
+      ->addValue('data_type', 'String')
+      ->execute();
+
+    $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
   }
 
 }
