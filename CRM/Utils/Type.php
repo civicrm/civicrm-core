@@ -474,6 +474,101 @@ class CRM_Utils_Type {
   }
 
   /**
+   * Validate that a value matches a PHP type.
+   *
+   * Note that, at a micro-level, this is probably slower than using real PHP type-checking, but it doesn't seem bad.
+   * (In light benchmarking of ~1000 validations on an i3-10100, there is no obvious effect on the execution-time.)
+   * Should be fast enough for validating business entities.
+   *
+   * Example usage: 'validatePhpType(123, 'int|double');`
+   *
+   * @param mixed $value
+   * @param string|string[] $types
+   *   The list of acceptable PHP types and/or classnames.
+   *   Either an array or a string (with '|' delimiters).
+   *   Note that 'null' is a distinct type.
+   *   Ex: 'int'
+   *   Ex: 'Countable|null'
+   *   Ex: 'string|bool'
+   *   Ex: 'string|false'
+   * @param bool $isStrict
+   *   If data is likely to come from another text medium, then you may want to
+   *   allow (say) numbers and string-like-numbers to be used interchangably.
+   *
+   *   With $isStrict=TRUE, the string "123" does not match type "int". The int 456 does not match type "double". etc.
+   *
+   *   With $isStrict=FALSE, the string "123" will match types "string", "int", and "double".
+   * @return bool
+   */
+  public static function validatePhpType($value, $types, bool $isStrict = TRUE) {
+    if (is_string($types)) {
+      $types = preg_split('/ *\| */', $types);
+    }
+
+    $checkTypeStrict = function($type, $value) {
+      static $aliases = ['integer' => 'int', 'boolean' => 'bool', 'float' => 'double', 'NULL' => 'null'];
+      switch ($type) {
+        case 'mixed':
+          return TRUE;
+
+        case 'false':
+        case 'FALSE':
+        case 'true':
+        case 'TRUE':
+          $expectBool = mb_strtolower($type) === 'true';
+          return $value === $expectBool;
+      }
+      $realType = gettype($value);
+      if (($aliases[$realType] ?? $realType) === ($aliases[$type] ?? $type)) {
+        return TRUE;
+      }
+      if ($realType === 'object' && $value instanceof $type) {
+        return TRUE;
+      }
+      return FALSE;
+    };
+    $checkTypeRelaxed = function($type, $value) use ($checkTypeStrict) {
+      switch ($type) {
+        case 'string':
+          return is_string($value) || is_int($value) || is_float($value);
+
+        case 'bool':
+        case 'boolean':
+          return is_bool($value) || CRM_Utils_Rule::integer($value);
+
+        case 'int':
+        case' integer':
+          return CRM_Utils_Rule::integer($value);
+
+        case 'float':
+        case 'double':
+          return CRM_Utils_Rule::numeric($value);
+
+        default:
+          return $checkTypeStrict($type, $value);
+      }
+    };
+    $checkType = $isStrict ? $checkTypeStrict : $checkTypeRelaxed;
+
+    foreach ($types as $type) {
+      $isTypedArray = substr($type, -2, 2) === '[]';
+      if (!$isTypedArray && $checkType($type, $value)) {
+        return TRUE;
+      }
+      if ($isTypedArray && is_array($value)) {
+        $baseType = substr($type, 0, -2);
+        foreach ($value as $vItem) {
+          if (!\CRM_Utils_Type::validatePhpType($vItem, [$baseType], $isStrict)) {
+            continue 2;
+          }
+        }
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Preg_replace_callback for mysqlOrderByFieldFunction escape.
    *
    * Add backticks around the field name.
