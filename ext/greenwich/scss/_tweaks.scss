@@ -20,3 +20,8 @@ label input[type=checkbox]:not(:checked) + * {
 input[type="search"]::-webkit-search-cancel-button {
   -webkit-appearance: searchfield-cancel-button;
 }
+/* civicrm.css makes this too big */
+.select2-container .select2-choice > .select2-chosen {
+  font-size: inherit;
+  font-weight: normal;
+}
