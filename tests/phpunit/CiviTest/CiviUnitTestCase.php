@@ -1870,16 +1870,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
-
-      CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
-        ->addChain('delete_options', OptionGroup::delete()
-          ->addWhere('id', '=', '$option_group_id')
-        )
-        ->addChain('delete_fields', CustomField::delete()
-          ->addWhere('id', '=', '$id')
-        )->execute();
-
-      CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+      $this->cleanupCustomGroups();
       // Reset autoincrement too.
       $tablesToTruncate[] = 'civicrm_custom_group';
       $tablesToTruncate[] = 'civicrm_custom_field';
@@ -3876,6 +3867,23 @@ WHERE a1.is_primary = 0
       'Case Coordinator is',
       'Supervised by',
     ])->execute();
+  }
+
+  /**
+   * Delete any existing custom data groups.
+   *
+   * @throws \API_Exception
+   */
+  protected function cleanupCustomGroups(): void {
+    CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
+      ->addChain('delete_options', OptionGroup::delete()
+        ->addWhere('id', '=', '$option_group_id')
+      )
+      ->addChain('delete_fields', CustomField::delete()
+        ->addWhere('id', '=', '$id')
+      )->execute();
+
+    CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
   }
 
 }

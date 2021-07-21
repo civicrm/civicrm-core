@@ -91,12 +91,11 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $fieldParams
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
-  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = NULL, $fieldParams = []): void {
+  public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
     $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
     if (!in_array($customFieldType, $supported, TRUE)) {
-      throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
+      $this->fail('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
     $groupParams['title'] = empty($groupParams['title']) ? $identifier . 'Group with field ' . $customFieldType : $groupParams['title'];
     $groupParams['name'] = $identifier ?? 'Custom Group';
