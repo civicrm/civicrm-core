@@ -12,7 +12,7 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
     // cleanup logic.
     $idx = new CRM_Core_InnoDBIndexer(FALSE, []);
     $idx->fixSchemaDifferences();
-
+    $this->assertFullTextIndexesNotPresent();
     parent::tearDown();
   }
 
@@ -65,11 +65,6 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
    * When enabled, the FTS index is created, so queries that rely on FTS work.
    */
   public function testEnabled() {
-    if (!$this->supportsFts()) {
-      $this->markTestSkipped("Local installation of InnoDB does not support FTS.");
-      return;
-    }
-
     $idx = new CRM_Core_InnoDBIndexer(TRUE, [
       'civicrm_contact' => [
         ['first_name', 'last_name'],
@@ -81,10 +76,14 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
   }
 
   /**
-   * @return mixed
+   * Assert that all indices have been removed.
    */
-  public function supportsFts() {
-    return version_compare(CRM_Core_DAO::singleValueQuery('SELECT VERSION()'), '5.6.0', '>=');
+  protected function assertFullTextIndexesNotPresent(): void {
+    $this->assertEmpty(CRM_Core_DAO::singleValueQuery("
+  SELECT GROUP_CONCAT(CONCAT(table_name, ' ', index_name))
+  FROM information_Schema.STATISTICS
+  WHERE table_schema = '" . CRM_Core_DAO::getDatabaseName() . "'
+    AND index_type = 'FULLTEXT'"), 'Full text indices should have been removed');
   }
 
 }
