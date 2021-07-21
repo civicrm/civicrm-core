@@ -67,7 +67,7 @@
             // Multiselects cannot use range search
             !ctrl.getDefn().input_attrs.multiple &&
             // DataType & inputType must make sense for a range
-            _.includes(['Date', 'Timestamp', 'Integer', 'Float'], ctrl.getDefn().data_type) &&
+            _.includes(['Date', 'Timestamp', 'Integer', 'Float', 'Money'], ctrl.getDefn().data_type) &&
             _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'))
         ));
       };
