@@ -417,7 +417,13 @@ class CRM_Utils_Type {
       case 'String':
       case 'Link':
       case 'Memo':
-        return $data;
+        // This probably should be `is_string()` or `CRM_Utils_Rule::string()`, but
+        // traditionally there was no enforcement here, so we'll be generous about some
+        // values (integer/float/double/null) that can trivially cast to string.
+        if (is_scalar($data) || $data === NULL) {
+          return $data;
+        }
+        break;
 
       case 'Date':
       case 'Timestamp':
