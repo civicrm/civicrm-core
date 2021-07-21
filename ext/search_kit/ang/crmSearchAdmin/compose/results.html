@@ -13,7 +13,9 @@
         </span>
       </th>
       <th class="form-inline">
-        <input class="form-control crm-action-menu fa-plus" ng-model="controls.select" crm-ui-select="::{data: fieldsForSelect, placeholder: ts('Add')}" ng-change="addParam('select')">
+        <input class="form-control crm-action-menu fa-plus"
+               crm-ui-select="::{data: fieldsForSelect, placeholder: ts('Add'), width: '80px', containerCss: {minWidth: '80px'}, dropdownCss: {width: '300px'}}"
+               on-crm-ui-select="$ctrl.addParam('select', selection)" >
       </th>
     </tr>
   </thead>

@@ -16,7 +16,10 @@
       <fieldset>
         <div class="form-inline">
           <select class="form-control" ng-model="controls.joinType" ng-options="o.k as o.v for o in ::joinTypes" ></select>
-          <input id="crm-search-add-join" class="form-control crm-action-menu fa-plus huge" ng-model="controls.join" crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities}" ng-change="addJoin()"/>
+          <input id="crm-search-add-join"
+                 class="form-control crm-action-menu fa-plus"
+                 crm-ui-select="{placeholder: ts('Entity'), data: getJoinEntities, dropdownCss: {width: '275px'}}"
+                 on-crm-ui-select="$ctrl.addJoin(selection)">
         </div>
       </fieldset>
     </div>
@@ -27,7 +30,10 @@
         <hr>
       </div>
       <div class="form-inline">
-        <input id="crm-search-add-groupBy" class="form-control crm-action-menu fa-plus huge" ng-model="controls.groupBy" crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy}" ng-change="addParam('groupBy')"/>
+        <input id="crm-search-add-groupBy"
+               class="form-control crm-action-menu fa-plus"
+               crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
+               on-crm-ui-select="$ctrl.addParam('groupBy', selection)" >
       </div>
       <fieldset id="crm-search-build-group-aggregate" ng-if="$ctrl.savedSearch.api_params.groupBy.length" class="crm-collapsible collapsed">
         <legend class="collapsible-title">{{:: ts('Aggregate fields') }}</legend>
