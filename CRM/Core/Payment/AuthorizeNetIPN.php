@@ -173,7 +173,6 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $input['amount'] = $this->retrieve('x_amount', 'String');
     $input['subscription_id'] = $this->retrieve('x_subscription_id', 'Integer');
     $input['response_code'] = $this->retrieve('x_response_code', 'Integer');
-    $input['MD5_Hash'] = $this->retrieve('x_MD5_Hash', 'String', FALSE, '');
     $input['response_reason_code'] = $this->retrieve('x_response_reason_code', 'String', FALSE);
     $input['response_reason_text'] = $this->retrieve('x_response_reason_text', 'String', FALSE);
     $input['subscription_paynum'] = $this->retrieve('x_subscription_paynum', 'Integer', FALSE, 0);
