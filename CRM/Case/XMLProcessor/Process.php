@@ -707,7 +707,7 @@ AND        a.is_deleted = 0
     }
 
     $contact = civicrm_api3('Contact', 'get', [
-      'id' => $activityTypeXML->default_assignee_contact,
+      'id' => (string) $activityTypeXML->default_assignee_contact,
     ]);
 
     if ($contact['count'] == 1) {
