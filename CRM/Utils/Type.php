@@ -376,6 +376,7 @@ class CRM_Utils_Type {
       'Money',
       'Text',
       'String',
+      'Blob',
       'Link',
       'Memo',
       'Date',
@@ -415,6 +416,7 @@ class CRM_Utils_Type {
 
       case 'Text':
       case 'String':
+      case 'Blob':
       case 'Link':
       case 'Memo':
         return $data;
