@@ -177,19 +177,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test  using example code.
-   */
-  /*function testCustomFieldCreateExample( )
-  {
-
-  $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
-  require_once 'api/v3/examples/CustomField/Create.ex.php';
-  $result = custom_field_create_example();
-  $expectedResult = custom_field_create_expectedresult();
-  $this->assertEquals($result,$expectedResult);
-  }*/
-
-  /**
    * Check with data type - Options with option_values
    */
   public function testCustomFieldCreateWithEmptyOptionGroup(): void {
@@ -216,7 +203,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionGroup = $this->callAPISuccess('option_group', 'getsingle', [
       'id' => $optionGroupID,
     ]);
-    $this->assertEquals($optionGroup['title'], 'Country');
+    $this->assertEquals('Country', $optionGroup['title']);
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);

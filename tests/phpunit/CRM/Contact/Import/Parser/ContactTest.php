@@ -689,7 +689,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test the determination of whether a custom field is valid.
    */
-  public function testCustomFieldValidation() {
+  public function testCustomFieldValidation(): void {
     $errorMessage = [];
     $customGroup = $this->customGroupCreate([
       'extends' => 'Contact',
