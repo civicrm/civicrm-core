@@ -621,6 +621,14 @@ class CRM_Utils_Rule {
 
   /**
    * @param $value
+   * @return bool
+   */
+  public static function blob($value) {
+    return is_string($value);
+  }
+
+  /**
+   * @param $value
    *
    * @return bool
    */

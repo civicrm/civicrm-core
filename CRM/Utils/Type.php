@@ -376,6 +376,8 @@ class CRM_Utils_Type {
       'Money',
       'Text',
       'String',
+      'Blob',
+      'Mediumblob',
       'Link',
       'Memo',
       'Date',
@@ -409,6 +411,13 @@ class CRM_Utils_Type {
       case 'Float':
       case 'Money':
         if (CRM_Utils_Rule::numeric($data)) {
+          return $data;
+        }
+        break;
+
+      case 'Blob':
+      case 'Mediumblob':
+        if (CRM_Utils_Rule::blob($data)) {
           return $data;
         }
         break;
