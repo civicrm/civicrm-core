@@ -2009,7 +2009,7 @@ WHERE  id IN ( %1, %2 )
       // the option_values key. If not set then it is not ignored.
       $optionsType = (int) ($params['option_type'] ?? 0);
       if (($optionsType !== 2 && empty($params['id']))
-        && (empty($params['option_group_id']) || !empty($params['option_value'])
+        && (empty($params['option_group_id']) && !empty($params['option_value'])
         )
       ) {
         // first create an option group for this custom group
