@@ -97,7 +97,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         }
       }
       if (!empty($addressCustom)) {
-        CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id);
+        CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id, $hook);
       }
 
       // call the function to sync shared address and create relationships
