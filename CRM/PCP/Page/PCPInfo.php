@@ -57,6 +57,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     CRM_Utils_System::setTitle($pcpInfo['title']);
     $this->assign('pcp', $pcpInfo);
+    $this->assign('currency', $pcpInfo['currency']);
 
     $pcpStatus = CRM_Core_OptionGroup::values("pcp_status");
     $approvedId = CRM_Core_PseudoConstant::getKey('CRM_PCP_BAO_PCP', 'status_id', 'Approved');

@@ -50,7 +50,7 @@
       {if $pcp.is_thermometer}
       <div class="thermometer-wrapper">
           <div class="pcp-amount-goal">
-            {ts}Goal{/ts} <span class="goal-amount crmMoney">{$pcp.goal_amount|crmMoney}</span>
+            {ts}Goal{/ts} <span class="goal-amount crmMoney">{$pcp.goal_amount|crmMoney:$currency}</span>
         </div>
         <div class="thermometer-fill-wrapper">
             <div style="height: {$achieved}%;" class="thermometer-fill">
@@ -58,7 +58,7 @@
             </div><!-- /.thermometer-fill -->
         </div><!-- /.thermometer-fill-wrapper -->
         <div class="pcp-amount-raised">
-             <span class="raised-amount crmMoney">{$total|crmMoney}</span> {ts}raised{/ts}
+             <span class="raised-amount crmMoney">{$total|crmMoney:$currency}</span> {ts}raised{/ts}
         </div>
     </div>
       {/if}
