@@ -419,7 +419,11 @@ class CRM_Utils_Type {
       case 'Blob':
       case 'Link':
       case 'Memo':
-        return $data;
+        // This probably should be `is_string()` or `CRM_Utils_Rule::string()`, but traditionally there was no type enforcement, so we'll be generous about stringy scalars.
+        if (is_scalar($data)) {
+          return $data;
+        }
+        break;
 
       case 'Date':
       case 'Timestamp':
