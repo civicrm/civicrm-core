@@ -538,7 +538,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'yid_value' => 2015,
       'yid_op' => 'fiscal',
       'options' => ['metadata' => ['sql']],
-      'fields' => ['first_name'],
+      'fields' => ['first_name' => 1],
       'order_bys' => [
         [
           'column' => 'last_year_total_amount',
