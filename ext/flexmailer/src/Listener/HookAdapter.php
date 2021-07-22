@@ -30,10 +30,10 @@ class HookAdapter extends BaseListener {
       if ($mailParams) {
         \CRM_Utils_Hook::alterMailParams($mailParams, 'flexmailer');
         if (!empty($mailParams['text'])) {
-          $mailParams['text'] = CRM_Utils_Mail::wrapEmailText($mailParams['text']);
+          $mailParams['text'] = \CRM_Utils_Mail::wrapEmailText($mailParams['text']);
         }
         if (!empty($mailParams['html'])) {
-          $mailParams['html'] = CRM_Utils_Mail::wrapEmailText($mailParams['html']);
+          $mailParams['html'] = \CRM_Utils_Mail::wrapEmailText($mailParams['html']);
         }
         $task->setMailParams($mailParams);
       }

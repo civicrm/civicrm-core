@@ -189,10 +189,10 @@ class CRM_Utils_Mail {
 
     // wrap lines - https://lab.civicrm.org/dev/core/-/issues/2705
     if (!is_null($textMessage)) {
-        $textMessage = self::wrapEmailText($textMessage);
+      $textMessage = self::wrapEmailText($textMessage);
     }
     if (!is_null($htmlMessage)) {
-        $htmlMessage = self::wrapEmailText($htmlMessage);
+      $htmlMessage = self::wrapEmailText($htmlMessage);
     }
 
     // CRM-6224
@@ -610,7 +610,7 @@ class CRM_Utils_Mail {
    * @see https://civicrm.stackexchange.com/questions/39172/line-wrapping-breaking-lines-longer-than-998-characters-in-civicrm-civimail
    */
   public static function wrapEmailText($text) {
-      return wordwrap($text, 990);
+    return wordwrap($text, 990);
   }
 
 }
