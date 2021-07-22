@@ -586,4 +586,23 @@ class CRM_Utils_Mail {
     return $from;
   }
 
+  /**
+   * Wrap the too long lines.
+   * The SMTP protocol only allows 1000 chars per line (998 +\r\n).
+   * In the linked issue the suggestion for the wrapping was 990, so that
+   * this value is used as the width parameter of the wordwrap.
+   *
+   * @param string $text
+   *   The email message string.
+   * @return string
+   *   The wrapped email string.
+   *
+   * @see https://datatracker.ietf.org/doc/html/rfc2822#section-2.1.1
+   * @see https://lab.civicrm.org/dev/core/-/issues/2705
+   * @see https://civicrm.stackexchange.com/questions/39172/line-wrapping-breaking-lines-longer-than-998-characters-in-civicrm-civimail
+   */
+  public static function wrapEmailText($text) {
+      return wordwrap($text, 990);
+  }
+
 }
