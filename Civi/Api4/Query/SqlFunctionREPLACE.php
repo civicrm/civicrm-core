@@ -18,20 +18,22 @@ class SqlFunctionREPLACE extends SqlFunction {
 
   protected static $category = self::CATEGORY_STRING;
 
-  protected static $params = [
-    [
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlString'],
-    ],
-    [
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlString'],
-    ],
-    [
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlString'],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
+      ],
+    ];
+  }
 
   /**
    * @return string

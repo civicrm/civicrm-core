@@ -19,11 +19,6 @@ namespace Civi\Api4\Query;
 abstract class SqlFunction extends SqlExpression {
 
   /**
-   * @var array
-   */
-  protected static $params = [];
-
-  /**
    * @var array[]
    */
   protected $args = [];
@@ -224,9 +219,9 @@ abstract class SqlFunction extends SqlExpression {
    * Get the param metadata for this sql function.
    * @return array
    */
-  public static function getParams(): array {
+  final public static function getParams(): array {
     $params = [];
-    foreach (static::$params as $param) {
+    foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
         'prefix' => [],
@@ -241,6 +236,8 @@ abstract class SqlFunction extends SqlExpression {
     }
     return $params;
   }
+
+  abstract protected static function params(): array;
 
   /**
    * Get the arguments passed to this sql function instance.

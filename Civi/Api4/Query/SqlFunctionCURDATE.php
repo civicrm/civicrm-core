@@ -18,6 +18,10 @@ class SqlFunctionCURDATE extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
+  protected static function params(): array {
+    return [];
+  }
+
   /**
    * @return string
    */

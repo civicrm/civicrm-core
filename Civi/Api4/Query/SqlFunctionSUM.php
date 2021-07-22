@@ -18,12 +18,14 @@ class SqlFunctionSUM extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'must_be' => ['SqlField'],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'must_be' => ['SqlField'],
+      ],
+    ];
+  }
 
   /**
    * @return string

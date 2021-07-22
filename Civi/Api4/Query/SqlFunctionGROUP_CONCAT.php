@@ -20,31 +20,33 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'max_expr' => 1,
-      'must_be' => ['SqlField', 'SqlFunction'],
-      'optional' => FALSE,
-    ],
-    [
-      'prefix' => ['ORDER BY'],
-      'max_expr' => 1,
-      'suffix' => ['', 'ASC', 'DESC'],
-      'must_be' => ['SqlField'],
-      'optional' => TRUE,
-    ],
-    [
-      'prefix' => ['SEPARATOR'],
-      'max_expr' => 1,
-      'must_be' => ['SqlString'],
-      'optional' => TRUE,
-      // @see self::formatOutput()
-      'api_default' => [
-        'expr' => ['"' . \CRM_Core_DAO::VALUE_SEPARATOR . '"'],
+  protected static function params(): array {
+    return [
+      [
+        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'max_expr' => 1,
+        'must_be' => ['SqlField', 'SqlFunction'],
+        'optional' => FALSE,
       ],
-    ],
-  ];
+      [
+        'prefix' => ['ORDER BY'],
+        'max_expr' => 1,
+        'suffix' => ['', 'ASC', 'DESC'],
+        'must_be' => ['SqlField'],
+        'optional' => TRUE,
+      ],
+      [
+        'prefix' => ['SEPARATOR'],
+        'max_expr' => 1,
+        'must_be' => ['SqlString'],
+        'optional' => TRUE,
+        // @see self::formatOutput()
+        'api_default' => [
+          'expr' => ['"' . \CRM_Core_DAO::VALUE_SEPARATOR . '"'],
+        ],
+      ],
+    ];
+  }
 
   /**
    * Reformat result as array if using default separator

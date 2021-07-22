@@ -18,12 +18,14 @@ class SqlFunctionABS extends SqlFunction {
 
   protected static $category = self::CATEGORY_MATH;
 
-  protected static $params = [
-    [
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlNumber'],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlNumber'],
+      ],
+    ];
+  }
 
   /**
    * @return string

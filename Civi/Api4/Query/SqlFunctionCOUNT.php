@@ -18,14 +18,16 @@ class SqlFunctionCOUNT extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'max_expr' => 1,
-      'must_be' => ['SqlField', 'SqlWild'],
-      'cant_be' => [],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'max_expr' => 1,
+        'must_be' => ['SqlField', 'SqlWild'],
+        'cant_be' => [],
+      ],
+    ];
+  }
 
   /**
    * Reformat result as integer
