@@ -246,28 +246,24 @@
         return {results: addEntityJoins(ctrl.savedSearch.api_entity)};
       };
 
-      $scope.addJoin = function() {
-        // Debounce the onchange event using timeout
-        $timeout(function() {
-          if ($scope.controls.join) {
-            ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
-            var join = searchMeta.getJoin($scope.controls.join),
-              entity = searchMeta.getEntity(join.entity),
-              params = [$scope.controls.join, $scope.controls.joinType || 'LEFT'];
-            _.each(_.cloneDeep(join.conditions), function(condition) {
-              params.push(condition);
-            });
-            _.each(_.cloneDeep(join.defaults), function(condition) {
-              params.push(condition);
-            });
-            ctrl.savedSearch.api_params.join.push(params);
-            if (entity.label_field && $scope.controls.joinType !== 'EXCLUDE') {
-              ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
-            }
-            loadFieldOptions();
+      this.addJoin = function(value) {
+        if (value) {
+          ctrl.savedSearch.api_params.join = ctrl.savedSearch.api_params.join || [];
+          var join = searchMeta.getJoin(value),
+            entity = searchMeta.getEntity(join.entity),
+            params = [value, $scope.controls.joinType || 'LEFT'];
+          _.each(_.cloneDeep(join.conditions), function(condition) {
+            params.push(condition);
+          });
+          _.each(_.cloneDeep(join.defaults), function(condition) {
+            params.push(condition);
+          });
+          ctrl.savedSearch.api_params.join.push(params);
+          if (entity.label_field && $scope.controls.joinType !== 'EXCLUDE') {
+            ctrl.savedSearch.api_params.select.push(join.alias + '.' + entity.label_field);
           }
-          $scope.controls.join = '';
-        });
+          loadFieldOptions();
+        }
       };
 
       // Remove an explicit join + all SELECT, WHERE & other JOINs that use it
@@ -408,9 +404,9 @@
         return 'fa-sort disabled';
       };
 
-      $scope.addParam = function(name) {
-        if ($scope.controls[name] && !_.contains(ctrl.savedSearch.api_params[name], $scope.controls[name])) {
-          ctrl.savedSearch.api_params[name].push($scope.controls[name]);
+      this.addParam = function(name, value) {
+        if (value && !_.contains(ctrl.savedSearch.api_params[name], value)) {
+          ctrl.savedSearch.api_params[name].push(value);
           if (name === 'groupBy') {
             // Expand the aggregate block
             $timeout(function() {
@@ -418,7 +414,6 @@
             }, 10);
           }
         }
-        $scope.controls[name] = '';
       };
 
       // Deletes an item from an array param
