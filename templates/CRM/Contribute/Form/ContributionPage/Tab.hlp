@@ -52,7 +52,7 @@
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&action=preview&id=`$contributionPageID`"}" id="idTest"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Online Contribution{/ts}</a><br /> ({ts}Test-drive{/ts})</td>
-  <td>{ts}Test-drive the entire contribution process&mdash;including custom fields, confirmation, thank-you page, and receipting. Transactions will be directed to your payment processor's test server. No live financial transactions will be submitted. However, a contact record will be created or updated and a test contribution record will be saved to the database. Use obvious test contact names so you can review and delete these records as needed. Test contributions are not visible on the Contributions tab, but can be viewed by searching for 'Test Contributions' in the CiviContribute search form.{/ts}</td>
+  <td>{ts}Test-drive the entire contribution process&mdash;including custom fields, confirmation, thank-you page, and receipting. Transactions will be directed to your payment processor's test server. No live financial transactions will be submitted. However, a contact record will be created or updated and a test contribution record will be saved to the database. Use obvious test contact names so you can review and delete these records as needed.{/ts}</td>
 </tr>
 <tr>
   <td><a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$contributionPageID`"}" id="idLive"><i class="crm-i fa-chevron-right" aria-hidden="true"></i> {ts}Online Contribution{/ts}</a><br /> ({ts}Live{/ts})</td>
