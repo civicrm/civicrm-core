@@ -1232,11 +1232,11 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     }
 
     if (!empty($mailParams['text'])) {
-      $message->setTxtBody($mailParams['text']);
+      $message->setTxtBody(CRM_Utils_Mail::wrapEmailText($mailParams['text']));
     }
 
     if (!empty($mailParams['html'])) {
-      $message->setHTMLBody($mailParams['html']);
+      $message->setHTMLBody(CRM_Utils_Mail::wrapEmailText($mailParams['html']));
     }
 
     if (!empty($mailParams['attachments'])) {
