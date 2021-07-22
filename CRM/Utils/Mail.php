@@ -187,6 +187,14 @@ class CRM_Utils_Mail {
     $htmlMessage = $params['html'] ?? NULL;
     $attachments = $params['attachments'] ?? NULL;
 
+    // wrap lines - https://lab.civicrm.org/dev/core/-/issues/2705
+    if (!is_null($textMessage)) {
+        $textMessage = self::wrapEmailText($textMessage);
+    }
+    if (!is_null($htmlMessage)) {
+        $htmlMessage = self::wrapEmailText($htmlMessage);
+    }
+
     // CRM-6224
     if (trim(CRM_Utils_String::htmlToText($htmlMessage)) == '') {
       $htmlMessage = FALSE;
