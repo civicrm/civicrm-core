@@ -659,8 +659,9 @@
         if (ctrl.savedSearch.api_params.groupBy.indexOf(info.path) > -1) {
           return false;
         }
-        // If the entity this column belongs to is being grouped by id, then also no
-        return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + 'id') < 0;
+        // If the entity this column belongs to is being grouped by primary key, then also no
+        var idField = searchMeta.getEntity(info.field.entity).primary_key[0];
+        return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + idField) < 0;
       };
 
       $scope.formatResult = function(row, col) {
