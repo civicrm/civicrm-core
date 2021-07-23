@@ -50,13 +50,15 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
       list($task, $result) = $this->taskName($controller, 'Basic');
     }
     $this->_task = $task;
-    if (is_array($task)) {
-      foreach ($task as $t) {
-        $this->_pages[$t] = NULL;
+    if (isset($task)) {
+      if (is_array($task)) {
+        foreach ($task as $t) {
+          $this->_pages[$t] = NULL;
+        }
       }
-    }
-    else {
-      $this->_pages[$task] = NULL;
+      else {
+        $this->_pages[$task] = NULL;
+      }
     }
 
     if ($result) {
