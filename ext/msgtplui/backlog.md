@@ -9,20 +9,41 @@
 [x] token insert - monaco
 [x] full screen edit
 [x] more button/toolbar cleanup
+[x] preview ui (skeleton)
+[x] fork-off: APIv4 metadata for array inputs (#2665)
+[x] (big chunk outside this list)
+[x] move traits under 'Traits/'
+[x] example loading
+[x] - scanner
+[x] - api
+[x] update FluentGetterSetter for use in AbstractAction
+[x] Reflective::validate() method
+[x] - delegate to validateExtra()
+[x] - check @required
+[x] - check types (maybe)
 
 = near =
 
-[x] preview ui (skeleton)
-[ ] preview api
-[ ] preview ui-api (hookup)
+[ ] MR for devdocs msgtpl
+
+[ ] test class for msgwf
+[x] - test trait; new class
+[x] - extract data file
+[x] - move test
+[ ] - rework equivalence assertions
+[ ] - add rendering assertions for stock template
+
+[~] render api
 
 = mid =
 
+[ ] render ui-api (hookup)
 [ ] rough token list via api
 [ ] metadata for available tokens
 [ ] real token list via api
 
 = far =
+[ ] contributionId / tokenprocessor PR
 [ ] switch User Templates to angular editor
 [ ] - add "Message Source"
 [ ] - add "PDF Layout"
