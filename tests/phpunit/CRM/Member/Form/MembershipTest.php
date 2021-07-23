@@ -499,13 +499,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'cid' => $this->_individualId,
       'contact_id' => $this->_individualId,
       'join_date' => date('Y-m-d'),
-      'start_date' => '',
-      'end_date' => '',
       // This format reflects the organisation & then the type.
       'membership_type_id' => [$this->ids['contact']['organization'], $this->ids['membership_type']['AnnualFixed']],
       'auto_renew' => '0',
       'max_related' => '',
-      'num_terms' => '1',
+      'num_terms' => 2,
       'source' => '',
       'total_amount' => $this->formatMoneyInput(1234.56),
       //Member dues, see data.xml
@@ -522,7 +520,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
-      'billing_middlename' => 'Last',
+      'billing_last_name' => 'Last',
       'billing_street_address-5' => '10 Test St',
       'billing_city-5' => 'Test',
       'billing_state_province_id-5' => '1003',
@@ -534,6 +532,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->_contactID = $this->_individualId;
     $form->testSubmit($params);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $this->assertEquals(date('Y') + 1 . '-12-31', $membership['end_date']);
     $this->callAPISuccessGetCount('ContributionRecur', ['contact_id' => $this->_individualId], 0);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->_individualId,
@@ -541,11 +540,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ]);
 
     //CRM-20264 : Check that CC type and number (last 4 digit) is stored during backoffice membership payment
-    $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
-      'FinancialTrxn',
+      'Payment',
       [
-        'id' => $lastFinancialTrxnId['financialTrxnId'],
+        'contribution_id' => $contribution['id'],
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
@@ -574,7 +572,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->mut->stop();
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . date('Y') . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been added. The new membership End Date is December 31st, ' . (date('Y') + 1) . '. A membership confirmation and receipt has been sent to anthony_anderson@civicrm.org.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
