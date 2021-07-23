@@ -55,13 +55,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   protected $_ssID;
 
   /**
-   * Tells the controller if we are being called from a contact tab.
-   *
-   * @var bool
-   */
-  protected $_isTab = FALSE;
-
-  /**
    * Metadata of all fields to include on the form.
    *
    * @var array
@@ -291,7 +284,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     // We don't show test records in summaries or dashboards
-    if (empty($this->_formValues['participant_test']) && $this->_force && !$this->_isTab) {
+    if (empty($this->_formValues['participant_test']) && $this->_force && !empty($this->_context) && $this->_context === 'dashboard') {
       $this->_formValues["participant_test"] = 0;
     }
 
@@ -418,12 +411,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
-    }
-
-    $isTab = CRM_Utils_Request::retrieve('is_tab', 'Boolean', $this);
-
-    if (isset($isTab)) {
-      $this->_isTab = $isTab;
     }
   }
 

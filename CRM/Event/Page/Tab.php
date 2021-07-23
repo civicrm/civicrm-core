@@ -32,7 +32,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('context', 'participant');
-    $controller->set('is_tab', TRUE);
     $controller->process();
     $controller->run();
 
