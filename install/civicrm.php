@@ -89,7 +89,7 @@ function civicrm_main(&$config) {
   civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm.mysql');
 
   if (!empty($config['loadGenerated'])) {
-    civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm_generated.mysql', TRUE);
+    civicrm_source($dsn, $sqlPath . DIRECTORY_SEPARATOR . 'civicrm_generated.mysql');
   }
   else {
     if (isset($config['seedLanguage'])
