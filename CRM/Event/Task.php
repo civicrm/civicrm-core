@@ -144,19 +144,25 @@ class CRM_Event_Task extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params = []) {
+    $tasks = [];
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit event participants')
     ) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
-      ];
+      foreach ([
+        self::TASK_EXPORT,
+        self::TASK_EMAIL,
+      ] as $task) {
+        if (isset(self::$_tasks[$task]) &&
+          !empty(self::$_tasks[$task]['title'])) {
+          $tasks[$task] = self::$_tasks[$task]['title'];
+        }
+      }
 
-      //CRM-4418,
-      if (CRM_Core_Permission::check('delete in CiviEvent')) {
+      if (CRM_Core_Permission::check('delete in CiviEvent')
+        && !empty(self::$_tasks[self::TASK_DELETE]['title'])) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
       }
     }

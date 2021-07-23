@@ -283,8 +283,11 @@ class CRM_Contact_Task extends CRM_Core_Task {
     $tasks = [];
     if ($params['deletedContacts']) {
       if (CRM_Core_Permission::check('access deleted contacts')) {
-        $tasks[self::RESTORE] = self::$_tasks[self::RESTORE]['title'];
-        if (CRM_Core_Permission::check('delete contacts')) {
+        if (!empty(self::$_tasks[self::RESTORE]['title'])) {
+          $tasks[self::RESTORE] = self::$_tasks[self::RESTORE]['title'];
+        }
+        if (CRM_Core_Permission::check('delete contacts')
+          && !empty(self::$_tasks[self::DELETE_PERMANENTLY]['title'])) {
           $tasks[self::DELETE_PERMANENTLY] = self::$_tasks[self::DELETE_PERMANENTLY]['title'];
         }
       }
@@ -293,13 +296,10 @@ class CRM_Contact_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
-        self::LABEL_CONTACTS => self::$_tasks[self::LABEL_CONTACTS]['title'],
-      ];
-
       foreach ([
+        self::TASK_EXPORT,
+        self::TASK_EMAIL,
+        self::LABEL_CONTACTS,
         self::MAP_CONTACTS,
         self::CREATE_MAILING,
         self::TASK_SMS,

@@ -112,11 +112,7 @@ class CRM_Campaign_Task extends CRM_Core_Task {
       // Set the interview task as default
       $value = self::INTERVIEW;
     }
-
-    return [
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    ];
+    return parent::getTask($value);
   }
 
 }

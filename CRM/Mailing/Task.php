@@ -79,11 +79,7 @@ class CRM_Mailing_Task extends CRM_Core_Task {
       // make the print task by default
       $value = self::TASK_PRINT;
     }
-
-    return [
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    ];
+    return parent::getTask($value);
   }
 
 }

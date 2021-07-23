@@ -186,14 +186,19 @@ class CRM_Contribute_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
-        self::PDF_RECEIPT => self::$_tasks[self::PDF_RECEIPT]['title'],
-      ];
+      foreach ([
+        self::TASK_EXPORT,
+        self::TASK_EMAIL,
+        self::PDF_RECEIPT,
+      ] as $task) {
+        if (isset(self::$_tasks[$task])
+          && !empty(self::$_tasks[$task]['title'])) {
+          $tasks[$task] = self::$_tasks[$task]['title'];
+        }
+      }
 
-      //CRM-4418,
-      if (CRM_Core_Permission::check('delete in CiviContribute')) {
+      if (CRM_Core_Permission::check('delete in CiviContribute')
+        && !empty(self::$_tasks[self::TASK_DELETE]['title'])) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
       }
     }

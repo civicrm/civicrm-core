@@ -74,17 +74,19 @@ class CRM_Pledge_Task extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params = []) {
+    $tasks = [];
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit pledges')
     ) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-      ];
-      //CRM-4418,
-      if (CRM_Core_Permission::check('delete in CiviPledge')) {
+      if (!empty(self::$_tasks[self::TASK_EXPORT]['title'])) {
+        $tasks[self::TASK_EXPORT] = self::$_tasks[self::TASK_EXPORT]['title'];
+      }
+
+      if (CRM_Core_Permission::check('delete in CiviPledge')
+        && !empty(self::$_tasks[self::TASK_DELETE]['title'])) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
       }
     }

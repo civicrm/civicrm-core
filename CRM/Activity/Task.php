@@ -124,16 +124,17 @@ class CRM_Activity_Task extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params = []) {
+    $tasks = [];
     if ($permission == CRM_Core_Permission::EDIT) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-      ];
+      if (!empty(self::$_tasks[self::TASK_EXPORT]['title'])) {
+        $tasks[self::TASK_EXPORT] = self::$_tasks[self::TASK_EXPORT]['title'];
+      }
 
-      //CRM-4418,
-      if (CRM_Core_Permission::check('delete activities')) {
+      if (CRM_Core_Permission::check('delete activities')
+        && (!empty(self::$_tasks[self::TASK_DELETE]['title']))) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
       }
     }
@@ -156,11 +157,7 @@ class CRM_Activity_Task extends CRM_Core_Task {
       // make the print task by default
       $value = self::TASK_PRINT;
     }
-
-    return [
-      self::$_tasks[$value]['class'],
-      self::$_tasks[$value]['result'],
-    ];
+    return parent::getTask($value);
   }
 
 }
