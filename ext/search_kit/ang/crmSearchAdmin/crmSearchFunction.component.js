@@ -23,17 +23,23 @@
 
       function initFunction() {
         ctrl.fnInfo = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fn});
-        if (ctrl.fnInfo && _.includes(ctrl.fnInfo.params[0].prefix, 'DISTINCT')) {
-          ctrl.modifierAllowed = true;
+        if (ctrl.fnInfo && ctrl.fnInfo.params[0] && !_.isEmpty(ctrl.fnInfo.params[0].flag_before)) {
+          ctrl.modifierName = _.keys(ctrl.fnInfo.params[0].flag_before)[0];
+          ctrl.modifierLabel = ctrl.fnInfo.params[0].flag_before[ctrl.modifierName];
         }
         else {
-          ctrl.modifierAllowed = false;
+          ctrl.modifierName = null;
           ctrl.modifier = null;
         }
       }
 
       this.selectFunction = function() {
         initFunction();
+        ctrl.writeExpr();
+      };
+
+      this.toggleModifier = function() {
+        ctrl.modifier = ctrl.modifier ? null : ctrl. modifierName;
         ctrl.writeExpr();
       };
 

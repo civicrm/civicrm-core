@@ -21,7 +21,7 @@ class SqlFunctionCOUNT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlWild'],
         'cant_be' => [],

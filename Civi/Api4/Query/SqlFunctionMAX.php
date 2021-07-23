@@ -23,7 +23,7 @@ class SqlFunctionMAX extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'must_be' => ['SqlField'],
       ],
     ];

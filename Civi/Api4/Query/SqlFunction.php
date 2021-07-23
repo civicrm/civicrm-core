@@ -42,19 +42,38 @@ abstract class SqlFunction extends SqlExpression {
   protected function initialize() {
     $arg = trim(substr($this->expr, strpos($this->expr, '(') + 1, -1));
     foreach ($this->getParams() as $idx => $param) {
-      $prefix = $this->captureKeyword($param['prefix'], $arg);
+      $prefix = NULL;
+      if ($param['prefix']) {
+        $prefix = $this->captureKeyword([$param['prefix']], $arg);
+        // Supply api_default
+        if (!$prefix && isset($param['api_default'])) {
+          $this->args[$idx] = [
+            'prefix' => $param['api_default']['prefix'] ?? [$param['prefix']],
+            'expr' => array_map([parent::class, 'convert'], $param['api_default']['expr']),
+            'suffix' => $param['api_default']['suffix'] ?? [],
+          ];
+          continue;
+        }
+        if (!$prefix && !$param['optional']) {
+          throw new \API_Exception("Missing {$param['prefix']} for SQL function " . static::getName());
+        }
+      }
+      elseif ($param['flag_before']) {
+        $prefix = $this->captureKeyword(array_keys($param['flag_before']), $arg);
+      }
       $this->args[$idx] = [
-        'prefix' => $prefix,
+        'prefix' => (array) $prefix,
         'expr' => [],
-        'suffix' => NULL,
+        'suffix' => [],
       ];
-      if ($param['max_expr'] && isset($prefix) || in_array('', $param['prefix']) || !$param['optional']) {
+      if ($param['max_expr'] && (!$param['prefix'] || $param['prefix'] === $prefix)) {
         $exprs = $this->captureExpressions($arg, $param['must_be'], $param['cant_be']);
         if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
           throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
-        $this->args[$idx]['suffix'] = $this->captureKeyword($param['suffix'], $arg);
+
+        $this->args[$idx]['suffix'] = (array) $this->captureKeyword(array_keys($param['flag_after']), $arg);
       }
     }
   }
@@ -68,7 +87,7 @@ abstract class SqlFunction extends SqlExpression {
    * @return mixed|null
    */
   private function captureKeyword($keywords, &$arg) {
-    foreach (array_filter($keywords) as $key) {
+    foreach ($keywords as $key) {
       if (strpos($arg, $key . ' ') === 0) {
         $arg = ltrim(substr($arg, strlen($key)));
         return $key;
@@ -178,23 +197,15 @@ abstract class SqlFunction extends SqlExpression {
    * @return string
    */
   private function renderArg($arg, $param, $fieldList): string {
-    // Supply api_default
-    if (!isset($arg['prefix']) && !isset($arg['suffix']) && empty($arg['expr']) && !empty($param['api_default'])) {
-      $arg = [
-        'prefix' => $param['api_default']['prefix'] ?? reset($param['prefix']),
-        'expr' => array_map([parent::class, 'convert'], $param['api_default']['expr'] ?? []),
-        'suffix' => $param['api_default']['suffix'] ?? reset($param['suffix']),
-      ];
-    }
-    $rendered = $arg['prefix'] ?? '';
+    $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {
         $rendered .= $idx ? ', ' : ' ';
       }
       $rendered .= $expr->render($fieldList);
     }
-    if (isset($arg['suffix'])) {
-      $rendered .= (strlen($rendered) ? ' ' : '') . $arg['suffix'];
+    if ($arg['suffix']) {
+      $rendered .= (strlen($rendered) ? ' ' : '') . implode(' ', $arg['suffix']);
     }
     return $rendered;
   }
@@ -224,10 +235,11 @@ abstract class SqlFunction extends SqlExpression {
     foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
-        'prefix' => [],
+        'prefix' => NULL,
         'min_expr' => 1,
         'max_expr' => 1,
-        'suffix' => [],
+        'flag_before' => [],
+        'flag_after' => [],
         'optional' => FALSE,
         'must_be' => [],
         'cant_be' => ['SqlWild'],

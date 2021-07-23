@@ -23,20 +23,20 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'prefix' => ['', 'DISTINCT', 'ALL'],
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlFunction'],
         'optional' => FALSE,
       ],
       [
-        'prefix' => ['ORDER BY'],
+        'prefix' => 'ORDER BY',
         'max_expr' => 1,
-        'suffix' => ['', 'ASC', 'DESC'],
+        'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
         'must_be' => ['SqlField'],
         'optional' => TRUE,
       ],
       [
-        'prefix' => ['SEPARATOR'],
+        'prefix' => 'SEPARATOR',
         'max_expr' => 1,
         'must_be' => ['SqlString'],
         'optional' => TRUE,
@@ -59,7 +59,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   public function formatOutputValue($value, &$dataType) {
     $exprArgs = $this->getArgs();
     // By default, values are split into an array and formatted according to the field's dataType
-    if (!$exprArgs[2]['prefix']) {
+    if (isset($exprArgs[2]['expr'][0]->expr) && $exprArgs[2]['expr'][0]->expr === \CRM_Core_DAO::VALUE_SEPARATOR) {
       $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
       // If the first expression is another sqlFunction, allow it to control the dataType
       if ($exprArgs[0]['expr'][0] instanceof SqlFunction && is_callable([$exprArgs[0]['expr'][0], 'formatOutputValue'])) {
