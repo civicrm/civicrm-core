@@ -47,7 +47,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       ]);
     }
     catch (Exception $e) {
-      CRM_Core_Error::statusBounce(ts('Recurring contribution not found (ID: %1', [1 => $this->getEntityId()]));
+      CRM_Core_Error::statusBounce(ts('Recurring contribution not found (ID: %1)', [1 => $this->getEntityId()]));
     }
 
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
