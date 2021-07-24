@@ -38,7 +38,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     if (empty($fileName)) {
       $hash = CRM_Utils_Request::retrieve('fcs', 'Alphanumeric', $this);
       if (!CRM_Core_BAO_File::validateFileHash($hash, $entityId, $fileId)) {
-        CRM_Core_Error::statusBounce('URL for file is not valid');
+        CRM_Core_Error::statusBounce(ts('URL for file is not valid'));
       }
 
       list($path, $mimeType) = CRM_Core_BAO_File::path($fileId, $entityId);
@@ -52,7 +52,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
 
     if (!$path) {
-      CRM_Core_Error::statusBounce('Could not retrieve the file');
+      CRM_Core_Error::statusBounce(ts('Could not retrieve the file'));
     }
 
     if (empty($mimeType)) {
@@ -71,7 +71,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
 
     $buffer = file_get_contents($path);
     if (!$buffer) {
-      CRM_Core_Error::statusBounce('The file is either empty or you do not have permission to retrieve the file');
+      CRM_Core_Error::statusBounce(ts('The file is either empty or you do not have permission to retrieve the file'));
     }
 
     if ($action & CRM_Core_Action::DELETE) {

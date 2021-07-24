@@ -166,7 +166,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
       $this->assign('financialTypeTitle', $this->_title);
     }
     else {
-      CRM_Core_Error::statusBounce('No Financial Accounts found for the Financial Type');
+      CRM_Core_Error::statusBounce(ts('No Financial Accounts found for the Financial Type'));
     }
   }
 

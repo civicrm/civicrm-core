@@ -38,7 +38,7 @@ class CRM_Core_Page_Redirect extends CRM_Core_Page {
    */
   public static function createUrl($requestPath, $requestArgs, $pageArgs, $absolute) {
     if (empty($pageArgs['url'])) {
-      CRM_Core_Error::statusBounce('This page is configured as a redirect, but it does not have a target.');
+      CRM_Core_Error::statusBounce(ts('This page is configured as a redirect, but it does not have a target.'));
     }
 
     $vars = [];

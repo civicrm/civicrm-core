@@ -27,7 +27,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this, TRUE);
 
-    // ensure that there is a particpant type for this
+    // ensure that there is a participant type for this
     $this->_participantListingID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
       $this->_id,
       'participant_listing_id'
@@ -75,7 +75,7 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       ) . '.php';
     $error = include_once $classFile;
     if ($error == FALSE) {
-      CRM_Core_Error::statusBounce('Participant listing code file: ' . $classFile . ' does not exist. Please verify your custom particpant listing settings in CiviCRM administrative panel.');
+      CRM_Core_Error::statusBounce(ts('Participant listing code file: %1 does not exist. Please verify your custom participant listing settings in CiviCRM administrative panel.', [1 => $classFile]));
     }
 
     $participantListingClass = new $className();

@@ -424,7 +424,7 @@ class CRM_Core_Form_RecurringEntity {
                   ]
                 );
                 if ($result['error']) {
-                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
                 }
               }
             }
@@ -440,7 +440,7 @@ class CRM_Core_Form_RecurringEntity {
                   ]
                 );
                 if ($result['error']) {
-                  CRM_Core_Error::statusBounce('Error creating recurring list');
+                  CRM_Core_Error::statusBounce(ts('Error creating recurring list'));
                 }
               }
             }

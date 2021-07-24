@@ -89,7 +89,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       (!$this->_crid && !$this->_coid && !$this->_mid) ||
       (!$this->getSubscriptionDetails())
     ) {
-      CRM_Core_Error::statusBounce('Required information missing.');
+      CRM_Core_Error::statusBounce(ts('Required information missing.'));
     }
 
     $this->assign('cancelRecurDetailText', $this->_paymentProcessorObj->getText('cancelRecurDetailText', $cancelRecurTextParams));
