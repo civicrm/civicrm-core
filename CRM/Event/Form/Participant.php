@@ -1661,8 +1661,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       CRM_Event_Form_Registration::initEventFee($form, $event['id']);
       CRM_Event_Form_Registration_Register::buildAmount($form, TRUE, $form->_discountId);
       $lineItem = [];
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = $invoiceSettings['invoicing'] ?? NULL;
       $totalTaxAmount = 0;
       if (!CRM_Utils_System::isNull(CRM_Utils_Array::value('line_items', $form->_values))) {
         $lineItem[] = $form->_values['line_items'];
@@ -1670,9 +1668,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           $totalTaxAmount = $value['tax_amount'] + $totalTaxAmount;
         }
       }
-      if ($invoicing) {
-        $form->assign('totalTaxAmount', $totalTaxAmount);
-      }
+      $form->assign('totalTaxAmount', $totalTaxAmount);
       $form->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
       $discounts = [];
       if (!empty($form->_values['discount'])) {
@@ -1726,7 +1722,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         // don't show transaction id in batch update mode
         $path = CRM_Utils_System::currentPath();
         $form->assign('showTransactionId', FALSE);
-        if ($path != 'civicrm/contact/search/basic') {
+        if ($path !== 'civicrm/contact/search/basic') {
           $form->add('text', 'trxn_id', ts('Transaction ID'));
           $form->addRule('trxn_id', ts('Transaction ID already exists in Database.'),
             'objectExists', ['CRM_Contribute_DAO_Contribution', $form->_eventId, 'trxn_id']
@@ -1765,7 +1761,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $form->add('textarea', 'receipt_text', ts('Confirmation Message'));
 
     // Retrieve the name and email of the contact - form will be the TO for receipt email ( only if context is not standalone)
-    if ($form->_context != 'standalone') {
+    if ($form->_context !== 'standalone') {
       if ($form->_contactId) {
         list($form->_contributorDisplayName,
           $form->_contributorEmail
