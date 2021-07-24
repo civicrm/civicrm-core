@@ -367,6 +367,9 @@ class CRM_Core_ManagedEntities {
       if ((bool) $check['count']) {
         $result = civicrm_api($dao->entity_type, 'delete', $params);
         if ($result['is_error']) {
+          if (isset($dao->name)) {
+            $params['name'] = $dao->name;
+          }
           $this->onApiError($dao->entity_type, 'delete', $params, $result);
         }
       }
@@ -482,7 +485,7 @@ class CRM_Core_ManagedEntities {
       'result' => $result,
     ]);
     throw new Exception('API error: ' . $result['error_message'] . ' on ' . $entity . '.' . $action
-      . !empty($params['name']) ? '( entity name ' . $params['name'] . ')' : ''
+      . (!empty($params['name']) ? '( entity name ' . $params['name'] . ')' : '')
     );
   }
 
