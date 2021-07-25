@@ -24,7 +24,7 @@
       $scope.$watch('$ctrl.expr', function(expr) {
         var fieldInfo = searchMeta.parseExpr(expr);
         ctrl.path = fieldInfo.path + fieldInfo.suffix;
-        ctrl.field = fieldInfo.field;
+        ctrl.field = [fieldInfo.field];
         ctrl.fn = !fieldInfo.fn ? '' : fieldInfo.fn.name;
         ctrl.modifier = fieldInfo.modifier || null;
         initFunction();
@@ -42,6 +42,7 @@
         }
       }
 
+      // On-demand options for dropdown function selector
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
         if (ctrl.expr && ctrl.field) {
@@ -49,17 +50,26 @@
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.field.data_type)) {
+            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.field[0].data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.field.data_type)) {
+            if (_.includes(['Date', 'Timestamp'], ctrl.field[0].data_type)) {
               allowedTypes.push('date');
             }
           }
-          _.each(allowedTypes, function (type) {
+          _.each(allowedTypes, function(type) {
+            var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
+              return fn.category === type &&
+                fn.params.length &&
+                // For now, only support functions that take a single field
+                fn.params[0].min_expr === 1 &&
+                fn.params[0].max_expr === 1 &&
+                !_.includes(fn.params[0].cant_be, 'SqlField') &&
+                (!fn.params[0].must_be.length || _.includes(fn.params[0].must_be, 'SqlField'));
+            });
             functions.push({
               text: allTypes[type],
-              children: formatForSelect2(_.where(CRM.crmSearchAdmin.functions, {category: type}), 'name', 'title')
+              children: formatForSelect2(allowedFunctions, 'name', 'title')
             });
           });
         }
