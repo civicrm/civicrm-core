@@ -9,21 +9,10 @@
 *}
 <div class="crm-block crm-content-block crm-report-form-block">
   {if $rows}
-    {* todo: Is `raw` ever assigned to the template and why would it make a difference as to whether this div is present? The revert confirmation is handled (awkwardly) lower down by javascript $revertConfirm *}
-    {if $raw}
-      <div class="status">
-        <dl>
-          <dt>{icon icon="fa-info-circle"}{/icon}</dt>
-          <dd>
-            {ts}WARNING: Are you sure you want to revert the below changes?{/ts}
-          </dd>
-        </dl>
-      </div>
-    {/if}
     <p>{ts 1=$whom_url 2=$whom_name|escape 3=$who_url 4=$who_name|escape 5=$log_date}Change to <a href='%1'>%2</a> made by <a href='%3'>%4</a> on %5:{/ts}</p>
     {if $layout eq 'overlay'}
       {include file="CRM/Report/Form/Layout/Overlay.tpl"}
-    {elseif !$chartEnabled || !$chartSupported}
+    {else}
       {include file="CRM/Report/Form/Layout/Table.tpl"}
     {/if}
   {else}
@@ -34,7 +23,7 @@
   {if $layout neq 'overlay'}
   <div class="action-link">
       <a href="{$backURL}"   class="button"><span><i class="crm-i fa-chevron-left" aria-hidden="true"></i> {ts}Back to Logging Summary{/ts}</span></a>
-      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm}');"><span><i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Revert These Changes{/ts}</span></a>
+      <a href="{$revertURL}" class="button" onclick="return confirm('{$revertConfirm|escape:'javascript'}');"><span><i class="crm-i fa-undo" aria-hidden="true"></i> {ts}Revert These Changes{/ts}</span></a>
   </div>
   {/if}
 </div>
