@@ -296,21 +296,30 @@
       };
 
       $scope.changeGroupBy = function(idx) {
+        // When clearing a selection
         if (!ctrl.savedSearch.api_params.groupBy[idx]) {
           ctrl.clearParam('groupBy', idx);
         }
-        // Remove aggregate functions when no grouping
-        if (!ctrl.savedSearch.api_params.groupBy.length) {
-          _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
-            if (_.contains(col, '(')) {
-              var info = searchMeta.parseExpr(col);
-              if (info.fn.category === 'aggregate') {
-                ctrl.savedSearch.api_params.select[pos] = info.path + info.suffix;
-              }
-            }
-          });
-        }
+        reconcileAggregateColumns();
       };
+
+      function reconcileAggregateColumns() {
+        _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
+          var info = searchMeta.parseExpr(col),
+            fieldExpr = info.path + info.suffix;
+          if (ctrl.canAggregate(col)) {
+            // Ensure all non-grouped columns are aggregated if using GROUP BY
+            if (!info.fn || info.fn.category !== 'aggregate') {
+              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + fieldExpr + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_DISTINCT_' + fieldExpr.replace(/[.:]/g, '_');
+            }
+          } else {
+            // Remove aggregate functions when no grouping
+            if (info.fn && info.fn.category === 'aggregate') {
+              ctrl.savedSearch.api_params.select[pos] = fieldExpr;
+            }
+          }
+        });
+      }
 
       function clauseUsesJoin(clause, alias) {
         if (clause[0].indexOf(alias + '.') === 0) {
@@ -407,12 +416,8 @@
       this.addParam = function(name, value) {
         if (value && !_.contains(ctrl.savedSearch.api_params[name], value)) {
           ctrl.savedSearch.api_params[name].push(value);
-          if (name === 'groupBy') {
-            // Expand the aggregate block
-            $timeout(function() {
-              $('#crm-search-build-group-aggregate.collapsed .collapsible-title').click();
-            }, 10);
-          }
+          // This needs to be called when adding a field as well as changing groupBy
+          reconcileAggregateColumns();
         }
       };
 
@@ -429,17 +434,6 @@
 
       function unlockTableHeight() {
         $('.crm-search-results', $element).css('height', '');
-      }
-
-      // Ensure all non-grouped columns are aggregated if using GROUP BY
-      function aggregateGroupByColumns() {
-        if (ctrl.savedSearch.api_params.groupBy.length) {
-          _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
-            if (!_.contains(col, '(') && ctrl.canAggregate(col)) {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + col + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_DISTINCT_' + col.replace(/[.:]/g, '_');
-            }
-          });
-        }
       }
 
       // Debounced callback for loadResults
@@ -522,7 +516,6 @@
 
       function loadResults() {
         $scope.loading = true;
-        aggregateGroupByColumns();
         _loadResults();
       }
 

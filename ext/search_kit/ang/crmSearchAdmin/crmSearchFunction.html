@@ -1,6 +1,6 @@
 <div class="form-inline">
   <label>{{ $ctrl.field.label }}:</label>
-  <input class="form-control" style="width: 15em;" ng-model="$ctrl.fn" crm-ui-select="{data: $ctrl.functions, placeholder: ts('Select')}" ng-change="$ctrl.selectFunction()">
+  <input class="form-control" style="width: 15em;" ng-model="$ctrl.fn" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ts('Select')}" ng-change="$ctrl.selectFunction()">
   <label ng-if="$ctrl.modifierName">
     <input type="checkbox" ng-checked="!!$ctrl.modifier" ng-click="$ctrl.toggleModifier()">
     {{ $ctrl.modifierLabel }}

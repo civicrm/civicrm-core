@@ -3,23 +3,32 @@
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
-      expr: '=',
-      cat: '<'
+      expr: '='
+    },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchFunction.html',
     controller: function($scope, formatForSelect2, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.$onInit = function() {
-        ctrl.functions = formatForSelect2(_.where(CRM.crmSearchAdmin.functions, {category: ctrl.cat}), 'name', 'title');
-        var fieldInfo = searchMeta.parseExpr(ctrl.expr);
+      var allTypes = {
+        aggregate: ts('Aggregate'),
+        comparison: ts('Comparison'),
+        date: ts('Date'),
+        math: ts('Math'),
+        string: ts('Text')
+      };
+
+      $scope.$watch('$ctrl.expr', function(expr) {
+        var fieldInfo = searchMeta.parseExpr(expr);
         ctrl.path = fieldInfo.path + fieldInfo.suffix;
         ctrl.field = fieldInfo.field;
         ctrl.fn = !fieldInfo.fn ? '' : fieldInfo.fn.name;
         ctrl.modifier = fieldInfo.modifier || null;
         initFunction();
-      };
+      });
 
       function initFunction() {
         ctrl.fnInfo = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fn});
@@ -33,8 +42,31 @@
         }
       }
 
+      this.getFunctions = function() {
+        var allowedTypes = [], functions = [];
+        if (ctrl.expr && ctrl.field) {
+          if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+            allowedTypes.push('aggregate');
+          } else {
+            allowedTypes.push('comparison', 'string');
+            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.field.data_type)) {
+              allowedTypes.push('math');
+            }
+            if (_.includes(['Date', 'Timestamp'], ctrl.field.data_type)) {
+              allowedTypes.push('date');
+            }
+          }
+          _.each(allowedTypes, function (type) {
+            functions.push({
+              text: allTypes[type],
+              children: formatForSelect2(_.where(CRM.crmSearchAdmin.functions, {category: type}), 'name', 'title')
+            });
+          });
+        }
+        return {results: functions};
+      };
+
       this.selectFunction = function() {
-        initFunction();
         ctrl.writeExpr();
       };
 
