@@ -13,6 +13,7 @@ use Civi\API\Request;
 use Civi\Api4\Group;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Api4\SavedSearch;
 
 /**
  *
@@ -796,7 +797,10 @@ ORDER BY   gc.contact_id, g.children
    */
   protected static function insertGroupContactsIntoTempTable(string $tempTableName, int $groupID, ?int $savedSearchID, ?string $children): void {
     if ($savedSearchID) {
-      $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
+      $savedSearch = SavedSearch::get(FALSE)
+        ->addWhere('id', '=', $savedSearchID)
+        ->execute()
+        ->first();
 
       $excludeClause = "NOT IN (
                         SELECT contact_id FROM civicrm_group_contact
@@ -804,10 +808,22 @@ ORDER BY   gc.contact_id, g.children
                         AND civicrm_group_contact.group_id = $groupID )";
       $addSelect = "$groupID AS group_id";
 
-      if (!empty($ssParams['api_entity'])) {
-        $sql = self::getApiSQL($ssParams, $addSelect, $excludeClause);
+      if (!empty($savedSearch['api_entity'])) {
+        $sql = self::getApiSQL($savedSearch, $addSelect, $excludeClause);
       }
       else {
+        $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+        //check if the saved search has mapping id
+        if ($savedSearch['mapping_id']) {
+          $ssParams = CRM_Core_BAO_Mapping::formattedFields($fv);
+        }
+        elseif (!empty($fv['customSearchID'])) {
+          $ssParams = $fv;
+        }
+        else {
+          $ssParams = CRM_Contact_BAO_Query::convertFormValues($fv);
+        }
+
         // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
         if (!empty($ssParams)) {
           CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
