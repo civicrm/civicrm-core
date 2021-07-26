@@ -20,6 +20,13 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
   protected $_entity = 'line_item';
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * Prepare for test.
    *
    * @throws \CRM_Core_Exception
@@ -143,7 +150,9 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testDeleteLineItem($version): void {
+  public function testDeleteLineItem(int $version): void {
+    // Deleting line items does not leave valid financial data.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->_apiversion = $version;
     $getParams = [
       'entity_table' => 'civicrm_contribution',

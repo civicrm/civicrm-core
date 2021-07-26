@@ -21,18 +21,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+
   /**
-   * CHeck that all tests that have created payments have created them with the right financial entities.
+   * Should financials be checked after the test but before tear down.
    *
-   * Ideally this would be on CiviUnitTestCase but many classes would still fail. Also, it might
-   * be good if it only ran on tests that created at least one contribution.
-   *
-   * @throws \CRM_Core_Exception
+   * @var bool
    */
-  protected function assertPostConditions(): void {
-    $this->validateAllPayments();
-    $this->validateAllContributions();
-  }
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * Initial test of submit function.
