@@ -10,6 +10,17 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
   use CRMTraits_Profile_ProfileTrait;
 
+
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   public function setUp(): void {
     $this->useTransaction(TRUE);
     parent::setUp();
@@ -95,6 +106,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    */
   public function testPaidSubmit($thousandSeparator) {
+    // @todo - figure out why this doesn't pass validate financials
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->setCurrencySeparators($thousandSeparator);
     $mut = new CiviMailUtils($this);
     $paymentProcessorID = $this->processorCreate();
@@ -222,6 +235,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testTaxMultipleParticipant() {
+    // @todo - figure out why this doesn't pass validate financials
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $mut = new CiviMailUtils($this);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
     $event = $this->eventCreate($params);

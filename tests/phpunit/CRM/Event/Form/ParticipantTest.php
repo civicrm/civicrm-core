@@ -21,7 +21,6 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-
   /**
    * Should financials be checked after the test but before tear down.
    *

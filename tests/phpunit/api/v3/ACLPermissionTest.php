@@ -25,6 +25,16 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
 
   use Civi\Test\ACLPermissionTrait;
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * The setup methodology in this class bypasses valid financial creation
+   * so we don't check.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
   public $DBResetRequired = FALSE;
   protected $_entity;
 

@@ -23,6 +23,17 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
   protected $_membershipStatusID;
   protected $_contribution = [];
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * This test class is opted out as this method should not be called outside
+   * of the LineItem::create function and the test is artificial & not creating
+   * valid financials.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = FALSE;
+
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction(TRUE);
