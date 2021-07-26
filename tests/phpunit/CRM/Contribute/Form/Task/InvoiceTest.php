@@ -25,6 +25,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
     CRM_Utils_Hook::singleton()->reset();
   }
 
@@ -173,22 +174,14 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
     $this->_individualId = $this->individualCreate();
 
-    $contributionParams = [
-      'contact_id' => $this->_individualId,
-      'total_amount' => 100,
-      'currency' => 'GBP',
-      'financial_type_id' => 'Donation',
-      'contribution_status_id' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $contributionID = $this->setupContribution();
 
     $params = [
       'output' => 'pdf_invoice',
       'forPage' => 1,
     ];
 
-    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$contribution['id']], $params, [$this->_individualId]);
+    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$contributionID], $params, [$this->_individualId]);
 
     $this->assertStringNotContainsString('$', $invoiceHTML);
     $this->assertStringNotContainsString('Amount USD', $invoiceHTML);
@@ -198,6 +191,53 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->assertStringContainsString('Amount GBP', $invoiceHTML);
     $this->assertStringContainsString('TOTAL GBP', $invoiceHTML);
 
+  }
+
+  /**
+   * Test invoice contact fields.
+   */
+  public function testInvoiceContactFields(): void {
+    $this->swapMessageTemplateForTestTemplate('contribution_invoice_receipt');
+    $contactID = $this->individualCreate([
+      'postal_code' => 2345,
+      'street_address' => 'on my street',
+      'supplemental_address_1' => 'and more detail',
+      'supplemental_address_2' => 'and more',
+      'stateProvinceAbbreviation' => 'ME',
+      'city' => 'Baltimore',
+      'country' => 'US',
+      'external_identifier' => 2345,
+    ]);
+    $params = [
+      'output' => 'pdf_invoice',
+      'forPage' => 1,
+    ];
+    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$this->setupContribution(['contact_id' => $contactID])], $params, [$contactID]);
+    $expected = [
+      'externalIdentifier (token):::2345',
+      'displayName (token):::Mr. Anthony Anderson II',
+    ];
+    foreach ($expected as $string) {
+      $this->assertStringContainsString($string, $invoiceHTML);
+    }
+  }
+
+  /**
+   * Set up a contribution.
+   *
+   * @param array $params
+   *
+   * @return int
+   */
+  protected function setupContribution(array $params = []): int {
+    $contributionParams = array_merge([
+      'contact_id' => $this->_individualId,
+      'total_amount' => 100,
+      'currency' => 'GBP',
+      'financial_type_id' => 'Donation',
+      'contribution_status_id' => 1,
+    ], $params);
+    return (int) $this->callAPISuccess('Contribution', 'create', $contributionParams)['id'];
   }
 
 }
