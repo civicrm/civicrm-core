@@ -554,14 +554,19 @@ ORDER BY   gc.contact_id, g.children
    * so temp tables are not destroyed if they are used
    *
    * @param int $savedSearchID
-   * @param array $ssParams
+   * @param array $savedSearch
    * @param string $addSelect
    * @param string $excludeClause
    *
    * @return string
    * @throws CRM_Core_Exception
    */
-  protected static function getCustomSearchSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
+  protected static function getCustomSearchSQL($savedSearchID, array $savedSearch, string $addSelect, string $excludeClause) {
+    $ssParams = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+    // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+    if (!empty($ssParams)) {
+      CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+    }
     $searchSQL = CRM_Contact_BAO_SearchCustom::customClass($ssParams['customSearchID'], $savedSearchID)->contactIDs();
     $searchSQL = str_replace('ORDER BY contact_a.id ASC', '', $searchSQL);
     if (strpos($searchSQL, 'WHERE') === FALSE) {
@@ -577,7 +582,7 @@ ORDER BY   gc.contact_id, g.children
    * Get array of sql from a saved query object group.
    *
    * @param int $savedSearchID
-   * @param array $ssParams
+   * @param array $savedSearch
    * @param string $addSelect
    * @param string $excludeClause
    *
@@ -585,7 +590,20 @@ ORDER BY   gc.contact_id, g.children
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected static function getQueryObjectSQL($savedSearchID, array $ssParams, string $addSelect, string $excludeClause) {
+  protected static function getQueryObjectSQL($savedSearchID, array $savedSearch, string $addSelect, string $excludeClause): string {
+    $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
+    //check if the saved search has mapping id
+    if ($savedSearch['mapping_id']) {
+      $ssParams = CRM_Core_BAO_Mapping::formattedFields($fv);
+    }
+    else {
+      $ssParams = CRM_Contact_BAO_Query::convertFormValues($fv);
+    }
+    // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
+    if (!empty($ssParams)) {
+      CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
+    }
+
     $returnProperties = NULL;
     if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $savedSearchID, 'mapping_id')) {
       $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
@@ -799,6 +817,7 @@ ORDER BY   gc.contact_id, g.children
     if ($savedSearchID) {
       $savedSearch = SavedSearch::get(FALSE)
         ->addWhere('id', '=', $savedSearchID)
+        ->addSelect('*')
         ->execute()
         ->first();
 
@@ -808,31 +827,15 @@ ORDER BY   gc.contact_id, g.children
                         AND civicrm_group_contact.group_id = $groupID )";
       $addSelect = "$groupID AS group_id";
 
-      if (!empty($savedSearch['api_entity'])) {
+      if ($savedSearch['api_entity']) {
         $sql = self::getApiSQL($savedSearch, $addSelect, $excludeClause);
       }
       else {
-        $fv = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
-        //check if the saved search has mapping id
-        if ($savedSearch['mapping_id']) {
-          $ssParams = CRM_Core_BAO_Mapping::formattedFields($fv);
-        }
-        elseif (!empty($fv['customSearchID'])) {
-          $ssParams = $fv;
+        if (!empty($savedSearch['form_values']['customSearchID'])) {
+          $sql = self::getCustomSearchSQL($savedSearchID, $savedSearch, $addSelect, $excludeClause);
         }
         else {
-          $ssParams = CRM_Contact_BAO_Query::convertFormValues($fv);
-        }
-
-        // CRM-7021 rectify params to what proximity search expects if there is a value for prox_distance
-        if (!empty($ssParams)) {
-          CRM_Contact_BAO_ProximityQuery::fixInputParams($ssParams);
-        }
-        if (isset($ssParams['customSearchID'])) {
-          $sql = self::getCustomSearchSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
-        }
-        else {
-          $sql = self::getQueryObjectSQL($savedSearchID, $ssParams, $addSelect, $excludeClause);
+          $sql = self::getQueryObjectSQL($savedSearchID, $savedSearch, $addSelect, $excludeClause);
         }
       }
     }
