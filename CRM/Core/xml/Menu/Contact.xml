@@ -60,10 +60,6 @@
      <weight>14</weight>
   </item>
   <item>
-     <path>civicrm/contact/search/custom</path>
-     <page_arguments>mode=16384</page_arguments>
-  </item>
-  <item>
      <path>civicrm/contact/search/custom/list</path>
      <title>Custom Searches</title>
      <page_callback>CRM_Contact_Page_CustomSearch</page_callback>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/contact/search/custom</path>
+    <title>Find Contacts</title>
+    <page_callback>CRM_Legacycustomsearches_Controller_Search</page_callback>
+    <page_arguments>mode=16384</page_arguments>
+    <access_arguments>access CiviCRM</access_arguments>
+    <weight>10</weight>
+    <page_type>1</page_type>
+  </item>
+</menu>
