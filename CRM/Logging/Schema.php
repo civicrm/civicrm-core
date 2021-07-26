@@ -131,6 +131,15 @@ AND    TABLE_NAME LIKE 'civicrm_%'
     while ($dao->fetch()) {
       $this->tables[] = $dao->TABLE_NAME;
     }
+    // Get any non standard table names used for custom groups.
+    // include these BEFORE the hook is called.
+    $customFieldDAO = CRM_Core_DAO::executeQuery("
+      SELECT DISTINCT table_name as TABLE_NAME FROM civicrm_custom_group
+      where table_name NOT LIKE 'civicrm_%';
+    ");
+    while ($customFieldDAO->fetch()) {
+      $this->tables[] = $customFieldDAO->TABLE_NAME;
+    }
 
     // do not log temp import, cache, menu and log tables
     $this->tables = preg_grep('/^civicrm_import_job_/', $this->tables, PREG_GREP_INVERT);

@@ -6,19 +6,43 @@
  */
 class CRM_Logging_LoggingTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
+  /**
+   * Has the db been set to multilingual.
+   *
+   * @var bool
+   */
+  protected $isDBMultilingual = FALSE;
+
   public function tearDown(): void {
     Civi::settings()->set('logging', FALSE);
-    CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    if ($this->isDBMultilingual) {
+      CRM_Core_I18n_Schema::makeSinglelingual('en_US');
+    }
     $logging = new CRM_Logging_Schema();
     $logging->dropAllLogTables();
+    $this->cleanupCustomGroups();
     parent::tearDown();
+  }
+
+  /**
+   * Check that log tables are created even for non standard custom fields
+   * tables.
+   *
+   * @throws \API_Exception
+   */
+  public function testLoggingNonStandardCustomTableName(): void {
+    $this->createCustomGroupWithFieldOfType(['table_name' => 'abcd']);
+    Civi::settings()->set('logging', TRUE);
+    $this->assertNotEmpty(CRM_Core_DAO::singleValueQuery("SHOW tables LIKE 'log_abcd'"));
   }
 
   /**
    * Test creating logging schema when database is in multilingual mode.
    */
   public function testMultilingualLogging(): void {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $this->makeMultilingual();
     Civi::settings()->set('logging', TRUE);
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
     $this->assertNotNull($value, 'Logging not enabled successfully');
@@ -29,7 +53,7 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
    * Also test altering a multilingual table.
    */
   public function testMultilingualAlterSchemaLogging(): void {
-    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $this->makeMultilingual();
     Civi::settings()->set('logging', TRUE);
     $logging = new CRM_Logging_Schema();
     $value = CRM_Core_DAO::singleValueQuery('SELECT id FROM log_civicrm_contact LIMIT 1', [], FALSE, FALSE);
@@ -65,6 +89,14 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
       || in_array("  `logging_test` int DEFAULT '0'", $create, TRUE)
       || in_array('  `logging_test` int DEFAULT 0', $create, TRUE)
     );
+  }
+
+  /**
+   * Convert the database to multilingual mode.
+   */
+  protected function makeMultilingual(): void {
+    CRM_Core_I18n_Schema::makeMultilingual('en_US');
+    $this->isDBMultilingual = TRUE;
   }
 
 }
