@@ -141,7 +141,7 @@
         {* CRM-7362 --add campaign to contributions *}
         {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
-        {if !$contributionMode || $payNow}
+        {if (empty($is_template) && (!$contributionMode || $payNow))}
           <tr class="crm-contribution-form-block-contribution_status_id">
             <td class="label">{$form.contribution_status_id.label}</td>
             <td>{$form.contribution_status_id.html}
@@ -188,12 +188,14 @@
               </fieldset>
             </td>
           </tr>
+          {if empty($is_template)}
           <tr class="crm-contribution-form-block-receive_date">
             <td class="label">{$form.receive_date.label}</td>
             <td>{$form.receive_date.html}<br />
               <span class="description">{ts}The date this contribution was received.{/ts}</span>
             </td>
           </tr>
+          {/if}
         {/if}
         {if $form.revenue_recognition_date && !$payNow}
           <tr class="crm-contribution-form-block-revenue_recognition_date">
@@ -202,36 +204,40 @@
           </tr>
         {/if}
 
-        {if $email and $outBound_option != 2}
+        {if empty($is_template) and $email and $outBound_option != 2}
           <tr class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
             <td>{$form.is_email_receipt.html}&nbsp;
               <span class="description">{ts 1=$email}Automatically email a receipt for this payment to %1?{/ts}</span>
             </td>
           </tr>
-        {elseif $context eq 'standalone' and $outBound_option != 2 }
+        {elseif empty($is_template) and $context eq 'standalone' and $outBound_option != 2 }
           <tr id="email-receipt" style="display:none;" class="crm-contribution-form-block-is_email_receipt">
             <td class="label">{$form.is_email_receipt.label}</td>
             <td>{$form.is_email_receipt.html} <span class="description">{ts}Automatically email a receipt for this payment to {/ts}<span id="email-address"></span>?</span>
             </td>
           </tr>
         {/if}
+        {if empty($is_template)}
         <tr id="fromEmail" class="crm-contribution-form-block-receipt_date" style="display:none;">
           <td class="label">{$form.from_email_address.label}</td>
           <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
         </tr>
+        {/if}
+        {if empty($is_template)}
         <tr id="receiptDate" class="crm-contribution-form-block-receipt_date">
           <td class="label">{$form.receipt_date.label}</td>
           <td>{$form.receipt_date.html}<br />
             <span class="description">{ts}Date that a receipt was sent to the contributor.{/ts}</span>
           </td>
         </tr>
+        {/if}
         {if $form.payment_processor_id}
           <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
         {/if}
       </table>
 
-    {if !$contributionMode}
+    {if !$contributionMode && empty($is_template)}
       <fieldset class="payment-details_group">
         <legend>
           {ts}Payment Details{/ts}

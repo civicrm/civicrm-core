@@ -278,6 +278,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->applyCustomData('Contribution', $this->getFinancialTypeID(), $this->_id);
     }
 
+    if (!empty($this->_values['is_template'])) {
+      $this->assign('is_template', TRUE);
+    }
+
     $this->_lineItems = [];
     if ($this->_id) {
       if (!empty($this->_compId) && $this->_compContext === 'participant') {
@@ -298,6 +302,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_payNow = TRUE;
       $this->assign('payNow', $this->_payNow);
       CRM_Utils_System::setTitle(ts('Pay with Credit Card'));
+    }
+    elseif (!empty($this->_values['is_template'])) {
+      $this->setPageTitle(ts('Template Contribution'));
     }
     elseif ($this->_mode) {
       $this->setPageTitle($this->_ppID ? ts('Credit Card Pledge Payment') : ts('Credit Card Contribution'));
