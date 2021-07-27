@@ -90,7 +90,7 @@
     </tr>
 {/if}
 
-{if $form.tag.html}
+{if !empty($form.tag.html)}
     <tr class="crm-case-form-block-tag">
       <td class="label">{$form.tag.label}</td>
       <td class="view-value"><div class="crm-select-container">{$form.tag.html}</div>
