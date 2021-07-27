@@ -22,22 +22,23 @@
 [x] - check @required
 [x] - check types (maybe)
 
+[x] test class for msgwf
+[x] - test trait; new class
+[x] - extract data file
+[x] - move test
+[~] - rework equivalence assertions
+[~] - add rendering assertions for stock template
+[x] wfmsgexample api test
+
 = near =
 
 [ ] MR for devdocs msgtpl
 
-[ ] test class for msgwf
-[x] - test trait; new class
-[x] - extract data file
-[x] - move test
-[ ] - rework equivalence assertions
-[ ] - add rendering assertions for stock template
-
-[~] render api
+[x] render api
+[ ] render ui-api (hookup)
 
 = mid =
 
-[ ] render ui-api (hookup)
 [ ] rough token list via api
 [ ] metadata for available tokens
 [ ] real token list via api
