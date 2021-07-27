@@ -11,6 +11,7 @@
 
 use Civi\Api4\LineItem;
 use Civi\Api4\PriceField;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 
 /**
@@ -229,6 +230,13 @@ class CRM_Financial_BAO_Order {
    * @var array
    */
   protected $defaultPriceField;
+
+  /**
+   * Cache of the default price field value ID.
+   *
+   * @var array
+   */
+  protected $defaultPriceFieldValueID;
 
   /**
    * Get parameters for the entities bought as part of this order.
@@ -664,6 +672,23 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the id of the price field to use when just an amount is provided.
+   *
+   * @throws \API_Exception
+   *
+   * @return int
+   */
+  public function getDefaultPriceFieldValueID():int {
+    if (!$this->defaultPriceFieldValueID) {
+      $this->defaultPriceFieldValueID = PriceFieldValue::get(FALSE)
+        ->addWhere('name', '=', 'contribution_amount')
+        ->addWhere('price_field_id.name', '=', 'contribution_amount')
+        ->execute()->first()['id'];
+    }
+    return $this->defaultPriceFieldValueID;
+  }
+
+  /**
    * Get line items.
    *
    * return array
@@ -1089,6 +1114,7 @@ class CRM_Financial_BAO_Order {
     $defaults = [
       'qty' => 1,
       'price_field_id' => $this->getDefaultPriceFieldID(),
+      'price_field_value_id' => $this->getDefaultPriceFieldValueID(),
       'entity_table' => 'civicrm_contribution',
       'unit_price' => $lineItem['line_total'],
       'label' => ts('Contribution Amount'),

@@ -241,7 +241,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $order['id'],
     ];
-    $order = $this->callAPISuccess('order', 'get', $params);
+    $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = [
       $order['id'] => [
         'total_amount' => 200,
@@ -269,7 +269,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
     $p['total_amount'] = 300;
-    $order = $this->callAPISuccess('order', 'create', $p);
+    $order = $this->callAPISuccess('Order', 'create', $p);
     $expectedResult = [
       $order['id'] => [
         'total_amount' => 300,
