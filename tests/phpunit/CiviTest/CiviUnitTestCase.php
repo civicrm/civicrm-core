@@ -486,7 +486,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Create default domain contacts for the two domains added during test class.
    * database population.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
    */
   public function createDomainContacts(): void {

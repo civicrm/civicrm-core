@@ -3468,8 +3468,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testPendingToCompleteContribution(): void {
-    // @todo - figure out why this test is not valid.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceSetWithPage('membership');
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
@@ -3729,8 +3727,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testSendConfirmationPayLater(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    // This probably needs to call the order api in order to generate valid financial entities.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Create contribution page
     $pageParams = [
       'title' => 'Webform Contributions',
@@ -3741,30 +3737,30 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'pay_later_text' => 'I will send payment by cheque',
       'pay_later_receipt' => 'Send your cheque payable to "CiviCRM LLC" to the office',
     ];
-    $contributionPage = $this->callAPISuccess('contribution_page', 'create', $pageParams);
+    $contributionPage = $this->callAPISuccess('ContributionPage', 'create', $pageParams);
 
     // Create pay later contribution
-    $contribParams = [
+    $contribution = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->_individualId,
       'financial_type_id' => 1,
       'is_pay_later' => 1,
       'contribution_status_id' => 2,
       'contribution_page_id' => $contributionPage['id'],
       'total_amount' => '10.00',
-    ];
-    $contribution = $this->callAPISuccess('contribution', 'create', $contribParams);
-
-    // Create line item
-    $lineItemParams = [
-      'contribution_id' => $contribution['id'],
-      'entity_id' => $contribution['id'],
-      'entity_table' => 'civicrm_contribution',
-      'label' => 'My lineitem label',
-      'qty' => 1,
-      'unit_price' => '10.00',
-      'line_total' => '10.00',
-    ];
-    $this->callAPISuccess('LineItem', 'create', $lineItemParams);
+      'line_items' => [
+        [
+          'line_item' => [
+            [
+              'entity_table' => 'civicrm_contribution',
+              'label' => 'My lineitem label',
+              'qty' => 1,
+              'unit_price' => '10.00',
+              'line_total' => '10.00',
+            ],
+          ],
+        ],
+      ],
+    ]);
 
     // Create email
     try {
@@ -3785,7 +3781,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Retrieve mail & check it has the pay_later_receipt info
     $mut->getMostRecentEmail('raw');
     $mut->checkMailLog([
-      (string) $contribParams['total_amount'],
+      (string) 10,
       $pageParams['pay_later_receipt'],
     ], [
       'Event',

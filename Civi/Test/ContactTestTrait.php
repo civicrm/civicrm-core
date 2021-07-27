@@ -54,8 +54,6 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Organisation created
-   *
-   * @throws \CiviCRM_API3_Exception
    */
   public function organizationCreate($params = [], $seq = 0): int {
     if (!$params) {

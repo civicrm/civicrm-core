@@ -21,6 +21,13 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   use CRMTraits_Financial_PriceSetTrait;
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * Clean up after tests.
    */
   public function tearDown(): void {
@@ -666,7 +673,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testAssignProportionalLineItems() {
+  public function testAssignProportionalLineItems(): void {
+    // This test doesn't seem to manage financials properly, possibly by design
+    $this->isValidateFinancialsOnPostAssert = FALSE;
     $contribution = $this->addParticipantWithContribution();
     // Delete existing financial_trxns. This is because we are testing a code flow we
     // want to deprecate & remove & the test relies on bad data asa starting point.
