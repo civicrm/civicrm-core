@@ -553,6 +553,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // classes frees memory as they are not otherwise unset until the
     // very end.
     unset($this->mut);
+    $this->checkPhoneNumeric();
   }
 
   /**
@@ -3883,6 +3884,13 @@ WHERE a1.is_primary = 0
       )->execute();
 
     CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+  }
+
+  protected function checkPhoneNumeric(): void {
+    $dao = CRM_Core_DAO::executeQuery("SHOW function status WHERE db = database() AND name = 'civicrm_strip_non_numeric'");
+    if (!$dao->fetch()) {
+      $this->fail('where is it??');
+    }
   }
 
 }
