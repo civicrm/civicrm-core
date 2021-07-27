@@ -55,6 +55,9 @@
   name        : Alessandro Verdura
   organization: CompuCorp
 
+- github      : akosgarai
+  name        : Akos Garai
+
 - github      : AlainBenbassat
   name        : Alain Benbassat
   organization: Business & Code
@@ -1414,6 +1417,10 @@
 - github      : ryanlrobinson
   name        : Ryan L. Robinson
 
+- github      : sadashivdalvi
+  name        : Sadashiv
+  organization: Gokhalemethod
+
 - github      : scoobird
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
@@ -1422,7 +1429,7 @@
   jira        : s.bink
 
 - github      : shaneonabike
-  name        :  Abeilles en Vélo / Bees on a bike
+  name        : Abeilles en Vélo / Bees on a bike
 
 - name        : Sheila Burkett
   organization: Spry Digital
