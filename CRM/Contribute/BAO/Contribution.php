@@ -5015,7 +5015,7 @@ LIMIT 1;";
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $financialAccount = [];
     while ($dao->fetch()) {
-      $financialAccount[$dao->id] = $dao->id;
+      $financialAccount[(int) $dao->id] = (int) $dao->id;
     }
     return $financialAccount;
   }
