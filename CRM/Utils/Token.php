@@ -1559,7 +1559,7 @@ class CRM_Utils_Token {
   protected static function _buildContributionTokens() {
     $key = 'contribution';
 
-    if (self::$_tokens[$key] == NULL) {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$key])) {
       $processor = new CRM_Contribute_Tokens();
       $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
         ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
@@ -1571,8 +1571,9 @@ class CRM_Utils_Token {
           $tokens[$token['name']] = [];
         }
       }
-      self::$_tokens[$key] = array_keys($tokens);
+      Civi::$statics[__CLASS__][__FUNCTION__][$key] = array_keys($tokens);
     }
+    self::$_tokens[$key] = Civi::$statics[__CLASS__][__FUNCTION__][$key];
   }
 
   /**
