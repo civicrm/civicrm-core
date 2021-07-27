@@ -808,7 +808,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $order = new CRM_Financial_BAO_Order();
         // We use the override total amount because we are dealing with a
         // possibly tax_inclusive total, which is assumed for the override total.
-        $order->setOverrideTotalAmount($value['total_amount']);
+        $order->setOverrideTotalAmount((float) $value['total_amount']);
         $order->setLineItem([
           'membership_type_id' => $value['membership_type_id'],
           'financial_type_id' => $value['financial_type_id'],

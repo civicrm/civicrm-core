@@ -921,7 +921,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $order = new CRM_Financial_BAO_Order();
     $order->setPriceSelectionFromUnfilteredInput($fields);
     if (isset($fields['total_amount'])) {
-      $order->setOverrideTotalAmount($fields['total_amount']);
+      $order->setOverrideTotalAmount((float) $fields['total_amount']);
     }
     $lineItems = $order->getLineItems();
     try {
