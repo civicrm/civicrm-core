@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\MessageTemplate;
+
 /**
  * Class CRM_UF_Page_ProfileEditorTest
  * @group headless
@@ -35,6 +37,31 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         $this->callAPISuccess('MessageTemplate', 'create', ['msg_text' => $originalText, 'id' => $template['id']]);
       }
     }
+  }
+
+  /**
+   * Test that a string replacement in a message template can be done.
+   *
+   * @throws \API_Exception
+   */
+  public function testMessageTemplateStringReplace(): void {
+    MessageTemplate::update()->setValues(['msg_html' => '{$display_name}'])->addWhere(
+      'workflow_name', '=', 'contribution_invoice_receipt'
+    )->execute();
+    $upgrader = new CRM_Upgrade_Incremental_MessageTemplates('5.41.0');
+    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    $this->assertEquals('Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}', $messages);
+    $upgrader->replaceTokenInTemplate('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    $templates = MessageTemplate::get()->addSelect('msg_html')
+      ->addWhere(
+        'workflow_name', '=', 'contribution_invoice_receipt'
+      )->execute();
+    foreach ($templates as $template) {
+      $this->assertEquals('{contact.display_name}', $template['msg_html']);
+    }
+    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    $this->assertEquals('', $messages);
+    $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
   }
 
   /**
