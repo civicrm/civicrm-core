@@ -2000,7 +2000,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $order->setPriceSelectionFromUnfilteredInput($params);
     if (isset($params['amount']) && !CRM_Contribute_BAO_ContributionPage::getIsMembershipPayment($form->_id)) {
       // @todo deprecate receiving amount, calculate on the form.
-      $order->setOverrideTotalAmount($params['amount']);
+      $order->setOverrideTotalAmount((float) $params['amount']);
     }
     $amount = $order->getTotalAmount();
     if ($form->_separateMembershipPayment) {
