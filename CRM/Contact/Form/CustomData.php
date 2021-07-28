@@ -224,7 +224,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           TRUE,
           NULL,
           FALSE,
-          TRUE,
+          CRM_Core_Permission::EDIT,
           $this->_copyValueId
         );
         $valueIdDefaults = [];

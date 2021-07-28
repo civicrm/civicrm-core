@@ -126,11 +126,13 @@ class CustomValue {
    * @return array
    */
   public static function permissions() {
-    $entity = 'contact';
-    $permissions = \CRM_Core_Permission::getEntityActionPermissions();
-
-    // Merge permissions for this entity with the defaults
-    return \CRM_Utils_Array::value($entity, $permissions, []) + $permissions['default'];
+    // Permissions are managed by ACLs
+    return [
+      'create' => [],
+      'update' => [],
+      'delete' => [],
+      'get' => [],
+    ];
   }
 
   /**

@@ -99,6 +99,12 @@ class CRM_Custom_Page_AJAX {
     $params['cid'] = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
     $params['cgid'] = CRM_Utils_Type::escape($_GET['cgid'], 'Integer');
 
+    if (!CRM_Core_BAO_CustomGroup::checkGroupAccess($params['cgid'], CRM_Core_Permission::VIEW) ||
+      !CRM_Contact_BAO_Contact_Permission::allow($params['cid'], CRM_Core_Permission::VIEW)
+    ) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $contactType = CRM_Contact_BAO_Contact::getContactType($params['cid']);
 
     $obj = new CRM_Profile_Page_MultipleRecordFieldsListing();
@@ -117,7 +123,6 @@ class CRM_Custom_Page_AJAX {
     // format params and add class attributes
     $fieldList = [];
     foreach ($fields as $id => $value) {
-      $field = [];
       foreach ($value as $fieldId => &$fieldName) {
         if (!empty($attributes[$fieldId][$id]['class'])) {
           $fieldName = ['data' => $fieldName, 'cellClass' => $attributes[$fieldId][$id]['class']];
@@ -127,8 +132,7 @@ class CRM_Custom_Page_AJAX {
           CRM_Utils_Array::crmReplaceKey($value, $fieldId, $fName);
         }
       }
-      $field = $value;
-      array_push($fieldList, $field);
+      array_push($fieldList, $value);
     }
     $totalRecords = !empty($obj->_total) ? $obj->_total : 0;
 

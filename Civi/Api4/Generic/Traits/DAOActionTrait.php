@@ -244,15 +244,13 @@ trait DAOActionTrait {
           NULL,
           $entityId,
           FALSE,
-          FALSE,
+          $this->getCheckPermissions(),
           TRUE
         );
       }
     }
 
-    if ($customParams) {
-      $params['custom'] = $customParams;
-    }
+    $params['custom'] = $customParams ?: NULL;
   }
 
   /**

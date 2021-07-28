@@ -19,7 +19,7 @@
     {if $multiRecordDisplay neq 'single'}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
-      {if ($showEdit && $cd_edit.editable && $groupId) && ($editOwnCustomData or $editCustomData)}
+      {if $showEdit && $cd_edit.editable && $groupId && $editPermission}
         <tr>
           <td>
             <a
@@ -38,7 +38,7 @@
               </div>
             {/if}
             <div class="crm-accordion-body">
-              {if $groupId and $cvID and $editCustomData and $cd_edit.editable}
+              {if $groupId and $cvID and $editPermission and $cd_edit.editable}
                 <div class="crm-submit-buttons">
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'

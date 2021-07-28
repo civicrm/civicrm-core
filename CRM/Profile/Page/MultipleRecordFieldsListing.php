@@ -241,7 +241,15 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       }
       $linkAction = array_sum(array_keys($this->links()));
     }
-
+    // Check permissions to edit the contact and the custom fields
+    $editPermission = FALSE;
+    if ($this->_contactId) {
+      $editPermission = CRM_Core_BAO_CustomGroup::checkGroupAccess($customGroupId, CRM_Core_Permission::EDIT) &&
+        CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
+      if (!$editPermission) {
+        $linkAction -= (CRM_Core_Action::COPY + CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE);
+      }
+    }
     if (!empty($fieldIDs) && $this->_contactId) {
       $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
@@ -267,6 +275,9 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         }
         $customGroupInfo = CRM_Core_BAO_CustomGroup::getGroupTitles($fieldInput);
         $this->_customGroupTitle = $customGroupInfo[$fieldIdInput]['groupTitle'];
+      }
+      elseif ($this->_pageViewType == 'customDataView') {
+
       }
       // $cgcount is defined before 'if' condition as entity may have no record
       // and $cgcount is used to build new record url
@@ -430,6 +441,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         }
       }
     }
+    $this->assign('editPermission', $editPermission);
     $this->assign('dateFields', $dateFields);
     $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
