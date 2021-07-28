@@ -515,13 +515,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         else {
           $visibility_id = self::getVisibilityOptionID('public');
         }
-        $element = &$qf->add('select', $elementName, $label,
-          [
-            '' => ts('- select -'),
-          ] + $selectOption,
-          $useRequired && $field->is_required,
-          ['price' => json_encode($priceVal), 'class' => 'crm-select2', 'data-price-field-values' => json_encode($customOption)]
-        );
+        $element = &$qf->add('select', $elementName, $label, $selectOption, $useRequired && $field->is_required, [
+          'placeholder' => ts('- select %1 -', [1 => $label]),
+          'price' => json_encode($priceVal),
+          'class' => 'crm-select2',
+          'data-price-field-values' => json_encode($customOption),
+        ]);
 
         // CRM-6902 - Add "max" option for a price set field
         $button = substr($qf->controller->getButtonName(), -4);
