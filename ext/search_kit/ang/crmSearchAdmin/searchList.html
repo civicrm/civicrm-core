@@ -101,10 +101,10 @@
           </div>
         </td>
         <td title="{{:: formatDate(search.created_date, null, true) }}">
-          {{:: search['created.display_name'] ? ts('%1 by %2', {1: formatDate(search.created_date), 2: search['created.display_name']}) : formatDate(search.created_date) }}
+          {{:: search['created_id.display_name'] ? ts('%1 by %2', {1: formatDate(search.created_date), 2: search['created_id.display_name']}) : formatDate(search.created_date) }}
         </td>
         <td title="{{:: formatDate(search.modified_date, null, true) }}">
-          {{:: search['modified.display_name'] ? ts('%1 by %2', {1: formatDate(search.modified_date), 2: search['modified.display_name']}) : formatDate(search.modified_date) }}
+          {{:: search['modified_id.display_name'] ? ts('%1 by %2', {1: formatDate(search.modified_date), 2: search['modified_id.display_name']}) : formatDate(search.modified_date) }}
         </td>
         <td class="text-right">
           <a class="btn btn-xs btn-default" href="#/edit/{{:: search.id }}" ng-if="search.permissionToEdit">{{:: ts('Edit') }}</a>
