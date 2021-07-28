@@ -2,8 +2,6 @@
 
 namespace Civi\Financialacls;
 
-use Civi\Api4\PriceField;
-
 // I fought the Autoloader and the autoloader won.
 require_once 'BaseTestClass.php';
 
@@ -27,10 +25,11 @@ class LineItemTest extends BaseTestClass {
    * Test api applies permissions on line item actions (delete & get).
    *
    * @dataProvider versionThreeAndFour
+   * @throws \API_Exception
    */
   public function testLineItemApiPermissions($version): void {
     $contact1 = $this->individualCreate();
-    $defaultPriceFieldID = $this->getDefaultPriceFieldID();
+    $this->createPriceSet();
     $order = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => 'Donation',
       'contact_id' => $contact1,
@@ -40,13 +39,15 @@ class LineItemTest extends BaseTestClass {
             [
               'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
               'line_total' => 40,
-              'price_field_id' => $defaultPriceFieldID,
+              'price_field_id' => $this->ids['PriceField'][0],
+              'price_field_value_id' => $this->ids['PriceFieldValue'][0],
               'qty' => 1,
             ],
             [
               'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues'),
               'line_total' => 50,
-              'price_field_id' => $defaultPriceFieldID,
+              'price_field_id' => $this->ids['PriceField'][0],
+              'price_field_value_id' => $this->ids['PriceFieldValue'][1],
               'qty' => 1,
             ],
           ],
@@ -68,7 +69,7 @@ class LineItemTest extends BaseTestClass {
       'entity_table' => 'civicrm_contribution',
       'line_total' => 20,
       'unit_price' => 20,
-      'price_field_id' => $defaultPriceFieldID,
+      'price_field_id' => $this->ids['PriceField'][0],
       'qty' => 1,
       'financial_type_id' => 'Donation',
       'check_permissions' => ($version == 3),
@@ -80,19 +81,6 @@ class LineItemTest extends BaseTestClass {
 
     $this->callAPIFailure('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => TRUE, 'financial_type_id' => 'Event Fee']);
     $this->callAPISuccess('LineItem', 'Create', ['id' => $line['id'], 'check_permissions' => ($version == 3), 'financial_type_id' => 'Donation']);
-  }
-
-  /**
-   * @return mixed
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  protected function getDefaultPriceFieldID(): int {
-    return PriceField::get()
-      ->addWhere('price_set_id:name', '=', 'default_contribution_amount')
-      ->addWhere('name', '=', 'contribution_amount')
-      ->addWhere('html_type', '=', 'Text')
-      ->addSelect('id')->execute()->first()['id'];
   }
 
 }

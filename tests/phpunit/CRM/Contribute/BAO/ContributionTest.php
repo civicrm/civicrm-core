@@ -1147,7 +1147,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * to the original payment - ie. .0909 of the $110 is 10 & that * 50 is $4.54 (note the rounding seems wrong as it should be
    * saved un-rounded).
    */
-  public function testCreateProportionalFinancialEntriesViaPaymentCreate() {
+  public function testCreateProportionalFinancialEntriesViaPaymentCreate(): void {
     [$contribution, $financialAccount] = $this->createContributionWithTax([], FALSE);
     $params = [
       'total_amount' => 50,
@@ -1164,7 +1164,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_trxn_id' => $financialTrxn['id'],
     ];
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
-    $this->assertEquals($entityFinancialTrxn['count'], 2, 'Invalid count.');
+    $this->assertEquals(2, $entityFinancialTrxn['count'], 'Invalid count.');
     $testAmount = [4.55, 45.45];
     foreach ($entityFinancialTrxn['values'] as $value) {
       $this->assertEquals(array_pop($testAmount), $value['amount'], 'Invalid amount stored in civicrm_entity_financial_trxn.');

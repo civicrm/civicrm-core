@@ -4412,8 +4412,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     elseif ($flag === 'single') {
       $params = array_merge($this->_params, ['contribution_recur_id' => $contributionRecur['id']]);
       $params = array_merge($params, $contributionParams);
-      $params['api.Payment.create'] = ['total_amount' => $params['total_amount']];
       $originalContribution = $this->callAPISuccess('Order', 'create', $params);
+      // Note the saved contribution amount will include tax.
+      $this->callAPISuccess('Payment', 'create', [
+        'contribution_id' => $originalContribution['id'],
+        'total_amount' => $originalContribution['values'][$originalContribution['id']]['total_amount'],
+      ]);
     }
     $originalContribution['contribution_recur_id'] = $contributionRecur['id'];
     $originalContribution['payment_processor_id'] = $paymentProcessorID;

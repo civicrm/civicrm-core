@@ -713,7 +713,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contact_id' => $this->getContactID(),
       'amount' => 1550.55,
       'currency' => 'USD',
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Unpaid'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Partially paid'),
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem['id'],
       'financial_account_id' => 4,

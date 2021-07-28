@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Api4\FinancialItem;
 
 /**
  *  Test APIv3 civicrm_contribute_* functions
@@ -198,7 +199,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   /**
    * Test create order api for membership
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testAddOrderForMembership(): void {
     $membershipType = $this->membershipTypeCreate();
@@ -241,7 +242,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $order['id'],
     ];
-    $order = $this->callAPISuccess('order', 'get', $params);
+    $order = $this->callAPISuccess('Order', 'get', $params);
     $expectedResult = [
       $order['id'] => [
         'total_amount' => 200,
@@ -269,7 +270,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
     $p['total_amount'] = 300;
-    $order = $this->callAPISuccess('order', 'create', $p);
+    $order = $this->callAPISuccess('Order', 'create', $p);
     $expectedResult = [
       $order['id'] => [
         'total_amount' => 300,
@@ -280,9 +281,26 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $paymentMembership = [
       'contribution_id' => $order['id'],
     ];
-    $order = $this->callAPISuccess('order', 'get', $paymentMembership);
+    $order = $this->callAPISuccess('Order', 'get', $paymentMembership);
     $this->checkPaymentResult($order, $expectedResult);
     $this->callAPISuccessGetCount('MembershipPayment', $paymentMembership, 2);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'payment_instrument_id' => 'Check',
+      'total_amount' => 300,
+    ]);
+    foreach (FinancialItem::get(FALSE)
+      ->addJoin(
+        'LineItem AS line_item',
+        'INNER',
+        NULL,
+        ['entity_table', '=', '"civicrm_line_item"'],
+        ['entity_id', '=', 'line_item.id'],
+        ['line_item.contribution_id', '=', $order['id']]
+      )
+      ->addSelect('status_id')->execute() as $item) {
+      $this->assertEquals('Paid', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialItem', 'status_id', $item['status_id']));
+    }
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
