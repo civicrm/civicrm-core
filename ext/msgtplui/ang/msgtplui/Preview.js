@@ -13,6 +13,13 @@
       $ctrl[idFld] = ($ctrl[idFld] + delta) % model[listFld].length;
     };
 
+    $ctrl.adhocExample = {};
+    $ctrl.isAdhocExample = false;
+    $ctrl.toggleAdhoc = function(value){
+      $ctrl.isAdhocExample = !$ctrl.isAdhocExample;
+      $ctrl.adhocExampleJson = angular.toJson(model.examples[$ctrl.exampleId], 2);
+    };
+
     var lastId = null;
     var update = function update() {
       var id = $ctrl.revisionId + ':' + $ctrl.exampleId;
