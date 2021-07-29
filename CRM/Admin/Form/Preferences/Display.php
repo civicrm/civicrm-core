@@ -47,8 +47,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
   public function buildQuickForm() {
 
     //changes for freezing the invoices/credit notes checkbox if invoicing is uncheck
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
+    $this->assign('invoicing', Civi::settings()->get('invoicing'));
 
     $this->addElement(
       'xbutton',

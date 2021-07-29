@@ -1675,9 +1675,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param array $lineItem
    */
   protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
-
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    if (empty($invoiceSettings['invoicing'])) {
+    if (!Civi::settings()->get('invoicing')) {
       return;
     }
     $taxRate = [];
