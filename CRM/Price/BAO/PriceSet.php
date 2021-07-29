@@ -421,96 +421,100 @@ WHERE     cpf.price_set_id = %1";
    */
   public static function getSetDetail($setID, $required = TRUE, $doNotIncludeExpiredFields = FALSE) {
     // create a new tree
-    $setTree = [];
+    $cacheKey = $setID . '_' . $required . '_' . $doNotIncludeExpiredFields;
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey])) {
+      $setTree = [];
 
-    $priceFields = [
-      'id',
-      'name',
-      'label',
-      'html_type',
-      'is_enter_qty',
-      'help_pre',
-      'help_post',
-      'weight',
-      'is_display_amounts',
-      'options_per_line',
-      'is_active',
-      'active_on',
-      'expire_on',
-      'javascript',
-      'visibility_id',
-      'is_required',
-    ];
-    if ($required == TRUE) {
-      $priceFields[] = 'is_required';
-    }
+      $priceFields = [
+        'id',
+        'name',
+        'label',
+        'html_type',
+        'is_enter_qty',
+        'help_pre',
+        'help_post',
+        'weight',
+        'is_display_amounts',
+        'options_per_line',
+        'is_active',
+        'active_on',
+        'expire_on',
+        'javascript',
+        'visibility_id',
+        'is_required',
+      ];
+      if ($required == TRUE) {
+        $priceFields[] = 'is_required';
+      }
 
-    // create select
-    $select = 'SELECT ' . implode(',', $priceFields);
-    $from = ' FROM civicrm_price_field';
+      // create select
+      $select = 'SELECT ' . implode(',', $priceFields);
+      $from = ' FROM civicrm_price_field';
 
-    $params = [
-      1 => [$setID, 'Integer'],
-    ];
-    $currentTime = date('YmdHis');
-    $where = "
+      $params = [
+        1 => [$setID, 'Integer'],
+      ];
+      $currentTime = date('YmdHis');
+      $where = "
 WHERE price_set_id = %1
 AND is_active = 1
 AND ( active_on IS NULL OR active_on <= {$currentTime} )
 ";
-    $dateSelect = '';
-    if ($doNotIncludeExpiredFields) {
-      $dateSelect = "
+      $dateSelect = '';
+      if ($doNotIncludeExpiredFields) {
+        $dateSelect = "
 AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 ";
-    }
-
-    $orderBy = ' ORDER BY weight';
-
-    $sql = $select . $from . $where . $dateSelect . $orderBy;
-
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-
-    $isDefaultContributionPriceSet = FALSE;
-    if ('default_contribution_amount' == CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID)) {
-      $isDefaultContributionPriceSet = TRUE;
-    }
-
-    $visibility = CRM_Core_PseudoConstant::visibility('name');
-    while ($dao->fetch()) {
-      $fieldID = $dao->id;
-
-      $setTree[$setID]['fields'][$fieldID] = [];
-      $setTree[$setID]['fields'][$fieldID]['id'] = $fieldID;
-
-      foreach ($priceFields as $field) {
-        if ($field == 'id' || is_null($dao->$field)) {
-          continue;
-        }
-
-        if ($field == 'visibility_id') {
-          $setTree[$setID]['fields'][$fieldID]['visibility'] = $visibility[$dao->$field];
-        }
-        $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
       }
-      $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet);
-    }
 
-    // also get the pre and post help from this price set
-    $sql = "
+      $orderBy = ' ORDER BY weight';
+
+      $sql = $select . $from . $where . $dateSelect . $orderBy;
+
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
+
+      $isDefaultContributionPriceSet = FALSE;
+      if ('default_contribution_amount' == CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $setID)) {
+        $isDefaultContributionPriceSet = TRUE;
+      }
+
+      $visibility = CRM_Core_PseudoConstant::visibility('name');
+      while ($dao->fetch()) {
+        $fieldID = $dao->id;
+
+        $setTree[$setID]['fields'][$fieldID] = [];
+        $setTree[$setID]['fields'][$fieldID]['id'] = $fieldID;
+
+        foreach ($priceFields as $field) {
+          if ($field == 'id' || is_null($dao->$field)) {
+            continue;
+          }
+
+          if ($field == 'visibility_id') {
+            $setTree[$setID]['fields'][$fieldID]['visibility'] = $visibility[$dao->$field];
+          }
+          $setTree[$setID]['fields'][$fieldID][$field] = $dao->$field;
+        }
+        $setTree[$setID]['fields'][$fieldID]['options'] = CRM_Price_BAO_PriceField::getOptions($fieldID, FALSE, FALSE, $isDefaultContributionPriceSet);
+      }
+
+      // also get the pre and post help from this price set
+      $sql = "
 SELECT extends, financial_type_id, help_pre, help_post, is_quick_config, min_amount
 FROM   civicrm_price_set
 WHERE  id = %1";
-    $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    if ($dao->fetch()) {
-      $setTree[$setID]['extends'] = $dao->extends;
-      $setTree[$setID]['financial_type_id'] = $dao->financial_type_id;
-      $setTree[$setID]['help_pre'] = $dao->help_pre;
-      $setTree[$setID]['help_post'] = $dao->help_post;
-      $setTree[$setID]['is_quick_config'] = $dao->is_quick_config;
-      $setTree[$setID]['min_amount'] = $dao->min_amount;
+      $dao = CRM_Core_DAO::executeQuery($sql, $params);
+      if ($dao->fetch()) {
+        $setTree[$setID]['extends'] = $dao->extends;
+        $setTree[$setID]['financial_type_id'] = $dao->financial_type_id;
+        $setTree[$setID]['help_pre'] = $dao->help_pre;
+        $setTree[$setID]['help_post'] = $dao->help_post;
+        $setTree[$setID]['is_quick_config'] = $dao->is_quick_config;
+        $setTree[$setID]['min_amount'] = $dao->min_amount;
+      }
+      Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey] = $setTree;
     }
-    return $setTree;
+    return Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey];
   }
 
   /**
