@@ -267,7 +267,7 @@
 
       crmApi4('WorkflowMessageExample', 'get', {
         // FIXME: workflow name
-        where: [["tags", "CONTAINS", "preview"], ["workflow", "=", "case_activity"]],
+        where: [["tags", "CONTAINS", "preview"], ["workflow", "=", $ctrl.records.main.workflow_name]],
         limit: 25
       }).then(function(workflowMessageExamples) {
         defaults.exampleName = workflowMessageExamples.length > 0  ? workflowMessageExamples[0].name : null;
