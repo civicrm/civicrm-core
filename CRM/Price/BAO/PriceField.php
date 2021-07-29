@@ -281,7 +281,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       $label = (!empty($qf->_membershipBlock) && $field->name == 'contribution_amount') ? ts('Additional Contribution') : $field->label;
     }
 
-    if ($field->name == 'contribution_amount') {
+    if ($field->name === 'contribution_amount') {
       $qf->_contributionAmount = 1;
     }
 
@@ -297,10 +297,9 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     //use value field.
     $valueFieldName = 'amount';
     $separator = '|';
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     $taxTerm = Civi::settings()->get('tax_term');
-    $displayOpt = $invoiceSettings['tax_display_settings'] ?? NULL;
-    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
+    $displayOpt = Civi::settings()->get('tax_display_settings');
+    $invoicing = Civi::settings()->get('invoicing');
     switch ($field->html_type) {
       case 'Text':
         $optionKey = key($customOption);
