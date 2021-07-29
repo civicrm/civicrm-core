@@ -62,16 +62,16 @@
 
         <div class="form-group" ng-if="!$ctrl.preview.loading">
           <label class="control-label col-sm-2">{{::ts('Subject')}}</label>
-          <p class="col-sm-9">{{$ctrl.preview.msg_subject}}</p>
+          <p class="col-sm-9">{{$ctrl.preview.subject}}</p>
         </div>
 
         <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_text'">
-          <pre class="col-sm-12">{{$ctrl.preview.msg_text}}</pre>
+          <pre class="col-sm-12">{{$ctrl.preview.text}}</pre>
         </div>
 
         <div class="form-group" ng-if="!$ctrl.preview.loading && model.formats[$ctrl.formatId].name === 'msg_html'">
           <div class="jumbotron well col-sm-12">
-            <iframe crm-ui-iframe="$ctrl.preview.msg_html"></iframe>
+            <iframe crm-ui-iframe="$ctrl.preview.html"></iframe>
           </div>
         </div>
 
