@@ -18,6 +18,8 @@ class SqlFunctionCOUNT extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
+  protected static $dataType = 'Integer';
+
   protected static function params(): array {
     return [
       [
@@ -27,20 +29,6 @@ class SqlFunctionCOUNT extends SqlFunction {
         'cant_be' => [],
       ],
     ];
-  }
-
-  /**
-   * Reformat result as integer
-   *
-   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string|array
-   */
-  public function formatOutputValue($value, &$dataType) {
-    // Count is always an integer
-    $dataType = 'Integer';
-    return (int) $value;
   }
 
   /**

@@ -18,6 +18,8 @@ class SqlFunctionYEAR extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
+  protected static $dataType = 'Integer';
+
   protected static function params(): array {
     return [
       [
@@ -32,19 +34,6 @@ class SqlFunctionYEAR extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Year Only');
-  }
-
-  /**
-   * Prevent reformatting
-   *
-   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string|array
-   */
-  public function formatOutputValue($value, &$dataType) {
-    $dataType = NULL;
-    return $value;
   }
 
 }

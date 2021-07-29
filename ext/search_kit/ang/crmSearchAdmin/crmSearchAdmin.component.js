@@ -660,9 +660,6 @@
       $scope.formatResult = function(row, col) {
         var info = searchMeta.parseExpr(col),
           value = row[info.alias];
-        if (info.fn && info.fn.name === 'COUNT') {
-          return value;
-        }
         return formatFieldValue(row, info, value);
       };
 
@@ -697,7 +694,7 @@
       }
 
       function formatFieldValue(row, info, value, index) {
-        var type = info.field.data_type,
+        var type = (info.fn && info.fn.dataType) || info.field.data_type,
           result = value,
           link;
         if (_.isArray(value)) {

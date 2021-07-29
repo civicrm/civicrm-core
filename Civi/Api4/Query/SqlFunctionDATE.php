@@ -18,6 +18,8 @@ class SqlFunctionDATE extends SqlFunction {
 
   protected static $category = self::CATEGORY_DATE;
 
+  protected static $dataType = 'Date';
+
   protected static function params(): array {
     return [
       [
@@ -32,19 +34,6 @@ class SqlFunctionDATE extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Date Only');
-  }
-
-  /**
-   * Ensure is processed as type Date
-   *
-   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string|array
-   */
-  public function formatOutputValue($value, &$dataType) {
-    $dataType = 'Date';
-    return $value;
   }
 
 }

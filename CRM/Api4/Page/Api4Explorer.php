@@ -61,6 +61,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
             'title' => $className::getTitle(),
             'params' => $className::getParams(),
             'category' => $className::getCategory(),
+            'dataType' => $className::getDataType(),
           ];
         }
       }

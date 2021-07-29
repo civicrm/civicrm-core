@@ -62,13 +62,13 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     if (isset($exprArgs[2]['expr'][0]->expr) && $exprArgs[2]['expr'][0]->expr === \CRM_Core_DAO::VALUE_SEPARATOR) {
       $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
       // If the first expression is another sqlFunction, allow it to control the dataType
-      if ($exprArgs[0]['expr'][0] instanceof SqlFunction && is_callable([$exprArgs[0]['expr'][0], 'formatOutputValue'])) {
+      if ($exprArgs[0]['expr'][0] instanceof SqlFunction) {
         $exprArgs[0]['expr'][0]->formatOutputValue(NULL, $dataType);
       }
     }
-    // If using custom separator, unset $dataType to preserve raw string
+    // If using custom separator, preserve raw string
     else {
-      $dataType = NULL;
+      $dataType = 'String';
     }
     return $value;
   }

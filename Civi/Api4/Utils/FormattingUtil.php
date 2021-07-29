@@ -200,12 +200,9 @@ class FormattingUtil {
         $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
         $field = $fieldName && isset($fields[$fieldName]) ? $fields[$fieldName] : NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
-        // If Sql Function e.g. GROUP_CONCAT or COUNT wants to do its own formatting, apply
+        // Allow Sql Functions to do special formatting and/or alter the $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
           $result[$key] = $value = $fieldExpr->formatOutputValue($value, $dataType);
-        }
-        if (!$field) {
-          continue;
         }
         if (!empty($field['output_formatters'])) {
           self::applyFormatters($result, $fieldName, $field, $value);

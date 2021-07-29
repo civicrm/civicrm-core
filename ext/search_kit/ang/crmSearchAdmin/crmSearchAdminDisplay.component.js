@@ -184,7 +184,7 @@
           values.label = searchMeta.getDefaultLabel(fieldExpr);
         }
         if (defaults.dataType) {
-          values.dataType = (info.fn && info.fn.name === 'COUNT') ? 'Integer' : info.field && info.field.data_type;
+          values.dataType = (info.fn && info.fn.dataType) || (info.field && info.field.data_type);
         }
         return values;
       }

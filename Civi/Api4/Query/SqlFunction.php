@@ -30,6 +30,13 @@ abstract class SqlFunction extends SqlExpression {
    */
   protected static $category;
 
+  /**
+   * Data type output by this function
+   *
+   * @var string
+   */
+  protected static $dataType;
+
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',
@@ -76,6 +83,21 @@ abstract class SqlFunction extends SqlExpression {
         $this->args[$idx]['suffix'] = (array) $this->captureKeyword(array_keys($param['flag_after']), $arg);
       }
     }
+  }
+
+  /**
+   * Change $dataType according to output of function
+   *
+   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
+   * @param string $value
+   * @param string $dataType
+   * @return string
+   */
+  public function formatOutputValue($value, &$dataType) {
+    if (static::$dataType) {
+      $dataType = static::$dataType;
+    }
+    return $value;
   }
 
   /**
@@ -264,6 +286,13 @@ abstract class SqlFunction extends SqlExpression {
    */
   public static function getCategory(): string {
     return static::$category;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public static function getDataType():? string {
+    return static::$dataType;
   }
 
   /**
