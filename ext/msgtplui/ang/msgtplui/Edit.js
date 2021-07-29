@@ -172,8 +172,8 @@
     var revisionTypes = [
       {name: 'original', label: ts('Original')},
       {name: 'main', label: ts('Standard')},
-      {name: 'txActive', label: ts('%1 - Current translation', {1: $ctrl.locales[$ctrl.lang]})},
-      {name: 'txDraft', label: ts('%1 - Draft translation', {1: $ctrl.locales[$ctrl.lang]})}
+      {name: 'txActive', label: ts('%1 - Current translation', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang})},
+      {name: 'txDraft', label: ts('%1 - Draft translation', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang})}
     ];
 
     $ctrl.switchTab = function switchTab(tgt) {
@@ -265,17 +265,32 @@
         title: ts('Preview')
       };
 
-      crmApi4('WorkflowMessageExample', 'get', {
-        // FIXME: workflow name
-        where: [["tags", "CONTAINS", "preview"], ["workflow", "=", $ctrl.records.main.workflow_name]],
-        limit: 25
-      }).then(function(workflowMessageExamples) {
-        defaults.exampleName = workflowMessageExamples.length > 0  ? workflowMessageExamples[0].name : null;
+      crmApi4({
+        examples: ['WorkflowMessageExample', 'get', {
+          // FIXME: workflow name
+          where: [["tags", "CONTAINS", "preview"], ["workflow", "=", $ctrl.records.main.workflow_name]],
+          select: ['name', 'title', 'workflow', 'data']
+        }],
+        adhoc: ['WorkflowMessage', 'getTemplateFields', {
+          workflow: $ctrl.records.main.workflow_name,
+          format: 'example'
+        }]
+      }).then(function(resp) {
+        console.log('resp',resp);
+        if ((!resp.examples || resp.examples.length === 0) && resp.adhoc) {
+          resp.examples = [{
+            name: 'auto',
+            title: ts('Empty example'),
+            workflow: $ctrl.records.main.workflow_name,
+            data: {modelProps: resp.adhoc[0]}
+          }];
+        }
+        defaults.exampleName = resp.examples.length > 0  ? (resp.examples)[0].name : null;
         var i = 0;
-        angular.forEach(workflowMessageExamples, function(ex) {
+        angular.forEach(resp.examples, function(ex) {
           ex.id = i++;
         });
-        defaults.examples = workflowMessageExamples;
+        defaults.examples = resp.examples;
 
         var model = angular.extend({}, defaults, args);
         var options = CRM.utils.adjustDialogDefaults({
