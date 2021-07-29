@@ -456,11 +456,11 @@ WHERE     cpf.price_set_id = %1";
     $where = "
 WHERE price_set_id = %1
 AND is_active = 1
-AND ( active_on IS NULL OR active_on <= {$currentTime} )
 ";
     $dateSelect = '';
     if ($doNotIncludeExpiredFields) {
       $dateSelect = "
+AND ( active_on IS NULL OR active_on <= {$currentTime} )
 AND ( expire_on IS NULL OR expire_on >= {$currentTime} )
 ";
     }
