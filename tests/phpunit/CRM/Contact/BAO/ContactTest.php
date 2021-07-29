@@ -1801,4 +1801,29 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertGreaterThanOrEqual('59', $age['years']);
   }
 
+  /**
+   * Test invalidateChecksum hook.
+   */
+  public function testInvalidateChecksumHook() {
+    $contact_id = $this->individualCreate();
+    $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contact_id);
+    // without the hook it's valid
+    $this->assertTrue(CRM_Contact_BAO_Contact_Utils::validChecksum($contact_id, $checksum));
+    $this->hookClass->setHook('civicrm_invalidateChecksum', [$this, 'hookForInvalidateChecksum']);
+    // with the hook it should be invalid, because our hook implementation says so
+    $this->assertFalse(CRM_Contact_BAO_Contact_Utils::validChecksum($contact_id, $checksum));
+  }
+
+  /**
+   * Hook for invalidateChecksum.
+   *
+   * @param int $contactID
+   * @param string $inputCheck
+   * @param bool $invalid
+   */
+  public function hookForInvalidateChecksum(int $contactID, string $inputCheck, bool &$invalid) {
+    // invalidate all checksums
+    $invalid = TRUE;
+  }
+
 }
