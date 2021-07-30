@@ -77,7 +77,8 @@ trait ContactTestTrait {
    */
   public function individualCreate(array $params = [], $seq = 0, $random = FALSE): int {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
-    return $this->_contactCreate($params);
+    $this->ids['Contact']['individual_' . $seq] = $this->_contactCreate($params);
+    return $this->ids['Contact']['individual_' . $seq];
   }
 
   /**

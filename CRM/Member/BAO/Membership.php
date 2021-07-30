@@ -301,7 +301,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $excludeIsAdmin = TRUE;
       }
 
-      if (empty($params['is_override'])) {
+      if (empty($params['status_id']) && empty($params['is_override'])) {
         $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($params['start_date'], $params['end_date'], $params['join_date'],
           'now', $excludeIsAdmin, $params['membership_type_id'] ?? NULL, $params
         );

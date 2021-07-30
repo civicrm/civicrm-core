@@ -139,7 +139,9 @@ function civicrm_api3_order_create(array $params): array {
     }
 
     if ($entityParams['entity'] === 'membership') {
-      $entityParams['status_id'] = 'Pending';
+      if (empty($entityParams['id'])) {
+        $entityParams['status_id'] = 'Pending';
+      }
       if (!empty($params['contribution_recur_id'])) {
         $entityParams['contribution_recur_id'] = $params['contribution_recur_id'];
       }

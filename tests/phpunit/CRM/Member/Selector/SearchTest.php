@@ -19,9 +19,9 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
   /**
    * Test results from getRows.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  public function testSelectorGetRows() {
+  public function testSelectorGetRows(): void {
     $this->_contactID = $this->individualCreate();
     $this->_invoiceID = 1234;
     $this->_contributionPageID = NULL;
@@ -44,7 +44,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'membership_source' => 'Payment',
       'member_is_test' => '0',
       'owner_membership_id' => NULL,
-      'membership_status' => 'New',
+      'membership_status' => 'Pending',
       'member_campaign_id' => NULL,
       'campaign' => NULL,
       'campaign_id' => NULL,
