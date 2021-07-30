@@ -649,6 +649,7 @@ class CRM_Utils_Token {
     $returnBlankToken = FALSE,
     $escapeSmarty = FALSE
   ) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the processor');
     // Refresh contact tokens in case they have changed. There is heavy caching
     // in exportable fields so there is no benefit in doing this conditionally.
     self::$_tokens['contact'] = array_merge(
