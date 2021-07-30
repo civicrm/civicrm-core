@@ -35,13 +35,18 @@
 [ ] MR for devdocs msgtpl
 
 [x] render api
-[ ] render ui-api (hookup)
-
-= mid =
+[x] render ui-api (hookup)
+[~] api - get example fields; json
+[~] render - edit example,
+[x] default/autogen example? or maybe hide preview?
 
 [ ] rough token list via api
 [ ] metadata for available tokens
 [ ] real token list via api
+
+= mid =
+
+[ ] try to reproduce/debug issue crashiness after browsing multiple msgtpl txs
 
 = far =
 [ ] contributionId / tokenprocessor PR
