@@ -18,6 +18,7 @@
 !/ext/recaptcha
 !/ext/payflowpro
 !/ext/ckeditor4
+!/ext/legacycustomsearches
 backdrop/
 bower_components
 CRM/Case/xml/configuration

@@ -25,7 +25,7 @@
  *
  * The second form is used to process search results with the associated actions.
  */
-class CRM_Contact_Controller_Search extends CRM_Core_Controller {
+class CRM_Legacycustomsearches_Controller_Search extends CRM_Core_Controller {
 
   protected $entity = 'Contact';
 
@@ -35,11 +35,13 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
    * @param string $title
    * @param bool $modal
    * @param int|mixed|null $action
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct($title = NULL, $modal = TRUE, $action = CRM_Core_Action::NONE) {
     parent::__construct($title, $modal);
 
-    $this->_stateMachine = new CRM_Contact_StateMachine_Search($this, $action);
+    $this->_stateMachine = new CRM_Legacycustomsearches_StateMachine_Search($this, $action);
 
     // create and instantiate the pages
     $this->addPages($this->_stateMachine, $action);
@@ -50,29 +52,19 @@ class CRM_Contact_Controller_Search extends CRM_Core_Controller {
   }
 
   /**
-   * @return mixed
+   * @return string
    */
-  public function selectorName() {
+  public function selectorName(): string {
     return $this->get('selectorName');
   }
 
-  public function invalidKey() {
+  /**
+   * Handle invalid session key.
+   */
+  public function invalidKey(): void {
     $message = ts('Because your session timed out, we have reset the search page.');
     CRM_Core_Session::setStatus($message);
-
-    // see if we can figure out the url and redirect to the right search form
-    // note that this happens really early on, so we can't use any of the form or controller
-    // variables
-    $qString = CRM_Utils_System::currentPath();
-    $args = "reset=1";
-    $path = 'civicrm/contact/search/advanced';
-    if (strpos($qString, 'basic') !== FALSE) {
-      $path = 'civicrm/contact/search/basic';
-    }
-    elseif (strpos($qString, 'builder') !== FALSE) {
-      $path = 'civicrm/contact/search/builder';
-    }
-    $url = CRM_Utils_System::url($path, $args);
+    $url = CRM_Utils_System::url('civicrm/contact/search/custom', "reset=1&csid={$_REQUEST['csid']}");
     CRM_Utils_System::redirect($url);
   }
 

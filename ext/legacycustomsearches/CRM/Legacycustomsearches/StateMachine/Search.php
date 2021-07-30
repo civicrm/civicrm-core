@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
+class CRM_Legacycustomsearches_StateMachine_Search extends CRM_Core_StateMachine {
 
   /**
    * The task that the wizard is currently processing
@@ -33,23 +33,9 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
     parent::__construct($controller, $action);
 
     $this->_pages = [];
-    if ($action == CRM_Core_Action::ADVANCED) {
-      $this->_pages['CRM_Contact_Form_Search_Advanced'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Advanced');
-    }
-    elseif ($action == CRM_Core_Action::PROFILE) {
-      $this->_pages['CRM_Contact_Form_Search_Builder'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Builder');
-    }
-    // @todo - this 'should' be removable but it's getting to this controller, for now
-    elseif ($action == CRM_Core_Action::COPY) {
-      $this->_pages['CRM_Contact_Form_Search_Custom'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Custom');
-    }
-    else {
-      $this->_pages['CRM_Contact_Form_Search_Basic'] = NULL;
-      list($task, $result) = $this->taskName($controller, 'Basic');
-    }
+    $this->_pages['CRM_Contact_Form_Search_Custom'] = NULL;
+    list($task, $result) = $this->taskName($controller, 'Custom');
+
     $this->_task = $task;
     if (is_array($task)) {
       foreach ($task as $t) {
@@ -104,9 +90,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
       // return first page
       return CRM_Utils_String::getClassName($this->_task[0]);
     }
-    else {
-      return CRM_Utils_String::getClassName($this->_task);
-    }
+    return CRM_Utils_String::getClassName($this->_task);
   }
 
   /**
