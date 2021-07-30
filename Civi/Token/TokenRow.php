@@ -192,6 +192,8 @@ class TokenRow {
   /**
    * Update the value of a token. Apply formatting based on DB schema.
    *
+   * @deprecated
+   *
    * @param string $tokenEntity
    * @param string $tokenField
    * @param string $baoName
