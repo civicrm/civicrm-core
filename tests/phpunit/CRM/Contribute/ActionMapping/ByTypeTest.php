@@ -231,10 +231,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->recipient_listing = CRM_Utils_Array::implodePadded([3]);
   }
 
-  public function useHelloFirstNameStatus() {
-    $this->schedule->subject = 'Hello, {contact.first_name}. @{contribution.status}. (via subject)';
-    $this->schedule->body_html = '<p>Hello, {contact.first_name}. @{contribution.status}. (via body_html)</p>';
-    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status} (via body_text)';
+  public function useHelloFirstNameStatus(): void {
+    $this->schedule->subject = 'Hello, {contact.first_name}. @{contribution.contribution_status_id:name}. (via subject)';
+    $this->schedule->body_html = '<p>Hello, {contact.first_name}. @{contribution.contribution_status_id:name}. (via body_html)</p>';
+    $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.contribution_status_id:name} (via body_text)';
   }
 
   /**
@@ -252,6 +252,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   public function testTokenRendering(): void {
     $this->targetDate = '20150201000107';
     \CRM_Utils_Time::setTime('2015-02-01 00:00:00');
+    \CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET label = 'Completed Label**' where label = 'Completed' AND name = 'Completed'");
+
     $this->addAliceDues();
     $this->scheduleForAny();
     $this->startOnTime();
@@ -260,8 +262,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       first name = {contact.first_name}
       receive_date = {contribution.receive_date}
       contribution status id = {contribution.contribution_status_id}
-      legacy style status = {contribution.status}
-      new style status = {contribution.contribution_status_id:name}';
+      new style status = {contribution.contribution_status_id:name}
+      new style label = {contribution.contribution_status_id:label}
+    ';
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
@@ -269,7 +272,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'receive_date = February 1st, 2015 12:00 AM',
       'contribution status id = 1',
       'new style status = Completed',
-      'legacy style status = Completed',
+      'new style label = Completed Label**',
     ];
     $this->mut->checkMailLog($expected);
 

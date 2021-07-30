@@ -290,6 +290,23 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option.
+   *
+   * @param string $old
+   * @param string $new
+   */
+  public function replaceTokenInActionSchedule(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_action_schedule
+      SET
+        body_text = REPLACE(body_text, '$oldToken', '$newToken'),
+        subject = REPLACE(subject, '$oldToken', '$newToken'),
+        body_html = REPLACE(body_html, '$oldToken', '$newToken')
+    ");
+  }
+
+  /**
    * Get warnings for users if the replaced string is still present.
    *
    * This might be the case when used in an IF and for now we will recommend
