@@ -151,7 +151,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues() {
-    $this->callAPISuccess('Contribution', 'create', [
+    $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '100',
@@ -168,7 +168,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
           'soft_credit_type_id' => 3,
         ],
       ],
-    ]);
+    ])['id'];
   }
 
   /**
@@ -237,7 +237,19 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->schedule->body_text = 'Hello, {contact.first_name}. @{contribution.status} (via body_text)';
   }
 
-  public function testTokenRendering() {
+  /**
+   * Test that reconciled tokens are rendered the same via multiple code paths.
+   *
+   * We expect that the list of tokens from the processor class === the selectValues function.
+   * - once this is verified to be true selectValues can call the processor function internally.
+   *
+   * We also expect that rendering action action schedules will do the same as the
+   * legacy processor function. Once this is true we can expose the listener on the
+   * token processor for contribution and call it internally from the legacy code.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testTokenRendering(): void {
     $this->targetDate = '20150201000107';
     \CRM_Utils_Time::setTime('2015-02-01 00:00:00');
     $this->addAliceDues();
@@ -248,15 +260,43 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       first name = {contact.first_name}
       receive_date = {contribution.receive_date}
       contribution status id = {contribution.contribution_status_id}
-      legacy style status = {contribution.status}';
+      legacy style status = {contribution.status}
+      new style status = {contribution.contribution_status_id:name}';
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $this->mut->checkMailLog([
+    $expected = [
       'first name = Alice',
       'receive_date = February 1st, 2015 12:00 AM',
       'contribution status id = 1',
+      'new style status = Completed',
       'legacy style status = Completed',
-    ]);
+    ];
+    $this->mut->checkMailLog($expected);
+
+    $messageToken = CRM_Utils_Token::getTokens($this->schedule->body_text);
+
+    $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
+      [$this->ids['Contribution']['alice']],
+      $this->schedule->body_text,
+      $messageToken,
+      $this->schedule->body_text,
+      $this->schedule->body_text,
+      $messageToken,
+      TRUE
+    );
+    $expected = [
+      'receive_date = February 1st, 2015 12:00 AM',
+      'new style status = Completed',
+      'contribution status id = 1',
+    ];
+    foreach ($expected as $string) {
+      $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
+    }
+    $tokens = ['contribution_status_id', 'contribution_status_id:name', 'contribution_status_id:label'];
+    $processor = new CRM_Contribute_Tokens();
+    foreach ($tokens as $token) {
+      $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
+    }
   }
 
 }
