@@ -202,7 +202,42 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       $row->tokens($entity, $field, $fieldValue);
     }
     else {
-      $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
+      // This section is copied & pasted & can be cleaned up later.
+      // most if probably already done in this functions
+      $tokenEntity = $entity;
+      $tokenField = $field;
+      $baoName = $this->getBAOName();
+      $baoField = $field;
+      if ($fieldValue === NULL || $fieldValue === '') {
+        $row->tokens($tokenEntity, $tokenField, '');
+      }
+
+      $fields = $baoName::fields();
+      if (!empty($fields[$baoField]['pseudoconstant'])) {
+        $options = $baoName::buildOptions($baoField, 'get');
+        $row->format('text/plain')->tokens($tokenEntity, $tokenField, $options[$fieldValue]);
+      }
+
+      switch ($fields[$baoField]['type']) {
+        case \CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME:
+          $row->format('text/plain')->tokens($tokenEntity, $tokenField, \CRM_Utils_Date::customFormat($fieldValue));
+          break;
+
+        case \CRM_Utils_Type::T_MONEY:
+          // Is this something you should ever use? Seems like you need more context
+          // to know which currency to use.
+          $row->format('text/plain')->tokens($tokenEntity, $tokenField, \CRM_Utils_Money::format($fieldValue));
+          break;
+
+        case \CRM_Utils_Type::T_STRING:
+        case \CRM_Utils_Type::T_BOOLEAN:
+        case \CRM_Utils_Type::T_INT:
+        case \CRM_Utils_Type::T_TEXT:
+          $row->format('text/plain')->tokens($tokenEntity, $tokenField, $fieldValue);
+          break;
+      }
+
+      throw new \CRM_Core_Exception("Cannot format token for field '$baoField' in '$baoName'");
     }
   }
 
