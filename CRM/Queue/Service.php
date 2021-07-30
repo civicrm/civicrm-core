@@ -117,7 +117,7 @@ class CRM_Queue_Service {
    * @return CRM_Queue_Queue
    */
   public function load($queueSpec) {
-    if (is_object($this->queues[$queueSpec['name']])) {
+    if (is_object($this->queues[$queueSpec['name']] ?? NULL)) {
       return $this->queues[$queueSpec['name']];
     }
     $queue = $this->instantiateQueueObject($queueSpec);
