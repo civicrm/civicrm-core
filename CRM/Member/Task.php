@@ -44,12 +44,18 @@ class CRM_Member_Task extends CRM_Core_Task {
       self::TASK_DELETE => [
         'title' => ts('Delete memberships'),
         'class' => 'CRM_Member_Form_Task_Delete',
+        'permissions' => ['delete in CiviMember'],
         'result' => FALSE,
+        // Hopefully transitional key - if permission to edit the contact also required.
+        'requires_edit_contact_permission' => FALSE,
       ],
       self::TASK_PRINT => [
         'title' => ts('Print selected rows'),
         'class' => 'CRM_Member_Form_Task_Print',
         'result' => FALSE,
+        'permissions' => [['view memberships', 'edit memberships']],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => FALSE,
       ],
       self::TASK_EXPORT => [
         'title' => ts('Export members'),
@@ -57,6 +63,9 @@ class CRM_Member_Task extends CRM_Core_Task {
           'CRM_Member_Export_Form_Select',
           'CRM_Member_Export_Form_Map',
         ],
+        'permissions' => [['view memberships', 'edit memberships']],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => FALSE,
         'result' => FALSE,
       ],
       self::TASK_EMAIL => [
@@ -66,6 +75,9 @@ class CRM_Member_Task extends CRM_Core_Task {
         ]),
         'class' => 'CRM_Member_Form_Task_Email',
         'result' => TRUE,
+        'permissions' => ['edit memberships'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => TRUE,
       ],
       self::BATCH_UPDATE => [
         'title' => ts('Update multiple memberships'),
@@ -73,6 +85,9 @@ class CRM_Member_Task extends CRM_Core_Task {
           'CRM_Member_Form_Task_PickProfile',
           'CRM_Member_Form_Task_Batch',
         ],
+        'permissions' => ['edit memberships'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => TRUE,
         'result' => TRUE,
       ],
       self::LABEL_MEMBERS => [
@@ -80,36 +95,37 @@ class CRM_Member_Task extends CRM_Core_Task {
         'class' => [
           'CRM_Member_Form_Task_Label',
         ],
+        'permissions' => ['edit memberships'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => TRUE,
         'result' => TRUE,
       ],
       self::PDF_LETTER => [
         'title' => ts('Print/merge document for memberships'),
         'class' => 'CRM_Member_Form_Task_PDFLetter',
         'result' => FALSE,
+        'permissions' => ['edit memberships'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => TRUE,
       ],
       self::SAVE_SEARCH => [
         'title' => ts('Group - create smart group'),
         'class' => 'CRM_Contact_Form_Task_SaveSearch',
         'result' => TRUE,
+        'permissions' => ['edit groups'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => FALSE,
       ],
       self::SAVE_SEARCH_UPDATE => [
         'title' => ts('Group - update smart group'),
         'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
         'result' => TRUE,
+        'permissions' => ['edit groups'],
+        // Transitional key. May change.
+        'requires_edit_contact_permission' => FALSE,
       ],
     ];
-
-    //CRM-4418, check for delete
-    if (!CRM_Core_Permission::check('delete in CiviMember')) {
-      unset(self::$_tasks[self::TASK_DELETE]);
-    }
-    //CRM-12920 - check for edit permission
-    if (!CRM_Core_Permission::check('edit memberships')) {
-      unset(self::$_tasks[self::BATCH_UPDATE]);
-    }
-
     parent::tasks();
-
     return self::$_tasks;
   }
 
@@ -135,24 +151,8 @@ class CRM_Member_Task extends CRM_Core_Task {
    *   set of tasks that are valid for the user
    */
   public static function permissionedTaskTitles($permission, $params = []) {
-    if (($permission == CRM_Core_Permission::EDIT)
-      || CRM_Core_Permission::check('edit memberships')
-    ) {
-      $tasks = self::taskTitles();
-    }
-    else {
-      $tasks = [
-        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
-      ];
-      //CRM-4418,
-      if (CRM_Core_Permission::check('delete in CiviMember')) {
-        $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
-      }
-    }
-
-    $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
-    return $tasks;
+    $tasks = self::getTitlesFilteredByPermission(self::$_tasks, $permission === CRM_Core_Permission::EDIT);
+    return parent::corePermissionedTaskTitles($tasks, $permission, $params);
   }
 
   /**
