@@ -35,16 +35,10 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
     $this->_pages = [];
 
     $this->_pages['CRM_Activity_Form_Search'] = NULL;
-    list($task, $result) = $this->taskName($controller, 'Search');
+    list($task) = $this->taskName($controller, 'Search');
     $this->_task = $task;
-
-    if (is_array($task)) {
-      foreach ($task as $t) {
-        $this->_pages[$t] = NULL;
-      }
-    }
-    else {
-      $this->_pages[$task] = NULL;
+    foreach ($task as $t) {
+      $this->_pages[$t] = NULL;
     }
 
     $this->addSequentialPages($this->_pages, $action);
@@ -63,7 +57,7 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    * @return array
    *   the name of the form that will handle the task
    */
-  public function taskName($controller, $formName = 'Search') {
+  protected function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
     $value = $_POST['task'] ?? NULL;
     if (!isset($value)) {
