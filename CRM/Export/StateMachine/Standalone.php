@@ -28,10 +28,20 @@ class CRM_Export_StateMachine_Standalone extends CRM_Core_StateMachine {
 
     $entityMap = ['Contribution' => 'Contribute', 'Membership' => 'Member', 'Participant' => 'Event'];
     $entity = $entityMap[$entity] ?? $entity;
-    $this->_pages = [
-      'CRM_' . $entity . '_Export_Form_Select' => NULL,
-      'CRM_' . $entity . '_Export_Form_Map' => NULL,
-    ];
+    switch ($entity) {
+      case 'Case':
+        $this->_pages = [
+          'CRM_Export_Form_Select_Case' => NULL,
+          'CRM_Export_Form_Map' => NULL,
+        ];
+        break;
+
+      default:
+        $this->_pages = [
+          'CRM_' . $entity . '_Export_Form_Select' => NULL,
+          'CRM_' . $entity . '_Export_Form_Map' => NULL,
+        ];
+    }
 
     $this->addSequentialPages($this->_pages, $action);
   }
