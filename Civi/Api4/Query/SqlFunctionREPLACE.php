@@ -21,14 +21,8 @@ class SqlFunctionREPLACE extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString'],
-      ],
-      [
-        'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString'],
-      ],
-      [
+        'min_expr' => 3,
+        'max_expr' => 3,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
       ],
