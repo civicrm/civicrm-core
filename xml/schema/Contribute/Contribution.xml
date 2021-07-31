@@ -114,6 +114,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment Method</label>
     </html>
     <add>1.3</add>
   </field>
