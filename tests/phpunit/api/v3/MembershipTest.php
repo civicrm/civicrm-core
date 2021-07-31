@@ -38,6 +38,17 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   protected $_entity;
   protected $_params;
 
+
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   /**
    * Set up for tests.
    */
@@ -154,17 +165,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testActivityForCancelledContribution(): void {
-    $contactId = $this->ids['Contact']['order'] = $this->createLoggedInUser();
-
+    // @todo - this appears to be a real bug. However it is deep in recordFinancialAccounts
+    // and dev/core#2715 is probably better done before a fix on this.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $this->ids['Contact']['order'] = $this->createLoggedInUser();
     $this->createContributionAndMembershipOrder();
     $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);
     $form = new CRM_Contribute_Form_Contribution();
     $form->_id = $this->ids['Contribution'][0];
     $form->testSubmit([
-      'total_amount' => 100,
-      'financial_type_id' => 1,
-      'contact_id' => $contactId,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 3,
     ],
     CRM_Core_Action::UPDATE);
@@ -1683,18 +1692,19 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that a contribution linked to multiple memberships results in all being updated.
+   * Test that a contribution linked to multiple memberships results in all
+   * being updated.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  public function testMultipleMembershipContribution() {
+  public function testMultipleMembershipContribution(): void {
     $this->createMultipleMembershipOrder();
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->ids['Contribution'][0],
       'payment_instrument_id' => 'Check',
       'total_amount' => 400,
     ]);
-    $memberships = $this->callAPISuccess('membership', 'get')['values'];
+    $memberships = $this->callAPISuccess('Membership', 'get')['values'];
     $this->assertCount(2, $memberships);
   }
 

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MembershipType;
+use Civi\Api4\PriceFieldValue;
 use Civi\Test\Api3TestTrait;
 
 /**
@@ -132,30 +134,92 @@ trait CRMTraits_Financial_OrderTrait {
         $this->ids['Membership']['order'] = $line['entity_id'];
       }
     }
+  }
 
+  /**
+   * Create a non-quick-config price set with all memberships in it.
+   *
+   * The price field is of type checkbox and each price-option
+   * corresponds to a membership type. There are 2 price fields with the same
+   * options in each.
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function createMembershipPriceSet(): void {
+    $this->ids['PriceSet']['membership'] = (int) $this->callAPISuccess('PriceSet', 'create', [
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => 1,
+      'title' => 'my Page',
+    ])['id'];
+
+    $this->ids['PriceField']['membership_0'] = (int) $this->callAPISuccess('PriceField', 'create', [
+      'price_set_id' => $this->getPriceSetID(),
+      'label' => 'Memberships',
+      'html_type' => 'Checkbox',
+    ])['id'];
+
+    $this->ids['PriceField']['membership_1'] = (int) $this->callAPISuccess('PriceField', 'create', [
+      'price_set_id' => $this->getPriceSetID(),
+      'label' => 'Memberships more',
+      'html_type' => 'Checkbox',
+    ])['id'];
+    $membershipTypes = MembershipType::get()->addSelect('minimum_fee', 'name')
+      ->execute();
+    foreach ($membershipTypes as $membershipType) {
+      foreach ($this->ids['PriceField'] as $key => $id) {
+        $this->ids['PriceFieldValue'][$key][$membershipType['name']] = PriceFieldValue::create()
+          ->setValues([
+            'price_set_id' => $this->ids['PriceSet'],
+            'price_field_id' => $id,
+            'label' => $membershipType['name'],
+            'amount' => $membershipType['minimum_fee'],
+            'financial_type_id:name' => 'Donation',
+            'membership_type_id' => $membershipType['id'],
+            'membership_num_terms' => 1,
+          ])
+          ->execute()
+          ->first()['id'];
+      }
+    }
+  }
+
+  /**
+   * Get the created price set id.
+   *
+   * @param string $key
+   *
+   * @return int
+   */
+  protected function getPriceSetID(string $key = 'membership'):int {
+    return $this->ids['PriceSet'][$key];
+  }
+
+
+  /**
+   * Get the created price field id.
+   *
+   * @param string $key
+   *
+   * @return int
+   */
+  protected function getPriceFieldID(string $key = 'membership'):int {
+    return $this->ids['PriceField'][$key];
   }
 
   /**
    * Create an order with more than one membership.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
-  protected function createMultipleMembershipOrder() {
+  protected function createMultipleMembershipOrder(): void {
     $this->createExtraneousContribution();
     $this->ids['contact'][0] = $this->individualCreate();
     $this->ids['contact'][1] = $this->individualCreate();
     $this->ids['membership_type'][0] = $this->membershipTypeCreate();
     $this->ids['membership_type'][1] = $this->membershipTypeCreate(['name' => 'Type 2']);
-    $priceFieldID = $this->callAPISuccessGetValue('price_field', [
-      'return' => 'id',
-      'label' => 'Membership Amount',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
-    $generalPriceFieldValueID = $this->callAPISuccessGetValue('price_field_value', [
-      'return' => 'id',
-      'label' => 'General',
-      'options' => ['limit' => 1, 'sort' => 'id DESC'],
-    ]);
+    $this->createMembershipPriceSet();
 
     $orderID = $this->callAPISuccess('Order', 'create', [
       'total_amount' => 400,
@@ -173,14 +237,13 @@ trait CRMTraits_Financial_OrderTrait {
           ],
           'line_item' => [
             [
-              'label' => 'General',
+              'line_total' => 200,
               'qty' => 1,
               'unit_price' => 200,
-              'line_total' => 200,
               'financial_type_id' => 1,
               'entity_table' => 'civicrm_membership',
-              'price_field_id' => $priceFieldID,
-              'price_field_value_id' => $generalPriceFieldValueID,
+              'price_field_id' => $this->ids['PriceField']['membership_0'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['membership_0']['General'],
             ],
           ],
         ],
@@ -198,8 +261,8 @@ trait CRMTraits_Financial_OrderTrait {
               'line_total' => 200,
               'financial_type_id' => 1,
               'entity_table' => 'civicrm_membership',
-              'price_field_id' => $priceFieldID,
-              'price_field_value_id' => $generalPriceFieldValueID,
+              'price_field_id' => $this->ids['PriceField']['membership_1'],
+              'price_field_value_id' => $this->ids['PriceFieldValue']['membership_1']['General'],
             ],
           ],
         ],

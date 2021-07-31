@@ -29,7 +29,6 @@ use Civi\Api4\MembershipType;
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_OrderTrait;
-  use CRMTraits_Financial_PriceSetTrait;
 
   /**
    * @var int
