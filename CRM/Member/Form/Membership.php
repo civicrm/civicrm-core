@@ -1322,6 +1322,9 @@ DESC limit 1");
         CRM_Member_BAO_Membership::recordMembershipContribution($params);
       }
     }
+
+    $this->updateContributionOnMembershipTypeChange($params);
+
     if (($this->_action & CRM_Core_Action::UPDATE)) {
       $this->addStatusMessage($this->getStatusMessageForUpdate());
     }
@@ -1384,18 +1387,17 @@ DESC limit 1");
       $receiptSent = TRUE;
     }
 
-    // finally set membership id if already not set
-    if (!$this->_id) {
-      $this->_id = $this->getMembershipID();
-    }
-
-    $this->updateContributionOnMembershipTypeChange($params);
     if ($receiptSent && $mailSend) {
       $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
     }
 
     CRM_Core_Session::setStatus($this->getStatusMessage(), ts('Complete'), 'success');
     $this->setStatusMessage();
+
+    // finally set membership id if already not set
+    if (!$this->_id) {
+      $this->_id = $this->getMembershipID();
+    }
   }
 
   /**
@@ -1555,8 +1557,8 @@ DESC limit 1");
   protected function setStatusMessage() {
     //CRM-15187
     // display message when membership type is changed
-    if (($this->_action & CRM_Core_Action::UPDATE) && $this->_id && !in_array($this->_memType, $this->_memTypeSelected)) {
-      $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_id, 'membership');
+    if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->_memType, $this->_memTypeSelected)) {
+      $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
       $maxID = max(array_keys($lineItem));
       $lineItem = $lineItem[$maxID];
       $membershipTypeDetails = $this->allMembershipTypeDetails[$this->getMembership()['membership_type_id']];
