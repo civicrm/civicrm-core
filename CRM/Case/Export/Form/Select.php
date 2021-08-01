@@ -18,7 +18,7 @@
 /**
  * This class gets the name of the file to upload
  */
-class CRM_Export_Form_Select_Case extends CRM_Export_Form_Select {
+class CRM_Case_Export_Form_Select extends CRM_Export_Form_Select {
 
   /**
    * @var int
