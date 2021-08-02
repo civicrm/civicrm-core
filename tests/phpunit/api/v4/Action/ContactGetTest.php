@@ -117,8 +117,9 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       \CRM_Core_DAO::executeQuery("
         ALTER TABLE civicrm_contact MODIFY COLUMN
         `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8
+        CHARSET utf8 COLLATE utf8_unicode_ci
       ");
+      \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
     }
     \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
     Contact::get()
@@ -129,7 +130,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       \CRM_Core_DAO::executeQuery("
         ALTER TABLE civicrm_contact MODIFY COLUMN
         `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8mb4
+        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
       ");
     }
   }
