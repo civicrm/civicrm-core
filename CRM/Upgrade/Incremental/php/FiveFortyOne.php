@@ -80,6 +80,12 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
     $this->addTask('Replace contribution source token in action schedule',
       'updateActionScheduleToken', 'contribution.contribution_source', 'contribution.source', $rev
     );
+    $this->addTask('Replace contribution type token in action schedule',
+      'updateActionScheduleToken', 'contribution.type', 'contribution.financial_type_id:label', $rev
+    );
+    $this->addTask('Replace contribution payment instrument token in action schedule',
+      'updateActionScheduleToken', 'contribution.payment_instrument', 'contribution.payment_instrument_id:label', $rev
+    );
   }
 
   /**
