@@ -155,29 +155,20 @@ class CRM_Core_InnoDBIndexer {
    * Get a list of FTS index names that are currently defined in the database.
    *
    * @param string $table
+   *
    * @return array
    *   (string $indexName => string $indexName)
    */
-  public function findActualFtsIndexNames($table) {
-    $mysqlVersion = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
-    // Note: In MYSQL 8 the Tables have been renamed from INNODB_SYS_TABLES and INNODB_SYS_INDEXES to INNODB_TABLES and INNODB_INDEXES
-    $innodbTable = 'innodb_sys_tables';
-    $innodbIndex = "innodb_sys_indexes";
-    if (version_compare($mysqlVersion, '8.0', '>=')
-      // As of 10.4 mariadb is NOT adopting the mysql 8 table names
-      // - this means it's likely it never will.
-      && stripos($mysqlVersion, 'mariadb') === FALSE) {
-      $innodbTable = 'innodb_tables';
-      $innodbIndex = 'innodb_indexes';
-    }
-    $sql = "
-      SELECT i.name as `index_name`
-      FROM information_schema.$innodbTable t
-      JOIN information_schema.$innodbIndex i USING (table_id)
-      WHERE t.name = concat(database(),'/$table')
-      AND i.name like '" . self::IDX_PREFIX . "%'
-      ";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+  public function findActualFtsIndexNames(string $table): array {
+    $dao = CRM_Core_DAO::executeQuery("
+  SELECT index_name as index_name
+  FROM information_Schema.STATISTICS
+  WHERE table_schema = '" . CRM_Core_DAO::getDatabaseName() . "'
+    AND table_name = '$table'
+    AND index_type = 'FULLTEXT'
+  GROUP BY index_name
+    ");
+
     $indexNames = [];
     while ($dao->fetch()) {
       $indexNames[$dao->index_name] = $dao->index_name;
@@ -200,7 +191,7 @@ class CRM_Core_InnoDBIndexer {
     if ($this->isActive && isset($this->indices[$table])) {
       foreach ($this->indices[$table] as $fields) {
         $name = self::IDX_PREFIX . md5($table . '::' . implode(',', $fields));
-        $sqls[$name] = sprintf("CREATE FULLTEXT INDEX %s ON %s (%s)", $name, $table, implode(',', $fields));
+        $sqls[$name] = sprintf('CREATE FULLTEXT INDEX %s ON %s (%s)', $name, $table, implode(',', $fields));
       }
     }
     return $sqls;
