@@ -5836,10 +5836,7 @@ AND   displayRelType.is_active = 1
       else {
         $from .= $qcache['from'];
       }
-      if (!strlen($where)) {
-        $where = " WHERE 1 ";
-      }
-      $where .= $qcache['where'];
+      $where = $qcache['where'];
       if (!empty($this->_tables['civicrm_case'])) {
         // Change the join on CiviCRM case so that it joins on the right contac from the relationship.
         $from = str_replace("ON civicrm_case_contact.contact_id = contact_a.id", "ON civicrm_case_contact.contact_id = transform_temp.contact_id", $from);
