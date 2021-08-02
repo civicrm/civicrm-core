@@ -18,12 +18,12 @@
       $scope.elementList = [];
       $scope.elementTitles = [];
 
-      function getEntityType() {
+      this.getEntityType = function() {
         return (ctrl.entity.type === 'Contact' && ctrl.entity.data) ? ctrl.entity.data.contact_type || 'Contact' : ctrl.entity.type;
-      }
+      };
 
       $scope.getMeta = function() {
-        return afGui.meta.entities[getEntityType()];
+        return afGui.meta.entities[ctrl.getEntityType()];
       };
 
       $scope.getAdminTpl = function() {
@@ -54,7 +54,7 @@
         $scope.fieldList.length = 0;
         $scope.fieldList.push({
           entityName: ctrl.entity.name,
-          entityType: getEntityType(),
+          entityType: ctrl.getEntityType(),
           label: ts('%1 Fields', {1: $scope.getMeta().label}),
           fields: filterFields($scope.getMeta().fields)
         });

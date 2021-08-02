@@ -3,7 +3,7 @@
     <legend>{{:: ts('Values:') }}</legend>
     <div class="form-inline" ng-if="getMeta().fields[fieldName]" ng-repeat="(fieldName, value) in $ctrl.entity.data">
       <label>{{ getMeta().fields[fieldName].label }}:</label><br />
-      <input class="form-control" af-gui-field-value="getField($ctrl.entity.type, fieldName)" ng-model="$ctrl.entity.data[fieldName]" />
+      <input class="form-control" af-gui-field-value="getField($ctrl.getEntityType(), fieldName)" ng-model="$ctrl.entity.data[fieldName]" />
       <a href ng-click="removeValue($ctrl.entity, fieldName)">
         <i class="crm-i fa-times"></i>
       </a>
