@@ -74,6 +74,12 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
     $this->addTask('Replace contribution status token in action schedule',
       'updateActionScheduleToken', 'contribution.status', 'contribution.contribution_status_id:label', $rev
     );
+    $this->addTask('Replace contribution cancel_date token in action schedule',
+      'updateActionScheduleToken', 'contribution.contribution_cancel_date', 'contribution.cancel_date', $rev
+    );
+    $this->addTask('Replace contribution source token in action schedule',
+      'updateActionScheduleToken', 'contribution.contribution_source', 'contribution.source', $rev
+    );
   }
 
   /**
