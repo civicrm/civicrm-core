@@ -65,6 +65,12 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
   public function upgrade_5_41_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install legacy custom search extension', 'installCustomSearches');
+    $this->addTask('Replace legacy displayName smarty token in Invoice workflow template',
+      'updateMessageToken', 'contribution_invoice_receipt', '$display_name', 'contact.display_name', $rev
+    );
+    $this->addTask('Replace contribution status token in action schedule',
+      'updateActionScheduleToken', 'contribution.status', 'contribution.contribution_status_id:label', $rev
+    );
   }
 
   /**

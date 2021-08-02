@@ -78,7 +78,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       'id' => 'contribution_id',
       'payment_instrument' => 'payment_instrument_id',
       'source' => 'contribution_source',
-      'status' => 'contribution_status_id',
       'type' => 'financial_type_id',
       'cancel_date' => 'contribution_cancel_date',
     ];
@@ -129,10 +128,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
     $tokens['id'] = ts('Contribution ID');
     $tokens['payment_instrument'] = ts('Payment Instrument');
     $tokens['source'] = ts('Contribution Source');
-    // Per https://lab.civicrm.org/dev/core/-/issues/2650
-    // the intent is to deprecate this field in favour of
-    // {contribution.contribution_status_id:label}
-    $tokens['status'] = ts('Contribution Status');
     $tokens['type'] = ts('Financial Type');
     $tokens = array_merge($tokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
     parent::__construct('contribution', $tokens);
@@ -196,9 +191,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
     }
     elseif (in_array($field, array_keys($this->getBasicTokens()))) {
-      // For now we just ensure that the label fields do not override the
-      // id field here.
-      // Later we will add support for contribution_status_id:label
       $row->tokens($entity, $field, $fieldValue);
     }
     else {

@@ -249,6 +249,22 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Updated a message token within a template.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old
+   * @param string $new
+   * @param $version
+   *
+   * @return bool
+   */
+  public static function updateActionScheduleToken($ctx, string $old, string $new, $version):bool {
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageObj->replaceTokenInActionSchedule($old, $new);
+    return TRUE;
+  }
+
+  /**
    * Re-save any valid values from contribute settings into the normal setting
    * format.
    *

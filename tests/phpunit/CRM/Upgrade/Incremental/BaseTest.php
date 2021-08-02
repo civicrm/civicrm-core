@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\ActionSchedule;
 use Civi\Api4\MessageTemplate;
 
 /**
@@ -10,14 +11,15 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_saved_search']);
+    $this->quickCleanup(['civicrm_saved_search', 'civicrm_action_schedule']);
+    parent::tearDown();
   }
 
   /**
    * Test message upgrade process.
    */
-  public function testMessageTemplateUpgrade() {
-    $workFlowID = civicrm_api3('OptionValue', 'getvalue', ['return' => 'id', 'name' => 'membership_online_receipt', 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
+  public function testMessageTemplateUpgrade(): void {
+    $workFlowID = $this->callAPISuccessGetValue('OptionValue', ['return' => 'id', 'name' => 'membership_online_receipt', 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
 
     $templates = $this->callAPISuccess('MessageTemplate', 'get', ['workflow_id' => $workFlowID])['values'];
     foreach ($templates as $template) {
@@ -62,6 +64,33 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
     $this->assertEquals('', $messages);
     $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
+  }
+
+  /**
+   * Test that a $this->string replacement in a message template can be done.
+   *
+   * @throws \API_Exception
+   */
+  public function testActionScheduleStringReplace(): void {
+    ActionSchedule::create(FALSE)->setValues([
+      'title' => 'schedule',
+      'absolute_date' => '2021-01-01',
+      'start_action_date' => '2021-01-01',
+      'mapping_id' => 1,
+      'entity_value' => 1,
+      'body_text' => 'blah {contribution.status}',
+      'body_html' => 'blah {contribution.status}',
+      'subject' => 'blah {contribution.status}',
+    ])->execute();
+
+    $upgrader = new CRM_Upgrade_Incremental_MessageTemplates('5.41.0');
+    $upgrader->replaceTokenInActionSchedule('contribution.status', 'contribution.contribution_status_id:label');
+    $templates = ActionSchedule::get()->addSelect('body_html', 'subject', 'body_text')->execute();
+    foreach ($templates as $template) {
+      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['body_html']);
+      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['body_text']);
+      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['subject']);
+    }
   }
 
   /**
