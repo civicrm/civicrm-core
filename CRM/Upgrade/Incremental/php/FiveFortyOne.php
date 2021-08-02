@@ -44,7 +44,10 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     $templateUpgrader = new CRM_Upgrade_Incremental_MessageTemplates($rev);
-    $postUpgradeMessage .= '<ul><li>' . htmlspecialchars($templateUpgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name')) . '</li></ul>';
+    $upgradeMessage = $templateUpgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
+    if (!empty($upgradeMessage)) {
+      $postUpgradeMessage .= '<ul><li>' . htmlspecialchars($upgradeMessage) . '</li></ul>';
+    }
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
