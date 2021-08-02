@@ -104,7 +104,7 @@ class CRM_Contact_Form_Search_Custom_Base {
     $sql = "SELECT $selectClause " . $this->from();
     $where = $this->where();
     if (!empty($where)) {
-      $sql .= " WHERE " . $where;
+      $sql .= ' WHERE ' . $where;
     }
 
     if ($includeContactIDs) {
