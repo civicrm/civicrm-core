@@ -112,6 +112,10 @@
   min-height: 3.5em;
 }
 
+#bootstrap-theme.crm-search legend[ng-click] {
+  cursor: pointer;
+}
+
 #bootstrap-theme.crm-search .api4-input-group {
   display: inline-block;
 }

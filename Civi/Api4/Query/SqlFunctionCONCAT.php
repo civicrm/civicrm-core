@@ -18,32 +18,23 @@ class SqlFunctionCONCAT extends SqlFunction {
 
   protected static $category = self::CATEGORY_STRING;
 
-  protected static $params = [
-    [
-      'max_expr' => 99,
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlString'],
-    ],
-  ];
+  protected static $dataType = 'String';
+
+  protected static function params(): array {
+    return [
+      [
+        'max_expr' => 99,
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
+      ],
+    ];
+  }
 
   /**
    * @return string
    */
   public static function getTitle(): string {
     return ts('Combine');
-  }
-
-  /**
-   * Prevent reformatting of result
-   *
-   * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
-   * @param string $value
-   * @param string $dataType
-   * @return string|array
-   */
-  public function formatOutputValue($value, &$dataType) {
-    $dataType = NULL;
-    return $value;
   }
 
 }

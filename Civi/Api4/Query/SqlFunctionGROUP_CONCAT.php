@@ -20,31 +20,33 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'max_expr' => 1,
-      'must_be' => ['SqlField', 'SqlFunction'],
-      'optional' => FALSE,
-    ],
-    [
-      'prefix' => ['ORDER BY'],
-      'max_expr' => 1,
-      'suffix' => ['', 'ASC', 'DESC'],
-      'must_be' => ['SqlField'],
-      'optional' => TRUE,
-    ],
-    [
-      'prefix' => ['SEPARATOR'],
-      'max_expr' => 1,
-      'must_be' => ['SqlString'],
-      'optional' => TRUE,
-      // @see self::formatOutput()
-      'api_default' => [
-        'expr' => ['"' . \CRM_Core_DAO::VALUE_SEPARATOR . '"'],
+  protected static function params(): array {
+    return [
+      [
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'max_expr' => 1,
+        'must_be' => ['SqlField', 'SqlFunction'],
+        'optional' => FALSE,
       ],
-    ],
-  ];
+      [
+        'prefix' => 'ORDER BY',
+        'max_expr' => 1,
+        'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
+        'must_be' => ['SqlField'],
+        'optional' => TRUE,
+      ],
+      [
+        'prefix' => 'SEPARATOR',
+        'max_expr' => 1,
+        'must_be' => ['SqlString'],
+        'optional' => TRUE,
+        // @see self::formatOutput()
+        'api_default' => [
+          'expr' => ['"' . \CRM_Core_DAO::VALUE_SEPARATOR . '"'],
+        ],
+      ],
+    ];
+  }
 
   /**
    * Reformat result as array if using default separator
@@ -57,16 +59,16 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
   public function formatOutputValue($value, &$dataType) {
     $exprArgs = $this->getArgs();
     // By default, values are split into an array and formatted according to the field's dataType
-    if (!$exprArgs[2]['prefix']) {
+    if (isset($exprArgs[2]['expr'][0]->expr) && $exprArgs[2]['expr'][0]->expr === \CRM_Core_DAO::VALUE_SEPARATOR) {
       $value = explode(\CRM_Core_DAO::VALUE_SEPARATOR, $value);
       // If the first expression is another sqlFunction, allow it to control the dataType
-      if ($exprArgs[0]['expr'][0] instanceof SqlFunction && is_callable([$exprArgs[0]['expr'][0], 'formatOutputValue'])) {
+      if ($exprArgs[0]['expr'][0] instanceof SqlFunction) {
         $exprArgs[0]['expr'][0]->formatOutputValue(NULL, $dataType);
       }
     }
-    // If using custom separator, unset $dataType to preserve raw string
+    // If using custom separator, preserve raw string
     else {
-      $dataType = NULL;
+      $dataType = 'String';
     }
     return $value;
   }

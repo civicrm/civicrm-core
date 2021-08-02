@@ -44,16 +44,16 @@ class SqlExpressionParserTest extends UnitTestCase {
   public function testAggregateFuncitons($fnName) {
     $className = 'Civi\Api4\Query\SqlFunction' . $fnName;
     $params = $className::getParams();
-    $this->assertNotEmpty($params[0]['prefix']);
-    $this->assertEmpty($params[0]['suffix']);
+    $this->assertNotEmpty($params[0]['flag_before']);
+    $this->assertEmpty($params[0]['flag_after']);
 
     $sqlFn = new $className($fnName . '(total)');
     $this->assertEquals($fnName, $sqlFn->getName());
     $this->assertEquals(['total'], $sqlFn->getFields());
     $args = $sqlFn->getArgs();
     $this->assertCount(1, $args);
-    $this->assertNull($args[0]['prefix']);
-    $this->assertNull($args[0]['suffix']);
+    $this->assertEmpty($args[0]['prefix']);
+    $this->assertEmpty($args[0]['suffix']);
     $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     $sqlFn = SqlExpression::convert($fnName . '(DISTINCT stuff)');
@@ -63,8 +63,8 @@ class SqlExpressionParserTest extends UnitTestCase {
     $this->assertEquals(['stuff'], $sqlFn->getFields());
     $args = $sqlFn->getArgs();
     $this->assertCount(1, $args);
-    $this->assertEquals('DISTINCT', $args[0]['prefix']);
-    $this->assertNull($args[0]['suffix']);
+    $this->assertEquals('DISTINCT', $args[0]['prefix'][0]);
+    $this->assertEmpty($args[0]['suffix']);
     $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 
     try {
@@ -72,8 +72,8 @@ class SqlExpressionParserTest extends UnitTestCase {
       if ($fnName === 'COUNT') {
         $args = $sqlFn->getArgs();
         $this->assertCount(1, $args);
-        $this->assertNull($args[0]['prefix']);
-        $this->assertNull($args[0]['suffix']);
+        $this->assertEmpty($args[0]['prefix']);
+        $this->assertEmpty($args[0]['suffix']);
         $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlWild'));
       }
       else {

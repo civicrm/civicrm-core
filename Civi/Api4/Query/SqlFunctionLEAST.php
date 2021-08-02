@@ -20,12 +20,14 @@ class SqlFunctionLEAST extends SqlFunction {
 
   protected static $category = self::CATEGORY_COMPARISON;
 
-  protected static $params = [
-    [
-      'max_expr' => 99,
-      'optional' => FALSE,
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'max_expr' => 99,
+        'optional' => FALSE,
+      ],
+    ];
+  }
 
   /**
    * @return string

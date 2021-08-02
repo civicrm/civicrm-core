@@ -18,16 +18,18 @@ class SqlFunctionROUND extends SqlFunction {
 
   protected static $category = self::CATEGORY_MATH;
 
-  protected static $params = [
-    [
-      'optional' => FALSE,
-      'must_be' => ['SqlField', 'SqlNumber'],
-    ],
-    [
-      'optional' => TRUE,
-      'must_be' => ['SqlNumber'],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlNumber'],
+      ],
+      [
+        'optional' => TRUE,
+        'must_be' => ['SqlNumber'],
+      ],
+    ];
+  }
 
   /**
    * @return string

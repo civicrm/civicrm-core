@@ -35,11 +35,14 @@
                crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
                on-crm-ui-select="$ctrl.addParam('groupBy', selection)" >
       </div>
-      <fieldset id="crm-search-build-group-aggregate" ng-if="$ctrl.savedSearch.api_params.groupBy.length" class="crm-collapsible collapsed">
-        <legend class="collapsible-title">{{:: ts('Aggregate fields') }}</legend>
-        <div>
-          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-if="$ctrl.canAggregate(col)">
-            <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]" cat="'aggregate'"></crm-search-function>
+      <fieldset id="crm-search-build-functions">
+        <legend ng-click="controls.showFunctions = !controls.showFunctions">
+          <i class="crm-i fa-caret-{{ !controls.showFunctions ? 'right' : 'down' }}"></i>
+          {{:: ts('Field Transformations') }}
+        </legend>
+        <div ng-if="!!controls.showFunctions">
+          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select">
+            <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]"></crm-search-function>
           </fieldset>
         </div>
       </fieldset>

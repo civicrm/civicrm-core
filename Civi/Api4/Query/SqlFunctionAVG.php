@@ -18,12 +18,14 @@ class SqlFunctionAVG extends SqlFunction {
 
   protected static $category = self::CATEGORY_AGGREGATE;
 
-  protected static $params = [
-    [
-      'prefix' => ['', 'DISTINCT', 'ALL'],
-      'must_be' => ['SqlField'],
-    ],
-  ];
+  protected static function params(): array {
+    return [
+      [
+        'flag_before' => ['DISTINCT' => ts('Distinct')],
+        'must_be' => ['SqlField'],
+      ],
+    ];
+  }
 
   /**
    * @return string

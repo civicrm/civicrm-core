@@ -14,15 +14,17 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionABS extends SqlFunction {
+class SqlFunctionDATE extends SqlFunction {
 
-  protected static $category = self::CATEGORY_MATH;
+  protected static $category = self::CATEGORY_DATE;
+
+  protected static $dataType = 'Date';
 
   protected static function params(): array {
     return [
       [
+        'max_expr' => 1,
         'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlNumber'],
       ],
     ];
   }
@@ -31,7 +33,7 @@ class SqlFunctionABS extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Absolute');
+    return ts('Date Only');
   }
 
 }
