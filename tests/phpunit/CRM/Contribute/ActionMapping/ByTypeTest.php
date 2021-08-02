@@ -264,6 +264,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       contribution status id = {contribution.contribution_status_id}
       new style status = {contribution.contribution_status_id:name}
       new style label = {contribution.contribution_status_id:label}
+      id {contribution.id}
+      contribution_id {contribution.contribution_id} - not valid for action schedule
     ';
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -273,6 +275,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'contribution status id = 1',
       'new style status = Completed',
       'new style label = Completed Label**',
+      'id ' . $this->ids['Contribution']['alice'],
+      'id  - not valid for action schedule',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -291,11 +295,13 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'receive_date = February 1st, 2015 12:00 AM',
       'new style status = Completed',
       'contribution status id = 1',
+      'id ' . $this->ids['Contribution']['alice'],
+      'contribution_id ' . $this->ids['Contribution']['alice'],
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
     }
-    $tokens = ['contribution_status_id', 'contribution_status_id:name', 'contribution_status_id:label'];
+    $tokens = ['id', 'contribution_status_id', 'contribution_status_id:name', 'contribution_status_id:label'];
     $processor = new CRM_Contribute_Tokens();
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);

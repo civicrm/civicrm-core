@@ -564,7 +564,7 @@ class CRM_Core_SelectValues {
    */
   public static function contributionTokens() {
     return array_merge([
-      '{contribution.contribution_id}' => ts('Contribution ID'),
+      '{contribution.id}' => ts('Contribution ID'),
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
