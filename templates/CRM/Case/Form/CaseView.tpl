@@ -178,7 +178,7 @@
             <th data-data="phone">{ts}Phone{/ts}</th>
             <th data-data="email">{ts}Email{/ts}</th>
             <th data-data="end_date">{ts}End Date{/ts}</th>
-            {if $relId neq 'client' and $hasAccessToAllCases}
+            {if $hasAccessToAllCases}
               <th data-data="actions" data-orderable="false">{ts}Actions{/ts}</th>
             {/if}
           </tr>
