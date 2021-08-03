@@ -570,6 +570,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
       if ($count > 50) {
         $this->freeze(['target_contact_id']);
+        $this->assign('disable_swap_button', TRUE);
       }
     }
 
