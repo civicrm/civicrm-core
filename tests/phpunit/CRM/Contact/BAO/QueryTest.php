@@ -1323,13 +1323,13 @@ civicrm_relationship.is_active = 1 AND
    * Preparation:
    *   Create an individual contact Contact A
    *   Create an organization contact Contact B
-   *   Create an "Employer of" relationship between them. 
+   *   Create an "Employer of" relationship between them.
    *
    * Searching:
    *   Go to advanced search
    *   Click on View contact as related contact
    *   Select Employee of as relationship type
-   *   Select "Organization" as contact type 
+   *   Select "Organization" as contact type
    *
    * Expected results
    *   We expect to find contact A.
@@ -1366,4 +1366,5 @@ civicrm_relationship.is_active = 1 AND
     $this->assertEquals('John', $rows[0]['first_name']);
     $this->assertEquals('Smith', $rows[0]['last_name']);
   }
+
 }
