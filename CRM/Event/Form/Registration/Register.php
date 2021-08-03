@@ -650,6 +650,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
             $isRequire = FALSE;
           }
+
+          //check if this is a backend registration
+          $isBackEnd = (in_array($className, $formClasses)) ? TRUE : FALSE;
+
           if (!empty($options)) {
             //build the element.
             CRM_Price_BAO_PriceField::addQuickFormElement($form,
@@ -659,7 +663,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
               $isRequire,
               NULL,
               $options,
-              $optionFullIds
+              $optionFullIds,
+              $isBackEnd
             );
           }
         }
@@ -765,11 +770,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
               $optionFullTotalAmount += CRM_Utils_Array::value('amount', $option);
             }
           }
-          else {
-            if (!empty($defaultPricefieldIds) && in_array($optId, $defaultPricefieldIds)) {
-              unset($optionFullIds[$optId]);
-            }
-          }
         }
         //here option is not full,
         //but we don't want to allow participant to increase
@@ -786,11 +786,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $option['is_full'] = $isFull;
         $option['db_total_count'] = $dbTotalCount;
         $option['total_option_count'] = $dbTotalCount + $currentTotalCount;
-      }
-
-      //ignore option full for offline registration.
-      if ($className == 'CRM_Event_Form_Participant' || $className === 'CRM_Event_Form_Task_Register') {
-        $optionFullIds = [];
       }
 
       //finally get option ids in.

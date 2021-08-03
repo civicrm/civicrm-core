@@ -81,12 +81,12 @@
                       {else}
                         {$option.amount|crmMoney} {$fieldHandle} {$form.$fieldHandle.frozen}
                       {/if}
-                      {if $form.$element_name.frozen EQ 1} ({ts}Sold out{/ts}){/if}
+                      {if $form.$element_name.frozen EQ 1 || $option.id|in_array:$sold_out} ({ts}Sold out{/ts}){/if}
                     {/foreach}
                     </span>
                     {else}
                       {* Not showing amount, but still need to conditionally show Sold out marker *}
-                      {if $form.$element_name.frozen EQ 1}
+                      {if $form.$element_name.frozen EQ 1 || $option.id|in_array:$sold_out}
                         <span class="sold-out-option">({ts}Sold out{/ts})<span>
                       {/if}
                     {/if}
