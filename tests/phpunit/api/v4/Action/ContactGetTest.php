@@ -120,6 +120,7 @@ class ContactGetTest extends \api\v4\UnitTestCase {
         CHARSET utf8
       ");
     }
+    \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
     Contact::get()
       ->setDebug(TRUE)
       ->addWhere('first_name', '=', '🦉Claire')
