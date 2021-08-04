@@ -43,7 +43,8 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
     }
   }
 
-  public static function tearDown(): void {
+  public function tearDown(): void {
+    parent::tearDown();
     $idx = new CRM_Core_InnoDBIndexer(FALSE, [
       'civicrm_contact' => [
         ['first_name', 'last_name'],
