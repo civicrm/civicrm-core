@@ -374,14 +374,14 @@ WHERE  id IN ( $groupIDs )
       self::invalidateGroupContactCache($group->id);
     }
 
-    $locks = self::getLocksForRefreshableGroupsTo([$groupID]);
-    foreach ($locks as $groupID => $lock) {
+    $lockedGroups = self::getLocksForRefreshableGroupsTo([$groupID]);
+    foreach ($lockedGroups as $groupID) {
       $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('gccache')
         ->setMemory();
       self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
       self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
-      $lock->release();
+      self::releaseGroupLocks([$groupID]);
     }
   }
 
@@ -401,9 +401,8 @@ WHERE  id IN ( $groupIDs )
     $locks = [];
     $groupIDs = self::getGroupsNeedingRefreshing($groupIDs);
     foreach ($groupIDs as $groupID) {
-      $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
-      if ($lock->isAcquired()) {
-        $locks[$groupID] = $lock;
+      if (self::getGroupLock($groupID)) {
+        $locks[] = $groupID;
       }
     }
     return $locks;
@@ -675,9 +674,9 @@ ORDER BY   gc.contact_id, g.children
       $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('gccache')
         ->setMemory();
-      $locks = self::getLocksForRefreshableGroupsTo($smartGroups);
-      if (!empty($locks)) {
-        self::buildGroupContactTempTable(array_keys($locks), $groupContactsTempTable);
+      $lockedGroups = self::getLocksForRefreshableGroupsTo($smartGroups);
+      if (!empty($lockedGroups)) {
+        self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
         // Note in theory we could do this transfer from the temp
         // table to the group_contact_cache table out-of-process - possibly by
         // continuing on after the browser is released (which seems to be
@@ -691,11 +690,8 @@ ORDER BY   gc.contact_id, g.children
         // Also - if we switched to the 'triple union' approach described above
         // we could throw a try-catch around this line since best-effort would
         // be good enough & potentially improve user experience.
-        self::updateCacheFromTempTable($groupContactsTempTable, array_keys($locks));
-
-        foreach ($locks as $lock) {
-          $lock->release();
-        }
+        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
+        self::releaseGroupLocks($lockedGroups);
       }
 
       $smartGroups = implode(',', $smartGroups);
@@ -871,6 +867,44 @@ AND  civicrm_group_contact.group_id = $groupID ";
         $str = implode(',', $values);
         CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) VALUES $str");
       }
+    }
+  }
+
+  /**
+   * Get a lock, if available, for the given group.
+   *
+   * @param int $groupID
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getGroupLock(int $groupID): bool {
+    $cacheKey = "data.core.group.$groupID";
+    if (isset(Civi::$statics["data.core.group.$groupID"])) {
+      // Loop avoidance for a circular parent-child situation.
+      // This would occur where the parent is a criteria of the child
+      // but needs to resolve the child to resolve itself.
+      // This has a unit test - testGroupWithParentInCriteria
+      return FALSE;
+    }
+    $lock = Civi::lockManager()->acquire($cacheKey);
+    if ($lock->isAcquired()) {
+      Civi::$statics["data.core.group.$groupID"] = $lock;
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Release locks on the groups.
+   *
+   * @param array $groupIDs
+   */
+  protected static function releaseGroupLocks(array $groupIDs): void {
+    foreach ($groupIDs as $groupID) {
+      $lock = Civi::$statics["data.core.group.$groupID"];
+      $lock->release();
+      unset(Civi::$statics["data.core.group.$groupID"]);
     }
   }
 
