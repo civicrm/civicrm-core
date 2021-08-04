@@ -64,6 +64,6 @@
 
 
 
-{if $context EQ 'Search'}
+{if $context EQ 'Search' or $context EQ 'grant'}
     {include file="CRM/common/pager.tpl" location="bottom"}
 {/if}
