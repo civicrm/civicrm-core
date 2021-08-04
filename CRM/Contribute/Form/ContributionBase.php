@@ -336,7 +336,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $this->assignBillingType();
 
       // check for is_monetary status
-      $isMonetary = $this->_values['is_monetary'] ?? NULL;
       $isPayLater = $this->_values['is_pay_later'] ?? NULL;
       if (!empty($this->_ccid)) {
         $this->_values['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
@@ -352,14 +351,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $this->setPayLaterLabel($this->_values['pay_later_text']);
       }
 
-      if ($isMonetary) {
-        $this->_paymentProcessorIDs = array_filter(explode(
-          CRM_Core_DAO::VALUE_SEPARATOR,
-          CRM_Utils_Array::value('payment_processor', $this->_values)
-        ));
+      $this->_paymentProcessorIDs = array_filter(explode(
+        CRM_Core_DAO::VALUE_SEPARATOR,
+        CRM_Utils_Array::value('payment_processor', $this->_values)
+      ));
 
-        $this->assignPaymentProcessor($isPayLater);
-      }
+      $this->assignPaymentProcessor($isPayLater);
 
       // get price info
       // CRM-5095
