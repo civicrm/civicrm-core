@@ -2744,7 +2744,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return mixed|null
    */
-  protected function getSubmittedValue(string $fieldName) {
+  public function getSubmittedValue(string $fieldName) {
     if (empty($this->exportedValues)) {
       $this->exportedValues = $this->controller->exportValues($this->_name);
     }

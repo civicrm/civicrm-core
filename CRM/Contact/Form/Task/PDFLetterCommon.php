@@ -178,8 +178,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $mimeType = self::getMimeType($type);
     // ^^ Useful side-effect: consistently throws error for unrecognized types.
 
+    $fileName = self::getFileName($form);
+    $fileName = "$fileName.$type";
+
     if ($type == 'pdf') {
-      $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
@@ -187,7 +189,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
-      $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
     }
 
@@ -213,6 +214,29 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $form->postProcessHook();
 
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Returns the filename for the pdf by striping off unwanted characters and limits the length to 200 characters.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return string
+   *   The name of the file.
+   */
+  private static function getFileName(CRM_Core_Form $form) {
+    if (!empty($form->getSubmittedValue('pdf_file_name'))) {
+      $fileName = CRM_Utils_String::munge($form->getSubmittedValue('pdf_file_name'), '_', 200);
+    }
+    elseif (!empty($form->getSubmittedValue('subject'))) {
+      $fileName = CRM_Utils_String::munge($form->getSubmittedValue('subject'), '_', 200);
+    }
+    else {
+      $fileName = "CiviLetter";
+    }
+    $fileName = self::isLiveMode($form) ? $fileName : $fileName . "_preview";
+
+    return $fileName;
   }
 
   /**
