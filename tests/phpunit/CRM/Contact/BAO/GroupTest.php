@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Group;
+use Civi\Api4\SavedSearch;
+
 /**
  * Test class for CRM_Contact_BAO_Group BAO
  *
@@ -51,13 +54,13 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    * Test case to ensure child group is present in the hierarchy
    *  if it has multiple parent groups and not all are disabled.
    */
-  public function testGroupHirearchy() {
+  public function testGroupHirearchy(): void {
     // Use-case :
     // 1. Create two parent group A and B and disable B
     // 2. Create a child group C
     // 3. Ensure that Group C is present in the group hierarchy
     $params = [
-      'name' => uniqid(),
+      'name' => 'parent group a',
       'title' => 'Parent Group A',
       'description' => 'Parent Group One',
       'visibility' => 'User and User Admin Only',
@@ -66,7 +69,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group1 = CRM_Contact_BAO_Group::create($params);
 
     $params = array_merge($params, [
-      'name' => uniqid(),
+      'name' => 'parent group b',
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
       // disable
@@ -75,7 +78,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group2 = CRM_Contact_BAO_Group::create($params);
 
     $params = array_merge($params, [
-      'name' => uniqid(),
+      'name' => 'parent group c',
       'title' => 'Child Group C',
       'description' => 'Child Group C',
       'parents' => [
@@ -103,9 +106,9 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Test nestedGroup pseudoconstant
    */
-  public function testNestedGroup() {
+  public function testNestedGroup(): void {
     $params = [
-      'name' => 'groupa',
+      'name' => 'group a',
       'title' => 'Parent Group A',
       'description' => 'Parent Group One',
       'visibility' => 'User and User Admin Only',
@@ -116,7 +119,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group1 = CRM_Contact_BAO_Group::create($params);
 
     $params = [
-      'name' => 'groupb',
+      'name' => 'group b',
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
       'visibility' => 'User and User Admin Only',
@@ -125,7 +128,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     $group2 = CRM_Contact_BAO_Group::create($params);
 
     $params = [
-      'name' => 'groupc',
+      'name' => 'group c',
       'title' => 'Child Group C',
       'description' => 'Child Group C',
       'visibility' => 'User and User Admin Only',
@@ -155,9 +158,34 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that parents as criteria don't cause loops.
+   *
+   * @throws \API_Exception
+   */
+  public function testGroupWithParentInCriteria(): void {
+    $parentGroupID = Group::create()->setValues([
+      'name' => 'Parent',
+      'title' => 'Parent',
+    ])->execute()->first()['id'];
+    $savedSearchID = SavedSearch::create()->setValues([
+      'form_values' => [
+        ['group', '=', ['IN' => [$parentGroupID]], 0, 0],
+      ],
+      'name' => 'child',
+    ])->execute()->first()['id'];
+    $childGroupID = Group::create()->setValues([
+      'name' => 'Child',
+      'title' => 'Child',
+      'saved_search_id' => $savedSearchID,
+      'parents' => [$parentGroupID],
+    ])->execute()->first()['id'];
+    $this->callAPISuccess('Contact', 'get', ['group' => $childGroupID]);
+  }
+
+  /**
    * Test adding a smart group.
    */
-  public function testAddSmart() {
+  public function testAddSmart(): void {
 
     $checkParams = $params = [
       'title' => 'Group Dos',
@@ -289,7 +317,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'search_custom_id' => NULL,
       'search_context' => 'advanced',
     ];
-    list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+    [$smartGroupID, $savedSearchID] = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
     $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->callAPISuccess('MailingGroup', 'create', [
