@@ -1,6 +1,6 @@
-<div class="form-inline">
+<div class="form-inline" title="{{:: ts('Set default value') }}">
   <label ng-repeat="opt in $ctrl.getOptions()" class="radio" >
-    <input class="crm-form-radio" type="radio" disabled />
+    <input class="crm-form-radio" type="radio" ng-checked="defaultValueContains(opt.id)" ng-click="toggleDefaultValueItem(opt.id)" >
     {{ opt.label }}
   </label>
 </div>

@@ -210,11 +210,13 @@
           .on('show.bs.dropdown', function() {
             $scope.$apply(function() {
               $scope.menu.open = true;
+              element.closest('#afGuiEditor-canvas').addClass('af-gui-menu-open');
             });
           })
           .on('hidden.bs.dropdown', function() {
             $scope.$apply(function() {
               $scope.menu.open = false;
+              element.closest('#afGuiEditor-canvas').removeClass('af-gui-menu-open');
             });
           });
       }

@@ -3231,7 +3231,7 @@ span.crm-select-item-color {
   top: 4px;
 }
 .crm-container ul.crm-checkbox-list li label {
-  display: block;
+  display: block !important;
   padding: 2px 0 2px 22px;
   margin: 0;
   word-break: break-all;

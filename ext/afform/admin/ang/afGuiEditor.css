@@ -133,16 +133,18 @@
   text-align: right;
 }
 
-#afGuiEditor .af-gui-bar {
+#afGuiEditor-canvas .af-gui-bar {
   height: 22px;
   width: 100%;
-  opacity: 0;
   transition: opacity .2s;
   position:relative;
   font-family: "Courier New", Courier, monospace;
   font-size: 12px;
 }
-#afGuiEditor [ui-sortable] .af-gui-bar {
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-bar {
+  opacity: 0;
+}
+#afGuiEditor-canvas [ui-sortable] .af-gui-bar {
   cursor: move;
   background-color: #f2f2f2;
   position: absolute;
@@ -154,7 +156,7 @@
   opacity: 1;
   transition: opacity .2s;
 }
-#afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar {
+#afGuiEditor #afGuiEditor-canvas .af-gui-dragtarget > .af-gui-bar {
   background-color: #d7e6ff;
   opacity: 1;
   transition: opacity .1s;
@@ -218,7 +220,7 @@ body.af-gui-dragging {
   margin-bottom: 20px;
 }
 
-#afGuiEditor .af-gui-container:hover,
+#afGuiEditor-canvas:not(.af-gui-menu-open) .af-gui-container:hover,
 .af-gui-dragging #afGuiEditor .af-gui-container {
   border: 2px dashed #757575;
 }
@@ -455,9 +457,6 @@ body.af-gui-dragging {
 #afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu {
   width: 100%;
   right: 0;
-}
-#afGuiEditor .af-gui-field-input-type-select .input-group .dropdown-menu a {
-  cursor: default;
 }
 
 #afGuiEditor .af-gui-text-h1 {
