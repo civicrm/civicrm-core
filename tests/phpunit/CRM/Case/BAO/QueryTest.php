@@ -139,16 +139,16 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
    *
    * @throws \Exception
    */
-  public function testAdvancedSearchWithDisplayRelationshipsAndCaseType() {
-    // Preperation
-    $benefitRelationshipTypeId = civicrm_api3('RelationshipType', 'getvalue', ['return' => 'id', 'name_a_b' => 'Benefits Specialist is']);
+  public function testAdvancedSearchWithDisplayRelationshipsAndCaseType(): void {
+    $this->markTestIncomplete('temporarily disabled as https://github.com/civicrm/civicrm-core/pull/20002 reverted for now');
+    $benefitRelationshipTypeId = $this->callAPISuccess('RelationshipType', 'getvalue', ['return' => 'id', 'name_a_b' => 'Benefits Specialist is']);
     $clientContactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Smith']);
     $benefitSpecialist1 = $this->individualCreate(['Individual', 'first_name' => 'Alexa', 'last_name' => 'Clarke']);
     $benefitSpecialist2 = $this->individualCreate(['Individual', 'first_name' => 'Sandra', 'last_name' => 'Johnson']);
     $housingSupportCase = $this->createCase($clientContactID, NULL, ['case_type' => 'housing_support', 'case_type_id' => 1]);
     $adultDayCareReferralCase = $this->createCase($clientContactID, NULL, ['case_type' => 'adult_day_care_referral', 'case_type_id' => 2]);
-    civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist1, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $housingSupportCase->id]);
-    civicrm_api3('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist2, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $adultDayCareReferralCase->id]);
+    $this->callAPISuccess('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist1, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $housingSupportCase->id]);
+    $this->callAPISuccess('Relationship', 'create', ['contact_id_a' => $clientContactID, 'contact_id_b' => $benefitSpecialist2, 'relationship_type_id' => $benefitRelationshipTypeId, 'case_id' => $adultDayCareReferralCase->id]);
 
     // Search setup
     $formValues = ['display_relationship_type' => $benefitRelationshipTypeId . '_b_a', 'case_type_id' => 1];
