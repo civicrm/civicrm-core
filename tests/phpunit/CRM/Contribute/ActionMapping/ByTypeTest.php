@@ -354,6 +354,11 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'contribution_status_id:label',
     ];
     $processor = new CRM_Contribute_Tokens();
+    $legacyTokens = [];
+    foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
+      $legacyTokens[substr($token, 14, -1)] = $label;
+    }
+    $this->assertEquals($legacyTokens, $processor->tokenNames);
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
     }
