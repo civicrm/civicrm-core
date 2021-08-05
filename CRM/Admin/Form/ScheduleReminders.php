@@ -516,6 +516,8 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       'end_frequency_interval',
       'end_action',
       'end_date',
+      'effective_end_date',
+      'effective_start_date',
     ];
 
     if (empty($params['absolute_date'])) {
