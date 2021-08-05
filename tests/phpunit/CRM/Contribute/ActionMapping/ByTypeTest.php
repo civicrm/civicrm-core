@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Contribute_ActionMapping_ByTypeTest
  * @group ActionSchedule
@@ -151,6 +153,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * Create a contribution record for Alice with type "Member Dues".
    */
   public function addAliceDues(): void {
+    $this->enableCiviCampaign();
+    $campaignID = $this->campaignCreate();
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -164,6 +168,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       // Having a cancel date is a bit artificial here but we can test it....
       'cancel_date' => '2021-08-09',
       'contribution_status_id' => 1,
+      'campaign_id' => $campaignID,
       'soft_credit' => [
         '1' => [
           'contact_id' => $this->contacts['carol']['id'],
@@ -281,7 +286,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       non_deductible_amount = {contribution.non_deductible_amount}
       total_amount = {contribution.total_amount}
       net_amount = {contribution.net_amount}
-      fee_amount = {contribution.fee_amount}';
+      fee_amount = {contribution.fee_amount}
+      campaign_id = {contribution.campaign_id}
+      campaign name = {contribution.campaign_id:name}
+      campaign label = {contribution.campaign_id:label}';
 
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -305,6 +313,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'total_amount = € 100.00',
       'net_amount = € 95.00',
       'fee_amount = € 5.00',
+      'campaign_id = 1',
+      'campaign name = big_campaign',
+      'campaign label = Campaign',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -337,6 +348,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'total_amount = € 100.00',
       'net_amount = € 95.00',
       'fee_amount = € 5.00',
+      'campaign_id = 1',
+      'campaign name = big_campaign',
+      'campaign label = Campaign',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
@@ -354,6 +368,21 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'contribution_status_id:label',
     ];
     $processor = new CRM_Contribute_Tokens();
+    $legacyTokens = [];
+    $realLegacyTokens = [];
+    foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
+      $legacyTokens[substr($token, 14, -1)] = $label;
+      if (strpos($token, ':') === FALSE) {
+        $realLegacyTokens[substr($token, 14, -1)] = $label;
+      }
+    }
+    $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
+    $allFields = [];
+    foreach ($fields as $field) {
+      $allFields[$field['name']] = $field['title'];
+    }
+    // $this->assertEquals($realLegacyTokens, $allFields);
+    $this->assertEquals($legacyTokens, $processor->tokenNames);
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
     }

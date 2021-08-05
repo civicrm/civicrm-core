@@ -56,7 +56,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    * @return array
    */
   protected function getExposedFields(): array {
-    return [
+    $fields = [
       'contribution_page_id',
       'source',
       'id',
@@ -75,7 +75,14 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
       'contribution_status_id',
       'financial_type_id',
       'payment_instrument_id',
+      'cancel_reason',
+      'amount_level',
+      'check_number',
     ];
+    if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+      $fields[] = 'campaign_id';
+    }
+    return $fields;
   }
 
   /**

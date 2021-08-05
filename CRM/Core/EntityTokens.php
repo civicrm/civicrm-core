@@ -10,6 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Campaign;
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
@@ -59,6 +60,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @var array
    */
   protected $fieldMetadata = [];
+
+  /**
+   * Loaded campaigns.
+   *
+   * As campaigns are not a true pseudoconstant we stash them here as we load them.
+   *
+   * @var array
+   */
+  protected $campaigns;
 
   /**
    * Get the entity name for api v4 calls.
@@ -214,6 +224,14 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // from the metadata as yet.
       return FALSE;
     }
+    if ($fieldName === 'campaign_id') {
+      // Ah campaign_id - let me count the ways you drive me crazy.
+      // campaign_id is the pseudo-constant that isn't. Unnecessarily loading
+      // all campaigns can be a huge performance drag.
+      // Hence it is not defined in the metadata as a pseudoconstant.
+      // but we still want it to be usable like one. We brute force it...
+      return TRUE;
+    }
     return (bool) $this->getFieldMetadata()[$fieldName]['options'];
   }
 
@@ -227,9 +245,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return string
    *   Eg. 'Completed' in the example above.
    *
+   * @throws \API_Exception
    * @internal function will likely be protected soon.
    */
   public function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    if ($realField === 'campaign_id') {
+      if (!isset($this->campaigns[$fieldValue])) {
+        $campaign = Campaign::get(FALSE)->addWhere('id', '=', (int) $fieldValue)
+          ->addSelect('name', 'title')->execute()->first();
+        $this->campaigns[$fieldValue]['name'] = (string) $campaign['name'];
+        $this->campaigns[$fieldValue]['label'] = (string) $campaign['title'];
+      }
+      return $this->campaigns[$fieldValue][$pseudoKey];
+    }
     if ($pseudoKey === 'name') {
       $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
     }
