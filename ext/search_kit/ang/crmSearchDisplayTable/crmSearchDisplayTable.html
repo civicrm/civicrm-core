@@ -1,6 +1,6 @@
 <div class="crm-search-display crm-search-display-table">
   <div class="form-inline" ng-if="$ctrl.settings.actions">
-    <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="getResults()"></crm-search-tasks>
+    <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-tasks>
   </div>
   <table>
     <thead>
@@ -8,8 +8,8 @@
         <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
           <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="setSort(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
-          <i ng-if="col.type === 'field'" class="crm-i {{ getSort(col) }}"></i>
+        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
+          <i ng-if="col.type === 'field'" class="crm-i {{ $ctrl.getSort(col) }}"></i>
           <span>{{ col.label }}</span>
         </th>
       </tr>

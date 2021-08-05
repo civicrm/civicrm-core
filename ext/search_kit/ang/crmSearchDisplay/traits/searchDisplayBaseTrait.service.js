@@ -85,8 +85,8 @@
         var ctrl = this;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
 
-        $scope.getResults = _.debounce(function() {
-          ctrl.getResults();
+        this.getResults = _.debounce(function() {
+          ctrl.runSearch();
         }, 100);
 
         // If search is embedded in contact summary tab, display count in tab-header
@@ -106,7 +106,7 @@
           if (ctrl.onChangeFilters) {
             ctrl.onChangeFilters();
           }
-          $scope.getResults();
+          ctrl.getResults();
         }
 
         if (this.afFieldset) {
@@ -128,7 +128,7 @@
       },
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
-      getResults: function() {
+      runSearch: function() {
         var ctrl = this;
         return crmApi4('SearchDisplay', 'run', ctrl.getApiParams()).then(function(results) {
           ctrl.results = results;
