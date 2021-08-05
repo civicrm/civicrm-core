@@ -7,25 +7,36 @@
   </div>
 </li>
 <li>
-  <a href ng-click="toggleRequired(); $event.stopPropagation();" title="{{:: ts('Require this field') }}">
+  <a href ng-click="toggleRequired(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Require this field') }}">
     <i class="crm-i fa-{{ getProp('required') ? 'check-' : '' }}square-o"></i>
     {{:: ts('Required') }}
   </a>
 </li>
 <li>
-  <a href ng-click="toggleLabel(); $event.stopPropagation();" title="{{:: ts('Show field label') }}">
+  <a href ng-click="toggleDefaultValue(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Pre-fill this field with a value') }}">
+    <i class="crm-i fa-{{ $ctrl.hasDefaultValue ? 'check-' : '' }}square-o"></i>
+    {{:: ts('Default value') }}
+  </a>
+</li>
+<li ng-if="$ctrl.hasDefaultValue">
+  <div ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <input class="form-control" af-gui-field-value="$ctrl.fieldDefn" ng-model="getSet('afform_default')" ng-model-options="{getterSetter: true}" >
+  </div>
+</li>
+<li>
+  <a href ng-click="toggleLabel(); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show field label') }}">
     <i class="crm-i fa-{{ $ctrl.node.defn.label === false ? '' : 'check-' }}square-o"></i>
     {{:: ts('Label') }}
   </a>
 </li>
 <li>
-  <a href ng-click="toggleHelp('pre'); $event.stopPropagation();" title="{{:: ts('Show help text above this field') }}">
+  <a href ng-click="toggleHelp('pre'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show help text above this field') }}">
     <i class="crm-i fa-{{ propIsset('help_pre') ? 'check-' : '' }}square-o"></i>
     {{:: ts('Pre help text') }}
   </a>
 </li>
 <li>
-  <a href ng-click="toggleHelp('post'); $event.stopPropagation();" title="{{:: ts('Show help text below this field') }}">
+  <a href ng-click="toggleHelp('post'); $event.stopPropagation(); $event.target.blur();" title="{{:: ts('Show help text below this field') }}">
     <i class="crm-i fa-{{ propIsset('help_post') ? 'check-' : '' }}square-o" ></i>
     {{:: ts('Post help text') }}
   </a>

@@ -12,7 +12,7 @@
       fieldName: '@name',
       defn: '='
     },
-    controller: function($scope, $element, crmApi4) {
+    controller: function($scope, $element, crmApi4, $timeout) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
         boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
@@ -83,6 +83,14 @@
                   ctrl.defn.options = data.options;
                 });
             }
+          });
+        }
+
+        // Set default value
+        if (ctrl.defn.afform_default) {
+          // Wait for parent controllers to initialize
+          $timeout(function() {
+            $scope.dataProvider.getFieldData()[ctrl.fieldName] = ctrl.defn.afform_default;
           });
         }
 
