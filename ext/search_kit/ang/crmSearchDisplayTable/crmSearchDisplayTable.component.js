@@ -13,13 +13,10 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
-    controller: function($scope, $element, crmApi4, searchDisplayBaseTrait) {
+    controller: function($scope, $element, crmApi4, searchDisplayBaseTrait, searchDisplayTasksTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        // Mix in properties of searchDisplayBaseTrait
-        ctrl = angular.extend(this, searchDisplayBaseTrait);
-
-      this.selectedRows = [];
-      this.allRowsSelected = false;
+        // Mix in traits to this controller
+        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait);
 
       this.$onInit = function() {
         this.initializeDisplay($scope, $element);
@@ -36,11 +33,6 @@
               ctrl.selectedRows.splice(index, 1);
             }
           });
-      };
-
-      this.onChangeFilters = function() {
-        ctrl.selectedRows.legth = 0;
-        ctrl.allRowsSelected = false;
       };
 
       /**
@@ -78,43 +70,6 @@
           ctrl.sort.push([col.key, dir]);
         }
         $scope.getResults();
-      };
-
-      $scope.selectAllRows = function() {
-        // Deselect all
-        if (ctrl.allRowsSelected) {
-          ctrl.allRowsSelected = false;
-          ctrl.selectedRows.length = 0;
-          return;
-        }
-        // Select all
-        ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results.length < ctrl.settings.limit) {
-          ctrl.selectedRows = _.pluck(ctrl.results, 'id');
-          return;
-        }
-        // If more than one page of results, use ajax to fetch all ids
-        $scope.loadingAllRows = true;
-        var params = ctrl.getApiParams('id');
-        crmApi4('SearchDisplay', 'run', params, ['id']).then(function(ids) {
-          $scope.loadingAllRows = false;
-          ctrl.selectedRows = _.toArray(ids);
-        });
-      };
-
-      $scope.selectRow = function(row) {
-        var index = ctrl.selectedRows.indexOf(row.id);
-        if (index < 0) {
-          ctrl.selectedRows.push(row.id);
-          ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
-        } else {
-          ctrl.allRowsSelected = false;
-          ctrl.selectedRows.splice(index, 1);
-        }
-      };
-
-      $scope.isRowSelected = function(row) {
-        return ctrl.allRowsSelected || _.includes(ctrl.selectedRows, row.id);
       };
 
     }

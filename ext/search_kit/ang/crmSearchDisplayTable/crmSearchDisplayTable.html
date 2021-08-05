@@ -6,7 +6,7 @@
     <thead>
       <tr>
         <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
-          <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="selectAllRows()" >
+          <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
         </th>
         <th ng-repeat="col in $ctrl.settings.columns" ng-click="setSort(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
           <i ng-if="col.type === 'field'" class="crm-i {{ getSort(col) }}"></i>
@@ -17,7 +17,7 @@
     <tbody>
       <tr ng-repeat="(rowIndex, row) in $ctrl.results">
         <td ng-if=":: $ctrl.settings.actions">
-          <input type="checkbox" ng-checked="isRowSelected(row)" ng-click="selectRow(row)" ng-disabled="!(!loadingAllRows && row.id)">
+          <input type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.selectRow(row)" ng-disabled="!(!$ctrl.loadingAllRows && row.id)">
         </td>
         <td ng-repeat="col in $ctrl.settings.columns" ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'" title="{{:: $ctrl.replaceTokens(col.title, row) }}" class="{{:: col.alignment }}">
         </td>
