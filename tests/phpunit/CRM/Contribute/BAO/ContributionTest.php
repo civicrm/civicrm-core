@@ -1341,7 +1341,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contribution2 = $this->contributionCreate($params);
     $ids = [$contribution1, $contribution2];
 
-    $subject = "This is a test for contribution ID: {contribution.contribution_id}";
+    $subject = 'This is a test for contribution ID: {contribution.contribution_id}';
     $text = 'Contribution Amount: {contribution.total_amount}';
     $html = "<p>Contribution Source: {contribution.contribution_source}</p></br>
       <p>Contribution Invoice ID: {contribution.invoice_id}</p></br>

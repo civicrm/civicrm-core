@@ -5170,7 +5170,7 @@ LIMIT 1;";
       $pseudoFields = array_keys($processor->getPseudoTokens());
       foreach ($pseudoFields as $pseudoField) {
         $split = explode(':', $pseudoField);
-        $result['values'][$id][$pseudoField] = $processor->getPseudoValue($split[0], $split[1], $result['values'][$id][$split[0]]);
+        $result['values'][$id][$pseudoField] = $processor->getPseudoValue($split[0], $split[1], $result['values'][$id][$split[0]] ?? '');
       }
     }
     return $result;
