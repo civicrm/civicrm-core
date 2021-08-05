@@ -269,7 +269,14 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       id {contribution.id}
       contribution_id {contribution.contribution_id} - not valid for action schedule
       cancel date {contribution.cancel_date}
-      source {contribution.source}';
+      source {contribution.source}
+      financial type id = {contribution.financial_type_id}
+      financial type name = {contribution.financial_type_id:name}
+      financial type label = {contribution.financial_type_id:label}
+      payment instrument id = {contribution.payment_instrument_id}
+      payment instrument name = {contribution.payment_instrument_id:name}
+      payment instrument label = {contribution.payment_instrument_id:label}';
+
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
@@ -282,6 +289,12 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'id  - not valid for action schedule',
       'cancel date August 9th, 2021 12:00 AM',
       'source SSF',
+      'financial type id = 1',
+      'financial type name = Donation',
+      'financial type label = Donation',
+      'payment instrument id = 4',
+      'payment instrument name = Check',
+      'payment instrument label = Check',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -302,11 +315,28 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'contribution status id = 1',
       'id ' . $this->ids['Contribution']['alice'],
       'contribution_id ' . $this->ids['Contribution']['alice'],
+      'financial type id = 1',
+      'financial type name = Donation',
+      'financial type label = Donation',
+      'payment instrument id = 4',
+      'payment instrument name = Check',
+      'payment instrument label = Check',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
     }
-    $tokens = ['id', 'contribution_status_id', 'contribution_status_id:name', 'contribution_status_id:label'];
+    $tokens = [
+      'id',
+      'payment_instrument_id',
+      'payment_instrument_id:name',
+      'payment_instrument_id:label',
+      'financial_type_id',
+      'financial_type_id:name',
+      'financial_type_id:label',
+      'contribution_status_id',
+      'contribution_status_id:name',
+      'contribution_status_id:label',
+    ];
     $processor = new CRM_Contribute_Tokens();
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);

@@ -562,15 +562,19 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function contributionTokens() {
-    return array_merge([
+  public static function contributionTokens(): array {
+    $tokens = [];
+    $processor = new CRM_Contribute_Tokens();
+    foreach (array_merge($processor->getPseudoTokens(), $processor->getBasicTokens()) as $token => $title) {
+      $tokens['{contribution.' . $token . '}'] = $title;
+    }
+    return array_merge($tokens, [
       '{contribution.id}' => ts('Contribution ID'),
       '{contribution.total_amount}' => ts('Total Amount'),
       '{contribution.fee_amount}' => ts('Fee Amount'),
       '{contribution.net_amount}' => ts('Net Amount'),
       '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
       '{contribution.receive_date}' => ts('Contribution Date Received'),
-      '{contribution.payment_instrument}' => ts('Payment Method'),
       '{contribution.trxn_id}' => ts('Transaction ID'),
       '{contribution.invoice_id}' => ts('Invoice ID'),
       '{contribution.currency}' => ts('Currency'),
@@ -580,13 +584,6 @@ class CRM_Core_SelectValues {
       '{contribution.thankyou_date}' => ts('Thank You Date'),
       '{contribution.contribution_source}' => ts('Contribution Source'),
       '{contribution.amount_level}' => ts('Amount Level'),
-      //'{contribution.contribution_recur_id}' => ts('Contribution Recurring ID'),
-      //'{contribution.honor_contact_id}' => ts('Honor Contact ID'),
-      '{contribution.contribution_status_id}' => ts('Contribution Status ID'),
-      '{contribution.contribution_status_id:label}' => ts('Contribution Status'),
-      '{contribution.contribution_status_id:name}' => ts('Machine name') . ': ' . ts('Contribution Status'),
-      //'{contribution.honor_type_id}' => ts('Honor Type ID'),
-      //'{contribution.address_id}' => ts('Address ID'),
       '{contribution.check_number}' => ts('Check Number'),
       '{contribution.campaign}' => ts('Contribution Campaign'),
     ], CRM_Utils_Token::getCustomFieldTokens('Contribution', TRUE));

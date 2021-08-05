@@ -67,18 +67,8 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       'thankyou_date',
       'tax_amount',
       'contribution_status_id',
-    ];
-  }
-
-  /**
-   * Get alias tokens.
-   *
-   * @return array
-   */
-  protected function getAliasTokens(): array {
-    return [
-      'payment_instrument' => 'payment_instrument_id',
-      'type' => 'financial_type_id',
+      'financial_type_id',
+      'payment_instrument_id',
     ];
   }
 
@@ -93,8 +83,12 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
    *
    * @return string[]
    */
-  protected function getBasicTokens(): array {
-    return ['contribution_status_id' => ts('Contribution Status ID')];
+  public function getBasicTokens(): array {
+    $return = [];
+    foreach (['contribution_status_id', 'payment_instrument_id', 'financial_type_id'] as $fieldName) {
+      $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
+    }
+    return $return;
   }
 
   /**
@@ -123,10 +117,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       CRM_Utils_Array::collect('title', $this->getFieldMetadata()),
       $this->getPassthruTokens()
     );
-    $tokens['id'] = ts('Contribution ID');
-    $tokens['payment_instrument'] = ts('Payment Instrument');
-    $tokens['source'] = ts('Contribution Source');
-    $tokens['type'] = ts('Financial Type');
     $tokens = array_merge($tokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
     parent::__construct('contribution', $tokens);
   }
@@ -161,9 +151,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       $split = explode(':', $token);
       $e->query->select("e." . $fields[$split[0]]['name'] . " AS contrib_{$split[0]}");
     }
-    foreach ($this->getAliasTokens() as $alias => $orig) {
-      $e->query->select('e.' . $fields[$orig]['name'] . " AS contrib_{$alias}");
-    }
   }
 
   /**
@@ -173,13 +160,9 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
     $actionSearchResult = $row->context['actionSearchResult'];
     $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
 
-    $aliasTokens = $this->getAliasTokens();
     if (in_array($field, ['total_amount', 'fee_amount', 'net_amount'])) {
       return $row->format('text/plain')->tokens($entity, $field,
         \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
-    }
-    if (isset($aliasTokens[$field])) {
-      $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $aliasTokens[$field], $fieldValue);
     }
     elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
       $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
