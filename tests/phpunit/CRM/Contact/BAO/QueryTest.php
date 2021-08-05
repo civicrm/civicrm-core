@@ -1317,4 +1317,53 @@ civicrm_relationship.is_active = 1 AND
     $this->assertEquals('World Region = Middle East and North Africa', $query->_qill[0][0]);
   }
 
+  /**
+   * Tests the advanced search query by searching on related contacts and contact type same time.
+   *
+   * Preparation:
+   *   Create an individual contact Contact A
+   *   Create an organization contact Contact B
+   *   Create an "Employer of" relationship between them.
+   *
+   * Searching:
+   *   Go to advanced search
+   *   Click on View contact as related contact
+   *   Select Employee of as relationship type
+   *   Select "Organization" as contact type
+   *
+   * Expected results
+   *   We expect to find contact A.
+   *
+   * @throws \Exception
+   */
+  public function testAdvancedSearchWithDisplayRelationshipsAndContactType(): void {
+    $employeeRelationshipTypeId = $this->callAPISuccess('RelationshipType', 'getvalue', ['return' => 'id', 'name_a_b' => 'Employee of']);
+    $indContactID = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Smith']);
+    $orgContactID = $this->organizationCreate(['contact_type' => 'Organization', 'organization_name' => 'Healthy Planet Fund']);
+    $this->callAPISuccess('Relationship', 'create', ['contact_id_a' => $indContactID, 'contact_id_b' => $orgContactID, 'relationship_type_id' => $employeeRelationshipTypeId]);
+
+    // Search setup
+    $formValues = ['display_relationship_type' => $employeeRelationshipTypeId . '_a_b', 'contact_type' => 'Organization'];
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues, 0, FALSE, NULL, []);
+    $isDeleted = FALSE;
+    $selector = new CRM_Contact_Selector(
+      'CRM_Contact_Selector',
+      $formValues,
+      $params,
+      NULL,
+      CRM_Core_Action::NONE,
+      NULL,
+      FALSE,
+      'advanced'
+    );
+    $queryObject = $selector->getQueryObject();
+    $sql = $queryObject->query(FALSE, FALSE, FALSE, $isDeleted);
+    // Run the search
+    $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
+    // Check expected results.
+    $this->assertCount(1, $rows);
+    $this->assertEquals('John', $rows[0]['first_name']);
+    $this->assertEquals('Smith', $rows[0]['last_name']);
+  }
+
 }
