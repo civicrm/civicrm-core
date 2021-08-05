@@ -5791,7 +5791,7 @@ INNER JOIN civicrm_relationship displayRelType ON ( displayRelType.contact_id_a 
 INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRelType.contact_id_a OR transform_temp.contact_id = displayRelType.contact_id_b )
 ";
         $qcache['where'] = "
-AND displayRelType.relationship_type_id = {$this->_displayRelationshipType}
+WHERE displayRelType.relationship_type_id = {$this->_displayRelationshipType}
 AND   displayRelType.is_active = 1
 ";
       }
@@ -5812,7 +5812,7 @@ INNER JOIN $tableName transform_temp ON ( transform_temp.contact_id = displayRel
 ";
         }
         $qcache['where'] = "
-AND displayRelType.relationship_type_id = $relType
+WHERE displayRelType.relationship_type_id = $relType
 AND   displayRelType.is_active = 1
 ";
       }
@@ -5836,14 +5836,10 @@ AND   displayRelType.is_active = 1
       else {
         $from .= $qcache['from'];
       }
-      if (!strlen($where)) {
-        $where = " WHERE 1 ";
-      }
-      $where .= $qcache['where'];
+      $where = $qcache['where'];
       if (!empty($this->_tables['civicrm_case'])) {
         // Change the join on CiviCRM case so that it joins on the right contac from the relationship.
         $from = str_replace("ON civicrm_case_contact.contact_id = contact_a.id", "ON civicrm_case_contact.contact_id = transform_temp.contact_id", $from);
-        $where = str_replace("AND civicrm_case_contact.contact_id = contact_a.id", "AND civicrm_case_contact.contact_id = transform_temp.contact_id", $where);
         $where .= " AND displayRelType.case_id = civicrm_case_contact.case_id ";
       }
       if (!empty($this->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
