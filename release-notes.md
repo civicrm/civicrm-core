@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.40.0
 
-Released August 4, 2021
+Released August 5, 2021
 
 - **[Synopsis](release-notes/5.40.0.md#synopsis)**
 - **[Features](release-notes/5.40.0.md#features)**
@@ -26,6 +26,14 @@ Released August 4, 2021
 - **[Credits](release-notes/5.40.0.md#credits)**
 - **[Feedback](release-notes/5.40.0.md#feedback)**
 
+## CiviCRM 5.39.1
+
+Released August 5, 2021
+
+- **[Synopsis](release-notes/5.39.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.39.1.md#bugs)**
+- **[Credits](release-notes/5.39.1.md#credits)**
+- **[Feedback](release-notes/5.39.1.md#feedback)**
 
 ## CiviCRM 5.39.0
 

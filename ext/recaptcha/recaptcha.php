@@ -127,7 +127,7 @@ function recaptcha_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_navigationMenu().
  */
 function recaptcha_civicrm_navigationMenu(&$menu) {
-  _recaptcha_civix_insert_navigation_menu($menu, 'Administer/Customize Data and Screens', [
+  _recaptcha_civix_insert_navigation_menu($menu, 'Administer/System Settings', [
     'label' => E::ts('reCAPTCHA Settings'),
     'name' => 'recaptcha_settings',
     'url' => 'civicrm/admin/setting/recaptcha',

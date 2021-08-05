@@ -22,8 +22,12 @@
       mode = CRM.config && CRM.config.isFrontend ? 'front' : 'back';
     }
     query = query || '';
-    var url,
-      frag = path.split('?');
+    var url, frag, hash = '';
+    if (path.indexOf('#') > -1) {
+      hash = '#' + path.split('#')[1];
+      path = path.split('#')[0];
+    }
+    frag = path.split('?');
     // Encode url path only if slashes in placeholder were also encoded
     if (tplURL[mode].indexOf('civicrm/placeholder-url-path') >= 0) {
       url = tplURL[mode].replace('civicrm/placeholder-url-path', frag[0]);
@@ -39,7 +43,7 @@
     if (frag[1]) {
       url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
     }
-    return url;
+    return url + hash;
   };
 
   $.fn.crmURL = function () {
