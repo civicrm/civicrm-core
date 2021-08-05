@@ -150,7 +150,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
   /**
    * Create a contribution record for Alice with type "Member Dues".
    */
-  public function addAliceDues() {
+  public function addAliceDues(): void {
     $this->ids['Contribution']['alice'] = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
@@ -160,6 +160,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'fee_amount' => '5',
       'net_amount' => '95',
       'source' => 'SSF',
+      // Having a cancel date is a bit artificial here but we can test it....
+      'cancel_date' => '2021-08-09',
       'contribution_status_id' => 1,
       'soft_credit' => [
         '1' => [
@@ -266,7 +268,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       new style label = {contribution.contribution_status_id:label}
       id {contribution.id}
       contribution_id {contribution.contribution_id} - not valid for action schedule
-    ';
+      cancel date {contribution.cancel_date}
+      source {contribution.source}';
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
@@ -277,6 +280,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'new style label = Completed Label**',
       'id ' . $this->ids['Contribution']['alice'],
       'id  - not valid for action schedule',
+      'cancel date August 9th, 2021 12:00 AM',
+      'source SSF',
     ];
     $this->mut->checkMailLog($expected);
 

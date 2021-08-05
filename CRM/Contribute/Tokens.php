@@ -28,7 +28,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
   /**
    * @return string
    */
-  private function getEntityName(): string {
+  protected function getEntityName(): string {
     return 'contribution';
   }
 
@@ -44,7 +44,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
    *
    * @var array
    */
-  protected $entityFieldMetadata = [];
+  protected $fieldMetadata = [];
 
   /**
    * Get a list of tokens whose name and title match the DB fields.
@@ -53,6 +53,8 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
   protected function getPassthruTokens(): array {
     return [
       'contribution_page_id',
+      'source',
+      'id',
       'receive_date',
       'total_amount',
       'fee_amount',
@@ -60,7 +62,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       'trxn_id',
       'invoice_id',
       'currency',
-      'contribution_cancel_date',
+      'cancel_date',
       'receipt_date',
       'thankyou_date',
       'tax_amount',
@@ -75,11 +77,8 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
    */
   protected function getAliasTokens(): array {
     return [
-      'id' => 'contribution_id',
       'payment_instrument' => 'payment_instrument_id',
-      'source' => 'contribution_source',
       'type' => 'financial_type_id',
-      'cancel_date' => 'contribution_cancel_date',
     ];
   }
 
@@ -108,9 +107,9 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
   public function getPseudoTokens(): array {
     $return = [];
     foreach (array_keys($this->getBasicTokens()) as $fieldName) {
-      if (!empty($this->entityFieldMetadata[$fieldName]['pseudoconstant'])) {
-        $return[$fieldName . ':label'] = $this->entityFieldMetadata[$fieldName]['html']['label'];
-        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->entityFieldMetadata[$fieldName]['html']['label'];
+      if (!empty($this->fieldMetadata[$fieldName]['pseudoconstant'])) {
+        $return[$fieldName . ':label'] = $this->fieldMetadata[$fieldName]['html']['label'];
+        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->fieldMetadata[$fieldName]['html']['label'];
       }
     }
     return $return;
@@ -120,9 +119,8 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    $this->entityFieldMetadata = CRM_Contribute_DAO_Contribution::fields();
     $tokens = CRM_Utils_Array::subset(
-      CRM_Utils_Array::collect('title', $this->entityFieldMetadata),
+      CRM_Utils_Array::collect('title', $this->getFieldMetadata()),
       $this->getPassthruTokens()
     );
     $tokens['id'] = ts('Contribution ID');
@@ -155,7 +153,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       return;
     }
 
-    $fields = CRM_Contribute_DAO_Contribution::fields();
+    $fields = $this->getFieldMetadata();
     foreach ($this->getPassthruTokens() as $token) {
       $e->query->select("e." . $fields[$token]['name'] . " AS contrib_{$token}");
     }
@@ -193,9 +191,28 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
     elseif (in_array($field, array_keys($this->getBasicTokens()))) {
       $row->tokens($entity, $field, $fieldValue);
     }
+    elseif (!array_key_exists($field, CRM_Contribute_BAO_Contribution::fields())) {
+      if ($this->isDateField($field)) {
+        $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
+      }
+      else {
+        $row->format('text/plain')->tokens($entity, $field, $fieldValue);
+      }
+    }
     else {
       $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
     }
+  }
+
+  /**
+   * Is the given field a date field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isDateField($fieldName): bool {
+    return $this->getFieldMetadata()[$fieldName]['type'] === (\CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME);
   }
 
   /**
@@ -218,6 +235,25 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
     }
     return (string) $fieldValue;
+  }
+
+  /**
+   * Get the metadata for the available fields.
+   *
+   * @return array
+   */
+  protected function getFieldMetadata(): array {
+    if (empty($this->fieldMetadata)) {
+      $baoName = $this->getBAOName();
+      $fields = (array) $baoName::fields();
+      // re-index by real field name. I originally wanted to use apiv4
+      // getfields - but it returns different stuff for 'type' and
+      // does not return 'pseudoconstant' as a key so for now...
+      foreach ($fields as $details) {
+        $this->fieldMetadata[$details['name']] = $details;
+      }
+    }
+    return $this->fieldMetadata;
   }
 
 }
