@@ -154,7 +154,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customField->custom_group_id, 'table_name');
       $sql[$tableName][] = $fieldSQL;
-      $addedColumns[$tableName][] = $customField->name;
+      $addedColumns[$tableName][] = $customField->column_name;
       $customFields[$index] = $customField;
     }
 
