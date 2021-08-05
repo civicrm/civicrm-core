@@ -568,14 +568,7 @@ class CRM_Core_SelectValues {
     foreach ($processor->getAllTokens() as $token => $title) {
       $tokens['{contribution.' . $token . '}'] = $title;
     }
-    return array_merge($tokens, [
-      '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
-      '{contribution.amount_level}' => ts('Amount Level'),
-      '{contribution.check_number}' => ts('Check Number'),
-      '{contribution.campaign}' => ts('Contribution Campaign'),
-      // @todo - we shouldn't need to include custom fields here -
-      // remove, with test.
-    ], CRM_Utils_Token::getCustomFieldTokens('Contribution', TRUE));
+    return $tokens;
   }
 
   /**
