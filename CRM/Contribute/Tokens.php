@@ -85,7 +85,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
    */
   public function getBasicTokens(): array {
     $return = [];
-    foreach (['contribution_status_id', 'payment_instrument_id', 'financial_type_id'] as $fieldName) {
+    foreach (['contribution_status_id', 'payment_instrument_id', 'financial_type_id', 'contribution_page_id'] as $fieldName) {
       $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
     }
     return $return;
