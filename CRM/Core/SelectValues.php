@@ -565,27 +565,16 @@ class CRM_Core_SelectValues {
   public static function contributionTokens(): array {
     $tokens = [];
     $processor = new CRM_Contribute_Tokens();
-    foreach (array_merge($processor->getPseudoTokens(), $processor->getBasicTokens()) as $token => $title) {
+    foreach ($processor->getAllTokens() as $token => $title) {
       $tokens['{contribution.' . $token . '}'] = $title;
     }
     return array_merge($tokens, [
-      '{contribution.id}' => ts('Contribution ID'),
-      '{contribution.total_amount}' => ts('Total Amount'),
-      '{contribution.fee_amount}' => ts('Fee Amount'),
-      '{contribution.net_amount}' => ts('Net Amount'),
-      '{contribution.non_deductible_amount}' => ts('Non-deductible Amount'),
-      '{contribution.receive_date}' => ts('Contribution Date Received'),
-      '{contribution.trxn_id}' => ts('Transaction ID'),
-      '{contribution.invoice_id}' => ts('Invoice ID'),
-      '{contribution.currency}' => ts('Currency'),
-      '{contribution.cancel_date}' => ts('Contribution Cancel Date'),
       '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
-      '{contribution.receipt_date}' => ts('Receipt Date'),
-      '{contribution.thankyou_date}' => ts('Thank You Date'),
-      '{contribution.source}' => ts('Contribution Source'),
       '{contribution.amount_level}' => ts('Amount Level'),
       '{contribution.check_number}' => ts('Check Number'),
       '{contribution.campaign}' => ts('Contribution Campaign'),
+      // @todo - we shouldn't need to include custom fields here -
+      // remove, with test.
     ], CRM_Utils_Token::getCustomFieldTokens('Contribution', TRUE));
   }
 
