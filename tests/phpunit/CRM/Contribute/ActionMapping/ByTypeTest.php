@@ -270,6 +270,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       contribution_id {contribution.contribution_id} - not valid for action schedule
       cancel date {contribution.cancel_date}
       source {contribution.source}
+      legacy source {contribution.contribution_source}
       financial type id = {contribution.financial_type_id}
       financial type name = {contribution.financial_type_id:name}
       financial type label = {contribution.financial_type_id:label}
@@ -321,6 +322,8 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'payment instrument id = 4',
       'payment instrument name = Check',
       'payment instrument label = Check',
+      'legacy source SSF',
+      'source SSF',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);
