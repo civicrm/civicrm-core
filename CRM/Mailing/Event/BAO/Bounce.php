@@ -244,7 +244,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
   }
 
   /**
-   * Put the email on hold if it has met the threshold.
+   * Put the email on hold if it has met the threshold during the last 365 days
    *
    * @param int $email_id
    */
@@ -266,6 +266,7 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
                 INNER JOIN  $emailTable
                         ON  $queueTable.email_id = $emailTable.id
                 WHERE       $emailTable.id = $email_id
+                    AND     $bounceTable.time_stamp >= DATE_SUB(NOW(), INTERVAL 365 DAY)
                     AND     ($emailTable.reset_date IS NULL
                         OR  $bounceTable.time_stamp >= $emailTable.reset_date)
                 GROUP BY    $bounceTable.bounce_type_id
