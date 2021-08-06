@@ -147,23 +147,21 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $aliasedField = $this->getEntityAlias() . $field;
-    $fieldValue = $actionSearchResult->{$aliasedField} ?? NULL;
+    $fieldValue = $this->getFieldValue($row, $field);
 
     if ($this->isPseudoField($field)) {
       $split = explode(':', $field);
-      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
+      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
     }
     if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
+        \CRM_Utils_Money::format($fieldValue, $this->getFieldValue($row, 'currency')));
     }
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
     }
     if ($this->isCustomField($field)) {
-      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $actionSearchResult->entity_id);
+      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     else {
       $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);

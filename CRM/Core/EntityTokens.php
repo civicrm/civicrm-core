@@ -212,4 +212,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return (string) $fieldValue;
   }
 
+  /**
+   * @param \Civi\Token\TokenRow $row
+   * @param string $field
+   * @return string|int
+   */
+  protected function getFieldValue(TokenRow $row, string $field) {
+    $actionSearchResult = $row->context['actionSearchResult'];
+    $aliasedField = $this->getEntityAlias() . $field;
+    return $actionSearchResult->{$aliasedField} ?? NULL;
+  }
+
 }
