@@ -155,6 +155,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'contact_id' => $this->contacts['alice']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '100',
+      'currency' => 'EUR',
       'financial_type_id' => 1,
       'non_deductible_amount' => '10',
       'fee_amount' => '5',
@@ -276,7 +277,11 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       financial type label = {contribution.financial_type_id:label}
       payment instrument id = {contribution.payment_instrument_id}
       payment instrument name = {contribution.payment_instrument_id:name}
-      payment instrument label = {contribution.payment_instrument_id:label}';
+      payment instrument label = {contribution.payment_instrument_id:label}
+      non_deductible_amount = {contribution.non_deductible_amount}
+      total_amount = {contribution.total_amount}
+      net_amount = {contribution.net_amount}
+      fee_amount = {contribution.fee_amount}';
 
     $this->schedule->save();
     $this->callAPISuccess('job', 'send_reminder', []);
@@ -296,6 +301,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'payment instrument id = 4',
       'payment instrument name = Check',
       'payment instrument label = Check',
+      'non_deductible_amount = € 10.00',
+      'total_amount = € 100.00',
+      'net_amount = € 95.00',
+      'fee_amount = € 5.00',
     ];
     $this->mut->checkMailLog($expected);
 
@@ -324,6 +333,10 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'payment instrument label = Check',
       'legacy source SSF',
       'source SSF',
+      'non_deductible_amount = € 10.00',
+      'total_amount = € 100.00',
+      'net_amount = € 95.00',
+      'fee_amount = € 5.00',
     ];
     foreach ($expected as $string) {
       $this->assertStringContainsString($string, $contributionDetails[$this->contacts['alice']['id']]['html']);

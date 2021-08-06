@@ -11,7 +11,6 @@
  */
 
 use Civi\ActionSchedule\Event\MailingQueryEvent;
-use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenProcessor;
 use Civi\Token\TokenRow;
 
@@ -23,7 +22,7 @@ use Civi\Token\TokenRow;
  * At time of writing, we don't have any particularly special tokens -- we just
  * do some basic formatting based on the corresponding DB field.
  */
-class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
+class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
 
   /**
    * @return string
@@ -59,6 +58,7 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       'total_amount',
       'fee_amount',
       'net_amount',
+      'non_deductible_amount',
       'trxn_id',
       'invoice_id',
       'currency',
@@ -155,47 +155,29 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
 
   /**
    * @inheritDoc
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
     $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
 
-    if (in_array($field, ['total_amount', 'fee_amount', 'net_amount'])) {
+    if (array_key_exists($field, $this->getPseudoTokens())) {
+      $split = explode(':', $field);
+      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
+    }
+    if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
         \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
     }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
+    if ($this->isDateField($field)) {
+      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
+    }
+    if ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
       $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
-    elseif (array_key_exists($field, $this->getPseudoTokens())) {
-      $split = explode(':', $field);
-      $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
-    }
-    elseif (in_array($field, array_keys($this->getBasicTokens()))) {
-      $row->tokens($entity, $field, $fieldValue);
-    }
-    elseif (!array_key_exists($field, CRM_Contribute_BAO_Contribution::fields())) {
-      if ($this->isDateField($field)) {
-        $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
-      }
-      else {
-        $row->format('text/plain')->tokens($entity, $field, $fieldValue);
-      }
-    }
     else {
-      $row->dbToken($entity, $field, 'CRM_Contribute_BAO_Contribution', $field, $fieldValue);
+      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
     }
-  }
-
-  /**
-   * Is the given field a date field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isDateField($fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['type'] === (\CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME);
   }
 
   /**
@@ -218,25 +200,6 @@ class CRM_Contribute_Tokens extends AbstractTokenSubscriber {
       $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
     }
     return (string) $fieldValue;
-  }
-
-  /**
-   * Get the metadata for the available fields.
-   *
-   * @return array
-   */
-  protected function getFieldMetadata(): array {
-    if (empty($this->fieldMetadata)) {
-      $baoName = $this->getBAOName();
-      $fields = (array) $baoName::fields();
-      // re-index by real field name. I originally wanted to use apiv4
-      // getfields - but it returns different stuff for 'type' and
-      // does not return 'pseudoconstant' as a key so for now...
-      foreach ($fields as $details) {
-        $this->fieldMetadata[$details['name']] = $details;
-      }
-    }
-    return $this->fieldMetadata;
   }
 
 }

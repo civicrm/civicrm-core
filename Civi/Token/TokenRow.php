@@ -201,6 +201,7 @@ class TokenRow {
    * @throws \CRM_Core_Exception
    */
   public function dbToken($tokenEntity, $tokenField, $baoName, $baoField, $fieldValue) {
+    \CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     if ($fieldValue === NULL || $fieldValue === '') {
       return $this->tokens($tokenEntity, $tokenField, '');
     }
