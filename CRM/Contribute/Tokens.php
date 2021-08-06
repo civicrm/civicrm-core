@@ -58,10 +58,15 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   protected $fieldMetadata = [];
 
   /**
-   * Get a list of tokens whose name and title match the DB fields.
+   * Get a list of tokens for the entity for which access is permitted to.
+   *
+   * This list is historical and we need to question whether we
+   * should filter out any fields (other than those fields, like api_key
+   * on the contact entity) with permissions defined.
+   *
    * @return array
    */
-  protected function getPassthruTokens(): array {
+  protected function getExposedFields(): array {
     return [
       'contribution_page_id',
       'source',
@@ -97,7 +102,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    */
   public function getBasicTokens(): array {
     $return = [];
-    foreach (['contribution_status_id', 'payment_instrument_id', 'financial_type_id', 'contribution_page_id'] as $fieldName) {
+    foreach ($this->getExposedFields() as $fieldName) {
       $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
     }
     return $return;
@@ -107,11 +112,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    * Class constructor.
    */
   public function __construct() {
-    $tokens = CRM_Utils_Array::subset(
-      CRM_Utils_Array::collect('title', $this->getFieldMetadata()),
-      $this->getPassthruTokens()
-    );
-    $tokens = array_merge($tokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
+    $tokens = $this->getAllTokens();
     parent::__construct('contribution', $tokens);
   }
 
@@ -138,7 +139,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     }
 
     $fields = $this->getFieldMetadata();
-    foreach ($this->getPassthruTokens() as $token) {
+    foreach (array_keys($this->getBasicTokens()) as $token) {
       $e->query->select('e.' . $fields[$token]['name'] . ' AS ' . $this->getEntityAlias() . $token);
     }
     foreach (array_keys($this->getPseudoTokens()) as $token) {

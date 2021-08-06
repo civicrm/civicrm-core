@@ -62,6 +62,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get all the tokens supported by this processor.
+   *
+   * @return array|string[]
+   */
+  public function getAllTokens(): array {
+    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
+  }
+
+  /**
    * Is the given field a date field.
    *
    * @param string $fieldName
