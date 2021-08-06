@@ -582,7 +582,7 @@ class CRM_Core_SelectValues {
       '{contribution.cancel_reason}' => ts('Contribution Cancel Reason'),
       '{contribution.receipt_date}' => ts('Receipt Date'),
       '{contribution.thankyou_date}' => ts('Thank You Date'),
-      '{contribution.contribution_source}' => ts('Contribution Source'),
+      '{contribution.source}' => ts('Contribution Source'),
       '{contribution.amount_level}' => ts('Amount Level'),
       '{contribution.check_number}' => ts('Check Number'),
       '{contribution.campaign}' => ts('Contribution Campaign'),
