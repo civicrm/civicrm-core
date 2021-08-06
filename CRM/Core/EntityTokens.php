@@ -34,6 +34,34 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get the entity name for api v4 calls.
+   *
+   * @return string
+   */
+  protected function getApiEntityName(): string {
+    return '';
+  }
+
+  /**
+   * Get the entity alias to use within queries.
+   *
+   * The default has a double underscore which should prevent any
+   * ambiguity with an existing table name.
+   *
+   * @return string
+   */
+  protected function getEntityAlias(): string {
+    return $this->getApiEntityName() . '__';
+  }
+
+  /**
+   * Get the relevant bao name.
+   */
+  public function getBAOName(): string {
+    return CRM_Core_DAO_AllCoreTables::getFullName($this->getApiEntityName());
+  }
+
+  /**
    * Is the given field a date field.
    *
    * @param string $fieldName
@@ -41,7 +69,29 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isDateField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['type'] === (\CRM_Utils_Type::T_DATE + \CRM_Utils_Type::T_TIME);
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Timestamp';
+  }
+
+  /**
+   * Is the given field a pseudo field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isPseudoField(string $fieldName): bool {
+    return strpos($fieldName, ':') !== FALSE;
+  }
+
+  /**
+   * Is the given field a custom field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isCustomField(string $fieldName) : bool {
+    return (bool) \CRM_Core_BAO_CustomField::getKeyID($fieldName);
   }
 
   /**
@@ -52,7 +102,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isMoneyField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['type'] === (\CRM_Utils_Type::T_MONEY);
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Money';
   }
 
   /**
@@ -62,17 +112,75 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getFieldMetadata(): array {
     if (empty($this->fieldMetadata)) {
-      $baoName = $this->getBAOName();
-
-      $fields = (array) $baoName::fields();
-      // re-index by real field name. I originally wanted to use apiv4
-      // getfields - but it returns different stuff for 'type' and
-      // does not return 'pseudoconstant' as a key so for now...
-      foreach ($fields as $details) {
-        $this->fieldMetadata[$details['name']] = $details;
+      try {
+        // Tests fail without checkPermissions = FALSE
+        $this->fieldMetadata = (array) civicrm_api4($this->getApiEntityName(), 'getfields', ['checkPermissions' => FALSE], 'name');
+      }
+      catch (API_Exception $e) {
+        $this->fieldMetadata = [];
       }
     }
     return $this->fieldMetadata;
+  }
+
+  /**
+   * Get pseudoTokens - it tokens that reflect the name or label of a pseudoconstant.
+   *
+   * @internal - this function will likely be made protected soon.
+   *
+   * @return array
+   */
+  public function getPseudoTokens(): array {
+    $return = [];
+    foreach (array_keys($this->getBasicTokens()) as $fieldName) {
+      if ($this->isAddPseudoTokens($fieldName)) {
+        $return[$fieldName . ':label'] = $this->fieldMetadata[$fieldName]['input_attrs']['label'];
+        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->fieldMetadata[$fieldName]['input_attrs']['label'];
+      }
+    }
+    return $return;
+  }
+
+  /**
+   * Is this a field we should add pseudo-tokens to?
+   *
+   * Pseudo-tokens allow access to name and label fields - e.g
+   *
+   * {contribution.contribution_status_id:name} might resolve to 'Completed'
+   *
+   * @param string $fieldName
+   */
+  public function isAddPseudoTokens($fieldName): bool {
+    if ($fieldName === 'currency') {
+      // 'currency' is manually added to the skip list as an anomaly.
+      // name & label aren't that suitable for 'currency' (symbol, which
+      // possibly maps to 'abbr' would be) and we can't gather that
+      // from the metadata as yet.
+      return FALSE;
+    }
+    return (bool) $this->getFieldMetadata()[$fieldName]['options'];
+  }
+
+  /**
+   * Get the value for the relevant pseudo field.
+   *
+   * @param string $realField e.g contribution_status_id
+   * @param string $pseudoKey e.g name
+   * @param int|string $fieldValue e.g 1
+   *
+   * @return string
+   *   Eg. 'Completed' in the example above.
+   *
+   * @internal function will likely be protected soon.
+   */
+  public function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    if ($pseudoKey === 'name') {
+      $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
+    }
+    if ($pseudoKey === 'label') {
+      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
+    }
+    return (string) $fieldValue;
   }
 
 }
