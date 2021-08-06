@@ -43,7 +43,7 @@
     </tr>
 
     {* language *}
-    {if $form.language}
+    {if !empty($form.language)}
       <tr>
         <td>{$form.language.label} {help id="id-language"}<br />
           {$form.language.html|crmAddClass:big}
