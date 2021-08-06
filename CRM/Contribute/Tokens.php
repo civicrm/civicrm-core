@@ -32,10 +32,22 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get the relevant bao name.
+   * @return string
    */
-  public function getBAOName(): string {
-    return CRM_Core_DAO_AllCoreTables::getFullName(ucfirst($this->getEntityName()));
+  protected function getEntityAlias(): string {
+    return 'contrib_';
+  }
+
+  /**
+   * Get the entity name for api v4 calls.
+   *
+   * In practice this IS just ucfirst($this->GetEntityName)
+   * but declaring it seems more legible.
+   *
+   * @return string
+   */
+  protected function getApiEntityName(): string {
+    return 'Contribution';
   }
 
   /**
@@ -92,24 +104,6 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get pseudoTokens - it tokens that reflect the name or label of a pseudoconstant.
-   *
-   * @internal - this function will likely be made protected soon.
-   *
-   * @return array
-   */
-  public function getPseudoTokens(): array {
-    $return = [];
-    foreach (array_keys($this->getBasicTokens()) as $fieldName) {
-      if (!empty($this->fieldMetadata[$fieldName]['pseudoconstant'])) {
-        $return[$fieldName . ':label'] = $this->fieldMetadata[$fieldName]['html']['label'];
-        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->fieldMetadata[$fieldName]['html']['label'];
-      }
-    }
-    return $return;
-  }
-
-  /**
    * Class constructor.
    */
   public function __construct() {
@@ -145,11 +139,11 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
 
     $fields = $this->getFieldMetadata();
     foreach ($this->getPassthruTokens() as $token) {
-      $e->query->select("e." . $fields[$token]['name'] . " AS contrib_{$token}");
+      $e->query->select('e.' . $fields[$token]['name'] . ' AS ' . $this->getEntityAlias() . $token);
     }
     foreach (array_keys($this->getPseudoTokens()) as $token) {
       $split = explode(':', $token);
-      $e->query->select("e." . $fields[$split[0]]['name'] . " AS contrib_{$split[0]}");
+      $e->query->select('e.' . $fields[$split[0]]['name'] . ' AS ' . $this->getEntityAlias() . $split[0]);
     }
   }
 
@@ -159,9 +153,10 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
-    $fieldValue = $actionSearchResult->{"contrib_$field"} ?? NULL;
+    $aliasedField = $this->getEntityAlias() . $field;
+    $fieldValue = $actionSearchResult->{$aliasedField} ?? NULL;
 
-    if (array_key_exists($field, $this->getPseudoTokens())) {
+    if ($this->isPseudoField($field)) {
       $split = explode(':', $field);
       return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
     }
@@ -172,34 +167,12 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
     }
-    if ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+    if ($this->isCustomField($field)) {
+      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $actionSearchResult->entity_id);
     }
     else {
       $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
     }
-  }
-
-  /**
-   * Get the value for the relevant pseudo field.
-   *
-   * @param string $realField e.g contribution_status_id
-   * @param string $pseudoKey e.g name
-   * @param int|string $fieldValue e.g 1
-   *
-   * @return string
-   *   Eg. 'Completed' in the example above.
-   *
-   * @internal function will likely be protected soon.
-   */
-  public function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
-    if ($pseudoKey === 'name') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
-    }
-    if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
-    }
-    return (string) $fieldValue;
   }
 
 }
