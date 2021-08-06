@@ -35,7 +35,7 @@
           ctrl.display.settings = {
             style: 'ul',
             limit: CRM.crmSearchAdmin.defaultPagerSize,
-            pager: true
+            pager: {}
           };
         }
         ctrl.parent.initColumns({key: true, dataType: true, type: 'field'});

@@ -83,6 +83,7 @@
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
         var ctrl = this;
+        this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
 
         this.getResults = _.debounce(function() {
@@ -109,8 +110,16 @@
           ctrl.getResults();
         }
 
+        function onChangePageSize() {
+          ctrl.page = 1;
+          ctrl.getResults();
+        }
+
         if (this.afFieldset) {
           $scope.$watch(this.afFieldset.getFieldData, onChangeFilters, true);
+        }
+        if (this.settings.pager && this.settings.pager.expose_limit) {
+          $scope.$watch('$ctrl.limit', onChangePageSize);
         }
         $scope.$watch('$ctrl.filters', onChangeFilters, true);
       },
@@ -122,6 +131,7 @@
           savedSearch: this.search,
           display: this.display,
           sort: this.sort,
+          limit: this.limit,
           filters: _.assign({}, (this.afFieldset ? this.afFieldset.getFieldData() : {}), this.filters),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };
@@ -134,7 +144,7 @@
           ctrl.results = results;
           ctrl.editing = false;
           if (!ctrl.rowCount) {
-            if (!ctrl.settings.limit || results.length < ctrl.settings.limit) {
+            if (!ctrl.limit || results.length < ctrl.limit) {
               ctrl.rowCount = results.length;
             } else if (ctrl.settings.pager) {
               var params = ctrl.getApiParams('row_count');

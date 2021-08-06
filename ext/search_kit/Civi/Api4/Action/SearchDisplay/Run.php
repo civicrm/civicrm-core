@@ -35,6 +35,12 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
   protected $sort = [];
 
   /**
+   * Number of results to return
+   * @var int
+   */
+  protected $limit;
+
+  /**
    * Should this api call return a page of results or the row_count or the ids
    * E.g. "page:1" or "row_count" or "id"
    * @var string
@@ -123,7 +129,8 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
         if (!empty($settings['pager']) && preg_match('/^page:\d+$/', $this->return)) {
           $page = explode(':', $this->return)[1];
         }
-        $apiParams['limit'] = $settings['limit'] ?? NULL;
+        $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
+        $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         $apiParams['orderBy'] = $this->getOrderByFromSort();
         $this->augmentSelectClause($apiParams);

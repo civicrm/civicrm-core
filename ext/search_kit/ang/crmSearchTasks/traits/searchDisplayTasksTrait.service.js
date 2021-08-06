@@ -22,7 +22,7 @@
         }
         // Select all
         ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results.length < ctrl.settings.limit) {
+        if (ctrl.page === 1 && ctrl.results.length < ctrl.limit) {
           ctrl.selectedRows = _.pluck(ctrl.results, 'id');
           return;
         }
