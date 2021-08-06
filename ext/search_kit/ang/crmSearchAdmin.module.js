@@ -187,6 +187,29 @@
         }
         return info;
       }
+      function getDefaultLabel(col) {
+        var info = parseExpr(col),
+          label = info.field.label;
+        if (info.fn) {
+          label = '(' + info.fn.title + ') ' + label;
+        }
+        if (info.join) {
+          label = info.join.label + ': ' + label;
+        }
+        return label;
+      }
+      function fieldToColumn(fieldExpr, defaults) {
+        var info = parseExpr(fieldExpr),
+          values = _.merge({
+            type: 'field',
+            key: info.alias,
+            dataType: (info.fn && info.fn.dataType) || (info.field && info.field.data_type)
+          }, defaults);
+        if (defaults.label) {
+          values.label = getDefaultLabel(fieldExpr);
+        }
+        return values;
+      }
       return {
         getEntity: getEntity,
         getField: function(fieldName, entityName) {
@@ -194,17 +217,8 @@
         },
         getJoin: getJoin,
         parseExpr: parseExpr,
-        getDefaultLabel: function(col) {
-          var info = parseExpr(col),
-            label = info.field.label;
-          if (info.fn) {
-            label = '(' + info.fn.title + ') ' + label;
-          }
-          if (info.join) {
-            label = info.join.label + ': ' + label;
-          }
-          return label;
-        },
+        getDefaultLabel: getDefaultLabel,
+        fieldToColumn: fieldToColumn,
         // Find all possible search columns that could serve as contact_id for a smart group
         getSmartGroupColumns: function(api_entity, api_params) {
           var joins = _.pluck((api_params.join || []), 0);

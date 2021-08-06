@@ -38,7 +38,7 @@
             pager: {}
           };
         }
-        ctrl.parent.initColumns({key: true, dataType: true, type: 'field'});
+        ctrl.parent.initColumns({});
       };
 
     }
