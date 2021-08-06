@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
+
 /**
  * Class CRM_Contribute_ActionMapping_ByTypeTest
  * @group ActionSchedule
@@ -355,9 +357,19 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     ];
     $processor = new CRM_Contribute_Tokens();
     $legacyTokens = [];
+    $realLegacyTokens = [];
     foreach (CRM_Core_SelectValues::contributionTokens() as $token => $label) {
       $legacyTokens[substr($token, 14, -1)] = $label;
+      if (strpos($token, ':') === FALSE) {
+        $realLegacyTokens[substr($token, 14, -1)] = $label;
+      }
     }
+    $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
+    $allFields = [];
+    foreach ($fields as $field) {
+      $allFields[$field['name']] = $field['title'];
+    }
+    $this->assertEquals($realLegacyTokens, $allFields);
     $this->assertEquals($legacyTokens, $processor->tokenNames);
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
