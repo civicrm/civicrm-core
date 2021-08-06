@@ -969,6 +969,7 @@
   organization: CYIM
 
 - github      : mmyriam
+  organization: Coop SymbioTIC
 
 - github      : mohamedziada
   name        : Mohamed Ziada
@@ -1194,7 +1195,8 @@
 - name        : Steve Binkowski
 
 - github      : shaneonabike
-  name        : Abeilles en Vélo / Bees on a bike
+  name        : Shane Bill
+  organization: Coop SymbioTIC
 
 - name        : Sheila Burkett
   organization: Spry Digital
