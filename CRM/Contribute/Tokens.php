@@ -125,7 +125,7 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    */
   public function checkActive(TokenProcessor $processor) {
     return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_contribution';
+      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
   }
 
   /**
@@ -134,17 +134,11 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== 'civicrm_contribution') {
+    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
       return;
     }
-
-    $fields = $this->getFieldMetadata();
-    foreach (array_keys($this->getBasicTokens()) as $token) {
-      $e->query->select('e.' . $fields[$token]['name'] . ' AS ' . $this->getEntityAlias() . $token);
-    }
-    foreach (array_keys($this->getPseudoTokens()) as $token) {
-      $split = explode(':', $token);
-      $e->query->select('e.' . $fields[$split[0]]['name'] . ' AS ' . $this->getEntityAlias() . $split[0]);
+    foreach ($this->getReturnFields() as $token) {
+      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
     }
   }
 

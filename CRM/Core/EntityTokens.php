@@ -55,10 +55,30 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get the name of the table this token class can extend.
+   *
+   * The default is based on the entity but some token classes,
+   * specifically the event class, latch on to other tables - ie
+   * the participant table.
+   */
+  public function getExtendableTableName(): string {
+    return CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getApiEntityName());
+  }
+
+  /**
    * Get the relevant bao name.
    */
   public function getBAOName(): string {
     return CRM_Core_DAO_AllCoreTables::getFullName($this->getApiEntityName());
+  }
+
+  /**
+   * Get an array of fields to be requested.
+   *
+   * @return string[]
+   */
+  public function getReturnFields(): array {
+    return array_keys($this->getBasicTokens());
   }
 
   /**
