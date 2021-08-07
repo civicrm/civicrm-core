@@ -5196,11 +5196,27 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * out when we are.
    */
   public function testEmojiInWhereClause(): void {
+    $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
+    if ($schemaNeedsAlter) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE civicrm_contact MODIFY COLUMN
+        `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
+        CHARSET utf8 COLLATE utf8_unicode_ci
+      ");
+      Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
+    }
     $this->callAPISuccess('Contact', 'get', [
       'debug' => 1,
       'first_name' => '🦉Claire',
-      'version' => 4,
     ]);
+    if ($schemaNeedsAlter) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE civicrm_contact MODIFY COLUMN
+        `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
+        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
+      ");
+      Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
+    }
   }
 
   /**
