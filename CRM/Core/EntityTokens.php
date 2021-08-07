@@ -12,6 +12,8 @@
 
 use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\TokenRow;
+use Civi\ActionSchedule\Event\MailingQueryEvent;
+use Civi\Token\TokenProcessor;
 
 /**
  * Class CRM_Core_EntityTokens
@@ -26,12 +28,37 @@ use Civi\Token\TokenRow;
 class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
 
   /**
-   * This is required for the parent - it will be filled out.
-   *
    * @inheritDoc
+   * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+    $fieldValue = $this->getFieldValue($row, $field);
+
+    if ($this->isPseudoField($field)) {
+      $split = explode(':', $field);
+      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
+    }
+    if ($this->isMoneyField($field)) {
+      return $row->format('text/plain')->tokens($entity, $field,
+        \CRM_Utils_Money::format($fieldValue, $this->getFieldValue($row, 'currency')));
+    }
+    if ($this->isDateField($field)) {
+      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
+    }
+    if ($this->isCustomField($field)) {
+      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
+    }
+    else {
+      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+    }
   }
+
+  /**
+   * Metadata about the entity fields.
+   *
+   * @var array
+   */
+  protected $fieldMetadata = [];
 
   /**
    * Get the entity name for api v4 calls.
@@ -221,6 +248,40 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $actionSearchResult = $row->context['actionSearchResult'];
     $aliasedField = $this->getEntityAlias() . $field;
     return $actionSearchResult->{$aliasedField} ?? NULL;
+  }
+
+  /**
+   * Class constructor.
+   */
+  public function __construct() {
+    $tokens = $this->getAllTokens();
+    parent::__construct($this->getEntityName(), $tokens);
+  }
+
+  /**
+   * Check if the token processor is active.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   *
+   * @return bool
+   */
+  public function checkActive(TokenProcessor $processor) {
+    return !empty($processor->context['actionMapping'])
+      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
+  }
+
+  /**
+   * Alter action schedule query.
+   *
+   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
+   */
+  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
+    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
+      return;
+    }
+    foreach ($this->getReturnFields() as $token) {
+      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
+    }
   }
 
 }
