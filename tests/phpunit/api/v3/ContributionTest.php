@@ -2072,9 +2072,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
       "receipt_date:::\n",
-      'contributeMode:::notify',
       'title:::Contribution',
-      'displayName:::Mr. Anthony Anderson II',
       'contributionStatus:::Completed',
     ]);
     $mut->stop();
@@ -2112,9 +2110,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency:::EUR',
       'receive_date:::' . date('Ymd', strtotime($contribution['receive_date'])),
       "receipt_date:::\n",
-      'contributeMode:::notify',
       'title:::Contribution',
-      'displayName:::Mr. Anthony Anderson II',
       'contributionStatus:::Completed',
     ]);
     $mut->stop();
@@ -2150,7 +2146,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_pay_later:::1',
       'email:::anthony_anderson@civicrm.org',
       'pay_later_receipt:::This is a pay later receipt',
-      'displayName:::Mr. Anthony Anderson II',
       'contributionPageId:::' . $contributionPageID,
       'title:::Test Contribution Page',
       'amount:::100',
@@ -3185,9 +3180,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'currency:::USD',
       'receive_date:::' . date('Ymd', strtotime($receive_date)),
       'receipt_date:::' . date('Ymd'),
-      'contributeMode:::notify',
       'title:::Contribution',
-      'displayName:::Mr. Anthony Anderson II',
       'trxn_id:::kazam',
       'contactID:::' . $this->_params['contact_id'],
       'contributionID:::' . $contribution['id'],

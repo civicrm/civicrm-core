@@ -2983,14 +2983,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // and this function should assign them (assigning null if not set).
     // the way the pcpParams & honor Params section works is a baby-step towards this.
     $template = CRM_Core_Smarty::singleton();
-    $template->assign('first_name', $this->_relatedObjects['contact']->first_name);
-    $template->assign('last_name', $this->_relatedObjects['contact']->last_name);
-    $template->assign('displayName', $this->_relatedObjects['contact']->display_name);
     $template->assign('billingName', $values['billingName']);
-
-    // For some unit tests contribution cannot contain paymentProcessor information
-    $billingMode = empty($this->_relatedObjects['paymentProcessor']) ? CRM_Core_Payment::BILLING_MODE_NOTIFY : $this->_relatedObjects['paymentProcessor']['billing_mode'];
-    $template->assign('contributeMode', CRM_Core_SelectValues::contributeMode()[$billingMode] ?? NULL);
 
     //assign honor information to receipt message
     $softRecord = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($this->id);

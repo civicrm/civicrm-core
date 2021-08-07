@@ -60,9 +60,19 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    *
    * @param string $rev
    */
-  public function upgrade_5_43_alpha1($rev) {
+  public function upgrade_5_43_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Fix DB Collation if needed on the relatonship cache table', 'fixRelationshipCacheTableCollation');
+
+    $this->addTask('Replace legacy displayName smarty token in Online contribution workflow template',
+      'updateMessageToken', 'contribution_online_receipt', '$displayName', 'contact.display_name', $rev
+    );
+    $this->addTask('Replace legacy first_name smarty token in Online contribution workflow template',
+      'updateMessageToken', 'contribution_online_receipt', '$first_name', 'contact.first_name', $rev
+    );
+    $this->addTask('Replace legacy last_name smarty token in Online contribution workflow template',
+      'updateMessageToken', 'contribution_online_receipt', '$last_name', 'contact.last_name', $rev
+    );
   }
 
   public static function fixRelationshipCacheTableCollation():bool {

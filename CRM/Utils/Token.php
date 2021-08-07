@@ -1952,6 +1952,12 @@ class CRM_Utils_Token {
         'contribution_invoice_receipt' => [
           '$display_name' => 'contact.display_name',
         ],
+        'contribution_online_receipt' => [
+          '$contributeMode' => 'no longer available / relevant',
+          '$first_name' => 'contact.first_name',
+          '$last_name' => 'contact.last_name',
+          '$displayName' => 'contact.display_name',
+        ],
       ],
     ];
   }
