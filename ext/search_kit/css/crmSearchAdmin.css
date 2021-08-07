@@ -13,13 +13,6 @@
   min-width: 500px;
 }
 
-#bootstrap-theme #crm-search-results-page-size {
-  width: 5em;
-}
-#bootstrap-theme .crm-search-results {
-  min-height: 200px;
-}
-
 #bootstrap-theme.crm-search .nav-stacked {
   margin-left: 0;
   margin-right: 20px;

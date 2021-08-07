@@ -13,17 +13,7 @@
 
       this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
 
-      this.selectedRows = [];
-      this.limit = CRM.crmSearchAdmin.defaultPagerSize;
-      this.page = 1;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
-      // After a search this.results is an object of result arrays keyed by page,
-      // Initially this.results is an empty string because 1: it's falsey (unlike an empty object) and 2: it doesn't throw an error if you try to access undefined properties (unlike null)
-      this.results = '';
-      this.rowCount = false;
-      this.allRowsSelected = false;
-      // Have the filters (WHERE, HAVING, GROUP BY, JOIN) changed?
-      this.stale = true;
 
       $scope.controls = {tab: 'compose', joinType: 'LEFT'};
       $scope.joinTypes = [
@@ -69,21 +59,16 @@
 
         $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
 
-        $scope.$watch('$ctrl.savedSearch.api_params.where', onChangeFilters, true);
-
         if (this.paramExists('groupBy')) {
           this.savedSearch.api_params.groupBy = this.savedSearch.api_params.groupBy || [];
-          $scope.$watchCollection('$ctrl.savedSearch.api_params.groupBy', onChangeFilters);
         }
 
         if (this.paramExists('join')) {
           this.savedSearch.api_params.join = this.savedSearch.api_params.join || [];
-          $scope.$watch('$ctrl.savedSearch.api_params.join', onChangeFilters, true);
         }
 
         if (this.paramExists('having')) {
           this.savedSearch.api_params.having = this.savedSearch.api_params.having || [];
-          $scope.$watch('$ctrl.savedSearch.api_params.having', onChangeFilters, true);
         }
 
         $scope.$watch('$ctrl.savedSearch', onChangeAnything, true);
@@ -382,37 +367,6 @@
         return !errors.length;
       }
 
-      /**
-       * Called when clicking on a column header
-       * @param col
-       * @param $event
-       */
-      $scope.setOrderBy = function(col, $event) {
-        col = _.last(col.split(' AS '));
-        var dir = $scope.getOrderBy(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';
-        if (!$event.shiftKey || !ctrl.savedSearch.api_params.orderBy) {
-          ctrl.savedSearch.api_params.orderBy = {};
-        }
-        ctrl.savedSearch.api_params.orderBy[col] = dir;
-        if (ctrl.results) {
-          ctrl.refreshPage();
-        }
-      };
-
-      /**
-       * Returns crm-i icon class for a sortable column
-       * @param col
-       * @returns {string}
-       */
-      $scope.getOrderBy = function(col) {
-        col = _.last(col.split(' AS '));
-        var dir = ctrl.savedSearch.api_params.orderBy && ctrl.savedSearch.api_params.orderBy[col];
-        if (dir) {
-          return 'fa-sort-' + dir.toLowerCase();
-        }
-        return 'fa-sort disabled';
-      };
-
       this.addParam = function(name, value) {
         if (value && !_.contains(ctrl.savedSearch.api_params[name], value)) {
           ctrl.savedSearch.api_params[name].push(value);
@@ -426,148 +380,6 @@
         ctrl.savedSearch.api_params[name].splice(idx, 1);
       };
 
-      // Prevent visual jumps in results table height during loading
-      function lockTableHeight() {
-        var $table = $('.crm-search-results', $element);
-        $table.css('height', $table.height());
-      }
-
-      function unlockTableHeight() {
-        $('.crm-search-results', $element).css('height', '');
-      }
-
-      // Debounced callback for loadResults
-      function _loadResultsCallback() {
-        // Multiply limit to read 2 pages at once & save ajax requests
-        var params = _.merge(_.cloneDeep(ctrl.savedSearch.api_params), {debug: true, limit: ctrl.limit * 2});
-        // Select the join field of implicitly joined entities (helps with displaying links)
-        _.each(params.select, function(fieldName) {
-          if (_.includes(fieldName, '.') && !_.includes(fieldName, ' AS ')) {
-            var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.name !== info.field.fieldName)) {
-              var idField = fieldName.substr(0, fieldName.lastIndexOf('.'));
-              if (!_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
-                params.select.push(idField);
-              }
-            }
-          }
-        });
-        // Select primary key of explicitly joined entities (helps with displaying links)
-        _.each(params.join, function(join) {
-          var entity = join[0].split(' AS ')[0],
-            alias = join[0].split(' AS ')[1],
-            primaryKeys = searchMeta.getEntity(entity).primary_key,
-            idField = alias + '.' + primaryKeys[0];
-          if (primaryKeys.length && !_.includes(params.select, idField) && !ctrl.canAggregate(idField)) {
-            params.select.push(idField);
-          }
-        });
-        lockTableHeight();
-        $scope.error = false;
-        if (ctrl.stale) {
-          ctrl.page = 1;
-          ctrl.rowCount = false;
-        }
-        params.offset = ctrl.limit * (ctrl.page - 1);
-        crmApi4(ctrl.savedSearch.api_entity, 'get', params).then(function(success) {
-          if (ctrl.stale) {
-            ctrl.results = {};
-            // Get row count for pager
-            if (success.length < params.limit) {
-              ctrl.rowCount = success.count;
-            } else {
-              var countParams = _.cloneDeep(params);
-              // Select is only needed needed by HAVING
-              countParams.select = countParams.having && countParams.having.length ? countParams.select : [];
-              countParams.select.push('row_count');
-              delete countParams.debug;
-              crmApi4(ctrl.savedSearch.api_entity, 'get', countParams).then(function(result) {
-                ctrl.rowCount = result.count;
-              });
-            }
-          }
-          ctrl.debug = success.debug;
-          // populate this page & the next
-          ctrl.results[ctrl.page] = success.slice(0, ctrl.limit);
-          if (success.length > ctrl.limit) {
-            ctrl.results[ctrl.page + 1] = success.slice(ctrl.limit);
-          }
-          $scope.loading = false;
-          ctrl.stale = false;
-          unlockTableHeight();
-        }, function(error) {
-          $scope.loading = false;
-          ctrl.results = {};
-          ctrl.stale = true;
-          ctrl.debug = error.debug;
-          $scope.error = errorMsg(error);
-        })
-          .finally(function() {
-            if (ctrl.debug) {
-              ctrl.debug.params = JSON.stringify(params, null, 2);
-              if (ctrl.debug.timeIndex) {
-                ctrl.debug.timeIndex = Number.parseFloat(ctrl.debug.timeIndex).toPrecision(2);
-              }
-            }
-          });
-      }
-
-      var _loadResults = _.debounce(_loadResultsCallback, 250);
-
-      function loadResults() {
-        $scope.loading = true;
-        _loadResults();
-      }
-
-      // What to tell the user when search returns an error from the server
-      // Todo: parse error codes and give helpful feedback.
-      function errorMsg(error) {
-        return ts('Ensure all search critera are set correctly and try again.');
-      }
-
-      this.changePage = function() {
-        if (ctrl.stale || !ctrl.results[ctrl.page]) {
-          lockTableHeight();
-          loadResults();
-        }
-      };
-
-      this.refreshAll = function() {
-        ctrl.stale = true;
-        clearSelection();
-        loadResults();
-      };
-
-      // Refresh results while staying on current page.
-      this.refreshPage = function() {
-        lockTableHeight();
-        ctrl.results = {};
-        loadResults();
-      };
-
-      $scope.onClickSearch = function() {
-        if (ctrl.autoSearch) {
-          ctrl.autoSearch = false;
-        } else {
-          ctrl.refreshAll();
-        }
-      };
-
-      $scope.onClickAuto = function() {
-        ctrl.autoSearch = !ctrl.autoSearch;
-        if (ctrl.autoSearch && ctrl.stale) {
-          ctrl.refreshAll();
-        }
-        $('.crm-search-auto-toggle').blur();
-      };
-
-      $scope.onChangeLimit = function() {
-        // Refresh only if search has already been run
-        if (ctrl.autoSearch || ctrl.results) {
-          ctrl.refreshAll();
-        }
-      };
-
       function onChangeSelect(newSelect, oldSelect) {
         // When removing a column from SELECT, also remove from ORDER BY & HAVING
         _.each(_.difference(oldSelect, newSelect), function(col) {
@@ -577,67 +389,7 @@
             return clauseUsesFields(clause, [col]);
           });
         });
-        // Re-arranging or removing columns doesn't merit a refresh, only adding columns does
-        if (!oldSelect || _.difference(newSelect, oldSelect).length) {
-          if (ctrl.autoSearch) {
-            ctrl.refreshPage();
-          } else {
-            ctrl.stale = true;
-          }
-        }
       }
-
-      function onChangeFilters() {
-        ctrl.stale = true;
-        clearSelection();
-        if (ctrl.autoSearch) {
-          ctrl.refreshAll();
-        }
-      }
-
-      function clearSelection() {
-        ctrl.allRowsSelected = false;
-        ctrl.selectedRows.length = 0;
-      }
-
-      $scope.selectAllRows = function() {
-        // Deselect all
-        if (ctrl.allRowsSelected) {
-          clearSelection();
-          return;
-        }
-        // Select all
-        ctrl.allRowsSelected = true;
-        if (ctrl.page === 1 && ctrl.results[1].length < ctrl.limit) {
-          ctrl.selectedRows = _.pluck(ctrl.results[1], 'id');
-          return;
-        }
-        // If more than one page of results, use ajax to fetch all ids
-        $scope.loadingAllRows = true;
-        var params = _.cloneDeep(ctrl.savedSearch.api_params);
-        // Select is only needed needed by HAVING
-        params.select = params.having && params.having.length ? params.select : [];
-        params.select.push('id');
-        crmApi4(ctrl.savedSearch.api_entity, 'get', params, ['id']).then(function(ids) {
-          $scope.loadingAllRows = false;
-          ctrl.selectedRows = _.toArray(ids);
-        });
-      };
-
-      $scope.selectRow = function(row) {
-        var index = ctrl.selectedRows.indexOf(row.id);
-        if (index < 0) {
-          ctrl.selectedRows.push(row.id);
-          ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
-        } else {
-          ctrl.allRowsSelected = false;
-          ctrl.selectedRows.splice(index, 1);
-        }
-      };
-
-      $scope.isRowSelected = function(row) {
-        return ctrl.allRowsSelected || _.includes(ctrl.selectedRows, row.id);
-      };
 
       this.getFieldLabel = searchMeta.getDefaultLabel;
 
@@ -657,80 +409,9 @@
         return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + idField) < 0;
       };
 
-      $scope.formatResult = function(row, col) {
-        var info = searchMeta.parseExpr(col),
-          value = row[info.alias];
-        return formatFieldValue(row, info, value);
-      };
-
-      // Attempts to construct a view url for a given entity
-      function getEntityUrl(row, info, index) {
-        var entity = searchMeta.getEntity(info.field.entity),
-          path = _.result(_.findWhere(entity.paths, {action: 'view'}), 'path');
-        // Only proceed if the path metadata exists for this entity
-        if (path) {
-          // Replace tokens in the path (e.g. [id])
-          var tokens = path.match(/\[\w*]/g) || [],
-            prefix = info.prefix;
-          var replacements = _.transform(tokens, function(replacements, token) {
-            var fieldName = token.slice(1, token.length - 1);
-            // For implicit join fields
-            if (fieldName === 'id' && info.field.name !== info.field.fieldName) {
-              fieldName = info.field.name.substr(0, info.field.name.lastIndexOf('.'));
-            }
-            var replacement = row[prefix + fieldName];
-            if (replacement) {
-              replacements.push(_.isArray(replacement) ? replacement[index] : replacement);
-            }
-          });
-          // Only proceed if the row contains all the necessary data to resolve tokens
-          if (tokens.length === replacements.length) {
-            _.each(tokens, function(token, key) {
-              path = path.replace(token, replacements[key]);
-            });
-            return {url: CRM.url(path), title: path.title};
-          }
-        }
-      }
-
-      function formatFieldValue(row, info, value, index) {
-        var type = (info.fn && info.fn.dataType) || info.field.data_type,
-          result = value,
-          link;
-        if (_.isArray(value)) {
-          return _.map(value, function(val, idx) {
-            return formatFieldValue(row, info, val, idx);
-          }).join(', ');
-        }
-        if (value && (type === 'Date' || type === 'Timestamp') && /^\d{4}-\d{2}-\d{2}/.test(value)) {
-          result = CRM.utils.formatDate(value, null, type === 'Timestamp');
-        }
-        else if (type === 'Boolean' && typeof value === 'boolean') {
-          result = value ? ts('Yes') : ts('No');
-        }
-        else if (type === 'Money' && typeof value === 'number') {
-          result = CRM.formatMoney(value);
-        }
-        // Output user-facing name/label fields as a link, if possible
-        if (info.field.fieldName === searchMeta.getEntity(info.field.entity).label_field && !info.fn) {
-          link = getEntityUrl(row, info, index || 0);
-        }
-        if (link) {
-          return '<a href="' + _.escape(link.url) + '" title="' + _.escape(link.title) + '">' + _.escape(result) + '</a>';
-        }
-        return _.escape(result);
-      }
-
       $scope.fieldsForGroupBy = function() {
         return {results: ctrl.getAllFields('', ['Field', 'Custom'], function(key) {
             return _.contains(ctrl.savedSearch.api_params.groupBy, key);
-          })
-        };
-      };
-
-      $scope.fieldsForSelect = function() {
-        return {results: ctrl.getAllFields(':label', ['Field', 'Custom', 'Extra'], function(key) {
-            return _.contains(ctrl.savedSearch.api_params.select, key);
           })
         };
       };
@@ -752,17 +433,6 @@
 
       $scope.fieldsForHaving = function() {
         return {results: ctrl.getSelectFields()};
-      };
-
-      $scope.sortableColumnOptions = {
-        axis: 'x',
-        handle: '.crm-draggable',
-        update: function(e, ui) {
-          // Don't allow items to be moved to position 0 if locked
-          if (!ui.item.sortable.dropindex && ctrl.groupExists) {
-            ui.item.sortable.cancel();
-          }
-        }
       };
 
       // Sets the default select clause based on commonly-named fields
@@ -906,6 +576,75 @@
           });
         }
       }
+
+      // Build a list of all possible links to main entity & join entities
+      this.buildLinks = function() {
+        function addTitle(link, entityName) {
+          switch (link.action) {
+            case 'view':
+              link.title = ts('View %1', {1: entityName});
+              break;
+
+            case 'update':
+              link.title = ts('Edit %1', {1: entityName});
+              break;
+
+            case 'delete':
+              link.title = ts('Delete %1', {1: entityName});
+              break;
+          }
+        }
+
+        // Links to main entity
+        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
+          links = _.cloneDeep(mainEntity.paths || []);
+        _.each(links, function(link) {
+          link.join = '';
+          addTitle(link, mainEntity.title);
+        });
+        // Links to explicitly joined entities
+        _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
+          var join = searchMeta.getJoin(joinClause[0]),
+            joinEntity = searchMeta.getEntity(join.entity),
+            bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
+          _.each(joinEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+            link.join = join.alias;
+            addTitle(link, join.label);
+            links.push(link);
+          });
+          _.each(bridgeEntity && bridgeEntity.paths, function(path) {
+            var link = _.cloneDeep(path);
+            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+            link.join = join.alias;
+            addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
+            links.push(link);
+          });
+        });
+        // Links to implicit joins
+        _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
+          if (!_.includes(fieldName, ' AS ')) {
+            var info = searchMeta.parseExpr(fieldName);
+            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
+              var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
+                idField = searchMeta.parseExpr(idFieldName).field;
+              if (!ctrl.canAggregate(idFieldName)) {
+                var joinEntity = searchMeta.getEntity(idField.fk_entity),
+                  label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
+                _.each((joinEntity || {}).paths, function(path) {
+                  var link = _.cloneDeep(path);
+                  link.path = link.path.replace(/\[id/g, '[' + idFieldName);
+                  link.join = idFieldName;
+                  addTitle(link, label);
+                  links.push(link);
+                });
+              }
+            }
+          }
+        });
+        return _.uniq(links, 'path');
+      };
 
     }
   });

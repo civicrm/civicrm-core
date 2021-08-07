@@ -52,11 +52,12 @@
         return this.allRowsSelected || _.includes(this.selectedRows, row.id);
       },
 
-      // Reset selection when filters are changed
-      onChangeFilters: function() {
+      // Overwrite empty onChangeFilters array from searchDisplayBaseTrait
+      onChangeFilters: [function() {
+        // Reset selection when filters are changed
         this.selectedRows.length = 0;
         this.allRowsSelected = false;
-      }
+      }]
 
     };
   });

@@ -79,6 +79,10 @@
       page: 1,
       rowCount: null,
       getUrl: getUrl,
+      // Arrays may contain callback functions for various events
+      onChangeFilters: [],
+      onPreRun: [],
+      onPostRun: [],
 
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
@@ -106,9 +110,9 @@
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
-          if (ctrl.onChangeFilters) {
-            ctrl.onChangeFilters();
-          }
+          _.each(ctrl.onChangeFilters, function(callback) {
+            callback.call(ctrl);
+          });
           if (!ctrl.settings.button) {
             ctrl.getResults();
           }
@@ -149,6 +153,9 @@
         var ctrl = this,
           apiParams = this.getApiParams();
         this.loading = true;
+        _.each(ctrl.onPreRun, function(callback) {
+          callback.call(ctrl, apiParams);
+        });
         return crmApi4('SearchDisplay', 'run', apiParams).then(function(results) {
           ctrl.results = results;
           ctrl.editing = ctrl.loading = false;
@@ -162,9 +169,15 @@
               });
             }
           }
+          _.each(ctrl.onPostRun, function(callback) {
+            callback.call(ctrl, results, 'success');
+          });
         }, function(error) {
           ctrl.results = [];
           ctrl.editing = ctrl.loading = false;
+          _.each(ctrl.onPostRun, function(callback) {
+            callback.call(ctrl, error, 'error');
+          });
         });
       },
       replaceTokens: function(value, row) {

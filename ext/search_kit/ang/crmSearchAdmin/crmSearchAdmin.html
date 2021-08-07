@@ -33,11 +33,8 @@
       <ul class="nav nav-pills nav-stacked" ng-include="'~/crmSearchAdmin/tabs.html'"></ul>
       <div class="crm-flex-4" ng-switch="controls.tab">
         <div ng-switch-when="compose">
-          <div ng-include="'~/crmSearchAdmin/compose/criteria.html'"></div>
-          <div ng-include="'~/crmSearchAdmin/compose/controls.html'"></div>
-          <div ng-include="'~/crmSearchAdmin/compose/debug.html'" ng-if="$ctrl.debug"></div>
-          <div ng-include="'~/crmSearchAdmin/compose/results.html'" class="crm-search-results"></div>
-          <div ng-include="'~/crmSearchAdmin/compose/pager.html'" ng-if="$ctrl.results"></div>
+          <div ng-include="'~/crmSearchAdmin/compose.html'"></div>
+          <crm-search-admin-results-table search="$ctrl.savedSearch"></crm-search-admin-results-table>
         </div>
         <div ng-switch-when="group">
           <fieldset ng-include="'~/crmSearchAdmin/group.html'"></fieldset>

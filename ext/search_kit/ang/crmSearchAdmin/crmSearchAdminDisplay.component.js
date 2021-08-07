@@ -190,94 +190,19 @@
 
       this.getLinks = function(columnKey) {
         if (!ctrl.links) {
-          ctrl.links = {'*': buildLinks()};
+          ctrl.links = {'*': ctrl.crmSearchAdmin.buildLinks()};
         }
         if (!columnKey) {
           return ctrl.links['*'];
         }
         var expr = ctrl.getExprFromSelect(columnKey),
           info = searchMeta.parseExpr(expr),
-          joinEntity = '';
-        if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
-          joinEntity = info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
-        } else if (info.prefix) {
-          joinEntity = info.prefix.replace('.', '');
-        }
+          joinEntity = searchMeta.getJoinEntity(info);
         if (!ctrl.links[joinEntity]) {
-          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], function(link) {
-            return joinEntity === (link.join || '');
-          });
+          ctrl.links[joinEntity] = _.filter(ctrl.links['*'], {join: joinEntity});
         }
         return ctrl.links[joinEntity];
       };
-
-      // Build a list of all possible links to main entity or join entities
-      function buildLinks() {
-        function addTitle(link, entityName) {
-          switch (link.action) {
-            case 'view':
-              link.title = ts('View %1', {1: entityName});
-              break;
-
-            case 'update':
-              link.title = ts('Edit %1', {1: entityName});
-              break;
-
-            case 'delete':
-              link.title = ts('Delete %1', {1: entityName});
-              break;
-          }
-        }
-
-        // Links to main entity
-        var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-          links = _.cloneDeep(mainEntity.paths || []);
-        _.each(links, function(link) {
-          addTitle(link, mainEntity.title);
-        });
-        // Links to explicitly joined entities
-        _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
-          var join = searchMeta.getJoin(joinClause[0]),
-            joinEntity = searchMeta.getEntity(join.entity),
-            bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
-          _.each(joinEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
-            link.join = join.alias;
-            addTitle(link, join.label);
-            links.push(link);
-          });
-          _.each(bridgeEntity && bridgeEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
-            link.join = join.alias;
-            addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
-            links.push(link);
-          });
-        });
-        // Links to implicit joins
-        _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
-          if (!_.includes(fieldName, ' AS ')) {
-            var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
-              var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
-                idField = searchMeta.parseExpr(idFieldName).field;
-              if (!ctrl.crmSearchAdmin.canAggregate(idFieldName)) {
-                var joinEntity = searchMeta.getEntity(idField.fk_entity),
-                  label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
-                _.each((joinEntity || {}).paths, function(path) {
-                  var link = _.cloneDeep(path);
-                  link.path = link.path.replace(/\[id/g, '[' + idFieldName);
-                  link.join = idFieldName;
-                  addTitle(link, label);
-                  links.push(link);
-                });
-              }
-            }
-          }
-        });
-        return _.uniq(links, 'path');
-      }
 
       this.pickIcon = function(model, key) {
         searchMeta.pickIcon().then(function(icon) {
