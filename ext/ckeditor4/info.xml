@@ -15,7 +15,7 @@
     <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2021-05-23</releaseDate>
-  <version>5.40.0</version>
+  <version>5.40.1</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.39</ver>
