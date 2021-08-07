@@ -28,10 +28,16 @@ use Civi\Token\TokenProcessor;
 class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
 
   /**
+   * @var array
+   */
+  protected $prefetch = [];
+
+  /**
    * @inheritDoc
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+    $this->prefetch = (array) $prefetch;
     $fieldValue = $this->getFieldValue($row, $field);
 
     if ($this->isPseudoField($field)) {
@@ -40,7 +46,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     }
     if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $this->getFieldValue($row, 'currency')));
+        \CRM_Utils_Money::format($fieldValue, $this->getCurrency($row)));
     }
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
@@ -256,7 +262,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected function getFieldValue(TokenRow $row, string $field) {
     $actionSearchResult = $row->context['actionSearchResult'];
     $aliasedField = $this->getEntityAlias() . $field;
-    return $actionSearchResult->{$aliasedField} ?? NULL;
+    if (isset($actionSearchResult->{$aliasedField})) {
+      return $actionSearchResult->{$aliasedField};
+    }
+    $entityID = $row->context[$this->getEntityIDField()];
+    return $this->prefetch[$entityID][$field] ?? '';
   }
 
   /**
@@ -275,8 +285,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
+    return (!empty($processor->context['actionMapping'])
+        // This makes the 'schema context compulsory - which feels accidental
+        // since recent discu
+      && $processor->context['actionMapping']->getEntity()) || in_array($this->getEntityIDField(), $processor->context['schema']);
   }
 
   /**
@@ -347,6 +359,47 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getEntityName(): string {
     return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
+  }
+
+  public function getEntityIDField() {
+    return $this->getEntityName() . 'Id';
+  }
+
+  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
+    $entityIDs = $e->getTokenProcessor()->getContextValues($this->getEntityIDField());
+    if (empty($entityIDs)) {
+      return [];
+    }
+    $select = $this->getPrefetchFields($e);
+    $result = (array) civicrm_api4($this->getApiEntityName(), 'get', [
+      'checkPermissions' => FALSE,
+      // Note custom fields are not yet added - I need to
+      // re-do the unit tests to support custom fields first.
+      'select' => $select,
+      'where' => [['id', 'IN', $entityIDs]],
+    ], 'id');
+    return $result;
+  }
+
+  public function getCurrencyFieldName() {
+    return [];
+  }
+
+  /**
+   * Get the currency to use for formatting money.
+   * @param $row
+   *
+   * @return string
+   */
+  public function getCurrency($row): string {
+    if (!empty($this->getCurrencyFieldName())) {
+      return $this->getFieldValue($row, $this->getCurrencyFieldName()[0]);
+    }
+    return CRM_Core_Config::singleton()->defaultCurrency;
+  }
+
+  public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
+    return array_intersect($this->getActiveTokens($e), $this->getCurrencyFieldName(), array_keys($this->getAllTokens()));
   }
 
 }

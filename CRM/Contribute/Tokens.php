@@ -39,4 +39,11 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     return 'Contribution';
   }
 
+  /**
+   * @return array
+   */
+  public function getCurrencyFieldName() {
+    return ['currency'];
+  }
+
 }
