@@ -5668,7 +5668,10 @@ civicrm_relationship.start_date > {$today}
           }
           throw new CRM_Core_Exception(ts('Failed to interpret input for search'));
         }
-
+        $emojiWhere = CRM_Utils_SQL::handleEmojiInQuery($value);
+        if ($emojiWhere === '0 = 1') {
+          $value = $emojiWhere;
+        }
         $value = CRM_Utils_Type::escape($value, $dataType);
         // if we don't have a dataType we should assume
         if ($dataType == 'String' || $dataType == 'Text') {
