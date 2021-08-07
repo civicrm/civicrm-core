@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class CRM_Contribute_ActionMapping_ByTypeTest
  * @group ActionSchedule
@@ -307,6 +309,21 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'fee_amount = € 5.00',
     ];
     $this->mut->checkMailLog($expected);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => get_class(),
+      'smarty' => FALSE,
+      'contributionId' => $this->ids['Contribution']['alice'],
+      'contactId' => $this->contacts['alice']['id'],
+    ]);
+    $tokenProcessor->addRow([]);
+    $tokenProcessor->addMessage('html', $this->schedule->body_text, 'text/plain');
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      foreach ($expected as $value) {
+        $this->assertStringContainsString($value, $row->render('html'));
+      }
+    }
 
     $messageToken = CRM_Utils_Token::getTokens($this->schedule->body_text);
 

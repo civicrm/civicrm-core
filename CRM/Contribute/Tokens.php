@@ -23,13 +23,6 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   /**
    * @return string
    */
-  protected function getEntityName(): string {
-    return 'contribution';
-  }
-
-  /**
-   * @return string
-   */
   protected function getEntityAlias(): string {
     return 'contrib_';
   }
