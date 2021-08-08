@@ -1,12 +1,13 @@
 <div class="crm-search-display crm-search-display-table">
-  <div class="form-inline" ng-if="$ctrl.settings.actions">
-    <crm-search-tasks entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-tasks>
+  <div class="form-inline">
+    <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
+    <crm-search-tasks ng-if="$ctrl.settings.actions" entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-tasks>
   </div>
   <table>
     <thead>
       <tr>
         <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
-          <input type="checkbox" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
+          <input type="checkbox" ng-disabled="$ctrl.loading || !$ctrl.results.length" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
         </th>
         <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
           <i ng-if="col.type === 'field'" class="crm-i {{ $ctrl.getSort(col) }}"></i>

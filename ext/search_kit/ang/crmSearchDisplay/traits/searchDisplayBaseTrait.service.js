@@ -87,7 +87,9 @@
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
 
         this.getResults = _.debounce(function() {
-          ctrl.runSearch();
+          $scope.$apply(function() {
+            ctrl.runSearch();
+          });
         }, 100);
 
         // If search is embedded in contact summary tab, display count in tab-header
@@ -107,12 +109,17 @@
           if (ctrl.onChangeFilters) {
             ctrl.onChangeFilters();
           }
-          ctrl.getResults();
+          if (!ctrl.settings.button) {
+            ctrl.getResults();
+          }
         }
 
         function onChangePageSize() {
           ctrl.page = 1;
-          ctrl.getResults();
+          // Only refresh if search has already been run
+          if (ctrl.results) {
+            ctrl.getResults();
+          }
         }
 
         if (this.afFieldset) {
@@ -139,10 +146,12 @@
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function() {
-        var ctrl = this;
-        return crmApi4('SearchDisplay', 'run', ctrl.getApiParams()).then(function(results) {
+        var ctrl = this,
+          apiParams = this.getApiParams();
+        this.loading = true;
+        return crmApi4('SearchDisplay', 'run', apiParams).then(function(results) {
           ctrl.results = results;
-          ctrl.editing = false;
+          ctrl.editing = ctrl.loading = false;
           if (!ctrl.rowCount) {
             if (!ctrl.limit || results.length < ctrl.limit) {
               ctrl.rowCount = results.length;
@@ -153,6 +162,9 @@
               });
             }
           }
+        }, function(error) {
+          ctrl.results = [];
+          ctrl.editing = ctrl.loading = false;
         });
       },
       replaceTokens: function(value, row) {
