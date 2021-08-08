@@ -187,6 +187,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     $this->set('allowWaitlist', $this->_allowWaitlist);
 
+    // Load JS to warn if someone is trying to register more participants than the number available.
+    if ($this->_values['event']['is_multiple_registrations'] && isset($this->_values['event']['max_participants'])) {
+      CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Price/Form/ParticipantCount.js');
+    }
     //To check if the user is already registered for the event(CRM-2426)
     if (!$this->_skipDupeRegistrationCheck) {
       self::checkRegistration(NULL, $this);
