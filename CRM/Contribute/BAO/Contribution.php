@@ -2079,26 +2079,22 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
    *
    */
   public static function transitionComponents($params) {
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution_status_id']);
+    $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['previous_contribution_status_id']);
     // @todo fix the one place that calls this function to use Payment.create
     // remove this.
     // get minimum required values.
-    $contactId = $params['contact_id'] ?? NULL;
-    $componentId = $params['component_id'] ?? NULL;
-    $componentName = $params['componentName'] ?? NULL;
-    $contributionId = $params['contribution_id'] ?? NULL;
-    $contributionStatusId = $params['contribution_status_id'] ?? NULL;
+    $contactId = NULL;
+    $componentId = NULL;
+    $componentName = NULL;
+    $contributionId = $params['contribution_id'];
+    $contributionStatusId = $params['contribution_status_id'];
 
     // if we already processed contribution object pass previous status id.
-    $previousContriStatusId = $params['previous_contribution_status_id'] ?? NULL;
-
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    $previousContriStatusId = $params['previous_contribution_status_id'];
 
     // we process only ( Completed, Cancelled, or Failed ) contributions.
-    if (!$contributionId ||
-      !in_array($contributionStatusId, [
-        array_search('Completed', $contributionStatuses),
-      ])
-    ) {
+    if (!$contributionId || $contributionStatus !== 'Completed') {
       return;
     }
 
@@ -2170,11 +2166,11 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         'status_id'
       );
     }
-    if ($contributionStatusId == array_search('Completed', $contributionStatuses)) {
+    if ($contributionStatus === 'Completed') {
 
       // only pending contribution related object processed.
       if ($previousContriStatusId &&
-        !in_array($contributionStatuses[$previousContriStatusId], [
+        !in_array($previousStatus, [
           'Pending',
           'Partially paid',
         ])
@@ -2183,7 +2179,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         return;
       }
       elseif (!$previousContriStatusId &&
-        !in_array($contributionStatuses[$contribution->contribution_status_id], [
+        !in_array($contributionStatus, [
           'Pending',
           'Partially paid',
         ])
