@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
+
 /**
  * This class contains functions for email handling.
  */
@@ -381,6 +383,27 @@ AND    reset_date IS NULL
       CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name', $primaryEmail);
       CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_Contact', $contactId, 'sort_name', $primaryEmail);
     }
+  }
+
+  /**
+   * Get default text for a message with the signature from the email sender populated.
+   *
+   * @param int $emailID
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getEmailSignatureDefaults(int $emailID): array {
+    // Add signature
+    $defaultEmail = Email::get(FALSE)
+      ->addSelect('signature_html', 'signature_text')
+      ->addWhere('id', '=', $emailID)->execute()->first();
+    return [
+      'html_message' => empty($defaultEmail['signature_html']) ? '' : '<br/><br/>--' . $defaultEmail['signature_html'],
+      'text_message' => empty($defaultEmail['signature_text']) ? '' : "\n\n--\n" . $defaultEmail['signature_text'],
+    ];
   }
 
 }
