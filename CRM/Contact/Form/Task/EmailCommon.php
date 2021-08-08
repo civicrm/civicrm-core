@@ -76,28 +76,16 @@ class CRM_Contact_Form_Task_EmailCommon {
    *
    * @param array $fields
    *   The input form values.
-   * @param array $dontCare
-   * @param array $self
-   *   Additional values form 'this'.
    *
    * @return bool|array
    *   true if no errors, else array of errors
    */
-  public static function formRule($fields, $dontCare, $self) {
+  public static function formRule(array $fields) {
     $errors = [];
-    $template = CRM_Core_Smarty::singleton();
-
-    if (isset($fields['html_message'])) {
-      $htmlMessage = str_replace(["\n", "\r"], ' ', $fields['html_message']);
-      $htmlMessage = str_replace('"', '\"', $htmlMessage);
-      $template->assign('htmlContent', $htmlMessage);
-    }
-
     //Added for CRM-1393
     if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
-      $errors['saveTemplateName'] = ts("Enter name to save message template");
+      $errors['saveTemplateName'] = ts('Enter name to save message template');
     }
-
     return empty($errors) ? TRUE : $errors;
   }
 
