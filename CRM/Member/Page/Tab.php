@@ -297,8 +297,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
         //show associated soft credit when contribution payment is paid by different person in edit mode
         if ($this->_id && $this->_contactId) {
-          $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
-          $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+          $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
           if (!empty($softCreditList)) {
             $this->assign('softCredit', TRUE);
             $this->assign('softCreditRows', $softCreditList);
@@ -350,9 +349,11 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   }
 
   /**
-   * the main function that is called when the page loads, it decides the which action has to be taken for the page.
+   * the main function that is called when the page loads, it decides the which
+   * action has to be taken for the page.
    *
    * @return null
+   * @throws \API_Exception
    */
   public function run() {
     $this->preProcess();
@@ -372,8 +373,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       //show associated soft credit when contribution payment is paid by different person
       if ($this->_id && $this->_contactId) {
-        $filter = " AND cc.id IN (SELECT contribution_id FROM civicrm_membership_payment WHERE membership_id = {$this->_id})";
-        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $filter);
+        $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->_contactId, $this->_id);
         if (!empty($softCreditList)) {
           $this->assign('softCredit', TRUE);
           $this->assign('softCreditRows', $softCreditList);
