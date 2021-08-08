@@ -42,6 +42,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    if (!isset($form->_single)) {
+      // @todo ensure this is already set.
+      $form->_single = FALSE;
+    }
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     $messageText = [];
     $messageSubject = [];
