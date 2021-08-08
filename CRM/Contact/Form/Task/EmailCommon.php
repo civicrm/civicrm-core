@@ -81,6 +81,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    *   true if no errors, else array of errors
    */
   public static function formRule(array $fields) {
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     $errors = [];
     //Added for CRM-1393
     if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
