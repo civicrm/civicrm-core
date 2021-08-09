@@ -331,7 +331,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     //Added for CRM-15984: Add campaign field
     CRM_Campaign_BAO_Campaign::addCampaign($this);
 
-    $this->addFormRule(['CRM_Contact_Form_Task_EmailCommon', 'formRule'], $this);
+    $this->addFormRule([__CLASS__, 'saveTemplateFormRule'], $this);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
 
@@ -642,6 +642,24 @@ trait CRM_Contact_Form_Task_EmailTrait {
       }
     }
     return $followupStatus;
+  }
+
+  /**
+   * Form rule.
+   *
+   * @param array $fields
+   *   The input form values.
+   *
+   * @return bool|array
+   *   true if no errors, else array of errors
+   */
+  public static function saveTemplateFormRule(array $fields) {
+    $errors = [];
+    //Added for CRM-1393
+    if (!empty($fields['saveTemplate']) && empty($fields['saveTemplateName'])) {
+      $errors['saveTemplateName'] = ts('Enter name to save message template');
+    }
+    return empty($errors) ? TRUE : $errors;
   }
 
 }
