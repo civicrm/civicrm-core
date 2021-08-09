@@ -415,14 +415,11 @@ class CRM_Utils_File {
    *   whether the file can be include()d or require()d
    */
   public static function isIncludable($name) {
-    $x = @fopen($name, 'r', TRUE);
-    if ($x) {
-      fclose($x);
-      return TRUE;
-    }
-    else {
+    $full_filepath = stream_resolve_include_path($name);
+    if ($full_filepath === FALSE) {
       return FALSE;
     }
+    return is_readable($full_filepath);
   }
 
   /**

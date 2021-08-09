@@ -130,4 +130,35 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals($expectedExtensions, CRM_Utils_File::getAcceptableExtensionsForMimeType($mimeType));
   }
 
+  /**
+   * Check a few variations of isIncludable
+   */
+  public function testIsIncludable() {
+    $path = \Civi::paths()->getPath('[civicrm.private]/');
+    $bare_filename = 'afile' . time() . '.php';
+    $file = "$path/$bare_filename";
+    file_put_contents($file, '<?php');
+
+    // A file that doesn't exist shouldn't be includable.
+    $this->assertFalse(CRM_Utils_File::isIncludable('invisiblefile.php'));
+
+    // Shouldn't be includable by default in civicrm.private
+    $this->assertFalse(CRM_Utils_File::isIncludable($bare_filename));
+
+    // Add civicrm.private to the include_path, then it should be includable.
+    $old_include_path = ini_get('include_path');
+    ini_set('include_path', $old_include_path . PATH_SEPARATOR . $path);
+    $this->assertTrue(CRM_Utils_File::isIncludable($bare_filename));
+
+    // Set permissions to 0, then it shouldn't be includable even if in path.
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+      chmod($file, 0);
+      $this->assertFalse(CRM_Utils_File::isIncludable($bare_filename));
+      chmod($file, 0644);
+    }
+
+    ini_set('include_path', $old_include_path);
+    unlink($file);
+  }
+
 }
