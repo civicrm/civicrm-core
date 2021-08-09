@@ -22,6 +22,70 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  public function testSendTemplate_RenderMode_OpenTemplate() {
+    $contactId = $this->individualCreate([
+      'first_name' => 'Abba',
+      'last_name' => 'Baab',
+      'prefix_id' => NULL,
+      'suffix_id' => NULL,
+    ]);
+    [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [
+        'valueName' => 'case_activity',
+        'contactId' => $contactId,
+        'from' => 'admin@example.com',
+        // No 'toEmail'/'toName' address => not sendable, but still returns rendered value.
+        'attachments' => NULL,
+        'messageTemplate' => [
+          'msg_subject' => 'Hello testSendTemplate_RenderMode_OpenTemplate {contact.display_name}!',
+          'msg_text' => 'Hello testSendTemplate_RenderMode_OpenTemplate {contact.display_name}!',
+          'msg_html' => '<p>Hello testSendTemplate_RenderMode_OpenTemplate {contact.display_name}!</p>',
+        ],
+      ]
+    );
+    $this->assertEquals(FALSE, $sent);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $subject);
+    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!', $messageText);
+    $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baab!</p>', $messageHtml);
+  }
+
+  public function testSendTemplate_RenderMode_DefaultTpl() {
+    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+      $tx->rollback();
+
+      \Civi\Api4\MessageTemplate::update()
+        ->addWhere('workflow_name', '=', 'case_activity')
+        ->addWhere('is_reserved', '=', 0)
+        ->setValues([
+          'msg_subject' => 'Hello testSendTemplate_RenderMode_Default {contact.display_name}!',
+          'msg_text' => 'Hello testSendTemplate_RenderMode_Default {contact.display_name}!',
+          'msg_html' => '<p>Hello testSendTemplate_RenderMode_Default {contact.display_name}!</p>',
+        ])
+        ->execute();
+
+      $contactId = $this->individualCreate([
+        'first_name' => 'Abba',
+        'last_name' => 'Baab',
+        'prefix_id' => NULL,
+        'suffix_id' => NULL,
+      ]);
+
+      [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+        [
+          'valueName' => 'case_activity',
+          'contactId' => $contactId,
+          'from' => 'admin@example.com',
+          // No 'toEmail'/'toName' address => not sendable, but still returns rendered value.
+          'attachments' => NULL,
+        ]
+      );
+      $this->assertEquals(FALSE, $sent);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $subject);
+      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baab!', $messageText);
+      $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baab!</p>', $messageHtml);
+    });
+  }
+
   /**
    * Test message template send.
    *
