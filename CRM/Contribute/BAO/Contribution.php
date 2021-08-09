@@ -4690,19 +4690,23 @@ LIMIT 1;";
         );
         $dates['join_date'] = $currentMembership['join_date'];
       }
+      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id'])) {
+        $membershipParams['skipStatusCal'] = '';
+      }
+      else {
+        //get the status for membership.
+        $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
+          $dates['end_date'],
+          $dates['join_date'],
+          'now',
+         TRUE,
+          $membershipParams['membership_type_id'],
+          $membershipParams
+        );
 
-      //get the status for membership.
-      $calcStatus = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($dates['start_date'],
-        $dates['end_date'],
-        $dates['join_date'],
-        'now',
-        TRUE,
-        $membershipParams['membership_type_id'],
-        $membershipParams
-      );
-
-      unset($dates['end_date']);
-      $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
+        unset($dates['end_date']);
+        $membershipParams['status_id'] = CRM_Utils_Array::value('id', $calcStatus, 'New');
+      }
       //we might be renewing membership,
       //so make status override false.
       $membershipParams['is_override'] = FALSE;

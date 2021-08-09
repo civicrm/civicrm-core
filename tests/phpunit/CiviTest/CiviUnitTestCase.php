@@ -514,7 +514,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    *  Common teardown functions for all unit tests.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
@@ -712,8 +711,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $name
    *
    * @return mixed
-   *
-   * @throws \CRM_Core_Exception
    */
   public function membershipStatusCreate($name = 'test member status') {
     $params['name'] = $name;
@@ -825,7 +822,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return mixed
-   * @throws \CRM_Core_Exception
    */
   public function paymentProcessorAuthorizeNetCreate($params = []) {
     $params = array_merge([
@@ -3169,7 +3165,7 @@ VALUES
   public function createPriceSetWithPage($entity = NULL, $params = []) {
     $membershipTypeID = $this->membershipTypeCreate(['name' => 'Special']);
     $contributionPageResult = $this->callAPISuccess('contribution_page', 'create', [
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
       'goal_amount' => 50,
