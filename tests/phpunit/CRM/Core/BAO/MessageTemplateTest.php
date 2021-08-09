@@ -86,6 +86,47 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     });
   }
 
+  public function testSendTemplate_RenderMode_TokenContext() {
+    CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
+      $tx->rollback();
+
+      \Civi\Api4\MessageTemplate::update()
+        ->addWhere('workflow_name', '=', 'case_activity')
+        ->addWhere('is_reserved', '=', 0)
+        ->setValues([
+          'msg_subject' => 'Hello {contact.display_name} about {activity.subject}!',
+          'msg_text' => 'Hello {contact.display_name} about {activity.subject}!',
+          'msg_html' => '<p>Hello {contact.display_name} about {activity.subject}!</p>',
+        ])
+        ->execute();
+
+      $contactId = $this->individualCreate([
+        'first_name' => 'Abba',
+        'last_name' => 'Baab',
+        'prefix_id' => NULL,
+        'suffix_id' => NULL,
+      ]);
+      $activityId = $this->activityCreate(['subject' => 'Something Something'])['id'];
+
+      [$sent, $subject, $messageText, $messageHtml] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+        [
+          'valueName' => 'case_activity',
+          'tokenContext' => [
+            'contactId' => $contactId,
+            'activityId' => $activityId,
+          ],
+          'from' => 'admin@example.com',
+          // No 'toEmail'/'toName' address => not sendable, but still returns rendered value.
+          'attachments' => NULL,
+        ]
+      );
+      $this->assertEquals(FALSE, $sent);
+      $this->assertEquals('Hello Abba Baab about Something Something!', $subject);
+      $this->assertEquals('Hello Abba Baab about Something Something!', $messageText);
+      $this->assertStringContainsString('<p>Hello Abba Baab about Something Something!</p>', $messageHtml);
+    });
+  }
+
   /**
    * Test message template send.
    *
