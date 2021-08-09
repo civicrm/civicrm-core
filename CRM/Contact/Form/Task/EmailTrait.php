@@ -30,8 +30,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   public $_single = FALSE;
 
-  public $_noEmails = FALSE;
-
   /**
    * All the existing templates in the system.
    *

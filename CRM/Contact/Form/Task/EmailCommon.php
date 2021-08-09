@@ -31,11 +31,6 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @throws \CiviCRM_API3_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
-    if (!isset($form->_single)) {
-      // @todo ensure this is already set.
-      $form->_single = FALSE;
-    }
-
     $form->_emails = [];
 
     // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
