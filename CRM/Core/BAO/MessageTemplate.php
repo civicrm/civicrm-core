@@ -383,12 +383,14 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'messageTemplateID' => NULL,
       // content of the message template
       // Ex: ['msg_subject' => 'Hello {contact.display_name}', 'msg_html' => '...', 'msg_text' => '...']
+      // INTERNAL: 'messageTemplate' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
       'messageTemplate' => NULL,
       // contact id if contact tokens are to be replaced
       'contactId' => NULL,
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
       // additional token params (passed to the TokenProcessor)
+      // INTERNAL: 'tokenContext' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
       'tokenContext' => [],
       // the From: header
       'from' => NULL,
