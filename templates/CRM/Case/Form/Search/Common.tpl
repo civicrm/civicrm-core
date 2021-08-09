@@ -22,10 +22,10 @@
   </tr>
 
   <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_start_date"}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_start_date" hideRelativeLabel=0}
   </tr>
   <tr>
-    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_end_date"}
+    {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="case_end_date" hideRelativeLabel=0}
   </tr>
 
   <tr id='case_search_form'>
