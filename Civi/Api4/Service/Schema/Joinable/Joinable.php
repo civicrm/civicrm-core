@@ -97,17 +97,17 @@ class Joinable {
   /**
    * Gets conditions required when joining to a base table
    *
-   * @param string|null $baseTableAlias
-   *   Name of the base table, if aliased.
+   * @param string $baseTableAlias
+   * @param string $tableAlias
    *
    * @return array
    */
-  public function getConditionsForJoin($baseTableAlias = NULL) {
+  public function getConditionsForJoin(string $baseTableAlias, string $tableAlias) {
     $baseCondition = sprintf(
       '%s.%s =  %s.%s',
-      $baseTableAlias ?: $this->baseTable,
+      $baseTableAlias,
       $this->baseColumn,
-      $this->getAlias(),
+      $tableAlias,
       $this->targetColumn
     );
 

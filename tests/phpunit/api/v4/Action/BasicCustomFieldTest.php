@@ -277,6 +277,52 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
     $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
   }
 
+  public function testMultipleJoinsToCustomTable() {
+    $cgName = uniqid('My');
+
+    CustomGroup::create(FALSE)
+      ->addValue('name', $cgName)
+      ->addValue('extends', 'Contact')
+      ->addChain('field1', CustomField::create()
+        ->addValue('label', 'FavColor')
+        ->addValue('custom_group_id', '$id')
+        ->addValue('html_type', 'Text')
+        ->addValue('data_type', 'String'))
+      ->execute();
+
+    $parent = Contact::create(FALSE)
+      ->addValue('first_name', 'Parent')
+      ->addValue('last_name', 'Tester')
+      ->addValue("$cgName.FavColor", 'Purple')
+      ->execute()
+      ->first()['id'];
+
+    $child = Contact::create(FALSE)
+      ->addValue('first_name', 'Child')
+      ->addValue('last_name', 'Tester')
+      ->addValue("$cgName.FavColor", 'Cyan')
+      ->execute()
+      ->first()['id'];
+
+    Relationship::create(FALSE)
+      ->addValue('contact_id_a', $parent)
+      ->addValue('contact_id_b', $child)
+      ->addValue('relationship_type_id', 1)
+      ->execute();
+
+    $results = Contact::get(FALSE)
+      ->addSelect('first_name', 'child.first_name', "$cgName.FavColor", "child.$cgName.FavColor")
+      ->addWhere('id', '=', $parent)
+      ->addJoin('Contact AS child', 'INNER', 'RelationshipCache', ['id', '=', 'child.far_contact_id'])
+      ->execute();
+
+    $this->assertCount(1, $results);
+    $this->assertEquals('Parent', $results[0]['first_name']);
+    $this->assertEquals('Child', $results[0]['child.first_name']);
+    $this->assertEquals('Purple', $results[0]["$cgName.FavColor"]);
+    $this->assertEquals('Cyan', $results[0]["child.$cgName.FavColor"]);
+  }
+
   /**
    * Some types are creating a dummy option group even if we don't have
    * any option values.
