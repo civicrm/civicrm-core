@@ -70,17 +70,6 @@
         },
       };
 
-      this.toggleLimit = function() {
-        if (ctrl.display.settings.limit) {
-          ctrl.display.settings.limit = 0;
-          if (ctrl.display.settings.pager) {
-            ctrl.display.settings.pager = false;
-          }
-        } else {
-          ctrl.display.settings.limit = CRM.crmSearchAdmin.defaultPagerSize;
-        }
-      };
-
       // Drag-n-drop settings for reordering columns
       this.sortableOptions = {
         connectWith: '.crm-search-admin-edit-columns',
@@ -173,21 +162,6 @@
           info = searchMeta.parseExpr(expr);
         return !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
       };
-
-      function fieldToColumn(fieldExpr, defaults) {
-        var info = searchMeta.parseExpr(fieldExpr),
-          values = _.cloneDeep(defaults);
-        if (defaults.key) {
-          values.key = info.alias;
-        }
-        if (defaults.label) {
-          values.label = searchMeta.getDefaultLabel(fieldExpr);
-        }
-        if (defaults.dataType) {
-          values.dataType = (info.fn && info.fn.dataType) || (info.field && info.field.data_type);
-        }
-        return values;
-      }
 
       this.toggleLink = function(column) {
         if (column.link) {
@@ -315,7 +289,7 @@
       this.initColumns = function(defaults) {
         if (!ctrl.display.settings.columns) {
           ctrl.display.settings.columns = _.transform(ctrl.savedSearch.api_params.select, function(columns, fieldExpr) {
-            columns.push(fieldToColumn(fieldExpr, defaults));
+            columns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
           });
           ctrl.hiddenColumns = [];
         } else {
@@ -326,7 +300,7 @@
           ctrl.hiddenColumns = _.transform(ctrl.savedSearch.api_params.select, function(hiddenColumns, fieldExpr) {
             var key = _.last(fieldExpr.split(' AS '));
             if (!_.includes(activeColumns, key)) {
-              hiddenColumns.push(fieldToColumn(fieldExpr, defaults));
+              hiddenColumns.push(searchMeta.fieldToColumn(fieldExpr, defaults));
             }
           });
           _.eachRight(activeColumns, function(key, index) {

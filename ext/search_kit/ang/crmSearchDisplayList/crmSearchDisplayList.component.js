@@ -25,7 +25,7 @@
 
       // Refresh current page
       this.refresh = function(row) {
-        ctrl.getResults();
+        ctrl.runSearch();
       };
 
     }

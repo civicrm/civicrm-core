@@ -5,6 +5,7 @@ return [
     'ang/crmSearchAdmin.module.js',
     'ang/crmSearchAdmin/*.js',
     'ang/crmSearchAdmin/*/*.js',
+    'ang/crmSearchAdmin/*/*/*.js',
   ],
   'css' => [
     'css/crmSearchAdmin.css',

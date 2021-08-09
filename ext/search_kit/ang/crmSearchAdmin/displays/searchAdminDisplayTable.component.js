@@ -19,10 +19,10 @@
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
             limit: CRM.crmSearchAdmin.defaultPagerSize,
-            pager: true
+            pager: {}
           };
         }
-        ctrl.parent.initColumns({key: true, label: true, dataType: true, type: 'field'});
+        ctrl.parent.initColumns({label: true});
       };
 
     }
