@@ -680,7 +680,10 @@ class Api4SelectQuery {
         continue;
       }
       // Ensure alias is a safe string, and supply default if not given
-      $alias = $alias ? \CRM_Utils_String::munge($alias, '_', 256) : strtolower($entity);
+      $alias = $alias ?: strtolower($entity);
+      if ($alias === self::MAIN_TABLE_ALIAS || !preg_match('/^[-\w]{1,256}$/', $alias)) {
+        throw new \API_Exception('Illegal join alias: "' . $alias . '"');
+      }
       // First item in the array is a boolean indicating if the join is required (aka INNER or LEFT).
       // The rest are join conditions.
       $side = array_shift($join);

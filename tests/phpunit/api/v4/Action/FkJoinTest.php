@@ -121,6 +121,40 @@ class FkJoinTest extends UnitTestCase {
     $this->assertNotContains($this->getReference('test_contact_1')['id'], $contacts);
   }
 
+  public function testInvalidJoinAlias() {
+    // Not allowed to use same alias as the base table
+    try {
+      Contact::get(FALSE)->addJoin('Address AS a')->execute();
+    }
+    catch (\API_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals('Illegal join alias: "a"', $message);
+
+    // Not allowed to use dots in the alias
+    try {
+      Contact::get(FALSE)->addJoin('Address AS add.ress')->execute();
+    }
+    catch (\API_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals('Illegal join alias: "add.ress"', $message);
+
+    // Not allowed to use an alias > 256 characters
+    try {
+      $longAlias = str_repeat('z', 257);
+      Contact::get(FALSE)->addJoin("Address AS $longAlias")->execute();
+    }
+    catch (\API_Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertEquals("Illegal join alias: \"$longAlias\"", $message);
+
+    // Alpha-numeric with dashes 256 characters long - weird but allowed
+    $okAlias = str_repeat('-0_a-9Z_', 32);
+    Contact::get(FALSE)->addJoin("Address AS $okAlias")->execute();
+  }
+
   public function testJoinToTheSameTableTwice() {
     $cid1 = Contact::create(FALSE)
       ->addValue('first_name', 'Aaa')
