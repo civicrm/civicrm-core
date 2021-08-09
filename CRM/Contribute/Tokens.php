@@ -10,10 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\Event\MailingQueryEvent;
-use Civi\Token\TokenProcessor;
-use Civi\Token\TokenRow;
-
 /**
  * Class CRM_Contribute_Tokens
  *
@@ -49,13 +45,6 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   protected function getApiEntityName(): string {
     return 'Contribution';
   }
-
-  /**
-   * Metadata about the entity fields.
-   *
-   * @var array
-   */
-  protected $fieldMetadata = [];
 
   /**
    * Get a list of tokens for the entity for which access is permitted to.
@@ -106,68 +95,6 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
       $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
     }
     return $return;
-  }
-
-  /**
-   * Class constructor.
-   */
-  public function __construct() {
-    $tokens = $this->getAllTokens();
-    parent::__construct('contribution', $tokens);
-  }
-
-  /**
-   * Check if the token processor is active.
-   *
-   * @param \Civi\Token\TokenProcessor $processor
-   *
-   * @return bool
-   */
-  public function checkActive(TokenProcessor $processor) {
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
-  }
-
-  /**
-   * Alter action schedule query.
-   *
-   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
-   */
-  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
-      return;
-    }
-    foreach ($this->getReturnFields() as $token) {
-      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
-    }
-  }
-
-  /**
-   * @inheritDoc
-   * @throws \CRM_Core_Exception
-   */
-  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $aliasedField = $this->getEntityAlias() . $field;
-    $fieldValue = $actionSearchResult->{$aliasedField} ?? NULL;
-
-    if ($this->isPseudoField($field)) {
-      $split = explode(':', $field);
-      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $actionSearchResult->{"contrib_$split[0]"} ?? NULL));
-    }
-    if ($this->isMoneyField($field)) {
-      return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
-    }
-    if ($this->isDateField($field)) {
-      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
-    }
-    if ($this->isCustomField($field)) {
-      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $actionSearchResult->entity_id);
-    }
-    else {
-      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
-    }
   }
 
 }
