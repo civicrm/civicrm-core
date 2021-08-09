@@ -20,6 +20,40 @@
       $ctrl.adhocExampleJson = angular.toJson(model.examples[$ctrl.exampleId], 2);
     };
 
+    function requestAdhocExample() {
+      var adhocExample;
+      try {
+        adhocExample = JSON.parse($ctrl.adhocExampleJson);
+      }
+      catch (err) {
+        return $q.reject(ts('Malformed JSON example'));
+      }
+      return crmApi4('WorkflowMessage', 'render', {
+        workflow: adhocExample.workflow,
+        values: adhocExample.data.modelProps,
+        messageTemplate: model.revisions[$ctrl.revisionId].rec
+      }).then(function(response) {
+        return response[0];
+      });
+    }
+
+    function requestStoredExample() {
+      // For a dev working on example, it's easier if the example is always loaded fresh.
+      return crmApi4('WorkflowMessageExample', 'get', {
+        where: [["name", "=", model.examples[$ctrl.exampleId].name]],
+        select: ['workflow', 'data'],
+        chain: {
+          "render": ["WorkflowMessage", "render", {
+            "workflow": "$workflow",
+            "values": "$data.modelProps",
+            "messageTemplate": model.revisions[$ctrl.revisionId].rec
+          }]
+        }
+      }).then(function(response) {
+        return response[0].render[0];
+      });
+    }
+
     var lastId = null;
     var update = function update() {
       var id = $ctrl.revisionId + ':' + $ctrl.exampleId;
@@ -28,18 +62,14 @@
 
       //   $ctrl.preview = model.revisions[$ctrl.revisionId].rec;
       $ctrl.preview = {loading: true};
-      var liveExample = model.examples[$ctrl.exampleId];
-      var getting = crmApi4('WorkflowMessage', 'render', {
-        workflow: liveExample.workflow,
-        values: liveExample.data.modelProps,
-        messageTemplate: model.revisions[$ctrl.revisionId].rec
-      }).then(function(response) {
-        $ctrl.preview = response[0];
+      var rendering = $ctrl.isAdhocExample ? requestAdhocExample() : requestStoredExample();
+      rendering.then(function(response) {
+        $ctrl.preview = response;
       }, function(failure) {
         $ctrl.preview = {};
         crmUiAlert({title: ts('Render failed'), text: failure.error_message, type: 'error'});
       });
-      return crmStatus({start: ts('Rendering...'), success: ''}, getting);
+      return crmStatus({start: ts('Rendering...'), success: ''}, rendering);
     };
 
     $scope.$watch('$ctrl.revisionId', update);
