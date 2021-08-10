@@ -139,6 +139,75 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testRenderLocalizedSmarty() {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'smarty' => TRUE,
+    ]);
+    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts}', 'text/plain');
+    $p->addRow([]);
+    $p->addRow(['locale' => 'fr_FR']);
+    $p->addRow(['locale' => 'es_MX']);
+
+    $expectText = [
+      'Yes No',
+      'Oui Non',
+      'Sí No',
+    ];
+
+    $rowCount = 0;
+    foreach ($p->evaluate()->getRows() as $key => $row) {
+      /** @var TokenRow */
+      $this->assertTrue($row instanceof TokenRow);
+      $this->assertEquals($expectText[$key], $row->render('text'));
+      $rowCount++;
+    }
+    $this->assertEquals(3, $rowCount);
+  }
+
+  public function testRenderLocalizedHookToken() {
+    $cid = $this->individualCreate();
+
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
+      $e->tokens['trans'] = [
+        'trans.affirm' => ts('Translated affirmation'),
+      ];
+    });
+    \Civi::dispatcher()->addListener('hook_civicrm_tokenValues', function($e) {
+      if (in_array('affirm', $e->tokens['trans'])) {
+        foreach ($e->contactIDs as $cid) {
+          $e->details[$cid]['trans.affirm'] = ts('Yes');
+        }
+      }
+    });
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
+    $p->addMessage('text', '!!{trans.affirm}!!', 'text/plain');
+    $p->addRow(['contactId' => $cid]);
+    $p->addRow(['contactId' => $cid, 'locale' => 'fr_FR']);
+    $p->addRow(['contactId' => $cid, 'locale' => 'es_MX']);
+
+    $expectText = [
+      '!!Yes!!',
+      '!!Oui!!',
+      '!!Sí!!',
+    ];
+
+    $rowCount = 0;
+    foreach ($p->evaluate()->getRows() as $key => $row) {
+      /** @var TokenRow */
+      $this->assertTrue($row instanceof TokenRow);
+      $this->assertEquals($expectText[$key], $row->render('text'));
+      $rowCount++;
+    }
+    $this->assertEquals(3, $rowCount);
+  }
+
   public function testGetMessageTokens() {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
