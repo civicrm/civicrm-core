@@ -233,6 +233,27 @@ class TokenRow {
   }
 
   /**
+   * Copy a token, including any/all available formats.
+   *
+   * @param string $src
+   *   Ex: 'contact.foo_bar'
+   * @param string $dest
+   *   Ex: 'contact.whiz_bang'
+   * @return TokenRow
+   */
+  public function copyToken($src, $dest) {
+    [$srcEntity, $srcField] = explode('.', $src, 2);
+    [$destEntity, $destField] = explode('.', $dest, 2);
+    $rv = &$this->tokenProcessor->rowValues;
+    foreach (array_keys($rv[$this->tokenRow]) as $format) {
+      if (isset($rv[$this->tokenRow][$format][$srcEntity][$srcField])) {
+        $rv[$this->tokenRow][$format][$destEntity][$destField] = $rv[$this->tokenRow][$format][$srcEntity][$srcField];
+      }
+    }
+    return $this;
+  }
+
+  /**
    * Auto-convert between different formats
    *
    * @param string $format
