@@ -55,6 +55,7 @@ class TokenProcessor {
    *     automatically from contactId.)
    *   - actionSchedule: DAO, the rule which triggered the mailing
    *     [for CRM_Core_BAO_ActionScheduler].
+   *   - locale: string, the name of a locale (eg 'fr_CA') to use for {ts} strings in the view.
    *   - schema: array, a list of fields that will be provided for each row.
    *     This is automatically populated with any general context
    *     keys, but you may need to add extra keys for token-row data.
@@ -350,6 +351,12 @@ class TokenProcessor {
     if (!is_object($row)) {
       $row = $this->getRow($row);
     }
+    $i18n = NULL;
+    if (!empty($row->context['locale'])) {
+      $i18n = \CRM_Core_I18n::singleton();
+      $oldLocale = $GLOBALS['tsLocale'] ?? NULL;
+      $i18n->setLocale($row->context['locale']);
+    }
 
     $message = $this->getMessage($name);
     $row->fill($message['format']);
@@ -372,6 +379,11 @@ class TokenProcessor {
     $event->row = $row;
     $event->string = strtr($message['string'], $filteredTokens);
     $this->dispatcher->dispatch('civi.token.render', $event);
+
+    if ($i18n !== NULL) {
+      $i18n->setLocale($oldLocale);
+    }
+
     return $event->string;
   }
 

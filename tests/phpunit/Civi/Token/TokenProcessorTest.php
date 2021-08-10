@@ -139,6 +139,33 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testRenderLocalizedSmarty() {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'smarty' => TRUE,
+    ]);
+    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts}', 'text/plain');
+    $p->addRow([]);
+    $p->addRow(['locale' => 'fr_FR']);
+    $p->addRow(['locale' => 'es_MX']);
+
+    $expectText = [
+      'Yes No',
+      'Oui Non',
+      'Sí No',
+    ];
+
+    $rowCount = 0;
+    foreach ($p->evaluate()->getRows() as $key => $row) {
+      /** @var TokenRow */
+      $this->assertTrue($row instanceof TokenRow);
+      $this->assertEquals($expectText[$key], $row->render('text'));
+      $rowCount++;
+    }
+    $this->assertEquals(3, $rowCount);
+  }
+
   public function testGetMessageTokens() {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
