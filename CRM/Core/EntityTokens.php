@@ -16,7 +16,14 @@ use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\TokenProcessor;
 
 /**
- * Class CRM_Core_EntityTokens
+ * Generic base-class which loads tokens via APIv4.
+ *
+ * To write a subclass:
+ *
+ * - (MUST) Implement getEntityName() and getApiEntityName()
+ * - (MUST) Implement getApiTokens()
+ * - (MAY) Implement getAliasTokens()
+ * - (MAY) Override evaluateToken()
  *
  * Parent class for generic entity token functionality.
  *
@@ -25,31 +32,29 @@ use Civi\Token\TokenProcessor;
  * AbstractTokenSubscriber in future. It is being used to clarify
  * functionality but should NOT be used from outside of core tested code.
  */
-class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
+abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
 
   /**
    * @inheritDoc
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $fieldValue = $this->getFieldValue($row, $field);
+    $aliases = $this->getAliasTokens();
+    if (isset($aliases[$field])) {
+      $this->evaluateToken($row, $entity, $aliases[$field], $prefetch);
+      return $row->copyToken("$entity." . $aliases[$field], "$entity.$field");
+    }
 
-    if ($this->isPseudoField($field)) {
-      $split = explode(':', $field);
-      return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
-    }
-    if ($this->isMoneyField($field)) {
-      return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $this->getFieldValue($row, 'currency')));
-    }
-    if ($this->isDateField($field)) {
-      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
+    $values = $prefetch[$row->context[$this->getEntityIDField()]];
+
+    if ($this->isApiFieldType($field, 'Timestamp')) {
+      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($values[$field]));
     }
     if ($this->isCustomField($field)) {
-      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
+      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $row->context[$this->getEntityIDField()]);
     }
     else {
-      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+      $row->format('text/plain')->tokens($entity, $field, (string) ($values[$field]));
     }
   }
 
@@ -61,51 +66,70 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected $fieldMetadata = [];
 
   /**
+   * Get the entity name, as it appears in the token.
+   *
+   * @return string
+   *   Ex: 'contribution' for token '{contribution.total_amount}'.
+   */
+  abstract protected function getEntityName(): string;
+
+  /**
    * Get the entity name for api v4 calls.
    *
    * @return string
+   *   Ex: 'Contribution' for token '{contribution.total_amount}'.
    */
-  protected function getApiEntityName(): string {
-    return '';
-  }
+  abstract protected function getApiEntityName(): string;
 
   /**
-   * Get the entity alias to use within queries.
-   *
-   * The default has a double underscore which should prevent any
-   * ambiguity with an existing table name.
-   *
-   * @return string
-   */
-  protected function getEntityAlias(): string {
-    return $this->getApiEntityName() . '__';
-  }
-
-  /**
-   * Get the name of the table this token class can extend.
-   *
-   * The default is based on the entity but some token classes,
-   * specifically the event class, latch on to other tables - ie
-   * the participant table.
-   */
-  public function getExtendableTableName(): string {
-    return CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getApiEntityName());
-  }
-
-  /**
-   * Get the relevant bao name.
-   */
-  public function getBAOName(): string {
-    return CRM_Core_DAO_AllCoreTables::getFullName($this->getApiEntityName());
-  }
-
-  /**
-   * Get an array of fields to be requested.
+   * Get a list of tokens which are loaded via APIv4.
    *
    * @return string[]
+   *   Ex: ['foo', 'bar_id', 'bar_id:name', 'bar_id:label']
    */
-  public function getReturnFields(): array {
-    return array_keys($this->getBasicTokens());
+  abstract protected function getApiTokens(): array;
+
+  /**
+   * Get a list of aliased tokens.
+   *
+   * @return array
+   *   Ex: ['my_alias_field' => 'original_field']
+   */
+  public function getAliasTokens(): array {
+    return [];
+  }
+
+  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
+    $entityIDs = $e->getTokenProcessor()->getContextValues($this->getEntityIDField());
+    if (empty($entityIDs)) {
+      return [];
+    }
+    $select = $this->getPrefetchFields($e);
+    $result = (array) civicrm_api4($this->getApiEntityName(), 'get', [
+      'checkPermissions' => FALSE,
+      // Note custom fields are not yet added - I need to
+      // re-do the unit tests to support custom fields first.
+      'select' => $select,
+      'where' => [['id', 'IN', $entityIDs]],
+    ], 'id');
+    return $result;
+  }
+
+  /**
+   * Determine which fields should be prefetched.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   * @return array
+   *   List of API fields to prefetch.
+   */
+  public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
+    $activeTokens = $this->getActiveTokens($e);
+    foreach ($this->getAliasTokens() as $aliasToken => $aliasTarget) {
+      if (in_array($aliasToken, $activeTokens)) {
+        $activeTokens[] = $aliasTarget;
+      }
+    }
+    return array_intersect($this->getApiTokens(), $activeTokens);
   }
 
   /**
@@ -114,29 +138,37 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array|string[]
    */
   public function getAllTokens(): array {
-    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
+    $apiTokens = $this->getApiTokens();
+    $apiFields = $this->getFieldMetadata();
+    $return = [];
+    $suffixes = ['name' => ts('(Name)'), 'label' => ts('(Label)'), 'title' => ts('(Title)')];
+    foreach ($apiTokens as $apiToken) {
+      if (preg_match('/^(.*)([:\.])(name|label|title)$/', $apiToken, $m)) {
+        $fieldName = $m[1];
+        $suffix = $suffixes[$m[3]];
+        $return[$apiToken] = $apiFields[$fieldName]['input_attrs']['label'] . ' ' . $suffix;
+      }
+      else {
+        $fieldName = $apiToken;
+        $return[$fieldName] = $apiFields[$fieldName]['title'] ?? $fieldName;
+      }
+    }
+    foreach ($this->getAliasTokens() as $aliasToken => $aliasTarget) {
+      $return[$aliasToken] = ts('%1 (Alias)', [1 => $return[$aliasTarget]]);
+    }
+    return array_merge($return, CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
   }
 
   /**
-   * Is the given field a date field.
+   * Does the field have the given type?
    *
    * @param string $fieldName
-   *
+   * @param string $expectType
+   *   Ex: 'Number', 'Money', 'Timestamp'
    * @return bool
    */
-  public function isDateField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Timestamp';
-  }
-
-  /**
-   * Is the given field a pseudo field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isPseudoField(string $fieldName): bool {
-    return strpos($fieldName, ':') !== FALSE;
+  protected function isApiFieldType(string $fieldName, string $expectType): bool {
+    return ($this->getFieldMetadata($fieldName)['data_type'] ?? NULL) === $expectType;
   }
 
   /**
@@ -146,27 +178,17 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isCustomField(string $fieldName) : bool {
+  protected function isCustomField(string $fieldName) : bool {
     return (bool) \CRM_Core_BAO_CustomField::getKeyID($fieldName);
-  }
-
-  /**
-   * Is the given field a date field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isMoneyField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Money';
   }
 
   /**
    * Get the metadata for the available fields.
    *
-   * @return array
+   * @param string|null $field
+   * @return array|null
    */
-  protected function getFieldMetadata(): array {
+  protected function getFieldMetadata(?string $field = NULL): ?array {
     if (empty($this->fieldMetadata)) {
       try {
         // Tests fail without checkPermissions = FALSE
@@ -176,78 +198,56 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $this->fieldMetadata = [];
       }
     }
-    return $this->fieldMetadata;
+    if ($field) {
+      return $this->fieldMetadata[$field] ?? NULL;
+    }
+    else {
+      return $this->fieldMetadata;
+    }
   }
 
   /**
    * Get pseudoTokens - it tokens that reflect the name or label of a pseudoconstant.
    *
-   * @internal - this function will likely be made protected soon.
-   *
+   * @internal - this function is a bridge for legacy CRM_Utils_Token callers. It should be removed.
+   * @deprecated
    * @return array
    */
   public function getPseudoTokens(): array {
-    $return = [];
-    foreach (array_keys($this->getBasicTokens()) as $fieldName) {
-      if ($this->isAddPseudoTokens($fieldName)) {
-        $return[$fieldName . ':label'] = $this->fieldMetadata[$fieldName]['input_attrs']['label'];
-        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->fieldMetadata[$fieldName]['input_attrs']['label'];
+    $labels = $this->getAllTokens();
+    // Simpler, but doesn't currently pass: $labels = $this->tokenNames;
+    $r = [];
+    foreach ($this->getApiTokens() as $key) {
+      if (strpos($key, ':') !== FALSE || strpos($key, '.') !== FALSE) {
+        $r[$key] = $labels[$key];
       }
     }
-    return $return;
+    return $r;
   }
 
   /**
-   * Is this a field we should add pseudo-tokens to?
+   * Get the values for all exported pseudo-fields.
    *
-   * Pseudo-tokens allow access to name and label fields - e.g
-   *
-   * {contribution.contribution_status_id:name} might resolve to 'Completed'
-   *
-   * @param string $fieldName
+   * @param int $id
+   * @return array
+   * @throws \API_Exception
+   * @internal - this function is a bridge for legacy CRM_Utils_Token callers. It should be removed.
+   * @deprecated
    */
-  public function isAddPseudoTokens($fieldName): bool {
-    if ($fieldName === 'currency') {
-      // 'currency' is manually added to the skip list as an anomaly.
-      // name & label aren't that suitable for 'currency' (symbol, which
-      // possibly maps to 'abbr' would be) and we can't gather that
-      // from the metadata as yet.
-      return FALSE;
+  public function getPseudoValues(int $id): array {
+    $pseudoFields = array_keys($this->getPseudoTokens());
+    $api4 = civicrm_api4('Contribution', 'get', [
+      'checkPermissions' => FALSE,
+      'select' => $pseudoFields,
+      'where' => [['id', '=', $id]],
+    ]);
+    $result = CRM_Utils_Array::subset($api4->single(), $pseudoFields);
+    foreach ($this->getAliasTokens() as $aliasToken => $aliasTarget) {
+      if (isset($result[$aliasTarget])) {
+        $result[$aliasToken] = $result[$aliasTarget];
+      }
     }
-    return (bool) $this->getFieldMetadata()[$fieldName]['options'];
-  }
-
-  /**
-   * Get the value for the relevant pseudo field.
-   *
-   * @param string $realField e.g contribution_status_id
-   * @param string $pseudoKey e.g name
-   * @param int|string $fieldValue e.g 1
-   *
-   * @return string
-   *   Eg. 'Completed' in the example above.
-   *
-   * @internal function will likely be protected soon.
-   */
-  public function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
-    if ($pseudoKey === 'name') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
-    }
-    if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
-    }
-    return (string) $fieldValue;
-  }
-
-  /**
-   * @param \Civi\Token\TokenRow $row
-   * @param string $field
-   * @return string|int
-   */
-  protected function getFieldValue(TokenRow $row, string $field) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $aliasedField = $this->getEntityAlias() . $field;
-    return $actionSearchResult->{$aliasedField} ?? NULL;
+    return $result;
   }
 
   /**
@@ -258,6 +258,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     parent::__construct($this->getEntityName(), $tokens);
   }
 
+  public function getEntityIDField() {
+    return $this->getEntityName() . 'Id';
+  }
+
   /**
    * Check if the token processor is active.
    *
@@ -266,21 +270,20 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
+    return in_array($this->getEntityIDField(), $processor->context['schema']);
   }
 
   /**
    * Alter action schedule query.
    *
+   * If there is an action-schedule that deals with our entity, then make sure the
+   * entity ID is passed through in `$tokenRow->context['myEntityid']`.
+   *
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
-      return;
-    }
-    foreach ($this->getReturnFields() as $token) {
-      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
+    if ($e->mapping->getEntity() === CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getApiEntityName())) {
+      $e->query->select('e.id' . ' AS tokenContext_' . $this->getEntityIDField());
     }
   }
 
