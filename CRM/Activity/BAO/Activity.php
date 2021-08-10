@@ -1059,7 +1059,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $subjectToken = CRM_Utils_Token::getTokens($subject);
     $messageToken = CRM_Utils_Token::getTokens($text);
     $messageToken = array_merge($messageToken, CRM_Utils_Token::getTokens($html));
-    $allTokens = array_merge($messageToken, $subjectToken);
+    $allTokens = CRM_Utils_Array::crmArrayMerge($messageToken, $subjectToken);
 
     if (!$from) {
       $from = "$fromDisplayName <$fromEmail>";
