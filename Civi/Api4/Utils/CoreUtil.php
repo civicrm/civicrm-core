@@ -60,7 +60,8 @@ class CoreUtil {
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    return self::getApiClass($entityName)::getInfo()[$keyToReturn] ?? NULL;
+    $className = self::getApiClass($entityName);
+    return $className ? $className::getInfo()[$keyToReturn] ?? NULL : NULL;
   }
 
   /**
