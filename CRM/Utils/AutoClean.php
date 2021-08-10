@@ -49,6 +49,26 @@ class CRM_Utils_AutoClean {
   }
 
   /**
+   * Temporarily set the active locale. Cleanup locale when the autoclean handle disappears.
+   *
+   * @param string|null $newLocale
+   *   Ex: 'fr_CA'
+   * @return \CRM_Utils_AutoClean|null
+   */
+  public static function swapLocale(?string $newLocale) {
+    $oldLocale = $GLOBALS['tsLocale'] ?? NULL;
+    if ($oldLocale === $newLocale) {
+      return NULL;
+    }
+
+    $i18n = \CRM_Core_I18n::singleton();
+    $i18n->setLocale($newLocale);
+    return static::with(function() use ($i18n, $oldLocale) {
+      $i18n->setLocale($oldLocale);
+    });
+  }
+
+  /**
    * Temporarily swap values using callback functions, and cleanup
    * when the current context shuts down.
    *
