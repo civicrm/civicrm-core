@@ -287,6 +287,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       total_amount = {contribution.total_amount}
       net_amount = {contribution.net_amount}
       fee_amount = {contribution.fee_amount}
+      legacy campaign = {contribution.campaign}
       campaign_id = {contribution.campaign_id}
       campaign name = {contribution.campaign_id:name}
       campaign label = {contribution.campaign_id:label}';
@@ -313,6 +314,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'total_amount = € 100.00',
       'net_amount = € 95.00',
       'fee_amount = € 5.00',
+      'legacy campaign = big_campaign',
       'campaign_id = 1',
       'campaign name = big_campaign',
       'campaign label = Campaign',
@@ -348,6 +350,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       'total_amount = € 100.00',
       'net_amount = € 95.00',
       'fee_amount = € 5.00',
+      'legacy campaign = big_campaign',
       'campaign_id = 1',
       'campaign name = big_campaign',
       'campaign label = Campaign',
