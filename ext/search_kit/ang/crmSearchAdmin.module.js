@@ -245,6 +245,15 @@
             deferred.resolve($(this).val());
           });
           return deferred.promise;
+        },
+        // Returns name of explicit or implicit join, for links
+        getJoinEntity: function(info) {
+          if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
+            return info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
+          } else if (info.prefix) {
+            return info.prefix.replace('.', '');
+          }
+          return '';
         }
       };
     })

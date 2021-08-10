@@ -34,7 +34,9 @@
         } else {
           this.sort.push([col.key, dir]);
         }
-        this.getResults();
+        if (this.results || !this.settings.button) {
+          this.getResults();
+        }
       }
 
     };

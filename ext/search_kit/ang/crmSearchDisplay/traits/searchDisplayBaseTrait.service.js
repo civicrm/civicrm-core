@@ -79,6 +79,10 @@
       page: 1,
       rowCount: null,
       getUrl: getUrl,
+      // Arrays may contain callback functions for various events
+      onChangeFilters: [],
+      onPreRun: [],
+      onPostRun: [],
 
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
@@ -87,7 +91,9 @@
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
 
         this.getResults = _.debounce(function() {
-          ctrl.runSearch();
+          $scope.$apply(function() {
+            ctrl.runSearch();
+          });
         }, 100);
 
         // If search is embedded in contact summary tab, display count in tab-header
@@ -104,15 +110,20 @@
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
-          if (ctrl.onChangeFilters) {
-            ctrl.onChangeFilters();
+          _.each(ctrl.onChangeFilters, function(callback) {
+            callback.call(ctrl);
+          });
+          if (!ctrl.settings.button) {
+            ctrl.getResults();
           }
-          ctrl.getResults();
         }
 
         function onChangePageSize() {
           ctrl.page = 1;
-          ctrl.getResults();
+          // Only refresh if search has already been run
+          if (ctrl.results) {
+            ctrl.getResults();
+          }
         }
 
         if (this.afFieldset) {
@@ -139,10 +150,15 @@
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function() {
-        var ctrl = this;
-        return crmApi4('SearchDisplay', 'run', ctrl.getApiParams()).then(function(results) {
+        var ctrl = this,
+          apiParams = this.getApiParams();
+        this.loading = true;
+        _.each(ctrl.onPreRun, function(callback) {
+          callback.call(ctrl, apiParams);
+        });
+        return crmApi4('SearchDisplay', 'run', apiParams).then(function(results) {
           ctrl.results = results;
-          ctrl.editing = false;
+          ctrl.editing = ctrl.loading = false;
           if (!ctrl.rowCount) {
             if (!ctrl.limit || results.length < ctrl.limit) {
               ctrl.rowCount = results.length;
@@ -153,6 +169,15 @@
               });
             }
           }
+          _.each(ctrl.onPostRun, function(callback) {
+            callback.call(ctrl, results, 'success');
+          });
+        }, function(error) {
+          ctrl.results = [];
+          ctrl.editing = ctrl.loading = false;
+          _.each(ctrl.onPostRun, function(callback) {
+            callback.call(ctrl, error, 'error');
+          });
         });
       },
       replaceTokens: function(value, row) {

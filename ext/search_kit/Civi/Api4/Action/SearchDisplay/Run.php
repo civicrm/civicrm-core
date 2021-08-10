@@ -130,6 +130,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
           $page = explode(':', $this->return)[1];
         }
         $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
+        $apiParams['debug'] = $this->debug;
         $apiParams['limit'] = $limit ?? $settings['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         $apiParams['orderBy'] = $this->getOrderByFromSort();
@@ -142,6 +143,7 @@ class Run extends \Civi\Api4\Generic\AbstractAction {
 
     $result->rowCount = $apiResult->rowCount;
     $result->exchangeArray($apiResult->getArrayCopy());
+    $result->debug = $apiResult->debug;
   }
 
   /**

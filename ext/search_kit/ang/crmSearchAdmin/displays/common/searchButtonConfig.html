@@ -1,0 +1,13 @@
+<div class="input-group">
+  <div class="input-group-btn" title="{{:: ts('Should the search be run immediately, or wait for the user to click a button?') }}">
+    <button type="button" class="btn btn-outline-default" ng-click="$ctrl.display.settings.button = null" ng-class="{active: !$ctrl.display.settings.button}">
+      <i class="crm-i fa-{{ $ctrl.display.settings.button ? '' : 'check-' }}circle-o"></i>
+      {{:: ts('Auto-Run') }}
+    </button>
+    <button type="button" class="btn btn-outline-default" ng-click="$ctrl.display.settings.button = ts('Search')" ng-class="{active: $ctrl.display.settings.button}">
+      <i class="crm-i fa-{{ !$ctrl.display.settings.button ? '' : 'check-' }}circle-o"></i>
+      {{:: ts('Search Button') }}
+    </button>
+  </div>
+  <input type="text" ng-show="$ctrl.display.settings.button" ng-model="$ctrl.display.settings.button" ng-model-options="{updateOn: 'blur'}" class="form-control" title="{{:: ts('Search button text') }}" placeholder="{{:: ts('Search button text') }}">
+</div>
