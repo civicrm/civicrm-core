@@ -2090,9 +2090,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     $contributionId = $params['contribution_id'];
     $contributionStatusId = $params['contribution_status_id'];
 
-    // if we already processed contribution object pass previous status id.
-    $previousContriStatusId = $params['previous_contribution_status_id'];
-
     // we process only ( Completed, Cancelled, or Failed ) contributions.
     if (!$contributionId || $contributionStatus !== 'Completed') {
       return;
@@ -2169,22 +2166,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     if ($contributionStatus === 'Completed') {
 
       // only pending contribution related object processed.
-      if ($previousContriStatusId &&
-        !in_array($previousStatus, [
-          'Pending',
-          'Partially paid',
-        ])
-      ) {
+      if (!in_array($previousStatus, ['Pending', 'Partially paid'])) {
         // this is case when we already processed contribution object.
-        return;
-      }
-      elseif (!$previousContriStatusId &&
-        !in_array($contributionStatus, [
-          'Pending',
-          'Partially paid',
-        ])
-      ) {
-        // this is case when we are going to process contribution object later.
         return;
       }
 
