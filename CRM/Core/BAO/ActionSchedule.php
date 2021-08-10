@@ -271,7 +271,7 @@ FROM civicrm_action_schedule cas
         // switch language if necessary
         if ($multilingual) {
           $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
-          CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
+          CRM_Core_I18n::singleton()->setLocale(CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
         }
 
         $errors = [];
@@ -401,10 +401,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param $communication_language
-   * @param $preferred_language
+   * @param string|null $communication_language
+   * @param string|null $preferred_language
+   * @return string
    */
-  public static function setCommunicationLanguage($communication_language, $preferred_language) {
+  public static function pickLocale($communication_language, $preferred_language) {
     $currentLocale = CRM_Core_I18n::getLocale();
     $language = $currentLocale;
 
@@ -425,8 +426,7 @@ FROM civicrm_action_schedule cas
     }
 
     // change the language
-    $i18n = CRM_Core_I18n::singleton();
-    $i18n->setLocale($language);
+    return $language;
   }
 
   /**
