@@ -282,6 +282,9 @@ FROM civicrm_action_schedule cas
           }
 
           foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
+            // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+            $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+
             if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
               CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
             }
@@ -294,6 +297,8 @@ FROM civicrm_action_schedule cas
               $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
               CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
             }
+
+            unset($swapLocale);
           }
         }
         catch (\Civi\Token\TokenException $e) {
