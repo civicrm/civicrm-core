@@ -5167,11 +5167,7 @@ LIMIT 1;";
     }
     if (!empty($messageToken['contribution'])) {
       $processor = new CRM_Contribute_Tokens();
-      $pseudoFields = array_keys($processor->getPseudoTokens());
-      foreach ($pseudoFields as $pseudoField) {
-        $split = explode(':', $pseudoField);
-        $result['values'][$id][$pseudoField] = $processor->getPseudoValue($split[0], $split[1], $result['values'][$id][$split[0]] ?? '');
-      }
+      $result['values'][$id] = array_merge($result['values'][$id], $processor->getPseudoValues($id));
     }
     return $result;
   }

@@ -1567,6 +1567,7 @@ class CRM_Utils_Token {
       $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
         ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
         self::getCustomFieldTokens('Contribution'),
+        $processor->getAliasTokens(),
         $processor->getPseudoTokens()
       );
       foreach ($tokens as $token) {
