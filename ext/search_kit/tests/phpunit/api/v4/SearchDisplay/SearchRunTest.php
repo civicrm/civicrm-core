@@ -464,7 +464,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     }
     $this->assertStringContainsString('failed', $error);
 
-    $config->userPermissionClass->permissions = ['administer CiviCRM data'];
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM data'];
 
     // Admins can edit the search and the display
     SavedSearch::update()->addWhere('name', '=', $searchName)

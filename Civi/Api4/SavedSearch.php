@@ -22,4 +22,10 @@ namespace Civi\Api4;
  */
 class SavedSearch extends Generic\DAOEntity {
 
+  public static function permissions() {
+    $permissions = parent::permissions();
+    $permissions['get'] = ['access CiviCRM'];
+    return $permissions;
+  }
+
 }
