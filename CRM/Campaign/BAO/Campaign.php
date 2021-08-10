@@ -301,20 +301,11 @@ Order By  camp.title";
 
   /**
    * Is CiviCampaign enabled.
+   *
    * @return bool
    */
-  public static function isCampaignEnable() {
-    static $isEnable = NULL;
-
-    if (!isset($isEnable)) {
-      $isEnable = FALSE;
-      $config = CRM_Core_Config::singleton();
-      if (in_array('CiviCampaign', $config->enableComponents)) {
-        $isEnable = TRUE;
-      }
-    }
-
-    return $isEnable;
+  public static function isCampaignEnable(): bool {
+    return in_array('CiviCampaign', CRM_Core_Config::singleton()->enableComponents, TRUE);
   }
 
   /**
