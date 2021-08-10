@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    * @param bool $bounce determine if we want to throw a status bounce.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
     $form->_emails = [];
@@ -49,19 +49,12 @@ class CRM_Contact_Form_Task_EmailCommon {
     $form->_emails = $fromEmailValues;
     $defaults = [];
     $form->_fromEmails = $fromEmailValues;
+    if (is_numeric(key($form->_fromEmails))) {
+      $emailID = (int) key($form->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
       $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
-    }
-    if (is_numeric(key($form->_fromEmails))) {
-      // Add signature
-      $defaultEmail = civicrm_api3('email', 'getsingle', ['id' => key($form->_fromEmails)]);
-      $defaults = [];
-      if (!empty($defaultEmail['signature_html'])) {
-        $defaults['html_message'] = '<br/><br/>--' . $defaultEmail['signature_html'];
-      }
-      if (!empty($defaultEmail['signature_text'])) {
-        $defaults['text_message'] = "\n\n--\n" . $defaultEmail['signature_text'];
-      }
     }
     $form->setDefaults($defaults);
   }

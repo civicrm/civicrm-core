@@ -118,10 +118,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * Call trait preProcess function.
    *
    * This function exists as a transitional arrangement so classes overriding
-   * preProcess can still call it. Ideally it will be melded into preProcess later.
+   * preProcess can still call it. Ideally it will be melded into preProcess
+   * later.
    *
-   * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   protected function traitPreProcess() {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
