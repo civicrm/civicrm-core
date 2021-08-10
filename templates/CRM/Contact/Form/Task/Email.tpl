@@ -124,8 +124,7 @@ CRM.$(function($) {
   }
 
   {/literal}
-  var toContact = {if $toContact}{$toContact}{else}''{/if},
-    ccContact = {if $ccContact}{$ccContact}{else}''{/if};
+  var toContact = {if $toContact}{$toContact}{else}''{/if};
   {literal}
   emailSelect('#to', toContact);
 });
