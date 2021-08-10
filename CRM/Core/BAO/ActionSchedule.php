@@ -278,6 +278,15 @@ FROM civicrm_action_schedule cas
           $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
           $row->context('locale', CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
         }
+
+        foreach ($dao->toArray() as $key => $value) {
+          if (preg_match('/^tokenContext_(.*)/', $key, $m)) {
+            if (!in_array($m[1], $tokenProcessor->context['schema'])) {
+              $tokenProcessor->context['schema'][] = $m[1];
+            }
+            $row->context($m[1], $value);
+          }
+        }
       }
 
       $tokenProcessor->evaluate();
