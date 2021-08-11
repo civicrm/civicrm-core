@@ -35,9 +35,9 @@
         <td>
             {foreach from=$extension.requires item=ext}
                 {if array_key_exists($ext, $localExtensionRows)}
-                    {$localExtensionRows.$ext.name} (already downloaded - {$ext})
+                    {$localExtensionRows.$ext.label|escape} (already downloaded)
                 {elseif array_key_exists($ext, $remoteExtensionRows)}
-                    {$remoteExtensionRows.$ext.name} (not downloaded - {$ext})
+                    {$remoteExtensionRows.$ext.label|escape} (not downloaded)
                 {else}
                     {$ext} {ts}(not available){/ts}
                 {/if}
@@ -56,10 +56,9 @@
     <tr>
       <td class="label">{ts}Local path{/ts}</td><td>{$extension.path|escape}</td>
     </tr>
+    {if !empty($extension.downloadUrl)}
     <tr>
       <td class="label">{ts}Download location{/ts}</td><td>{$extension.downloadUrl|escape}</td>
     </tr>
-    <tr>
-      <td class="label">{ts}Key{/ts}</td><td>{$extension.key|escape}</td>
-    </tr>
+    {/if}
 </table>
