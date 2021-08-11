@@ -4,7 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\AfformAdmin\AfformAdminMeta;
 use Civi\Api4\Afform;
-use Civi\Api4\Entity;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Query\SqlExpression;
 
 /**
@@ -209,6 +209,10 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     $result[] = $info;
   }
 
+  /**
+   * @param string $name
+   * @return array|null
+   */
   private function loadForm($name) {
     return Afform::get($this->checkPermissions)
       ->setFormatWhitespace(TRUE)
@@ -262,10 +266,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
       else {
         $joinCount[$entityName] = 1;
       }
-      $label = Entity::get(FALSE)
-        ->addWhere('name', '=', $entityName)
-        ->addSelect('title')
-        ->execute()->first()['title'];
+      $label = CoreUtil::getInfoItem($entityName, 'title');
       $joinMap[$alias] = $label . $num;
     }
 
@@ -288,6 +289,9 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     return $calcFields;
   }
 
+  /**
+   * @return array[]
+   */
   public function fields() {
     return [
       [
