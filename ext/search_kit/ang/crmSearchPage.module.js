@@ -16,8 +16,8 @@
           display: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SearchDisplay', 'get', {
-              where: [['name', '=', params.displayName], ['saved_search.name', '=', params.savedSearchName]],
-              select: ['*', 'saved_search.api_entity', 'saved_search.name']
+              where: [['name', '=', params.displayName], ['saved_search_id.name', '=', params.savedSearchName]],
+              select: ['*', 'saved_search_id.api_entity', 'saved_search_id.name']
             }, 0);
           }
         }
@@ -28,8 +28,8 @@
     .controller('crmSearchPageDisplay', function($scope, $location, display) {
       var ctrl = $scope.$ctrl = this;
       this.display = display;
-      this.searchName = display['saved_search.name'];
-      this.apiEntity = display['saved_search.api_entity'];
+      this.searchName = display['saved_search_id.name'];
+      this.apiEntity = display['saved_search_id.api_entity'];
 
       $scope.$watch(function() {return $location.search();}, function(params) {
         ctrl.filters = params;
