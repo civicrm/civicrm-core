@@ -1371,10 +1371,10 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @throws \CRM_Core_Exception
    * @throws \CRM_Contribute_Exception_InactiveContributionPageException
    */
-  public function testContributionBasePreProcess() {
+  public function testContributionBasePreProcess(): void {
     //Create contribution page with only pay later enabled.
     $params = [
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
       'goal_amount' => 100,
@@ -1387,7 +1387,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'receipt_from_name' => 'Ego Freud',
     ];
 
-    $page1 = $this->callAPISuccess("contribution_page", 'create', $params);
+    $page1 = $this->callAPISuccess('ContributionPage', 'create', $params);
 
     //Execute CRM_Contribute_Form_ContributionBase preProcess
     //and check the assignment of payment processors
@@ -1397,25 +1397,18 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $_REQUEST['id'] = $page1['id'];
 
     $form->preProcess();
-    $this->assertEquals($form->_paymentProcessor['name'], 'pay_later');
+    $this->assertEquals('pay_later', $form->_paymentProcessor['name']);
 
     //Disable all the payment processor for the contribution page.
     $params['is_pay_later'] = 0;
-    $page2 = $this->callAPISuccess("contribution_page", 'create', $params);
+    $page2 = $this->callAPISuccess('ContributionPage', 'create', $params);
 
     //Assert an exception is thrown on loading the contribution page.
     $form = new CRM_Contribute_Form_ContributionBase();
     $form->controller = new CRM_Core_Controller();
     $_REQUEST['id'] = $page2['id'];
     $form->set('id', $page2['id']);
-    try {
-      $form->preProcess();
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertStringContainsString("A payment processor configured for this page might be disabled (contact the site administrator for assistance).", $e->getMessage());
-      return;
-    }
-    $this->fail('Exception was expected');
+    $form->preProcess();
   }
 
   /**
