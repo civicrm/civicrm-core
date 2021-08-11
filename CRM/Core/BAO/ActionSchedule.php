@@ -268,19 +268,23 @@ FROM civicrm_action_schedule cas
 
       $multilingual = CRM_Core_I18n::isMultilingual();
       while ($dao->fetch()) {
-        // switch language if necessary
-        if ($multilingual) {
-          $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
-          CRM_Core_BAO_ActionSchedule::setCommunicationLanguage($actionSchedule->communication_language, $preferred_language);
-        }
-
         $errors = [];
         try {
           $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
-          $tokenProcessor->addRow()
+          $row = $tokenProcessor->addRow()
             ->context('contactId', $dao->contactID)
             ->context('actionSearchResult', (object) $dao->toArray());
+
+          // switch language if necessary
+          if ($multilingual) {
+            $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
+            $row->context('locale', CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
+          }
+
           foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
+            // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+            $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+
             if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
               CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
             }
@@ -293,6 +297,8 @@ FROM civicrm_action_schedule cas
               $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
               CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
             }
+
+            unset($swapLocale);
           }
         }
         catch (\Civi\Token\TokenException $e) {
@@ -401,10 +407,11 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @param $communication_language
-   * @param $preferred_language
+   * @param string|null $communication_language
+   * @param string|null $preferred_language
+   * @return string
    */
-  public static function setCommunicationLanguage($communication_language, $preferred_language) {
+  public static function pickLocale($communication_language, $preferred_language) {
     $currentLocale = CRM_Core_I18n::getLocale();
     $language = $currentLocale;
 
@@ -425,8 +432,7 @@ FROM civicrm_action_schedule cas
     }
 
     // change the language
-    $i18n = CRM_Core_I18n::singleton();
-    $i18n->setLocale($language);
+    return $language;
   }
 
   /**

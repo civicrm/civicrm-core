@@ -51,6 +51,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       if (empty($row->context['contactId'])) {
         continue;
       }
+
+      unset($swapLocale);
+      $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+
       /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {

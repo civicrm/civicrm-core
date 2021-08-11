@@ -55,6 +55,7 @@ class TokenProcessor {
    *     automatically from contactId.)
    *   - actionSchedule: DAO, the rule which triggered the mailing
    *     [for CRM_Core_BAO_ActionScheduler].
+   *   - locale: string, the name of a locale (eg 'fr_CA') to use for {ts} strings in the view.
    *   - schema: array, a list of fields that will be provided for each row.
    *     This is automatically populated with any general context
    *     keys, but you may need to add extra keys for token-row data.
@@ -350,6 +351,8 @@ class TokenProcessor {
     if (!is_object($row)) {
       $row = $this->getRow($row);
     }
+
+    $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
     $message = $this->getMessage($name);
     $row->fill($message['format']);
