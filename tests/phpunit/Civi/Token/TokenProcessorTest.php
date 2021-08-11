@@ -297,4 +297,58 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
   }
 
+  /**
+   * Inspired by dev/core#2673. This creates three custom tokens and uses each
+   * of them in a different template (subject/body_text/body_html). Ensure
+   * that all 3 tokens are properly evaluated.
+   *
+   * This is not literally the same as dev/core#2673. But that class of problem
+   * could arise in different code-paths. This just ensures that it arise in
+   * TokenProcessor.
+   *
+   * It also improves test-coverage of hooks and TokenProcessor.
+   *
+   * @link https://lab.civicrm.org/dev/core/-/issues/2673
+   */
+  public function testHookTokenDiagonal() {
+    $cid = $this->individualCreate();
+
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
+      $e->tokens['fruit'] = [
+        'fruit.apple' => ts('Apple'),
+        'fruit.banana' => ts('Banana'),
+        'fruit.cherry' => ts('Cherry'),
+      ];
+    });
+    \Civi::dispatcher()->addListener('hook_civicrm_tokenValues', function($e) {
+      $fruits = array_intersect($e->tokens['fruit'], ['apple', 'banana', 'cherry']);
+      foreach ($fruits as $fruit) {
+        foreach ($e->contactIDs as $cid) {
+          $e->details[$cid]['fruit.' . $fruit] = 'Nomnomnom' . $fruit;
+        }
+      }
+    });
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
+    $p->addMessage('subject', '!!{fruit.apple}!!', 'text/plain');
+    $p->addMessage('body_html', '!!{fruit.banana}!!', 'text/html');
+    $p->addMessage('body_text', '!!{fruit.cherry}!!', 'text/plain');
+    $p->addMessage('other', 'No fruit :(', 'text/plain');
+    $p->addRow(['contactId' => $cid]);
+    $p->evaluate();
+
+    foreach ($p->getRows() as $row) {
+      $this->assertEquals('!!Nomnomnomapple!!', $row->render('subject'));
+      $this->assertEquals('!!Nomnomnombanana!!', $row->render('body_html'));
+      $this->assertEquals('!!Nomnomnomcherry!!', $row->render('body_text'));
+      $this->assertEquals('No fruit :(', $row->render('other'));
+      $looped = TRUE;
+    }
+    $this->assertTrue(isset($looped));
+  }
+
 }
