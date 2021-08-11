@@ -219,31 +219,23 @@ class CRM_Extension_Browser {
    * @throws \CRM_Extension_Exception
    */
   private function grabRemoteJson() {
-
-    ini_set('default_socket_timeout', self::CHECK_TIMEOUT);
     set_error_handler(array('CRM_Extension_Browser', 'downloadError'));
-
-    if (!ini_get('allow_url_fopen')) {
-      ini_set('allow_url_fopen', 1);
-    }
 
     if (FALSE === $this->getRepositoryUrl()) {
       // don't check if the user has configured civi not to check an external
       // url for extensions. See CRM-10575.
-      return [];
+      return '';
     }
 
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
-    $status = CRM_Utils_HttpClient::singleton()->fetch($url, $filename);
 
-    ini_restore('allow_url_fopen');
-    ini_restore('default_socket_timeout');
-
+    $client = new GuzzleHttp\Client();
+    $response = $client->request('GET', $url, ['sink' => $filename, 'timeout' => \Civi::settings()->get('http_timeout')]);
     restore_error_handler();
 
-    if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests. Contact your site administrator for assistance.', [1 => $this->getRepositoryUrl()]), 'connection_error');
+    if ($response->getStatusCode() !== 200) {
+      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests', [1 => $this->getRepositoryUrl()]), 'connection_error');
     }
 
     // Don't call grabCachedJson here, that would risk infinite recursion
