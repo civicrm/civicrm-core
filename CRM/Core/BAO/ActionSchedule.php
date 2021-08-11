@@ -267,9 +267,8 @@ FROM civicrm_action_schedule cas
       );
 
       $multilingual = CRM_Core_I18n::isMultilingual();
+      $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
       while ($dao->fetch()) {
-        $errors = [];
-        $tokenProcessor = self::createTokenProcessor($actionSchedule, $mapping);
         $row = $tokenProcessor->addRow()
           ->context('contactId', $dao->contactID)
           ->context('actionSearchResult', (object) $dao->toArray());
@@ -279,26 +278,30 @@ FROM civicrm_action_schedule cas
           $preferred_language = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $dao->contactID, 'preferred_language');
           $row->context('locale', CRM_Core_BAO_ActionSchedule::pickLocale($actionSchedule->communication_language, $preferred_language));
         }
+      }
 
-        foreach ($tokenProcessor->evaluate()->getRows() as $tokenRow) {
-          // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
-          $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+      $tokenProcessor->evaluate();
+      foreach ($tokenProcessor->getRows() as $tokenRow) {
+        $dao = $tokenRow->context['actionSearchResult'];
+        $errors = [];
 
-          if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
-          }
+        // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+        $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
-          if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
-          }
-          // insert activity log record if needed
-          if ($actionSchedule->record_activity && empty($errors)) {
-            $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-            CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
-          }
-
-          unset($swapLocale);
+        if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
+          CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID));
         }
+
+        if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
+          CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID));
+        }
+        // insert activity log record if needed
+        if ($actionSchedule->record_activity && empty($errors)) {
+          $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+          CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+        }
+
+        unset($swapLocale);
 
         // update action log record
         $logParams = [
