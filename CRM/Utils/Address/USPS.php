@@ -74,6 +74,7 @@ class CRM_Utils_Address_USPS {
         'API' => 'Verify',
         'XML' => $XMLQuery,
       ],
+      'timeout' => \Civi::settings()->get('http_timeout'),
     ]);
 
     $session = CRM_Core_Session::singleton();

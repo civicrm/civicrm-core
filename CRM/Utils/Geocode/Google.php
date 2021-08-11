@@ -106,7 +106,7 @@ class CRM_Utils_Geocode_Google {
     $query = 'https://' . self::$_server . self::$_uri . $add;
 
     $client = new GuzzleHttp\Client();
-    $request = $client->request('GET', $query);
+    $request = $client->request('GET', $query, ['timeout' => \Civi::settings()->get('http_timeout')]);
     $string = $request->getBody();
 
     libxml_use_internal_errors(TRUE);
