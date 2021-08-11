@@ -1,7 +1,9 @@
 <table class="crm-info-panel">
+    {if !empty($extension.urls)}
         {foreach from=$extension.urls key=label item=url}
             <tr><td class="label">{$label|escape}</td><td><a href="{$url|escape}">{$url|escape}</a></td></tr>
         {/foreach}
+    {/if}
     <tr>
         <td class="label">{ts}Author{/ts}</td>
         <td>
@@ -15,21 +17,25 @@
           {/foreach}
         </td>
     </tr>
+    {if !empty($extension.comments)}
     <tr>
       <td class="label">{ts}Comments{/ts}</td><td>{$extension.comments|escape}</td>
     </tr>
+    {/if}
     <tr>
-        <td class="label">{ts}Version{/ts}</td><td>{$extension.version|escape}</td>
+      <td class="label">{ts}Version{/ts}</td><td>{$extension.version|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate|escape}</td>
+      <td class="label">{ts}Released on{/ts}</td><td>{$extension.releaseDate|escape}</td>
     </tr>
     <tr>
-        <td class="label">{ts}License{/ts}</td><td>{$extension.license|escape}</td>
+      <td class="label">{ts}License{/ts}</td><td>{$extension.license|escape}</td>
     </tr>
+    {if !empty($extension.develStage)}
     <tr>
-        <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage|escape}</td>
+      <td class="label">{ts}Development stage{/ts}</td><td>{$extension.develStage|escape}</td>
     </tr>
+    {/if}
     <tr>
         <td class="label">{ts}Requires{/ts}</td>
         <td>
