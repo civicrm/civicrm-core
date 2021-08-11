@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea837c7aee5b94c6cbc1df32c5b3aa70",
+    "content-hash": "58272f5bca4104f5bab01213016da6e7",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -1450,27 +1450,22 @@
         },
         {
             "name": "pear/db",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/DB.git",
-                "reference": "e158c3a48246b67cd8c95856ffbb93de4ef380fe"
+                "reference": "7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/DB/zipball/e158c3a48246b67cd8c95856ffbb93de4ef380fe",
-                "reference": "e158c3a48246b67cd8c95856ffbb93de4ef380fe",
+                "url": "https://api.github.com/repos/pear/DB/zipball/7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21",
+                "reference": "7e4f33dcecd99595df982ef8f56c1d7c2bbeaa21",
                 "shasum": ""
             },
             "require": {
                 "pear/pear-core-minimal": "*"
             },
             "type": "library",
-            "extra": {
-                "patches_applied": {
-                    "Apply CiviCRM Customisations for the pear:db package": "https://raw.githubusercontent.com/civicrm/civicrm-core/a48a43c2b5f6d694fff1cfb99d522c5d9e2459a0/tools/scripts/composer/pear_db_civicrm_changes.patch"
-                }
-            },
             "autoload": {
                 "psr-0": {
                     "DB": "./"
@@ -1481,7 +1476,7 @@
                 "./"
             ],
             "license": [
-                "PHP License v3.01"
+                "PHP-3.01"
             ],
             "authors": [
                 {
@@ -1506,7 +1501,11 @@
                 }
             ],
             "description": "More info available on: http://pear.php.net/package/DB",
-            "time": "2020-04-19T19:45:59+00:00"
+            "support": {
+                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=DB",
+                "source": "https://github.com/pear/DB"
+            },
+            "time": "2021-08-11T00:24:34+00:00"
         },
         {
             "name": "pear/log",
@@ -3990,5 +3989,5 @@
     "platform-overrides": {
         "php": "7.2"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }
