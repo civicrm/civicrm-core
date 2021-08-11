@@ -256,7 +256,7 @@ class TokenProcessor {
    *   Each row is presented with a fluent, OOP facade.
    */
   public function getRows() {
-    return new TokenRowIterator($this, new \ArrayIterator($this->rowContexts));
+    return new TokenRowIterator($this, new \ArrayIterator($this->rowContexts ?: []));
   }
 
   /**
