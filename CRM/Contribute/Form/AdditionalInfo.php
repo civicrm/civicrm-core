@@ -432,7 +432,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'toEmail' => $contributorEmail,
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
       ]
     );
 

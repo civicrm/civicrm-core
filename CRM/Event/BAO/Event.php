@@ -1242,7 +1242,7 @@ WHERE civicrm_event.is_active = 1
             $values['event']
           );
 
-          if (Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
+          if (Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
             $sendTemplateParams['contributionId'] = $values['contributionId'];
           }

@@ -942,7 +942,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         'toName' => $form->_contributorDisplayName,
         'toEmail' => $form->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
-        'isEmailPdf' => Civi::settings()->get('invoicing') && Civi::settings()->get('invoice_is_email_pdf'),
+        'isEmailPdf' => Civi::settings()->get('invoice_is_email_pdf'),
         'contributionId' => $this->getCurrentRowContributionID(),
         'isTest' => (bool) ($form->_action & CRM_Core_Action::PREVIEW),
       ]
