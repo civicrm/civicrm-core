@@ -204,24 +204,6 @@ class CRM_Core_Component {
   }
 
   /**
-   * @return array
-   */
-  public static function &menu() {
-    $info = self::_info();
-    $items = [];
-    foreach ($info as $name => $comp) {
-      $mnu = $comp->getMenuObject();
-
-      $ret = $mnu->permissioned();
-      $items = array_merge($items, $ret);
-
-      $ret = $mnu->main($task);
-      $items = array_merge($items, $ret);
-    }
-    return $items;
-  }
-
-  /**
    * @param string $componentName
    *
    * @return mixed
@@ -230,9 +212,6 @@ class CRM_Core_Component {
     $info = self::_info();
     if (!empty($info[$componentName])) {
       return $info[$componentName]->componentID;
-    }
-    else {
-      return;
     }
   }
 
