@@ -84,6 +84,7 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
     // Multiple revisions of the activity.
     // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
+    $e->query->select('e.id AS tokenContext_' . $this->getEntityContextSchema());
   }
 
   /**
@@ -91,9 +92,7 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
    */
   public function prefetch(TokenValueEvent $e) {
     // Find all the entity IDs
-    $entityIds
-      = $e->getTokenProcessor()->getContextValues('actionSearchResult', 'entityID')
-      + $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
+    $entityIds = $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
 
     if (!$entityIds) {
       return NULL;
@@ -144,8 +143,7 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
       'activity_id' => 'id',
     ];
 
-    // Get ActivityID either from actionSearchResult (for scheduled reminders) if exists
-    $activityId = $row->context['actionSearchResult']->entityID ?? $row->context[$this->getEntityContextSchema()];
+    $activityId = $row->context[$this->getEntityContextSchema()];
 
     $activity = $prefetch['activity'][$activityId];
 
