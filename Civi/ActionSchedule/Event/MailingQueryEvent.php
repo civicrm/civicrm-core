@@ -28,6 +28,18 @@ use Symfony\Component\EventDispatcher\Event;
  *   ->select('foo.bar_value AS bar');
  * ```
  *
+ * Modifications may be used to do the following:
+ *
+ * - Joining to business tables - to help target filter-criteria/temporal criteria on other entites.
+ *   (Ex: Join to the `civicrm_participant` table and filter on participant status or registration date.)
+ * - Joining business tables - to select/return additional columns. Feed the data downstream for mail-merge/token-handling. As in:
+ *     - (Recommended) Return the IDs of business-records. Use the prefix `tokenContext_*`.
+ *       Ex query: `$event->query->select('foo.id AS tokenContext_fooId')
+ *       Ex output: `$tokenRow->context['fooId']`
+ *     - (Deprecated) Return detailed data of business-records. Ex:
+ *       Ex query: `$event->query->select('foo.title as foo_title, foo.status_id as foo_status_id')`
+ *       Ex output: `$tokenRow->context['actionSearchResult']->foo_title`
+ *
  * There are several parameters pre-set for use in queries:
  *  - 'casActionScheduleId'
  *  - 'casEntityJoinExpr' - eg 'e.id = reminder.entity_id'
