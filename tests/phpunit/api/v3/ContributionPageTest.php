@@ -52,8 +52,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Setup for test.
-   *
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -113,7 +111,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   * @throws \CRM_Core_Exception
    */
   public function testGetBasicContributionPage(int $version): void {
     $this->_apiversion = $version;
@@ -129,8 +126,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test get with amount as a parameter.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetContributionPageByAmount(): void {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
@@ -1702,11 +1697,13 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    * Contribution total = 3723.05
    *  made up of  tax 337.55
    *          non tax 3385.5
+   *
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
-   * @dataProvider getThousandSeparators
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @dataProvider getThousandSeparators
    */
   public function testSubmitContributionPageWithPriceSetQuantity(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);

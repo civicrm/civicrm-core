@@ -5164,14 +5164,11 @@ LIMIT 1;";
    *
    * @param int $contributionID
    *
-   * @return string
+   * @return string|null
    */
-  public static function getInvoiceNumber($contributionID) {
-    if ($invoicePrefix = self::checkContributeSettings('invoice_prefix')) {
-      return $invoicePrefix . $contributionID;
-    }
-
-    return NULL;
+  public static function getInvoiceNumber(int $contributionID): ?string {
+    $invoicePrefix = Civi::settings()->get('invoice_prefix');
+    return $invoicePrefix ? $invoicePrefix . $contributionID : NULL;
   }
 
   /**

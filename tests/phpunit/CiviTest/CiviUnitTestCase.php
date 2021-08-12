@@ -3073,32 +3073,30 @@ VALUES
    * Enable Tax and Invoicing
    *
    * @param array $params
-   *
-   * @return \Civi\Core\SettingsBag
    */
-  protected function enableTaxAndInvoicing($params = []) {
+  protected function enableTaxAndInvoicing(array $params = []): void {
     // Enable component contribute setting
     $contributeSetting = array_merge($params,
       [
         'invoicing' => 1,
         'invoice_prefix' => 'INV_',
-        'due_date' => 10,
-        'due_date_period' => 'days',
-        'notes' => '',
-        'is_email_pdf' => 1,
+        'invoice_due_date' => 10,
+        'invoice_due_date_period' => 'days',
+        'invoice_notes' => '',
+        'invoice_is_email_pdf' => 1,
         'tax_term' => 'Sales Tax',
         'tax_display_settings' => 'Inclusive',
       ]
     );
-    return Civi::settings()->set('contribution_invoice_settings', $contributeSetting);
+    foreach ($contributeSetting as $setting => $value) {
+      Civi::settings()->set($setting, $value);
+    }
   }
 
   /**
    * Enable Tax and Invoicing
-   *
-   * @throws \CRM_Core_Exception
    */
-  protected function disableTaxAndInvoicing(): \Civi\Core\SettingsBag {
+  protected function disableTaxAndInvoicing(): void {
     $accounts = $this->callAPISuccess('EntityFinancialAccount', 'get', ['account_relationship' => 'Sales Tax Account is'])['values'];
     foreach ($accounts as $account) {
       $this->callAPISuccess('EntityFinancialAccount', 'delete', ['id' => $account['id']]);
@@ -3108,7 +3106,8 @@ VALUES
     if (!empty(\Civi::$statics['CRM_Core_PseudoConstant']) && isset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates'])) {
       unset(\Civi::$statics['CRM_Core_PseudoConstant']['taxRates']);
     }
-    return Civi::settings()->set('invoicing', FALSE);
+    Civi::settings()->set('invoice_is_email_pdf', FALSE);
+    Civi::settings()->set('invoicing', FALSE);
   }
 
   /**
