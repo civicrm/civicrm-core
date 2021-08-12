@@ -915,23 +915,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     );
   }
 
-  public function testMembershipCreateWithInvalidStatus() {
-    $params = $this->_params;
-    $params['status_id'] = 999;
-    $this->callAPIFailure('membership', 'create', $params,
-      "'999' is not a valid option for field status_id"
-    );
-  }
-
-  public function testMembershipCreateWithInvalidType() {
-    $params = $this->_params;
-    $params['membership_type_id'] = 999;
-
-    $this->callAPIFailure('membership', 'create', $params,
-      "'999' is not a valid option for field membership_type_id"
-    );
-  }
-
   /**
    * Check with complete array + custom field
    * Note that the test is written on purpose without any
