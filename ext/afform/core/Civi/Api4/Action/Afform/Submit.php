@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\Event\AfformSubmitEvent;
+use Civi\Api4\AfformSubmission;
 
 /**
  * Class Submit
@@ -57,6 +58,15 @@ class Submit extends AbstractProcessor {
       $this->fillIdFields($records, $entityName);
       $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
+    }
+
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->_entityIds)
+        ->execute()->first();
     }
 
     // What should I return?

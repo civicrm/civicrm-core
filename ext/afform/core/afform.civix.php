@@ -449,5 +449,11 @@ function _afform_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _afform_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Afform_DAO_AfformSubmission' => [
+      'name' => 'AfformSubmission',
+      'class' => 'CRM_Afform_DAO_AfformSubmission',
+      'table' => 'civicrm_afform_submission',
+    ],
+  ]);
 }

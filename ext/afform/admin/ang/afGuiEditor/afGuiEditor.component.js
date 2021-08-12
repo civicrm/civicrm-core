@@ -69,6 +69,7 @@
 
           if (editor.mode === 'create') {
             editor.addEntity(editor.entity);
+            editor.afform.create_submission = true;
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
         }
