@@ -255,6 +255,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * legacy processor function. Once this is true we can expose the listener on the
    * token processor for contribution and call it internally from the legacy code.
    *
+   * @throws \API_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function testTokenRendering(): void {
@@ -381,7 +382,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     foreach ($fields as $field) {
       $allFields[$field['name']] = $field['title'];
     }
-    // $this->assertEquals($realLegacyTokens, $allFields);
+    // contact ID is skipped.
+    unset($allFields['contact_id']);
+    $this->assertEquals($allFields, $realLegacyTokens);
     $this->assertEquals($legacyTokens, $processor->tokenNames);
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);
