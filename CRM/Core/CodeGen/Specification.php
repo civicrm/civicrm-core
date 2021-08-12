@@ -456,6 +456,9 @@ class CRM_Core_CodeGen_Specification {
         'callback',
         // Path to options edit form
         'optionEditPath',
+        // Should options for this field be prefetched (for presenting on forms).
+        // The default is TRUE, but adding FALSE helps when there could be many options
+        'prefetch',
       ];
       foreach ($validOptions as $pseudoOption) {
         if (!empty($fieldXML->pseudoconstant->$pseudoOption)) {
