@@ -230,7 +230,7 @@ class CRM_Financial_BAO_Order {
    *
    * @throws \API_Exception
    */
-  public function getPriceSetID(): int {
+  public function getPriceSetID() {
     if (!$this->priceSetID) {
       foreach ($this->getPriceOptions() as $fieldID => $valueID) {
         $this->setPriceSetIDFromSelectedField($fieldID);

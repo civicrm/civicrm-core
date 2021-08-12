@@ -794,6 +794,9 @@ WHERE  id = %1";
    * @return array
    */
   public static function getCachedPriceSetDetail($priceSetID) {
+    if (!isset($priceSetId)) {
+      return [];
+    }
     $cacheKey = __CLASS__ . __FUNCTION__ . '_' . $priceSetID;
     $cache = CRM_Utils_Cache::singleton();
     $values = $cache->get($cacheKey);
