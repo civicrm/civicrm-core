@@ -568,4 +568,27 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     return (int) $this->getSubmittedValue('payment_instrument_id') ?: $this->_paymentProcessor['object']->getPaymentInstrumentID();
   }
 
+  /**
+   * Get the last 4 numbers of the card.
+   *
+   * @return int|null
+   */
+  protected function getPanTruncation(): ?int {
+    $card = $this->getSubmittedValue('credit_card_number');
+    return $card ? (int) substr($card, -4) : NULL;
+  }
+
+  /**
+   * Get the card_type_id.
+   *
+   * This value is the integer representing the option value for
+   * the credit card type (visa, mastercard). It is stored as part of the
+   * payment record in civicrm_financial_trxn.
+   *
+   * @return int|null
+   */
+  protected function getCardTypeID(): ?int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
+  }
+
 }

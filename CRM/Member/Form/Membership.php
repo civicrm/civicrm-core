@@ -1103,10 +1103,6 @@ DESC limit 1");
 
     if ($this->_mode) {
       $params['total_amount'] = $this->order->getTotalAmount();
-
-      //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
-      $params['card_type_id'] = $this->_params['card_type_id'] ?? NULL;
-      $params['pan_truncation'] = $this->_params['pan_truncation'] ?? NULL;
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
@@ -1146,46 +1142,46 @@ DESC limit 1");
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.
       $result = NULL;
-      if ($this->isCreateRecurringContribution()) {
-        $this->_params = $formValues;
-        $contribution = civicrm_api3('Order', 'create',
-          [
-            'contact_id' => $this->_contributorContactID,
-            'line_items' => $this->getLineItemForOrderApi(),
-            'is_test' => $this->isTest(),
-            'campaign_id' => $this->getSubmittedValue('campaign_id'),
-            'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-            'payment_instrument_id' => $this->getPaymentInstrumentID(),
-            'financial_type_id' => $this->getFinancialTypeID(),
-            'receive_date' => $this->getReceiveDate(),
-            'tax_amount' => $this->order->getTotalTaxAmount(),
-            'total_amount' => $this->order->getTotalAmount(),
-            'invoice_id' => $this->getInvoiceID(),
-            'currency' => $this->getCurrency(),
-            'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
-            'contribution_recur_id' => $this->getContributionRecurID(),
-            'skipCleanMoney' => TRUE,
-          ]
-        );
-        $this->ids['Contribution'] = $contribution['id'];
-        $this->setMembershipIDsFromOrder($contribution);
 
-        //create new soft-credit record, CRM-13981
-        if ($softParams) {
-          $softParams['contribution_id'] = $contribution['id'];
-          $softParams['currency'] = $this->getCurrency();
-          $softParams['amount'] = $this->order->getTotalAmount();
-          CRM_Contribute_BAO_ContributionSoft::add($softParams);
-        }
+      $this->_params = $formValues;
+      $contribution = civicrm_api3('Order', 'create',
+        [
+          'contact_id' => $this->_contributorContactID,
+          'line_items' => $this->getLineItemForOrderApi(),
+          'is_test' => $this->isTest(),
+          'campaign_id' => $this->getSubmittedValue('campaign_id'),
+          'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
+          'payment_instrument_id' => $this->getPaymentInstrumentID(),
+          'financial_type_id' => $this->getFinancialTypeID(),
+          'receive_date' => $this->getReceiveDate(),
+          'tax_amount' => $this->order->getTotalTaxAmount(),
+          'total_amount' => $this->order->getTotalAmount(),
+          'invoice_id' => $this->getInvoiceID(),
+          'currency' => $this->getCurrency(),
+          'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
+          'contribution_recur_id' => $this->getContributionRecurID(),
+          'skipCleanMoney' => TRUE,
+        ]
+      );
+      $this->ids['Contribution'] = $contribution['id'];
+      $this->setMembershipIDsFromOrder($contribution);
 
-        $paymentParams['contactID'] = $this->_contactID;
-        $paymentParams['contributionID'] = $contribution['id'];
-
-        $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
-        $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
-        $params['contribution_id'] = $paymentParams['contributionID'];
-        $params['contribution_recur_id'] = $this->getContributionRecurID();
+      //create new soft-credit record, CRM-13981
+      if ($softParams) {
+        $softParams['contribution_id'] = $contribution['id'];
+        $softParams['currency'] = $this->getCurrency();
+        $softParams['amount'] = $this->order->getTotalAmount();
+        CRM_Contribute_BAO_ContributionSoft::add($softParams);
       }
+
+      $paymentParams['contactID'] = $this->_contactID;
+      $paymentParams['contributionID'] = $contribution['id'];
+
+      $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
+      $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
+      $params['contribution_id'] = $paymentParams['contributionID'];
+      $params['contribution_recur_id'] = $this->getContributionRecurID();
+
       $paymentStatus = NULL;
 
       if ($this->order->getTotalAmount() > 0.0) {
@@ -1202,6 +1198,8 @@ DESC limit 1");
               'trxn_id' => $result['trxn_id'],
               'contribution_id' => $params['contribution_id'],
               'is_send_contribution_notification' => FALSE,
+              'card_type_id' => $this->getCardTypeID(),
+              'pan_truncation' => $this->getPanTruncation(),
             ]);
           }
         }
@@ -1260,10 +1258,6 @@ DESC limit 1");
       $count = 0;
       foreach ($this->_memTypeSelected as $memType) {
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
-        //CRM-15366
-        if (!empty($softParams) && !$this->isCreateRecurringContribution()) {
-          $membershipParams['soft_credit'] = $softParams;
-        }
         if (isset($result['fee_amount'])) {
           $membershipParams['fee_amount'] = $result['fee_amount'];
         }
@@ -1274,19 +1268,11 @@ DESC limit 1");
         // process -
         // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
         $membershipParams['contribution_status_id'] = $result['payment_status_id'] ?? NULL;
-        if ($this->isCreateRecurringContribution()) {
-          // The earlier process created the line items (although we want to get rid of the earlier one in favour
-          // of a single path!
-          unset($membershipParams['lineItems']);
-        }
+        // The earlier process created the line items (although we want to get rid of the earlier one in favour
+        // of a single path!
+        unset($membershipParams['lineItems']);
         $membershipParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
         // @todo stop passing $ids (membership and userId only are set above)
-        if (!$this->isCreateRecurringContribution()) {
-          // For recurring we already created it 'the right way' (order api).
-          // In time we will do that for all paths through this code but for now
-          // we have not migrated the other paths.
-          $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams, $ids));
-        }
         $params['contribution'] = $membershipParams['contribution'] ?? NULL;
         unset($params['lineItems']);
       }
