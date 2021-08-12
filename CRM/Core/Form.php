@@ -848,9 +848,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       // It's not clear why we set this on the form.
       $this->set('paymentProcessors', $this->_paymentProcessors);
     }
-    else {
-      throw new CRM_Core_Exception(ts('A payment processor configured for this page might be disabled (contact the site administrator for assistance).'));
-    }
   }
 
   /**
