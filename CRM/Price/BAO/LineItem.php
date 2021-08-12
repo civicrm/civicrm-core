@@ -214,8 +214,6 @@ WHERE li.contribution_id = %1";
     ];
 
     $getTaxDetails = FALSE;
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
 
     $dao = CRM_Core_DAO::executeQuery("$selectClause $fromClause $whereClause $orderByClause", $params);
     while ($dao->fetch()) {
@@ -257,7 +255,7 @@ WHERE li.contribution_id = %1";
         $getTaxDetails = TRUE;
       }
     }
-    if ($invoicing) {
+    if (Civi::settings()->get('invoicing')) {
       // @todo - this is an inappropriate place to be doing form level assignments.
       $taxTerm = Civi::settings()->get('tax_term');
       $smarty = CRM_Core_Smarty::singleton();

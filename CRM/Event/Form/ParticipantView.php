@@ -192,8 +192,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = [];
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
@@ -201,7 +199,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
     }
-    if ($invoicing) {
+    if (Civi::settings()->get('invoicing')) {
       $this->assign('totalTaxAmount', $totalTaxAmount);
     }
     if ($participantCount) {
