@@ -351,4 +351,68 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertTrue(isset($looped));
   }
 
+  /**
+   * Define extended tokens with funny symbols
+   */
+  public function testHookTokenExtraChar() {
+    $cid = $this->individualCreate();
+
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    \Civi::dispatcher()->addListener('hook_civicrm_tokens', function ($e) {
+      $e->tokens['food'] = [
+        'food.fruit.apple' => ts('Apple'),
+        'food.fruit:summary' => ts('Fruit summary'),
+      ];
+    });
+    \Civi::dispatcher()->addListener('hook_civicrm_tokenValues', function ($e) {
+      foreach ($e->tokens['food'] ?? [] as $subtoken) {
+        foreach ($e->contactIDs as $cid) {
+          switch ($subtoken) {
+            case 'fruit.apple':
+              $e->details[$cid]['food.fruit.apple'] = 'Fruit of the Tree';
+              break;
+
+            case 'fruit:summary':
+              $e->details[$cid]['food.fruit:summary'] = 'Apples, Bananas, and Cherries Oh My';
+              break;
+          }
+        }
+      }
+    });
+
+    $expectRealSmartyOutputs = [
+      TRUE => 'Fruit of the Tree yes',
+      FALSE => 'Fruit of the Tree {if 1}yes{else}no{/if}',
+    ];
+
+    $loops = 0;
+    foreach ([TRUE, FALSE] as $smarty) {
+      $p = new TokenProcessor($this->dispatcher, [
+        'controller' => __CLASS__,
+        'smarty' => $smarty,
+      ]);
+      $p->addMessage('real_dot', '!!{food.fruit.apple}!!', 'text/plain');
+      $p->addMessage('real_dot_smarty', '{food.fruit.apple} {if 1}yes{else}no{/if}', 'text/plain');
+      $p->addMessage('real_colon', 'Summary of fruits: {food.fruit:summary}!', 'text/plain');
+      $p->addMessage('not_real_1', '!!{food.fruit}!!', 'text/plain');
+      $p->addMessage('not_real_2', '!!{food.apple}!!', 'text/plain');
+      $p->addMessage('not_real_3', '!!{fruit.apple}!!', 'text/plain');
+      $p->addMessage('not_real_4', '!!{food.fruit:apple}!!', 'text/plain');
+      $p->addRow(['contactId' => $cid]);
+      $p->evaluate();
+
+      foreach ($p->getRows() as $row) {
+        $loops++;
+        $this->assertEquals('!!Fruit of the Tree!!', $row->render('real_dot'));
+        $this->assertEquals($expectRealSmartyOutputs[$smarty], $row->render('real_dot_smarty'));
+        $this->assertEquals('Summary of fruits: Apples, Bananas, and Cherries Oh My!', $row->render('real_colon'));
+        $this->assertEquals('!!!!', $row->render('not_real_1'));
+        $this->assertEquals('!!!!', $row->render('not_real_2'));
+        $this->assertEquals('!!!!', $row->render('not_real_3'));
+        $this->assertEquals('!!!!', $row->render('not_real_4'));
+      }
+    }
+    $this->assertEquals(2, $loops);
+  }
+
 }
