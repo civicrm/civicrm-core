@@ -214,6 +214,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // from the metadata as yet.
       return FALSE;
     }
+    if ($this->getFieldMetadata()[$fieldName]['type'] === 'Custom') {
+      // If we remove this early return then we get that extra nuanced goodness
+      // and support for the more portable v4 style field names
+      // on custom fields - where labels or names can be returned.
+      // At present the gap is that the metadata for the label is not accessed
+      // and tests failed on the enotice and we don't have a clear plan about
+      // v4 style custom tokens - but medium term this IF will probably go.
+      return FALSE;
+    }
     return (bool) $this->getFieldMetadata()[$fieldName]['options'];
   }
 
@@ -282,6 +291,62 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     foreach ($this->getReturnFields() as $token) {
       $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
     }
+  }
+
+  /**
+   * Get tokens supporting the syntax we are migrating to.
+   *
+   * In general these are tokens that were not previously supported
+   * so we can add them in the preferred way or that we have
+   * undertaken some, as yet to be written, db update.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/2650
+   *
+   * @return string[]
+   * @throws \API_Exception
+   */
+  public function getBasicTokens(): array {
+    $return = [];
+    foreach ($this->getExposedFields() as $fieldName) {
+      $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
+    }
+    return $return;
+  }
+
+  /**
+   * Get entity fields that should be exposed as tokens.
+   *
+   * @return string[]
+   *
+   */
+  public function getExposedFields(): array {
+    $return = [];
+    foreach ($this->getFieldMetadata() as $field) {
+      if (!in_array($field['name'], $this->getSkippedFields(), TRUE)) {
+        $return[] = $field['name'];
+      }
+    }
+    return $return;
+  }
+
+  /**
+   * Get entity fields that should not be exposed as tokens.
+   *
+   * @return string[]
+   */
+  public function getSkippedFields(): array {
+    $fields = ['contact_id'];
+    if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+      $fields[] = 'campaign_id';
+    }
+    return $fields;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getEntityName(): string {
+    return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
   }
 
 }

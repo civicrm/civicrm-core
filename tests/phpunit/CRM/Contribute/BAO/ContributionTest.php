@@ -1304,7 +1304,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test for replaceContributionTokens.
-   *   This function tests whether the contribution tokens are replaced with
+   *
+   * This function tests whether the contribution tokens are replaced with
    * values from contribution.
    *
    * @throws \CiviCRM_API3_Exception
