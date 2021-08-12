@@ -669,9 +669,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $params
    *
    * @return int
-   * @throws \CRM_Core_Exception
    */
-  public function contactMembershipCreate($params) {
+  public function contactMembershipCreate(array $params): int {
     $params = array_merge([
       'join_date' => '2007-01-21',
       'start_date' => '2007-01-21',

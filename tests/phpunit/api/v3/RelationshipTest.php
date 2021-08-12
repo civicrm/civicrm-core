@@ -80,11 +80,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown(): void {
-    $this->contactDelete($this->_cId_a);
-    $this->contactDelete($this->_cId_a_2);
-    $this->contactDelete($this->_cId_b);
-    $this->contactDelete($this->_cId_b2);
-    $this->quickCleanup(['civicrm_relationship'], TRUE);
+    $this->quickCleanup(['civicrm_relationship', 'civicrm_membership'], TRUE);
     $this->relationshipTypeDelete($this->_relTypeID);
     parent::tearDown();
   }
@@ -94,7 +90,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * @param int $version
    * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipCreateEmpty($version) {
+  public function testRelationshipCreateEmpty($version): void {
     $this->_apiversion = $version;
     $this->callAPIFailure('relationship', 'create', []);
   }
@@ -1316,11 +1312,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testCreateRelatedMembership($version) {
+  public function testCreateRelatedMembership(int $version): void {
     $this->_apiversion = $version;
+    $mainContactID = $this->organizationCreate();
     $relatedMembershipType = $this->callAPISuccess('MembershipType', 'create', [
       'name' => 'Membership with Related',
       'member_of_contact_id' => 1,
@@ -1338,12 +1333,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ]);
     $originalMembership = $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $relatedMembershipType['id'],
-      'contact_id' => $this->_cId_b,
+      'contact_id' => $mainContactID,
     ]);
     $this->callAPISuccess('Relationship', 'create', [
       'relationship_type_id' => $this->_relTypeID,
       'contact_id_a' => $this->_cId_a,
-      'contact_id_b' => $this->_cId_b,
+      'contact_id_b' => $mainContactID,
     ]);
     $contactAMembership = $this->callAPISuccessGetSingle('membership', ['contact_id' => $this->_cId_a]);
     $this->assertEquals($originalMembership['id'], $contactAMembership['owner_membership_id']);
@@ -1352,14 +1347,19 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'create', [
       'relationship_type_id' => $this->_relTypeID,
       'contact_id_a' => $this->_cId_a_2,
-      'contact_id_b' => $this->_cId_b,
+      'contact_id_b' => $mainContactID,
       'start_date' => 'now + 1 week',
     ]);
     $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a_2], 0);
 
+    // @todo - this is actually mimicing an accidental test set up from earlier.
+    // there is a legit bug whereby apiv4 contact.delete is
+    // somehow bypassing Membership cleanup.
+    // https://lab.civicrm.org/dev/core/-/issues/2757
+    $this->_apiversion = 3;
     // Deleting the organization should cause the related membership to be deleted.
-    $this->callAPISuccess('contact', 'delete', ['id' => $this->_cId_b]);
-    $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a], 0);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $mainContactID]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $this->_cId_a], 0);
   }
 
   /**
@@ -1382,7 +1382,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $reln = new CRM_Contact_Form_Relationship();
     $reln->_action = CRM_Core_Action::ADD;
     $reln->_contactId = $this->_cId_a;
-    list ($params, $relationshipIds) = $reln->submit($params);
+    [$params, $relationshipIds] = $reln->submit($params);
     $this->assertEquals(
       $this->_cId_b,
       $this->callAPISuccess('Contact', 'getvalue', [
@@ -1398,7 +1398,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ];
     $reln->_action = CRM_Core_Action::UPDATE;
     $reln->_relationshipId = $relationshipIds[0];
-    list ($params, $relationshipIds) = $reln->submit($params);
+    [$params, $relationshipIds] = $reln->submit($params);
     $this->assertEmpty($this->callAPISuccess('Contact', 'getvalue', [
       'id' => $this->_cId_a,
       'return' => 'current_employer_id',

@@ -16,6 +16,8 @@
  * @package CiviCRM_APIv3
  */
 
+use Civi\Api4\Membership;
+
 /**
  * Retrieve a set of Order.
  *
@@ -140,15 +142,18 @@ function civicrm_api3_order_create(array $params): array {
 
     if ($entityParams['entity'] === 'membership') {
       if (empty($entityParams['id'])) {
-        $entityParams['status_id'] = 'Pending';
+        $entityParams['status_id:name'] = 'Pending';
       }
       if (!empty($params['contribution_recur_id'])) {
         $entityParams['contribution_recur_id'] = $params['contribution_recur_id'];
       }
-      $entityParams['skipLineItem'] = TRUE;
-      $entityResult = civicrm_api3('Membership', 'create', $entityParams);
+      // At this stage we need to get this passed through.
+      $entityParams['version'] = 4;
+      _order_create_wrangle_membership_params($entityParams);
+
+      $membershipID = Membership::save($params['check_permissions'] ?? FALSE)->setRecords([$entityParams])->execute()->first()['id'];
       foreach ($entityParams['line_references'] as $lineIndex) {
-        $order->setLineItemValue('entity_id', $entityResult['id'], $lineIndex);
+        $order->setLineItemValue('entity_id', $membershipID, $lineIndex);
       }
     }
   }
@@ -285,4 +290,30 @@ function _civicrm_api3_order_delete_spec(array &$params) {
     'type' => CRM_Utils_Type::T_INT,
   ];
   $params['id']['api.aliases'] = ['contribution_id'];
+}
+
+/**
+ * Handle possibility of v3 style params.
+ *
+ * We used to call v3 Membership.create. Now we call v4.
+ * This converts membership input parameters.
+ *
+ * @param array $membershipParams
+ *
+ * @throws \API_Exception
+ */
+function _order_create_wrangle_membership_params(array &$membershipParams) {
+  $fields = Membership::getFields(FALSE)->execute()->indexBy('name');
+  foreach ($fields as $fieldName => $field) {
+    $customFieldName = 'custom_' . ($field['custom_field_id'] ?? NULL);
+    if ($field['type'] === ['Custom'] && isset($membershipParams[$customFieldName])) {
+      $membershipParams[$field['custom_group'] . '.' . $field['custom_field']] = $membershipParams[$customFieldName];
+      unset($membershipParams[$customFieldName]);
+    }
+
+    if (!empty($membershipParams[$fieldName]) && $field['data_type'] === 'Integer' && !is_numeric($membershipParams[$fieldName])) {
+      $membershipParams[$field['name'] . ':name'] = $membershipParams[$fieldName];
+      unset($membershipParams[$field['name']]);
+    }
+  }
 }
