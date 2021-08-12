@@ -81,14 +81,19 @@ class CRM_Contact_Form_Edit_Email {
       $form->addElement('radio', "email[$blockId][is_primary]", '', '', '1', $js);
 
       if (CRM_Utils_System::getClassName($form) == 'CRM_Contact_Form_Contact') {
-
-        $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
-          ['rows' => 2, 'cols' => 40]
-        );
-
-        $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
-          ['rows' => 2, 'cols' => 40]
-        );
+        // Only display the signature fields if this contact has a CMS account
+        // because they can only send email if they have access to the CRM
+        if (!empty($form->_contactId)) {
+          $ufID = CRM_Core_BAO_UFMatch::getUFId($form->_contactId);
+          if ($ufID) {
+            $form->add('textarea', "email[$blockId][signature_text]", ts('Signature (Text)'),
+              ['rows' => 2, 'cols' => 40]
+            );
+            $form->add('wysiwyg', "email[$blockId][signature_html]", ts('Signature (HTML)'),
+              ['rows' => 2, 'cols' => 40]
+            );
+          }
+        }
       }
     }
   }
