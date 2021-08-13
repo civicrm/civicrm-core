@@ -135,6 +135,7 @@
     <title>Membership Type Duration Unit</title>
     <type>varchar</type>
     <length>8</length>
+    <required>true</required>
     <comment>Unit in which membership period is expressed.</comment>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::membershipTypeUnitList</callback>

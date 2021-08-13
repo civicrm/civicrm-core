@@ -2,6 +2,7 @@
 
 namespace Civi\Financialacls;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\MembershipType;
 
 // I fought the Autoloader and the autoloader won.
@@ -38,13 +39,13 @@ class MembershipTypesTest extends BaseTestClass {
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function setUpMembershipTypesACLLimited(): \Civi\Api4\Generic\Result {
+  protected function setUpMembershipTypesACLLimited(): Result {
     $types = MembershipType::save(FALSE)
       ->setRecords([
         ['name' => 'Forbidden', 'financial_type_id:name' => 'Member Dues', 'weight' => 1],
         ['name' => 'Go for it', 'financial_type_id:name' => 'Donation', 'weight' => 2],
       ])
-      ->setDefaults(['period_type' => 'rolling', 'member_of_contact_id' => 1])
+      ->setDefaults(['period_type' => 'rolling', 'member_of_contact_id' => 1, 'duration_unit' => 'month'])
       ->execute()
       ->indexBy('name');
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
