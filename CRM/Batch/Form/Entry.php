@@ -836,8 +836,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = $value['source'] ?? NULL;
-          $membership = $this->legacyProcessMembership(
-            $value['contact_id'], $value['membership_type_id'],
+          $membership = $this->legacyProcessMembership($value['membership_type_id'],
             $value['custom'], $membershipSource, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
           );
 
@@ -1005,7 +1004,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * @param int $contactID
    * @param int $membershipTypeID
    * @param $customFieldsFormatted
    * @param $membershipSource
@@ -1018,15 +1016,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessMembership($contactID, $membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_DAO_Membership {
+  protected function legacyProcessMembership($membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_DAO_Membership {
     $updateStatusId = FALSE;
     $changeToday = NULL;
     $is_test = FALSE;
     $numRenewTerms = 1;
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
-    $statusFormat = '%Y-%m-%d';
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $ids = [];
     $isPayLater = NULL;
     $currentMembership = $this->getCurrentMembership();
