@@ -820,12 +820,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         // end of contribution related section
 
-        $membershipParams = [
-          'start_date' => $value['membership_start_date'] ?? NULL,
-          'end_date' => $value['membership_end_date'] ?? NULL,
-          'join_date' => $value['membership_join_date'] ?? NULL,
-          'campaign_id' => $value['member_campaign_id'] ?? NULL,
-        ];
+        $membershipParams = $this->getMembershipParams();
 
         if ($this->currentRowIsRenew()) {
           // The following parameter setting may be obsolete.
@@ -1205,6 +1200,20 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($this->currentRowExistingMembership);
     }
     return $this->currentRowExistingMembership;
+  }
+
+  /**
+   * Get the params as related to the membership entity.
+   *
+   * @return array
+   */
+  private function getMembershipParams(): array {
+    return [
+      'start_date' => $this->currentRow['membership_start_date'] ?? NULL,
+      'end_date' => $this->currentRow['membership_end_date'] ?? NULL,
+      'join_date' => $this->currentRow['membership_join_date'] ?? NULL,
+      'campaign_id' => $this->currentRow['member_campaign_id'] ?? NULL,
+    ];
   }
 
 }
