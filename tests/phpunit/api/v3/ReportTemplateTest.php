@@ -1348,7 +1348,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
     $this->contactIDs[] = $this->individualCreate(['last_name' => 'Łąchowski-Roberts']);
 
-    $this->callAPISuccess('Activity', 'create', [
+    $this->activityID = $this->callAPISuccess('Activity', 'create', [
       'subject' => 'Very secret meeting',
       'activity_date_time' => date('Y-m-d 23:59:58'),
       'duration' => 120,
@@ -1359,7 +1359,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'source_contact_id' => $this->contactIDs[2],
       'target_contact_id' => [$this->contactIDs[0], $this->contactIDs[1]],
       'assignee_contact_id' => $this->contactIDs[1],
-    ]);
+    ])['id'];
   }
 
   /**
@@ -1620,6 +1620,113 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'street_address' => '1',
       ],
     ]);
+  }
+
+  /**
+   * Convoluted test of the convoluted logging detail report.
+   *
+   * In principle it's just make an update and get the report and see if it
+   * matches the update.
+   * In practice, besides some setup and trigger-wrangling, the report isn't
+   * useful for activities, so we're checking activity_contact records, and
+   * because of how an activity update works that's actually a delete+insert.
+   */
+  public function testLoggingDetail() {
+    \Civi::settings()->set('logging', 1);
+    $this->createContactsWithActivities();
+    $this->doQuestionableStuffInASeparateFunctionSoNobodyNotices();
+
+    // Do something that creates an update record.
+    $this->callAPISuccess('Activity', 'create', [
+      'id' => $this->activityID,
+      'assignee_contact_id' => $this->contactIDs[0],
+      'details' => 'Edited details',
+    ]);
+
+    // In normal UI flow you would go to the summary report and drill down,
+    // but here we need to go directly to the connection id, so find out what
+    // it was.
+    $queryParams = [1 => [$this->activityID, 'Integer']];
+    $log_conn_id = CRM_Core_DAO::singleValueQuery("SELECT log_conn_id FROM log_civicrm_activity WHERE id = %1 AND log_action='UPDATE' LIMIT 1", $queryParams);
+
+    // There should be only one instance of this after enabling so we can
+    // just specify the template id as the lookup criteria.
+    $instance_id = $this->callAPISuccess('report_instance', 'getsingle', [
+      'return' => ['id'],
+      'report_id' => 'logging/contact/detail',
+    ])['id'];
+
+    $_GET = $_REQUEST = [
+      'reset' => '1',
+      'log_conn_id' => $log_conn_id,
+      'q' => "civicrm/report/instance/$instance_id",
+    ];
+    $values = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'logging/contact/detail',
+    ])['values'];
+
+    // Note this is a delete+insert which is logically equivalent to update
+    $expectedValues = [
+      // here's the delete
+      0 => [
+        'field' => [
+          0 => 'Activity ID (id: 2)',
+          1 => 'Contact ID (id: 2)',
+          2 => 'Activity Contact Type (id: 2)',
+        ],
+        'from' => [
+          0 => 'Very secret meeting (id: 1)',
+          1 => 'Mr. Anthony Łąchowski-Roberts II (id: 4)',
+          2 => 'Activity Assignees',
+        ],
+        'to' => [
+          0 => '',
+          1 => '',
+          2 => '',
+        ],
+      ],
+      // this is the insert
+      1 => [
+        'field' => [
+          0 => 'Activity ID (id: 5)',
+          1 => 'Contact ID (id: 5)',
+          2 => 'Activity Contact Type (id: 5)',
+        ],
+        'from' => [
+          0 => '',
+          1 => '',
+          2 => '',
+        ],
+        'to' => [
+          0 => 'Very secret meeting (id: 1)',
+          1 => 'Mr. Anthony Brzęczysław II (id: 3)',
+          2 => 'Activity Assignees',
+        ],
+      ],
+    ];
+    $this->assertEquals($expectedValues, $values);
+
+    \Civi::settings()->set('logging', 0);
+  }
+
+  /**
+   * The issue is that in a unit test the log_conn_id is going to
+   * be the same throughout the entire test, which is not how it works normally
+   * when you have separate page requests. So use the fact that the conn_id
+   * format is controlled by a hidden variable, so we can force different
+   * conn_id's during initialization and after.
+   * If we don't do this, then the report thinks EVERY log record is part
+   * of the one change detail.
+   *
+   * On the plus side, this doesn't affect other tests since if they enable
+   * logging then that'll just recreate the variable and triggers.
+   */
+  private function doQuestionableStuffInASeparateFunctionSoNobodyNotices(): void {
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_setting WHERE name='logging_uniqueid_date'");
+    // Now we have to rebuild triggers because the format formula is stored in
+    // every trigger.
+    CRM_Core_Config::singleton(TRUE, TRUE);
+    \Civi::service('sql_triggers')->rebuild(NULL, TRUE);
   }
 
 }

@@ -215,11 +215,24 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           $to = implode(', ', array_filter($tos));
         }
 
+        $tableDAOClass = CRM_Core_DAO_AllCoreTables::getClassForTable($table);
+        if (!empty($tableDAOClass)) {
+          $tableDAOFields = (new $tableDAOClass())->fields();
+          // If this field is a foreign key, then we can later use the foreign
+          // class to translate the id into something more useful for display.
+          $fkClassName = $tableDAOFields[$field]['FKClassName'] ?? NULL;
+        }
         if (isset($values[$field][$from])) {
           $from = $values[$field][$from];
         }
+        elseif (!empty($from) && !empty($fkClassName)) {
+          $from = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $from);
+        }
         if (isset($values[$field][$to])) {
           $to = $values[$field][$to];
+        }
+        elseif (!empty($to) && !empty($fkClassName)) {
+          $to = $this->convertForeignKeyValuesToLabels($fkClassName, $field, $to);
         }
         if (isset($titles[$field])) {
           $field = $titles[$field];
@@ -448,6 +461,28 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
       $this->dblimit = $rowCount;
       $this->dboffset = $offset;
     }
+  }
+
+  /**
+   * Given a key value that we know is a foreign key to another table, return
+   * what the DAO thinks is the "label" for the foreign entity. For example
+   * if it's referencing a contact then return the contact name, or if it's an
+   * activity then return the activity subject.
+   * If it's the type of DAO that doesn't have such a thing, just echo back
+   * what we were given.
+   *
+   * @param string $fkClassName
+   * @param string $field
+   * @param int $keyval
+   * @return string
+   */
+  private function convertForeignKeyValuesToLabels(string $fkClassName, string $field, int $keyval): string {
+    if (property_exists($fkClassName, '_labelField')) {
+      $labelValue = CRM_Core_DAO::getFieldValue($fkClassName, $keyval, $fkClassName::$_labelField);
+      // Not sure if this should use ts - there's not a lot of context (`%1 (id: %2)`) - and also the similar field labels above don't use ts.
+      return "{$labelValue} (id: {$keyval})";
+    }
+    return (string) $keyval;
   }
 
 }
