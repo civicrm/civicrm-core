@@ -458,7 +458,16 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
     $mailContent = self::loadTemplate((string) $params['valueName'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
 
-    $mailContent = self::renderMessageTemplate($mailContent, (bool) $params['disableSmarty'], $params['contactId'] ?? NULL, $params['tplParams'], $params['tokenContext']);
+    $params['tokenContext'] = array_merge([
+      'smarty' => (bool) !$params['disableSmarty'],
+      'contactId' => $params['contactId'],
+    ], $params['tokenContext']);
+    $rendered = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $params['tokenContext'], $params['tplParams']);
+    if (isset($rendered['subject'])) {
+      $rendered['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $rendered['subject']));
+    }
+    $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
+    $mailContent = array_merge($nullSet, $mailContent, $rendered);
 
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
@@ -609,43 +618,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     return $mailContent;
-  }
-
-  /**
-   * Render the message template, resolving tokens and smarty tokens.
-   *
-   * This method has been deprecated in favor of two alternatives:
-   *  - Use CRM_Core_BAO_MessageTemplate::renderTemplate() if you want a high-level
-   *    trial-run of sendTemplate(). This will use the loaders, filters, hooks, etc
-   *    but stop short of delivery.
-   *  - Use CRM_Core_TokenSmarty::render() if you want a low-level utility to
-   *    render a template with the hybrid Token-Smarty template format.
-   *
-   * @internal
-   * @deprecated
-   * @see CRM_Core_BAO_MessageTemplate::renderTemplate()
-   * @see CRM_Core_TokenSmarty::render()
-   * @param array $mailContent
-   * @param bool $disableSmarty
-   * @param int|NULL $contactID
-   * @param array $smartyAssigns
-   *   Data to pass through to Smarty.
-   * @param array $tokenContext
-   *   Data to pass through to TokenProcessor.
-   *
-   * @return array
-   */
-  public static function renderMessageTemplate(array $mailContent, bool $disableSmarty, $contactID, array $smartyAssigns, array $tokenContext = []): array {
-    $tokenContext['smarty'] = !$disableSmarty;
-    if ($contactID && !isset($tokenContext['contactId'])) {
-      $tokenContext['contactId'] = $contactID;
-    }
-    $result = CRM_Core_TokenSmarty::render(CRM_Utils_Array::subset($mailContent, ['text', 'html', 'subject']), $tokenContext, $smartyAssigns);
-    if (isset($mailContent['subject'])) {
-      $result['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $result['subject']));
-    }
-    $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
-    return array_merge($nullSet, $mailContent, $result);
   }
 
 }

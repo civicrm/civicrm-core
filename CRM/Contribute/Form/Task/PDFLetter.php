@@ -545,8 +545,12 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       // no change to normal behaviour to avoid risk of breakage
       $tokenHtml = CRM_Utils_Token::replaceContributionTokens($html_message, $contribution, TRUE, $messageToken);
     }
-    $useSmarty = (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY);
-    return CRM_Core_BAO_MessageTemplate::renderMessageTemplate(['text' => '', 'html' => $tokenHtml, 'subject' => ''], !$useSmarty, $contact['contact_id'], ['contact' => $contact])['html'];
+    $tokenContext = [
+      'smarty' => (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY),
+      'contactId' => $contact['contact_id'],
+    ];
+    $smarty = ['contact' => $contact];
+    return CRM_Core_TokenSmarty::render(['html' => $tokenHtml], $tokenContext, $smarty)['html'];
   }
 
 }

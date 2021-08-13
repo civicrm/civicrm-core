@@ -210,12 +210,17 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('Address', 'create', array_merge($values['address'], ['contact_id' => 1]));
     $this->callAPISuccess('Email', 'create', array_merge(['email' => $values['email']], ['contact_id' => 1, 'is_primary' => 1]));
     $tokenString = '{domain.' . implode('} ~ {domain.', array_keys($values)) . '}';
-    $messageContent = CRM_Core_BAO_MessageTemplate::renderMessageTemplate([
-      'html' => $tokenString,
-      // Check the space is stripped.
-      'subject' => $tokenString . ' ',
-      'text' => $tokenString,
-    ], FALSE, FALSE, []);
+
+    $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'valueName' => 'dummy',
+      'messageTemplate' => [
+        'msg_html' => $tokenString,
+        // Check the space is stripped.
+        'msg_subject' => $tokenString . ' ',
+        'msg_text' => $tokenString,
+      ],
+    ]);
+
     $this->assertEquals('Default Domain Name ~  ~ <div class="location vcard"><span class="adr"><span class="street-address">Buckingham palace</span><br /><span class="extended-address">Up the road</span><br /><span class="locality">London</span>, <span class="postal-code">90210</span><br /></span></div> ~ crown@example.com ~ 1 ~ rather nice', $messageContent['html']);
     $this->assertEquals('Default Domain Name ~  ~ Buckingham palace
 Up the road
@@ -229,14 +234,17 @@ London, 90210
    *
    * @throws \CRM_Core_Exception
    */
-  public function testRenderMessageTemplateSmarty(): void {
-    $messageContent = CRM_Core_BAO_MessageTemplate::renderMessageTemplate([
-      'html' => '{$tokenString}',
-      // Check the space is stripped.
-      'subject' => '{$tokenString} ',
-      'text' => '{$tokenString}',
-    ], FALSE, FALSE, ['tokenString' => 'Something really witty']);
-
+  public function testRenderTemplateSmarty(): void {
+    $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'valueName' => 'dummy',
+      'messageTemplate' => [
+        'msg_html' => '{$tokenString}',
+        // Check the space is stripped.
+        'msg_subject' => '{$tokenString} ',
+        'msg_text' => '{$tokenString}',
+      ],
+      'tplParams' => ['tokenString' => 'Something really witty'],
+    ]);
     $this->assertEquals('Something really witty', $messageContent['text']);
     $this->assertEquals('Something really witty', $messageContent['html']);
     $this->assertEquals('Something really witty', $messageContent['subject']);
@@ -246,13 +254,18 @@ London, 90210
    * Test rendering of smarty tokens.
    *
    */
-  public function testRenderMessageTemplateIgnoreSmarty(): void {
-    $messageContent = CRM_Core_BAO_MessageTemplate::renderMessageTemplate([
-      'html' => '{$tokenString}',
-      // Check the space is stripped.
-      'subject' => '{$tokenString} ',
-      'text' => '{$tokenString}',
-    ], TRUE, FALSE, ['tokenString' => 'Something really witty']);
+  public function testRenderTemplateIgnoreSmarty(): void {
+    $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'valueName' => 'dummy',
+      'messageTemplate' => [
+        'msg_html' => '{$tokenString}',
+        // Check the space is stripped.
+        'msg_subject' => '{$tokenString} ',
+        'msg_text' => '{$tokenString}',
+      ],
+      'disableSmarty' => TRUE,
+      'tplParams' => ['tokenString' => 'Something really witty'],
+    ]);
 
     $this->assertEquals('{$tokenString}', $messageContent['text']);
     $this->assertEquals('{$tokenString}', $messageContent['html']);
@@ -284,12 +297,17 @@ London, 90210
     foreach (array_keys($tokenData) as $key) {
       $tokenString .= "{$key}:{contact.{$key}}\n";
     }
-    $messageContent = CRM_Core_BAO_MessageTemplate::renderMessageTemplate([
-      'html' => $tokenString,
-      // Check the space is stripped.
-      'subject' => $tokenString . ' ',
-      'text' => $tokenString,
-    ], FALSE, $tokenData['contact_id'], ['passed_smarty' => 'whoa']);
+    $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'valueName' => 'dummy',
+      'messageTemplate' => [
+        'msg_html' => $tokenString,
+        // Check the space is stripped.
+        'msg_subject' => $tokenString . ' ',
+        'msg_text' => $tokenString,
+      ],
+      'tokenContext' => ['contactId' => $tokenData['contact_id']],
+      'tplParams' => ['passed_smarty' => 'whoa'],
+    ]);
     $expected = 'weewhoa
 Default Domain Name
 ';
