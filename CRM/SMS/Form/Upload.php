@@ -338,7 +338,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $dummy_mail = new CRM_Mailing_BAO_Mailing();
       $mess = "body_text";
       $dummy_mail->$mess = $str;
-      $str = CRM_Core_BAO_MessageTemplate::renderMessageTemplate(['text' => $str, 'html' => '', 'subject' => ''], TRUE, CRM_Core_Session::getLoggedInContactID(), [])['text'];
+      $str = CRM_Core_TokenSmarty::render(['text' => $str], [
+        'smarty' => FALSE,
+        'contactId' => CRM_Core_Session::getLoggedInContactID(),
+      ])['text'];
       $tokens = $dummy_mail->getTokens();
 
       $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
