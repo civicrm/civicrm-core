@@ -66,6 +66,30 @@ class CRM_Financial_BAO_Order {
   protected $defaultFinancialTypeID;
 
   /**
+   * Number of line items.
+   *
+   * @var int
+   */
+  protected $lineItemCount;
+
+  /**
+   * @return int
+   */
+  public function getLineItemCount(): int {
+    if (!isset($this->lineItemCount)) {
+      $this->lineItemCount = count($this->getPriceOptions()) || count($this->lineItems);
+    }
+    return $this->lineItemCount;
+  }
+
+  /**
+   * @param int $lineItemCount
+   */
+  public function setLineItemCount(int $lineItemCount): void {
+    $this->lineItemCount = $lineItemCount;
+  }
+
+  /**
    * @return int
    */
   public function getDefaultFinancialTypeID(): int {
@@ -179,7 +203,7 @@ class CRM_Financial_BAO_Order {
   public function getOverrideTotalAmount() {
     // The override amount is only valid for quick config price sets where more
     // than one field has not been selected.
-    if (!$this->overrideTotalAmount || !$this->supportsOverrideAmount() || count($this->getPriceOptions()) > 1) {
+    if (!$this->overrideTotalAmount || $this->getLineItemCount() > 1) {
       return FALSE;
     }
     return $this->overrideTotalAmount;
@@ -190,9 +214,9 @@ class CRM_Financial_BAO_Order {
    *
    * @internal use in tested core code only.
    *
-   * @param float $overrideTotalAmount
+   * @param float|null $overrideTotalAmount
    */
-  public function setOverrideTotalAmount(float $overrideTotalAmount): void {
+  public function setOverrideTotalAmount(?float $overrideTotalAmount): void {
     $this->overrideTotalAmount = $overrideTotalAmount;
   }
 
@@ -573,6 +597,10 @@ class CRM_Financial_BAO_Order {
         $lineItems[$newLine['price_field_value_id']] = $newLine;
       }
     }
+    // Set the line item count here because it is needed to determine whether
+    // we can use overrides and would not be set yet if we have loaded them from
+    // a template contribution.
+    $this->setLineItemCount(count($lineItems));
 
     foreach ($lineItems as &$lineItem) {
       // Set any pre-calculation to zero as we will calculate.
