@@ -26,8 +26,8 @@
 
 <tr id="Email_Block_{$blockId}">
   <td>{$form.email.$blockId.email.html|crmAddClass:email}&nbsp;{$form.email.$blockId.location_type_id.html}
-    <div class="clear"></div>
-    {if $className eq 'CRM_Contact_Form_Contact'}
+    {if $className eq 'CRM_Contact_Form_Contact' and !empty($form.email.$blockId.signature_html.html)}
+      <div class="clear"></div>
       <div class="email-signature crm-collapsible collapsed">
         <div class="collapsible-title">
           {ts}Signature{/ts}
