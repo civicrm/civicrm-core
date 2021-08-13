@@ -73,8 +73,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Setup function.
-   *
-   * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
     parent::setUp();
@@ -120,8 +118,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -144,8 +142,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test Get.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetContribution(): void {
     $this->enableTaxAndInvoicing();
@@ -280,8 +276,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the 'return' param works for all fields.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testGetContributionReturnFunctionality(): void {
     $params = $this->_params;
@@ -316,7 +310,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // update contribution with invoice number
     $params = array_merge($params, [
       'id' => $contributionID,
-      'invoice_number' => CRM_Utils_Array::value('invoice_prefix', Civi::settings()->get('contribution_invoice_settings')) . "" . $contributionID,
+      'invoice_number' => Civi::settings()->get('invoice_prefix') . $contributionID,
       'trxn_id' => 12345,
       'invoice_id' => 6789,
     ]);
@@ -1288,7 +1282,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
     $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 2);
+    $this->assertEquals(2, $contribution['values'][$contribution['id']]['contribution_status_id']);
     $this->_checkFinancialRecords($contribution, 'pending');
   }
 
