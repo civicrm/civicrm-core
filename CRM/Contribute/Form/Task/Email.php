@@ -22,6 +22,17 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
   use CRM_Contact_Form_Task_EmailTrait;
 
   /**
+   * Get selected contribution IDs.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionIDs(): array {
+    return $this->getIDs();
+  }
+
+  /**
    * List available tokens for this form.
    *
    * @return array

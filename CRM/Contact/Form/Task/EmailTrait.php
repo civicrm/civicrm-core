@@ -257,12 +257,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     if ($this->_single) {
       // also fix the user context stack
-      if ($this->_caseId) {
+      if ($this->getCaseID()) {
         $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $this->_caseId,
           'contact_id', 'case_id'
         );
         $url = CRM_Utils_System::url('civicrm/contact/view/case',
-          "&reset=1&action=view&cid={$ccid}&id={$this->_caseId}"
+          "&reset=1&action=view&cid={$ccid}&id=" . $this->getCaseID()
         );
       }
       elseif ($this->_context) {
@@ -412,7 +412,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // send the mail
-    list($sent, $activityIds) = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activityIds] = CRM_Activity_BAO_Activity::sendEmail(
       $formattedContactDetails,
       $this->getSubject($formValues['subject']),
       $formValues['text_message'],
@@ -425,9 +425,9 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $bcc,
       array_keys($this->_toContactDetails),
       $additionalDetails,
-      $this->getVar('_contributionIds') ?? [],
+      $this->getContributionIDs(),
       CRM_Utils_Array::value('campaign_id', $formValues),
-      $this->getVar('_caseId')
+      $this->getCaseID()
     );
 
     if ($sent) {
@@ -591,11 +591,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @param string $subject
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
   protected function getSubject(string $subject):string {
     // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
-    if (isset($this->_caseId) && is_numeric($this->_caseId)) {
-      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->_caseId), 0, 7);
+    if ($this->getCaseID()) {
+      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->getCaseID()), 0, 7);
       $subject = "[case #$hash] $subject";
     }
     return $subject;
@@ -659,6 +660,30 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $errors['saveTemplateName'] = ts('Enter name to save message template');
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Get selected contribution IDs.
+   *
+   * @return array
+   */
+  protected function getContributionIDs(): array {
+    return [];
+  }
+
+  /**
+   * Get case ID - if any.
+   *
+   * @return int|null
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getCaseID(): ?int {
+    $caseID = CRM_Utils_Request::retrieve('caseid', 'String', $this);
+    if ($caseID) {
+      return (int) $caseID;
+    }
+    return NULL;
   }
 
 }
