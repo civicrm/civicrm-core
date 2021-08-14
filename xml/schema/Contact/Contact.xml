@@ -274,11 +274,28 @@
     <comment>optional URL for preferred image (photo, logo, etc.) to display for this contact.</comment>
     <add>1.1</add>
     <html>
-      <type>File</type>
+      <type>Text</type>
       <size>30</size>
       <label>Image URL</label>
     </html>
   </field>
+  <field>
+    <name>image_file_id</name>
+    <title>Image File</title>
+    <type>int unsigned</type>
+    <comment>Image file (photo, logo, etc.) to display for this contact.</comment>
+    <html>
+      <type>File</type>
+      <label>Image</label>
+    </html>
+    <add>5.41</add>
+  </field>
+  <foreignKey>
+    <name>image_file_id</name>
+    <table>civicrm_file</table>
+    <key>id</key>
+    <add>5.41</add>
+  </foreignKey>
   <field>
     <name>preferred_communication_method</name>
     <title>Preferred Communication Method</title>
