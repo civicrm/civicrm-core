@@ -604,6 +604,7 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour, 
        */
     }
   }
+  $profileFields[$profileID] = $profileFields[$profileID] ?? [];
   uasort($profileFields[$profileID], "_civicrm_api3_order_by_weight");
   return $profileFields[$profileID];
 }
