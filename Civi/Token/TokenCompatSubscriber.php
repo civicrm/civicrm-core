@@ -130,8 +130,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     }
 
     if ($useSmarty) {
-      $smarty = \CRM_Core_Smarty::singleton();
-      $e->string = $smarty->fetch("string:" . $e->string);
+      $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
     }
   }
 
