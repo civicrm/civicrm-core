@@ -3,6 +3,7 @@
 namespace Civi\Schema;
 
 use Civi\Schema\Traits\MagicGetterSetterTrait;
+use Civi\Test\Invasive;
 
 class MagicGetterSetterTest extends \CiviUnitTestCase {
 
@@ -35,6 +36,20 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
         return $this;
       }
 
+    };
+  }
+
+  public function createAltExample() {
+    return new class() {
+      use MagicGetterSetterTrait;
+      protected $altField;
+
+    };
+  }
+
+  public function createEmptyExample() {
+    return new class() {
+      use MagicGetterSetterTrait;
     };
   }
 
@@ -89,6 +104,22 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
         $message = $e->getMessage();
         $this->assertRegExp('/Unknown method.*::' . $nonMethod . '()/', $message);
       }
+    }
+  }
+
+  public function testImplIndependence() {
+    $ex1 = $this->createExample();
+    $ex2 = $this->createAltExample();
+    $ex3 = $this->createEmptyExample();
+
+    // Multiple alternating calls. Caches remain independent.
+    foreach (range(0, 2) as $i) {
+      $this->assertEquals(
+        ['protectedField', 'publicField', 'overriddenProtectedField', 'set', 'get'],
+        array_keys(Invasive::call([$ex1, 'getMagicProperties']))
+      );
+      $this->assertEquals(['altField'], array_keys(Invasive::call([$ex2, 'getMagicProperties'])));
+      $this->assertEquals([], array_keys(Invasive::call([$ex3, 'getMagicProperties'])));
     }
   }
 

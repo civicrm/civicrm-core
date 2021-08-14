@@ -11,6 +11,8 @@
 
 namespace Civi\Schema\Traits;
 
+use Civi\Api4\Utils\ReflectionUtils;
+
 /**
  * Automatically define getter/setter methods for public and protected fields.
  *
@@ -52,6 +54,9 @@ trait MagicGetterSetterTrait {
           return $this->$prop;
 
         case 'set':
+          if (count($arguments) < 1) {
+            throw new \CRM_Core_Exception(sprintf('Missing required parameter for method %s::%s()', static::CLASS, $method));
+          }
           $this->$prop = $arguments[0];
           return $this;
       }
@@ -68,29 +73,18 @@ trait MagicGetterSetterTrait {
    *   Array(string $propertyName => bool $true).
    */
   protected static function getMagicProperties(): array {
-    // Thread-local cache of class metadata. This is strictly readonly and immutable, and it should ideally be reused across varied test-functions.
-    static $cache = [];
-
-    if (!isset($cache[static::CLASS])) {
-      try {
-        $clazz = new \ReflectionClass(static::CLASS);
+    // Thread-local cache of class metadata. Class metadata is immutable at runtime, so this is strictly write-once. It should ideally be reused across varied test-functions.
+    static $caches = [];
+    $CLASS = static::CLASS;
+    $cache =& $caches[$CLASS];
+    if ($cache === NULL) {
+      $cache = [];
+      foreach (ReflectionUtils::findStandardProperties(static::CLASS) as $property) {
+        /** @var \ReflectionProperty $property */
+        $cache[$property->getName()] = TRUE;
       }
-      catch (\ReflectionException $e) {
-        // This shouldn't happen. Cast to RuntimeException so that we don't have a million `@throws` statements.
-        throw new \RuntimeException(sprintf("Class %s cannot reflect upon itself.", static::CLASS));
-      }
-
-      $fields = [];
-      foreach ($clazz->getProperties(\ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PUBLIC) as $property) {
-        $name = $property->getName();
-        if (!$property->isStatic() && $name[0] !== '_') {
-          $fields[$name] = TRUE;
-        }
-      }
-      unset($clazz);
-      $cache[static::CLASS] = $fields;
     }
-    return $cache[static::CLASS];
+    return $cache;
   }
 
 }
