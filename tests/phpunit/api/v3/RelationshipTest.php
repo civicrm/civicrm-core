@@ -1357,8 +1357,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a_2], 0);
 
+    $this->_apiversion = 4;
     // Deleting the organization should cause the related membership to be deleted.
-    $this->callAPISuccess('contact', 'delete', ['id' => $this->_cId_b]);
+    $this->callAPISuccess('Contact', 'delete', ['id' => $this->_cId_b]);
+    $this->_apiversion = 3;
     $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a], 0);
   }
 
