@@ -1199,10 +1199,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * In the interests of removing financial type / contribution type checks from
    * legacy format function lets test that the api is doing this for us
    */
-  public function testCreateInvalidFinancialType() {
+  public function testCreateInvalidFinancialType(): void {
     $params = $this->_params;
     $params['financial_type_id'] = 99999;
-    $this->callAPIFailure($this->entity, 'create', $params, "'99999' is not a valid option for field financial_type_id");
+    $this->callAPIFailure($this->entity, 'create', $params);
   }
 
   /**
