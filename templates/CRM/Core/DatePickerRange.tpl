@@ -9,8 +9,8 @@
 *}
 {*this is included inside a table row*}
 {assign var=relativeName   value=$fieldName|cat:"_relative"}
-{assign var='from' value=$from|default:'_low'}
-{assign var='to' value=$to|default:'_high'}
+{if !isset($from) || $from === ''}{assign var='from' value='_low'}{else}{assign var='from' value=$from}{/if}
+{if !isset($to) || $to === ''}{assign var='to' value='_high'}{else}{assign var='to' value=$to}{/if}
 
   {if !$hideRelativeLabel}
     {$form.$relativeName.label}<br />

@@ -9,8 +9,8 @@
 *}
 {* Wrapper around DatePickerRange TPL file *}
 <td {if !empty($colspan)} colspan="{$colspan}" {else} colspan="2" {/if} {if !empty($class)} class="{$class}" {/if}>
-  {assign var='hideRelativeLabel' value=$hideRelativeLabel|default:0}
-  {assign var='from' value=$from|default:'_low'}
-  {assign var='to' value=$to|default:'_high'}
+  {if !isset($hideRelativeLabel) || $hideRelativeLabel === ''}{assign var='hideRelativeLabel' value=0}{else}{assign var='hideRelativeLabel' value=$hideRelativeLabel}{/if}
+  {if !isset($from) || $from === ''}{assign var='from' value='_low'}{else}{assign var='from' value=$from}{/if}
+  {if !isset($to) || $to === ''}{assign var='to' value='_high'}{else}{assign var='to' value=$to}{/if}
   {include file="CRM/Core/DatePickerRange.tpl" fieldName=$fieldName hideRelativeLabel=$hideRelativeLabel to=$to from=$from}
 </td>
