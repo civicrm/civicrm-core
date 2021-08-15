@@ -177,6 +177,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ],
       'activitySubject' => 'Test 123',
       'idHash' => substr(sha1(CIVICRM_SITE_KEY . '1234'), 0, 7),
+      'contact' => ['role' => 'Sand grain counter'],
     ];
 
     [, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate(
@@ -192,7 +193,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     );
 
     $this->assertEquals('[case #' . $tplParams['idHash'] . '] Test 123', $subject);
-    $this->assertStringContainsString('Your Case Role', $message);
+    $this->assertStringContainsString('Your Case Role(s) : Sand grain counter', $message);
     $this->assertStringContainsString('Case ID : 1234', $message);
   }
 
