@@ -21,13 +21,6 @@
 class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * @return string
-   */
-  protected function getEntityName(): string {
-    return 'contribution';
-  }
-
-  /**
    * Get the entity name for api v4 calls.
    *
    * In practice this IS just ucfirst($this->GetEntityName)
@@ -40,52 +33,32 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get a list of tokens which are loaded via APIv4.
+   * Get a list of simple, passthrough tokens which are loaded via APIv4.
    *
    * This list is historical and we need to question whether we
    * should filter out any fields (other than those fields, like api_key
    * on the contact entity) with permissions defined.
    *
    * @return array
-   *   Ex: ['foo', 'bar_id', 'bar_id:name', 'bar_id:label']
+   *   Ex: ['foo' => 'Foo Stuff', 'bar_id' => 'Barber ID#']
    */
   protected function getApiTokens(): array {
-    $fields = [
-      'contribution_page_id',
-      'source',
-      'id',
-      'receive_date',
-      'total_amount',
-      'fee_amount',
-      'net_amount',
-      'non_deductible_amount',
-      'trxn_id',
-      'invoice_id',
-      'currency',
-      'cancel_date',
-      'receipt_date',
-      'thankyou_date',
-      'tax_amount',
-      'contribution_status_id',
-      'contribution_status_id:name',
-      'contribution_status_id:label',
-      'financial_type_id',
-      'financial_type_id:name',
-      'financial_type_id:label',
-      'payment_instrument_id',
-      'payment_instrument_id:name',
-      'payment_instrument_id:label',
-      'cancel_reason',
-      'amount_level',
-      'check_number',
-    ];
+    $result = parent::getApiTokens();
+
+    // When enabling joins/etc, there is a potential for qty to explode or maybe reveal extra info. For now, curate the list.
+    $result['contribution_status_id:name'] = ts('Contribution Status (Name)');
+    $result['contribution_status_id:label'] = ts('Contribution Status (Label)');
+    $result['financial_type_id:name'] = ts('Financial Type (Name)');
+    $result['financial_type_id:label'] = ts('Financial Type (Label)');
+    $result['payment_instrument_id:name'] = ts('Payment Instrument (Name)');
+    $result['payment_instrument_id:label'] = ts('Payment Instrument (Label)');
     if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
-      $fields[] = 'campaign_id';
-      $fields[] = 'campaign_id.name';
-      $fields[] = 'campaign_id.title';
+      $result['campaign_id.name'] = ts('Campaign (Name)');
+      $result['campaign_id.title'] = ts('Campaign (Title)');
     }
 
-    return $fields;
+    asort($result);
+    return $result;
   }
 
   public function getAliasTokens(): array {

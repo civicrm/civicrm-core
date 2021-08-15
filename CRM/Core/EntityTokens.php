@@ -20,10 +20,11 @@ use Civi\Token\TokenProcessor;
  *
  * To write a subclass:
  *
- * - (MUST) Implement getEntityName() and getApiEntityName()
- * - (MUST) Implement getApiTokens()
- * - (MAY) Implement getAliasTokens()
- * - (MAY) Override evaluateToken()
+ * - (MUST) Implement getApiEntityName()
+ * - (MAY) Override getEntityName() - Customize the `{entity_name.*}` entity.
+ * - (MAY) Override getApiTokens() - Add/remove tokens. (Default based on `getFields()`.)
+ * - (MAY) Override getAliasTokens() - Make interoperable tokens.
+ * - (MAY) Override evaluateToken() - Evaluate the content of a token.
  *
  * Parent class for generic entity token functionality.
  *
@@ -66,12 +67,23 @@ abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected $fieldMetadata = [];
 
   /**
+   * @var string
+   *   Ex: 'contribution', 'contact'
+   */
+  private $entityName;
+
+  /**
    * Get the entity name, as it appears in the token.
    *
    * @return string
    *   Ex: 'contribution' for token '{contribution.total_amount}'.
    */
-  abstract protected function getEntityName(): string;
+  protected function getEntityName(): string {
+    if ($this->entityName === NULL) {
+      $this->entityName = CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
+    }
+    return $this->entityName;
+  }
 
   /**
    * Get the entity name for api v4 calls.
@@ -82,12 +94,18 @@ abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   abstract protected function getApiEntityName(): string;
 
   /**
-   * Get a list of tokens which are loaded via APIv4.
+   * Get a list of simple, passthrough tokens which are loaded via APIv4.
    *
    * @return string[]
-   *   Ex: ['foo', 'bar_id', 'bar_id:name', 'bar_id:label']
+   *   Ex: ['foo' => 'Foo', 'bar_id' => 'Bar ID#']
    */
-  abstract protected function getApiTokens(): array;
+  protected function getApiTokens(): array {
+    $return = [];
+    foreach ($this->getFieldMetadata() as $fieldName => $field) {
+      $return[$fieldName] = $field['title'] ?? $fieldName;
+    }
+    return $return;
+  }
 
   /**
    * Get a list of aliased tokens.
@@ -129,7 +147,7 @@ abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $activeTokens[] = $aliasTarget;
       }
     }
-    return array_intersect($this->getApiTokens(), $activeTokens);
+    return array_intersect(array_keys($this->getApiTokens()), $activeTokens);
   }
 
   /**
@@ -138,21 +156,7 @@ abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array|string[]
    */
   public function getAllTokens(): array {
-    $apiTokens = $this->getApiTokens();
-    $apiFields = $this->getFieldMetadata();
-    $return = [];
-    $suffixes = ['name' => ts('(Name)'), 'label' => ts('(Label)'), 'title' => ts('(Title)')];
-    foreach ($apiTokens as $apiToken) {
-      if (preg_match('/^(.*)([:\.])(name|label|title)$/', $apiToken, $m)) {
-        $fieldName = $m[1];
-        $suffix = $suffixes[$m[3]];
-        $return[$apiToken] = $apiFields[$fieldName]['input_attrs']['label'] . ' ' . $suffix;
-      }
-      else {
-        $fieldName = $apiToken;
-        $return[$fieldName] = $apiFields[$fieldName]['title'] ?? $fieldName;
-      }
-    }
+    $return = $this->getApiTokens();
     foreach ($this->getAliasTokens() as $aliasToken => $aliasTarget) {
       $return[$aliasToken] = ts('%1 (Alias)', [1 => $return[$aliasTarget]]);
     }
@@ -214,12 +218,12 @@ abstract class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array
    */
   public function getPseudoTokens(): array {
-    $labels = $this->getAllTokens();
     // Simpler, but doesn't currently pass: $labels = $this->tokenNames;
+    // FIXME: change getApiTokens to $this->tokenNames
     $r = [];
-    foreach ($this->getApiTokens() as $key) {
+    foreach ($this->getApiTokens() as $key => $label) {
       if (strpos($key, ':') !== FALSE || strpos($key, '.') !== FALSE) {
-        $r[$key] = $labels[$key];
+        $r[$key] = $label;
       }
     }
     return $r;
