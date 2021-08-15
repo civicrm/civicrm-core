@@ -244,6 +244,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       // FIXME: loosen coupling
       _civix_phpunit_setUp();
     }
+
+    set_error_handler(array($this, 'letssee'));
+  }
+
+  public function letssee($dontcare, $msg, $alsodontcare, $stilldontcare) {
+    // There's a kazillion of these so skip them
+    if (strpos($msg, 'unlink') === FALSE && strpos($msg, 'mkdir') === FALSE) {
+      throw new \Exception($msg);
+    }
   }
 
   /**
