@@ -65,6 +65,15 @@ class CoreUtil {
   }
 
   /**
+   * Get name of unique identifier, typically "id"
+   * @param string $entityName
+   * @return string
+   */
+  public static function getIdFieldName(string $entityName): string {
+    return self::getInfoItem($entityName, 'primary_key')[0] ?? 'id';
+  }
+
+  /**
    * Get table name of given entity
    *
    * @param string $entityName

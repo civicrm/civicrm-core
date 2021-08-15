@@ -74,7 +74,7 @@ abstract class AbstractSaveAction extends AbstractAction {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function validateValues() {
-    $idField = $this->getIdField();
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
     // FIXME: There should be a protocol to report a full list of errors... Perhaps a subclass of API_Exception?
     $unmatched = [];
     foreach ($this->records as $record) {
