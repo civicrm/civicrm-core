@@ -86,6 +86,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\SubmitFile
+   */
+  public static function submitFile($checkPermissions = TRUE) {
+    return (new Action\Afform\SubmitFile('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicBatchAction
    */
   public static function revert($checkPermissions = TRUE) {
@@ -229,6 +238,7 @@ class Afform extends Generic\AbstractEntity {
       'get' => [],
       'prefill' => [],
       'submit' => [],
+      'submitFile' => [],
     ];
   }
 

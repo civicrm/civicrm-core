@@ -3,6 +3,7 @@ namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\Submit;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Handle submission of an "<af-form>" entity (or set of entities in the case of `<af-repeat>`).
@@ -96,12 +97,24 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * @param $index
-   * @param $entityId
+   * @param int $index
+   * @param int|string $entityId
    * @return $this
    */
   public function setEntityId($index, $entityId) {
-    $this->entityIds[$this->entityName][$index]['id'] = $entityId;
+    $idField = CoreUtil::getIdFieldName($this->entityName);
+    $this->entityIds[$this->entityName][$index][$idField] = $entityId;
+    return $this;
+  }
+
+  /**
+   * @param int $index
+   * @param string $joinEntity
+   * @param array $joinIds
+   * @return $this
+   */
+  public function setJoinIds($index, $joinEntity, $joinIds) {
+    $this->entityIds[$this->entityName][$index]['joins'][$joinEntity] = $joinIds;
     return $this;
   }
 
