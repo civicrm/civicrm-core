@@ -820,7 +820,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         // end of contribution related section
 
-        $membershipParams = $this->getMembershipParams();
+        $membershipParams = $this->getCurrentRowMembershipParams();
 
         if ($this->currentRowIsRenew()) {
           // The following parameter setting may be obsolete.
@@ -830,9 +830,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'end_date' => $value['membership_end_date'] ?? NULL,
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
-          $membershipSource = $value['source'] ?? NULL;
-          $membership = $this->legacyProcessMembership($value['membership_type_id'],
-            $value['custom'], $membershipSource, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
+
+          $membership = $this->legacyProcessMembership(
+            $value['custom'], $formDates
           );
 
           // make contribution entry
@@ -999,11 +999,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * @param int $membershipTypeID
    * @param $customFieldsFormatted
-   * @param $membershipSource
-   * @param $isPayLater
-   * @param array $memParams
    * @param array $formDates
    *
    * @return CRM_Member_BAO_Membership
@@ -1011,14 +1007,14 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessMembership($membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_DAO_Membership {
+  protected function legacyProcessMembership($customFieldsFormatted, $formDates = []): CRM_Member_DAO_Membership {
     $updateStatusId = FALSE;
     $changeToday = NULL;
-    $is_test = FALSE;
     $numRenewTerms = 1;
     $format = '%Y%m%d';
     $ids = [];
     $isPayLater = NULL;
+    $memParams = $this->getCurrentRowMembershipParams();
     $currentMembership = $this->getCurrentMembership();
     // @todo - remove this if - still here for now to leave whitespace change out of commit.
     if (1) {
@@ -1029,28 +1025,15 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // CRM-7297 Membership Upsell - calculate dates based on new membership type
         $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
           $changeToday,
-          $membershipTypeID,
+          $this->getCurrentRowMembershipTypeID(),
           $numRenewTerms
         );
 
-        $currentMembership['join_date'] = CRM_Utils_Date::customFormat($currentMembership['join_date'], $format);
         foreach (['start_date', 'end_date'] as $dateType) {
-          $currentMembership[$dateType] = $formDates[$dateType] ?? NULL;
-          if (empty($currentMembership[$dateType])) {
-            $currentMembership[$dateType] = $dates[$dateType] ?? NULL;
-          }
-        }
-        $currentMembership['is_test'] = $is_test;
-
-        if (!empty($membershipSource)) {
-          $currentMembership['source'] = $membershipSource;
+          $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
         }
 
-        if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
-        }
-        $memParams = array_merge($currentMembership, $memParams);
-        $memParams['membership_type_id'] = $membershipTypeID;
+        $ids['membership'] = $currentMembership['id'];
 
         //set the log start date.
         $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
@@ -1064,7 +1047,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // CRM-7297 Membership Upsell - calculate dates based on new membership type
         $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
           $changeToday,
-          $membershipTypeID,
+          $this->getCurrentRowMembershipTypeID(),
           $numRenewTerms
         );
 
@@ -1075,21 +1058,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         if (empty($memParams['end_date'])) {
           $memParams['end_date'] = $dates['end_date'] ?? NULL;
         }
-        $memParams['membership_type_id'] = $membershipTypeID;
 
         //set the log start date.
         $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
-
-        //CRM-18067
-        if (!empty($membershipSource)) {
-          $memParams['source'] = $membershipSource;
-        }
-        elseif (empty($membership->source)) {
-          $memParams['source'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership',
-            $currentMembership['id'],
-            'source'
-          );
-        }
 
         if (!empty($currentMembership['id'])) {
           $ids['membership'] = $currentMembership['id'];
@@ -1207,7 +1178,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    *
    * @return array
    */
-  private function getMembershipParams(): array {
+  private function getCurrentRowMembershipParams(): array {
     return [
       'start_date' => $this->currentRow['membership_start_date'] ?? NULL,
       'end_date' => $this->currentRow['membership_end_date'] ?? NULL,
