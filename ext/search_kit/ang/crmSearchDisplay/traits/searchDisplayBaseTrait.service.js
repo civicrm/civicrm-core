@@ -149,7 +149,7 @@
       },
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
-      runSearch: function() {
+      runSearch: function(editedRow) {
         var ctrl = this,
           apiParams = this.getApiParams();
         this.loading = true;
@@ -170,13 +170,13 @@
             }
           }
           _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, results, 'success');
+            callback.call(ctrl, results, 'success', editedRow);
           });
         }, function(error) {
           ctrl.results = [];
           ctrl.editing = ctrl.loading = false;
           _.each(ctrl.onPostRun, function(callback) {
-            callback.call(ctrl, error, 'error');
+            callback.call(ctrl, error, 'error', editedRow);
           });
         });
       },
