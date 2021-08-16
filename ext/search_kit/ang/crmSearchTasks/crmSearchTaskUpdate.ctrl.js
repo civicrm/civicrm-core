@@ -1,17 +1,17 @@
 (function(angular, $, _) {
   "use strict";
 
-  angular.module('crmSearchTasks').controller('crmSearchTaskUpdate', function ($scope, $timeout, crmApi4, dialogService) {
+  angular.module('crmSearchTasks').controller('crmSearchTaskUpdate', function ($scope, $timeout, crmApi4, searchTaskBaseTrait) {
     var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-      model = $scope.model,
-      ctrl = this;
+      // Combine this controller with model properties (ids, entity, entityInfo) and searchTaskBaseTrait
+      ctrl = angular.extend(this, $scope.model, searchTaskBaseTrait);
 
-    this.entityTitle = model.ids.length === 1 ? model.entityInfo.title : model.entityInfo.title_plural;
+    this.entityTitle = this.getEntityTitle();
     this.values = [];
     this.add = null;
     this.fields = null;
 
-    crmApi4(model.entity, 'getFields', {
+    crmApi4(this.entity, 'getFields', {
       action: 'update',
       select: ['name', 'label', 'description', 'data_type', 'serialize', 'options', 'fk_entity'],
       loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
@@ -67,25 +67,20 @@
       return {results: results};
     };
 
-    this.cancel = function() {
-      dialogService.cancel('crmSearchTask');
-    };
-
     this.save = function() {
-      $('.ui-dialog-titlebar button').hide();
-      ctrl.run = {
+      ctrl.start({
         values: _.zipObject(ctrl.values)
-      };
+      });
     };
 
     this.onSuccess = function() {
-      CRM.alert(ts('Successfully updated %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
-      dialogService.close('crmSearchTask');
+      CRM.alert(ts('Successfully updated %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Saved'), 'success');
+      this.close();
     };
 
     this.onError = function() {
-      CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: model.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
-      dialogService.close('crmSearchTask');
+      CRM.alert(ts('An error occurred while attempting to update %1 %2.', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
+      this.cancel();
     };
 
   });
