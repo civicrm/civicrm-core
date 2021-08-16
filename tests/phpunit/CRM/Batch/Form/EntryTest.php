@@ -201,6 +201,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $memberships[1]['start_date']);
     $this->assertEquals('2013-02-03', $memberships[2]['start_date']);
+    $this->assertEquals('2013-12-31', $memberships[2]['end_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $memberships[1]['end_date']);
@@ -346,8 +347,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'financial_type' => 2,
           'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
-          'receive_date_time' => NULL,
-          'payment_instrument' => NULL,
+          'payment_instrument' => 1,
           'trxn_id' => 'TX102',
           'check_number' => NULL,
           'contribution_status_id' => 1,
@@ -362,8 +362,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'financial_type' => 2,
           'total_amount' => $this->formatMoneyInput(1500),
           'receive_date' => '2013-07-17',
-          'receive_date_time' => NULL,
-          'payment_instrument' => NULL,
+          'payment_instrument' => 1,
           'trxn_id' => 'TX103',
           'check_number' => NULL,
           'contribution_status_id' => 1,

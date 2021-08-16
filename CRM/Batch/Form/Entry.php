@@ -137,6 +137,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
+   * Get the order (contribution) status for the current row.
+   */
+  protected function getCurrentRowPaymentStatus() {
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->currentRow['contribution_status_id']);
+  }
+
+  /**
    * Get the contact ID for the current row.
    *
    * @return int
@@ -781,7 +788,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->updateContactInfo($value);
 
         //check for custom data
-        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($params['field'][$key],
+        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($this->currentRow,
           $key,
           'Membership',
           $value['membership_type_id']
@@ -813,15 +820,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'membership_type_id' => $value['membership_type_id'],
           'financial_type_id' => $value['financial_type_id'],
         ], $key);
+        $order->setEntityParameters($this->getCurrentRowMembershipParams(), $key);
 
         if (!empty($order->getLineItems())) {
           $value['lineItems'] = [$order->getPriceSetID() => $order->getPriceFieldIndexedLineItems()];
           $value['processPriceSet'] = TRUE;
         }
         // end of contribution related section
-
-        $membershipParams = $this->getCurrentRowMembershipParams();
-
         if ($this->currentRowIsRenew()) {
           // The following parameter setting may be obsolete.
           $this->_params = $params;
@@ -844,11 +849,37 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           $this->setCurrentRowMembershipID($membership->id);
         }
         else {
-          // @todo - specify the relevant fields - don't copy all over
-          $membershipParams = array_merge($value, $membershipParams);
-          $membership = CRM_Member_BAO_Membership::create($membershipParams);
-        }
+          $createdOrder = civicrm_api3('Order', 'create', [
+            'line_items' => $order->getLineItemForV3OrderApi(),
+            'receive_date' => $this->currentRow['receive_date'],
+            'check_number' => $this->currentRow['check_number'] ?? '',
+            'contact_id' => $this->getCurrentRowContactID(),
+            'batch_id' => $this->_batchId,
+            'financial_type_id' => $this->currentRow['financial_type_id'],
+            'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
+          ]);
+          $this->currentRowContributionID = $createdOrder['id'];
 
+          $this->setCurrentRowMembershipID($createdOrder['values'][$this->getCurrentRowContributionID()]['line_item'][0]['entity_id']);
+          if ($this->getCurrentRowPaymentStatus() === 'Completed') {
+            civicrm_api3('Payment', 'create', [
+              'total_amount' => $order->getTotalAmount() + $order->getTotalTaxAmount(),
+              'check_number' => $this->currentRow['check_number'] ?? '',
+              'trxn_date' => $this->currentRow['receive_date'],
+              'trxn_id' => $this->currentRow['trxn_id'],
+              'payment_instrument_id' => $this->currentRow['payment_instrument_id'],
+              'contribution_id' => $this->getCurrentRowContributionID(),
+              'is_send_contribution_notification' => FALSE,
+            ]);
+          }
+
+          if (in_array($this->getCurrentRowPaymentStatus(), ['Failed', 'Cancelled'])) {
+            Contribution::update()
+              ->addValue('contribution_status_id', $this->currentRow['contribution_status_id'])
+              ->addWhere('id', '=', $this->getCurrentRowContributionID())
+              ->execute();
+          }
+        }
         //process premiums
         if (!empty($value['product_name'])) {
           if ($value['product_name'][0] > 0) {
@@ -872,9 +903,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         // end of premium
 
         //send receipt mail.
-        if ($membership->id && !empty($value['send_receipt'])) {
-          $value['membership_id'] = $membership->id;
-          $this->emailReceipt($this, $value, $membership);
+        if ($this->getCurrentRowMembershipID() && !empty($value['send_receipt'])) {
+          $value['membership_id'] = $this->getCurrentRowMembershipID();
+          $this->emailReceipt($this, $value);
         }
       }
     }
@@ -887,15 +918,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @param CRM_Core_Form $form
    *   Form object.
    * @param array $formValues
-   * @param object $membership
-   *   Object.
    *
    * @return bool
    *   true if mail was sent successfully
    * @throws \CRM_Core_Exception|\API_Exception
    *
    */
-  protected function emailReceipt($form, &$formValues, $membership): bool {
+  protected function emailReceipt($form, &$formValues): bool {
+    $membership = new CRM_Member_BAO_Membership();
+    $membership->id = $this->getCurrentRowMembershipID();
+    $membership->fetch();
     // @todo figure out how much of the stuff below is genuinely shared with the batch form & a logical shared place.
     if (!empty($formValues['payment_instrument_id'])) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
@@ -1165,8 +1197,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       $this->currentRowExistingMembership = CRM_Member_BAO_Membership::getContactMembership($this->getCurrentRowContactID(), $this->getCurrentRowMembershipTypeID(),
         FALSE, NULL, TRUE
       );
-      // Check and fix the membership if it is STALE
-      CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($this->currentRowExistingMembership);
+      if ($this->currentRowExistingMembership) {
+        // Check and fix the membership if it is STALE
+        CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($this->currentRowExistingMembership);
+      }
     }
     return $this->currentRowExistingMembership;
   }
@@ -1177,12 +1211,30 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @return array
    */
   private function getCurrentRowMembershipParams(): array {
-    return [
+    return array_merge($this->getCurrentRowCustomParams(), [
       'start_date' => $this->currentRow['membership_start_date'] ?? NULL,
       'end_date' => $this->currentRow['membership_end_date'] ?? NULL,
       'join_date' => $this->currentRow['membership_join_date'] ?? NULL,
       'campaign_id' => $this->currentRow['member_campaign_id'] ?? NULL,
-    ];
+      'source' => $this->currentRow['source'] ?? (!$this->currentRowIsRenew() ? ts('Batch entry') : ''),
+      'membership_type_id' => $this->currentRow['membership_type_id'],
+      'contact_id' => $this->getCurrentRowContactID(),
+    ]);
+  }
+
+  /**
+   * Get the custom value parameters from the current row.
+   *
+   * @return array
+   */
+  private function getCurrentRowCustomParams(): array {
+    $return = [];
+    foreach ($this->currentRow as $field => $value) {
+      if (strpos($field, 'custom_') === 0) {
+        $return[$field] = $value;
+      }
+    }
+    return $return;
   }
 
 }
