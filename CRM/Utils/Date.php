@@ -237,16 +237,27 @@ class CRM_Utils_Date {
    *
    */
   public static function &getFullMonthNames() {
-    static $fullMonthNames;
-    if (!isset($fullMonthNames)) {
-
-      // set LC_TIME and build the arrays from locale-provided names
-      CRM_Core_I18n::setLcTime();
-      for ($i = 1; $i <= 12; $i++) {
-        $fullMonthNames[$i] = strftime('%B', mktime(0, 0, 0, $i, 10, 1970));
-      }
+    if (empty(\Civi::$statics[__CLASS__]['fullMonthNames'])) {
+      // Not relying on strftime because it depends on the operating system
+      // and most people will not have a non-US locale configured out of the box
+      // Ignoring other date names for now, since less visible by default
+      \Civi::$statics[__CLASS__]['fullMonthNames'] = [
+        1 => ts('January'),
+        2 => ts('February'),
+        3 => ts('March'),
+        4 => ts('April'),
+        5 => ts('May'),
+        6 => ts('June'),
+        7 => ts('July'),
+        8 => ts('August'),
+        9 => ts('September'),
+        10 => ts('October'),
+        11 => ts('November'),
+        12 => ts('December'),
+      ];
     }
-    return $fullMonthNames;
+
+    return \Civi::$statics[__CLASS__]['fullMonthNames'];
   }
 
   /**
