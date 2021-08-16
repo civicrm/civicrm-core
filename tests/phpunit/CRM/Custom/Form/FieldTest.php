@@ -34,21 +34,21 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'data_type' => 'String',
           'html_type' => 'Text',
         ],
-        'null',
+        0,
       ],
       1 => [
         [
           'data_type' => 'String',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       2 => [
         [
           'data_type' => 'String',
           'html_type' => 'Radio',
         ],
-        'null',
+        0,
       ],
       3 => [
         [
@@ -62,7 +62,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'data_type' => 'String',
           'html_type' => 'Autocomplete-Select',
         ],
-        'null',
+        0,
       ],
       5 => [
         [
@@ -70,7 +70,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Text',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       6 => [
         [
@@ -86,7 +86,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Radio',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       8 => [
         [
@@ -109,21 +109,21 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'data_type' => 'Int',
           'html_type' => 'Text',
         ],
-        'null',
+        0,
       ],
       11 => [
         [
           'data_type' => 'Int',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       12 => [
         [
           'data_type' => 'Int',
           'html_type' => 'Radio',
         ],
-        'null',
+        0,
       ],
       13 => [
         [
@@ -131,7 +131,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Text',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       14 => [
         [
@@ -147,28 +147,28 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Radio',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       16 => [
         [
           'data_type' => 'Float',
           'html_type' => 'Text',
         ],
-        'null',
+        0,
       ],
       17 => [
         [
           'data_type' => 'Float',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       18 => [
         [
           'data_type' => 'Float',
           'html_type' => 'Radio',
         ],
-        'null',
+        0,
       ],
       19 => [
         [
@@ -176,7 +176,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Text',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       20 => [
         [
@@ -192,28 +192,28 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Radio',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       22 => [
         [
           'data_type' => 'Money',
           'html_type' => 'Text',
         ],
-        'null',
+        0,
       ],
       23 => [
         [
           'data_type' => 'Money',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       24 => [
         [
           'data_type' => 'Money',
           'html_type' => 'Radio',
         ],
-        'null',
+        0,
       ],
       25 => [
         [
@@ -221,7 +221,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Text',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       26 => [
         [
@@ -237,21 +237,21 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Radio',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       28 => [
         [
           'data_type' => 'Memo',
           'html_type' => 'TextArea',
         ],
-        'null',
+        0,
       ],
       29 => [
         [
           'data_type' => 'Memo',
           'html_type' => 'RichTextEditor',
         ],
-        'null',
+        0,
       ],
       30 => [
         [
@@ -259,7 +259,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'TextArea',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       31 => [
         [
@@ -267,14 +267,14 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'RichTextEditor',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       32 => [
         [
           'data_type' => 'Date',
           'html_type' => 'Select Date',
         ],
-        'null',
+        0,
       ],
       33 => [
         [
@@ -282,14 +282,14 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Select Date',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       34 => [
         [
           'data_type' => 'Boolean',
           'html_type' => 'Radio',
         ],
-        'null',
+        0,
       ],
       35 => [
         [
@@ -297,14 +297,14 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Radio',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       36 => [
         [
           'data_type' => 'StateProvince',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       37 => [
         [
@@ -319,7 +319,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'data_type' => 'Country',
           'html_type' => 'Select',
         ],
-        'null',
+        0,
       ],
       39 => [
         [
@@ -334,7 +334,7 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'data_type' => 'File',
           'html_type' => 'File',
         ],
-        'null',
+        0,
       ],
       41 => [
         [
@@ -342,14 +342,14 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'File',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       42 => [
         [
           'data_type' => 'Link',
           'html_type' => 'Link',
         ],
-        'null',
+        0,
       ],
       43 => [
         [
@@ -357,14 +357,14 @@ class CRM_Custom_Form_FieldTest extends CiviUnitTestCase {
           'html_type' => 'Link',
           'serialize' => '1',
         ],
-        'null',
+        0,
       ],
       44 => [
         [
           'data_type' => 'ContactReference',
           'html_type' => 'Autocomplete-Select',
         ],
-        'null',
+        0,
       ],
       45 => [
         [
