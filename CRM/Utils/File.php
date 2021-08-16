@@ -128,7 +128,7 @@ class CRM_Utils_File {
       throw new Exception("Overly broad deletion");
     }
 
-    if ($dh = @opendir($target)) {
+    if (is_dir($target) && ($dh = opendir($target))) {
       while (FALSE !== ($sibling = readdir($dh))) {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
