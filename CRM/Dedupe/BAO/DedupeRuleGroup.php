@@ -84,6 +84,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
         'civicrm_note',
         'civicrm_openid',
         'civicrm_phone',
+        'civicrm_website',
       ];
 
       foreach (['Individual', 'Organization', 'Household'] as $ctype) {
