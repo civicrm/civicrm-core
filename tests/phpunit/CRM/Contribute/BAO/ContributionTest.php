@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 use Civi\Api4\Activity;
+use Civi\Api4\Contribution;
 use Civi\Api4\PledgePayment;
 
 /**
@@ -1799,6 +1800,56 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activityContact = $this->callAPISuccessGetSingle('ActivityContact', $activityContactParams);
 
     $this->assertEquals($activityContact['contact_id'], $contactId_2, 'Check target contact ID matches the second contact');
+  }
+
+  /**
+   * Test status updates triggering activity creation and value propagation
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testContributionStatusUpdateActivityPropagation() {
+    $contactId = $this->individualCreate();
+    $campaignId = $this->campaignCreate();
+    $contribution = Contribution::create()
+      ->addValue('contact_id', $contactId)
+      ->addValue('campaign_id', $campaignId)
+      ->addValue('financial_type_id:name', 'Donation')
+      ->addValue('total_amount', 50)
+      ->addValue('contribution_status_id:name', 'Pending')
+      ->execute()
+      ->first();
+    $activityWhere = [
+      ['source_record_id', '=', $contribution['id']],
+      ['activity_type_id:name', '=', 'Contribution'],
+    ];
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertNull($activity, 'Should not create contribution activity for pending contribution');
+
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('contribution_status_id:name', 'Completed')
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertEquals($campaignId, $activity['campaign_id'], 'Should have created contribution activity with campaign');
+
+    $newCampaignId = $this->campaignCreate();
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('campaign_id', $newCampaignId)
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertEquals($newCampaignId, $activity['campaign_id'], 'Should have updated contribution activity to new campaign');
+
+    Contribution::update()
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('campaign_id', NULL)
+      ->execute();
+
+    $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
+    $this->assertNull($activity['campaign_id'], 'Should have removed campaign from contribution activity');
   }
 
 }
