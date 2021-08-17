@@ -23,11 +23,6 @@
         this.initializeDisplay($scope, $element);
       };
 
-      // Refresh current page
-      this.refresh = function(row) {
-        ctrl.runSearch();
-      };
-
     }
   });
 

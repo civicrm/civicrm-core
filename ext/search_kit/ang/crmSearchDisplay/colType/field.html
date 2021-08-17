@@ -1,4 +1,4 @@
-<crm-search-display-editable row="row" col="col" on-success="$ctrl.refresh(row)" cancel="$ctrl.editing = null;" ng-if="col.editable && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === col.key"></crm-search-display-editable>
+<crm-search-display-editable row="row" col="col" on-success="$ctrl.runSearch(row)" cancel="$ctrl.editing = null;" ng-if="col.editable && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === col.key"></crm-search-display-editable>
 <span ng-if="::!col.link" ng-class="{'crm-editable-enabled': col.editable && !$ctrl.editing && row[col.editable.id]}" ng-click="col.editable && !$ctrl.editing && ($ctrl.editing = [rowIndex, col.key])">
   {{:: $ctrl.formatFieldValue(row, col) }}
 </span>

@@ -57,6 +57,17 @@
         // Reset selection when filters are changed
         this.selectedRows.length = 0;
         this.allRowsSelected = false;
+      }],
+
+      // Overwrite empty onPostRun array from searchDisplayBaseTrait
+      onPostRun: [function(results, status, editedRow) {
+        if (editedRow && status === 'success') {
+          // If edited row disappears (because edits cause it to not meet search criteria), deselect it
+          var index = this.selectedRows.indexOf(editedRow.id);
+          if (index > -1 && !_.findWhere(results, {id: editedRow.id})) {
+            this.selectedRows.splice(index, 1);
+          }
+        }
       }]
 
     };

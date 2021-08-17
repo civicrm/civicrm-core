@@ -12,7 +12,7 @@
         <i class="crm-i fa-times"></i>
         {{:: ts('Cancel') }}
       </button>
-      <button ng-click="$ctrl.delete()" class="btn btn-primary" ng-disabled="$ctrl.run">
+      <button ng-click="$ctrl.start()" class="btn btn-primary" ng-disabled="$ctrl.run">
         <i class="crm-i fa-{{ $ctrl.run ? 'spin fa-spinner' : 'trash' }}"></i>
         {{:: ts('Delete %1', {1: $ctrl.entityTitle}) }}
       </button>

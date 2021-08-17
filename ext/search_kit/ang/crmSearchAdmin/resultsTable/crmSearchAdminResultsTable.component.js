@@ -62,11 +62,6 @@
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
       };
 
-      // Refresh current page
-      this.refresh = function(row) {
-        ctrl.runSearch();
-      };
-
       // Add callbacks for pre & post run
       this.onPreRun.push(function(apiParams) {
         apiParams.debug = true;
