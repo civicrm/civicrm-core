@@ -278,6 +278,8 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     // clear all caches
     self::clearDBCache();
     Civi::cache('session')->clear();
+    Civi::cache('metadata')->clear();
+    CRM_Core_DAO_AllCoreTables::reinitializeCache();
     CRM_Utils_System::flushCache();
 
     if ($sessionReset) {

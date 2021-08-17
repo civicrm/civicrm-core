@@ -399,7 +399,7 @@ class CRM_Core_Invoke {
       // For example - when uninstalling an extension. We already set "triggerRebuild" to true for these operations.
       $config->userSystem->invalidateRouteCache();
     }
-    CRM_Core_DAO_AllCoreTables::reinitializeCache(TRUE);
+
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
