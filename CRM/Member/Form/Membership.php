@@ -629,10 +629,9 @@ DESC limit 1");
     // Retrieve the name and email of the contact - this will be the TO for receipt email
     if ($this->_contactID) {
       [$this->_memberDisplayName, $this->_memberEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
-
-      $this->assign('emailExists', $this->_memberEmail);
-      $this->assign('displayName', $this->_memberDisplayName);
     }
+    $this->assign('emailExists', $this->_memberEmail);
+    $this->assign('displayName', $this->_memberDisplayName);
 
     if ($isUpdateToExistingRecurringMembership && CRM_Member_BAO_Membership::isCancelSubscriptionSupported($this->_id)) {
       $this->assign('cancelAutoRenew',
