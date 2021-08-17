@@ -366,11 +366,9 @@ class CRM_Core_DAO_AllCoreTables {
 
   /**
    * Reinitialise cache.
-   *
-   * @param bool $fresh
    */
-  public static function reinitializeCache($fresh = FALSE) {
-    self::init($fresh);
+  public static function reinitializeCache() {
+    self::init(TRUE);
   }
 
   /**
