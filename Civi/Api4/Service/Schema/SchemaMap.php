@@ -14,8 +14,6 @@ namespace Civi\Api4\Service\Schema;
 
 class SchemaMap {
 
-  const MAX_JOIN_DEPTH = 3;
-
   /**
    * @var Table[]
    */
@@ -25,20 +23,23 @@ class SchemaMap {
    * @param $baseTableName
    * @param $targetTableAlias
    *
-   * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   *   Array of links to the target table, empty if no path found
+   * @return \Civi\Api4\Service\Schema\Joinable\Joinable|NULL
+   *   Link to the target table
+   * @throws \API_Exception
    */
-  public function getPath($baseTableName, $targetTableAlias) {
+  public function getLink($baseTableName, $targetTableAlias): ?Joinable\Joinable {
     $table = $this->getTableByName($baseTableName);
-    $path = [];
 
     if (!$table) {
-      return $path;
+      throw new \API_Exception("Table $baseTableName not found");
     }
 
-    $this->findPaths($table, $targetTableAlias, $path);
-
-    return $path;
+    foreach ($table->getTableLinks() as $link) {
+      if ($link->getAlias() === $targetTableAlias) {
+        return $link;
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -84,24 +85,6 @@ class SchemaMap {
   public function addTables(array $tables) {
     foreach ($tables as $table) {
       $this->addTable($table);
-    }
-  }
-
-  /**
-   * Traverse the schema looking for a path
-   *
-   * @param Table $table
-   *   The current table to base fromm
-   * @param string $target
-   *   The target joinable table alias
-   * @param \Civi\Api4\Service\Schema\Joinable\Joinable[] $path
-   *   (By-reference) The possible paths to the target table
-   */
-  private function findPaths(Table $table, $target, &$path) {
-    foreach ($table->getTableLinks() as $link) {
-      if ($link->getAlias() === $target) {
-        $path[] = $link;
-      }
     }
   }
 

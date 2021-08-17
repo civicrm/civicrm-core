@@ -3445,7 +3445,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //Assert only three activities are created.
     $activityNames = (array) ActivityContact::get(FALSE)
       ->addWhere('contact_id', '=', $this->_ids['contact'])
-      ->addSelect('activity.*')
       ->addSelect('activity_id.activity_type_id:name')->execute()->indexBy('activity_id.activity_type_id:name');
     $this->assertArrayHasKey('Contribution', $activityNames);
     $this->assertArrayHasKey('Membership Signup', $activityNames);
