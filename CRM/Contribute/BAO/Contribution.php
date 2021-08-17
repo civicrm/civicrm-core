@@ -546,7 +546,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         'status_id:name' => $isCompleted ? 'Completed' : 'Scheduled',
         'skipRecentView' => TRUE,
         'subject' => CRM_Activity_BAO_Activity::getActivitySubject($contribution),
-        'campaign_id' => $contribution->campaign_id,
+        'campaign_id' => !is_numeric($contribution->campaign_id) ? NULL : $contribution->campaign_id,
         'id' => $existingActivity['id'] ?? NULL,
       ];
       if (!$activityParams['id']) {
