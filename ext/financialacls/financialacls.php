@@ -202,18 +202,29 @@ function financialacls_civicrm_selectWhereClause($entity, &$clauses) {
     case 'LineItem':
     case 'MembershipType':
     case 'ContributionRecur':
-      $types = [];
-      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
-      if ($types) {
-        $clauses['financial_type_id'] = 'IN (' . implode(',', array_keys($types)) . ')';
-      }
-      else {
-        $clauses['financial_type_id'] = '= 0';
-      }
+      $clauses['financial_type_id'] = _financialacls_civicrm_get_clause();
+      break;
+
+    case 'FinancialType':
+      $clauses['id'] = _financialacls_civicrm_get_clause();
       break;
 
   }
 
+}
+
+/**
+ * Get the clause to limit available types.
+ *
+ * @return string
+ */
+function _financialacls_civicrm_get_clause(): string {
+  $types = [];
+  CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
+  if ($types) {
+    return 'IN (' . implode(',', array_keys($types)) . ')';
+  }
+  return '= 0';
 }
 
 /**

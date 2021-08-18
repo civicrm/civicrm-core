@@ -62,4 +62,15 @@ class FinancialTypeTest extends BaseTestClass {
     ], $permissions['administer CiviCRM Financial Types']);
   }
 
+  /**
+   * Test income financial types are acl filtered.
+   */
+  public function testGetIncomeFinancialType(): void {
+    $types = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+    $this->assertCount(4, $types);
+    $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
+    $type = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+    $this->assertEquals([1 => 'Donation'], $type);
+  }
+
 }

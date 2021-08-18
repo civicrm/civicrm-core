@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialAccount;
+
 /**
  *
  * @package CRM
@@ -160,35 +162,33 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * fetch financial type having relationship as Income Account is.
-   *
+   * Fetch financial types having relationship as Income Account is.
    *
    * @return array
    *   all financial type with income account is relationship
+   *
+   * @throws \API_Exception
    */
-  public static function getIncomeFinancialType() {
-    // Financial Type
-    $financialType = CRM_Contribute_PseudoConstant::financialType();
-    $revenueFinancialType = [];
-    $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
-    CRM_Core_PseudoConstant::populate(
-      $revenueFinancialType,
-      'CRM_Financial_DAO_EntityFinancialAccount',
-      $all = TRUE,
-      $retrieve = 'entity_id',
-      $filter = NULL,
-      "account_relationship = $relationTypeId AND entity_table = 'civicrm_financial_type' "
-    );
-
-    foreach ($financialType as $key => $financialTypeName) {
-      if (!in_array($key, $revenueFinancialType)
-        || (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()
-          && !CRM_Core_Permission::check('add contributions of type ' . $financialTypeName))
-      ) {
-        unset($financialType[$key]);
-      }
+  public static function getIncomeFinancialType(): array {
+    // Realistically tests are the only place where logged in contact can
+    // change during the session at this stage.
+    $key = 'income_type' . CRM_Core_Session::getLoggedInContactID();
+    if (isset(Civi::$statics[__CLASS__][$key])) {
+      return Civi::$statics[__CLASS__][$key];
     }
-    return $financialType;
+    $types = EntityFinancialAccount::get()
+      ->addWhere('account_relationship:name', '=', 'Income Account is')
+      ->addWhere('entity_table', '=', 'civicrm_financial_type')
+      ->addSelect('entity_id', 'financial_type.name')
+      ->addJoin('FinancialType AS financial_type', 'LEFT', ['entity_id', '=', 'financial_type.id'])
+      ->execute()->indexBy('entity_id');
+    foreach ($types as $type) {
+      Civi::$statics[__CLASS__][$key][$type['id']] = $type['financial_type.name'];
+    }
+   if (!isset(Civi::$statics[__CLASS__][$key])) {
+     Civi::$statics[__CLASS__][$key] = [];
+   }
+   return Civi::$statics[__CLASS__][$key];
   }
 
   /**
