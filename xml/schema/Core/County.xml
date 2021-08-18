@@ -54,6 +54,7 @@
       <table>civicrm_state_province</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
   </field>
   <foreignKey>
