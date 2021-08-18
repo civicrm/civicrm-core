@@ -1,7 +1,7 @@
 <div class="form-inline" ng-repeat="sort in $ctrl.display.settings.sort">
   <label for="crm-search-display-sort-{{$index}}">{{ $index ? ts('Also by') : ts('Sort by') }}</label>
   <input id="crm-search-display-sort-{{$index}}" class="form-control huge" ng-model="sort[0]" crm-ui-select="{data: $ctrl.parent.fieldsForSort}" />
-  <select class="form-control" ng-model="sort[1]">
+  <select class="form-control" ng-model="sort[1]" ng-show="sort[0] !== 'RAND()'">
     <option value="ASC">{{ ts('Ascending') }}</option>
     <option value="DESC">{{ ts('Descending') }}</option>
   </select>
