@@ -91,6 +91,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
       case 'civicrm_im':
       case 'civicrm_openid':
       case 'civicrm_phone':
+      case 'civicrm_website':
         $id = 'contact_id';
         break;
 

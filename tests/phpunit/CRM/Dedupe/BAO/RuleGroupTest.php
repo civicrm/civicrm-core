@@ -93,6 +93,10 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'phone_numeric' => 'Phone',
           'phone_ext' => 'Phone Extension',
         ],
+      'civicrm_website' =>
+        [
+          'url' => 'Website',
+        ],
     ], $fields);
   }
 
