@@ -15,6 +15,13 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      this.$onInit = function() {
+        // Because this widget is so small, some placeholder text is helpful once it's open
+        $element.on('select2-open', function() {
+          $('#select2-drop > .select2-search > input').attr('placeholder', ts('Insert Token'));
+        });
+      };
+
       this.insertToken = function(key) {
         ctrl.model[ctrl.field] = (ctrl.model[ctrl.field] || '') + '[' + key + ']';
       };
@@ -30,6 +37,17 @@
         return {
           results: allFields
         };
+      };
+
+      this.tokenSelectSettings = {
+        data: this.getTokens,
+        // The crm-action-menu icon doesn't show without a placeholder
+        placeholder: ' ',
+        // Make this widget very compact
+        width: '52px',
+        containerCss: {minWidth: '52px'},
+        // Make the dropdown wider than the widget
+        dropdownCss: {width: '250px'}
       };
 
     }
