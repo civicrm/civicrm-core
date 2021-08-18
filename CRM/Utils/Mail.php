@@ -305,14 +305,16 @@ class CRM_Utils_Mail {
         $result = $mailer->send($to, $headers, $message);
       }
       catch (Exception $e) {
-        CRM_Core_Session::setStatus($e->getMessage(), ts('Mailing Error'), 'error');
+        \Civi::log()->error('Mailing error: ' . $e->getMessage());
+        CRM_Core_Session::setStatus(ts('Unable to send email. Please report this message to the site administrator'), ts('Mailing Error'), 'error');
         return FALSE;
       }
       if (is_a($result, 'PEAR_Error')) {
         $message = self::errorMessage($mailer, $result);
         // append error message in case multiple calls are being made to
         // this method in the course of sending a batch of messages.
-        CRM_Core_Session::setStatus($message, ts('Mailing Error'), 'error');
+        \Civi::log()->error('Mailing error: ' . $message);
+        CRM_Core_Session::setStatus(ts('Unable to send email. Please report this message to the site administrator'), ts('Mailing Error'), 'error');
         return FALSE;
       }
       // CRM-10699
