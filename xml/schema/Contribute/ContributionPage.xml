@@ -445,6 +445,12 @@
       <label>Campaign</label>
     </html>
     <add>3.4</add>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <prefetch>FALSE</prefetch>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>campaign_id</name>
