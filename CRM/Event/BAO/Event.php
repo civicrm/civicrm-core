@@ -2361,11 +2361,12 @@ LEFT  JOIN  civicrm_price_field_value value ON ( value.id = lineItem.price_field
     // Special logic for fields whose options depend on context or properties
     switch ($fieldName) {
       case 'financial_type_id':
-        // @fixme - this is going to ignore context, better to get conditions, add params, and call PseudoConstant::get
-        // @fixme - https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
-        //   because $relationTypeId is not set in CRM_Financial_BAO_FinancialType::getIncomeFinancialType()
+        // https://lab.civicrm.org/dev/core/issues/547 if CiviContribute not enabled this causes an invalid query
+        // @todo - the component is enabled check should be done within getIncomeFinancialType
+        // It looks to me like test cover was NOT added to cover the change
+        // that added this so we need to assume there is no test cover
         if (array_key_exists('CiviContribute', CRM_Core_Component::getEnabledComponents())) {
-          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
+          return CRM_Financial_BAO_FinancialType::getIncomeFinancialType($props['check_permissions'] ?? TRUE);
         }
         return [];
     }

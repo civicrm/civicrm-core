@@ -159,8 +159,8 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $types = [];
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($types);
     $expectedResult = [
-      1 => "Donation",
-      2 => "Member Dues",
+      1 => 'Donation',
+      2 => 'Member Dues',
     ];
     $this->assertEquals($expectedResult, $types, 'Verify that only certain financial types can be retrieved');
 
