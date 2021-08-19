@@ -21,7 +21,7 @@
         }
         // If no search operator this is an input for e.g. the bulk update action
         // Return `true` if the field is multi-valued, else `null`
-        return ctrl.field.serialize || ctrl.field.data_type === 'Array' ? true : null;
+        return ctrl.field && (ctrl.field.serialize || ctrl.field.data_type === 'Array') ? true : null;
       };
 
       this.$onInit = function() {

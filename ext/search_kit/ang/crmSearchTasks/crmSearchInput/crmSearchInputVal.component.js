@@ -85,28 +85,29 @@
       };
 
       this.getTemplate = function() {
+        var field = ctrl.field || {};
 
-        if (ctrl.field.input_type === 'Date') {
+        if (field.input_type === 'Date') {
           return '~/crmSearchTasks/crmSearchInput/date.html';
         }
 
-        if (ctrl.field.data_type === 'Boolean') {
+        if (field.data_type === 'Boolean') {
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
-        if (ctrl.field.options) {
+        if (field.options) {
           return '~/crmSearchTasks/crmSearchInput/select.html';
         }
 
-        if (ctrl.field.fk_entity || ctrl.field.name === 'id') {
+        if (field.fk_entity || field.name === 'id') {
           return '~/crmSearchTasks/crmSearchInput/entityRef.html';
         }
 
-        if (ctrl.field.data_type === 'Integer') {
+        if (field.data_type === 'Integer') {
           return '~/crmSearchTasks/crmSearchInput/integer.html';
         }
 
-        if (ctrl.field.data_type === 'Float') {
+        if (field.data_type === 'Float') {
           return '~/crmSearchTasks/crmSearchInput/float.html';
         }
 
@@ -114,7 +115,8 @@
       };
 
       this.getFieldOptions = function() {
-        return {results: formatForSelect2(ctrl.field.options, ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
+        var field = ctrl.field || {};
+        return {results: formatForSelect2(field.options || [], ctrl.optionKey || 'id', 'label', ['description', 'color', 'icon'])};
       };
 
     }

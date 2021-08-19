@@ -1,7 +1,7 @@
 <div class="crm-search-display crm-search-display-table">
   <div class="form-inline">
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
-    <crm-search-tasks ng-if="$ctrl.settings.actions" entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.getResults()"></crm-search-tasks>
+    <crm-search-tasks ng-if="$ctrl.settings.actions" entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" refresh="$ctrl.refreshAfterTask()"></crm-search-tasks>
   </div>
   <table>
     <thead>

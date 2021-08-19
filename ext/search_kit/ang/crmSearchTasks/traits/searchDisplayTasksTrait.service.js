@@ -52,6 +52,12 @@
         return this.allRowsSelected || _.includes(this.selectedRows, row.id);
       },
 
+      refreshAfterTask: function() {
+        this.selectedRows.length = 0;
+        this.allRowsSelected = false;
+        this.runSearch();
+      },
+
       // Overwrite empty onChangeFilters array from searchDisplayBaseTrait
       onChangeFilters: [function() {
         // Reset selection when filters are changed
