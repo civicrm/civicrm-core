@@ -192,51 +192,6 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Add permissions for financial types.
-   *
-   * @param array $permissions
-   * @param array $descriptions
-   *
-   * @return bool
-   */
-  public static function permissionedFinancialTypes(&$permissions, $descriptions) {
-    CRM_Core_Error::deprecatedFunctionWarning('not done via hook.');
-    if (!self::isACLFinancialTypeStatus()) {
-      return FALSE;
-    }
-    $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $actions = [
-      'add' => ts('add'),
-      'view' => ts('view'),
-      'edit' => ts('edit'),
-      'delete' => ts('delete'),
-    ];
-
-    foreach ($financialTypes as $id => $type) {
-      foreach ($actions as $action => $action_ts) {
-        if ($descriptions) {
-          $permissions[$action . ' contributions of type ' . $type] = [
-            ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
-            ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
-          ];
-        }
-        else {
-          $permissions[$action . ' contributions of type ' . $type] = ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]);
-        }
-      }
-    }
-    if (!$descriptions) {
-      $permissions['administer CiviCRM Financial Types'] = ts('CiviCRM: administer CiviCRM Financial Types');
-    }
-    else {
-      $permissions['administer CiviCRM Financial Types'] = [
-        ts('CiviCRM: administer CiviCRM Financial Types'),
-        ts('Administer access to Financial Types'),
-      ];
-    }
-  }
-
-  /**
    * Wrapper aroung getAvailableFinancialTypes to get all including disabled FinancialTypes
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
