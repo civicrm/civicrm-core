@@ -446,7 +446,7 @@ abstract class CRM_Utils_System_Base {
    * @return bool
    */
   public function isUserRegistrationPermitted() {
-    return FALSE;
+    return TRUE;
   }
 
   /**

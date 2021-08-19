@@ -618,17 +618,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function isUserRegistrationPermitted() {
-    $userParams = JComponentHelper::getParams('com_users');
-    if (!$userParams->get('allowUserRegistration')) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function isPasswordUserGenerated() {
     return TRUE;
   }

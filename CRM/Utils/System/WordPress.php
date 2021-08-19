@@ -1006,16 +1006,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function isUserRegistrationPermitted() {
-    if (!get_option('users_can_register')) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function isPasswordUserGenerated() {
     return FALSE;
   }

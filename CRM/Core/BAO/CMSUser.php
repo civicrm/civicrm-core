@@ -62,23 +62,10 @@ class CRM_Core_BAO_CMSUser {
    * @param bool $emailPresent
    *   True if the profile field has email(primary).
    * @param \const|int $action
-   *
-   * @return FALSE|void
-   *   WTF
-   *
    */
   public static function buildForm(&$form, $gid, $emailPresent, $action = CRM_Core_Action::NONE) {
     $config = CRM_Core_Config::singleton();
     $showCMS = FALSE;
-
-    $isDrupal = $config->userSystem->is_drupal;
-    $isJoomla = ucfirst($config->userFramework) == 'Joomla';
-    $isWordPress = $config->userFramework == 'WordPress';
-
-    if (!$config->userSystem->isUserRegistrationPermitted()) {
-      // Do not build form if CMS is not configured to allow creating users.
-      return FALSE;
-    }
 
     if ($gid) {
       $isCMSUser = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'is_cms_user');

@@ -402,16 +402,6 @@ AND    u.status = 1
   /**
    * @inheritDoc
    */
-  public function isUserRegistrationPermitted() {
-    if (config_get('system.core', 'user_register') == 'admin_only') {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function isPasswordUserGenerated() {
     if (config_get('system.core', 'user_email_verification') == TRUE) {
       return FALSE;

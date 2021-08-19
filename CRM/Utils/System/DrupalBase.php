@@ -389,16 +389,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
-  public function isUserRegistrationPermitted() {
-    if (!variable_get('user_register', TRUE)) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * @inheritDoc
-   */
   public function isPasswordUserGenerated() {
     if (variable_get('user_email_verification', TRUE)) {
       return FALSE;
