@@ -168,6 +168,10 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertTrue($getFields['fruit']['options']);
     $this->assertFalse($getFields['identifier']['options']);
 
+    // Getfields should figure out what suffixes are available based on option keys
+    $this->assertEquals(['name', 'label'], $getFields['group']['suffixes']);
+    $this->assertEquals(['name', 'label', 'color'], $getFields['fruit']['suffixes']);
+
     // Load simple options
     $getFields = MockBasicEntity::getFields()
       ->addWhere('name', 'IN', ['group', 'fruit'])

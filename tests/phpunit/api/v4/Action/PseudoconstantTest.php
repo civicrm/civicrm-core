@@ -20,8 +20,10 @@
 namespace api\v4\Action;
 
 use Civi\Api4\Address;
+use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Activity;
+use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Email;
@@ -296,6 +298,44 @@ class PseudoconstantTest extends BaseCustomValueTest {
       ->execute()->indexBy('id');
 
     $this->assertArrayNotHasKey($participant['id'], (array) $search2);
+  }
+
+  public function testPreloadFalse() {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+
+    $contact = $this->createEntity(['type' => 'Individual']);
+
+    $campaignTitle = uniqid('Test ');
+
+    $campaignId = Campaign::create(FALSE)
+      ->addValue('title', $campaignTitle)
+      ->addValue('campaign_type_id', 1)
+      ->execute()->first()['id'];
+
+    $contributionId = Contribution::create(FALSE)
+      ->addValue('campaign_id', $campaignId)
+      ->addValue('contact_id', $contact['id'])
+      ->addValue('financial_type_id', 1)
+      ->addValue('total_amount', .01)
+      ->execute()->first()['id'];
+
+    // Even though the option list of campaigns is not available (prefetch = false)
+    // We should still be able to get the title of the campaign as :label
+    $result = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionId)
+      ->addSelect('campaign_id:label')
+      ->execute()->single();
+
+    $this->assertEquals($campaignTitle, $result['campaign_id:label']);
+
+    // Fetching the title via join ought to work too
+    $result = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionId)
+      ->addSelect('campaign_id.title')
+      ->execute()->single();
+
+    $this->assertEquals($campaignTitle, $result['campaign_id.title']);
   }
 
 }
