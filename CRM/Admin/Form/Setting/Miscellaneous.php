@@ -65,7 +65,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, etc.)'));
+    $this->setTitle(ts('Misc (Undelete, PDFs, Limits, Logging, etc.)'));
 
     $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
     // dev/core#1812 Assign multilingual status.

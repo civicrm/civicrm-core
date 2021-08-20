@@ -54,7 +54,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Update multiple activities'));
+    $this->setTitle(ts('Update multiple activities'));
 
     $validate = FALSE;
     // Validations.

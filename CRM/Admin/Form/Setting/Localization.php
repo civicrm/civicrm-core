@@ -45,7 +45,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
 
-    CRM_Utils_System::setTitle(ts('Settings - Localization'));
+    $this->setTitle(ts('Settings - Localization'));
 
     $warningTitle = json_encode(ts("Warning"));
     $defaultLocaleOptions = CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions();

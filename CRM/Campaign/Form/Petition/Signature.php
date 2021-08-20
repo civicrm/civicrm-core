@@ -230,7 +230,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
 
     $this->setDefaultValues();
-    CRM_Utils_System::setTitle($this->petition['title']);
+    $this->setTitle($this->petition['title']);
   }
 
   /**

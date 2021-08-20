@@ -31,7 +31,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     parent::preProcess();
     $this->setContext();
 
-    CRM_Utils_System::setTitle(ts('Manage - Scheduled Jobs'));
+    $this->setTitle(ts('Manage - Scheduled Jobs'));
 
     if ($this->_id) {
       $refreshURL = CRM_Utils_System::url('civicrm/admin/job',

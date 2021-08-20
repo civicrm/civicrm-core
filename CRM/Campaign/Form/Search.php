@@ -144,7 +144,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
     }
 
     //set the form title.
-    CRM_Utils_System::setTitle(ts('Find Respondents To %1', array(1 => ucfirst($this->_operation))));
+    $this->setTitle(ts('Find Respondents To %1', array(1 => ucfirst($this->_operation))));
   }
 
   /**
