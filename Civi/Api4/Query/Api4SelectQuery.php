@@ -1014,7 +1014,7 @@ class Api4SelectQuery {
     try {
       $joinPath = $joiner->getPath($explicitJoin['table'] ?? $this->getFrom(), $pathArray);
     }
-    catch (\Exception $e) {
+    catch (\API_Exception $e) {
       // Because the select clause silently ignores unknown fields, this function shouldn't throw exceptions
       return;
     }
