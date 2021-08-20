@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Approve extends CRM_Core_Form {
    */
   public function buildQuickform() {
     $title = ts('Approve/Reject Mailing') . " - {$this->_mailing->name}";
-    CRM_Utils_System::setTitle($title);
+    $this->setTitle($title);
 
     $this->addElement('textarea', 'approval_note', ts('Approve/Reject Note'));
 

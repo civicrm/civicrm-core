@@ -72,7 +72,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if ($skipCount) {
       $this->assign('skipCount', $skipCount);
     }
-    CRM_Utils_System::setTitle(ts('Register Participant %1 of %2', [1 => $participantCnt, 2 => $participantTot]));
+    $this->setTitle(ts('Register Participant %1 of %2', [1 => $participantCnt, 2 => $participantTot]));
 
     //CRM-4320, hack to check last participant.
     $this->_lastParticipant = FALSE;

@@ -64,7 +64,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     $this->_BAOName = 'CRM_Financial_BAO_FinancialTypeAccount';
     if ($this->_aid && ($this->_action & CRM_Core_Action::ADD)) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', $this->_aid, 'name');
-      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('Financial Accounts'));
+      $this->setTitle($this->_title . ' - ' . ts('Financial Accounts'));
 
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext($url);
@@ -85,7 +85,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
     if ($this->_id) {
       $financialAccount = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_EntityFinancialAccount', $this->_id, 'financial_account_id');
       $fieldTitle = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccount, 'name');
-      CRM_Utils_System::setTitle($fieldTitle . ' - ' . ts('Financial Type Accounts'));
+      $this->setTitle($fieldTitle . ' - ' . ts('Financial Type Accounts'));
     }
 
     $breadCrumb = [

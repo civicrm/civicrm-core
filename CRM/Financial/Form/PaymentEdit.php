@@ -84,7 +84,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
    * Build quickForm.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Update Payment details'));
+    $this->setTitle(ts('Update Payment details'));
 
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);

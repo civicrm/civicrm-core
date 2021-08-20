@@ -72,7 +72,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
 
   public function buildQuickForm() {
     CRM_Utils_System::addHTMLHead('<META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">');
-    CRM_Utils_System::setTitle(ts('Unsubscribe Confirmation'));
+    $this->setTitle(ts('Unsubscribe Confirmation'));
 
     $this->add('text', 'email_confirm', ts('Verify email address to unsubscribe:'));
     $this->addRule('email_confirm', ts('Email address is required to unsubscribe.'), 'required');
