@@ -29,6 +29,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\RelationshipType;
@@ -1926,6 +1927,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->restoreDefaultPriceSetConfig();
     $this->disableTaxAndInvoicing();
     $this->setCurrencySeparators(',');
+    FinancialType::delete(FALSE)->addWhere(
+      'name', 'NOT IN', ['Donation' , 'Member Dues', 'Campaign Contribution', 'Event Fee']
+    )->execute();
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     // @fixme this parameter is leaking - it should not be defined as a class static

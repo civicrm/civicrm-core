@@ -941,7 +941,15 @@ class CRM_Financial_BAO_Order {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     elseif (isset($lineItem['line_total_inclusive'])) {
-      $lineItem = $this->alterLineItemForTax($this->getTaxRate($lineItem['financial_type_id']), $lineItem, $lineItem['line_total_inclusive']);
+      if (isset($lineItem['tax_amount_override'])) {
+        // @todo deprecate this - work with Karin to make sure she is not using order api in
+        // a way that deprecating this causes problems.
+        $lineItem['tax_amount'] = $lineItem['tax_amount_override'];
+        $lineItem['line_total'] = $lineItem['line_total_inclusive'] - $lineItem['tax_amount'];
+      }
+      else {
+        $lineItem = $this->alterLineItemForTax($this->getTaxRate($lineItem['financial_type_id']), $lineItem, $lineItem['line_total_inclusive']);
+      }
     }
     else {
       $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];

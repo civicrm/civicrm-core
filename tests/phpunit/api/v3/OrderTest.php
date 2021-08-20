@@ -23,6 +23,16 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_TaxTrait;
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   protected $_individualId;
 
   protected $_financialTypeId = 1;
@@ -493,17 +503,75 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testAPIOrderTax(): void {
+  public function testAPIOrderTaxSpecified(): void {
     $this->enableTaxAndInvoicing();
     $this->createFinancialTypeWithSalesTax();
     $order = $this->callAPISuccess('Order', 'create', [
-      'total_amount' => 10,
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+      'tax_amount' => 5,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIOrderTaxNotSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 105,
       'financial_type_id' => 'Test taxable financial Type',
       'contact_id' => $this->individualCreate(),
       'sequential' => 1,
     ])['values'][0];
-    $this->assertEquals(10, $order['total_amount']);
-    $this->assertEquals(0.47619047619048, $order['tax_amount']);
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIContributionTaxNotSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+    $order = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    // Contribution api does not add tax if none is specified so don't check as it is known to be wrong.
+    // $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIContributionTaxSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+
+    $order = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+      'tax_amount' => 5,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
   }
 
   /**

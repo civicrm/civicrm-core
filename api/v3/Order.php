@@ -106,6 +106,8 @@ function civicrm_api3_order_create(array $params): array {
       // This is inconsistent with the contribution api....
       'line_total_inclusive' => (float) $params['total_amount'],
       'financial_type_id' => (int) $params['financial_type_id'],
+      // This is expected to be temporary - but need to work with Karin before we start deprecating
+      'tax_amount_override' => isset($params['tax_amount']) ? (float) $params['tax_amount'] : NULL,
     ], 0);
   }
   // Only check the amount if line items are set because that is what we have historically
@@ -118,6 +120,7 @@ function civicrm_api3_order_create(array $params): array {
     }
   }
   $params['total_amount'] = $order->getTotalAmount();
+  $params['tax_amount'] = $order->getTotalTaxAmount();
 
   foreach ($order->getEntitiesToCreate() as $entityParams) {
     if ($entityParams['entity'] === 'participant') {
