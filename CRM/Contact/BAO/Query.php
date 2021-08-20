@@ -5839,10 +5839,14 @@ AND   displayRelType.is_active = 1
       else {
         $from .= $qcache['from'];
       }
+      $originalWhere = $where;
       $where = $qcache['where'];
       if (!empty($this->_tables['civicrm_case'])) {
         // Change the join on CiviCRM case so that it joins on the right contac from the relationship.
         $from = str_replace("ON civicrm_case_contact.contact_id = contact_a.id", "ON civicrm_case_contact.contact_id = transform_temp.contact_id", $from);
+        $originalWhere = str_replace("AND civicrm_case_contact.contact_id = contact_a.id", "AND civicrm_case_contact.contact_id = transform_temp.contact_id", $originalWhere);
+        $originalWhere = str_replace("WHERE ", "AND ", $originalWhere);
+        $where .= $originalWhere;
         $where .= " AND displayRelType.case_id = civicrm_case_contact.case_id ";
       }
       if (!empty($this->_permissionFromClause) && !stripos($from, 'aclContactCache')) {
