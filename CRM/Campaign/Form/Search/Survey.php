@@ -45,7 +45,7 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     $this->assign('suppressForm', TRUE);
 
     //set the form title.
-    CRM_Utils_System::setTitle(ts('Find Survey'));
+    $this->setTitle(ts('Find Survey'));
   }
 
   /**

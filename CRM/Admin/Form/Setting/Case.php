@@ -32,7 +32,7 @@ class CRM_Admin_Form_Setting_Case extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - CiviCase'));
+    $this->setTitle(ts('Settings - CiviCase'));
     parent::buildQuickForm();
   }
 

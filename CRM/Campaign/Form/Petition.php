@@ -57,10 +57,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        CRM_Utils_System::setTitle(ts('Edit Survey'));
+        $this->setTitle(ts('Edit Survey'));
       }
       else {
-        CRM_Utils_System::setTitle(ts('Delete Survey'));
+        $this->setTitle(ts('Delete Survey'));
       }
     }
 
@@ -89,10 +89,10 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
-        CRM_Utils_System::setTitle(ts('Edit Petition'));
+        $this->setTitle(ts('Edit Petition'));
       }
       else {
-        CRM_Utils_System::setTitle(ts('Delete Petition'));
+        $this->setTitle(ts('Delete Petition'));
       }
     }
 

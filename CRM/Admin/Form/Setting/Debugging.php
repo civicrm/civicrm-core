@@ -32,7 +32,7 @@ class CRM_Admin_Form_Setting_Debugging extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts(' Settings - Debugging and Error Handling '));
+    $this->setTitle(ts(' Settings - Debugging and Error Handling '));
     if (CRM_Core_Config::singleton()->userSystem->supports_UF_Logging == '1') {
       $this->_settings['userFrameworkLogging'] = CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME;
     }

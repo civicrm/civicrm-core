@@ -213,7 +213,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      CRM_Utils_System::setTitle(ts('View System Default Message Template'));
+      $this->setTitle(ts('View System Default Message Template'));
     }
   }
 

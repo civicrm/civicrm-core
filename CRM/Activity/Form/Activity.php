@@ -1243,10 +1243,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
             $displayName .= ' (' . ts('default organization') . ')';
           }
-          CRM_Utils_System::setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
+          $this->setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
         }
         else {
-          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
+          $this->setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
         }
       }
     }

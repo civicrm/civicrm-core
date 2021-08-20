@@ -36,7 +36,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
     }
 
-    CRM_Utils_System::setTitle(
+    $this->setTitle(
       ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 

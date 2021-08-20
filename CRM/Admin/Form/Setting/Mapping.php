@@ -31,7 +31,7 @@ class CRM_Admin_Form_Setting_Mapping extends CRM_Admin_Form_Setting {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Settings - Mapping and Geocoding Providers'));
+    $this->setTitle(ts('Settings - Mapping and Geocoding Providers'));
     parent::buildQuickForm();
   }
 

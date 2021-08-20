@@ -231,13 +231,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
     // get the profile information
     if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
-      CRM_Utils_System::setTitle(ts('Batch Data Entry for Contributions'));
+      $this->setTitle(ts('Batch Data Entry for Contributions'));
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Membership']) {
-      CRM_Utils_System::setTitle(ts('Batch Data Entry for Memberships'));
+      $this->setTitle(ts('Batch Data Entry for Memberships'));
     }
     elseif ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
-      CRM_Utils_System::setTitle(ts('Batch Data Entry for Pledge Payments'));
+      $this->setTitle(ts('Batch Data Entry for Pledge Payments'));
     }
 
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($this->_profileId, FALSE, CRM_Core_Action::VIEW);
