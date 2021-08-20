@@ -1,0 +1,8 @@
+<div ng-repeat="(rowIndex, row) in $ctrl.results">
+  <div ng-repeat="col in $ctrl.settings.columns" title="{{:: $ctrl.replaceTokens(col.title, row) }}" class="{{:: col.break ? '' : 'crm-inline-block' }}">
+    <label ng-if=":: col.label && (col.type !== 'field' || col.forceLabel || row[col.key])">
+      {{:: $ctrl.replaceTokens(col.label, row) }}
+    </label>
+    <span ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'"></span>
+  </div>
+</div>
