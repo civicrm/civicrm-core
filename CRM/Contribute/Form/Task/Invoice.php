@@ -123,10 +123,10 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     if ($this->_selectedOutput == 'email') {
-      CRM_Utils_System::setTitle(ts('Email Invoice'));
+      $this->setTitle(ts('Email Invoice'));
     }
     else {
-      CRM_Utils_System::setTitle(ts('Print Contribution Invoice'));
+      $this->setTitle(ts('Print Contribution Invoice'));
     }
   }
 

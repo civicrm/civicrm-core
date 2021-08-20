@@ -30,7 +30,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
   public function buildQuickForm() {
     $contactType = $this->get('contactType');
-    CRM_Utils_System::setTitle(ts('Add Contacts to %1', [1 => $contactType]));
+    $this->setTitle(ts('Add Contacts to %1', [1 => $contactType]));
     $this->addElement('text', 'name', ts('Find Target %1', [1 => $contactType]));
 
     $this->add('select',

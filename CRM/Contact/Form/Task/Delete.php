@@ -63,7 +63,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->assign('restore', $this->_restore);
 
     if ($this->_restore) {
-      CRM_Utils_System::setTitle(ts('Restore Contact'));
+      $this->setTitle(ts('Restore Contact'));
     }
 
     if ($cid) {

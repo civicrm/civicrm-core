@@ -301,7 +301,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_mode && $this->_id) {
       $this->_payNow = TRUE;
       $this->assign('payNow', $this->_payNow);
-      CRM_Utils_System::setTitle(ts('Pay with Credit Card'));
+      $this->setTitle(ts('Pay with Credit Card'));
     }
     elseif (!empty($this->_values['is_template'])) {
       $this->setPageTitle(ts('Template Contribution'));

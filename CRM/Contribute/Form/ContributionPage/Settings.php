@@ -41,7 +41,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         $this->_id,
         'title'
       );
-      CRM_Utils_System::setTitle(ts('Title and Settings') . " ($title)");
+      $this->setTitle(ts('Title and Settings') . " ($title)");
 
       foreach (['on_behalf', 'soft_credit'] as $module) {
         $ufJoinDAO = new CRM_Core_DAO_UFJoin();
