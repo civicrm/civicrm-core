@@ -44,6 +44,18 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ];
   }
 
+  public function testBrokeStuff() {
+    // Check for existing....
+    $matches = Civi\Api4\Email::get(FALSE)
+      ->addWhere('contact.first_name', '=', 'Peter')
+      ->addWhere('contact.last_name', '=', '')
+      ->addWhere('contact.is_deleted', '=', 0)
+      ->addWhere('contact.is_deceased', '=', 0)
+      ->addWhere('email', '=', '')
+      ->addWhere('is_primary', '=', TRUE)
+      ->setSelect(['contact_id'])->execute();
+  }
+
   /**
    * Test create email.
    *
