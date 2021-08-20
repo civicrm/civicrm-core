@@ -18,7 +18,7 @@
 /**
  *  Access Control List
  */
-class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
+class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL implements \Civi\Test\HookInterface {
 
   /**
    * Available operations for  pseudoconstant.
@@ -433,16 +433,21 @@ SELECT g.*
    * Delete ACL records.
    *
    * @param int $aclId
-   *   ID of the ACL record to be deleted.
-   *
+   * @deprecated
    */
   public static function del($aclId) {
-    // delete all entries from the acl cache
-    CRM_ACL_BAO_Cache::resetCache();
+    self::deleteRecord(['id' => $aclId]);
+  }
 
-    $acl = new CRM_ACL_DAO_ACL();
-    $acl->id = $aclId;
-    $acl->delete();
+  /**
+   * Event fired before an action is taken on an ACL record.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    // Reset cache when deleting an ACL record
+    if ($event->action === 'delete') {
+      CRM_ACL_BAO_Cache::resetCache();
+    }
   }
 
   /**
