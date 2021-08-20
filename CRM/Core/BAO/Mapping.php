@@ -48,24 +48,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * Delete the mapping.
    *
    * @param int $id
-   *   Mapping id.
    *
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    // delete from mapping_field table
-    $mappingField = new CRM_Core_DAO_MappingField();
-    $mappingField->mapping_id = $id;
-    $mappingField->delete();
-
-    // delete from mapping table
-    $mapping = new CRM_Core_DAO_Mapping();
-    $mapping->id = $id;
-    if ($mapping->find(TRUE)) {
-      $result = $mapping->delete();
-      return $result;
-    }
-    return FALSE;
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**
