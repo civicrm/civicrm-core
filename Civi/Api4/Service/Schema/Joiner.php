@@ -106,7 +106,7 @@ class Joiner {
    * @param array $joinPath
    *
    * @return \Civi\Api4\Service\Schema\Joinable\Joinable[]
-   * @throws \Exception
+   * @throws \API_Exception
    */
   protected function getPath(string $baseTable, array $joinPath) {
     $cacheKey = sprintf('%s.%s', $baseTable, implode('.', $joinPath));
@@ -117,7 +117,7 @@ class Joiner {
         $links = $this->schemaMap->getPath($baseTable, $targetAlias);
 
         if (empty($links)) {
-          throw new \Exception(sprintf('Cannot join %s to %s', $baseTable, $targetAlias));
+          throw new \API_Exception(sprintf('Cannot join %s to %s', $baseTable, $targetAlias));
         }
         else {
           $fullPath = array_merge($fullPath, $links);
