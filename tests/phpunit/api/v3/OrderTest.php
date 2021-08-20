@@ -489,6 +489,24 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIOrderTax(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 10,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+    ])['values'][0];
+    $this->assertEquals(10, $order['total_amount']);
+    $this->assertEquals(0.47619047619048, $order['tax_amount']);
+  }
+
+  /**
    * Test cancel order api
    *
    * @throws \CRM_Core_Exception
@@ -591,7 +609,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'receive_date' => '2018-01-01',
       'total_amount' => 36.75,
       'financial_type_id' => $this->_financialTypeId,
-      'contribution_status_id' => 'Pending',
       'tax_amount' => 1.75,
       'line_items' => [
         0 => [

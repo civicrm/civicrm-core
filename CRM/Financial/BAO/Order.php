@@ -940,6 +940,9 @@ class CRM_Financial_BAO_Order {
     if ($this->getOverrideTotalAmount()) {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
+    elseif (isset($lineItem['line_total_inclusive'])) {
+      $lineItem = $this->alterLineItemForTax($this->getTaxRate($lineItem['financial_type_id']), $lineItem, $lineItem['line_total_inclusive']);
+    }
     else {
       $lineItem['tax_amount'] = ($this->getTaxRate($lineItem['financial_type_id']) / 100) * $lineItem['line_total'];
     }
@@ -1032,9 +1035,7 @@ class CRM_Financial_BAO_Order {
   protected function addTotalsToLineBasedOnOverrideTotal(int $financialTypeID, array &$lineItem): void {
     $taxRate = $this->getTaxRate($financialTypeID);
     if ($taxRate) {
-      // Total is tax inclusive.
-      $lineItem['tax_amount'] = ($taxRate / 100) * $this->getOverrideTotalAmount() / (1 + ($taxRate / 100));
-      $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount() - $lineItem['tax_amount'];
+      $lineItem = $this->alterLineItemForTax($taxRate, $lineItem, $this->getOverrideTotalAmount());
     }
     else {
       $lineItem['line_total'] = $lineItem['unit_price'] = $this->getOverrideTotalAmount();
@@ -1120,6 +1121,22 @@ class CRM_Financial_BAO_Order {
       'label' => ts('Contribution Amount'),
     ];
     $lineItem = array_merge($defaults, $lineItem);
+  }
+
+  /**
+   * Update line item to have amount & tax amount based off tax rate & inclusive amount.
+   *
+   * @param float $taxRate
+   * @param array $lineItem
+   * @param $inclusiveAmount
+   *
+   * @return array
+   */
+  protected function alterLineItemForTax($taxRate, array $lineItem, $inclusiveAmount): array {
+    // Total is tax inclusive.
+    $lineItem['tax_amount'] = ($taxRate / 100) * $inclusiveAmount / (1 + ($taxRate / 100));
+    $lineItem['line_total'] = $lineItem['unit_price'] = $inclusiveAmount - $lineItem['tax_amount'];
+    return $lineItem;
   }
 
 }

@@ -2286,10 +2286,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
     ]);
     $contributionPostPayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'fee_amount', 'net_amount']]);
-    $this->assertEquals(5, $contributionPrePayment['tax_amount']);
-    $this->assertEquals(5, $contributionPostPayment['tax_amount']);
+    $this->assertEquals(4.76, $contributionPrePayment['tax_amount']);
+    $this->assertEquals(4.76, $contributionPostPayment['tax_amount']);
     $this->assertEquals('6.00', $contributionPostPayment['fee_amount']);
-    $this->assertEquals('99.00', $contributionPostPayment['net_amount']);
+    $this->assertEquals('94.00', $contributionPostPayment['net_amount']);
     $this->validateAllContributions();
     $this->validateAllPayments();
   }
@@ -4785,8 +4785,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //Assert line item records.
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
     foreach ($lineItems as $lineItem) {
-      $this->assertEquals($lineItem['unit_price'], $this->_params['total_amount']);
-      $this->assertEquals($lineItem['line_total'], $this->_params['total_amount']);
+      $this->assertEquals($lineItem['unit_price'] + $lineItem['tax_amount'], $this->_params['total_amount']);
+      $this->assertEquals($lineItem['line_total'] + $lineItem['tax_amount'], $this->_params['total_amount']);
     }
     $this->callAPISuccessGetCount('Contribution', [], 2);
   }

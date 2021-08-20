@@ -102,9 +102,9 @@ function civicrm_api3_order_create(array $params): array {
     $order->setPriceSetToDefault('contribution');
     $order->setLineItem([
       // Historically total_amount in this case could be tax
-      // inclusive if tax is also supplied.
+      // inclusive if tax is also supplied - as of 5.41 it always is.
       // This is inconsistent with the contribution api....
-      'line_total' => ((float) $params['total_amount'] - (float) ($params['tax_amount'] ?? 0)),
+      'line_total_inclusive' => (float) $params['total_amount'],
       'financial_type_id' => (int) $params['financial_type_id'],
     ], 0);
   }
