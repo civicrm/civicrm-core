@@ -217,19 +217,12 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * Delete the value.
    *
    * @param int $id
-   *   Id.
    *
+   * @deprecated
    * @return bool
-   *
    */
   public static function del($id) {
-    if (!$id) {
-      return FALSE;
-    }
-
-    $fieldValueDAO = new CRM_Price_DAO_PriceFieldValue();
-    $fieldValueDAO->id = $id;
-    return $fieldValueDAO->delete();
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**

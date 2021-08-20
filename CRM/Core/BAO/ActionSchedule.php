@@ -213,20 +213,11 @@ FROM civicrm_action_schedule cas
    * Delete a Reminder.
    *
    * @param int $id
-   *   ID of the Reminder to be deleted.
-   *
+   * @deprecated
    * @throws CRM_Core_Exception
    */
   public static function del($id) {
-    if ($id) {
-      $dao = new CRM_Core_DAO_ActionSchedule();
-      $dao->id = $id;
-      if ($dao->find(TRUE)) {
-        $dao->delete();
-        return;
-      }
-    }
-    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
+    self::deleteRecord(['id' => $id]);
   }
 
   /**

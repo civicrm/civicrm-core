@@ -106,13 +106,10 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Delete name labels.
    *
    * @param int $printLabelId
-   *   ID of the name label to be deleted.
-   *
+   * @deprecated
    */
   public static function del($printLabelId) {
-    $printLabel = new CRM_Core_DAO_PrintLabel();
-    $printLabel->id = $printLabelId;
-    $printLabel->delete();
+    self::deleteRecord(['id' => $printLabelId]);
   }
 
   /**
