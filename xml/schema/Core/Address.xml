@@ -265,6 +265,7 @@
       <table>civicrm_county</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
     <html>
       <type>ChainSelect</type>
@@ -292,6 +293,7 @@
       <table>civicrm_state_province</table>
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
+      <abbrColumn>abbreviation</abbrColumn>
     </pseudoconstant>
     <localize_context>province</localize_context>
     <html>

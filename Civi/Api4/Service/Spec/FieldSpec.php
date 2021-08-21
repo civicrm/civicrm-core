@@ -12,32 +12,28 @@
 
 namespace Civi\Api4\Service\Spec;
 
-use Civi\Schema\Traits\ArrayFormatTrait;
-use Civi\Schema\Traits\BasicSpecTrait;
-use Civi\Schema\Traits\DataTypeSpecTrait;
-use Civi\Schema\Traits\GuiSpecTrait;
-use Civi\Schema\Traits\OptionsSpecTrait;
-use Civi\Schema\Traits\SqlSpecTrait;
-
+/**
+ * Contains APIv4 field metadata
+ */
 class FieldSpec {
 
   // BasicSpecTrait: name, title, description
-  use BasicSpecTrait;
+  use \Civi\Schema\Traits\BasicSpecTrait;
 
   // DataTypeSpecTrait: dataType, serialize, fkEntity
-  use DataTypeSpecTrait;
+  use \Civi\Schema\Traits\DataTypeSpecTrait;
 
   // OptionsSpecTrait: options, optionsCallback
-  use OptionsSpecTrait;
+  use \Civi\Schema\Traits\OptionsSpecTrait;
 
   // GuiSpecTrait: label, inputType, inputAttrs, helpPre, helpPost
-  use GuiSpecTrait;
+  use \Civi\Schema\Traits\GuiSpecTrait;
 
   // SqlSpecTrait tableName, columnName, operators, sqlFilters
-  use SqlSpecTrait;
+  use \Civi\Schema\Traits\SqlSpecTrait;
 
   // ArrayFormatTrait: toArray():array, loadArray($array)
-  use ArrayFormatTrait;
+  use \Civi\Schema\Traits\ArrayFormatTrait;
 
   /**
    * @var mixed

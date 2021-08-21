@@ -30,6 +30,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       ->setType('Filter')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
+      ->setSuffixes(['id', 'name', 'label'])
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
   }

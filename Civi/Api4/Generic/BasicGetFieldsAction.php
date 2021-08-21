@@ -135,6 +135,9 @@ class BasicGetFieldsAction extends BasicGetAction {
       if (array_key_exists('label', $fieldDefaults)) {
         $field['label'] = $field['label'] ?? $field['title'] ?? $field['name'];
       }
+      if (!empty($field['options']) && is_array($field['options']) && empty($field['suffixes']) && array_key_exists('suffixes', $field)) {
+        $this->setFieldSuffixes($field);
+      }
       if (isset($defaults['options'])) {
         $field['options'] = $this->formatOptionList($field['options']);
       }
@@ -181,6 +184,22 @@ class BasicGetFieldsAction extends BasicGetAction {
       $formatted[] = array_intersect_key($option, array_flip($this->loadOptions));
     }
     return $formatted;
+  }
+
+  /**
+   * Set supported field suffixes based on available option keys
+   * @param array $field
+   */
+  private function setFieldSuffixes(array &$field) {
+    // These suffixes are always supported if a field has options
+    $field['suffixes'] = ['name', 'label'];
+    $firstOption = reset($field['options']);
+    // If first option is an array, merge in those keys as available suffixes
+    if (is_array($firstOption)) {
+      // Remove 'id' because there is no practical reason to use it as a field suffix
+      $otherKeys = array_diff(array_keys($firstOption), ['id', 'name', 'label']);
+      $field['suffixes'] = array_merge($field['suffixes'], $otherKeys);
+    }
   }
 
   /**
@@ -274,6 +293,13 @@ class BasicGetFieldsAction extends BasicGetAction {
         'name' => 'options',
         'data_type' => 'Array',
         'default_value' => FALSE,
+      ],
+      [
+        'name' => 'suffixes',
+        'data_type' => 'Array',
+        'default_value' => NULL,
+        'options' => ['name', 'label', 'description', 'abbr', 'color', 'icon'],
+        'description' => 'Available option transformations, e.g. :name, :label',
       ],
       [
         'name' => 'operators',
