@@ -84,7 +84,7 @@ class CRM_Queue_Service {
    * @return CRM_Queue_Queue
    */
   public function create($queueSpec) {
-    if (@is_object($this->queues[$queueSpec['name']]) && empty($queueSpec['reset'])) {
+    if (is_object($this->queues[$queueSpec['name']] ?? NULL) && empty($queueSpec['reset'])) {
       return $this->queues[$queueSpec['name']];
     }
 
