@@ -291,26 +291,6 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   }
 
   /**
-   * This function returns all entities assigned to a specific tag.
-   *
-   * @param object $tag
-   *   An object of a tag.
-   *
-   * @return array
-   *   array of entity ids
-   */
-  public function getEntitiesByTag($tag) {
-    $entityIds = [];
-    $entityTagDAO = new CRM_Core_DAO_EntityTag();
-    $entityTagDAO->tag_id = $tag->id;
-    $entityTagDAO->find();
-    while ($entityTagDAO->fetch()) {
-      $entityIds[] = $entityTagDAO->entity_id;
-    }
-    return $entityIds;
-  }
-
-  /**
    * Get contact tags.
    *
    * @param int $contactID
