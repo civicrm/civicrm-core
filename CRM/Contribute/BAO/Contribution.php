@@ -1518,7 +1518,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
     $note = CRM_Core_BAO_Note::getNote($id, 'civicrm_contribution');
     $noteId = key($note);
     if ($noteId) {
-      CRM_Core_BAO_Note::del($noteId, FALSE);
+      CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
     }
 
     $dao = new CRM_Contribute_DAO_Contribution();

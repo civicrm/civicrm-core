@@ -231,7 +231,9 @@ class CRM_Contribute_Form_AdditionalInfo {
    */
   public static function processNote($params, $contactID, $contributionID, $contributionNoteID = NULL) {
     if (CRM_Utils_System::isNull($params['note']) && $contributionNoteID) {
-      CRM_Core_BAO_Note::del($contributionNoteID);
+      CRM_Core_BAO_Note::deleteRecord(['id' => $contributionNoteID]);
+      $status = ts('Selected Note has been deleted successfully.');
+      CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
       return;
     }
     //process note
