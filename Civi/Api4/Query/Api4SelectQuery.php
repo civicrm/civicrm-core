@@ -988,7 +988,7 @@ class Api4SelectQuery {
     try {
       $joinPath = $joiner->autoJoin($this, $pathArray);
     }
-    catch (\Exception $e) {
+    catch (\API_Exception $e) {
       return;
     }
     $lastLink = array_pop($joinPath);
