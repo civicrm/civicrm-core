@@ -137,6 +137,20 @@ class CRM_Utils_Recent {
   }
 
   /**
+   * Callback for hook_civicrm_post().
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'delete' && $event->id && CRM_Core_Session::getLoggedInContactID()) {
+      // Is this an entity that might be in the recent items list?
+      $providersPermitted = Civi::settings()->get('recentItemsProviders') ?: array_keys(self::getProviders());
+      if (in_array($event->entity, $providersPermitted)) {
+        self::del(['id' => $event->id, 'type' => $event->entity]);
+      }
+    }
+  }
+
+  /**
    * Delete an item from the recent stack.
    *
    * @param array $recentItem

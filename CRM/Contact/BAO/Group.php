@@ -116,13 +116,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $transaction->commit();
 
     CRM_Utils_Hook::post('delete', 'Group', $id, $group);
-
-    // delete the recently created Group
-    $groupRecent = [
-      'id' => $id,
-      'type' => 'Group',
-    ];
-    CRM_Utils_Recent::del($groupRecent);
   }
 
   /**

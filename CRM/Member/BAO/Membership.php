@@ -673,13 +673,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
 
     CRM_Utils_Hook::post('delete', 'Membership', $membership->id, $membership);
 
-    // delete the recently created Membership
-    $membershipRecent = [
-      'id' => $membershipId,
-      'type' => 'Membership',
-    ];
-    CRM_Utils_Recent::del($membershipRecent);
-
     return $results;
   }
 

@@ -1530,13 +1530,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
 
     CRM_Utils_Hook::post('delete', 'Contribution', $dao->id, $dao);
 
-    // delete the recently created Contribution
-    $contributionRecent = [
-      'id' => $id,
-      'type' => 'Contribution',
-    ];
-    CRM_Utils_Recent::del($contributionRecent);
-
     return $results;
   }
 
