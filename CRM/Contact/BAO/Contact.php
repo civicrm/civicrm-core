@@ -1063,7 +1063,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     }
 
     //delete the contact id from recently view
-    CRM_Utils_Recent::delContact($id);
+    CRM_Utils_Recent::del(['contact_id' => $id]);
     self::updateContactCache($id, empty($restore));
 
     // delete any prevnext/dupe cache entry

@@ -90,22 +90,13 @@ class CRM_Utils_Recent {
     $contactName,
     $others = []
   ) {
-    self::initialize();
-
+    // Abort if this entity type is not supported
     if (!self::isProviderEnabled($type)) {
       return;
     }
 
-    $session = CRM_Core_Session::singleton();
-
-    // make sure item is not already present in list
-    for ($i = 0; $i < count(self::$_recent); $i++) {
-      if (self::$_recent[$i]['type'] === $type && self::$_recent[$i]['id'] == $id) {
-        // delete item from array
-        array_splice(self::$_recent, $i, 1);
-        break;
-      }
-    }
+    // Ensure item is not already present in list
+    self::removeItems(['id' => $id, 'type' => $type]);
 
     if (!is_array($others)) {
       $others = [];
@@ -127,12 +118,14 @@ class CRM_Utils_Recent {
       ]
     );
 
-    if (count(self::$_recent) > self::$_maxItems) {
+    // Keep the list trimmed to max length
+    while (count(self::$_recent) > self::$_maxItems) {
       array_pop(self::$_recent);
     }
 
     CRM_Utils_Hook::recent(self::$_recent);
 
+    $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
   }
 
@@ -151,27 +144,30 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Delete an item from the recent stack.
-   *
-   * @param array $recentItem
-   *   Array of the recent Item to be removed.
+   * Remove items from the array that match given props
+   * @param array $props
    */
-  public static function del($recentItem) {
+  private static function removeItems(array $props) {
     self::initialize();
-    $tempRecent = self::$_recent;
 
-    self::$_recent = [];
-
-    // make sure item is not already present in list
-    for ($i = 0; $i < count($tempRecent); $i++) {
-      if (!($tempRecent[$i]['id'] == $recentItem['id'] &&
-        $tempRecent[$i]['type'] == $recentItem['type']
-      )
-      ) {
-        self::$_recent[] = $tempRecent[$i];
+    self::$_recent = array_filter(self::$_recent, function($item) use ($props) {
+      foreach ($props as $key => $val) {
+        if (isset($item[$key]) && $item[$key] == $val) {
+          return FALSE;
+        }
       }
-    }
+      return TRUE;
+    });
+  }
 
+  /**
+   * Delete item(s) from the recently-viewed list.
+   *
+   * @param array $removeItem
+   *   Item to be removed.
+   */
+  public static function del($removeItem) {
+    self::removeItems($removeItem);
     CRM_Utils_Hook::recent(self::$_recent);
     $session = CRM_Core_Session::singleton();
     $session->set(self::STORE_NAME, self::$_recent);
@@ -181,27 +177,11 @@ class CRM_Utils_Recent {
    * Delete an item from the recent stack.
    *
    * @param string $id
-   *   Contact id that had to be removed.
+   * @deprecated
    */
   public static function delContact($id) {
-    self::initialize();
-
-    $tempRecent = self::$_recent;
-
-    self::$_recent = [];
-
-    // rebuild recent.
-    for ($i = 0; $i < count($tempRecent); $i++) {
-      // don't include deleted contact in recent.
-      if (CRM_Utils_Array::value('contact_id', $tempRecent[$i]) == $id) {
-        continue;
-      }
-      self::$_recent[] = $tempRecent[$i];
-    }
-
-    CRM_Utils_Hook::recent(self::$_recent);
-    $session = CRM_Core_Session::singleton();
-    $session->set(self::STORE_NAME, self::$_recent);
+    CRM_Core_Error::deprecatedFunctionWarning('del');
+    self::del(['contact_id' => $id]);
   }
 
   /**
