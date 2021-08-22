@@ -94,12 +94,12 @@
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
-            (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type)) &&
+            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.entity_type === ctrl.entity.data.contact_type)) &&
             block.name !== ctrl.editor.getAfform().name
           ) {
-            var item = {"#tag": block.join ? "div" : directive};
-            if (block.join) {
-              item['af-join'] = block.join;
+            var item = {"#tag": block.join_entity ? "div" : directive};
+            if (block.join_entity) {
+              item['af-join'] = block.join_entity;
               item['#children'] = [{"#tag": directive}];
             }
             if (block.repeat) {
