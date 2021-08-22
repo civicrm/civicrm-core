@@ -230,8 +230,8 @@ class CRM_Extension_Manager_ModuleUpgTest extends CiviUnitTestCase {
   public function assertHookCounts($module, $counts) {
     global $_test_extension_manager_moduleupgtest_counts;
     foreach ($counts as $key => $expected) {
-      $actual = @$_test_extension_manager_moduleupgtest_counts[$module][$key];
-      $this->assertEquals($expected, $actual,
+      $actual = $_test_extension_manager_moduleupgtest_counts[$module][$key] ?? 0;
+      $this->assertSame($expected, $actual,
         sprintf('Expected %d call(s) to hook_civicrm_%s -- found %d', $expected, $key, $actual)
       );
     }
