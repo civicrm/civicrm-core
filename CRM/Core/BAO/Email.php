@@ -20,7 +20,7 @@ use Civi\Api4\Email;
 /**
  * This class contains functions for email handling.
  */
-class CRM_Core_BAO_Email extends CRM_Core_DAO_Email {
+class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Test\HookInterface {
   use CRM_Contact_AccessTrait;
 
   /**
@@ -80,13 +80,19 @@ WHERE  contact_id = {$params['contact_id']}
       self::updateContactName($contactId, $address);
     }
 
-    if ($email->is_primary) {
-      // update the UF user email if that has changed
-      CRM_Core_BAO_UFMatch::updateUFName($email->contact_id);
-    }
-
     CRM_Utils_Hook::post($hook, 'Email', $email->id, $email);
     return $email;
+  }
+
+  /**
+   * Event fired after modifying an Email.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action !== 'delete' && !empty($event->object->is_primary) && !empty($event->object->contact_id)) {
+      // update the UF user email if that has changed
+      CRM_Core_BAO_UFMatch::updateUFName($event->object->contact_id);
+    }
   }
 
   /**
@@ -342,12 +348,14 @@ AND    reset_date IS NULL
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('Email', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**

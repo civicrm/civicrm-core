@@ -14,7 +14,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
+class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Test\HookInterface {
 
   /**
    * SQL function used to format the phone_numeric field via trigger.
@@ -3511,53 +3511,31 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
   }
 
   /**
-   * Delete a contact-related object that has an 'is_primary' field.
-   *
-   * Ensures that is_primary gets assigned to another object if available
-   * Also calls pre/post hooks
-   *
-   * @param string $type
-   * @param int $id
-   *
-   * @return bool
+   * Event fired after modifying any entity.
+   * @param \Civi\Core\Event\PostEvent $event
    */
-  public static function deleteObjectWithPrimary($type, $id) {
-    if (!$id || !is_numeric($id)) {
-      return FALSE;
-    }
-    $daoName = "CRM_Core_DAO_$type";
-    $obj = new $daoName();
-    $obj->id = $id;
-    $obj->find();
-
-    if ($obj->fetch()) {
-      CRM_Utils_Hook::pre('delete', $type, $id);
-      $contactId = $obj->contact_id;
-      $obj->delete();
-    }
-    else {
-      return FALSE;
-    }
-    // is_primary is only relavent if this field belongs to a contact
-    if ($contactId) {
-      $dao = new $daoName();
-      $dao->contact_id = $contactId;
+  public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    // Handle deleting a related entity with is_primary
+    $hasPrimary = ['Address', 'Email', 'IM', 'OpenID', 'Phone'];
+    if (
+      $event->action === 'delete' && $event->id &&
+      in_array($event->entity, $hasPrimary) &&
+      !empty($event->object->is_primary) &&
+      !empty($event->object->contact_id)
+    ) {
+      $daoClass = CRM_Core_DAO_AllCoreTables::getFullName($event->entity);
+      $dao = new $daoClass();
+      $dao->contact_id = $event->object->contact_id;
       $dao->is_primary = 1;
       // Pick another record to be primary (if one isn't already)
       if (!$dao->find(TRUE)) {
         $dao->is_primary = 0;
-        $dao->find();
-        if ($dao->fetch()) {
-          $dao->is_primary = 1;
-          $dao->save();
-          if ($type === 'Email') {
-            CRM_Core_BAO_UFMatch::updateUFName($dao->contact_id);
-          }
+        if ($dao->find(TRUE)) {
+          $baoClass = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
+          $baoClass::writeRecord(['id' => $dao->id, 'is_primary' => 1]);
         }
       }
     }
-    CRM_Utils_Hook::post('delete', $type, $id, $obj);
-    return TRUE;
   }
 
   /**
