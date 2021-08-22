@@ -962,7 +962,9 @@ class CRM_Core_DAO extends DB_DataObject {
     CRM_Utils_Hook::pre('delete', $entityName, $record['id'], $record);
     $instance = new $className();
     $instance->id = $record['id'];
-    if (!$instance->delete()) {
+    // Load complete object for the sake of post-hooks
+    $instance->find(TRUE);
+    if (!$instance || !$instance->delete()) {
       throw new CRM_Core_Exception("Could not delete {$entityName} id {$record['id']}");
     }
     CRM_Utils_Hook::post('delete', $entityName, $record['id'], $instance);

@@ -122,11 +122,11 @@ ORDER BY
    * Call common delete function.
    *
    * @param int $id
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }
