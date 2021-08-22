@@ -479,7 +479,11 @@ class CRM_Financial_Page_AJAX {
           $updated = CRM_Batch_BAO_EntityBatch::create($params);
         }
         else {
-          $updated = CRM_Batch_BAO_EntityBatch::del($params);
+          $delete = \Civi\Api4\EntityBatch::delete(FALSE);
+          foreach ($params as $field => $val) {
+            $delete->addWhere($field, '=', $val);
+          }
+          $updated = $delete->execute()->count();
         }
       }
     }

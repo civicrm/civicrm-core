@@ -29,19 +29,14 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
   /**
    * Remove entries from entity batch.
    * @param array|int $params
+   * @deprecated
    * @return CRM_Batch_DAO_EntityBatch
    */
   public static function del($params) {
     if (!is_array($params)) {
       $params = ['id' => $params];
     }
-    $entityBatch = new CRM_Batch_DAO_EntityBatch();
-    $entityId = $params['id'] ?? NULL;
-    CRM_Utils_Hook::pre('delete', 'EntityBatch', $entityId, $params);
-    $entityBatch->copyValues($params);
-    $entityBatch->delete();
-    CRM_Utils_Hook::post('delete', 'EntityBatch', $entityBatch->id, $entityBatch);
-    return $entityBatch;
+    return self::deleteRecord($params);
   }
 
 }
