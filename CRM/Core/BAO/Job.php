@@ -85,25 +85,14 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * Function  to delete scheduled job.
    *
    * @param $jobID
-   *   ID of the job to be deleted.
    *
    * @return bool|null
+   * @deprecated
    * @throws CRM_Core_Exception
    */
   public static function del($jobID) {
-    if (!$jobID) {
-      throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
-    }
-
-    $dao = new CRM_Core_DAO_Job();
-    $dao->id = $jobID;
-    if (!$dao->find(TRUE)) {
-      return NULL;
-    }
-
-    if ($dao->delete()) {
-      return TRUE;
-    }
+    self::deleteRecord(['id' => $jobID]);
+    return TRUE;
   }
 
   /**

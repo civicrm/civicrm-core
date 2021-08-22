@@ -69,10 +69,10 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
    *
    * @param int $entityRoleId
    *   ID of the EntityRole record to be deleted.
-   *
+   * @deprecated
    */
   public static function del($entityRoleId) {
-    return parent::deleteRecord(['id' => $entityRoleId]);
+    return self::deleteRecord(['id' => $entityRoleId]);
   }
 
 }

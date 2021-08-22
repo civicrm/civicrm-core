@@ -84,18 +84,11 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
    * Delete membership Payments.
    *
    * @param int $id
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    $dao = new CRM_Member_DAO_MembershipPayment();
-    $dao->id = $id;
-    $result = FALSE;
-    if ($dao->find(TRUE)) {
-      $dao->delete();
-      $result = TRUE;
-    }
-    return $result;
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }
