@@ -125,4 +125,34 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test only one column and a blank line at the end, because
+   * fgetcsv will return the blank lines as array(0 => NULL) which is an
+   * edge case. Note if it has more than one column then the blank line gets
+   * skipped because of some checking for column-count matches in the import,
+   * and so you don't hit the current fail.
+   */
+  public function testBlankLineAtEnd() {
+    $dataSource = new CRM_Import_DataSource_CSV();
+    $params = [
+      'uploadFile' => [
+        'name' => __DIR__ . '/blankLineAtEnd.csv',
+      ],
+      'skipColumnHeader' => TRUE,
+    ];
+
+    // Get the PEAR::DB object
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
+
+    $form = new CRM_Contact_Import_Form_DataSource();
+    $form->controller = new CRM_Contact_Import_Controller();
+
+    $dataSource->postProcess($params, $db, $form);
+    $tableName = $form->get('importTableName');
+    $json = json_encode(CRM_Core_DAO::singleValueQuery("SELECT email FROM $tableName"));
+    $this->assertEquals('"yogi@yellowstone.park"', $json);
+    CRM_Core_DAO::executeQuery("DROP TABLE $tableName");
+  }
+
 }

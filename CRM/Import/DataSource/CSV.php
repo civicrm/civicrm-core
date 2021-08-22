@@ -214,6 +214,10 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
       if (count($row) != $numColumns) {
         continue;
       }
+      // A blank line will be array(0 => NULL)
+      if ($row === [NULL]) {
+        continue;
+      }
 
       if (!$first) {
         $sql .= ', ';
