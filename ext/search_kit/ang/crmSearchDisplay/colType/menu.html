@@ -1,7 +1,7 @@
 <div class="btn-group">
   <button type="button" class="dropdown-toggle {{:: col.size }} btn-{{:: col.style }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ng-click="col.open = true">
     <i ng-if=":: col.icon" class="crm-i {{:: col.icon }}"></i>
-    {{:: col.text }}
+    {{:: $ctrl.replaceTokens(col.text, row) }}
   </button>
   <ul class="dropdown-menu {{ col.alignment === 'text-right' ? 'dropdown-menu-right' : '' }}" ng-if=":: col.open">
     <li ng-repeat="item in col.links" class="bg-{{:: item.style }}">

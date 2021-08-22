@@ -27,6 +27,7 @@
       <span crm-ui-editable ng-model="col.text">{{ col.text }}</span>
     </button>
   </div>
+  <crm-search-admin-token-select model="col" field="text" suffix=":label"></crm-search-admin-token-select>
 </div>
 <hr>
 <crm-search-admin-link-group links="$ctrl.parent.getLinks()" group="col.links" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>
