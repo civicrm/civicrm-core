@@ -153,17 +153,7 @@ WHERE  modified_date IS NULL
       ],
     ];
     CRM_Core_DAO::singleValueQuery($query, $params);
-    unset(Civi::$statics['CRM_ACL_API']);
-    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
-    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
-    if (CRM_Core_Transaction::isActive()) {
-      CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
-        CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-      });
-    }
-    else {
-      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
-    }
+    self::flushACLContactCache();
   }
 
   /**
@@ -173,6 +163,23 @@ WHERE  modified_date IS NULL
    */
   public static function deleteContactCacheEntry($userID) {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_acl_contact_cache WHERE user_id = %1", [1 => [$userID, 'Positive']]);
+  }
+
+  /**
+   * Flush the contents of the acl contact cache.
+   */
+  protected static function flushACLContactCache(): void {
+    unset(Civi::$statics['CRM_ACL_API']);
+    // CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache"); // No, force-commits transaction
+    // CRM_Core_DAO::singleValueQuery("DELETE FROM civicrm_acl_contact_cache"); // Transaction-safe
+    if (CRM_Core_Transaction::isActive()) {
+      CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, function () {
+        CRM_Core_DAO::singleValueQuery('TRUNCATE TABLE civicrm_acl_contact_cache');
+      });
+    }
+    else {
+      CRM_Core_DAO::singleValueQuery("TRUNCATE TABLE civicrm_acl_contact_cache");
+    }
   }
 
 }
