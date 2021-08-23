@@ -133,6 +133,17 @@
         }
       };
 
+      this.toggleImage = function(col) {
+        if (col.image) {
+          delete col.image;
+        } else {
+          col.image = {
+            alt: this.getColLabel(col)
+          };
+          delete col.editable;
+        }
+      };
+
       this.toggleEditable = function(col) {
         if (col.editable) {
           delete col.editable;
@@ -160,7 +171,7 @@
       this.isEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
+        return !col.image && !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
       };
 
       this.toggleLink = function(column) {
