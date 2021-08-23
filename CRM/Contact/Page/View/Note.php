@@ -144,7 +144,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-      CRM_Core_BAO_Note::del($this->_id);
+      $this->delete();
       CRM_Utils_System::redirect($url);
     }
 
@@ -219,10 +219,12 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * Delete the note object from the db.
+   * Delete the note object from the db and set a status msg.
    */
   public function delete() {
-    CRM_Core_BAO_Note::del($this->_id);
+    CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
+    $status = ts('Selected Note has been deleted successfully.');
+    CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
   }
 
   /**
