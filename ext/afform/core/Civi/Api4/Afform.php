@@ -135,10 +135,12 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
         [
-          'name' => 'block',
+          'name' => 'entity_type',
+          'description' => 'Block used for this entity type',
         ],
         [
-          'name' => 'join',
+          'name' => 'join_entity',
+          'description' => 'Used for blocks that join a sub-entity (e.g. Emails for a Contact)',
         ],
         [
           'name' => 'title',
@@ -183,6 +185,7 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'layout',
           'data_type' => 'Array',
+          'description' => 'HTML form layout; format is controlled by layoutFormat param',
         ],
       ];
       // Calculated fields returned by get action

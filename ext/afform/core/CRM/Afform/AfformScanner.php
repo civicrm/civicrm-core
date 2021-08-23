@@ -231,7 +231,7 @@ class CRM_Afform_AfformScanner {
    * @return mixed|string
    *   Ex: '/var/www/sites/default/files/civicrm/afform'.
    */
-  private function getSiteLocalPath() {
+  public function getSiteLocalPath() {
     // TODO Allow a setting override.
     // return Civi::paths()->getPath(Civi::settings()->get('afformPath'));
     return Civi::paths()->getPath('[civicrm.files]/ang');

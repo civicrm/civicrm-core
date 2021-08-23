@@ -1,5 +1,5 @@
 {
-  "title": "Organization Name (default)",
+  "title": "Organization Name",
   "type": "block",
-  "block": "Organization"
+  "entity_type": "Organization"
 }

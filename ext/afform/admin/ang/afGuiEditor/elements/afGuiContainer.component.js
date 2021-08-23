@@ -195,7 +195,7 @@
         };
 
         _.each(afGui.meta.blocks, function(blockInfo, directive) {
-          if (directive === ctrl.node['#tag'] || (blockInfo.join && blockInfo.join === ctrl.getFieldEntityType())) {
+          if (directive === ctrl.node['#tag'] || (blockInfo.join_entity && blockInfo.join_entity === ctrl.getFieldEntityType())) {
             block.options.push({
               id: directive,
               text: blockInfo.title

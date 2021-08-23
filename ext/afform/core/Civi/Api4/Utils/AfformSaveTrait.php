@@ -16,7 +16,7 @@ trait AfformSaveTrait {
 
     // If no name given, create a unique name based on the title
     if (empty($item['name'])) {
-      $prefix = !empty($item['join']) ? "afjoin-{$item['join']}" : (!empty($item['block']) ? ('afblock-' . str_replace('*', 'all', $item['block'])) : 'afform');
+      $prefix = 'af' . ($item['type'] ?? '');
       $item['name'] = _afform_angular_module_name($prefix . '-' . \CRM_Utils_String::munge($item['title'], '-'));
       $suffix = '';
       while (
