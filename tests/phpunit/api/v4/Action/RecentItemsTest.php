@@ -27,10 +27,7 @@ use Civi\Api4\Activity;
  */
 class RecentItemsTest extends UnitTestCase {
 
-  /**
-   * This locks in a fix to ensure that if a user doesn't have permission to view the is_deleted field that doesn't hard fail if that field happens to be in an APIv4 call.
-   */
-  public function testIsDeletedPermission(): void {
+  public function testAddDeleteActivity(): void {
     $cid = $this->createLoggedInUser();
 
     $aid = Activity::create(FALSE)
@@ -40,6 +37,8 @@ class RecentItemsTest extends UnitTestCase {
       ->execute()->first()['id'];
 
     $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid]));
+
+    $this->assertStringContainsString('Hello recent!', \CRM_Utils_Recent::get()[0]['title']);
 
     Activity::delete(FALSE)->addWhere('id', '=', $aid)->execute();
 
