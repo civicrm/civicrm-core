@@ -6,6 +6,9 @@
       <div class="input-group-btn" af-gui-menu>
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="crm-i fa-caret-down"></i></button>
         <ul class="dropdown-menu" ng-if="menu.open" title="{{:: ts('Set default value') }}">
+          <li class="disabled">
+            <a><strong>{{:: ts('Default Value:') }}</strong></a>
+          </li>
           <li ng-repeat="opt in $ctrl.getOptions()" >
             <a href ng-click="toggleDefaultValueItem(opt.id); $event.stopPropagation(); $event.target.blur();">
               <i class="crm-i fa-{{defaultValueContains(opt.id) ? 'check-' : ''}}circle-o"></i>
