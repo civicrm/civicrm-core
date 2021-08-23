@@ -38,10 +38,15 @@ class Refresh extends BasicBatchAction {
 
   private $syncFields = ['access_token', 'refresh_token', 'expires', 'token_type'];
   private $writeFields = ['access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
+  private $selectFields = ['id', 'client_id', 'access_token', 'refresh_token', 'expires', 'token_type', 'raw'];
   private $providers = [];
 
   public function __construct($entityName, $actionName) {
-    parent::__construct($entityName, $actionName, '*');
+    parent::__construct($entityName, $actionName);
+  }
+
+  protected function getSelect() {
+    return $this->selectFields;
   }
 
   protected function doTask($row) {
