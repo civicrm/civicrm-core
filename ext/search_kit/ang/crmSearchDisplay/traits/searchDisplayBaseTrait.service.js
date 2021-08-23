@@ -52,6 +52,18 @@
       return links;
     }
 
+    // Returns image attributes for a image column
+    function formatImageAttribute(rowData, key, columns, attribute) {
+      var column = _.findWhere(columns, {key: key});
+
+      var attributeValue = column.imageSrc;
+      if (attribute == 'imageAlt') {
+        attributeValue = column.imageAlt;
+      }
+
+      return replaceTokens(attributeValue, rowData, columns);
+    }
+
     // Formats raw field value according to data type
     function formatRawValue(column, value) {
       var type = column && column.dataType,
@@ -192,6 +204,9 @@
       },
       formatFieldValue: function(rowData, col) {
         return formatDisplayValue(rowData, col.key, this.settings.columns);
+      },
+      getImageAttribute: function (rowData, col, attribute) {
+        return formatImageAttribute(rowData, col.key, this.settings.columns, attribute);
       }
     };
   });
