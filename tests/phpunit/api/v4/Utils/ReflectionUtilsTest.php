@@ -109,4 +109,10 @@ This is the base class.';
     $this->assertEquals($expected, ReflectionUtils::parseDocBlock($input));
   }
 
+  public function testIsMethodDeprecated() {
+    $mockClass = 'api\v4\Mock\MockV4ReflectionGrandchild';
+    $this->assertTrue(ReflectionUtils::isMethodDeprecated($mockClass, 'deprecatedFn'));
+    $this->assertFalse(ReflectionUtils::isMethodDeprecated($mockClass, 'nonDeprecatedFn'));
+  }
+
 }
