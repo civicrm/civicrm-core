@@ -259,13 +259,6 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
 
     $grant->find();
 
-    // delete the recently created Grant
-    $grantRecent = [
-      'id' => $id,
-      'type' => 'Grant',
-    ];
-    CRM_Utils_Recent::del($grantRecent);
-
     if ($grant->fetch()) {
       $results = $grant->delete();
       CRM_Utils_Hook::post('delete', 'Grant', $grant->id, $grant);

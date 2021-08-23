@@ -217,15 +217,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       self::logActivityAction($activity, $logMsg);
     }
 
-    // delete the recently created Activity
-    if ($result) {
-      $activityRecent = [
-        'id' => $activity->id,
-        'type' => 'Activity',
-      ];
-      CRM_Utils_Recent::del($activityRecent);
-    }
-
     $transaction->commit();
     if (isset($activity)) {
       // CRM-8708
