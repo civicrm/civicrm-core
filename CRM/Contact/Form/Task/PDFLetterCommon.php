@@ -232,9 +232,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       $fileName = CRM_Utils_String::munge($form->getSubmittedValue('subject'), '_', 200);
     }
     else {
-      $fileName = "CiviLetter";
+      $fileName = 'CiviLetter';
     }
-    $fileName = self::isLiveMode($form) ? $fileName : $fileName . "_preview";
+    $fileName = self::isLiveMode($form) ? $fileName : $fileName . '_preview';
 
     return $fileName;
   }
