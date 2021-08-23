@@ -120,7 +120,7 @@
         while (!!$scope.entities[type + num]) {
           num++;
         }
-        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)($scope), {
+        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)(editor), {
           '#tag': 'af-entity',
           type: meta.entity,
           name: type + num,
@@ -331,7 +331,7 @@
       $scope.$watch('editor.afform.title', function(newTitle, oldTitle) {
         if (typeof oldTitle === 'string') {
           _.each($scope.entities, function(entity) {
-            if (entity.data && entity.data.source === oldTitle) {
+            if (entity.data && 'source' in entity.data && (entity.data.source || '') === oldTitle) {
               entity.data.source = newTitle;
             }
           });
