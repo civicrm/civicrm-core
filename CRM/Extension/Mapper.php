@@ -304,6 +304,7 @@ class CRM_Extension_Mapper {
         FROM civicrm_extension
         WHERE is_active = 1
         AND type = "module"
+        ORDER BY weight ASC
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {

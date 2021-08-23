@@ -49,27 +49,18 @@ class CRM_Upgrade_Incremental_php_FiveFortyTwo extends CRM_Upgrade_Incremental_B
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
+  public function upgrade_5_42_alpha1(string $rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+    $this->addTask('Add weight column to extension table', 'addColumn',
+      'civicrm_extension', 'weight',
+      "int(11) NOT NULL DEFAULT '0' COMMENT 'The order in which this extensions hooks should be invoked relative to other extensions. Equal-weighted extensions are ordered by name.'"
+    );
+  }
 
 }

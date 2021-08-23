@@ -101,4 +101,13 @@
     <comment>Is this extension active?</comment>
     <add>4.2</add>
   </field>
+  <field>
+    <name>weight</name>
+    <title>Weight</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <default>0</default>
+    <comment>The order in which this extensions hooks should be invoked relative to other extensions. Equal-weighted extensions are ordered by name.</comment>
+    <add>5.42</add>
+  </field>
 </table>
