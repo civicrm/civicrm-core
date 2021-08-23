@@ -188,7 +188,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!isset($params['tax_amount']) && $setPrevContribution && (isset($params['total_amount']) ||
      isset($params['financial_type_id']))) {
       $params['tax_amount'] = $taxAmount;
-      $params['total_amount'] = $taxAmount + $lineTotal;
     }
     if (isset($params['tax_amount']) && $params['tax_amount'] != $taxAmount && empty($params['skipLineItem'])) {
       CRM_Core_Error::deprecatedWarning('passing in incorrect tax amounts is deprecated');
