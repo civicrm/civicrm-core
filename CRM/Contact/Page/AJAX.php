@@ -578,8 +578,8 @@ LIMIT {$offset}, {$rowCount}
       'src_email' => 'ce2.email',
       'dst_postcode' => 'ca1.postal_code',
       'src_postcode' => 'ca2.postal_code',
-      'dst_street' => 'ca1.street',
-      'src_street' => 'ca2.street',
+      'dst_street' => 'ca1.street_address',
+      'src_street' => 'ca2.street_address',
     ];
 
     foreach ($mappings as $key => $dbName) {
