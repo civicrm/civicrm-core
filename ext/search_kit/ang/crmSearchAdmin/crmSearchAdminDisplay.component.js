@@ -138,7 +138,14 @@
           col.imageSrc = '';
           col.imageAlt = '';
         } else {
-          col.imageSrc = '[' + col.key + ']';
+          // this means custom field of type file
+          if (col.dataType == 'Integer') {
+            // TODO: need to switch to civicrm generated urls with checksum
+            col.imageSrc = '[' + col.key + ']';
+          } else {
+            // contact image and everything else
+            col.imageSrc = '[' + col.key + ']';
+          }
           col.imageAlt = '[' + col.key + ']';
           delete col.editable;
         }

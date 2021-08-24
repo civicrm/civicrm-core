@@ -25,6 +25,8 @@
     {{:: ts('Image') }}
   </label>
   <div class="crm-search-admin-flex-row" ng-if="col.imageSrc">
+    <label>{{:: ts('Width') }}</label> <input type="number" class="form-control crm-flex-1" placeholder="Auto" ng-model="col.imageWidth" ng-model-options="{updateOn: 'blur'}">
+    <label>{{:: ts('Height') }}</label> <input type="number" class="form-control crm-flex-1" placeholder="Auto" ng-model="col.imageHeight" ng-model-options="{updateOn: 'blur'}">
     <label>{{:: ts('Path') }}</label> <input type="text" class="form-control crm-flex-1" ng-model="col.imageSrc" ng-model-options="{updateOn: 'blur'}">
     <crm-search-admin-token-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" model="col" field="imageSrc"></crm-search-admin-token-select>
     <label>{{:: ts('Alt') }}</label> <input type="text" class="form-control crm-flex-1" ng-model="col.imageAlt" model="col" ng-model-options="{updateOn: 'blur'}">
