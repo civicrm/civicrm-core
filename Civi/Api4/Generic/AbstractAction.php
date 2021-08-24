@@ -192,6 +192,33 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
+   * Magic function to provide automatic getter/setter for params.
+   *
+   * @param $name
+   * @param $arguments
+   * @return static|mixed
+   * @throws \API_Exception
+   */
+  public function __call($name, $arguments) {
+    $param = lcfirst(substr($name, 3));
+    if (!$param || $param[0] == '_') {
+      throw new \API_Exception('Unknown api parameter: ' . $name);
+    }
+    $mode = substr($name, 0, 3);
+    if ($this->paramExists($param)) {
+      switch ($mode) {
+        case 'get':
+          return $this->$param;
+
+        case 'set':
+          $this->$param = $arguments[0];
+          return $this;
+      }
+    }
+    throw new \API_Exception('Unknown api parameter: ' . $name);
+  }
+
+  /**
    * Invoke api call.
    *
    * At this point all the params have been sent in and we initiate the api call & return the result.
