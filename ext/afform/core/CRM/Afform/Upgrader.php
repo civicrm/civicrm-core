@@ -50,7 +50,18 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
       }
       file_put_contents($fileName, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
+    return TRUE;
+  }
 
+  /**
+   * Upgrade 1000 - install civicrm_afform_submission table
+   * @return bool
+   */
+  public function upgrade_1001() {
+    $this->ctx->log->info('Applying update 1001 - install civicrm_afform_submission table.');
+    if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_afform_submission'")) {
+      $this->executeSqlFile('sql/auto_install.sql');
+    }
     return TRUE;
   }
 

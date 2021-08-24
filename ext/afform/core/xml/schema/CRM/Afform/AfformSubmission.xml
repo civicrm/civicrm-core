@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Afform</base>
+  <class>AfformSubmission</class>
+  <name>civicrm_afform_submission</name>
+  <comment>Recorded form submissions</comment>
+  <title>Form Builder Submission</title>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Submission ID</comment>
+    <html>
+      <type>Number</type>
+    </html>
+    <add>5.41</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <title>User Contact ID</title>
+    <add>5.41</add>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>afform_name</name>
+    <type>varchar</type>
+    <length>255</length>
+    <title>Afform Name</title>
+    <comment>Name of submitted afform</comment>
+    <add>5.41</add>
+  </field>
+
+  <field>
+    <name>data</name>
+    <type>text</type>
+    <title>Submission Data</title>
+    <comment>IDs of saved entities</comment>
+    <serialize>JSON</serialize>
+    <add>5.41</add>
+  </field>
+
+  <field>
+    <name>submission_date</name>
+    <type>timestamp</type>
+    <title>Submission Date/Time</title>
+    <default>CURRENT_TIMESTAMP</default>
+    <readonly>true</readonly>
+    <add>5.41</add>
+  </field>
+
+</table>

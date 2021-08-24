@@ -88,6 +88,14 @@
 
     <legend>{{:: ts('Submit Actions') }}</legend>
 
+    <div class="form-group" >
+      <label>
+        <input type="checkbox" ng-model="editor.afform.create_submission" >
+        {{:: ts('Log Submissions') }}
+      </label>
+      <p class="help-block">{{:: ts('Keep a log of the date, time, user, and items saved by each form submission.') }}</p>
+    </div>
+
     <div class="form-group" ng-class="{'has-error': !!config_form.redirect.$error.pattern}">
       <label for="af_config_redirect">
         {{:: ts('Post-Submit Page') }}

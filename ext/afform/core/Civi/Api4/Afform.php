@@ -183,6 +183,10 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'redirect',
         ],
         [
+          'name' => 'create_submission',
+          'data_type' => 'Boolean',
+        ],
+        [
           'name' => 'layout',
           'data_type' => 'Array',
           'description' => 'HTML form layout; format is controlled by layoutFormat param',
