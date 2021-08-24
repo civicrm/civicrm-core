@@ -10,5 +10,5 @@
   </span>
 </span>
 <span ng-if="::col.imageSrc">
-  <img src="{{:: $ctrl.getImageAttribute(row, col, 'imageSrc') }}" alt="{{::  $ctrl.getImageAttribute(row, col, 'imageAlt') }}" height="{{:: col.imageHeight}}" width="{{:: col.imageWidth}}"/>
+  <img ng-if="$ctrl.getImageAttribute(row, col, 'imageSrc') != 'null'" src="{{:: $ctrl.getImageAttribute(row, col, 'imageSrc') }}" alt="{{::  $ctrl.getImageAttribute(row, col, 'imageAlt') }}" height="{{:: col.imageHeight}}" width="{{:: col.imageWidth}}"/>
 </span>
