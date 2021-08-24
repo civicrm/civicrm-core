@@ -58,7 +58,7 @@
 
       if (ctrl.tab === 'form') {
         _.each(CRM.afGuiEditor.entities, function(entity, name) {
-          if (entity.defaults) {
+          if (entity.type === 'primary') {
             links.push({
               url: '#create/form/' + name,
               label: entity.label,

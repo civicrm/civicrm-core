@@ -179,10 +179,6 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
-          'name' => 'repeat',
-          'data_type' => 'Mixed',
-        ],
-        [
           'name' => 'server_route',
         ],
         [

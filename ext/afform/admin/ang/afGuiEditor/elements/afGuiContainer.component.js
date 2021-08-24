@@ -88,6 +88,7 @@
         }
       };
 
+      // Sets min value for af-repeat as a string, returns it as an int
       $scope.getSetMin = function(val) {
         if (arguments.length) {
           if (ctrl.node.max && val > parseInt(ctrl.node.max, 10)) {
@@ -103,6 +104,7 @@
         return ctrl.node.min ? parseInt(ctrl.node.min, 10) : null;
       };
 
+      // Sets max value for af-repeat as a string, returns it as an int
       $scope.getSetMax = function(val) {
         if (arguments.length) {
           if (ctrl.node.min && val && val < parseInt(ctrl.node.min, 10)) {
@@ -116,6 +118,16 @@
           }
         }
         return ctrl.node.max ? parseInt(ctrl.node.max, 10) : null;
+      };
+
+      // Returns the maximum number of repeats allowed if this is a joined entity with a limit
+      // Value comes from civicrm_custom_group.max_multiple for custom entities,
+      // or from afformEntity php file for core entities.
+      $scope.getRepeatMax = function() {
+        if (ctrl.join) {
+          return afGui.getEntity(ctrl.join).repeat_max || '';
+        }
+        return '';
       };
 
       $scope.pickAddIcon = function() {
