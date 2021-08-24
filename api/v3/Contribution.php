@@ -70,6 +70,18 @@ function civicrm_api3_contribution_create($params) {
       throw new API_Exception($error['financial_type_id']);
     }
   }
+  if (!isset($params['tax_amount']) && empty($params['line_item'])
+    && empty($params['skipLineItem'])
+    && empty($params['id'])
+  ) {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    $taxRate = $taxRates[$params['financial_type_id']] ?? 0;
+    if ($taxRate) {
+      // Be afraid - historically if a contribution was tax then the passed in amount is EXCLUSIVE
+      $params['tax_amount'] = $params['total_amount'] * ($taxRate / 100);
+      $params['total_amount'] += $params['tax_amount'];
+    }
+  }
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
