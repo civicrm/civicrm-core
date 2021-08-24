@@ -347,6 +347,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'settingPath',
       'autocomplete',
       'validContact',
+      'email',
     ];
 
     foreach ($rules as $rule) {

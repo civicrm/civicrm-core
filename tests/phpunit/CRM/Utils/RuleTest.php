@@ -306,7 +306,8 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test cvvs
+   * Test cvvs.
+   *
    * @return array
    */
   public static function cvvs(): array {
@@ -341,6 +342,32 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    */
   public function testCvvRule($cvv, $type, $expected): void {
     $this->assertEquals($expected, CRM_Utils_Rule::cvv($cvv, $type));
+  }
+
+  /**
+   * Test CVV rule
+   *
+   * @param string $email
+   * @param bool $expected expected outcome of the rule validation
+   *
+   * @dataProvider emails
+   */
+  public function testEmailRule(string $email, bool $expected): void {
+    $this->assertEquals($expected, CRM_Utils_Rule::email($email));
+  }
+
+  /**
+   * Test emails.
+   *
+   * @return array
+   */
+  public static function emails(): array {
+    $cases = [];
+    $cases['name.-o-.i.10@example.com'] = ['name.-o-.i.10@example.com', TRUE];
+    $cases['test@ēxāmplē.co.nz'] = ['test@ēxāmplē.co.nz', TRUE];
+    $cases['test@localhost'] = ['test@localhost', TRUE];
+    $cases['test@ēxāmplē.co'] = ['test@exāmple', FALSE];
+    return $cases;
   }
 
 }
