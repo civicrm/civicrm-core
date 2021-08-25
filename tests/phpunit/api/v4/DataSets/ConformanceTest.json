@@ -90,5 +90,26 @@
       "financial_type_id:name": "Donation",
       "min_contribution": "10.00"
     }
+  ],
+  "MembershipType": [
+    {
+      "name": "General",
+      "period_type" : "fixed",
+      "financial_type_id:name": "Donation",
+      "duration_unit" : "month",
+      "member_of_contact_id" : "@ref test_contact_1.id"
+    }
+  ],
+  "ContributionPage": [
+    {
+      "name": "General"
+    }
+  ],
+  "Membership": [
+    {
+      "membership_type_id:name": "General",
+      "contact_id" : "@ref test_contact_1.id",
+      "status_id:name" : "Pending"
+    }
   ]
 }

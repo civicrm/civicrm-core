@@ -965,9 +965,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test civicrm_contact_memberships_create with membership id (edit
    * membership).
-   * success expected.
+   *
+   * @dataProvider versionThreeAndFour
    */
-  public function testMembershipCreateWithId() {
+  public function testMembershipCreateWithId($version): void {
+    $this->_apiversion = $version;
     $membershipID = $this->contactMembershipCreate($this->_params);
     $params = [
       'id' => $membershipID,
