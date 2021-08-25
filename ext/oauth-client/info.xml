@@ -11,7 +11,7 @@
   <urls>
     <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/oauth-client</url>
     <url desc="Documentation">https://docs.civicrm.org/sysadmin/en/latest/setup/oauth/</url>
-    <url desc="Support">https://lab.civicrm.org/extensions/oauth/-/issues</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-10-23</releaseDate>
