@@ -1,5 +1,5 @@
 <div class="af-gui-bar" ng-if="$ctrl.node['#tag']" ng-click="selectEntity()" >
-  <div ng-if="!$ctrl.loading" class="form-inline" af-gui-menu>
+  <div ng-if="!$ctrl.loading" class="form-inline">
     <span ng-if="$ctrl.getNodeType($ctrl.node) == 'fieldset'">{{ $ctrl.editor.getEntity($ctrl.entityName).label }}</span>
     <span ng-if="block">{{ $ctrl.join ? ts($ctrl.join) + ':' : ts('Block:') }}</span>
     <span ng-if="!block">{{ tags[$ctrl.node['#tag']] }}</span>
@@ -8,10 +8,15 @@
       <option ng-value="option.id" ng-repeat="option in block.options track by option.id">{{ option.text }}</option>
     </select>
     <button type="button" class="btn btn-default btn-xs" ng-if="block && !block.layout" ng-click="saveBlock()">{{:: ts('Save...') }}</button>
-    <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button pull-right" data-toggle="dropdown" title="{{:: ts('Configure') }}">
-      <span><i class="crm-i fa-gear"></i></span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiContainer-menu.html'"></ul>
+    <div class="btn-group pull-right">
+      <af-gui-container-multi-toggle ng-if="!ctrl.loading && ($ctrl.join || $ctrl.node['af-repeat'])" entity="$ctrl.getFieldEntityType()" class="btn-group"></af-gui-container-multi-toggle>
+      <div class="btn-group" af-gui-menu>
+        <button type="button" class="btn btn-default btn-xs dropdown-toggle af-gui-add-element-button" data-toggle="dropdown" title="{{:: ts('Configure') }}">
+          <span><i class="crm-i fa-gear"></i></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right" ng-if="menu.open" ng-include="'~/afGuiEditor/elements/afGuiContainer-menu.html'"></ul>
+      </div>
+    </div>
   </div>
   <div ng-if="$ctrl.loading"><i class="crm-i fa-spin fa-spinner"></i></div>
 </div>

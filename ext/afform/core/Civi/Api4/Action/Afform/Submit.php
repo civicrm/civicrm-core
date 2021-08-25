@@ -38,9 +38,11 @@ class Submit extends AbstractProcessor {
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
-          // Only accept values from join fields on the form
           foreach ($joinValues as $index => $vals) {
+            // Only accept values from join fields on the form
             $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            // Merge in pre-set data
+            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
           }
         }
         $entityValues[$entityName][] = $values;

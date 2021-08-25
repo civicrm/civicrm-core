@@ -76,7 +76,7 @@
         return ctrl.node['af-fieldset'] || (block.directive && afGui.meta.blocks[block.directive].repeat) || ctrl.join;
       };
 
-      $scope.toggleRepeat = function() {
+      this.toggleRepeat = function() {
         if ('af-repeat' in ctrl.node) {
           delete ctrl.node.max;
           delete ctrl.node.min;
@@ -85,6 +85,7 @@
         } else {
           ctrl.node.min = '1';
           ctrl.node['af-repeat'] = ts('Add');
+          delete ctrl.node.data;
         }
       };
 
@@ -125,7 +126,7 @@
       // or from afformEntity php file for core entities.
       $scope.getRepeatMax = function() {
         if (ctrl.join) {
-          return afGui.getEntity(ctrl.join).repeat_max || '';
+          return ctrl.getJoinEntity().repeat_max || '';
         }
         return '';
       };
@@ -290,8 +291,19 @@
         afGui.removeRecursive($scope.getSetChildren(), {$$hashKey: element.$$hashKey});
       };
 
+      this.removeField = function(fieldName) {
+        afGui.removeRecursive($scope.getSetChildren(), {'#tag': 'af-field', name: fieldName});
+      };
+
       this.getEntityName = function() {
         return ctrl.entityName ? ctrl.entityName.split('-join-')[0] : null;
+      };
+
+      this.getJoinEntity = function() {
+        if (!ctrl.join) {
+          return null;
+        }
+        return afGui.getEntity(ctrl.join);
       };
 
       // Returns the primary entity type for this container e.g. "Contact"

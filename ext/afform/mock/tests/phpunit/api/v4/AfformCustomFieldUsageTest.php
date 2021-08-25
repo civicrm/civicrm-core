@@ -53,7 +53,6 @@ EOHTML;
       ->setLayoutFormat('shallow')
       ->setFormatWhitespace(TRUE)
       ->execute()->single();
-    $this->assertEquals(2, $block['repeat']);
     $this->assertEquals('afblock-custom-my-things', $block['directive_name']);
     $this->assertEquals('my_text', $block['layout'][0]['name']);
     $this->assertEquals('my_friend', $block['layout'][1]['name']);

@@ -10,7 +10,7 @@
 </li>
 <li ng-if="isRepeatable()" ng-click="$event.stopPropagation()">
   <div class="af-gui-field-select-in-dropdown form-inline">
-    <label ng-click="toggleRepeat()">
+    <label ng-click="$ctrl.toggleRepeat()">
       <i class="crm-i fa-{{ $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'check-' : '' }}square-o"></i>
       {{:: ts('Repeat') }}
     </label>
