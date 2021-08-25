@@ -126,7 +126,7 @@
     <td class="label">{$form.duration.label}</td>
     <td class="view-value">
       {$form.duration.html}
-      {if $action neq 4}<span class="description">{ts}minutes{/ts}{/if}
+      {if $action neq 4}<span class="description">{ts}minutes{/ts}</span>{/if}
     </td>
   </tr>
   <tr class="crm-activity-form-block-status_id">
