@@ -45,6 +45,13 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    $tasks[$entity['name']]['download'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Download Spreadsheet'),
+      'icon' => 'fa-download',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+    ];
+
     if (array_key_exists('update', $entity['actions'])) {
       $tasks[$entity['name']]['update'] = [
         'module' => 'crmSearchTasks',
