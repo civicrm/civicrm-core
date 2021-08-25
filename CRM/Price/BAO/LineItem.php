@@ -513,17 +513,20 @@ WHERE li.contribution_id = %1";
           }
           $financialType = $values['financial_type_id'];
         }
+        $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+        $taxRate = $taxRates[$financialType] ?? 0;
+        $taxAmount = ($taxRate / 100) * $totalAmount / (1 + ($taxRate / 100));
         $lineItem = [
           'price_field_id' => $values['priceFieldID'],
           'price_field_value_id' => $values['priceFieldValueID'],
           'label' => $values['label'],
           'qty' => 1,
-          'unit_price' => $totalAmount,
-          'line_total' => $totalAmount,
+          'unit_price' => $totalAmount - $taxAmount,
+          'line_total' => $totalAmount - $taxAmount,
           'financial_type_id' => $financialType,
           'membership_type_id' => $values['membership_type_id'],
+          'tax_amount' => $taxAmount,
         ];
-        $lineItem['tax_amount'] = self::getTaxAmountForLineItem($lineItem);
         $params['line_item'][$values['setID']][$values['priceFieldID']] = $lineItem;
         break;
       }
