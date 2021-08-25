@@ -820,12 +820,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         // end of contribution related section
 
-        $membershipParams = [
-          'start_date' => $value['membership_start_date'] ?? NULL,
-          'end_date' => $value['membership_end_date'] ?? NULL,
-          'join_date' => $value['membership_join_date'] ?? NULL,
-          'campaign_id' => $value['member_campaign_id'] ?? NULL,
-        ];
+        $membershipParams = $this->getMembershipParams();
 
         if ($this->currentRowIsRenew()) {
           // The following parameter setting may be obsolete.
@@ -836,8 +831,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
             'start_date' => $value['membership_start_date'] ?? NULL,
           ];
           $membershipSource = $value['source'] ?? NULL;
-          $membership = $this->legacyProcessMembership(
-            $value['contact_id'], $value['membership_type_id'],
+          $membership = $this->legacyProcessMembership($value['membership_type_id'],
             $value['custom'], $membershipSource, ['campaign_id' => $value['member_campaign_id'] ?? NULL], $formDates
           );
 
@@ -1005,7 +999,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   }
 
   /**
-   * @param int $contactID
    * @param int $membershipTypeID
    * @param $customFieldsFormatted
    * @param $membershipSource
@@ -1018,44 +1011,17 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected function legacyProcessMembership($contactID, $membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_DAO_Membership {
+  protected function legacyProcessMembership($membershipTypeID, $customFieldsFormatted, $membershipSource, $memParams = [], $formDates = []): CRM_Member_DAO_Membership {
     $updateStatusId = FALSE;
     $changeToday = NULL;
     $is_test = FALSE;
     $numRenewTerms = 1;
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
     $format = '%Y%m%d';
-    $statusFormat = '%Y-%m-%d';
-    $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($membershipTypeID);
     $ids = [];
     $isPayLater = NULL;
     $currentMembership = $this->getCurrentMembership();
-
-    if ($currentMembership) {
-
-      // Do NOT do anything.
-      //1. membership with status : PENDING/CANCELLED (CRM-2395)
-      //2. Paylater/IPN renew. CRM-4556.
-      if (in_array($currentMembership['status_id'], [
-        array_search('Pending', $allStatus),
-        // CRM-15475
-        array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
-      ])) {
-
-        $memParams = array_merge([
-          'id' => $currentMembership['id'],
-          'status_id' => $currentMembership['status_id'],
-          'start_date' => $currentMembership['start_date'],
-          'end_date' => $currentMembership['end_date'],
-          'join_date' => $currentMembership['join_date'],
-          'membership_type_id' => $membershipTypeID,
-          'max_related' => !empty($membershipTypeDetails['max_related']) ? $membershipTypeDetails['max_related'] : NULL,
-          'membership_activity_status' => $isPayLater ? 'Scheduled' : 'Completed',
-        ], $memParams);
-
-        return CRM_Member_BAO_Membership::create($memParams);
-      }
-
+    // @todo - remove this if - still here for now to leave whitespace change out of commit.
+    if (1) {
       // Now Renew the membership
       if (!$currentMembership['is_current_member']) {
         // membership is not CURRENT
@@ -1130,43 +1096,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
       }
-    }
-    else {
-      // NEW Membership
-      $memParams = array_merge([
-        'contact_id' => $contactID,
-        'membership_type_id' => $membershipTypeID,
-      ], $memParams);
-
-      $dates = CRM_Member_BAO_MembershipType::getDatesForMembershipType($membershipTypeID, NULL, NULL, NULL, $numRenewTerms);
-
-      foreach (['join_date', 'start_date', 'end_date'] as $dateType) {
-        $memParams[$dateType] = $formDates[$dateType] ?? NULL;
-        if (empty($memParams[$dateType])) {
-          $memParams[$dateType] = $dates[$dateType] ?? NULL;
-        }
-      }
-
-      $status = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate(CRM_Utils_Date::customFormat($dates['start_date'],
-        $statusFormat),
-        CRM_Utils_Date::customFormat($dates['end_date'],
-          $statusFormat
-        ),
-        CRM_Utils_Date::customFormat($dates['join_date'],
-          $statusFormat
-        ),
-        'now',
-        TRUE,
-        $membershipTypeID,
-        $memParams
-      );
-      $updateStatusId = $status['id'] ?? NULL;
-
-      if (!empty($membershipSource)) {
-        $memParams['source'] = $membershipSource;
-      }
-      $memParams['is_test'] = $is_test;
-      $memParams['is_pay_later'] = $isPayLater;
     }
 
     //CRM-4555
@@ -1244,9 +1173,12 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * Is the current row a renewal.
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function currentRowIsRenew(): bool {
-    return $this->currentRowIsRenewOption === 2;
+    return $this->currentRowIsRenewOption === 2 && $this->getCurrentMembership();
   }
 
   /**
@@ -1268,6 +1200,20 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       CRM_Member_BAO_Membership::fixMembershipStatusBeforeRenew($this->currentRowExistingMembership);
     }
     return $this->currentRowExistingMembership;
+  }
+
+  /**
+   * Get the params as related to the membership entity.
+   *
+   * @return array
+   */
+  private function getMembershipParams(): array {
+    return [
+      'start_date' => $this->currentRow['membership_start_date'] ?? NULL,
+      'end_date' => $this->currentRow['membership_end_date'] ?? NULL,
+      'join_date' => $this->currentRow['membership_join_date'] ?? NULL,
+      'campaign_id' => $this->currentRow['member_campaign_id'] ?? NULL,
+    ];
   }
 
 }
