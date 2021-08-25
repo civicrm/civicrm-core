@@ -28,10 +28,16 @@ use Civi\Token\TokenProcessor;
 class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
 
   /**
+   * @var array
+   */
+  protected $prefetch = [];
+
+  /**
    * @inheritDoc
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+    $this->prefetch = (array) $prefetch;
     $fieldValue = $this->getFieldValue($row, $field);
 
     if ($this->isPseudoField($field)) {
@@ -40,7 +46,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     }
     if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $this->getFieldValue($row, 'currency')));
+        \CRM_Utils_Money::format($fieldValue, $this->getCurrency($row)));
     }
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
@@ -214,6 +220,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // from the metadata as yet.
       return FALSE;
     }
+    if ($this->getFieldMetadata()[$fieldName]['type'] === 'Custom') {
+      // If we remove this early return then we get that extra nuanced goodness
+      // and support for the more portable v4 style field names
+      // on custom fields - where labels or names can be returned.
+      // At present the gap is that the metadata for the label is not accessed
+      // and tests failed on the enotice and we don't have a clear plan about
+      // v4 style custom tokens - but medium term this IF will probably go.
+      return FALSE;
+    }
     return (bool) $this->getFieldMetadata()[$fieldName]['options'];
   }
 
@@ -247,7 +262,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   protected function getFieldValue(TokenRow $row, string $field) {
     $actionSearchResult = $row->context['actionSearchResult'];
     $aliasedField = $this->getEntityAlias() . $field;
-    return $actionSearchResult->{$aliasedField} ?? NULL;
+    if (isset($actionSearchResult->{$aliasedField})) {
+      return $actionSearchResult->{$aliasedField};
+    }
+    $entityID = $row->context[$this->getEntityIDField()];
+    return $this->prefetch[$entityID][$field] ?? '';
   }
 
   /**
@@ -266,8 +285,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(TokenProcessor $processor) {
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === $this->getExtendableTableName();
+    return (!empty($processor->context['actionMapping'])
+        // This makes the 'schema context compulsory - which feels accidental
+        // since recent discu
+      && $processor->context['actionMapping']->getEntity()) || in_array($this->getEntityIDField(), $processor->context['schema']);
   }
 
   /**
@@ -282,6 +303,103 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     foreach ($this->getReturnFields() as $token) {
       $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
     }
+  }
+
+  /**
+   * Get tokens supporting the syntax we are migrating to.
+   *
+   * In general these are tokens that were not previously supported
+   * so we can add them in the preferred way or that we have
+   * undertaken some, as yet to be written, db update.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/2650
+   *
+   * @return string[]
+   * @throws \API_Exception
+   */
+  public function getBasicTokens(): array {
+    $return = [];
+    foreach ($this->getExposedFields() as $fieldName) {
+      $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
+    }
+    return $return;
+  }
+
+  /**
+   * Get entity fields that should be exposed as tokens.
+   *
+   * @return string[]
+   *
+   */
+  public function getExposedFields(): array {
+    $return = [];
+    foreach ($this->getFieldMetadata() as $field) {
+      if (!in_array($field['name'], $this->getSkippedFields(), TRUE)) {
+        $return[] = $field['name'];
+      }
+    }
+    return $return;
+  }
+
+  /**
+   * Get entity fields that should not be exposed as tokens.
+   *
+   * @return string[]
+   */
+  public function getSkippedFields(): array {
+    $fields = ['contact_id'];
+    if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+      $fields[] = 'campaign_id';
+    }
+    return $fields;
+  }
+
+  /**
+   * @return string
+   */
+  protected function getEntityName(): string {
+    return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
+  }
+
+  public function getEntityIDField() {
+    return $this->getEntityName() . 'Id';
+  }
+
+  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
+    $entityIDs = $e->getTokenProcessor()->getContextValues($this->getEntityIDField());
+    if (empty($entityIDs)) {
+      return [];
+    }
+    $select = $this->getPrefetchFields($e);
+    $result = (array) civicrm_api4($this->getApiEntityName(), 'get', [
+      'checkPermissions' => FALSE,
+      // Note custom fields are not yet added - I need to
+      // re-do the unit tests to support custom fields first.
+      'select' => $select,
+      'where' => [['id', 'IN', $entityIDs]],
+    ], 'id');
+    return $result;
+  }
+
+  public function getCurrencyFieldName() {
+    return [];
+  }
+
+  /**
+   * Get the currency to use for formatting money.
+   * @param $row
+   *
+   * @return string
+   */
+  public function getCurrency($row): string {
+    if (!empty($this->getCurrencyFieldName())) {
+      return $this->getFieldValue($row, $this->getCurrencyFieldName()[0]);
+    }
+    return CRM_Core_Config::singleton()->defaultCurrency;
+  }
+
+  public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
+    return array_intersect($this->getActiveTokens($e), $this->getCurrencyFieldName(), array_keys($this->getAllTokens()));
   }
 
 }
