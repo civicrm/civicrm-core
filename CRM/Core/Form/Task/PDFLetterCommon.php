@@ -55,7 +55,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
     // Added for core#2121,
     // To support sending a custom pdf filename before downloading.
-    $form->addElement('hidden', 'pdf_file_name', []);
+    $form->addElement('hidden', 'pdf_file_name');
 
     $form->addSelect('format_id', [
       'label' => ts('Select Format'),
