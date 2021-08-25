@@ -102,13 +102,8 @@ function civicrm_api3_order_create(array $params): array {
   }
   else {
     $order->setPriceSetToDefault('contribution');
-    $order->setLineItem([
-      // Historically total_amount in this case could be tax
-      // inclusive if tax is also supplied.
-      // This is inconsistent with the contribution api....
-      'line_total' => ((float) $params['total_amount'] - (float) ($params['tax_amount'] ?? 0)),
-      'financial_type_id' => (int) $params['financial_type_id'],
-    ], 0);
+    $order->setOverrideTotalAmount((float) $params['total_amount']);
+    $order->setLineItem([], 0);
   }
   // Only check the amount if line items are set because that is what we have historically
   // done and total amount is historically only inclusive of tax_amount IF
@@ -120,6 +115,11 @@ function civicrm_api3_order_create(array $params): array {
     }
   }
   $params['total_amount'] = $order->getTotalAmount();
+  if (!isset($params['tax_amount'])) {
+    // @todo always calculate tax amount - left for now
+    // for webform
+    $params['tax_amount'] = $order->getTotalTaxAmount();
+  }
 
   foreach ($order->getEntitiesToCreate() as $entityParams) {
     if ($entityParams['entity'] === 'participant') {
