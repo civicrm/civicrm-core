@@ -23,6 +23,16 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_TaxTrait;
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   protected $_individualId;
 
   protected $_financialTypeId = 1;
@@ -489,6 +499,63 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIOrderTaxSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+      'tax_amount' => 5,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIOrderTaxNotSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
+   * Test order api treats amount as inclusive when line items not set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAPIContributionTaxSpecified(): void {
+    $this->enableTaxAndInvoicing();
+    $this->createFinancialTypeWithSalesTax();
+
+    $order = $this->callAPISuccess('Contribution', 'create', [
+      'total_amount' => 105,
+      'financial_type_id' => 'Test taxable financial Type',
+      'contact_id' => $this->individualCreate(),
+      'sequential' => 1,
+      'tax_amount' => 5,
+    ])['values'][0];
+    $this->assertEquals(105, $order['total_amount']);
+    $this->assertEquals(5, $order['tax_amount']);
+  }
+
+  /**
    * Test cancel order api
    *
    * @throws \CRM_Core_Exception
@@ -652,7 +719,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'invoice_id' => '1859_woocommerce',
       'receive_date' => '2021-05-05 23:24:02',
       'contribution_status_id' => 'Pending',
-      'total_amount' => 109.69,
       'source' => 'Shop',
       'note' => 'Fundraiser Dinner Ticket x 1, Student Membership x 1',
       'line_items' => [

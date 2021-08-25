@@ -2266,8 +2266,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @param string $thousandSeparator
    *   punctuation used to refer to thousands.
    *
-   * @dataProvider getThousandSeparators
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @dataProvider getThousandSeparators
    */
   public function testCheckTaxAmount(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
@@ -2286,10 +2287,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
     ]);
     $contributionPostPayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'fee_amount', 'net_amount']]);
-    $this->assertEquals(5, $contributionPrePayment['tax_amount']);
-    $this->assertEquals(5, $contributionPostPayment['tax_amount']);
+    $this->assertEquals(4.76, $contributionPrePayment['tax_amount']);
+    $this->assertEquals(4.76, $contributionPostPayment['tax_amount']);
     $this->assertEquals('6.00', $contributionPostPayment['fee_amount']);
-    $this->assertEquals('99.00', $contributionPostPayment['net_amount']);
+    $this->assertEquals('94.00', $contributionPostPayment['net_amount']);
     $this->validateAllContributions();
     $this->validateAllPayments();
   }
@@ -4768,6 +4769,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test Repeat Transaction Contribution with Tax amount.
+   *
    * https://lab.civicrm.org/dev/core/issues/806
    *
    * @throws \CRM_Core_Exception
@@ -4792,7 +4794,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Completed',
       'trxn_id' => 'test',
     ]);
-    $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
+    $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1, 'return' => ['total_amount', 'tax_amount']])['values'];
     //Assert if first payment and repeated payment has the same contribution amount.
     $this->assertEquals($payments[0]['total_amount'], $payments[1]['total_amount']);
     $this->callAPISuccessGetCount('Contribution', [], 2);
@@ -4800,8 +4802,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //Assert line item records.
     $lineItems = $this->callAPISuccess('LineItem', 'get', ['sequential' => 1])['values'];
     foreach ($lineItems as $lineItem) {
-      $this->assertEquals($lineItem['unit_price'], $this->_params['total_amount']);
-      $this->assertEquals($lineItem['line_total'], $this->_params['total_amount']);
+      $taxExclusiveAmount = $payments[0]['total_amount'] - $payments[0]['tax_amount'];
+      $this->assertEquals($lineItem['unit_price'], $taxExclusiveAmount);
+      $this->assertEquals($lineItem['line_total'], $taxExclusiveAmount);
     }
     $this->callAPISuccessGetCount('Contribution', [], 2);
   }
