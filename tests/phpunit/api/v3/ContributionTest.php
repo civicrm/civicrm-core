@@ -3538,21 +3538,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //Update it to Failed.
     $form->_params['id'] = $this->getContributionID('second');
     $form->_params['contribution_status_id'] = 4;
-    // We now have 2 line items of $20 each.
-    // form params['total_amount'] is set to $20 but
-    // now that we have 2 line items of $20 it should be $40
-    // this is an artificial test scenario.
-    // but we need to ensure it is valid enough to
-    // pass validation checks. Note the way these lines are created
-    // above is wrong wrong wrong - but the rc is not the place to fix.
-    // Also note that this test has historically created incorrect
-    // financial data. The financials check was enabled on it
-    // AFTER the code we are honing was merged.
-    // so it used to tolerate incorrect financials, then it started
-    // re-calculating them (correctly in this artificial scenario - but not for tax scenarios)
-    // but as of 5.41 it is 'accepting' the total_amount
-    // so we should pass in a correct one.
-    $form->_params['total_amount'] = 40;
 
     $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
     //Existing membership should not get updated to expired.
