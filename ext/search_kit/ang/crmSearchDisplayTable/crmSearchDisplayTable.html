@@ -9,9 +9,9 @@
         <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
           <input type="checkbox" ng-disabled="$ctrl.loading || !$ctrl.results.length" ng-checked="$ctrl.allRowsSelected" ng-click="$ctrl.selectAllRows()" >
         </th>
-        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" title="{{:: ts('Click to sort results (shift-click to sort by multiple).') }}">
-          <i ng-if="col.type === 'field'" class="crm-i {{ $ctrl.getSort(col) }}"></i>
-          <span>{{ col.label }}</span>
+        <th ng-repeat="col in $ctrl.settings.columns" ng-click="$ctrl.setSort(col, $event)" title="{{:: col.type === 'field' ? ts('Click to sort results (shift-click to sort by multiple).') : '' }}">
+          <i ng-if=":: col.type === 'field'" class="crm-i {{ $ctrl.getSort(col) }}"></i>
+          <span>{{:: col.label }}</span>
         </th>
       </tr>
     </thead>
