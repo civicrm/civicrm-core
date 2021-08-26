@@ -29,7 +29,7 @@
     <length>64</length>
     <required>true</required>
     <pseudoconstant>
-      <callback>CRM_Price_BAO_LineItem::entityTables</callback>
+      <optionGroupName>entity_tables</optionGroupName>
     </pseudoconstant>
     <comment>May contain civicrm_contribution, civicrm_participant or civicrm_membership</comment>
     <add>1.7</add>

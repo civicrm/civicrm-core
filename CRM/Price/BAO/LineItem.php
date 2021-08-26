@@ -1258,17 +1258,4 @@ WHERE li.contribution_id = %1";
     return CRM_Contribute_BAO_Contribution::checkContributeSettings('tax_term');
   }
 
-  /**
-   * Whitelist of possible values for the entity_table field
-   *
-   * @return array
-   */
-  public static function entityTables(): array {
-    return [
-      'civicrm_contribution' => ts('Contribution'),
-      'civicrm_participant' => ts('Participant'),
-      'civicrm_membership' => ts('Membership'),
-    ];
-  }
-
 }

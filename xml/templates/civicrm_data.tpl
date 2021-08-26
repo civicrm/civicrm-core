@@ -199,7 +199,8 @@ VALUES
    ('pledge_status'                 , '{ts escape="sql"}Pledge Status{/ts}'                      , NULL, 1, 1, 1),
    ('contribution_recur_status'     , '{ts escape="sql"}Recurring Contribution Status{/ts}'      , NULL, 1, 1, 1),
    ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL, 1, 1, 0),
-   ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL, 1, 1, 0);
+   ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL, 1, 1, 0),
+   ('entity_tables'                 , '{ts escape="sql"}Entity Tables{/ts}'                      , NULL, 1, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -284,6 +285,7 @@ SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 
 SELECT @option_group_id_crs    := max(id) from civicrm_option_group where name = 'contribution_recur_status';
 SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
+SELECT @option_group_id_entity_tables := max(id) from civicrm_option_group where name = 'entity_tables';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -297,6 +299,10 @@ SELECT @mailCompId       := max(id) FROM civicrm_component where name = 'CiviMai
 INSERT INTO
    `civicrm_option_value` (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
 VALUES
+   (@option_group_id_entity_tables, '{ts escape="sql"}Contribution{/ts}', 'civicrm_contribution', 'civicrm_contribution', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_entity_tables, '{ts escape="sql"}Participant{/ts}', 'civicrm_participant', 'civicrm_participant', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_entity_tables, '{ts escape="sql"}Membership{/ts}', 'civicrm_membership', 'civicrm_membership', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
+
    (@option_group_id_pcm, '{ts escape="sql"}Phone{/ts}',       1, 'Phone', NULL, 0, NULL, 1, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_pcm, '{ts escape="sql"}Email{/ts}',       2, 'Email', NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_pcm, '{ts escape="sql"}Postal Mail{/ts}', 3, 'Postal Mail', NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL, NULL),
@@ -1792,4 +1798,3 @@ INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_act
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'recaptcha', 'reCAPTCHA', 'reCAPTCHA', 'recaptcha', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'ckeditor4', 'CKEditor4', 'CKEditor4', 'ckeditor4', 1);
 INSERT IGNORE INTO civicrm_extension (type, full_name, name, label, file, is_active) VALUES ('module', 'legacycustomsearches', 'Custom search framework', 'Custom search framework', 'legacycustomsearches', 1);
-
