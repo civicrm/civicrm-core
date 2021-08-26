@@ -11,34 +11,10 @@
 
     .config(function($routeProvider) {
       $routeProvider.when('/list', {
-        controller: 'searchList',
-        templateUrl: '~/crmSearchAdmin/searchList.html',
-        resolve: {
-          // Load data for lists
-          savedSearches: function(crmApi4) {
-            return crmApi4('SavedSearch', 'get', {
-              select: [
-                'id',
-                'name',
-                'label',
-                'api_entity',
-                'api_params',
-                'created_id.display_name',
-                'modified_id.display_name',
-                'created_date',
-                'modified_date',
-                'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
-                'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
-                'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
-                'GROUP_CONCAT(display.acl_bypass ORDER BY display.id) AS display_acl_bypass',
-                'GROUP_CONCAT(DISTINCT group.title) AS groups'
-              ],
-              join: [['SearchDisplay AS display'], ['Group AS group']],
-              where: [['api_entity', 'IS NOT NULL']],
-              groupBy: ['id']
-            });
-          }
-        }
+        controller: function() {
+          searchEntity = 'SavedSearch';
+        },
+        template: '<crm-search-admin-search-listing></crm-search-admin-search-listing>',
       });
       $routeProvider.when('/create/:entity', {
         controller: 'searchCreate',
@@ -205,7 +181,7 @@
             key: info.alias,
             dataType: (info.fn && info.fn.dataType) || (info.field && info.field.data_type)
           }, defaults);
-        if (defaults.label) {
+        if (defaults.label === true) {
           values.label = getDefaultLabel(fieldExpr);
         }
         return values;

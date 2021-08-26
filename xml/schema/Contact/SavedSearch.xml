@@ -49,6 +49,7 @@
     <default>NULL</default>
     <comment>Administrative label for search</comment>
     <html>
+      <label>Label</label>
       <type>Text</type>
     </html>
     <add>5.32</add>
