@@ -193,7 +193,7 @@ AND    {$this->_componentClause}";
 
     if ($elements['createPdf']) {
       CRM_Utils_PDF_Utils::html2pdf($message,
-        'civicrmContributionReceipt.pdf',
+        'receipt.pdf',
         FALSE,
         $elements['params']['pdf_format_id']
       );
