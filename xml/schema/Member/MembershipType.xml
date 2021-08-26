@@ -131,6 +131,25 @@
     <add>1.5</add>
   </field>
   <field>
+    <name>currency</name>
+    <type>varchar</type>
+    <length>3</length>
+    <default>NULL</default>
+    <comment>3 character string, value from config setting or input via user.</comment>
+    <add>3.2</add>
+    <pseudoconstant>
+      <table>civicrm_currency</table>
+      <keyColumn>name</keyColumn>
+      <labelColumn>full_name</labelColumn>
+      <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <label>Currency</label>
+    </html>
+  </field>
+  <field>
     <name>duration_unit</name>
     <title>Membership Type Duration Unit</title>
     <type>varchar</type>

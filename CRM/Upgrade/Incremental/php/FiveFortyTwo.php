@@ -13,6 +13,12 @@
  * Upgrade logic for FiveFortyTwo */
 class CRM_Upgrade_Incremental_php_FiveFortyTwo extends CRM_Upgrade_Incremental_Base {
 
+  /*
+   *
+   * Work should be done Here about the new column (currency in membershipType table)
+   *
+   */
+
   /**
    * Compute any messages which should be displayed beforeupgrade.
    *
