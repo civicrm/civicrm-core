@@ -141,26 +141,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
-    $firstLineItem = reset($lineItems[0]);
-    if (empty($firstLineItem['price_set_id'])) {
-      // CRM-20297 All we care is that it's not QuickConfig, so no price set
-      // is no problem.
-      $displayLineItems = TRUE;
-    }
-    else {
-      try {
-        $priceSet = civicrm_api3('PriceSet', 'getsingle', [
-          'id' => $firstLineItem['price_set_id'],
-          'return' => 'is_quick_config, id',
-        ]);
-        $displayLineItems = !$priceSet['is_quick_config'];
-      }
-      catch (CiviCRM_API3_Exception $e) {
-        throw new CRM_Core_Exception('Cannot find price set by ID');
-      }
-    }
     $this->assign('lineItem', $lineItems);
-    $this->assign('displayLineItems', $displayLineItems);
     $values['totalAmount'] = $values['total_amount'];
     $this->assign('displayLineItemFinancialType', TRUE);
 

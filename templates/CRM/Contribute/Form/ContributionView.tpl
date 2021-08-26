@@ -75,33 +75,18 @@
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}
-  {if $displayLineItems}
-    <tr>
-      <td class="label">{ts}Contribution Amount{/ts}</td>
-      <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+  <tr>
+    <td class="label">{ts}Contribution Amount{/ts}</td>
+    <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
         {if $contribution_recur_id}
           <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-            {ts}View Recurring Contribution{/ts}
+              {ts}View Recurring Contribution{/ts}
           </a>
           <br/>
-          {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
+            {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
-      </td>
-    </tr>
-  {else}
-    <tr>
-      <td class="label">{ts}Total Amount{/ts}</td>
-      <td><strong>{$total_amount|crmMoney:$currency}</strong>
-        {if $contribution_recur_id}
-          <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-            {ts}View Recurring Contribution{/ts}
-          </a>
-          <br/>
-          {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
-        {/if}
-      </td>
-    </tr>
-  {/if}
+    </td>
+  </tr>
   {if $invoicing && $tax_amount}
     <tr>
       <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>
