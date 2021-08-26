@@ -1469,7 +1469,7 @@ class CRM_Export_BAO_ExportProcessor {
             // @see https://lab.civicrm.org/dev/core/-/issues/2645
             switch ($fieldName) {
               case 'preferred_mail_format':
-                return "`$fieldName` varchar(16)";
+                return "`$fieldName` text(16)";
 
               default:
                 return "`$fieldName` varchar({$fieldSpec['maxlength']})";
