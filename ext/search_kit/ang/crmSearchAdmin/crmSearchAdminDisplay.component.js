@@ -68,6 +68,13 @@
             links: []
           }
         },
+        include: {
+          label: ts('Custom Code'),
+          icon: 'fa-code',
+          defaults: {
+            path: ''
+          }
+        }
       };
 
       // Drag-n-drop settings for reordering columns
