@@ -1016,57 +1016,55 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $isPayLater = NULL;
     $memParams = $this->getCurrentRowMembershipParams();
     $currentMembership = $this->getCurrentMembership();
-    // @todo - remove this if - still here for now to leave whitespace change out of commit.
-    if (1) {
-      // Now Renew the membership
-      if (!$currentMembership['is_current_member']) {
-        // membership is not CURRENT
 
-        // CRM-7297 Membership Upsell - calculate dates based on new membership type
-        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
-          $changeToday,
-          $this->getCurrentRowMembershipTypeID(),
-          $numRenewTerms
-        );
+    // Now Renew the membership
+    if (!$currentMembership['is_current_member']) {
+      // membership is not CURRENT
 
-        foreach (['start_date', 'end_date'] as $dateType) {
-          $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
-        }
+      // CRM-7297 Membership Upsell - calculate dates based on new membership type
+      $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($currentMembership['id'],
+        $changeToday,
+        $this->getCurrentRowMembershipTypeID(),
+        $numRenewTerms
+      );
 
+      foreach (['start_date', 'end_date'] as $dateType) {
+        $memParams[$dateType] = $memParams[$dateType] ?: ($dates[$dateType] ?? NULL);
+      }
+
+      $ids['membership'] = $currentMembership['id'];
+
+      //set the log start date.
+      $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
+    }
+    else {
+
+      // CURRENT Membership
+      $membership = new CRM_Member_DAO_Membership();
+      $membership->id = $currentMembership['id'];
+      $membership->find(TRUE);
+      // CRM-7297 Membership Upsell - calculate dates based on new membership type
+      $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
+        $changeToday,
+        $this->getCurrentRowMembershipTypeID(),
+        $numRenewTerms
+      );
+
+      // Insert renewed dates for CURRENT membership
+      $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
+      $memParams['start_date'] = $formDates['start_date'] ?? CRM_Utils_Date::isoToMysql($membership->start_date);
+      $memParams['end_date'] = $formDates['end_date'] ?? NULL;
+      if (empty($memParams['end_date'])) {
+        $memParams['end_date'] = $dates['end_date'] ?? NULL;
+      }
+
+      //set the log start date.
+      $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
+
+      if (!empty($currentMembership['id'])) {
         $ids['membership'] = $currentMembership['id'];
-
-        //set the log start date.
-        $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
       }
-      else {
-
-        // CURRENT Membership
-        $membership = new CRM_Member_DAO_Membership();
-        $membership->id = $currentMembership['id'];
-        $membership->find(TRUE);
-        // CRM-7297 Membership Upsell - calculate dates based on new membership type
-        $dates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership->id,
-          $changeToday,
-          $this->getCurrentRowMembershipTypeID(),
-          $numRenewTerms
-        );
-
-        // Insert renewed dates for CURRENT membership
-        $memParams['join_date'] = CRM_Utils_Date::isoToMysql($membership->join_date);
-        $memParams['start_date'] = $formDates['start_date'] ?? CRM_Utils_Date::isoToMysql($membership->start_date);
-        $memParams['end_date'] = $formDates['end_date'] ?? NULL;
-        if (empty($memParams['end_date'])) {
-          $memParams['end_date'] = $dates['end_date'] ?? NULL;
-        }
-
-        //set the log start date.
-        $memParams['log_start_date'] = CRM_Utils_Date::customFormat($dates['log_start_date'], $format);
-
-        if (!empty($currentMembership['id'])) {
-          $ids['membership'] = $currentMembership['id'];
-        }
-        $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
-      }
+      $memParams['membership_activity_status'] = $isPayLater ? 'Scheduled' : 'Completed';
     }
 
     //CRM-4555
