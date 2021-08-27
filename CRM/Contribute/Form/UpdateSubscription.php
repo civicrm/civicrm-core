@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * This class generates form components generic to recurring contributions.
@@ -111,7 +112,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('editableScheduleFields', array_diff($this->editableScheduleFields, $alreadyHardCodedFields));
 
     if ($this->_subscriptionDetails->contact_id) {
-      list($this->_donorDisplayName, $this->_donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      [$this->_donorDisplayName, $this->_donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
     }
 
     CRM_Utils_System::setTitle(ts('Update Recurring Contribution'));
@@ -210,18 +211,16 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
       try {
         $updateSubscription = $this->_paymentProcessorObj->changeSubscriptionAmount($message, $params);
+        if ($updateSubscription instanceof CRM_Core_Error) {
+          CRM_Core_Error::deprecatedWarning('An exception should be thrown');
+          throw new PaymentProcessorException(ts('Could not update the Recurring contribution details'));
+        }
       }
-      catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+      catch (PaymentProcessorException $e) {
         CRM_Core_Error::statusBounce($e->getMessage());
       }
     }
-    if (is_a($updateSubscription, 'CRM_Core_Error')) {
-      CRM_Core_Error::displaySessionError($updateSubscription);
-      $status = ts('Could not update the Recurring contribution details');
-      $msgTitle = ts('Update Error');
-      $msgType = 'error';
-    }
-    elseif ($updateSubscription) {
+    if ($updateSubscription) {
       // Handle custom data
       $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->contributionRecurID, 'ContributionRecur');
       // save the changes
@@ -296,7 +295,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
           $receiptFrom = "$domainValues[0] <$domainValues[1]>";
         }
 
-        list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+        [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
         $tplParams = [
           'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
@@ -319,7 +318,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
           'toName' => $donorDisplayName,
           'toEmail' => $donorEmail,
         ];
-        list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        [$sent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
 
