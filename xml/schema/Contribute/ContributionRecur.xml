@@ -86,6 +86,7 @@
     <add>1.6</add>
     <html>
       <type>Select</type>
+      <label>Frequency unit</label>
     </html>
   </field>
   <field>
@@ -271,6 +272,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Status</label>
     </html>
   </field>
   <index>
@@ -407,6 +409,7 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <label>Payment method</label>
     </html>
     <add>4.1</add>
   </field>
