@@ -19,6 +19,9 @@
  * This class provides the functionality to create PDF letter for a group of contacts.
  */
 class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
+
+  use CRM_Contact_Form_Task_PDFTrait;
+
   /**
    * All the existing templates in the system.
    *
@@ -38,15 +41,6 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
-  }
-
-  /**
-   * Set defaults for the pdf.
-   *
-   * @return array
-   */
-  public function setDefaultValues() {
-    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
   /**

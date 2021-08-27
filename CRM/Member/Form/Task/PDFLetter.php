@@ -45,15 +45,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   }
 
   /**
-   * Set defaults.
-   * (non-PHPdoc)
-   * @see CRM_Core_Form::setDefaultValues()
-   */
-  public function setDefaultValues() {
-    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
-  }
-
-  /**
    * Build the form object.
    *
    *
