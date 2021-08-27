@@ -213,7 +213,7 @@ class AfformAdminMeta {
         'title' => E::ts('Submit Button'),
         'element' => [
           '#tag' => 'button',
-          'class' => 'af-button btn-primary',
+          'class' => 'af-button btn btn-primary',
           'crm-icon' => 'fa-check',
           'ng-click' => 'afform.submit()',
           '#children' => [
