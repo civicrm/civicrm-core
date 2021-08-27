@@ -302,7 +302,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
           'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
           'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
           'amount' => CRM_Utils_Money::format($params['amount']),
-          'installments' => $params['installments'],
         ];
 
         $tplParams['contact'] = ['display_name' => $donorDisplayName];
