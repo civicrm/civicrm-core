@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\MessageTemplate;
+use Civi\WorkflowMessage\WorkflowMessage;
 
 require_once 'Mail/mime.php';
 
@@ -407,22 +408,34 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @throws \API_Exception
    */
   public static function sendTemplate($params) {
-    $defaults = [
-      // option value name of the template
+    $modelDefaults = [
+      // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
+      'model' => NULL,
+      // Symbolic name of the workflow step. Matches the option-value-name of the template.
       'valueName' => NULL,
-      // ID of the template
-      'messageTemplateID' => NULL,
-      // content of the message template
-      // Ex: ['msg_subject' => 'Hello {contact.display_name}', 'msg_html' => '...', 'msg_text' => '...']
-      // INTERNAL: 'messageTemplate' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
-      'messageTemplate' => NULL,
-      // contact id if contact tokens are to be replaced
-      'contactId' => NULL,
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
       // additional token params (passed to the TokenProcessor)
       // INTERNAL: 'tokenContext' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
       'tokenContext' => [],
+      // properties to import directly to the model object
+      'modelProps' => NULL,
+      // contact id if contact tokens are to be replaced; alias for tokenContext.contactId
+      'contactId' => NULL,
+    ];
+    $viewDefaults = [
+      // ID of the specific template to load
+      'messageTemplateID' => NULL,
+      // content of the message template
+      // Ex: ['msg_subject' => 'Hello {contact.display_name}', 'msg_html' => '...', 'msg_text' => '...']
+      // INTERNAL: 'messageTemplate' is currently only intended for use within civicrm-core only. For downstream usage, future updates will provide comparable public APIs.
+      'messageTemplate' => NULL,
+      // whether this is a test email (and hence should include the test banner)
+      'isTest' => FALSE,
+      // Disable Smarty?
+      'disableSmarty' => FALSE,
+    ];
+    $envelopeDefaults = [
       // the From: header
       'from' => NULL,
       // the recipient’s name
@@ -437,19 +450,18 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'replyTo' => NULL,
       // email attachments
       'attachments' => NULL,
-      // whether this is a test email (and hence should include the test banner)
-      'isTest' => FALSE,
       // filename of optional PDF version to add as attachment (do not include path)
       'PDFFilename' => NULL,
-      // Disable Smarty?
-      'disableSmarty' => FALSE,
     ];
-    $params = array_merge($defaults, $params);
 
-    // Core#644 - handle Email ID passed as "From".
-    if (isset($params['from'])) {
-      $params['from'] = CRM_Utils_Mail::formatFromAddress($params['from']);
-    }
+    // Allow WorkflowMessage to run any filters/mappings/cleanups.
+    $model = $params['model'] ?? WorkflowMessage::create($params['valueName'] ?? 'UNKNOWN');
+    $params = WorkflowMessage::exportAll(WorkflowMessage::importAll($model, $params));
+    unset($params['model']);
+    // Subsequent hooks use $params. Retaining the $params['model'] might be nice - but don't do it unless you figure out how to ensure data-consistency (eg $params['tplParams'] <=> $params['model']).
+    // If you want to expose the model via hook, consider interjecting a new Hook::alterWorkflowMessage($model) between `importAll()` and `exportAll()`.
+
+    $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
     if (!is_int($params['messageTemplateID']) && !is_null($params['messageTemplateID'])) {
@@ -493,6 +505,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
       $config = CRM_Core_Config::singleton();
       if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
+        // FIXME: $params['contributionId'] is not modeled in the parameter list. When is it supplied? Should probably move to tokenContext.contributionId.
         $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
         if (empty($params['attachments'])) {
           $params['attachments'] = [];
