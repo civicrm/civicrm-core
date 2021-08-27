@@ -492,7 +492,7 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
  */
 function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
   if ($entity == 'Afform') {
-    if ($action == 'prefill' || $action == 'submit') {
+    if ($action == 'prefill' || $action == 'submit' || $action == 'submitFile') {
       $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
     }
   }

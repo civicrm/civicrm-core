@@ -155,7 +155,8 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'File':
               if (!$field['file_id']) {
-                throw new CRM_Core_Exception('Missing parameter file_id');
+                $value = 'null';
+                break;
               }
 
               // need to add/update civicrm_entity_file

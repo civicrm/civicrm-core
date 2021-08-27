@@ -245,7 +245,7 @@ class Api4SelectQuery {
         // If the joined_entity.id isn't in the fieldspec already, autoJoinFK will attempt to add the entity.
         $fkField = substr($wildField, 0, strrpos($wildField, '.'));
         $fkEntity = $this->getField($fkField)['fk_entity'] ?? NULL;
-        $id = $fkEntity ? CoreUtil::getInfoItem($fkEntity, 'primary_key')[0] : 'id';
+        $id = $fkEntity ? CoreUtil::getIdFieldName($fkEntity) : 'id';
         $this->autoJoinFK($fkField . ".$id");
         $matches = $this->selectMatchingFields($wildField);
         array_splice($select, $pos, 1, $matches);
@@ -1101,7 +1101,7 @@ class Api4SelectQuery {
    */
   public static function renderSerializedJoin(array $field): string {
     $sep = \CRM_Core_DAO::VALUE_SEPARATOR;
-    $id = CoreUtil::getInfoItem($field['entity'], 'primary_key')[0];
+    $id = CoreUtil::getIdFieldName($field['entity']);
     $searchFn = "FIND_IN_SET(`{$field['table_name']}`.`$id`, REPLACE({$field['sql_name']}, '$sep', ','))";
     return "(
       SELECT GROUP_CONCAT(

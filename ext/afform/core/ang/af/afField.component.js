@@ -96,6 +96,27 @@
 
       };
 
+      // Get the repeat index of the entity fieldset (not the join)
+      ctrl.getEntityIndex = function() {
+        // If already in a join repeat, look up the outer repeat
+        if ('repeatIndex' in $scope.dataProvider && $scope.dataProvider.afRepeat.getRepeatType() === 'join') {
+          return $scope.dataProvider.outerRepeatItem ? $scope.dataProvider.outerRepeatItem.repeatIndex : 0;
+        } else {
+          return ctrl.afRepeatItem ? ctrl.afRepeatItem.repeatIndex : 0;
+        }
+      };
+
+      // Params for the Afform.submitFile API when uploading a file field
+      ctrl.getFileUploadParams = function() {
+        return {
+          entityName: ctrl.afFieldset.modelName,
+          fieldName: ctrl.fieldName,
+          joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
+          entityIndex: ctrl.getEntityIndex(),
+          joinIndex: ctrl.afJoin && $scope.dataProvider.repeatIndex || null
+        };
+      };
+
       $scope.getOptions = function () {
         return ctrl.defn.options || (ctrl.fieldName === 'is_primary' && ctrl.defn.input_type === 'Radio' ? noOptions : boolOptions);
       };

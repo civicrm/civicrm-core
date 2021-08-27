@@ -58,16 +58,15 @@
     .directive('afRepeatItem', function() {
       return {
         restrict: 'A',
-        require: ['afRepeatItem', '^^afRepeat'],
+        require: {
+          afRepeat: '^^',
+          outerRepeatItem: '?^^afRepeatItem'
+        },
         bindToController: {
           item: '=afRepeatItem',
           repeatIndex: '='
         },
-        link: function($scope, $el, $attr, ctrls) {
-          var self = ctrls[0];
-          self.afRepeat = ctrls[1];
-        },
-        controller: function($scope) {
+        controller: function() {
           this.getFieldData = function() {
             return this.afRepeat.getRepeatType() === 'join' ? this.item : this.item.fields;
           };

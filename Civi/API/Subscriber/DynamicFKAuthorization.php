@@ -174,9 +174,6 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
       }
 
       if (isset($apiRequest['params']['entity_table'])) {
-        if (!\CRM_Core_DAO_AllCoreTables::isCoreTable($apiRequest['params']['entity_table'])) {
-          throw new \API_Exception("Unrecognized target entity table {$apiRequest['params']['entity_table']}");
-        }
         $this->authorizeDelegate(
           $apiRequest['action'],
           $apiRequest['params']['entity_table'],

@@ -13,6 +13,7 @@
 namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * @inheritDoc
@@ -51,6 +52,7 @@ class BasicSaveAction extends AbstractSaveAction {
    * @param \Civi\Api4\Generic\Result $result
    */
   public function _run(Result $result) {
+    $idField = CoreUtil::getIdFieldName($this->getEntityName());
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
@@ -64,7 +66,7 @@ class BasicSaveAction extends AbstractSaveAction {
       $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
       $get
         ->setCheckPermissions($this->getCheckPermissions())
-        ->addWhere($this->getIdField(), 'IN', (array) $result->column($this->getIdField()));
+        ->addWhere($idField, 'IN', (array) $result->column($idField));
       $result->exchangeArray((array) $get->execute());
     }
   }
