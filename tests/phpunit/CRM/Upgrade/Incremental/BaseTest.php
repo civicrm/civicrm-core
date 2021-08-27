@@ -51,8 +51,9 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       'workflow_name', '=', 'contribution_invoice_receipt'
     )->execute();
     $upgrader = new CRM_Upgrade_Incremental_MessageTemplates('5.41.0');
-    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
-    $this->assertEquals('Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}', $messages);
+    $check = new CRM_Utils_Check_Component_Tokens();
+    $message = $check->checkTokens()[0];
+    $this->assertEquals('<p>You are using tokens that have been removed or deprecated.</p><ul><li>Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}</li></ul></p>', $message->getMessage());
     $upgrader->replaceTokenInTemplate('contribution_invoice_receipt', '$display_name', 'contact.display_name');
     $templates = MessageTemplate::get()->addSelect('msg_html')
       ->addWhere(
@@ -61,8 +62,8 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $this->assertEquals('{contact.display_name}', $template['msg_html']);
     }
-    $messages = $upgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
-    $this->assertEquals('', $messages);
+    $messages = $check->checkTokens();
+    $this->assertEmpty($messages);
     $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
   }
 
