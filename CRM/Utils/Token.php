@@ -1930,4 +1930,19 @@ class CRM_Utils_Token {
     return $value;
   }
 
+  /**
+   * Get token deprecation information.
+   *
+   * @return array
+   */
+  public static function getTokenDeprecations(): array {
+    return [
+      'WorkFlowMessageTemplates' => [
+        'contribution_invoice_receipt' => [
+          '$display_name' => 'contact.display_name',
+        ],
+      ],
+    ];
+  }
+
 }
