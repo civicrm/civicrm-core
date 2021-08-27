@@ -26,6 +26,15 @@ Released September 1, 2021
 - **[Credits](release-notes/5.41.0.md#credits)**
 - **[Feedback](release-notes/5.41.0.md#feedback)**
 
+## CiviCRM 5.40.4
+
+Released August 26, 2021
+
+- **[Synopsis](release-notes/5.40.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.40.4.md#bugs)**
+- **[Credits](release-notes/5.40.4.md#credits)**
+- **[Feedback](release-notes/5.40.4.md#feedback)**
+
 ## CiviCRM 5.40.3
 
 Released August 23, 2021
