@@ -460,6 +460,27 @@ class CRM_Utils_File {
   }
 
   /**
+   * CRM_Utils_String::munge() doesn't handle unicode and needs to be able
+   * to generate valid database tablenames so will sometimes generate a
+   * random string. Here what we want is a human-sensible filename that might
+   * contain unicode.
+   * Note that this does filter out emojis and such, but keeps characters that
+   * are considered alphanumeric in non-english languages.
+   *
+   * @param string $input
+   * @param string $replacementString Character or string to replace invalid characters with. Can be the empty string.
+   * @param int $cutoffLength Length to truncate the result after replacements.
+   * @return string
+   */
+  public static function makeFilenameWithUnicode(string $input, string $replacementString = '_', int $cutoffLength = 63): string {
+    $filename = preg_replace('/\W/u', $replacementString, $input);
+    if ($cutoffLength) {
+      return mb_substr($filename, 0, $cutoffLength);
+    }
+    return $filename;
+  }
+
+  /**
    * Copies a file
    *
    * @param $filePath

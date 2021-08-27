@@ -230,10 +230,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    */
   private static function getFileName(CRM_Core_Form $form) {
     if (!empty($form->getSubmittedValue('pdf_file_name'))) {
-      $fileName = CRM_Utils_String::munge($form->getSubmittedValue('pdf_file_name'), '_', 200);
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($form->getSubmittedValue('pdf_file_name'), '_', 200);
     }
     elseif (!empty($form->getSubmittedValue('subject'))) {
-      $fileName = CRM_Utils_String::munge($form->getSubmittedValue('subject'), '_', 200);
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($form->getSubmittedValue('subject'), '_', 200);
     }
     else {
       $fileName = 'CiviLetter';
