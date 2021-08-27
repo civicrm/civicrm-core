@@ -376,11 +376,20 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param array $html
    */
   protected static function outputFromHtml($formValues, array $html) {
-    if ($formValues['document_type'] === 'pdf') {
-      CRM_Utils_PDF_Utils::html2pdf($html, 'CiviLetter.pdf', FALSE, $formValues);
+
+    // Set the filename for the PDF using the Activity Subject, if defined. Remove unwanted characters and limit the length to 200 characters.
+    if (!empty($formValues['subject'])) {
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($formValues['subject'], '_', 200);
     }
     else {
-      CRM_Utils_PDF_Document::html2doc($html, 'CiviLetter.' . $formValues['document_type'], $formValues);
+      $fileName = 'CiviLetter';
+    }
+
+    if ($formValues['document_type'] === 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $formValues['document_type'], $formValues);
     }
   }
 
