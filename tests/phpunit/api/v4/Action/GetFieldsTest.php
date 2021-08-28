@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 
@@ -82,6 +83,7 @@ class GetFieldsTest extends UnitTestCase {
   public function testPreloadFalse() {
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    Campaign::create()->setValues(['name' => 'Big Campaign', 'title' => 'Biggie'])->execute();
     // The campaign_id field has preload = false in the schema,
     // Which means the options will NOT load but suffixes are still available
     $fields = Contribution::getFields(FALSE)
