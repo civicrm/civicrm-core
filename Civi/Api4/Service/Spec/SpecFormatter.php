@@ -61,7 +61,7 @@ class SpecFormatter {
       $field->setLabel($data['html']['label'] ?? NULL);
       if (!empty($data['pseudoconstant'])) {
         // Do not load options if 'prefetch' is explicitly FALSE
-        if ($data['pseudoconstant']['prefetch'] ?? TRUE) {
+        if (!isset($data['pseudoconstant']['prefetch']) || $data['pseudoconstant']['prefetch'] === FALSE) {
           $field->setOptionsCallback([__CLASS__, 'getOptions']);
         }
         // These suffixes are always supported if a field has options

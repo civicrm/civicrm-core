@@ -196,8 +196,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $return = [];
     foreach (array_keys($this->getBasicTokens()) as $fieldName) {
       if ($this->isAddPseudoTokens($fieldName)) {
-        $return[$fieldName . ':label'] = $this->fieldMetadata[$fieldName]['input_attrs']['label'];
-        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $this->fieldMetadata[$fieldName]['input_attrs']['label'];
+        $fieldLabel = $this->fieldMetadata[$fieldName]['input_attrs']['label'] ?? $this->fieldMetadata[$fieldName]['label'];
+        $return[$fieldName . ':label'] = $fieldLabel;
+        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $fieldLabel;
       }
     }
     return $return;
@@ -229,7 +230,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       // v4 style custom tokens - but medium term this IF will probably go.
       return FALSE;
     }
-    return (bool) $this->getFieldMetadata()[$fieldName]['options'];
+    return (bool) ($this->getFieldMetadata()[$fieldName]['options'] || !empty($this->getFieldMetadata()[$fieldName]['suffixes']));
   }
 
   /**
