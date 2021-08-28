@@ -43,11 +43,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     try {
       //we only get invoice num as a key player from payment gateway response.
       //for ARB we get x_subscription_id and x_subscription_paynum
-      $x_subscription_id = $this->retrieve('x_subscription_id', 'String');
-      if (!$x_subscription_id) {
-        // Presence of the id means it is approved.
-        return TRUE;
-      }
+      $x_subscription_id = $this->getRecurProcessorID();
       $ids = $input = [];
 
       $input['component'] = 'contribute';
@@ -327,6 +323,20 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
       'payment_processor_type_id' => $paymentProcessorTypeID,
       'return' => 'id',
     ]);
+  }
+
+  /**
+   * Get the processor_id for the recurring.
+   *
+   * This is the value stored in civicrm_contribution_recur.processor_id,
+   * sometimes called subscription_id.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRecurProcessorID(): string {
+    return $this->retrieve('x_subscription_id', 'String');
   }
 
 }
