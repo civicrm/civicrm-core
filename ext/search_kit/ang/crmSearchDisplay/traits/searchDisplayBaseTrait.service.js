@@ -40,7 +40,7 @@
     // Returns value and url for a column formatted as link(s)
     function formatLinks(rowData, key, columns) {
       var column = _.findWhere(columns, {key: key}),
-        value = formatRawValue(column, rowData[key]),
+        value = column.image ? '' : formatRawValue(column, rowData[key]),
         values = angular.isArray(value) ? value : [value],
         links = [];
       _.each(values, function(value, index) {
