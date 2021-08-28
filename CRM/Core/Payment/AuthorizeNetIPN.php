@@ -58,7 +58,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       // Check if the contribution exists
       // make sure contribution exists and is valid
       $contribution = new CRM_Contribute_BAO_Contribution();
-      $contribution->id = $contributionID = $ids['contribution'];
+      $contribution->id = $contributionID = $this->getContributionID();
       if (!$contribution->find(TRUE)) {
         throw new CRM_Core_Exception('Failure: Could not find contribution record for ' . (int) $contribution->id, NULL, ['context' => "Could not find contribution record: {$contribution->id} in IPN request: " . print_r($input, TRUE)]);
       }
@@ -210,8 +210,8 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CRM_Core_Exception
    */
   public function getIDs(&$ids, $input) {
-    $ids['contribution'] = (int) $this->retrieve('x_invoice_num', 'Integer');
-    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $ids['contribution']);
+    $ids['contribution'] = $this->getContributionID();
+    $contributionRecur = $this->getContributionRecurObject($input['subscription_id'], (int) $this->retrieve('x_cust_id', 'Integer', FALSE, 0), $this->getContributionID());
     $ids['contributionRecur'] = (int) $contributionRecur->id;
   }
 
@@ -337,6 +337,17 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
    */
   protected function getRecurProcessorID(): string {
     return $this->retrieve('x_subscription_id', 'String');
+  }
+
+  /**
+   * Get the contribution ID to be updated.
+   *
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContributionID(): int {
+    return (int) $this->retrieve('x_invoice_num', 'Integer');
   }
 
 }
