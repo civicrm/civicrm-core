@@ -171,8 +171,11 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * Set default values.
+   *
+   * @deprecated
    */
   public static function setDefaultValues() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
     return $defaultFormat;

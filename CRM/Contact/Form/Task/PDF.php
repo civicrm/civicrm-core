@@ -20,6 +20,8 @@
  */
 class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
 
+  use CRM_Contact_Form_Task_PDFTrait;
+
   /**
    * All the existing templates in the system.
    *
@@ -72,13 +74,12 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = [];
+    $defaults = $this->getPDFDefaultValues();
     if (isset($this->_activityId)) {
       $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       $defaults['html_message'] = $defaults['details'] ?? NULL;
     }
-    $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;
   }
 

@@ -23,6 +23,8 @@
  */
 class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
 
+  use CRM_Contact_Form_Task_PDFTrait;
+
   /**
    * Are we operating in "single mode", i.e. printing letter to one
    * specific participant?
@@ -65,15 +67,6 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    */
   public function postProcess() {
     CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
-  }
-
-  /**
-   * Set default values for the form.
-   *
-   * @return void
-   */
-  public function setDefaultValues() {
-    return CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
   }
 
   /**

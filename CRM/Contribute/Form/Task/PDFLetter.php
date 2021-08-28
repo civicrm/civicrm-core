@@ -20,6 +20,8 @@
  */
 class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
+  use CRM_Contact_Form_Task_PDFTrait;
+
   /**
    * All the existing templates in the system.
    *
@@ -55,7 +57,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = [];
+    $defaults = $this->getPDFDefaultValues();
     if (isset($this->_activityId)) {
       $params = ['id' => $this->_activityId];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
@@ -64,7 +66,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     else {
       $defaults['thankyou_update'] = 1;
     }
-    $defaults = $defaults + CRM_Contact_Form_Task_PDFLetterCommon::setDefaultValues();
     return $defaults;
   }
 
