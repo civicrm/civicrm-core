@@ -2076,9 +2076,6 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     // @todo fix the one place that calls this function to use Payment.create
     // remove this.
     // get minimum required values.
-    $contactId = NULL;
-    $componentId = NULL;
-    $componentName = NULL;
     $contributionId = $params['contribution_id'];
     $contributionStatusId = $params['contribution_status_id'];
 
@@ -2087,21 +2084,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return;
     }
 
-    if (!$componentName || !$componentId) {
-      // get the related component details.
-      $componentDetails = self::getComponentDetails($contributionId);
-    }
-    else {
-      $componentDetails['contact_id'] = $contactId;
-      $componentDetails['component'] = $componentName;
-
-      if ($componentName === 'event') {
-        $componentDetails['participant'] = $componentId;
-      }
-      else {
-        $componentDetails['membership'] = $componentId;
-      }
-    }
+    // get the related component details.
+    $componentDetails = self::getComponentDetails($contributionId);
 
     if (!empty($componentDetails['contact_id'])) {
       $componentDetails['contact_id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
