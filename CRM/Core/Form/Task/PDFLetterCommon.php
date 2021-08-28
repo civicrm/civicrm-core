@@ -36,10 +36,13 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   /**
    * Build the form object.
    *
+   * @deprecated
+   *
    * @var CRM_Core_Form $form
    * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no supported alternative for non-core code');
     // This form outputs a file so should never be submitted via ajax
     $form->preventAjaxSubmit();
 

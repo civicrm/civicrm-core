@@ -71,6 +71,8 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     //enable form element
@@ -82,7 +84,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
     $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
-    CRM_Core_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    $this->addPDFElementsToForm();
 
     // specific need for contributions
     $this->add('static', 'more_options_header', NULL, ts('Thank-you Letter Options'));

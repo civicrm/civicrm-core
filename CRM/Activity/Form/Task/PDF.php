@@ -26,9 +26,11 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
-    CRM_Activity_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    $this->addPDFElementsToForm();
     // Remove types other than pdf as they are not working (have never worked) and don't want fix
     // for them to block pdf.
     // @todo debug & fix....
