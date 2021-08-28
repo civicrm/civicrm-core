@@ -55,9 +55,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    * Clean up after each test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
     $this->quickCleanup(['civicrm_uf_match']);
   }
 
@@ -314,6 +316,43 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
+  }
+
+  /**
+   * Test that the membership start date is unchanged on payment.
+   */
+  public function testMembershipStartDateUnchanged(): void {
+    $this->restoreMembershipTypes();
+    $contactID = $this->individualCreate();
+    $order = $this->callAPISuccess('Order', 'create', [
+      'line_items' => [
+        [
+          'params' => [
+            'membership_type_id' => 'General',
+            'start_date' => '-1 year',
+            'contact_id' => $contactID,
+          ],
+          'line_item' => [
+            [
+              'line_total' => 100,
+              'qty' => 1,
+              'membership_type_id' => 'General',
+            ],
+          ],
+        ],
+      ],
+      'financial_type_id' => 'Donation',
+      'contact_id' => $contactID,
+      'receive_date' => '1 year ago',
+    ]);
+    $membership = $this->callAPISuccessGetSingle('Membership', []);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 100,
+      'trxn_date' => '-1 year',
+    ]);
+    $membershipPaid = $this->callAPISuccessGetSingle('Membership', []);
+    $this->assertEquals($membership['start_date'], $membershipPaid['start_date']);
   }
 
   /**
