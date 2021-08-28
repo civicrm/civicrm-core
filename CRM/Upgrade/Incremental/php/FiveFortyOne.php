@@ -86,6 +86,42 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_41_beta1($rev) {
+    $this->addTask('Ensure non-English installs have a default financial type for the membership price set.',
+      'ensureDefaultMembershipFinancialType');
+  }
+
+  public static function ensureDefaultMembershipFinancialType(): bool {
+    $membershipPriceSet = CRM_Core_DAO::executeQuery(
+      'SELECT id, financial_type_id FROM civicrm_price_set WHERE name = "default_membership_type_amount"'
+    );
+    $membershipPriceSet->fetch();
+    if (!is_numeric($membershipPriceSet->financial_type_id)) {
+      $membershipFinancialTypeID = CRM_Core_DAO::singleValueQuery('
+        SELECT id FROM civicrm_financial_type
+        WHERE name = "Member Dues"
+        OR name = %1', [1 => [ts('Member Dues'), 'String']]
+      );
+      if (!$membershipFinancialTypeID) {
+        // This should be unreachable - but something is better than nothing
+        // if we get to this point & 2 will be correct on 99.9% of installs.
+        $membershipFinancialTypeID = 2;
+      }
+      CRM_Core_DAO::executeQuery("
+        UPDATE civicrm_price_set
+        SET financial_type_id = $membershipFinancialTypeID
+        WHERE name = 'default_membership_type_amount'"
+      );
+
+    }
+    return TRUE;
+  }
+
+  /**
    * Install CustomSearches extension.
    *
    * This feature is restructured as a core extension - which is primarily a code cleanup step.
