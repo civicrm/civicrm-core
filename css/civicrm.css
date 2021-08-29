@@ -2087,6 +2087,11 @@ a.crm-i:hover {
   opacity: .8;
 }
 
+.crm-submit-buttons .helpicon {
+    float: left;
+    padding-right: 6px;
+}
+
 .crm-container  a.helpicon:hover,
 .crm-container  a.helpicon:focus {
   opacity: 1;
