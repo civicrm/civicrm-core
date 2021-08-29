@@ -47,25 +47,19 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @dataProvider getFilenameCases
    */
   public function testFilenameIsAssigned(?string $pdfFileName, ?string $activitySubject, ?bool $isLiveMode, string $expectedFilename): void {
+    // @todo - remove this cid - it helps direct the form controller but is
+    // pretty cludgey.
     $_REQUEST['cid'] = $this->contactId;
     $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', [
       'pdf_file_name' => $pdfFileName,
       'subject' => $activitySubject,
-      '_contactIds' => [],
       'document_type' => 'pdf',
       'buttons' => [
         '_qf_PDF_upload' => $isLiveMode,
       ],
     ]);
-    $fileNameAssigned = NULL;
-    $form->preProcess();
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $fileNameAssigned = $e->errorData['fileName'];
-    }
-
+    $form->_contactIds = [$this->contactId];
+    $fileNameAssigned = $this->submitForm($form)['fileName'];
     $this->assertEquals($expectedFilename, $fileNameAssigned);
   }
 
@@ -114,6 +108,23 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         'CiviLetter',
       ],
     ];
+  }
+
+  /**
+   * @param \CRM_Core_Form $form
+   *
+   * @return int|mixed
+   */
+  protected function submitForm(CRM_Core_Form $form) {
+    $form->preProcess();
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      return $e->errorData;
+
+    }
+    $this->fail('line should be unreachable');
   }
 
 }

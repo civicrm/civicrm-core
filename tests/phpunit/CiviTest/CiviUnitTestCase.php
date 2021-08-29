@@ -3336,7 +3336,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param string $pageName
    *
    * @return \CRM_Core_Form
-   * @throws \CRM_Core_Exception
    */
   public function getFormObject($class, $formValues = [], $pageName = '') {
     $_POST = $formValues;
