@@ -1633,9 +1633,12 @@ class CRM_Utils_Token {
    * @return string
    * @throws \CiviCRM_API3_Exception
    */
-  public static function replaceCaseTokens($caseId, $str, $knownTokens = [], $escapeSmarty = FALSE) {
-    if (!$knownTokens || empty($knownTokens['case'])) {
+  public static function replaceCaseTokens($caseId, $str, $knownTokens = NULL, $escapeSmarty = FALSE): string {
+    if (strpos($str, '{case.') === FALSE) {
       return $str;
+    }
+    if (!$knownTokens) {
+      $knownTokens = self::getTokens($str);
     }
     $case = civicrm_api3('case', 'getsingle', ['id' => $caseId]);
     return self::replaceEntityTokens('case', $case, $str, $knownTokens, $escapeSmarty);
