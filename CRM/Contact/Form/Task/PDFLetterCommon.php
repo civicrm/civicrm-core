@@ -152,6 +152,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
         $notSent[] = $contactId;
         continue;
       }
+      CRM_Core_Error::deprecatedWarning('find tests');
+      $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([])['html'];
 
       $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
 
