@@ -510,6 +510,10 @@ trait Api3TestTrait {
       }
     }
 
+    if (isset($actionInfo[0]['params']['useTrash'])) {
+      $v4Params['useTrash'] = empty($v3Params['skip_undelete']);
+    }
+
     // Build where clause for 'getcount', 'getsingle', 'getvalue', 'get' & 'replace'
     if ($v4Action == 'get' || $v3Action == 'replace') {
       foreach ($v3Params as $key => $val) {
