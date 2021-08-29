@@ -46,7 +46,26 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       // @todo ensure this is already set.
       $form->_single = FALSE;
     }
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
+    $form->_emails = [];
+
+    // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
+    // are having to re-write contactIds afterwards due to this inappropriate variable setting
+    // If we don't have any contact IDs, use the logged in contact ID
+    $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
+
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    $form->_emails = $fromEmailValues;
+    $defaults = [];
+    $form->_fromEmails = $fromEmailValues;
+    if (is_numeric(key($form->_fromEmails))) {
+      $emailID = (int) key($form->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+    }
+    $form->setDefaults($defaults);
     $messageText = [];
     $messageSubject = [];
     $dao = new CRM_Core_BAO_MessageTemplate();
