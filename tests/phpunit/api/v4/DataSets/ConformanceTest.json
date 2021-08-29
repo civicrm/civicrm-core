@@ -105,6 +105,29 @@
       "name": "General"
     }
   ],
+  "MembershipType": [
+    {
+      "domain_id": "1",
+      "name": "General",
+      "description": "Regular annual membership.",
+      "member_of_contact_id": "1",
+      "financial_type_id": "2",
+      "minimum_fee": "100.000000000",
+      "duration_unit": "year",
+      "duration_interval": "2",
+      "period_type": "rolling",
+      "relationship_type_id": [
+        "7"
+      ],
+      "relationship_direction": [
+        "b_a"
+      ],
+      "visibility": "Public",
+      "weight": "1",
+      "auto_renew": "0",
+      "is_active": "1"
+    }
+  ],
   "Membership": [
     {
       "membership_type_id:name": "General",
