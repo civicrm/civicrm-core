@@ -1975,7 +1975,7 @@ LIKE %1
   public function copyCustomFields($entityID, $newEntityID) {
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
-    // Obtain custom values for old event
+    // Obtain custom values for the old entity.
     $customParams = $htmlType = [];
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($entityID, $entity);
 
@@ -2009,8 +2009,8 @@ LIKE %1
         }
       }
 
-      // Save Custom Fields for new Event
-      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity);
+      // Save Custom Fields for new Entity.
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, 'create');
     }
 
     // copy activity attachments ( if any )
