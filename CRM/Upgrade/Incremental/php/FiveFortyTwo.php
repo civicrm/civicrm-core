@@ -55,21 +55,33 @@ class CRM_Upgrade_Incremental_php_FiveFortyTwo extends CRM_Upgrade_Incremental_B
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_42_alpha1(string $rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $contributeComponentID = CRM_Core_DAO::singleValueQuery('SELECT id from civicrm_component WHERE name = "CiviContribute"');
+    $this->addTask(
+      'Add option group for entity batch table (if you are using gift-aid you will need an extension update)',
+      'addOptionGroup',
+      [
+        'name' => 'entity_batch_extends',
+        'title' => ts('Entity Batch Extends'),
+        'is_reserved' => 1,
+        'is_active' => 1,
+        'is_locked' => 1,
+      ],
+      [
+        [
+          'name' => 'civicrm_financial_trxn',
+          'value' => 'civicrm_financial_trxn',
+          'label' => ts('Financial Transactions'),
+          'component_id' => $contributeComponentID,
+        ],
+      ]
+    );
+  }
 
 }
