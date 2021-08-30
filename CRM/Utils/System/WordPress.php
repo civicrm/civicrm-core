@@ -98,7 +98,12 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
           'url' => $upload_dir['baseurl'] . '/civicrm/',
         ];
 
-        if ($old['path'] === $new['path']) {
+        // If the path to the WordPress installation includes symlinks,
+        // the old and new paths can hold different names for the same folder
+        $oldRealpath = realpath($old['path']);
+        $newRealpath = realpath($new['path']);
+
+        if ($oldRealpath !== false && $oldRealpath === $newRealpath) {
            return $new;
         }
 
