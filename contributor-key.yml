@@ -36,7 +36,7 @@
   organization: Agileware
 
 - github      : ahed-compucorp
-  name        : Ahed
+  name        : Ahed Eid
   organization: CompuCorp
 
 - github      : ajdavis
@@ -73,6 +73,12 @@
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
+
+- github      : allinappli
+  name        : ALL IN APPLI
+
+- github      : Anatoleallain
+  name        : Anatole
 
 - github      : andyburnsco
   name        : Andy Burns
@@ -411,6 +417,13 @@
 - github      : Elennio
   name        : Elennio Dec
 
+- github      : encircle
+  name        : Darren Woods
+  organization: enCircle Solutions Ltd.
+
+- github      : erawat
+  name        : Erawat Chamanont
+
 - github      : ergonlogic
   name        : Christopher Gervais
   organization: Ergon Logic Enterprises
@@ -523,6 +536,11 @@
   organization: Greenleaf Advancement
 
 - github      : GValFr35
+
+- github      : hosseinamin
+  name        : Hossein Amin
+
+- github      : in2part
 
 - github      : irenemeisel
   name        : Irene Meisel
@@ -701,6 +719,8 @@
 
 - github      : josephlacey
   name        : Joseph Lacey
+
+- github      : jptillman
 
 - name        : Julian Libor
 
@@ -1011,6 +1031,10 @@
 - github      : nielosz
   name        : Niels Heinemann
   organization: Kompetenzzentrum Technik-Diversity-Chancengleichheit
+
+- github      : nirodaonline
+  name        : Miguel Almeida
+  jira        : almeidam
 
 - github      : nishant-bhorodia
   name        : Nishant Bhorodia
@@ -1394,6 +1418,10 @@
   name        : Stéphane Lussier
   organization: Coop SymbioTIC
 
+- github      : UshaMakoa
+  name        : Usha F. Matisson
+  organization: Makoa
+
 - name        : Vakees K
 
 - github      : valfr35
@@ -1451,9 +1479,17 @@
   name        : James Forbes Keir
   organization: Website Express
 
+- github      : wintermoor
+  name        : Torben Bertram
+  organization: ECOPLAN
+
 - github      : wmortada
   name        : William Mortada
   organization: a-n The Artists Information Company
+
+- github      : wyde22
+  name        : dewy
+  organization: OPEN
 
 - name        : Philipp Michael
   organization: XIMA
@@ -1467,26 +1503,3 @@
 - github      : yashodha
   name        : Yashodha Chaku
   organization: CiviDesk
-
-- github      : hosseinamin
-  name        : Hossein Amin
-
-- github      : reecebenson
-  name        : Reece Benson
-  organization: Circle Interactive
-
-- github      : UshaMakoa
-  name        : Usha F. Matisson
-  organization: Makoa
-
-- github      : ahed-compucorp
-  name        : Ahed Eid
-  organization: CompuCorp
-
-- github      : wintermoor
-  name        : Torben Bertram
-  organization: ECOPLAN
-  
-- github      : nirodaonline
-  name        : Miguel Almeida
-  jira        : almeidam
