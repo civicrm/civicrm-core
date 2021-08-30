@@ -37,7 +37,6 @@ class CRM_Core_Component {
   private static function &_info($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
       Civi::$statics[__CLASS__]['info'] = [];
-      $c = [];
 
       $config = CRM_Core_Config::singleton();
       $c = self::getComponents();
@@ -122,9 +121,13 @@ class CRM_Core_Component {
     return self::_info($force);
   }
 
+  /**
+   * Triggered by on_change callback of the 'enable_components' setting.
+   */
   public static function flushEnabledComponents() {
     unset(Civi::$statics[__CLASS__]);
     CRM_Core_BAO_Navigation::resetNavigation();
+    Civi::cache('metadata')->clear();
   }
 
   /**
