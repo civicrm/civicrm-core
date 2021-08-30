@@ -76,11 +76,11 @@ CRM.$(function($) {
 </script>
 {/literal}
 
-{if $context EQ 'smog' || $context EQ 'amtg' || $savedSearch}
+{if $context EQ 'smog' || $context EQ 'amtg' || !empty($savedSearch)}
   <h3>
     {if $context EQ 'smog'}{ts}Find Contacts within this Group{/ts}
     {elseif $context EQ 'amtg'}{ts}Find Contacts to Add to this Group{/ts}
-    {elseif $savedSearch}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
+    {elseif !empty($savedSearch)}{ts 1=$savedSearch.name}%1 Smart Group Criteria{/ts} &nbsp; {help id='id-advanced-smart'}
     {/if}
   </h3>
 {/if}
@@ -111,7 +111,7 @@ CRM.$(function($) {
     </div>
   </div>
   {foreach from=$allPanes key=paneName item=paneValue}
-    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || $openedPanes.$paneName} {else}collapsed{/if}">
+    <div class="crm-accordion-wrapper crm-ajax-accordion crm-{$paneValue.id}-accordion {if $paneValue.open eq 'true' || !empty($openedPanes.$paneName)} {else}collapsed{/if}">
       <div class="crm-accordion-header" id="{$paneValue.id}">
         {$paneName}
       </div>
