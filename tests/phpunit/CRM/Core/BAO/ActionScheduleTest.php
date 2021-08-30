@@ -961,7 +961,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // In this example, we test activity tokens
     $activityTokens = '{activity.subject};;{activity.details};;{activity.activity_date_time}';
-    $activity = $this->fixtures['phonecall'];
+    $activity = [
+      'status_id' => 1,
+      'activity_type_id' => 2,
+      'activity_date_time' => '20120615100000',
+      'is_current_revision' => 1,
+      'is_deleted' => 0,
+      'subject' => 'Phone call',
+      'details' => 'A phone call about a bear',
+    ];
     $activityTokensExpected = "Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM";
     $cases[4] = [
       // Schedule definition.
