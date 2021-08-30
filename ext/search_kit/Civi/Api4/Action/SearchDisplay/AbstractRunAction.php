@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Query\SqlExpression;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
@@ -91,11 +92,47 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
     $this->savedSearch['api_params'] += ['where' => []];
     $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
+    $this->display['settings']['columns'] = $this->display['settings']['columns'] ?? [];
 
     $this->processResult($result);
   }
 
   abstract protected function processResult(\Civi\Api4\Generic\Result $result);
+
+  /**
+   * Transform each value returned by the API into 'raw' and 'view' properties
+   * @param \Civi\Api4\Generic\Result $result
+   * @return array
+   */
+  protected function formatResult(\Civi\Api4\Generic\Result $result): array {
+    $select = [];
+    foreach ($this->savedSearch['api_params']['select'] as $selectExpr) {
+      $expr = SqlExpression::convert($selectExpr, TRUE);
+      $item = [
+        'fields' => [],
+        'dataType' => $expr->getDataType(),
+      ];
+      foreach ($expr->getFields() as $field) {
+        $item['fields'][] = $this->getField($field);
+      }
+      if (!isset($item['dataType']) && $item['fields']) {
+        $item['dataType'] = $item['fields'][0]['data_type'];
+      }
+      $select[$expr->getAlias()] = $item;
+    }
+    $formatted = [];
+    foreach ($result as $data) {
+      $row = [];
+      foreach ($data as $key => $raw) {
+        $row[$key] = [
+          'raw' => $raw,
+          'view' => $this->formatViewValue($select[$key]['dataType'], $raw),
+        ];
+      }
+      $formatted[] = $row;
+    }
+    return $formatted;
+  }
 
   /**
    * Returns field definition for a given field or NULL if not found
@@ -108,6 +145,40 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $this->_selectQuery = new \Civi\Api4\Query\Api4SelectQuery($api);
     }
     return $this->_selectQuery->getField($fieldName, FALSE);
+  }
+
+  /**
+   * Format raw field value according to data type
+   * @param $dataType
+   * @param mixed $rawValue
+   * @return array|string
+   */
+  protected function formatViewValue($dataType, $rawValue) {
+    if (is_array($rawValue)) {
+      return array_map(function($val) use ($dataType) {
+        return $this->formatViewValue($dataType, $val);
+      }, $rawValue);
+    }
+
+    $formatted = $rawValue;
+
+    switch ($dataType) {
+      case 'Boolean':
+        if (is_bool($rawValue)) {
+          $formatted = $rawValue ? ts('Yes') : ts('No');
+        }
+        break;
+
+      case 'Money':
+        $formatted = \CRM_Utils_Money::format($rawValue);
+        break;
+
+      case 'Date':
+      case 'Timestamp':
+        $formatted = \CRM_Utils_Date::customFormat($rawValue);
+    }
+
+    return $formatted;
   }
 
   /**
@@ -248,7 +319,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function augmentSelectClause(&$apiParams): void {
     $possibleTokens = '';
-    foreach ($this->display['settings']['columns'] ?? [] as $column) {
+    foreach ($this->display['settings']['columns'] as $column) {
       // Collect display values in which a token is allowed
       $possibleTokens .= ($column['rewrite'] ?? '') . ($column['link']['path'] ?? '');
       if (!empty($column['links'])) {

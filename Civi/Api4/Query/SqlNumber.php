@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlNumber extends SqlExpression {
 
+  protected static $dataType = 'Float';
+
   protected function initialize() {
     \CRM_Utils_Type::validate($this->expr, 'Float');
   }

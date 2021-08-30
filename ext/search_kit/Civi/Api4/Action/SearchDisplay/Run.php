@@ -59,10 +59,17 @@ class Run extends AbstractRunAction {
     $this->applyFilters();
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams);
-
+    // Copy over meta properties to this result
     $result->rowCount = $apiResult->rowCount;
-    $result->exchangeArray($apiResult->getArrayCopy());
     $result->debug = $apiResult->debug;
+
+    if ($this->return === 'row_count' || $this->return === 'id') {
+      $result->exchangeArray($apiResult->getArrayCopy());
+    }
+    else {
+      $result->exchangeArray($this->formatResult($apiResult));
+    }
+
   }
 
 }
