@@ -262,10 +262,18 @@
           return _.findIndex(ctrl.display.settings.sort, [key]) >= 0;
         }
         return {
-          results: [{
-            text: ts('Columns'),
-            children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
-          }].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
+          results: [
+            {
+              text: ts('Random'),
+              icon: 'crm-i fa-random',
+              id: 'RAND()',
+              disabled: disabledIf('RAND()')
+            },
+            {
+              text: ts('Columns'),
+              children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
+            }
+          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
         };
       };
 

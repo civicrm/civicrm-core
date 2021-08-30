@@ -199,4 +199,21 @@ class SqlFunctionTest extends UnitTestCase {
     }
   }
 
+  public function testRandFunction() {
+    $cid = Contact::create(FALSE)
+      ->addValue('first_name', 'hello')
+      ->execute()->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addSelect('RAND() AS rand')
+      ->addOrderBy('RAND()')
+      ->setDebug(TRUE)
+      ->setLimit(1)
+      ->execute();
+
+    $this->assertStringContainsString('ORDER BY RAND()', $result->debug['sql'][0]);
+    $this->assertGreaterThanOrEqual(0, $result[0]['rand']);
+    $this->assertLessThan(1, $result[0]['rand']);
+  }
+
 }
