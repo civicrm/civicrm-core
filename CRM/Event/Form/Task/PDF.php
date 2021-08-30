@@ -56,13 +56,6 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
   }
 
   /**
-   * Build the form object.
-   */
-  public function buildQuickForm() {
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
-  }
-
-  /**
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {

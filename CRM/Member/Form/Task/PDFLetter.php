@@ -21,6 +21,8 @@
  */
 class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
 
+  use CRM_Contact_Form_Task_PDFTrait;
+
   /**
    * All the existing templates in the system.
    *
@@ -49,11 +51,12 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    *
    * @return void
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     //enable form element
     $this->assign('suppressForm', FALSE);
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    $this->addPDFElementsToForm();
   }
 
   /**

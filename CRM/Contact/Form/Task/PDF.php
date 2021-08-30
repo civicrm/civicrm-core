@@ -89,7 +89,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public function buildQuickForm() {
     //enable form element
     $this->assign('suppressForm', FALSE);
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    $this->addPDFElementsToForm();
   }
 
   /**
