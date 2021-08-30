@@ -1068,7 +1068,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
 
           // check for values for custom fields for checkboxes and multiselect
-          if ($isSerialized) {
+          if ($isSerialized && $dataType != 'ContactReference') {
             $value = trim($value);
             $value = str_replace('|', ',', $value);
             $mulValues = explode(',', $value);
