@@ -104,7 +104,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
       // call the function to sync shared address and create relationships
       // if address is already shared, share master_id with all children and update relationships accordingly
       // (prevent chaining 2) CRM-21214
-      self::processSharedAddress($address->id, $params);
+      self::processSharedAddress($address->id, $params, $hook);
 
       // lets call the post hook only after we've done all the follow on processing
       CRM_Utils_Hook::post($hook, 'Address', $address->id, $address);
@@ -956,8 +956,9 @@ SELECT is_primary,
    *   Address id.
    * @param array $params
    *   Associated array of address params.
+   * @param string $parentOperation Operation being taken on the parent entity.
    */
-  public static function processSharedAddress($addressId, $params) {
+  public static function processSharedAddress($addressId, $params, $parentOperation = NULL) {
     $query = 'SELECT id, contact_id FROM civicrm_address WHERE master_id = %1';
     $dao = CRM_Core_DAO::executeQuery($query, [1 => [$addressId, 'Integer']]);
 
@@ -996,7 +997,7 @@ SELECT is_primary,
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
-      $addressDAO->copyCustomFields($addressId, $addressDAO->id);
+      $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
     }
   }
 

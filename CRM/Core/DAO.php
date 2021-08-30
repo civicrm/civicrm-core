@@ -1971,8 +1971,9 @@ LIKE %1
    *
    * @param int $entityID
    * @param int $newEntityID
+   * @param string $parentOperation
    */
-  public function copyCustomFields($entityID, $newEntityID) {
+  public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     // Obtain custom values for the old entity.
@@ -2010,7 +2011,7 @@ LIKE %1
       }
 
       // Save Custom Fields for new Entity.
-      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, 'create');
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, $parentOperation ?? 'create');
     }
 
     // copy activity attachments ( if any )
