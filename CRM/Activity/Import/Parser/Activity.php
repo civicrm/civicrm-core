@@ -168,11 +168,19 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
 
     foreach ($params as $key => $val) {
       if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        if (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Date') {
-          CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
-        }
-        elseif (!empty($customFields[$customFieldID]) && $customFields[$customFieldID]['data_type'] == 'Boolean') {
-          $params[$key] = CRM_Utils_String::strtoboolstr($val);
+        if (!empty($customFields[$customFieldID])) {
+          if ($customFields[$customFieldID]['data_type'] == 'Date') {
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+          }
+          elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+            $params[$key] = CRM_Utils_String::strtoboolstr($val);
+          }
+          elseif ($customFields[$customFieldID]['serialize']) {
+            // Assume that if people want to import multivalue custom data then
+            // they will use a comma seperator, and that any labels will not
+            // contain commas
+            $params[$key] = array_map('trim', explode(',', $val));
+          }
         }
       }
       elseif ($key === 'activity_date_time') {
