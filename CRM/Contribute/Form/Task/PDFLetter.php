@@ -78,10 +78,6 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     //enable form element
     $this->assign('suppressForm', FALSE);
 
-    // Build common form elements
-    // use contact form as a base
-    CRM_Contact_Form_Task_PDFLetterCommon::buildQuickForm($this);
-
     // Contribute PDF tasks allow you to email as well, so we need to add email address to those forms
     $this->add('select', 'from_email_address', ts('From Email Address'), $this->_fromEmails, TRUE);
     $this->addPDFElementsToForm();
