@@ -10,13 +10,13 @@
 </li>
 <li ng-if="isRepeatable()" ng-click="$event.stopPropagation()">
   <div class="af-gui-field-select-in-dropdown form-inline">
-    <label ng-click="toggleRepeat()">
+    <label ng-click="$ctrl.toggleRepeat()">
       <i class="crm-i fa-{{ $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'check-' : '' }}square-o"></i>
       {{:: ts('Repeat') }}
     </label>
     <span ng-style="{visibility: $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'visible' : 'hidden'}">
       <input type="number" class="form-control" ng-model="getSetMin" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('min') }}" min="0" step="1" />
-      - <input type="number" class="form-control" ng-model="getSetMax" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('max') }}" min="2" step="1" />
+      - <input type="number" class="form-control" ng-model="getSetMax" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('max') }}" min="2" max="{{:: getRepeatMax() }}" step="1" />
     </span>
   </div>
 </li>

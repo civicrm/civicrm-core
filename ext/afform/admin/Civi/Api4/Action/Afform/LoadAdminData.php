@@ -237,7 +237,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     }
     if ($entities) {
       $blockInfo = Afform::get($this->checkPermissions)
-        ->addSelect('name', 'title', 'entity_type', 'join_entity', 'directive_name', 'repeat')
+        ->addSelect('name', 'title', 'entity_type', 'join_entity', 'directive_name')
         ->setWhere($where)
         ->addWhere('type', '=', 'block')
         ->addWhere('entity_type', 'IN', $entities)

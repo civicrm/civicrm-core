@@ -135,7 +135,6 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
         'permission' => 'access CiviCRM',
         'join_entity' => 'Custom_' . $custom['name'],
         'entity_type' => $custom['extends'],
-        'repeat' => $custom['max_multiple'] ?: TRUE,
         'has_base' => TRUE,
       ];
       if ($getLayout) {
