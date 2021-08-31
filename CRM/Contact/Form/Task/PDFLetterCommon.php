@@ -42,22 +42,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    if (!isset($form->_single)) {
-      // @todo ensure this is already set.
-      $form->_single = FALSE;
-    }
-    $form->_emails = [];
-
-    // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
-    // are having to re-write contactIds afterwards due to this inappropriate variable setting
-    // If we don't have any contact IDs, use the logged in contact ID
-    $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
-
-    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
-
-    $form->_emails = $fromEmailValues;
     $defaults = [];
-    $form->_fromEmails = $fromEmailValues;
+    $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     if (is_numeric(key($form->_fromEmails))) {
       $emailID = (int) key($form->_fromEmails);
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
@@ -66,19 +52,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
     }
     $form->setDefaults($defaults);
-    $messageText = [];
-    $messageSubject = [];
-    $dao = new CRM_Core_BAO_MessageTemplate();
-    $dao->is_active = 1;
-    $dao->find();
-    while ($dao->fetch()) {
-      $messageText[$dao->id] = $dao->msg_text;
-      $messageSubject[$dao->id] = $dao->msg_subject;
-    }
-
-    $form->assign('message', $messageText);
-    $form->assign('messageSubject', $messageSubject);
-    parent::preProcess($form);
+    $form->setTitle('Print/Merge Document');
   }
 
   /**
