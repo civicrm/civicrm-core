@@ -71,12 +71,13 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
    *
    */
   public function addContribution(): void {
+    $this->paymentProcessorId = $this->processorCreate();
     $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->getContactID(),
       'contribution_recur_id' => $this->getContributionRecurID(),
       'financial_type_id' => 'Donation',
       'total_amount' => 10,
-      'api.Payment.create' => ['total_amount' => 10],
+      'api.Payment.create' => ['total_amount' => 10, 'payment_processor_id' => $this->paymentProcessorId],
     ]);
   }
 
