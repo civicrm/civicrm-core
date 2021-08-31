@@ -131,6 +131,12 @@
         };
       },
 
+      onClickSearchButton: function() {
+        this.rowCount = null;
+        this.page = 1;
+        this.getResults();
+      },
+
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(editedRow) {
         var ctrl = this,

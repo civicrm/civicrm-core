@@ -4,5 +4,11 @@
   </td>
   <td ng-repeat="col in $ctrl.settings.columns" ng-include="'~/crmSearchDisplay/colType/' + col.type + '.html'" title="{{:: $ctrl.replaceTokens(col.title, row) }}" class="{{:: col.alignment }}">
   </td>
-  <td></td>
+</tr>
+<tr ng-if="$ctrl.rowCount === 0">
+  <td colspan="{{ $ctrl.settings.columns.length + 2 }}">
+    <p class="alert alert-info text-center">
+      {{:: ts('None Found') }}
+    </p>
+  </td>
 </tr>
