@@ -71,7 +71,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       }
     }
     $messageToken = CRM_Utils_Token::getTokens($htmlMessage);
-    $testHTML = CRM_Member_Form_Task_PDFLetterCommon::generateHTML($membershipIds,
+    $testHTML = CRM_Member_Form_Task_PDFLetter::generateHTML($membershipIds,
       $returnProperties,
       NULL,
       NULL,
