@@ -37,7 +37,7 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+    $this->preProcessPDF();
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();

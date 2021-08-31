@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
   public function preProcess() {
 
     $this->skipOnHold = $this->skipDeceased = FALSE;
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+    $this->preProcessPDF();
 
     // store case id if present
     $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'CommaSeparatedIntegers', $this, FALSE);

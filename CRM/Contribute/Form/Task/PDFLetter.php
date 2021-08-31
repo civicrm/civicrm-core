@@ -38,7 +38,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    */
   public function preProcess() {
     $this->skipOnHold = $this->skipDeceased = FALSE;
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+    $this->preProcessPDF();
     parent::preProcess();
     $this->assign('single', $this->isSingle());
   }
