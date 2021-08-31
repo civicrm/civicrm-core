@@ -41,8 +41,17 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $fieldValue = $this->getFieldValue($row, $field);
 
     if ($this->isPseudoField($field)) {
+      if (!empty($fieldValue)) {
+        // If it's set here it has already been loaded in pre-fetch.
+        return $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+      }
+      // Once prefetch is fully standardised we can remove this - as long
+      // as tests pass we should be fine as tests cover this.
       $split = explode(':', $field);
       return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
+    }
+    if ($this->isCustomField($field)) {
+      return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
@@ -51,12 +60,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
     }
-    if ($this->isCustomField($field)) {
-      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
-    }
-    else {
-      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
-    }
+    $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
   }
 
   /**
@@ -120,7 +124,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array|string[]
    */
   public function getAllTokens(): array {
-    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
+    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
   }
 
   /**
@@ -131,7 +135,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isDateField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Timestamp';
+    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
   }
 
   /**
@@ -405,7 +409,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
-    return array_intersect($this->getActiveTokens($e), $this->getCurrencyFieldName(), array_keys($this->getAllTokens()));
+    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName()), array_keys($this->getAllTokens()));
   }
 
 }

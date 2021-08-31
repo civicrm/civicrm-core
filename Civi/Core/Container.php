@@ -323,16 +323,20 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition("crm_mailing_action_tokens", new Definition(
-      "CRM_Mailing_ActionTokens",
+      'CRM_Mailing_ActionTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     foreach (['Activity', 'Contribute', 'Event', 'Mailing', 'Member'] as $comp) {
-      $container->setDefinition("crm_" . strtolower($comp) . "_tokens", new Definition(
+      $container->setDefinition('crm_' . strtolower($comp) . '_tokens', new Definition(
         "CRM_{$comp}_Tokens",
         []
       ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     }
+    $container->setDefinition('crm_contribution_recur_tokens', new Definition(
+      'CRM_Contribute_RecurTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     $dispatcherDefn = $container->getDefinition('dispatcher');
     foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {
