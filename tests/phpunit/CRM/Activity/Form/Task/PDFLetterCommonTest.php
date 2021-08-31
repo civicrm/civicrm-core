@@ -35,7 +35,8 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ['Activity ID: {activity.activity_id}', 'Activity ID: ' . $activity['id']],
     ];
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
-    $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
+    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
+    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
 
     // Check some basic fields
     foreach ($data as $line) {
@@ -58,7 +59,8 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
     $html_message = "Custom: {activity.$cf}";
     $activityIds = CRM_Utils_Array::collect('id', $activities);
-    $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument($activityIds, $html_message, ['is_unit_test' => TRUE]);
+    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
+    $output = $form->createDocument($activityIds, $html_message, ['is_unit_test' => TRUE]);
     // Should have one row of output per activity
     $this->assertCount(count($activities), $output);
 
@@ -89,7 +91,8 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ['Target Count: {activity.targets_count}', "Target Count: 1"],
     ];
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
-    $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
+    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
+    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
 
     foreach ($data as $line) {
       $this->assertContains("\n" . $line[1] . "\n", $output[0]);
@@ -103,7 +106,8 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   public function testCreateDocumentUnknownTokens(): void {
     $activity = $this->activityCreate();
     $html_message = 'Unknown token: {activity.something_unknown}';
-    $output = CRM_Activity_Form_Task_PDFLetterCommon::createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
+    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
+    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
     // Unknown tokens should be left alone
     $this->assertEquals($html_message, $output[0]);
   }
