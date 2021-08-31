@@ -400,7 +400,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
-    return array_intersect($this->getActiveTokens($e), $this->getCurrencyFieldName(), array_keys($this->getAllTokens()));
+    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName()), array_keys($this->getAllTokens()));
   }
 
 }
