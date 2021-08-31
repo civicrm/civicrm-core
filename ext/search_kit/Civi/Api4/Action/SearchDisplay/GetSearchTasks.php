@@ -45,6 +45,15 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    $tasks[$entity['name']]['download'] = [
+      'module' => 'crmSearchTasks',
+      'title' => E::ts('Download Spreadsheet'),
+      'icon' => 'fa-download',
+      'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskDownload.html'],
+      // Does not require any rows to be selected
+      'number' => '>= 0',
+    ];
+
     if (array_key_exists('update', $entity['actions'])) {
       $tasks[$entity['name']]['update'] = [
         'module' => 'crmSearchTasks',
@@ -126,6 +135,8 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
 
     foreach ($tasks[$entity['name']] as $name => &$task) {
       $task['name'] = $name;
+      // Add default for number of rows action requires
+      $task += ['number' => '> 0'];
     }
 
     $result->exchangeArray(array_values($tasks[$entity['name']]));

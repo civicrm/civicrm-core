@@ -5,6 +5,9 @@
     bindings: {
       entity: '<',
       refresh: '&',
+      search: '<',
+      display: '<',
+      displayController: '<',
       ids: '<'
     },
     templateUrl: '~/crmSearchTasks/crmSearchTasks.html',
@@ -15,14 +18,17 @@
         unwatchIDs = $scope.$watch('$ctrl.ids.length', watchIDs);
 
       function watchIDs() {
-        if (ctrl.ids && ctrl.ids.length && !initialized) {
+        if (ctrl.ids && ctrl.ids.length) {
           unwatchIDs();
-          initialized = true;
-          initialize();
+          ctrl.getTasks();
         }
       }
 
-      function initialize() {
+      this.getTasks = function() {
+        if (initialized) {
+          return;
+        }
+        initialized = true;
         crmApi4({
           entityInfo: ['Entity', 'get', {select: ['name', 'title', 'title_plural'], where: [['name', '=', ctrl.entity]]}, 0],
           tasks: ['SearchDisplay', 'getSearchTasks', {entity: ctrl.entity}]
@@ -30,19 +36,22 @@
           ctrl.entityInfo = result.entityInfo;
           ctrl.tasks = result.tasks;
         });
-      }
+      };
 
       this.isActionAllowed = function(action) {
-        return !action.number || $scope.eval('' + $ctrl.ids.length + action.number);
+        return $scope.$eval('' + ctrl.ids.length + action.number);
       };
 
       this.doAction = function(action) {
-        if (!ctrl.isActionAllowed(action) || !ctrl.ids.length) {
+        if (!ctrl.isActionAllowed(action)) {
           return;
         }
         var data = {
           ids: ctrl.ids,
           entity: ctrl.entity,
+          search: ctrl.search,
+          display: ctrl.display,
+          displayController: ctrl.displayController,
           entityInfo: ctrl.entityInfo
         };
         // If action uses a crmPopup form
@@ -59,7 +68,8 @@
             title: action.title
           });
           dialogService.open('crmSearchTask', action.uiDialog.templateUrl, data, options)
-            .then(ctrl.refresh);
+            // Reload results on success, do nothing on cancel
+            .then(ctrl.refresh, _.noop);
         }
       };
     }

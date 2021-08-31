@@ -72,6 +72,11 @@
           apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
         };
         ctrl.settings = ctrl.display.settings;
+        setLabel();
+      }
+
+      function setLabel() {
+        ctrl.display.label = ctrl.search.label || searchMeta.getEntity(ctrl.search.api_entity).title_plural;
       }
 
       this.$onInit = function() {
@@ -79,6 +84,7 @@
         this.initializeDisplay($scope, $element);
         $scope.$watch('$ctrl.search.api_entity', buildSettings);
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
+        $scope.$watch('$ctrl.search.label', setLabel);
       };
 
       // Add callbacks for pre & post run
