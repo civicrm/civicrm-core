@@ -43,7 +43,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     $this->skipOnHold = $this->skipDeceased = FALSE;
     parent::preProcess();
     $this->setContactIDs();
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+    $this->preProcessPDF();
   }
 
   /**

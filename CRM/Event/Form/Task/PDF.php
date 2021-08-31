@@ -46,7 +46,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Build all the data structures needed to build the form.
    */
   public function preProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::preProcess($this);
+    $this->preProcessPDF();
     parent::preProcess();
 
     // we have all the participant ids, so now we get the contact ids

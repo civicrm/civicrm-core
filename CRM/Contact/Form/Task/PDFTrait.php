@@ -183,4 +183,22 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $form->addFormRule(['CRM_Core_Form_Task_PDFLetterCommon', 'formRule'], $form);
   }
 
+  /**
+   * Prepare form.
+   */
+  public function preProcessPDF(): void {
+    $form = $this;
+    $defaults = [];
+    $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+    if (is_numeric(key($form->_fromEmails))) {
+      $emailID = (int) key($form->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+    }
+    $form->setDefaults($defaults);
+    $form->setTitle('Print/Merge Document');
+  }
+
 }

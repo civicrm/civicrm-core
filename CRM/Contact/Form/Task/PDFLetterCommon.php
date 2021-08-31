@@ -39,9 +39,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   /**
    * Build all the data structures needed to build the form.
    *
+   * @deprecated
+   *
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $defaults = [];
     $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
     if (is_numeric(key($form->_fromEmails))) {
