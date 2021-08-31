@@ -30,13 +30,6 @@ abstract class SqlFunction extends SqlExpression {
    */
   protected static $category;
 
-  /**
-   * Data type output by this function
-   *
-   * @var string
-   */
-  protected static $dataType;
-
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',
@@ -286,13 +279,6 @@ abstract class SqlFunction extends SqlExpression {
    */
   public static function getCategory(): string {
     return static::$category;
-  }
-
-  /**
-   * @return string|NULL
-   */
-  public static function getDataType():? string {
-    return static::$dataType;
   }
 
   /**

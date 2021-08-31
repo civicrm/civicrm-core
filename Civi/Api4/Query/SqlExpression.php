@@ -46,6 +46,13 @@ abstract class SqlExpression {
   public $supportsExpansion = FALSE;
 
   /**
+   * Data type output by this expression
+   *
+   * @var string
+   */
+  protected static $dataType;
+
+  /**
    * SqlFunction constructor.
    * @param string $expr
    * @param string|null $alias
@@ -164,6 +171,13 @@ abstract class SqlExpression {
   public function getType(): string {
     $className = get_class($this);
     return substr($className, strrpos($className, '\\') + 1);
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public static function getDataType():? string {
+    return static::$dataType;
   }
 
 }

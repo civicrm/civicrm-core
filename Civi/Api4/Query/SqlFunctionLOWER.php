@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionLOWER extends SqlFunction {
 
+  protected static $dataType = 'String';
+
   protected static $category = self::CATEGORY_STRING;
 
   protected static function params(): array {

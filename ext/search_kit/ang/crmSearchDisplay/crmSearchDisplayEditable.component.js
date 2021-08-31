@@ -19,8 +19,8 @@
 
       this.$onInit = function() {
         col = this.col;
-        this.value = _.cloneDeep(this.row[col.editable.value]);
-        initialValue = _.cloneDeep(this.row[col.editable.value]);
+        this.value = _.cloneDeep(this.row[col.editable.value].raw);
+        initialValue = _.cloneDeep(this.row[col.editable.value].raw);
 
         this.field = {
           data_type: col.dataType,
@@ -54,7 +54,7 @@
           ctrl.cancel();
           return;
         }
-        var values = {id: ctrl.row[col.editable.id]};
+        var values = {id: ctrl.row[col.editable.id].raw};
         values[col.editable.name] = ctrl.value;
         $('input', $element).attr('disabled', true);
         crmStatus({}, crmApi4(col.editable.entity, 'update', {

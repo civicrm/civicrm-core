@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlString extends SqlExpression {
 
+  protected static $dataType = 'String';
+
   protected function initialize() {
     // Remove surrounding quotes
     $str = substr($this->expr, 1, -1);

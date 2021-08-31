@@ -52,7 +52,7 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
         'api_entity' => 'Contact',
         'api_params' => [
           'version' => 4,
-          'select' => ['id', 'first_name', 'last_name', 'contact_sub_type:label'],
+          'select' => ['id', 'first_name', 'last_name', 'contact_sub_type:label', 'is_deceased'],
           'where' => [],
         ],
       ],
@@ -103,15 +103,19 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $params['filters']['first_name'] = ['One', 'Two'];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('One', $result[0]['first_name']);
-    $this->assertEquals('Two', $result[1]['first_name']);
+    $this->assertEquals('One', $result[0]['first_name']['raw']);
+    $this->assertEquals('Two', $result[1]['first_name']['raw']);
 
-    $params['filters'] = ['id' => ['>' => $result[0]['id'], '<=' => $result[1]['id'] + 1]];
+    // Raw value should be boolean, view value should be string
+    $this->assertEquals(FALSE, $result[0]['is_deceased']['raw']);
+    $this->assertEquals(ts('No'), $result[0]['is_deceased']['view']);
+
+    $params['filters'] = ['id' => ['>' => $result[0]['id']['raw'], '<=' => $result[1]['id']['raw'] + 1]];
     $params['sort'] = [['first_name', 'ASC']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('Three', $result[0]['first_name']);
-    $this->assertEquals('Two', $result[1]['first_name']);
+    $this->assertEquals('Three', $result[0]['first_name']['raw']);
+    $this->assertEquals('Two', $result[1]['first_name']['raw']);
 
     $params['filters'] = ['contact_sub_type:label' => ['Tester', 'Bot']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
@@ -176,9 +180,9 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertNotEmpty($result->first()['display_name']);
+    $this->assertNotEmpty($result->first()['display_name']['raw']);
     // Assert that display name was added to the search due to the link token
-    $this->assertNotEmpty($result->first()['sort_name']);
+    $this->assertNotEmpty($result->first()['sort_name']['raw']);
 
     // These items are not part of the search, but will be added via links
     $this->assertArrayNotHasKey('contact_type', $result->first());
@@ -195,9 +199,9 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('Individual', $result->first()['contact_type']);
-    $this->assertEquals('Unit test', $result->first()['source']);
-    $this->assertEquals($lastName, $result->first()['last_name']);
+    $this->assertEquals('Individual', $result->first()['contact_type']['raw']);
+    $this->assertEquals('Unit test', $result->first()['source']['raw']);
+    $this->assertEquals($lastName, $result->first()['last_name']['raw']);
   }
 
   /**
@@ -294,14 +298,14 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->cleanupCachedPermissions();
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
-    $this->assertEquals($sampleData['Two'], $result[0]['id']);
+    $this->assertEquals($sampleData['Two'], $result[0]['id']['raw']);
 
     $hooks->setHook('civicrm_aclWhereClause', [$this, 'aclWhereGreaterThan']);
     $this->cleanupCachedPermissions();
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals($sampleData['Three'], $result[0]['id']);
-    $this->assertEquals($sampleData['Four'], $result[1]['id']);
+    $this->assertEquals($sampleData['Three'], $result[0]['id']['raw']);
+    $this->assertEquals($sampleData['Four'], $result[1]['id']['raw']);
   }
 
   public function testWithACLBypass() {
