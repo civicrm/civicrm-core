@@ -417,3 +417,21 @@ body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
 body.admin.com_civicrm.layout-default .crm-container .content {
 	padding: inherit; /* overrides J4 padding */
 }
+
+/* J4 Modals */
+
+body.admin.com_civicrm.layout-default .crm-container.ui-dialog.ui-resizable {
+	z-index: 1021;
+}
+
+body.admin.com_civicrm.layout-default .ui-widget-overlay {
+	z-index: 1;
+}
+
+body.admin.com_civicrm.layout-default .crm-container .modal-dialog {
+	max-width: inherit;
+	padding: 0;
+	margin: 0;
+	overflow: scroll;
+	pointer-events: all;
+}
