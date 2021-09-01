@@ -414,6 +414,10 @@ body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
 	max-width: 50vw; /* fixes over-wide news dashlet */ 
 }
 
+body.admin.com_civicrm.layout-default .crm-container .content {
+	padding: inherit; /* overrides J4 padding */
+}
+
 /* J4 Modals */
 
 body.admin.com_civicrm.layout-default .crm-container.ui-dialog.ui-resizable {
