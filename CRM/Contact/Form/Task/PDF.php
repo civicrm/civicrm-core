@@ -58,10 +58,11 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
       // in search context 'id' is the default profile id for search display
       // CRM-11227
       $this->_activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    }
-
-    if ($cid) {
-      CRM_Contact_Form_Task_PDFLetterCommon::preProcessSingle($this, $cid);
+      $this->_contactIds = explode(',', $cid);
+      // put contact display name in title for single contact mode
+      if (count($this->_contactIds) === 1) {
+        CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')]));
+      }
       $this->_single = TRUE;
     }
     else {
@@ -85,6 +86,8 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     //enable form element

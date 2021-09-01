@@ -59,10 +59,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   }
 
   /**
+   * @deprecated
    * @param CRM_Core_Form $form
    * @param int $cid
    */
   public static function preProcessSingle(&$form, $cid) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
     if (count($form->_contactIds) === 1) {
