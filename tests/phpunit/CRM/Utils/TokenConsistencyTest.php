@@ -74,8 +74,8 @@ July 26th, 2021
 case details
 Ongoing
 No
-' . $this->case['modified_date'] . '
 ' . $this->case['created_date'] . '
+' . $this->case['modified_date'] . '
 ';
   }
 
