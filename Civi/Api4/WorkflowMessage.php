@@ -97,6 +97,16 @@ class WorkflowMessage extends Generic\AbstractEntity {
           'title' => 'Description',
           'data_type' => 'String',
         ],
+        [
+          'name' => 'support',
+          'title' => 'Support Level',
+          'options'  => [
+            'experimental' => ts('Experimental: Message may change substantively with no special communication or facilitation.'),
+            'template-only' => ts('Template Support: Changes affecting the content of the message-template will get active support/facilitation.'),
+            'full' => ts('Full Support: All changes affecting message-templates or message-senders will get active support/facilitation.'),
+          ],
+          'data_type' => 'String',
+        ],
       ];
     }))->setCheckPermissions($checkPermissions);
   }

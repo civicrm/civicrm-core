@@ -15,6 +15,7 @@
  * the configuration/add-ons) additional copies may be sent.
  *
  * @see CRM_Case_BAO_Case::sendActivityCopy
+ * @support template-only
  */
 class CRM_Case_WorkflowMessage_CaseActivity extends Civi\WorkflowMessage\GenericWorkflowMessage {
 

@@ -181,7 +181,7 @@ class WorkflowMessage {
    */
   public static function getWorkflowSpecs() {
     $compute = function() {
-      $keys = ['name', 'group', 'class', 'description', 'comment'];
+      $keys = ['name', 'group', 'class', 'description', 'comment', 'support'];
       $list = [];
       foreach (self::getWorkflowNameClassMap() as $name => $class) {
         $specs = [
