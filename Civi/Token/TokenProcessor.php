@@ -49,6 +49,8 @@ class TokenProcessor {
    *
    *   - controller: string, the class which is managing the mail-merge.
    *   - smarty: bool, whether to enable smarty support.
+   *   - smartyTokenAlias: array, Define Smarty variables that are populated
+   *      based on token-content. Ex: ['theInvoiceId' => 'contribution.invoice_id']
    *   - contactId: int, the main person/org discussed in the message.
    *   - contact: array, the main person/org discussed in the message.
    *     (Optional for performance tweaking; if omitted, will load
