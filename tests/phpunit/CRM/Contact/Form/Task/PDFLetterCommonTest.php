@@ -47,18 +47,10 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @dataProvider getFilenameCases
    */
   public function testFilenameIsAssigned(?string $pdfFileName, ?string $activitySubject, ?bool $isLiveMode, string $expectedFilename): void {
-    // @todo - remove this cid - it helps direct the form controller but is
-    // pretty cludgey.
-    $_REQUEST['cid'] = $this->contactId;
-    $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', [
+    $form = $this->getPDFForm([
       'pdf_file_name' => $pdfFileName,
       'subject' => $activitySubject,
-      'document_type' => 'pdf',
-      'buttons' => [
-        '_qf_PDF_upload' => $isLiveMode,
-      ],
-    ]);
-    $form->_contactIds = [$this->contactId];
+    ], [$this->contactId], $isLiveMode);
     $fileNameAssigned = $this->submitForm($form)['fileName'];
     $this->assertEquals($expectedFilename, $fileNameAssigned);
   }
@@ -125,6 +117,40 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
     }
     $this->fail('line should be unreachable');
+  }
+
+  /**
+   * @param array $formValues
+   * @param array $contactIDs
+   * @param bool|null $isLiveMode
+   *
+   * @return \CRM_Contact_Form_Task_PDF
+   */
+  protected function getPDFForm(array $formValues, array $contactIDs, ?bool $isLiveMode = TRUE): CRM_Contact_Form_Task_PDF {
+    // pretty cludgey.
+    $_REQUEST['cid'] = $contactIDs[0];
+    /* @var CRM_Contact_Form_Task_PDF $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', array_merge([
+      'pdf_file_name' => 'pdf_file_name',
+      'subject' => 'subject',
+      'document_type' => 'pdf',
+      'buttons' => [
+        '_qf_PDF_upload' => $isLiveMode,
+      ],
+    ], $formValues));
+    $form->_contactIds = $contactIDs;
+    return $form;
+  }
+
+  /**
+   * Test contact tokens are resolved.
+   */
+  public function testContactTokensAreResolved(): void {
+    $form = $this->getPDFForm([
+      'html_message' => '{contact.first_name}, {contact.email_greeting}',
+    ], [$this->contactId]);
+    $processedMessage = $this->submitForm($form)['html'];
+    $this->assertStringContainsString('Logged In, Dear Logged In', $processedMessage);
   }
 
 }
