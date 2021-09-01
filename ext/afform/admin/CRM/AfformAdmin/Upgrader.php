@@ -6,9 +6,6 @@ use CRM_AfformAdmin_ExtensionUtil as E;
  */
 class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
 
-  // By convention, functions that look like "function upgrade_NNNN()" are
-  // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
-
   /**
    * Setup navigation item on new installs.
    *
@@ -52,10 +49,10 @@ class CRM_AfformAdmin_Upgrader extends CRM_AfformAdmin_Upgrader_Base {
   /**
    * Update menu item
    *
-   * @return TRUE on success
+   * @return bool
    * @throws Exception
    */
-  public function upgrade_0001() {
+  public function upgrade_0001(): bool {
     $this->ctx->log->info('Applying update 0001');
     \Civi\Api4\Navigation::update(FALSE)
       ->addValue('icon', 'crm-i fa-list-alt')

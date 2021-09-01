@@ -9,10 +9,9 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
   /**
    * Update names of blocks and joins
    *
-   * @return TRUE on success
-   * @throws Exception
+   * @return bool
    */
-  public function upgrade_1000() {
+  public function upgrade_1000(): bool {
     $this->ctx->log->info('Applying update 1000');
     $scanner = new CRM_Afform_AfformScanner();
     $localDir = $scanner->getSiteLocalPath();
@@ -57,7 +56,7 @@ class CRM_Afform_Upgrader extends CRM_Afform_Upgrader_Base {
    * Upgrade 1000 - install civicrm_afform_submission table
    * @return bool
    */
-  public function upgrade_1001() {
+  public function upgrade_1001(): bool {
     $this->ctx->log->info('Applying update 1001 - install civicrm_afform_submission table.');
     if (!CRM_Core_DAO::singleValueQuery("SHOW TABLES LIKE 'civicrm_afform_submission'")) {
       $this->executeSqlFile('sql/auto_install.sql');
