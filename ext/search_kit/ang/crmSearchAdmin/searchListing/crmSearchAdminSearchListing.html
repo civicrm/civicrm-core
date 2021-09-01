@@ -1,0 +1,12 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
+  <div class="form-inline">
+    <label for="search-list-filter">{{:: ts('Filter') }}</label>
+    <input class="form-control" type="search" id="search-list-filter" ng-model="$ctrl.filters.label" placeholder="&#xf002">
+    <a class="btn btn-primary pull-right" href="#/create/Contact/">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Search') }}
+    </a>
+  </div>
+  <div ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTable.html'"></div>
+</div>
