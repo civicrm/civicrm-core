@@ -321,7 +321,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   public function getBasicTokens(): array {
     $return = [];
     foreach ($this->getExposedFields() as $fieldName) {
-      $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
+      // Custom fields are still added v3 style - we want to keep v4 naming 'unpoluted'
+      // for now to allow us to consider how to handle names vs labels vs values
+      // and other raw vs not raw options.
+      if ($this->getFieldMetadata()[$fieldName]['type'] !== 'Custom') {
+        $return[$fieldName] = $this->getFieldMetadata()[$fieldName]['title'];
+      }
     }
     return $return;
   }
