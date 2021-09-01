@@ -12,12 +12,13 @@
     {{:: ts('Style') }}
   </label>
   <select id="crm-search-admin-col-style-{{$index}}" class="form-control" ng-model="col.style">
-    <option ng-repeat="opt in $ctrl.parent.styles" value="{{ opt.key }}">{{ opt.value }}</option>
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key }}">{{:: opt.value }}</option>
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key + '-outline' }}">{{:: opt.value + ' ' + ts('Outline') }}</option>
   </select>
 </div>
 <div class="form-inline">
   <label>
-    {{:: ts('Menu Text/Icon') }}
+    {{:: ts('Menu Icon/Text') }}
   </label>
   <div class="btn-group">
     <button type="button" class="btn btn-{{ col.style + ' ' + col.size }}">

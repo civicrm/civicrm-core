@@ -10,7 +10,7 @@
       crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmSearchAdmin/resultsTable/crmSearchAdminResultsTable.html',
-    controller: function($scope, searchMeta, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait) {
+    controller: function($scope, $element, searchMeta, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
@@ -49,6 +49,25 @@
             })
           }
         };
+        if (links.length) {
+          ctrl.display.settings.columns.push({
+            text: '',
+            icon: 'fa-bars',
+            type: 'menu',
+            size: 'btn-xs',
+            style: 'secondary-outline',
+            alignment: 'text-right',
+            links: _.transform(links, function(links, link) {
+              links.push({
+                path: link.path,
+                text: link.title,
+                icon: link.icon,
+                style: link.style,
+                target: link.action === 'view' ? '_blank' : 'crm-popup'
+              });
+            })
+          });
+        }
         ctrl.debug = {
           apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
         };
@@ -57,7 +76,7 @@
 
       this.$onInit = function() {
         buildSettings();
-        this.initializeDisplay($scope, $());
+        this.initializeDisplay($scope, $element);
         $scope.$watch('$ctrl.search.api_entity', buildSettings);
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
       };

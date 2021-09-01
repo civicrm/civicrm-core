@@ -31,18 +31,6 @@
         }
       };
 
-      var defaultIcons = {
-        view: 'fa-external-link',
-        update: 'fa-pencil',
-        delete: 'fa-trash'
-      };
-
-      var defaultStyles = {
-        view: 'primary',
-        update: 'warning',
-        delete: 'danger'
-      };
-
       $scope.pickIcon = function(index) {
         searchMeta.pickIcon().then(function(icon) {
           ctrl.group[index].icon = icon;
@@ -53,9 +41,9 @@
         var link = ctrl.getLink(path);
         ctrl.group.push({
           path: path,
-          style: link && defaultStyles[link.action] || 'default',
+          style: link && link.style || 'default',
           text: link ? link.title : ts('Link'),
-          icon: link && defaultIcons[link.action] || 'fa-external-link'
+          icon: link && link.icon || 'fa-external-link'
         });
       };
 

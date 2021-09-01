@@ -68,6 +68,7 @@ class Admin {
     return [
       'default' => E::ts('Default'),
       'primary' => E::ts('Primary'),
+      'secondary' => E::ts('Secondary'),
       'success' => E::ts('Success'),
       'info' => E::ts('Info'),
       'warning' => E::ts('Warning'),

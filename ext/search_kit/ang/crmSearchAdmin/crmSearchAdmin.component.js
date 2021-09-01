@@ -583,19 +583,26 @@
           switch (link.action) {
             case 'view':
               link.title = ts('View %1', {1: entityName});
+              link.icon = 'fa-external-link';
+              link.style = 'default';
               break;
 
             case 'update':
               link.title = ts('Edit %1', {1: entityName});
+              link.icon = 'fa-pencil';
+              link.style = 'default';
               break;
 
             case 'delete':
               link.title = ts('Delete %1', {1: entityName});
+              link.icon = 'fa-trash';
+              link.style = 'danger';
               break;
           }
         }
 
         // Links to main entity
+        // @return {Array}
         var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
           links = _.cloneDeep(mainEntity.paths || []);
         _.each(links, function(link) {
