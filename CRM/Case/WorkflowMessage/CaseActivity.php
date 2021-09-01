@@ -23,20 +23,29 @@ class CRM_Case_WorkflowMessage_CaseActivity extends Civi\WorkflowMessage\Generic
   const WORKFLOW = 'case_activity';
 
   /**
-   * The recipient.
+   * The recipient of the notification. The `{contact.*}` tokens will reference this person.
    *
    * Example: ['contact_id' => 123, 'display_name' => 'Bob Roberts', role => 'FIXME']
    *
    * @var array|null
    * @scope tokenContext, tplParams
+   * @fkEntity Contact
    * @required
    */
   public $contact;
 
   /**
+   * The primary contact associated with this case (eg `civicrm_case_contact.contact_id`).
+   *
+   * Existing callers are inconsistent about setting this parameter.
+   *
+   * By default, CiviCRM allows one client on any given case, and this should reflect
+   * that contact. However, some systems may enable multiple clients per case.
+   * This field may not make sense in the long-term.
+   *
    * @var int
    * @scope tplParams as client_id
-   * @required
+   * @fkEntity Contact
    */
   public $clientId;
 
