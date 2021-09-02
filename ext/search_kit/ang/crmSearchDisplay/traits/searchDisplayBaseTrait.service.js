@@ -90,6 +90,8 @@
           });
         }
 
+        $element.on('crmPopupFormSuccess', this.getResults);
+
         function onChangeFilters() {
           ctrl.page = 1;
           ctrl.rowCount = null;
