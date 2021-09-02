@@ -53,7 +53,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       }
     }
     if (isset($params['financial_type_id'], $params['line_total'])) {
-      $params['tax_amount'] = self::getTaxAmountForLineItem($params);
+      if (!self::needsToPermitExtensionHackery($params)) {
+        $params['tax_amount'] = self::getTaxAmountForLineItem($params);
+      }
     }
 
     $lineItemBAO = new CRM_Price_BAO_LineItem();
@@ -1099,6 +1101,28 @@ WHERE li.contribution_id = %1";
     $taxRates = CRM_Core_PseudoConstant::getTaxRates();
     $taxRate = $taxRates[$params['financial_type_id']] ?? 0;
     return ($taxRate / 100) * $params['line_total'];
+  }
+
+  /**
+   * Do we need to allow for the possibility an extension is try to force it's own tax through.
+   *
+   * This extra if is a temporary fix for https://lab.civicrm.org/dev/core/-/issues/2796
+   * discussion to continue on a longer fix.
+   *
+   * If an extension is setting tax rate for a financial type with no configured tax rate then
+   * let it until we figure out a more durable solution.
+   *
+   * @param array $params
+   */
+  protected static function needsToPermitExtensionHackery($params): bool {
+    $taxRates = CRM_Core_PseudoConstant::getTaxRates();
+    if (isset($taxRates[$params['financial_type_id']])) {
+      return FALSE;
+    }
+    if (!isset($params['tax_amount'])) {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
