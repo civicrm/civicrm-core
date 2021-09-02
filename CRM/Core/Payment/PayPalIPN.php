@@ -70,13 +70,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function recur($input, $recur, $contribution, $first) {
-    if ($this->getTrxnType() === 'subscr_payment' &&
-      $input['paymentStatus'] !== 'Completed'
-    ) {
-      Civi::log()->debug('PayPalIPN: Ignore all IPN payments that are not completed');
-      echo 'Failure: Invalid parameters<p>';
-      return;
-    }
 
     // make sure the invoice ids match
     // make sure the invoice is valid and matches what we have in the contribution record
@@ -102,23 +95,27 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         }
         $recur->processor_id = $this->retrieve('subscr_id', 'String');
         $recur->trxn_id = $recur->processor_id;
-        break;
+        $recur->save();
+        return;
 
       case 'subscr_eot':
         if ($recur->contribution_status_id != $contributionStatuses['Cancelled']) {
           $recur->contribution_status_id = $contributionStatuses['Completed'];
         }
         $recur->end_date = $now;
-        break;
+        $recur->save();
+        return;
 
       case 'subscr_cancel':
         $recur->contribution_status_id = $contributionStatuses['Cancelled'];
         $recur->cancel_date = $now;
-        break;
+        $recur->save();
+        return;
 
       case 'subscr_failed':
         $recur->contribution_status_id = $contributionStatuses['Failed'];
         $recur->modified_date = $now;
+        $recur->save();
         break;
 
       case 'subscr_modify':
@@ -126,27 +123,29 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
         echo "Failure: We do not handle modifications to subscriptions right now<p>";
         return;
 
-      case 'subscr_payment':
-        if ($first) {
-          $recur->start_date = $now;
-        }
-        else {
-          $recur->modified_date = $now;
-        }
-
-        // make sure the contribution status is not done
-        // since order of ipn's is unknown
-        if ($recur->contribution_status_id != $contributionStatuses['Completed']) {
-          $recur->contribution_status_id = $contributionStatuses['In Progress'];
-        }
-        break;
     }
-
-    $recur->save();
 
     if ($this->getTrxnType() !== 'subscr_payment') {
       return;
     }
+    if ($input['paymentStatus'] !== 'Completed') {
+      Civi::log()->debug('PayPalIPN: Ignore all IPN payments that are not completed');
+      echo 'Failure: Invalid parameters<p>';
+      return;
+    }
+    if ($first) {
+      $recur->start_date = $now;
+    }
+    else {
+      $recur->modified_date = $now;
+    }
+
+    // make sure the contribution status is not done
+    // since order of ipn's is unknown
+    if ($recur->contribution_status_id != $contributionStatuses['Completed']) {
+      $recur->contribution_status_id = $contributionStatuses['In Progress'];
+    }
+    $recur->save();
 
     if (!$first) {
       // check if this contribution transaction is already processed
@@ -155,7 +154,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->trxn_id = $input['trxn_id'];
       if ($contribution->trxn_id && $contribution->find()) {
         Civi::log()->debug('PayPalIPN: Returning since contribution has already been handled (trxn_id: ' . $contribution->trxn_id . ')');
-        echo "Success: Contribution has already been handled<p>";
+        echo 'Success: Contribution has already been handled<p>';
         return;
       }
 
