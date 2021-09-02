@@ -4,7 +4,7 @@
     bindings: {
       ctrl: '@'
     },
-    controller: function($scope, $timeout, crmApi4, crmStatus, $window, $location, FileUploader) {
+    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, FileUploader) {
       var schema = {},
         data = {},
         status,
@@ -79,10 +79,13 @@
           $window.location.href = url;
         }
         status.resolve();
+        $element.unblock();
       }
 
       this.submit = function() {
         status = CRM.status({});
+        $element.block();
+
         crmApi4('Afform', 'submit', {
           name: ctrl.getFormMeta().name,
           args: $scope.$parent.routeParams || {},
