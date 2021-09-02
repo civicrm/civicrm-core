@@ -95,7 +95,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
     $title = ts("Change selections for %1", [1 => $this->_contributorDisplayName]);
     if ($title) {
-      CRM_Utils_System::setTitle($title);
+      $this->setTitle($title);
     }
   }
 

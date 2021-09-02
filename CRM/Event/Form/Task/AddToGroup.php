@@ -120,10 +120,10 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
     // Set dynamic page title for 'Add Members Group (confirm)'
     if ($this->_id) {
-      CRM_Utils_System::setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
+      $this->setTitle(ts('Add Contacts: %1', [1 => $this->_title]));
     }
     else {
-      CRM_Utils_System::setTitle(ts('Add Contacts to A Group'));
+      $this->setTitle(ts('Add Contacts to A Group'));
     }
 
     $this->addDefaultButtons(ts('Add to Group'));

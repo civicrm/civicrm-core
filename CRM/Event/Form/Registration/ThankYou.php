@@ -46,7 +46,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     CRM_Event_Form_Registration_Confirm::assignProfiles($this);
 
-    CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
+    $this->setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
   }
 
   /**

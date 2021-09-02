@@ -30,7 +30,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @var CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    CRM_Utils_System::setTitle('Print/Merge Document');
+    $form->setTitle('Print/Merge Document');
   }
 
   /**

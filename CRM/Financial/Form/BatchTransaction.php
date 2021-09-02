@@ -53,7 +53,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
       $this->assign('validStatus', $validStatus);
       $this->_values = civicrm_api3('Batch', 'getSingle', ['id' => self::$_entityID]);
       $batchTitle = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'title');
-      CRM_Utils_System::setTitle(ts('Accounting Batch - %1', [1 => $batchTitle]));
+      $this->setTitle(ts('Accounting Batch - %1', [1 => $batchTitle]));
 
       $columnHeaders = [
         'created_by' => ts('Created By'),
