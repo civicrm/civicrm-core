@@ -25,9 +25,35 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     return [
-      'civi.token.eval' => 'onEvaluate',
+      'civi.token.eval' => [
+        ['setupSmartyAliases', 1000],
+        ['onEvaluate'],
+      ],
       'civi.token.render' => 'onRender',
     ];
+  }
+
+  /**
+   * Interpret the variable `$context['smartyTokenAlias']` (e.g. `mySmartyField' => `tkn_entity.tkn_field`).
+   *
+   * We need to ensure that any tokens like `{tkn_entity.tkn_field}` are hydrated, so
+   * we pretend that they are in use.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   */
+  public function setupSmartyAliases(TokenValueEvent $e) {
+    $aliasedTokens = [];
+    foreach ($e->getRows() as $row) {
+      $aliasedTokens = array_unique(array_merge($aliasedTokens,
+        array_values($row->context['smartyTokenAlias'] ?? [])));
+    }
+
+    $fakeMessage = implode('', array_map(function ($f) {
+      return '{' . $f . '}';
+    }, $aliasedTokens));
+
+    $proc = $e->getTokenProcessor();
+    $proc->addMessage('TokenCompatSubscriber.aliases', $fakeMessage, 'text/plain');
   }
 
   /**
@@ -130,7 +156,19 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     }
 
     if ($useSmarty) {
-      $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
+      $smartyVars = [];
+      foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
+        // Note: $e->row->tokens resolves event-based tokens (eg CRM_*_Tokens). But if the target token relies on the
+        // above bits (replaceGreetingTokens=>replaceContactTokens=>replaceHookTokens) then this lookup isn't sufficient.
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName));
+      }
+      \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
+      try {
+        $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
+      }
+      finally {
+        \CRM_Core_Smarty::singleton()->popScope();
+      }
     }
   }
 

@@ -415,4 +415,72 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(2, $loops);
   }
 
+  /**
+   * This defines a compatibility mechanism wherein an old Smarty expression can
+   * be evaluated based on a newer token expression.
+   *
+   * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
+   */
+  public function testSmartyTokenAlias_Contribution() {
+    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => 100, 'trxn_id' => 1000]);
+    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => 200, 'trxn_id' => 1]);
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId'],
+      'smarty' => TRUE,
+      'smartyTokenAlias' => [
+        'theInvoiceId' => 'contribution.invoice_id',
+      ],
+    ]);
+    $p->addMessage('example', 'Invoice #{$theInvoiceId}!', 'text/plain');
+    $p->addRow(['contributionId' => $first]);
+    $p->addRow(['contributionId' => $second]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #100!', $outputs[0]);
+    $this->assertEquals('Invoice #200!', $outputs[1]);
+  }
+
+  ///**
+  // * This defines a compatibility mechanism wherein an old Smarty expression can
+  // * be evaluated based on a newer token expression.
+  // *
+  // * The following example doesn't work because the handling of greeting+contact
+  // * tokens still use a special override (TokenCompatSubscriber::onRender).
+  // *
+  // * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
+  // */
+  //  public function testSmartyTokenAlias_Contact() {
+  //    $alice = $this->individualCreate(['first_name' => 'Alice']);
+  //    $bob = $this->individualCreate(['first_name' => 'Bob']);
+  //    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+  //
+  //    $p = new TokenProcessor($this->dispatcher, [
+  //      'controller' => __CLASS__,
+  //      'schema' => ['contactId'],
+  //      'smarty' => TRUE,
+  //      'smartyTokenAlias' => [
+  //        'myFirstName' => 'contact.first_name',
+  //      ],
+  //    ]);
+  //    $p->addMessage('example', 'Hello {$myFirstName}!', 'text/plain');
+  //    $p->addRow(['contactId' => $alice]);
+  //    $p->addRow(['contactId' => $bob]);
+  //    $p->evaluate();
+  //
+  //    $outputs = [];
+  //    foreach ($p->getRows() as $row) {
+  //      $outputs[] = $row->render('example');
+  //    }
+  //    $this->assertEquals('Hello Alice!', $outputs[0]);
+  //    $this->assertEquals('Hello Bob!', $outputs[1]);
+  //  }
+
 }
