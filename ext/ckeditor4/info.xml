@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="ckeditor4" type="module">
   <file>ckeditor4</file>
-  <name>CKEditor</name>
-  <description>CiviCRM CKEditor Plugin.</description>
+  <name>CKEditor4</name>
+  <description>CiviCRM CKEditor4 Plugin.</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Seamus Lee</author>
@@ -20,7 +20,7 @@
   <compatibility>
     <ver>5.39</ver>
   </compatibility>
-  <comments>This takes the original CKEditor and shifts it into its own core extension</comments>
+  <comments>This is the version of CKEditor that originally shipped with CiviCRM core</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
