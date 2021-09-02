@@ -62,4 +62,3 @@ sql/dummy_processor.mysql
 distmaker/distmaker.conf
 distmaker/out
 /tmp
-/.idea/*

@@ -13,11 +13,16 @@
  * Upgrade logic for FiveFortyTwo */
 class CRM_Upgrade_Incremental_php_FiveFortyTwo extends CRM_Upgrade_Incremental_Base {
 
-  /*
+  /**
+   * Upgrade function.
    *
-   * Work should be done Here about the new column (currency in membershipType table)
-   *
+   * @param string $rev
    */
+  public function upgrade_5_42_alpha1($rev) {
+    $this->addTask('Add currency to Membership Type minimum fee',
+      'addColumn', 'civicrm_membership_type', 'currency',
+      "varchar(3) DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.'");
+  }
 
   /**
    * Compute any messages which should be displayed beforeupgrade.
