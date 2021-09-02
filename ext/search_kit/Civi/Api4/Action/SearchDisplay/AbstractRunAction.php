@@ -123,10 +123,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $formatted = [];
     foreach ($result as $data) {
       $row = [];
-      foreach ($data as $key => $raw) {
+      foreach ($select as $key => $item) {
+        $raw = $data[$key] ?? NULL;
         $row[$key] = [
           'raw' => $raw,
-          'view' => $this->formatViewValue($select[$key]['dataType'], $raw),
+          'view' => $this->formatViewValue($item['dataType'], $raw),
         ];
       }
       $formatted[] = $row;
@@ -318,6 +319,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   protected function augmentSelectClause(&$apiParams): void {
+    $additions = [];
+    // Add primary key field if actions are enabled
+    if (!empty($this->display['settings']['actions'])) {
+      $additions = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
+    }
     $possibleTokens = '';
     foreach ($this->display['settings']['columns'] as $column) {
       // Collect display values in which a token is allowed
@@ -335,7 +341,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Add fields referenced via token
     $tokens = [];
     preg_match_all('/\\[([^]]+)\\]/', $possibleTokens, $tokens);
-    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $tokens[1]));
+    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions, $tokens[1]));
   }
 
   /**
