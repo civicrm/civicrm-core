@@ -24,7 +24,7 @@ class Download extends AbstractRunAction {
    *
    * @var string
    * @required
-   * @options array,csv,xlsx,ods
+   * @options array,csv,xlsx,ods,pdf
    */
   protected $format = 'array';
 
@@ -36,6 +36,10 @@ class Download extends AbstractRunAction {
     'ods' => [
       'writer' => 'Ods',
       'mime' => 'application/vnd.oasis.opendocument.spreadsheet',
+    ],
+    'pdf' => [
+      'writer' => 'Dompdf',
+      'mime' => 'application/pdf',
     ],
   ];
 
