@@ -214,6 +214,13 @@
     <default>NULL</default>
     <comment>Used to store option group id.</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <nameColumn>name</nameColumn>
+      <condition>name LIKE "civicrm_survey_%"</condition>
+    </pseudoconstant>
   </field>
   <field>
     <name>bypass_confirm</name>
