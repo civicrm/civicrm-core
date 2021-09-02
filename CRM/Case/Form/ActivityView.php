@@ -83,7 +83,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     }
 
     if ($revs) {
-      CRM_Utils_System::setTitle(ts('Activity Revision History'));
+      $this->setTitle(ts('Activity Revision History'));
       $this->assign('revs', $revs);
       $this->assign('result', $viewPriorActivities);
       $this->assign('subject', $activitySubject);

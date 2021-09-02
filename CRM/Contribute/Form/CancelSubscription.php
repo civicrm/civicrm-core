@@ -97,7 +97,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
 
-    CRM_Utils_System::setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
+    $this->setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
 
     if ($this->isSelfService()) {

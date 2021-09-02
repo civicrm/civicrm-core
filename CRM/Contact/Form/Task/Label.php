@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function buildLabelForm($form) {
-    CRM_Utils_System::setTitle(ts('Make Mailing Labels'));
+    $form->setTitle(ts('Make Mailing Labels'));
 
     //add select for label
     $label = CRM_Core_BAO_LabelFormat::getList(TRUE);

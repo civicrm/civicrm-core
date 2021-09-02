@@ -436,7 +436,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         }
 
         // Set dynamic page title for 'Show Members of Group'
-        CRM_Utils_System::setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
+        $this->setTitle(ts('Contacts in Group: %1', [1 => $this->_group[$this->_groupID]]));
       }
 
       $group_contact_status = [];
@@ -464,7 +464,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       }
 
       // Set dynamic page title for 'Add Members Group'
-      CRM_Utils_System::setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
+      $this->setTitle(ts('Add to Group: %1', [1 => $this->_group[$this->_amtgID]]));
       // also set the group title and freeze the action task with Add Members to Group
       $groupValues = ['id' => $this->_amtgID, 'title' => $this->_group[$this->_amtgID]];
       $this->assign_by_ref('group', $groupValues);

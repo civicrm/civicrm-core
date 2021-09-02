@@ -37,11 +37,11 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
 
     switch (CRM_Utils_Request::retrieve('fileOnCaseAction', 'String')) {
       case 'move':
-        CRM_Utils_System::setTitle(ts('Move to Case'));
+        $this->setTitle(ts('Move to Case'));
         break;
 
       case 'copy':
-        CRM_Utils_System::setTitle(ts('Copy to Case'));
+        $this->setTitle(ts('Copy to Case'));
         break;
 
     }

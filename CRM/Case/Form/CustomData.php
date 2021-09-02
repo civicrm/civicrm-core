@@ -60,7 +60,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
-      CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupValues['title']]));
+      $this->setTitle(ts('Edit %1', [1 => $groupValues['title']]));
     }
 
     $this->_defaults = [];

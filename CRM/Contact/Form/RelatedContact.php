@@ -74,7 +74,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
       }
 
       list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
-      CRM_Utils_System::setTitle($displayName, $contactImage . ' ' . $displayName);
+      $this->setTitle($displayName, $contactImage . ' ' . $displayName);
     }
     else {
       CRM_Core_Error::statusBounce(ts('Could not get a contact_id and/or contact_type'));

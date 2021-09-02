@@ -164,7 +164,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     $details = CRM_Case_PseudoConstant::caseActivityType(FALSE);
 
-    CRM_Utils_System::setTitle($details[$this->_activityTypeId]['label']);
+    $this->setTitle($details[$this->_activityTypeId]['label']);
     $this->assign('activityType', $details[$this->_activityTypeId]['label']);
     $this->assign('activityTypeDescription', $details[$this->_activityTypeId]['description']);
 

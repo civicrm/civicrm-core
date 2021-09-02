@@ -68,7 +68,10 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
     if (count($form->_contactIds) === 1) {
-      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')]));
+      $form->setTitle(
+        ts('Print/Merge Document for %1',
+        [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')])
+      );
     }
   }
 

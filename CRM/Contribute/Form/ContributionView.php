@@ -172,10 +172,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     if (empty($values['is_template'])) {
-      CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
+      $this->setTitle(ts('View Contribution from') . ' ' . $displayName);
     }
     else {
-      CRM_Utils_System::setTitle(ts('View Template Contribution from') . ' ' . $displayName);
+      $this->setTitle(ts('View Template Contribution from') . ' ' . $displayName);
     }
 
     // add viewed contribution to recent items list

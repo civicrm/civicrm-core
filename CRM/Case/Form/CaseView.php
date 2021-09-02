@@ -46,7 +46,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
       }
       $this->assign('relatedCases', $relatedCases);
       $this->assign('showRelatedCases', TRUE);
-      CRM_Utils_System::setTitle(ts('Related Cases'));
+      $this->setTitle(ts('Related Cases'));
       return;
     }
 
@@ -103,7 +103,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactID);
     $this->assign('displayName', $displayName);
 
-    CRM_Utils_System::setTitle($displayName . ' - ' . $caseType);
+    $this->setTitle($displayName . ' - ' . $caseType);
 
     $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviCase', CRM_Core_Action::DELETE)) {
