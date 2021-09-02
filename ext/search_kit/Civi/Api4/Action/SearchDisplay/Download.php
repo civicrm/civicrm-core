@@ -3,6 +3,8 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use League\Csv\Writer;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 /**
  * Download the results of a SearchDisplay as a spreadsheet.
@@ -22,9 +24,20 @@ class Download extends AbstractRunAction {
    *
    * @var string
    * @required
-   * @options array,csv
+   * @options array,csv,xlsx,ods
    */
   protected $format = 'array';
+
+  private $formats = [
+    'xlsx' => [
+      'writer' => 'Xlsx',
+      'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ],
+    'ods' => [
+      'writer' => 'Ods',
+      'mime' => 'application/vnd.oasis.opendocument.spreadsheet',
+    ],
+  ];
 
   /**
    * @param \Civi\Api4\Generic\Result $result
@@ -61,7 +74,7 @@ class Download extends AbstractRunAction {
       }
     }
 
-    // This weird little API spits out a file and exits instead of returning a result
+    // Unicode-safe filename for download
     $fileName = \CRM_Utils_File::makeFilenameWithUnicode($this->display['label']) . '.' . $this->format;
 
     switch ($this->format) {
@@ -79,13 +92,17 @@ class Download extends AbstractRunAction {
       case 'csv':
         $this->outputCSV($rows, $columns, $fileName);
         break;
+
+      default:
+        $this->sendHeaders($fileName);
+        $this->outputSpreadsheet($rows, $columns);
     }
 
     \CRM_Utils_System::civiExit();
   }
 
   /**
-   * Outputs csv format directly to browser for download
+   * Outputs headers and CSV directly to browser for download
    * @param array $rows
    * @param array $columns
    * @param string $fileName
@@ -109,6 +126,33 @@ class Download extends AbstractRunAction {
   }
 
   /**
+   * Create PhpSpreadsheet document and output directly to browser for download
+   * @param array $rows
+   * @param array $columns
+   */
+  private function outputSpreadsheet(array $rows, array $columns) {
+    $document = new Spreadsheet();
+    $document->getProperties()
+      ->setTitle($this->display['label']);
+    $sheet = $document->getActiveSheet();
+
+    // Header row
+    foreach ($columns as $index => $col) {
+      $sheet->setCellValueByColumnAndRow($index + 1, 1, $col['label']);
+    }
+
+    foreach ($rows as $rowNum => $data) {
+      foreach ($columns as $index => $col) {
+        $sheet->setCellValueByColumnAndRow($index + 1, $rowNum + 2, $this->formatColumnValue($col, $data));
+      }
+    }
+
+    $writer = IOFactory::createWriter($document, $this->formats[$this->format]['writer']);
+
+    $writer->save('php://output');
+  }
+
+  /**
    * Returns final formatted column value
    *
    * @param array $col
@@ -123,6 +167,38 @@ class Download extends AbstractRunAction {
       }
     }
     return is_array($val) ? implode(', ', $val) : $val;
+  }
+
+  /**
+   * Sets headers based on content type and file name
+   *
+   * @param string $fileName
+   */
+  protected function sendHeaders(string $fileName) {
+    header('Content-Type: ' . $this->formats[$this->format]['mime']);
+    header('Content-Transfer-Encoding: binary');
+    header('Content-Description: File Transfer');
+    header('Content-Disposition: ' . $this->getContentDisposition($fileName));
+  }
+
+  /**
+   * Copied from \League\Csv\AbstractCsv::sendHeaders()
+   * @param string $fileName
+   * @return string
+   */
+  protected function getContentDisposition(string $fileName) {
+    $flag = FILTER_FLAG_STRIP_LOW;
+    if (strlen($fileName) !== mb_strlen($fileName)) {
+      $flag |= FILTER_FLAG_STRIP_HIGH;
+    }
+
+    $filenameFallback = str_replace('%', '', filter_var($fileName, FILTER_SANITIZE_STRING, $flag));
+
+    $disposition = sprintf('attachment; filename="%s"', str_replace('"', '\\"', $filenameFallback));
+    if ($fileName !== $filenameFallback) {
+      $disposition .= sprintf("; filename*=utf-8''%s", rawurlencode($fileName));
+    }
+    return $disposition;
   }
 
 }

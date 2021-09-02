@@ -86,7 +86,8 @@
     "pear/db": "1.11",
     "civicrm/composer-compile-lib": "~0.3 || ~1.0",
     "ext-json": "*",
-    "ezyang/htmlpurifier": "^4.13"
+    "ezyang/htmlpurifier": "^4.13",
+    "phpoffice/phpspreadsheet": "^1.18"
   },
   "scripts": {
     "post-install-cmd": [
