@@ -56,7 +56,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       // Skip if afform does not exist or is not of requested type(s)
       if (
         (!$record && !isset($values[$name])) ||
-        ($getTypes && !in_array($record['type'], $getTypes, TRUE))
+        ($getTypes && isset($record['type']) && !in_array($record['type'], $getTypes, TRUE))
       ) {
         continue;
       }
