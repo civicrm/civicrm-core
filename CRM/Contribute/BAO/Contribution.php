@@ -2459,7 +2459,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
         // array_filter with strlen filters out NULL, '' and FALSE but not 0.
       ], 'strlen')
     );
-    $input['line_item'] = $contributionParams['line_item'] = $templateContribution['line_item'];
+    $contributionParams['line_item'] = $templateContribution['line_item'];
     $contributionParams['status_id'] = 'Pending';
 
     foreach (['contact_id', 'campaign_id', 'financial_type_id', 'currency', 'source', 'amount_level', 'address_id', 'on_behalf', 'source_contact_id', 'tax_amount', 'contribution_page_id', 'total_amount'] as $fieldName) {
