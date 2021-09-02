@@ -69,7 +69,25 @@ class CRM_Extension_Upgrades {
 
     CRM_Utils_Hook::upgrade('enqueue', $queue);
 
+    // dev/core#1618 When Extension Upgrades are run reconcile log tables
+    $task = new CRM_Queue_Task(
+      [__CLASS__, 'upgradeLogTables'],
+      [],
+      ts('Update log tables')
+    );
+    // Set weight low so that it will be run last.
+    $queue->createItem($task, -2);
+
     return $queue;
+  }
+
+  /**
+   * Update log tables following execution of extension upgrades
+   */
+  public static function upgradeLogTables() {
+    $logging = new CRM_Logging_Schema();
+    $logging->fixSchemaDifferences();
+    return TRUE;
   }
 
   /**
