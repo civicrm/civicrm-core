@@ -243,6 +243,9 @@ SELECT module,is_reserved
   /**
    * Process the user submitted custom data values.
    *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess() {
     parent::postProcess();
@@ -287,20 +290,11 @@ SELECT module,is_reserved
       $url = CRM_Utils_System::url('civicrm/profile/view', $urlParams);
     }
     else {
-      // Replace tokens from post URL
-      $contactParams = [
-        'contact_id' => $this->_id,
-        'version' => 3,
-      ];
-
-      $contact = civicrm_api('contact', 'get', $contactParams);
-      $contact = reset($contact['values']);
-
-      $dummyMail = new CRM_Mailing_BAO_Mailing();
-      $dummyMail->body_text = $this->_postURL;
-      $tokens = $dummyMail->getTokens();
-
-      $url = CRM_Utils_Token::replaceContactTokens($this->_postURL, $contact, FALSE, CRM_Utils_Array::value('text', $tokens));
+      $url = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => ['msg_text' => $this->_postURL],
+        'contactId' => $this->_id,
+        'disableSmarty' => TRUE,
+      ])['text'];
     }
 
     $session->replaceUserContext($url);
