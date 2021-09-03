@@ -1083,7 +1083,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       );
     }
 
-    // call token hook
     $tokens = [];
     CRM_Utils_Hook::tokens($tokens);
     $categories = array_keys($tokens);
@@ -1128,25 +1127,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $values = array_merge($values, $details["{$contactId}"]);
       }
 
-      $tokenSubject = CRM_Utils_Token::replaceContactTokens($subject, $values, FALSE, $subjectToken, FALSE, $escapeSmarty);
-      $tokenSubject = CRM_Utils_Token::replaceHookTokens($tokenSubject, $values, $categories, FALSE, $escapeSmarty);
-
-      // CRM-4539
-      if ($values['preferred_mail_format'] == 'Text' || $values['preferred_mail_format'] == 'Both') {
-        $tokenText = CRM_Utils_Token::replaceContactTokens($text, $values, FALSE, $messageToken, FALSE, $escapeSmarty);
-        $tokenText = CRM_Utils_Token::replaceHookTokens($tokenText, $values, $categories, FALSE, $escapeSmarty);
-      }
-      else {
-        $tokenText = NULL;
-      }
-
-      if ($values['preferred_mail_format'] == 'HTML' || $values['preferred_mail_format'] == 'Both') {
-        $tokenHtml = CRM_Utils_Token::replaceContactTokens($html, $values, TRUE, $messageToken, FALSE, $escapeSmarty);
-        $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $values, $categories, TRUE, $escapeSmarty);
-      }
-      else {
-        $tokenHtml = NULL;
-      }
+      $tokenSubject = $subject;
+      $tokenText = in_array($values['preferred_mail_format'], ['Both', 'Text'], TRUE) ? $text : '';
+      $tokenHtml = in_array($values['preferred_mail_format'], ['Both', 'HTML'], TRUE) ? $html : '';
 
       if ($caseId) {
         $tokenSubject = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenSubject, $subjectToken, $escapeSmarty);
@@ -1154,14 +1137,16 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken, $escapeSmarty);
       }
 
-      if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
-        // also add the contact tokens to the template
-        $smarty->assign_by_ref('contact', $values);
-
-        $tokenSubject = $smarty->fetch("string:$tokenSubject");
-        $tokenText = $smarty->fetch("string:$tokenText");
-        $tokenHtml = $smarty->fetch("string:$tokenHtml");
-      }
+      $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => [
+          'msg_text' => $tokenText,
+          'msg_html' => $tokenHtml,
+          'msg_subject' => $tokenSubject,
+        ],
+        'contactId' => $contactId,
+        'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
+        'tplParams' => ['contact' => $values],
+      ]);
 
       $sent = FALSE;
       // To minimize storage requirements, only one copy of any file attachments uploaded to CiviCRM is kept,
@@ -1171,7 +1156,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       }
 
       // Create email activity.
-      $activityID = self::createEmailActivity($userID, $tokenSubject, $tokenHtml, $tokenText, $additionalDetails, $campaignId, $attachments, $caseId);
+      $activityID = self::createEmailActivity($userID, $renderedTemplate['subject'], $renderedTemplate['html'], $renderedTemplate['text'], $additionalDetails, $campaignId, $attachments, $caseId);
       $activityIds[] = $activityID;
 
       if ($firstActivityCreated == FALSE && !empty($attachments)) {
