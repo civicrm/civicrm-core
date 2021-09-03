@@ -538,6 +538,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
       // Skip message template because workflow_id/workflow_name are sync'd.
       'MessageTemplate',
+      // Skip survey because the pseudoconstant will have no options.
+      'Survey',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithout;
