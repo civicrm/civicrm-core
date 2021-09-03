@@ -634,32 +634,6 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * Send start or end notification for recurring payments.
-   *
-   * @param array $ids
-   * @param CRM_Contribute_BAO_ContributionRecur $recur
-   * @param bool $isFirstOrLastRecurringPayment
-   */
-  public static function sendRecurringStartOrEndNotification($ids, $recur, $isFirstOrLastRecurringPayment) {
-    CRM_Core_Error::deprecatedFunctionWarning('use CRM_Contribute_BAO_ContributionPage::recurringNotify');
-    if ($isFirstOrLastRecurringPayment) {
-      $autoRenewMembership = FALSE;
-      if ($recur->id &&
-        isset($ids['membership']) && $ids['membership']
-      ) {
-        $autoRenewMembership = TRUE;
-      }
-
-      //send recurring Notification email for user
-      CRM_Contribute_BAO_ContributionPage::recurringNotify(
-        $ids['contribution'],
-        $isFirstOrLastRecurringPayment,
-        $recur
-      );
-    }
-  }
-
-  /**
    * Copy custom data of the initial contribution into its recurring contributions.
    *
    * @deprecated
