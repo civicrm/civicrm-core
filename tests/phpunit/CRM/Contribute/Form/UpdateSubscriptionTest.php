@@ -17,7 +17,7 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   /**
    * Test the mail sent on update.
    *
-   * @throws \CRM_Core_Exception
+   * @throws \CRM_Core_Exception|\API_Exception
    */
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
@@ -44,14 +44,14 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
   public function getExpectedMailStrings(): array {
     return [
       'MIME-Version: 1.0',
-      'From: FIXME <info@EXAMPLE.ORG>',
+      'From: "Bob" <bob@example.org>',
       'To: Anthony Anderson <anthony_anderson@civicrm.org>',
       'Subject: Recurring Contribution Update Notification - Mr. Anthony Anderson II',
-      'Return-Path: info@EXAMPLE.ORG',
+      'Return-Path: bob@example.org',
       'Dear Anthony,',
       'Your recurring contribution has been updated as requested:',
       'Recurring contribution is for $ 10.00, every 1 month(s) for 12 installments.',
-      'If you have questions please contact us at FIXME <info@EXAMPLE.ORG>.',
+      'If you have questions please contact us at "Bob" <bob@example.org>.',
     ];
   }
 
@@ -77,7 +77,12 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
       'contribution_recur_id' => $this->getContributionRecurID(),
       'financial_type_id' => 'Donation',
       'total_amount' => 10,
-      'api.Payment.create' => ['total_amount' => 10, 'payment_processor_id' => $this->paymentProcessorId],
+      'contribution_page_id' => $this->getContributionPageID(),
+      'api.Payment.create' => [
+        'total_amount' => 10,
+        'payment_processor_id' => $this->paymentProcessorId,
+        'is_send_contribution_notification' => FALSE,
+      ],
     ]);
   }
 
@@ -97,6 +102,22 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
       ])['id'];
     }
     return $this->ids['ContributionRecur'][0];
+  }
+
+  /**
+   * Get a contribution page id.
+   *
+   * @return int
+   */
+  public function getContributionPageID(): int {
+    if (!isset($this->ids['ContributionPage'][0])) {
+      $this->ids['ContributionPage'][0] = $this->callAPISuccess('ContributionPage', 'create', [
+        'receipt_from_name' => 'Bob',
+        'receipt_from_email' => 'bob@example.org',
+        'financial_type_id' => 'Donation',
+      ])['id'];
+    }
+    return $this->ids['ContributionPage'][0];
   }
 
 }
