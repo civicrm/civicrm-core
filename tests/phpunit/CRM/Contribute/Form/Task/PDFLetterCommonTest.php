@@ -46,7 +46,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function tearDown(): void {
     CRM_Utils_Token::$_tokens['contribution'] = NULL;
@@ -215,7 +214,13 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $date = CRM_Utils_Date::getToday();
       $displayDate = CRM_Utils_Date::customFormat($date, $format);
 
-      $html = $form->postProcess();
+      try {
+        $form->postProcess();
+        $this->fail('Exception expected');
+      }
+      catch (CRM_Core_Exception_PrematureExitException $e) {
+        $html = $e->errorData['html'];
+      }
       $expectedValues = [
         'Hello Anthony',
         '$ 100.00',
@@ -225,7 +230,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ];
 
       foreach ($expectedValues as $val) {
-        $this->assertTrue(strpos($html[$contributionId], $val) !== 0);
+        $this->assertNotSame(strpos($html[$contributionId], $val), 0);
       }
     }
   }
@@ -391,7 +396,6 @@ campaign : Big one
     $this->_individualId2 = $this->individualCreate();
     $htmlMessage = "{aggregate.rendered_token}";
     $formValues = [
-      'is_unit_test' => TRUE,
       'group_by' => 'contact_id',
       'html_message' => $htmlMessage,
       'email_options' => 'both',
@@ -427,7 +431,13 @@ campaign : Big one
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds($contributionIDs);
 
-    $html = $form->postProcess();
+    try {
+      $form->postProcess();
+      $this->fail('exception expected.');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $html = $e->errorData['html'];
+    }
     $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
   <tbody>
   <tr>
@@ -505,7 +515,7 @@ campaign : Big one
   /**
    * Implements civicrm_tokens().
    */
-  public function hook_tokens(&$tokens) {
+  public function hook_tokens(&$tokens): void {
     $this->hookTokensCalled++;
     $tokens['aggregate'] = ['rendered_token' => 'rendered_token'];
   }
@@ -561,7 +571,7 @@ value=$contact_aggregate+$contribution.total_amount}
    * @param array $tokens
    * @param null $context
    */
-  public function hook_aggregateTokenValues(&$values, $contactIDs, $job = NULL, $tokens = [], $context = NULL) {
+  public function hook_aggregateTokenValues(array &$values, $contactIDs, $job = NULL, $tokens = [], $context = NULL) {
     foreach ($contactIDs as $contactID) {
       CRM_Core_Smarty::singleton()->assign('messageContactID', $contactID);
       $values[$contactID]['aggregate.rendered_token'] = CRM_Core_Smarty::singleton()
@@ -577,7 +587,7 @@ value=$contact_aggregate+$contribution.total_amount}
    *
    * @dataProvider isHtmlTokenInTableCellProvider
    */
-  public function testIsHtmlTokenInTableCell($token, $entity, $textToSearch, $expected) {
+  public function testIsHtmlTokenInTableCell($token, $entity, $textToSearch, $expected): void {
     $this->assertEquals($expected,
       CRM_Contribute_Form_Task_PDFLetter::isHtmlTokenInTableCell($token, $entity, $textToSearch)
     );
@@ -657,11 +667,11 @@ value=$contact_aggregate+$contribution.total_amount}
   }
 
   /**
+   * @param array $contributionParams
+   *
    * @return mixed
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
-  protected function createContribution($contributionParams = []) {
+  protected function createContribution(array $contributionParams = []) {
     $contributionParams = array_merge([
       'contact_id' => $this->individualCreate(),
       'total_amount' => 100,
