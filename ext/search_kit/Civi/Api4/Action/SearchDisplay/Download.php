@@ -7,19 +7,24 @@ use League\Csv\Writer;
 /**
  * Download the results of a SearchDisplay as a spreadsheet.
  *
- * Note: unlike other APIs this action directly outputs a file.
+ * Note: unlike other APIs this action will directly output a file
+ * if 'format' is set to anything other than 'array'.
  *
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Download extends AbstractRunAction {
 
   /**
-   * Requested file format
+   * Requested file format.
+   *
+   * 'array' will return a normal api result, with table headers as the first row.
+   * 'csv', etc. will directly output a file to the browser.
+   *
    * @var string
    * @required
-   * @options csv
+   * @options array,csv
    */
-  protected $format;
+  protected $format = 'array';
 
   /**
    * @param \Civi\Api4\Generic\Result $result
@@ -60,6 +65,17 @@ class Download extends AbstractRunAction {
     $fileName = \CRM_Utils_File::makeFilenameWithUnicode($this->display['label']) . '.' . $this->format;
 
     switch ($this->format) {
+      case 'array':
+        $result[] = $columns;
+        foreach ($rows as $data) {
+          $row = [];
+          foreach ($columns as $col) {
+            $row[] = $this->formatColumnValue($col, $data);
+          }
+          $result[] = $row;
+        }
+        return;
+
       case 'csv':
         $this->outputCSV($rows, $columns, $fileName);
         break;

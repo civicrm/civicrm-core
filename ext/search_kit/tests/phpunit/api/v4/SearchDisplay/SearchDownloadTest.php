@@ -19,6 +19,65 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
   }
 
   /**
+   * Test downloading array format.
+   */
+  public function testDownloadArray() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'Four', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'array',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['last_name'],
+          'where' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 2,
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'last_name',
+              'label' => 'First Last',
+              'dataType' => 'String',
+              'type' => 'field',
+              'rewrite' => '[first_name] [last_name]',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'filters' => ['last_name' => $lastName],
+      'afform' => NULL,
+    ];
+
+    $download = (array) civicrm_api4('SearchDisplay', 'download', $params);
+    $header = array_shift($download);
+
+    $this->assertEquals('First Last', $header[0]['label']);
+
+    foreach ($download as $rowNum => $data) {
+      $this->assertEquals($sampleData[$rowNum]['first_name'] . ' ' . $lastName, $data[0]);
+    }
+  }
+
+  /**
    * Test downloading CSV format.
    *
    * Must run in separate process to capture direct output to browser
