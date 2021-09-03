@@ -102,16 +102,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
       $categories
     );
     CRM_Contact_Form_Task_PDFLetterCommon::createActivities($form, $html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
-
-    // Set the filename for the PDF using the Activity Subject, if defined. Remove unwanted characters and limit the length to 200 characters.
-    if (!empty($form->getSubmittedValue('subject'))) {
-      $fileName = CRM_Utils_File::makeFilenameWithUnicode($form->getSubmittedValue('subject'), '_', 200) . '.pdf';
-    }
-    else {
-      $fileName = 'CiviLetter.pdf';
-    }
-
-    CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
+    CRM_Utils_PDF_Utils::html2pdf($html, $this->getFileName() . '.pdf', FALSE, $formValues);
 
     $form->postProcessHook();
 

@@ -201,4 +201,41 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $form->setTitle('Print/Merge Document');
   }
 
+  /**
+   * Returns the filename for the pdf by striping off unwanted characters and limits the length to 200 characters.
+   *
+   * @return string
+   *   The name of the file.
+   */
+  public function getFileName(): string {
+    if (!empty($this->getSubmittedValue('pdf_file_name'))) {
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($this->getSubmittedValue('pdf_file_name'), '_', 200);
+    }
+    elseif (!empty($this->getSubmittedValue('subject'))) {
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($this->getSubmittedValue('subject'), '_', 200);
+    }
+    else {
+      $fileName = 'CiviLetter';
+    }
+    return $this->isLiveMode() ? $fileName : $fileName . '_preview';
+  }
+
+  /**
+   * Is the form in live mode (as opposed to being run as a preview).
+   *
+   * Returns true if the user has clicked the Download Document button on a
+   * Print/Merge Document (PDF Letter) search task form, or false if the Preview
+   * button was clicked.
+   *
+   * @return bool
+   *   TRUE if the Download Document button was clicked (also defaults to TRUE
+   *     if the form controller does not exist), else FALSE
+   */
+  protected function isLiveMode(): bool {
+    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
+    $buttonName = $this->controller->getButtonName();
+    $c = $this->controller->container();
+    return ($buttonName === '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
+  }
+
 }

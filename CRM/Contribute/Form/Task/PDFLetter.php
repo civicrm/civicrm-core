@@ -237,14 +237,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
 
     //CRM-19761
     if (!empty($html)) {
-      // Set the filename for the PDF using the Activity Subject, if defined. Remove unwanted characters and limit the length to 200 characters.
-      if (!empty($formValues['subject'])) {
-        $fileName = CRM_Utils_File::makeFilenameWithUnicode($formValues['subject'], '_', 200);
-      }
-      else {
-        $fileName = 'CiviLetter';
-      }
-
+      $fileName = $this->getFileName();
       if ($this->getSubmittedValue('document_type') === 'pdf') {
         CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
       }
