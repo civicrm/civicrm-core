@@ -27,9 +27,9 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Test token replacement for Print/Merge Task
    */
-  public function testMembershipTokenReplacementInPDF() {
+  public function testMembershipTokenReplacementInPDF(): void {
     $membershipIds = $returnProperties = $categories = $expected = [];
-    list($tokens, $htmlMessage) = self::getSampleHTML();
+    [$tokens, $htmlMessage] = self::getSampleHTML();
 
     $membershipDates = [
       date('Y-m-d'),
@@ -71,7 +71,8 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       }
     }
     $messageToken = CRM_Utils_Token::getTokens($htmlMessage);
-    $testHTML = CRM_Member_Form_Task_PDFLetter::generateHTML($membershipIds,
+    $form = new CRM_Member_Form_Task_PDFLetter();
+    $testHTML = $form->generateHTML($membershipIds,
       $returnProperties,
       NULL,
       NULL,
