@@ -70,28 +70,29 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     $this->setContactIDs();
     $skipOnHold = $this->skipOnHold ?? FALSE;
     $skipDeceased = $this->skipDeceased ?? TRUE;
-    self::postProcessMembers(
-      $this, $this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds
-    );
+    $this->postProcessMembers($this->_memberIds, $skipOnHold, $skipDeceased, $this->_contactIds);
   }
 
   /**
    * Process the form after the input has been submitted and validated.
-   * @todo this is horrible copy & paste code because there is so much risk of breakage
-   * in fixing the existing pdfLetter classes to be suitably generic
    *
-   * @param CRM_Core_Form $form
    * @param $membershipIDs
    * @param $skipOnHold
    * @param $skipDeceased
    * @param $contactIDs
+   *
+   * @throws \CRM_Core_Exception
+   * @todo this is horrible copy & paste code because there is so much risk of breakage
+   * in fixing the existing pdfLetter classes to be suitably generic
+   *
    */
-  public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+  public function postProcessMembers($membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
+    $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
 
     $html
-      = self::generateHTML(
+      = $this->generateHTML(
       $membershipIDs,
       $returnProperties,
       $skipOnHold,
@@ -120,6 +121,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Generate html for pdf letters.
    *
+   * @internal
+   *
    * @param array $membershipIDs
    * @param array $returnProperties
    * @param bool $skipOnHold
@@ -130,7 +133,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    * @return array
    */
-  public static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
+  public function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
     $html = [];
 
@@ -141,7 +144,7 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
       $params = ['contact_id' => $contactId];
       //getTokenDetails is much like calling the api contact.get function - but - with some minor
       // special handlings. It precedes the existence of the api
-      list($contacts) = CRM_Utils_Token::getTokenDetails(
+      [$contacts] = CRM_Utils_Token::getTokenDetails(
         $params,
         $returnProperties,
         $skipOnHold,
