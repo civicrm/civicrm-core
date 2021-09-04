@@ -1518,7 +1518,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   Form values.
    *
    * @param array $params
-   * @param array $ids
    *
    * @return object
    *   $mailing      The new mailing object
@@ -1526,12 +1525,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function create(&$params, $ids = []) {
-
-    if (empty($params['id']) && (array_filter($ids) !== [])) {
-      $params['id'] = $ids['mailing_id'] ?? $ids['id'];
-      CRM_Core_Error::deprecatedWarning('Parameter $ids is no longer used by Mailing::create. Use the api or just pass $params');
-    }
+  public static function create(&$params) {
 
     // CRM-#1843
     // If it is a mass sms, set url_tracking to false
