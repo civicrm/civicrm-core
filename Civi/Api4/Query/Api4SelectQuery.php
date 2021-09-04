@@ -431,7 +431,7 @@ class Api4SelectQuery {
 
   /**
    * Validate and transform a leaf clause array to SQL.
-   * @param array $clause [$fieldName, $operator, $criteria]
+   * @param array $clause [$fieldName, $operator, $criteria, $isExpression]
    * @param string $type
    *   WHERE|HAVING|ON
    * @param int $depth
@@ -443,12 +443,13 @@ class Api4SelectQuery {
     $field = NULL;
     // Pad array for unary operators
     [$expr, $operator, $value] = array_pad($clause, 3, NULL);
+    $isExpression = $clause[3] ?? FALSE;
     if (!in_array($operator, CoreUtil::getOperators(), TRUE)) {
       throw new \API_Exception('Illegal operator');
     }
 
     // For WHERE clause, expr must be the name of a field.
-    if ($type === 'WHERE') {
+    if ($type === 'WHERE' && !$isExpression) {
       $field = $this->getField($expr, TRUE);
       FormattingUtil::formatInputValue($value, $expr, $field, $operator);
       $fieldAlias = $this->getExpression($expr)->render($this->apiFieldSpec);
@@ -491,7 +492,7 @@ class Api4SelectQuery {
       }
       $fieldAlias = '`' . $fieldAlias . '`';
     }
-    elseif ($type === 'ON') {
+    elseif ($type === 'ON' || ($type === 'WHERE' && $isExpression)) {
       $expr = $this->getExpression($expr);
       $fieldName = count($expr->getFields()) === 1 ? $expr->getFields()[0] : NULL;
       $fieldAlias = $expr->render($this->apiFieldSpec);
