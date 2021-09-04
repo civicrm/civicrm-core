@@ -131,6 +131,20 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(100, $result[0]['MIN:total_amount']);
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
+
+    $result = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addGroupBy('receive_date')
+      ->addSelect('contact_id')
+      ->addSelect('receive_date')
+      ->addSelect('SUM(total_amount)')
+      ->addOrderBy('receive_date')
+      ->addWhere('contact_id', '=', $cid)
+      ->addHaving('SUM(total_amount)', '>', 300)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
+    $this->assertEquals(400, $result[0]['SUM:total_amount']);
   }
 
   public function testComparisonFunctions() {

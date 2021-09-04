@@ -261,6 +261,26 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
+  public function testGetWithWhereExpression() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('ALICE')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertCount(0, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('alice')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+  }
+
   /**
    * @throws \API_Exception
    */
