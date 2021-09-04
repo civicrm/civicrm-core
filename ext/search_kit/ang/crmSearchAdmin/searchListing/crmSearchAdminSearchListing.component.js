@@ -28,6 +28,8 @@
             'api_params',
             'created_date',
             'modified_date',
+            'DATE(created_date) AS date_created',
+            'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
             'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
             'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
@@ -96,13 +98,13 @@
               }),
               searchMeta.fieldToColumn('created_date', {
                 label: ts('Created'),
-                dataType: 'Date',
-                rewrite: ts('%1 by %2', {1: '[created_date]', 2: '[created_id.display_name]'})
+                title: '[created_date]',
+                rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
               }),
               searchMeta.fieldToColumn('modified_date', {
                 label: ts('Last Modified'),
-                dataType: 'Date',
-                rewrite: ts('%1 by %2', {1: '[modified_date]', 2: '[modified_id.display_name]'})
+                title: '[modified_date]',
+                rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
               }),
               {
                 type: 'include',
