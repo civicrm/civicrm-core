@@ -130,19 +130,27 @@ No
    */
   protected function getCaseID(): int {
     if (!isset($this->case)) {
-      $this->case = $this->callAPISuccess('Case', 'create', [
+      $case_id = $this->callAPISuccess('Case', 'create', [
         'case_type_id' => 'housing_support',
         'activity_subject' => 'Case Subject',
         'client_id' => $this->getContactID(),
         'status_id' => 1,
         'subject' => 'Case Subject',
         'start_date' => '2021-07-23 15:39:20',
+        // Note end_date is inconsistent with status Ongoing but for the
+        // purposes of testing tokens is ok. Creating it with status Resolved
+        // then ignores our known fixed end date.
         'end_date' => '2021-07-26 18:07:20',
         'medium_id' => 2,
         'details' => 'case details',
         'activity_details' => 'blah blah',
         'sequential' => 1,
-      ])['values'][0];
+      ])['id'];
+      // Need to retrieve the case again because modified date might be updated a
+      // split-second later than the original return value because of activity
+      // triggers when the timeline is populated. The returned array from create
+      // is determined before that happens.
+      $this->case = $this->callAPISuccess('Case', 'getsingle', ['id' => $case_id]);
     }
     return $this->case['id'];
   }
