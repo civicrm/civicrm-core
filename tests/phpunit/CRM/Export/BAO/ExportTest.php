@@ -97,7 +97,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
     if ($this->processor && $this->processor->getTemporaryTable()) {
       // delete the export temp table
-      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS " . $this->processor->getTemporaryTable());
+      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $this->processor->getTemporaryTable());
     }
     parent::tearDown();
   }
