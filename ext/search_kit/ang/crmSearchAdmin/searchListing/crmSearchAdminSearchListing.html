@@ -1,8 +1,9 @@
 <div id="bootstrap-theme" class="crm-search">
   <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
   <div class="form-inline">
-    <label for="search-list-filter">{{:: ts('Filter') }}</label>
-    <input class="form-control" type="search" id="search-list-filter" ng-model="$ctrl.filters.label" placeholder="&#xf002">
+    <input class="form-control" type="search" id="search-list-filter" ng-model="$ctrl.filters.label" placeholder="{{:: ts('Filter by label...') }}">
+    <input class="form-control collapsible-optgroups" ng-model="$ctrl.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
+    <input class="form-control" ng-model="$ctrl.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
     <a class="btn btn-primary pull-right" href="#/create/Contact/">
       <i class="crm-i fa-plus"></i>
       {{:: ts('New Search') }}

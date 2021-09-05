@@ -32,6 +32,7 @@
 
         this.savedSearch.displays = this.savedSearch.displays || [];
         this.savedSearch.groups = this.savedSearch.groups || [];
+        this.savedSearch.tag_id = this.savedSearch.tag_id || [];
         this.groupExists = !!this.savedSearch.groups.length;
 
         if (!this.savedSearch.id) {
@@ -48,14 +49,7 @@
           });
         }
 
-        var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'}),
-          secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'secondary'});
-        $scope.mainEntitySelect = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
-        $scope.mainEntitySelect.push({
-          text: ts('More...'),
-          description: ts('Other less-commonly searched entities'),
-          children: formatForSelect2(secondaryEntities, 'name', 'title_plural', ['description', 'icon'])
-        });
+        $scope.mainEntitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
         $scope.$watchCollection('$ctrl.savedSearch.api_params.select', onChangeSelect);
 
@@ -105,6 +99,17 @@
           apiCalls.deleteDisplays = ['SearchDisplay', 'delete', {where: [['saved_search_id', '=', params.id]]}];
         }
         delete params.displays;
+        if (params.tag_id && params.tag_id.length) {
+          chain.tag_id = ['EntityTag', 'replace', {
+            where: [['entity_id', '=', '$id'], ['entity_table', '=', 'civicrm_saved_search']],
+            records: _.transform(params.tag_id, function(records, id) {records.push({tag_id: id});})
+          }];
+        } else if (params.id) {
+          chain.tag_id = ['EntityTag', 'delete', {
+            where: [['entity_id', '=', '$id'], ['entity_table', '=', 'civicrm_saved_search']]
+          }];
+        }
+        delete params.tag_id;
         apiCalls.saved = ['SavedSearch', 'save', {records: [params], chain: chain}, 0];
         crmApi4(apiCalls).then(function(results) {
           // After saving a new search, redirect to the edit url
