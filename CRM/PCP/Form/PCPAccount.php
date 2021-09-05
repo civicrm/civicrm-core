@@ -100,7 +100,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     $this->assign('pcpComponent', $this->_component);
 
     if ($this->_single) {
-      CRM_Utils_System::setTitle(ts('Update Contact Information'));
+      $this->setTitle(ts('Update Contact Information'));
     }
   }
 

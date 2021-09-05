@@ -108,7 +108,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     elseif ($this->_action & CRM_Core_Action::VIEW) {
       $title = ts('Preview %1', [1 => $title]);
     }
-    CRM_Utils_System::setTitle($title);
+    $this->setTitle($title);
 
     $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
     $breadCrumb = [
