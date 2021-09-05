@@ -333,12 +333,10 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
    * @param $title
    */
   public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
+    if (empty($title)) {
+      $title = ts('Export Price Set Info for an Event');
     }
-    else {
-      CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
-    }
+    parent::setTitle($title);
   }
 
   /**

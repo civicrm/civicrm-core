@@ -207,18 +207,6 @@ LEFT JOIN civicrm_state_province state_province ON state_province.id = address.s
   }
 
   /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
-  }
-
-  /**
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {

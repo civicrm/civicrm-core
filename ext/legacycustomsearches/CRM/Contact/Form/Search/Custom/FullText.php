@@ -520,15 +520,6 @@ FROM   {$this->_tableName} contact_a
   }
 
   /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-  }
-
-  /**
    * @param int|array $limit
    * @return string
    *   SQL
