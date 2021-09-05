@@ -333,18 +333,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   }
 
   /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
-  }
-
-  /**
    * @return mixed
    */
 

@@ -23,6 +23,12 @@ class CRM_Contact_Form_Search_Custom_Base {
   protected $_stateID;
 
   /**
+   * The title of this form
+   * @var string
+   */
+  protected $_title = NULL;
+
+  /**
    * Class constructor.
    *
    * @param array $formValues
@@ -228,17 +234,17 @@ class CRM_Contact_Form_Search_Custom_Base {
   }
 
   /**
-   * Set the title.
+   * Setter function for title.
    *
    * @param string $title
+   *   The title of the form.
    */
   public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
+    if (empty($title)) {
+      $title = ts('Search');
     }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
+    $this->_title = $title;
+    CRM_Utils_System::setTitle($title);
   }
 
   /**
