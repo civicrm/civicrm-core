@@ -187,7 +187,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   public function preProcess() {
-    CRM_Utils_System::setTitle($this->getTitle());
+    $this->setTitle($this->getTitle());
     if (!$this->verifyPreDBState($errorMessage)) {
       if (!isset($errorMessage)) {
         $errorMessage = 'pre-condition failed for current upgrade step';
