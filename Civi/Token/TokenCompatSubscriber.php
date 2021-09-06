@@ -70,8 +70,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
 
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    $returnProperties = array_fill_keys($messageTokens['contact'] ?? [], 1);
-    $returnProperties = array_merge(\CRM_Contact_BAO_Query::defaultReturnProperties(), $returnProperties);
+    $returnProperties = $this->getReturnFields($messageTokens['contact']);
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
@@ -148,8 +147,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, $domain, $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
-      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
+      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], FALSE, $useSmarty);
 
       // FIXME: This may depend on $contact being merged with hook values.
       $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
@@ -170,6 +168,17 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         \CRM_Core_Smarty::singleton()->popScope();
       }
     }
+  }
+
+  /**
+   * @param $contact1
+   *
+   * @return array|int[]
+   */
+  protected function getReturnFields($contact1): array {
+    $returnProperties = array_fill_keys($contact1 ?? [], 1);
+    $returnProperties = array_merge(\CRM_Contact_BAO_Query::defaultReturnProperties(), $returnProperties);
+    return $returnProperties;
   }
 
 }
