@@ -114,6 +114,8 @@ class CoreUtil {
     $operators[] = 'CONTAINS';
     $operators[] = 'IS EMPTY';
     $operators[] = 'IS NOT EMPTY';
+    $operators[] = 'REGEXP';
+    $operators[] = 'NOT REGEXP';
     return $operators;
   }
 
