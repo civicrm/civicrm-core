@@ -84,6 +84,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     // Assert all membership tokens are replaced correctly.
     $expected = array_values($expected);
     foreach ($expected as $key => $dateVal) {
+      $this->assertStringContainsString('Anthony', $testHTML[$key]);
       foreach ($tokens as $text => $token) {
         $this->assertStringContainsString($dateVal[$token], $testHTML[$key]);
       }
@@ -107,6 +108,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     foreach ($tokens as $key => $val) {
       $html .= "<p>{$key} - {membership.{$val}}</p>";
     }
+    $html .= '{contact.first_name}';
     return [$tokens, $html];
   }
 
