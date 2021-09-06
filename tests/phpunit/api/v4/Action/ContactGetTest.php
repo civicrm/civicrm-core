@@ -197,6 +197,37 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertArrayHasKey($jan['id'], (array) $result);
   }
 
+  public function testRegexpOperators() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $alex = Contact::create()
+      ->setValues(['first_name' => 'Alex', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jane = Contact::create()
+      ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+  }
+
   public function testGetRelatedWithSubType() {
     $org = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')

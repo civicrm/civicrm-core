@@ -28,7 +28,8 @@ use Civi\Api4\Utils\SelectUtil;
  *
  * * '=', '<=', '>=', '>', '<', 'LIKE', "<>", "!=",
  * * 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN',
- * * 'IS NOT NULL', or 'IS NULL', 'CONTAINS'.
+ * * 'IS NOT NULL', 'IS NULL', 'CONTAINS', 'IS EMPTY', 'IS NOT EMPTY',
+ * * 'REGEXP', 'NOT REGEXP'.
  */
 class Api4SelectQuery {
 
@@ -575,6 +576,11 @@ class Api4SelectQuery {
         return "($fieldAlias $isEmptyClause $fieldAlias $operator)";
       }
     }
+
+    if ($operator == 'REGEXP' || $operator == 'NOT REGEXP') {
+      return sprintf('%s %s "%s"', $fieldAlias, $operator, \CRM_Core_DAO::escapeString($value));
+    }
+
     if (is_bool($value)) {
       $value = (int) $value;
     }

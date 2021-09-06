@@ -356,6 +356,28 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertEquals('two', $result->first()['group']);
   }
 
+  public function testRegexpOperators() {
+    $records = [
+      ['color' => 'red'],
+      ['color' => 'blue'],
+      ['color' => 'brown'],
+    ];
+    $this->replaceRecords($records);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'REGEXP', '^b')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals('blue', $result[0]['color']);
+    $this->assertEquals('brown', $result[1]['color']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'NOT REGEXP', '^b')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('red', $result[0]['color']);
+  }
+
   public function testPseudoconstantMatch() {
     $records = [
       ['group:label' => 'First', 'shape' => 'round', 'fruit:name' => 'banana'],
