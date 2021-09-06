@@ -1012,7 +1012,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       return FALSE;
     }
 
-    if (self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
+    if (CRM_Contribute_BAO_FinancialProcessor::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
     }
@@ -1116,21 +1116,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     ];
     $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
     CRM_Core_DAO::executeQuery($query, $fparams);
-  }
-
-  /**
-   * Does this contributtion status update represent a refund.
-   *
-   * @param int $previousContributionStatusID
-   * @param int $currentContributionStatusID
-   *
-   * @return bool
-   */
-  private static function isContributionUpdateARefund($previousContributionStatusID, $currentContributionStatusID): bool {
-    if ('Completed' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $previousContributionStatusID)) {
-      return FALSE;
-    }
-    return self::isContributionStatusNegative($currentContributionStatusID);
   }
 
   /**
@@ -3430,7 +3415,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
                 $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
               }
             }
-            self::updateFinancialAccounts($params, 'changeFinancialType');
+            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changeFinancialType');
             $params['skipLineItem'] = FALSE;
             foreach ($params['line_item'] as &$lineItems) {
               foreach ($lineItems as &$line) {
@@ -3445,7 +3430,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             if (isset($params['fee_amount'])) {
               $params['trxnParams']['fee_amount'] = $params['fee_amount'];
             }
-            self::updateFinancialAccounts($params);
+            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params);
             CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE);
             $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
             $updated = TRUE;
@@ -3467,7 +3452,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           //Update Financial Records
           $callUpdateFinancialAccounts = self::updateFinancialAccountsOnContributionStatusChange($params);
           if ($callUpdateFinancialAccounts) {
-            self::updateFinancialAccounts($params, 'changedStatus');
+            CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedStatus');
             CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedStatus');
           }
           $updated = TRUE;
@@ -3496,7 +3481,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         ) {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
-          self::updateFinancialAccounts($params, 'changedAmount');
+          CRM_Contribute_BAO_FinancialProcessor::updateFinancialAccounts($params, 'changedAmount');
           CRM_Core_BAO_FinancialTrxn::createDeferredTrxn(CRM_Utils_Array::value('line_item', $params), $params['contribution'], TRUE, 'changedAmount');
           $updated = TRUE;
         }
@@ -3565,39 +3550,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     unset($params['line_item']);
     self::$_trxnIDs = NULL;
     return $return;
-  }
-
-  /**
-   * Update all financial accounts entry.
-   *
-   * @param array $params
-   *   Contribution object, line item array and params for trxn.
-   *
-   * @param string $context
-   *   Update scenarios.
-   *
-   * @todo stop passing $params by reference. It is unclear the purpose of doing this &
-   * adds unpredictability.
-   *
-   */
-  public static function updateFinancialAccounts(&$params, $context = NULL) {
-    $inputParams = $params;
-    $isARefund = self::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id);
-
-    if ($context === 'changedAmount' || $context === 'changeFinancialType') {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-    }
-
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-    $params['entity_id'] = $trxn->id;
-
-    $trxnIds['id'] = $params['entity_id'];
-    $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
-    foreach ($params['line_item'] as $fieldId => $fields) {
-      $params = CRM_Contribute_BAO_FinancialProcessor::createFinancialItemsForLine($params, $context, $fields, $previousLineItems, $inputParams, $isARefund, $trxnIds, $fieldId);
-    }
   }
 
   /**
