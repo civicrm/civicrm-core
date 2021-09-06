@@ -134,12 +134,7 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    * @param array $html
    */
   protected function outputFromHtml($formValues, array $html) {
-    if (!empty($formValues['subject'])) {
-      $fileName = CRM_Utils_File::makeFilenameWithUnicode($formValues['subject'], '_', 200);
-    }
-    else {
-      $fileName = 'CiviLetter';
-    }
+    $fileName = $this->getFileName();
     if ($formValues['document_type'] === 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
     }
