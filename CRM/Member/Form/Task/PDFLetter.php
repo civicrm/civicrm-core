@@ -154,12 +154,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
         'CRM_Contribution_Form_Task_PDFLetterCommon'
       );
 
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contacts[$contactId], TRUE, $messageToken);
-      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $tokenHtml, $messageToken);
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contacts[$contactId], $categories, TRUE);
-      $tokenHtml = CRM_Utils_Token::parseThroughSmarty($tokenHtml, $contacts[$contactId]);
-
-      $html[] = $tokenHtml;
+      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $html_message, $messageToken);
+      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $tokenHtml], 'contactId' => $contactId])['html'];
 
     }
     return $html;
