@@ -1378,6 +1378,8 @@ $text
   }
 
   /**
+   * Test successful SMS send.
+   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
@@ -1385,7 +1387,10 @@ $text
    */
   public function testSendSmsMobilePhoneNumber(): void {
     $sent = $this->createSendSmsTest(TRUE, 2);
-    $this->assertEquals(TRUE, $sent[0], "Expected sent should be true");
+    $this->assertEquals(TRUE, $sent[0]);
+    /* @var CiviTestSMSProvider $provider $provider['id']*/
+    $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $this->ids['SmsProvider'][0]]);
+    $this->assertEquals('text Anthony', $providerObj->getSentMessage());
   }
 
   /**
@@ -1423,7 +1428,7 @@ $text
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function createSendSmsTest(bool $expectSuccess = TRUE, int $phoneType = 0, bool $passPhoneTypeInContactDetails = FALSE, array $additionalContactParams = []): array {
-    $provider = civicrm_api3('SmsProvider', 'create', [
+    $this->ids['SmsProvider'][0] = civicrm_api3('SmsProvider', 'create', [
       'name' => 'CiviTestSMSProvider',
       'api_type' => 1,
       'username' => 1,
@@ -1433,9 +1438,9 @@ $text
       'is_default' => 1,
       'is_active' => 1,
       'domain_id' => 1,
-    ]);
+    ])['id'];
 
-    $smsProviderParams['provider_id'] = $provider['id'];
+    $smsProviderParams['provider_id'] = $this->ids['SmsProvider'][0];
 
     // Create a contact
     $contactId = $this->individualCreate();
@@ -1450,7 +1455,7 @@ $text
       $contactIds[] = $contact['contact_id'];
     }
 
-    $activityParams['sms_text_message'] = 'text';
+    $activityParams['sms_text_message'] = 'text {contact.first_name}';
     $activityParams['activity_subject'] = 'subject';
 
     // Get a "logged in" user to set as source of Sms.
@@ -2663,7 +2668,8 @@ $textValue
     $this->assertEquals($outBoundSmsActivityId, $activity['activity_type_id'], 'Wrong activity type is set.');
     $this->assertEquals($activityStatusCompleted, $activity['status_id'], 'Expected activity status Completed.');
     $this->assertEquals('subject', $activity['subject'], 'Activity subject does not match.');
-    $this->assertEquals('text', $activity['details'], 'Activity details does not match.');
+    // Token is not resolved here.
+    $this->assertEquals('text {contact.first_name}', $activity['details'], 'Activity details does not match.');
   }
 
   /**
