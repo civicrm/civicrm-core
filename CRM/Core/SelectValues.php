@@ -707,7 +707,7 @@ class CRM_Core_SelectValues {
         '{case.end_date}' => 'Case End Date',
         '{case.details}' => 'Details',
         '{case.status_id:label}' => 'Case Status',
-        '{case.is_deleted}' => 'Case is in the Trash',
+        '{case.is_deleted:label}' => 'Case is in the Trash',
         '{case.created_date}' => 'Created Date',
         '{case.modified_date}' => 'Modified Date',
       ];

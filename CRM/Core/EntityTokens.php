@@ -383,7 +383,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return string[]
    */
   public function getSkippedFields(): array {
-    $fields = ['contact_id'];
+    // tags is offered in 'case' & is one of the only fields that is
+    // 'not a real field' offered up by case - seems like an oddity
+    // we should skip at the top level for now.
+    $fields = ['contact_id', 'tags'];
     if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
       $fields[] = 'campaign_id';
     }

@@ -327,7 +327,7 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
-    foreach (['Activity', 'Contribute', 'Event', 'Mailing', 'Member'] as $comp) {
+    foreach (['Activity', 'Contribute', 'Event', 'Mailing', 'Member', 'Case'] as $comp) {
       $container->setDefinition('crm_' . strtolower($comp) . '_tokens', new Definition(
         "CRM_{$comp}_Tokens",
         []
