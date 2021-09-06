@@ -699,9 +699,18 @@ class CRM_Core_SelectValues {
   public static function caseTokens($caseTypeId = NULL) {
     static $tokens = NULL;
     if (!$tokens) {
-      foreach (CRM_Case_BAO_Case::fields() as $field) {
-        $tokens["{case.{$field['name']}}"] = $field['title'];
-      }
+      $tokens = [
+        '{case.id}' => 'Case ID',
+        '{case.case_type_id:label}' => 'Case Type',
+        '{case.subject}' => 'Case Subject',
+        '{case.start_date}' => 'Case Start Date',
+        '{case.end_date}' => 'Case End Date',
+        '{case.details}' => 'Details',
+        '{case.status_id:label}' => 'Case Status',
+        '{case.is_deleted}' => 'Case is in the Trash',
+        '{case.created_date}' => 'Created Date',
+        '{case.modified_date}' => 'Modified Date',
+      ];
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
       foreach ($customFields as $id => $field) {
