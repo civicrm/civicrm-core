@@ -186,17 +186,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * Applies supplied filters to the where clause
    */
   protected function applyFilters() {
+    // Allow all filters that are included in SELECT clause or are fields on the Afform.
+    $allowedFilters = array_merge($this->getSelectAliases(), $this->getAfformFilters());
+
     // Ignore empty strings
     $filters = array_filter($this->filters, [$this, 'hasValue']);
     if (!$filters) {
       return;
     }
 
-    // Process all filters that are included in SELECT clause or are allowed by the Afform.
-    $allowedFilters = array_merge($this->getSelectAliases(), $this->getAfformFilters());
-    foreach ($filters as $fieldName => $value) {
-      if (in_array($fieldName, $allowedFilters, TRUE)) {
-        $this->applyFilter($fieldName, $value);
+    foreach ($filters as $key => $value) {
+      $fieldNames = explode(',', $key);
+      if (in_array($key, $allowedFilters, TRUE) || !array_diff($fieldNames, $allowedFilters)) {
+        $this->applyFilter($fieldNames, $value);
       }
     }
   }
@@ -221,13 +223,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * @param string $fieldName
+   * @param array $fieldNames
+   *   If multiple field names are given they will be combined in an OR clause
    * @param mixed $value
    */
-  private function applyFilter(string $fieldName, $value) {
+  private function applyFilter(array $fieldNames, $value) {
     // Global setting determines if % wildcard should be added to both sides (default) or only the end of a search string
     $prefixWithWildcard = \Civi::settings()->get('includeWildCardInName');
 
+    // Based on the first field, decide which clause to add this condition to
+    $fieldName = $fieldNames[0];
     $field = $this->getField($fieldName);
     // If field is not found it must be an aggregated column & belongs in the HAVING clause.
     if (!$field) {
@@ -248,44 +253,57 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $clause =& $this->savedSearch['api_params']['where'];
     }
 
-    $dataType = $field['data_type'] ?? NULL;
+    $filterClauses = [];
 
-    // Array is either associative `OP => VAL` or sequential `IN (...)`
-    if (is_array($value)) {
-      $value = array_filter($value, [$this, 'hasValue']);
-      // If array does not contain operators as keys, assume array of values
-      if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
-        // Use IN for regular fields
-        if (empty($field['serialize'])) {
-          $clause[] = [$fieldName, 'IN', $value];
-        }
-        // Use an OR group of CONTAINS for array fields
-        else {
-          $orGroup = [];
-          foreach ($value as $val) {
-            $orGroup[] = [$fieldName, 'CONTAINS', $val];
+    foreach ($fieldNames as $fieldName) {
+      $field = $this->getField($fieldName);
+      $dataType = $field['data_type'] ?? NULL;
+      // Array is either associative `OP => VAL` or sequential `IN (...)`
+      if (is_array($value)) {
+        $value = array_filter($value, [$this, 'hasValue']);
+        // If array does not contain operators as keys, assume array of values
+        if (array_diff_key($value, array_flip(CoreUtil::getOperators()))) {
+          // Use IN for regular fields
+          if (empty($field['serialize'])) {
+            $filterClauses[] = [$fieldName, 'IN', $value];
           }
-          $clause[] = ['OR', $orGroup];
+          // Use an OR group of CONTAINS for array fields
+          else {
+            $orGroup = [];
+            foreach ($value as $val) {
+              $orGroup[] = [$fieldName, 'CONTAINS', $val];
+            }
+            $filterClauses[] = ['OR', $orGroup];
+          }
+        }
+        // Operator => Value array
+        else {
+          $andGroup = [];
+          foreach ($value as $operator => $val) {
+            $andGroup[] = [$fieldName, $operator, $val];
+          }
+          $filterClauses[] = ['AND', $andGroup];
         }
       }
-      // Operator => Value array
+      elseif (!empty($field['serialize'])) {
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+      }
+      elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
+        $filterClauses[] = [$fieldName, '=', $value];
+      }
+      elseif ($prefixWithWildcard) {
+        $filterClauses[] = [$fieldName, 'CONTAINS', $value];
+      }
       else {
-        foreach ($value as $operator => $val) {
-          $clause[] = [$fieldName, $operator, $val];
-        }
+        $filterClauses[] = [$fieldName, 'LIKE', $value . '%'];
       }
     }
-    elseif (!empty($field['serialize'])) {
-      $clause[] = [$fieldName, 'CONTAINS', $value];
-    }
-    elseif (!empty($field['options']) || in_array($dataType, ['Integer', 'Boolean', 'Date', 'Timestamp'])) {
-      $clause[] = [$fieldName, '=', $value];
-    }
-    elseif ($prefixWithWildcard) {
-      $clause[] = [$fieldName, 'CONTAINS', $value];
+    // Single field
+    if (count($filterClauses) === 1) {
+      $clause[] = $filterClauses[0];
     }
     else {
-      $clause[] = [$fieldName, 'LIKE', $value . '%'];
+      $clause[] = ['OR', $filterClauses];
     }
   }
 
@@ -383,11 +401,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
     if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
       foreach (\CRM_Utils_JS::decode($filterAttr) as $filterKey => $filterVal) {
-        $filterKeys[] = $filterKey;
         // Automatically apply filters from the markup if they have a value
         // (if it's a javascript variable it will have come back from decode() as NULL and we'll ignore it).
+        unset($this->filters[$filterKey]);
         if ($this->hasValue($filterVal)) {
-          $this->applyFilter($filterKey, $filterVal);
+          $this->applyFilter(explode(',', $filterKey), $filterVal);
         }
       }
     }

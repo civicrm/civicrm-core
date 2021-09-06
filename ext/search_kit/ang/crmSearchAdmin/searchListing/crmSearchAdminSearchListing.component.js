@@ -27,6 +27,9 @@
             'api_entity',
             'api_entity:label',
             'api_params',
+            // These two need to be in the select clause so they are allowed as filters
+            'created_id.display_name',
+            'modified_id.display_name',
             'created_date',
             'modified_date',
             'DATE(created_date) AS date_created',
