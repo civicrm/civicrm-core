@@ -29,7 +29,12 @@
           savedSearch: function($route, crmApi4) {
             var params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
+              select: ['*', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
+              join: [
+                ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
+              ],
+              groupBy: ['id'],
               chain: {
                 groups: ['Group', 'get', {select: ['id', 'title', 'description', 'visibility', 'group_type', 'custom.*'], where: [['saved_search_id', '=', '$id']]}],
                 displays: ['SearchDisplay', 'get', {where: [['saved_search_id', '=', '$id']]}]
@@ -45,7 +50,7 @@
       searchEntity = $routeParams.entity;
       $scope.$ctrl = this;
       this.savedSearch = {
-        api_entity: searchEntity,
+        api_entity: searchEntity
       };
       // Changing entity will refresh the angular page
       $scope.$watch('$ctrl.savedSearch.api_entity', function(newEntity, oldEntity) {
@@ -62,7 +67,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function($q) {
+    .factory('searchMeta', function($q, formatForSelect2) {
       function getEntity(entityName) {
         if (entityName) {
           return _.find(CRM.crmSearchAdmin.schema, {name: entityName});
@@ -230,6 +235,17 @@
             return info.prefix.replace('.', '');
           }
           return '';
+        },
+        getPrimaryAndSecondaryEntitySelect: function() {
+          var primaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'primary'}),
+            secondaryEntities = _.filter(CRM.crmSearchAdmin.schema, {searchable: 'secondary'}),
+            select = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
+          select.push({
+            text: ts('More...'),
+            description: ts('Other less-commonly searched entities'),
+            children: formatForSelect2(secondaryEntities, 'name', 'title_plural', ['description', 'icon'])
+          });
+          return select;
         }
       };
     })

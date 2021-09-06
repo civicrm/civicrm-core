@@ -4,7 +4,7 @@
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
     templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
-    controller: function($scope, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
+    controller: function($scope, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait);
@@ -13,6 +13,7 @@
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
       this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
+      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -28,13 +29,21 @@
             'api_params',
             'created_date',
             'modified_date',
+            'DATE(created_date) AS date_created',
+            'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
             'GROUP_CONCAT(display.label ORDER BY display.id) AS display_label',
             'GROUP_CONCAT(display.type:icon ORDER BY display.id) AS display_icon',
             'GROUP_CONCAT(display.acl_bypass ORDER BY display.id) AS display_acl_bypass',
+            'tags', // Not a selectable field but this hacks around the requirement that filters be in the select clause
+            'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id',
             'GROUP_CONCAT(DISTINCT group.title) AS groups'
           ],
-          join: [['SearchDisplay AS display'], ['Group AS group']],
+          join: [
+            ['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']],
+            ['Group AS group', 'LEFT', ['id', '=', 'group.saved_search_id']],
+            ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
+          ],
           where: [['api_entity', 'IS NOT NULL']],
           groupBy: ['id']
         }
@@ -69,6 +78,14 @@
         );
       };
 
+      this.getTags = function() {
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+      };
+
+      this.getEntities = function() {
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+      };
+
       function buildDisplaySettings() {
         ctrl.display = {
           type: 'table',
@@ -88,6 +105,11 @@
               }),
               {
                 type: 'include',
+                label: ts('Tags'),
+                path: '~/crmSearchAdmin/searchListing/tags.html'
+              },
+              {
+                type: 'include',
                 label: ts('Displays'),
                 path: '~/crmSearchAdmin/searchListing/displays.html'
               },
@@ -96,13 +118,13 @@
               }),
               searchMeta.fieldToColumn('created_date', {
                 label: ts('Created'),
-                dataType: 'Date',
-                rewrite: ts('%1 by %2', {1: '[created_date]', 2: '[created_id.display_name]'})
+                title: '[created_date]',
+                rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
               }),
               searchMeta.fieldToColumn('modified_date', {
                 label: ts('Last Modified'),
-                dataType: 'Date',
-                rewrite: ts('%1 by %2', {1: '[modified_date]', 2: '[modified_id.display_name]'})
+                title: '[modified_date]',
+                rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
               }),
               {
                 type: 'include',
@@ -113,7 +135,7 @@
           }
         };
         if (ctrl.afformEnabled) {
-          ctrl.display.settings.columns.splice(3, 0, {
+          ctrl.display.settings.columns.splice(4, 0, {
             type: 'include',
             label: ts('Forms'),
             path: '~/crmSearchAdmin/searchListing/afforms.html'

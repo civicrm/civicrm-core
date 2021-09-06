@@ -11,6 +11,7 @@
 
 namespace Civi\Search;
 
+use Civi\Api4\Tag;
 use CRM_Search_ExtensionUtil as E;
 
 /**
@@ -35,6 +36,10 @@ class Admin {
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'afformEnabled' => $extensions->isActiveModule('afform'),
       'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
+      'tags' => Tag::get()
+        ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
+        ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
+        ->execute(),
     ];
   }
 
