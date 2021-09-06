@@ -31,7 +31,7 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
   /**
    * Test the documents got token replaced rightfully.
    */
-  public function testPrintDocument() {
+  public function testPrintDocument(): void {
     foreach (['docx', 'odt'] as $docType) {
       $formValues = [
         'document_file' => [
@@ -56,16 +56,7 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
     list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
     foreach ($this->_contactIds as $item => $contactId) {
-      $params = ['contact_id' => $contactId];
-      list($contact) = CRM_Utils_Token::getTokenDetails($params,
-        $returnProperties,
-        FALSE,
-        FALSE,
-        NULL,
-        $messageToken,
-        'CRM_Contact_Form_Task_PDFLetterCommon'
-      );
-      $html[] = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
+      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $html_message], 'contactId' => $contactId, 'disableSmarty' => TRUE])['html'];
     }
 
     $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
