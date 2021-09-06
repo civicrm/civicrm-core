@@ -352,6 +352,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     CRM_Campaign_BAO_Campaign::addCampaign($this);
 
     $this->addFormRule([__CLASS__, 'saveTemplateFormRule'], $this);
+    $this->addFormRule([__CLASS__, 'deprecatedTokensFormRule'], $this);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
   }
 
@@ -681,6 +682,27 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $errors['saveTemplateName'] = ts('Enter name to save message template');
     }
     return empty($errors) ? TRUE : $errors;
+  }
+
+  /**
+   * Prevent submission of deprecated tokens.
+   *
+   * @param array $fields
+   *
+   * @return bool|string[]
+   */
+  public static function deprecatedTokensFormRule(array $fields) {
+    $deprecatedTokens = [
+      '{case.status_id}' => '{case.status_id:label}',
+      '{case.case_type_id}' => '{case.case_type_id:label}',
+    ];
+    $tokenErrors = [];
+    foreach ($deprecatedTokens as $token => $replacement) {
+      if (strpos($fields['html_message'], $token) !== FALSE) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      }
+    }
+    return empty($tokenErrors) ? TRUE : ['html_message' => implode('<br>', $tokenErrors)];
   }
 
   /**

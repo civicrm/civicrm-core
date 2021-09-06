@@ -198,7 +198,19 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    $template = CRM_Core_Smarty::singleton();
+    $deprecatedTokens = [
+      '{case.status_id}' => '{case.status_id:label}',
+      '{case.case_type_id}' => '{case.case_type_id:label}',
+    ];
+    $tokenErrors = [];
+    foreach ($deprecatedTokens as $token => $replacement) {
+      if (strpos($fields['html_message'], $token) !== FALSE) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      }
+    }
+    if (!empty($tokenErrors)) {
+      $errors['html_message'] = implode('<br>', $tokenErrors);
+    }
 
     // If user uploads non-document file other than odt/docx
     if (empty($fields['template']) &&
