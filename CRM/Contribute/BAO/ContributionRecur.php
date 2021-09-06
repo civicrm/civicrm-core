@@ -1059,4 +1059,32 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
     return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
   }
 
+  /**
+   * Get the from address to use for the recurring contribution.
+   *
+   * This uses the contribution page id, if there is one, or the default domain one.
+   *
+   * @param int $id
+   *   Recurring contribution ID.
+   *
+   * @internal
+   *
+   * @return string
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public static function getRecurFromAddress(int $id): string {
+    $details = Contribution::get(FALSE)
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('contribution_page_id', 'IS NOT NULL')
+      ->addSelect('contribution_page_id.receipt_from_name', 'contribution_page_id.receipt_from_email')
+      ->addOrderBy('receive_date', 'DESC')
+      ->execute()->first();
+    if (empty($details['contribution_page_id.receipt_from_email'])) {
+      $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
+      return "$domainValues[0] <$domainValues[1]>";
+    }
+    return '"' . $details['contribution_page_id.receipt_from_name'] . '" <' . $details['contribution_page_id.receipt_from_email'] . '>';
+  }
+
 }

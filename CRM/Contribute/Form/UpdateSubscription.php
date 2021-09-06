@@ -192,6 +192,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
   /**
    * Called after the user submits the form.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -203,7 +206,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     // if this is an update of an existing recurring contribution, pass the ID
-    $params['id'] = $this->_subscriptionDetails->recur_id;
+    $params['id'] = $this->getContributionRecurID();
     $message = '';
 
     $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
@@ -279,21 +282,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Activity_BAO_Activity::create($activityParams);
 
       if (!empty($params['is_notify'])) {
-        // send notification
-        if ($this->_subscriptionDetails->contribution_page_id) {
-          CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
-            $this->_subscriptionDetails->contribution_page_id, $value, [
-              'title',
-              'receipt_from_name',
-              'receipt_from_email',
-            ]
-          );
-          $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) . '" <' . $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] . '>';
-        }
-        else {
-          $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-          $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-        }
+        $receiptFrom = CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID());
 
         [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
@@ -335,6 +324,15 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=update&result=1"));
     }
+  }
+
+  /**
+   * Get the recurring contribution ID.
+   *
+   * @return int
+   */
+  protected function getContributionRecurID(): int {
+    return $this->_subscriptionDetails->recur_id;
   }
 
 }
