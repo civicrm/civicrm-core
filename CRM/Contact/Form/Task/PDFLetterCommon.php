@@ -154,19 +154,16 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
         continue;
       }
 
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
-
+      $tokenHtml = $html_message;
       if ($caseId) {
         $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken);
       }
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
-
-      if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
-        $smarty = CRM_Core_Smarty::singleton();
-        // also add the contact tokens to the template
-        $smarty->assign_by_ref('contact', $contact);
-        $tokenHtml = $smarty->fetch("string:$tokenHtml");
-      }
+      $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'contactId' => $contactId,
+        'messageTemplate' => ['msg_html' => $tokenHtml],
+        'tplParams' => ['contact' => $contact],
+        'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
+      ])['html'];
 
       $html[] = $tokenHtml;
     }
@@ -186,7 +183,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $fileName = self::getFileName($form);
     $fileName = "$fileName.$type";
 
-    if ($type == 'pdf') {
+    if ($type === 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
