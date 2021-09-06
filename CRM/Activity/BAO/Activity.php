@@ -1168,9 +1168,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $from,
         $userID,
         $contactId,
-        $tokenSubject,
-        $tokenText,
-        $tokenHtml,
+        $renderedTemplate['subject'],
+        $renderedTemplate['text'],
+        $renderedTemplate['html'],
         $emailAddress,
         $activityID,
         // get the set of attachments from where they are stored
