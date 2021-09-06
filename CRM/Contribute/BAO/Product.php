@@ -111,20 +111,11 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    * Delete premium Types.
    *
    * @param int $productID
-   *
+   * @deprecated
    * @throws \CRM_Core_Exception
    */
   public static function del($productID) {
-    //check dependencies
-    $premiumsProduct = new CRM_Contribute_DAO_PremiumsProduct();
-    $premiumsProduct->product_id = $productID;
-    if ($premiumsProduct->find(TRUE)) {
-      throw new CRM_Core_Exception('Cannot delete a Premium that is linked to a Contribution page');
-    }
-    // delete product
-    $premium = new CRM_Contribute_DAO_Product();
-    $premium->id = $productID;
-    $premium->delete();
+    static::deleteRecord(['id' => $productID]);
   }
 
 }

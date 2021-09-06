@@ -957,6 +957,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($record['id'])) {
       throw new CRM_Core_Exception("Cannot delete {$entityName} with no id.");
     }
+    CRM_Utils_Type::validate($record['id'], 'Positive');
 
     CRM_Utils_Hook::pre('delete', $entityName, $record['id'], $record);
     $instance = new $className();
