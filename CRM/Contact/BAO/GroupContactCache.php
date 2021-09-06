@@ -210,33 +210,20 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * Function to clear group contact cache and reset the corresponding
-   *  group's cache and refresh date
+   * Function to clear group contact cache
    *
-   * @param int $groupID
+   * @param array $groupIDs
    *
    */
-  protected static function clearGroupContactCache($groupID): void {
-    $transaction = new CRM_Core_Transaction();
-    $query = "
+  protected static function clearGroupContactCache($groupIDs): void {
+    $clearCacheQuery = '
     DELETE  g
       FROM  civicrm_group_contact_cache g
-      WHERE  g.group_id = %1 ";
-
-    $update = "
-  UPDATE civicrm_group g
-    SET    cache_date = null
-    WHERE  id = %1 ";
-
+      WHERE  g.group_id IN (%1) ';
     $params = [
-      1 => [$groupID, 'Integer'],
+      1 => [implode(',', $groupIDs), 'CommaSeparatedIntegers'],
     ];
-
-    CRM_Core_DAO::executeQuery($query, $params);
-    // also update the cache_date for these groups
-    CRM_Core_DAO::executeQuery($update, $params);
-
-    $transaction->commit();
+    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
   }
 
   /**
@@ -381,6 +368,7 @@ WHERE  id IN ( $groupIDs )
         ->setCategory('gccache')
         ->setMemory();
       self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
+      self::clearGroupContactCache([$groupID]);
       self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
       self::releaseGroupLocks([$groupID]);
     }
@@ -724,6 +712,7 @@ ORDER BY   gc.contact_id, g.children
         // Also - if we switched to the 'triple union' approach described above
         // we could throw a try-catch around this line since best-effort would
         // be good enough & potentially improve user experience.
+        self::clearGroupContactCache($lockedGroups);
         self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
         self::releaseGroupLocks($lockedGroups);
       }
@@ -786,18 +775,6 @@ ORDER BY   gc.contact_id, g.children
   private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs): void {
     $tempTable = $groupContactsTempTable->getName();
 
-    // Don't call clearGroupContactCache as we don't want to clear the cache dates
-    // The will get updated by updateCacheTime() below and not clearing the dates reduces
-    // the chance that loadAll() will try and rebuild at the same time.
-    $clearCacheQuery = '
-    DELETE  g
-      FROM  civicrm_group_contact_cache g
-      WHERE  g.group_id IN (%1) ';
-    $params = [
-      1 => [implode(',', $groupIDs), 'CommaSeparatedIntegers'],
-    ];
-    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
-
     CRM_Core_DAO::executeQuery(
       "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT contact_id, group_id FROM $tempTable
@@ -852,8 +829,6 @@ ORDER BY   gc.contact_id, g.children
       "SELECT $groupID as group_id, contact_id as contact_id
        FROM   civicrm_group_contact
        WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
-
-    self::clearGroupContactCache($groupID);
 
     foreach ($contactQueries as $contactQuery) {
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) {$contactQuery}");
