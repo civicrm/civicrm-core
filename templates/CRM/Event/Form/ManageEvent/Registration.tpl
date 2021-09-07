@@ -225,7 +225,7 @@
       <tr class="crm-event-manage-registration-form-block-is_confirm_enabled">
         <td scope="row" class="label" width="20%">{$form.is_confirm_enabled.label}</td>
         <td>{$form.is_confirm_enabled.html}
-          <div class="description">{ts}Optionally hide the confirmation screen for free events.{/ts}</div>
+          <div class="description">{ts}Optionally hide the confirmation screen for events.{/ts}</div>
         </td>
       </tr>
     </table>
