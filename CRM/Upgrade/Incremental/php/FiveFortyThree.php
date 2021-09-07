@@ -75,7 +75,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
       $characterSet = 'utf8mb4';
     }
     if ($contactTableCollation !== $relationshipCacheCollation) {
-      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_relationship_cache ENGINE=InnoDB DEFAULT CHARACTER SET ' . $characterSet . ' COLLATE ' . $contactTableCollation);
+      CRM_Core_BAO_SchemaHandler::migrateUtf8mb4(($characterSet === 'utf8mb4' ? FALSE : TRUE), ['%civicrm_relationship_cache%']);
     }
     return TRUE;
   }
