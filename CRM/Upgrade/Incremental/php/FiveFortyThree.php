@@ -55,21 +55,29 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_43_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Fix DB Collation if needed on the relatonship cache table', 'fixRelationshipCacheTableCollation');
+  }
 
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  public static function fixRelationshipCacheTableCollation():bool {
+    $contactTableCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
+    $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_relationship_cache\'');
+    $dao->fetch();
+    $relationshipCacheCollation = $dao->Collation;
+    $characterSet = 'utf8';
+    if (stripos($contactTableCollation, 'utf8mb4') !== FALSE) {
+      $characterSet = 'utf8mb4';
+    }
+    if ($contactTableCollation !== $relationshipCacheCollation) {
+      CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_relationship_cache ENGINE=InnoDB DEFAULT CHARACTER SET ' . $characterSet . ' COLLATE ' . $contactTableCollation);
+    }
+    return TRUE;
+  }
 
 }

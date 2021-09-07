@@ -738,4 +738,14 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
   }
 
+  public function testUpdateRelationshipCacheTable() {
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_relationship_cache DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    CRM_Upgrade_Incremental_php_FiveFortyThree::fixRelationshipCacheTableCollation();
+    $contactTableCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
+    $dao = CRM_Core_DAO::executeQuery('SHOW TABLE STATUS LIKE \'civicrm_relationship_cache\'');
+    $dao->fetch();
+    $relationshipCacheCollation = $dao->Collation;
+    $this->assertEquals($contactTableCollation, $relationshipCacheCollation);
+  }
+
 }
