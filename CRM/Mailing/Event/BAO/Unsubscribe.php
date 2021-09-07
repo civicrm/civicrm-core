@@ -238,11 +238,10 @@ WHERE  email = %2
                 ON      gc.group_id = grp.id
             WHERE       grp.is_hidden = 0
                         $groupIdClause
-                AND     (grp.saved_search_id is not null
-                            OR  (gc.contact_id = $contact_id
-                                AND gc.status = 'Added')
-                            $baseGroupClause
-                        )");
+                AND     gc.contact_id = $contact_id
+                AND     gc.status = 'Added'
+                        $baseGroupClause
+                        ");
 
     if ($return) {
       $returnGroups = [];
