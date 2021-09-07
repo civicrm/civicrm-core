@@ -3,7 +3,7 @@
     <div class="btn-group" ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
     <crm-search-tasks ng-if="$ctrl.settings.actions" entity="$ctrl.apiEntity" ids="$ctrl.selectedRows" search="$ctrl.search" display="$ctrl.display" display-controller="$ctrl" refresh="$ctrl.refreshAfterTask()"></crm-search-tasks>
   </div>
-  <table>
+  <table class="{{:: $ctrl.settings.classes.join(' ') }}">
     <thead>
       <tr>
         <th class="crm-search-result-select" ng-if=":: $ctrl.settings.actions">
