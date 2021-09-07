@@ -67,10 +67,10 @@ class CRM_Core_ManagedEntities {
    *   Per hook_civicrm_managed.
    */
   public function __construct($modules, $declarations) {
-    $this->moduleIndex = self::createModuleIndex($modules);
+    $this->moduleIndex = $this->createModuleIndex($modules);
 
     if ($declarations !== NULL) {
-      $this->declarations = self::cleanDeclarations($declarations);
+      $this->declarations = $this->cleanDeclarations($declarations);
     }
     else {
       $this->declarations = NULL;
@@ -140,7 +140,7 @@ class CRM_Core_ManagedEntities {
     // an active module -- because we got it from a hook!
 
     // index by moduleName,name
-    $decls = self::createDeclarationIndex($this->moduleIndex, $this->getDeclarations());
+    $decls = $this->createDeclarationIndex($this->moduleIndex, $this->getDeclarations());
     foreach ($decls as $moduleName => $todos) {
       if (isset($this->moduleIndex[TRUE][$moduleName])) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
@@ -392,7 +392,7 @@ class CRM_Core_ManagedEntities {
         $this->declarations = array_merge($this->declarations, $component->getManagedEntities());
       }
       CRM_Utils_Hook::managed($this->declarations);
-      $this->declarations = self::cleanDeclarations($this->declarations);
+      $this->declarations = $this->cleanDeclarations($this->declarations);
     }
     return $this->declarations;
   }
@@ -404,7 +404,7 @@ class CRM_Core_ManagedEntities {
    * @return array
    *   indexed by is_active,name
    */
-  protected static function createModuleIndex($modules) {
+  protected function createModuleIndex($modules) {
     $result = [];
     foreach ($modules as $module) {
       $result[$module->is_active][$module->name] = $module;
@@ -419,7 +419,7 @@ class CRM_Core_ManagedEntities {
    * @return array
    *   indexed by module,name
    */
-  protected static function createDeclarationIndex($moduleIndex, $declarations) {
+  protected function createDeclarationIndex($moduleIndex, $declarations) {
     $result = [];
     if (!isset($moduleIndex[TRUE])) {
       return $result;
@@ -442,7 +442,7 @@ class CRM_Core_ManagedEntities {
    * @return string|bool
    *   string on error, or FALSE
    */
-  protected static function validate($declarations) {
+  protected function validate($declarations) {
     foreach ($declarations as $declare) {
       foreach (['name', 'module', 'entity', 'params'] as $key) {
         if (empty($declare[$key])) {
@@ -460,7 +460,7 @@ class CRM_Core_ManagedEntities {
    *
    * @return array
    */
-  protected static function cleanDeclarations($declarations) {
+  protected function cleanDeclarations(array $declarations): array {
     foreach ($declarations as $name => &$declare) {
       if (!array_key_exists('name', $declare)) {
         $declare['name'] = $name;
