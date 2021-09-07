@@ -180,6 +180,52 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test store function for multiselect int.
+   */
+  public function testStoreMultiSelectInt() {
+    $contactID = $this->individualCreate();
+    $customGroup = $this->customGroupCreate();
+    $fields = [
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'Int',
+      'html_type' => 'Multi-Select',
+      'option_values' => [
+        1 => 'choice1',
+        2 => 'choice2',
+      ],
+      'default_value' => '',
+    ];
+
+    $customField = $this->customFieldCreate($fields);
+
+    $params = [
+      [
+        $customField['id'] => [
+          'value' => CRM_Core_DAO::VALUE_SEPARATOR . '1' . CRM_Core_DAO::VALUE_SEPARATOR . '2' . CRM_Core_DAO::VALUE_SEPARATOR,
+          'type' => 'Int',
+          'custom_field_id' => $customField['id'],
+          'custom_group_id' => $customGroup['id'],
+          'table_name' => $customGroup['values'][$customGroup['id']]['table_name'],
+          'column_name' => $customField['values'][$customField['id']]['column_name'],
+          'file_id' => '',
+        ],
+      ],
+    ];
+
+    CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+
+    $customData = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('new_custom_group.Custom_Field')
+      ->addWhere('id', '=', $contactID)
+      ->execute()->first();
+    $this->assertEquals([1, 2], $customData['new_custom_group.Custom_Field']);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+    $this->contactDelete($contactID);
+  }
+
+  /**
    * Test getEntityValues function for stored value.
    */
   public function testGetEntityValues() {

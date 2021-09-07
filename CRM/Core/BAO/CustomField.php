@@ -1653,7 +1653,9 @@ SELECT $columnName
       'table_name' => $tableName,
       'column_name' => $columnName,
       'file_id' => $fileID,
+      // is_multiple refers to the custom group, serialize refers to the field.
       'is_multiple' => $customFields[$customFieldId]['is_multiple'],
+      'serialize' => $customFields[$customFieldId]['serialize'],
     ];
 
     //we need to sort so that custom fields are created in the order of entry
