@@ -1255,10 +1255,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     $subject = __FUNCTION__ . ' subject';
-    $html = __FUNCTION__ . ' html';
-    $text = __FUNCTION__ . ' text';
+    $html = __FUNCTION__ . ' html {contact.display_name}';
+    $text = __FUNCTION__ . ' text {contact.display_name}';
     $userID = $loggedInUser;
 
+    $mut = new CiviMailUtils($this, TRUE);
     [$sent, $activity_ids] = CRM_Activity_BAO_Activity::sendEmail(
       $contactDetails,
       $subject,
@@ -1266,18 +1267,26 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $html,
       $contact['email'],
       $userID,
-      $from = __FUNCTION__ . '@example.com'
+      $from = __FUNCTION__ . '@example.com',
+      NULL,
+      NULL,
+      NULL,
+      [$contactId]
     );
 
     $activity = $this->callAPISuccessGetSingle('Activity', ['id' => $activity_ids[0], 'return' => ['details', 'subject']]);
-    $details = "-ALTERNATIVE ITEM 0-
-$html
+    $details = '-ALTERNATIVE ITEM 0-
+' . __FUNCTION__ . ' html ' . $contact['display_name'] . '
 -ALTERNATIVE ITEM 1-
-$text
+' . __FUNCTION__ . ' text ' . $contact['display_name'] . '
 -ALTERNATIVE END-
-";
-    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
-    $this->assertEquals($activity['subject'], $subject, 'Activity subject does not match.');
+';
+    $this->assertEquals($details, $activity['details'], 'Activity details does not match.');
+    $this->assertEquals($subject, $activity['subject'], 'Activity subject does not match.');
+    $mut->checkMailLog([
+      'Mr. Anthony Anderson',
+    ]);
+    $mut->stop();
   }
 
   public function testSendEmailWithCampaign() {
