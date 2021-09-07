@@ -1616,7 +1616,12 @@ class CRM_Utils_Token {
     $fn = is_callable(['CRM_Utils_Token', $fn]) ? $fn : 'getApiTokenReplacement';
     // since we already know the tokens lets just use them & do str_replace which is faster & simpler than preg_replace
     foreach ($knownTokens[$entity] as $token) {
-      $replacement = self::$fn($entity, $token, $entityArray);
+      // We are now supporting the syntax case_type_id:label
+      // so strip anything after the ':'
+      // (we aren't supporting 'name' at this stage, so we can assume 'label'
+      // test cover in TokenConsistencyTest.
+      $parts = explode(':', $token);
+      $replacement = self::$fn($entity, $parts[0], $entityArray);
       if ($escapeSmarty) {
         $replacement = self::tokenEscapeSmarty($replacement);
       }

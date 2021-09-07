@@ -58,6 +58,10 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     // Now do the same without passing in 'knownTokens'
     $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, implode("\n", array_keys($this->getCaseTokens())));
     $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
+
+    // And check our deprecated tokens still work.
+    $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, '{case.case_type_id} {case.status_id}');
+    $this->assertEquals('Housing Support Ongoing', $tokenHtml);
   }
 
   /**
@@ -110,12 +114,12 @@ No
   public function getCaseTokens(): array {
     return [
       '{case.id}' => 'Case ID',
-      '{case.case_type_id}' => 'Case Type ID',
+      '{case.case_type_id:label}' => 'Case Type',
       '{case.subject}' => 'Case Subject',
       '{case.start_date}' => 'Case Start Date',
       '{case.end_date}' => 'Case End Date',
       '{case.details}' => 'Details',
-      '{case.status_id}' => 'Case Status',
+      '{case.status_id:label}' => 'Case Status',
       '{case.is_deleted}' => 'Case is in the Trash',
       '{case.created_date}' => 'Created Date',
       '{case.modified_date}' => 'Modified Date',
