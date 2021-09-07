@@ -79,6 +79,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
    */
   public static function create($params) {
     $id = $params['id'] ?? NULL;
+    $op = !empty($id) ? 'edit' : 'create';
     if (empty($id)) {
       $defaultParams = [
         'id' => $id,
@@ -90,7 +91,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
       ];
       $params = array_merge($defaultParams, $params);
     }
-
+    CRM_Utils_Hook::pre($op, 'Product', $id, $params);
     // Modify the submitted values for 'image' and 'thumbnail' so that we use
     // local URLs for these images when possible.
     if (isset($params['image'])) {
@@ -104,6 +105,7 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
     $premium = new CRM_Contribute_DAO_Product();
     $premium->copyValues($params);
     $premium->save();
+    CRM_Utils_Hook::post($op, 'Product', $id, $premium);
     return $premium;
   }
 
