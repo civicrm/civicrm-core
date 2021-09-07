@@ -40,13 +40,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   public static $_exportableFields = NULL;
 
   /**
-   * Static field to hold financial trxn id's.
-   *
-   * @var array
-   */
-  public static $_trxnIDs = NULL;
-
-  /**
    * Field for all the objects related to this contribution.
    *
    * This is used from
@@ -1048,10 +1041,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // This is an update so original currency if none passed in.
       $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
 
-      self::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      $transactionIDs[] = self::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['entity_id'] = self::$_trxnIDs[] = $trxn->id;
+      $params['entity_id'] = $transactionIDs[] = $trxn->id;
 
       $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
 
@@ -1068,7 +1061,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           while ($financialItem->fetch()) {
             $entityParams['entity_id'] = $financialItem->id;
             $entityParams['amount'] = $financialItem->amount;
-            foreach (self::$_trxnIDs as $tID) {
+            foreach ($transactionIDs as $tID) {
               $entityParams['financial_trxn_id'] = $tID;
               CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
             }
@@ -3516,7 +3509,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
-        self::$_trxnIDs[] = $financialTxn->id;
       }
     }
     // record line items and financial items
@@ -3548,7 +3540,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       CRM_Event_BAO_Participant::createDiscountTrxn($eventID, $params, $feeLevel);
     }
     unset($params['line_item']);
-    self::$_trxnIDs = NULL;
     return $return;
   }
 
@@ -4674,7 +4665,7 @@ LIMIT 1;";
    * @param array $contributionParams
    *   Contribution Params
    *
-   * @return null
+   * @return null|int
    */
   public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
     if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
@@ -4700,8 +4691,8 @@ LIMIT 1;";
     $params['status_id'] = array_search('Pending', $contributionStatuses);
     $params['is_payment'] = FALSE;
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
-    self::$_trxnIDs[] = $trxn->id;
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+    return $trxn->id;
   }
 
   /**
