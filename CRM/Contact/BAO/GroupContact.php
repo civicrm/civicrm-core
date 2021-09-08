@@ -131,7 +131,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
 
     $result = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
     CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    CRM_ACL_BAO_Cache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post('create', 'GroupContact', $groupId, $contactIds);
 
@@ -183,7 +183,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     foreach ($contactIds as $contactId) {
       if ($status == 'Deleted') {
         $query = "DELETE FROM civicrm_group_contact WHERE contact_id = %1 AND group_id = %2";
-        $dao = CRM_Core_DAO::executeQuery($query, [
+        CRM_Core_DAO::executeQuery($query, [
           1 => [$contactId, 'Positive'],
           2 => [$groupId, 'Positive'],
         ]);
@@ -196,10 +196,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
           'tracking' => $tracking,
         ];
         CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
-        // Removing a row from civicrm_group_contact for a smart group may mean a contact
-        // Is now back in a group based on criteria so we will invalidate the cache if it is there
-        // So that accurate group cache is created next time it is needed.
-        CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
       }
       else {
         $groupContact = new CRM_Contact_DAO_GroupContact();
@@ -228,12 +224,13 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
         CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
         $groupContact->status = $status;
         $groupContact->save();
-        // Remove any rows from the group contact cache so it disappears straight away from smart groups.
-        CRM_Contact_BAO_GroupContactCache::removeContact($contactId, $groupId);
       }
     }
-
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    // Removing a row from civicrm_group_contact for a smart group may mean a contact
+    // Is now back in a group based on criteria so we will invalidate the cache if it is there
+    // So that accurate group cache is created next time it is needed.
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($groupId);
+    CRM_ACL_BAO_Cache::opportunisticCacheFlush();
 
     CRM_Utils_Hook::post($op, 'GroupContact', $groupId, $contactIds);
 
