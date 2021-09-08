@@ -34,6 +34,7 @@
             limit: CRM.crmSearchAdmin.defaultPagerSize,
             pager: {show_count: true, expose_limit: true},
             actions: true,
+            classes: ['table', 'table-striped'],
             button: ts('Search'),
             columns: _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
               var column = {label: true},

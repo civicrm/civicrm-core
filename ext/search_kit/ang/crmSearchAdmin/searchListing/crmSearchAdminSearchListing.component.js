@@ -96,6 +96,7 @@
             limit: CRM.crmSearchAdmin.defaultPagerSize,
             pager: {show_count: true, expose_limit: true},
             actions: false,
+            classes: ['table', 'table-striped'],
             sort: [['modified_date', 'DESC']],
             columns: [
               searchMeta.fieldToColumn('label', {
