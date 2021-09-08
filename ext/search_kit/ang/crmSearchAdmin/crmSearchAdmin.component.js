@@ -613,9 +613,12 @@
         _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
           var join = searchMeta.getJoin(joinClause[0]),
             joinEntity = searchMeta.getEntity(join.entity),
+            primaryKey = joinEntity.primary_key[0],
+            isAggregate = ctrl.canAggregate(join.alias + '.' + primaryKey),
             bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
+            link.isAggregate = isAggregate;
             link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
             link.join = join.alias;
             addTitle(link, join.label);
