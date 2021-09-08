@@ -319,6 +319,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @param array $apiParams
    */
   protected function augmentSelectClause(&$apiParams): void {
+    $existing = array_map(function($item) {
+      return explode(' AS ', $item)[1] ?? $item;
+    }, $apiParams['select']);
     $additions = [];
     // Add primary key field if actions are enabled
     if (!empty($this->display['settings']['actions'])) {
@@ -334,14 +337,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
 
       // Select value fields for in-place editing
-      if (isset($column['editable']['value']) && !in_array($column['editable']['value'], $apiParams['select'])) {
-        $apiParams['select'][] = $column['editable']['value'];
+      if (isset($column['editable']['value'])) {
+        $additions[] = $column['editable']['value'];
       }
     }
     // Add fields referenced via token
     $tokens = [];
     preg_match_all('/\\[([^]]+)\\]/', $possibleTokens, $tokens);
-    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions, $tokens[1]));
+    // Only add fields not already in SELECT clause
+    $additions = array_diff(array_merge($additions, $tokens[1]), $existing);
+    $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions));
   }
 
   /**
