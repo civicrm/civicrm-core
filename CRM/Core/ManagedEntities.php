@@ -235,7 +235,7 @@ class CRM_Core_ManagedEntities {
    * @param array $todo
    *   Entity specification (per hook_civicrm_managedEntities).
    */
-  public function insertNewEntity($todo) {
+  protected function insertNewEntity($todo) {
     $result = civicrm_api($todo['entity'], 'create', $todo['params']);
     if (!empty($result['is_error'])) {
       $this->onApiError($todo['entity'], 'create', $todo['params'], $result);
@@ -307,7 +307,7 @@ class CRM_Core_ManagedEntities {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public function disableEntity($dao): void {
+  protected function disableEntity($dao): void {
     $entity_type = $dao->entity_type;
     if ($this->isActivationSupported($entity_type)) {
       // FIXME cascading for payproc types?
@@ -329,7 +329,7 @@ class CRM_Core_ManagedEntities {
    * @param CRM_Core_DAO_Managed $dao
    * @throws Exception
    */
-  public function removeStaleEntity($dao) {
+  protected function removeStaleEntity($dao) {
     $policy = empty($dao->cleanup) ? 'always' : $dao->cleanup;
     switch ($policy) {
       case 'always':
@@ -384,7 +384,7 @@ class CRM_Core_ManagedEntities {
    *
    * @return array|null
    */
-  public function getDeclarations() {
+  protected function getDeclarations() {
     if ($this->declarations === NULL) {
       $this->declarations = [];
       foreach (CRM_Core_Component::getEnabledComponents() as $component) {
