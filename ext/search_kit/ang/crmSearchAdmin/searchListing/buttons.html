@@ -4,6 +4,6 @@
 <a class="btn btn-xs btn-default" href="#/create/{{:: row.api_entity.raw + '?params=' + $ctrl.encode(row.api_params.raw) }}">
   {{:: ts('Clone') }}
 </a>
-<a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: row}" on-yes="$ctrl.deleteSearch(row)">
+<a href class="btn btn-xs btn-danger" crm-confirm="{type: 'delete', obj: {label: row.label.raw}}" on-yes="$ctrl.deleteSearch(row)">
   {{:: ts('Delete') }}
 </a>
