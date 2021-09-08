@@ -517,6 +517,18 @@ ORDER BY   gc.contact_id, g.children
   }
 
   /**
+   * Invalidates the smart group cache for all groups containing contact ID
+   * @param int $contactID - Groups containing this contactID will be invalidated
+   */
+  public static function invalidateGroupContactCacheByContactID(int $contactID): void {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_group
+      SET cache_date = NULL
+      WHERE id IN (SELECT distinct group_id FROM civicrm_group_contact_cache WHERE contact_id = %1)', [
+        1 => [$contactID, 'Positive'],
+      ]);
+  }
+
+  /**
    * @param array $savedSearch
    * @param int $groupID
    *

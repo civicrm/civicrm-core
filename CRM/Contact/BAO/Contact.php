@@ -394,7 +394,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       'name'
     );
 
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    CRM_ACL_BAO_Cache::opportunisticCacheFlush();
+    // We used to call CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush() here but we only need to
+    // invalidate the ones that contained this contact ID. They will be rebuilt when required.
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCacheByContactID($contact->id);
 
     if ($invokeHooks) {
       if ($isEdit) {
