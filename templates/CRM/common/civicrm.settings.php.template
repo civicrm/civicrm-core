@@ -176,8 +176,6 @@ if (!defined('CIVICRM_LOGGING_DSN')) {
  *
  */
 
-global $civicrm_root;
-
 $civicrm_root = '%%crmRoot%%';
 if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
   define( 'CIVICRM_TEMPLATE_COMPILEDIR', '%%templateCompileDir%%');
