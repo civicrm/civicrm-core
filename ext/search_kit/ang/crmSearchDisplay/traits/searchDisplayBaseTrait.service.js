@@ -143,7 +143,7 @@
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(editedRow) {
         var ctrl = this,
-          requestId = ++runCount;
+          requestId = ++runCount,
           apiParams = this.getApiParams();
         this.loading = true;
         _.each(ctrl.onPreRun, function(callback) {
