@@ -1289,6 +1289,79 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
+  /**
+   * This is different from SentEmailBasic to try to help prevent code that
+   * assumes an email always has tokens in it.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testSendEmailBasicWithoutAnyTokens(): void {
+    $contactId = $this->individualCreate();
+
+    // create a logged in USER since the code references it for sendEmail user.
+    $loggedInUser = $this->createLoggedInUser();
+
+    $contactDetailsIntersectKeys = [
+      'contact_id' => '',
+      'sort_name' => '',
+      'display_name' => '',
+      'do_not_email' => '',
+      'preferred_mail_format' => '',
+      'is_deceased' => '',
+      'email' => '',
+      'on_hold' => '',
+    ];
+
+    $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactId, 'return' => array_keys($contactDetailsIntersectKeys)]);
+    $contactDetailsIntersectKeys = [
+      'contact_id' => '',
+      'sort_name' => '',
+      'display_name' => '',
+      'do_not_email' => '',
+      'preferred_mail_format' => '',
+      'is_deceased' => '',
+      'email' => '',
+      'on_hold' => '',
+    ];
+    $contactDetails = [
+      array_intersect_key($contact, $contactDetailsIntersectKeys),
+    ];
+
+    $subject = __FUNCTION__ . ' subject';
+    $html = __FUNCTION__ . ' html';
+    $text = __FUNCTION__ . ' text';
+
+    $mut = new CiviMailUtils($this, TRUE);
+    [$sent, $activity_ids] = CRM_Activity_BAO_Activity::sendEmail(
+      $contactDetails,
+      $subject,
+      $text,
+      $html,
+      $contact['email'],
+      $loggedInUser,
+      $from = __FUNCTION__ . '@example.com'
+    );
+
+    $activity = $this->callAPISuccessGetSingle('Activity', ['id' => $activity_ids[0], 'return' => ['details', 'subject']]);
+    $details = "-ALTERNATIVE ITEM 0-
+$html
+-ALTERNATIVE ITEM 1-
+$text
+-ALTERNATIVE END-
+";
+    $this->assertEquals($activity['details'], $details, 'Activity details does not match.');
+    $this->assertEquals($activity['subject'], $subject, 'Activity subject does not match.');
+    $mut->checkMailLog([
+      "From: $from",
+      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
+      "Subject: $subject",
+      $html,
+      $text,
+    ]);
+    $mut->stop();
+  }
+
   public function testSendEmailWithCampaign() {
     // Create a contact and contactDetails array.
     $contactId = $this->individualCreate();
