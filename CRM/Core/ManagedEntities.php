@@ -142,14 +142,8 @@ class CRM_Core_ManagedEntities {
     // index by moduleName,name
     $decls = $this->createDeclarationIndex($this->moduleIndex, $this->getDeclarations());
     foreach ($decls as $moduleName => $todos) {
-      if (isset($this->moduleIndex[TRUE][$moduleName])) {
+      if ($this->isModuleEnabled($moduleName)) {
         $this->reconcileEnabledModule($this->moduleIndex[TRUE][$moduleName], $todos);
-      }
-      elseif (isset($this->moduleIndex[FALSE][$moduleName])) {
-        // do nothing -- module should get swept up later
-      }
-      else {
-        throw new Exception("Entity declaration references invalid or inactive module name [$moduleName]");
       }
     }
   }
@@ -443,16 +437,51 @@ class CRM_Core_ManagedEntities {
    *   string on error, or FALSE
    */
   protected function validate($declarations) {
-    foreach ($declarations as $declare) {
+    foreach ($declarations as $module => $declare) {
       foreach (['name', 'module', 'entity', 'params'] as $key) {
         if (empty($declare[$key])) {
           $str = print_r($declare, TRUE);
-          return ("Managed Entity is missing field \"$key\": $str");
+          return ts('Managed Entity (%1) is missing field "%2": %3', [$module, $key, $str]);
         }
       }
-      // FIXME: validate that each 'module' is known
+      if (!$this->isModuleRecognised($declare['module'])) {
+        return ts('Entity declaration references invalid or inactive module name [%1]', [$declare['module']]);
+      }
     }
     return FALSE;
+  }
+
+  /**
+   * Is the module recognised (as an enabled or disabled extension in the system).
+   *
+   * @param string $module
+   *
+   * @return bool
+   */
+  protected function isModuleRecognised(string $module): bool {
+    return $this->isModuleDisabled($module) || $this->isModuleEnabled($module);
+  }
+
+  /**
+   * Is the module enabled.
+   *
+   * @param string $module
+   *
+   * @return bool
+   */
+  protected function isModuleEnabled(string $module): bool {
+    return isset($this->moduleIndex[TRUE][$module]);
+  }
+
+  /**
+   * Is the module disabled.
+   *
+   * @param string $module
+   *
+   * @return bool
+   */
+  protected function isModuleDisabled(string $module): bool {
+    return isset($this->moduleIndex[FALSE][$module]);
   }
 
   /**
