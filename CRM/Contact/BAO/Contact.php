@@ -3531,6 +3531,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       if (!$dao->find(TRUE)) {
         $dao->is_primary = 0;
         if ($dao->find(TRUE)) {
+          throw new CRM_Core_Exception('I found it');
           $baoClass = CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
           $baoClass::writeRecord(['id' => $dao->id, 'is_primary' => 1]);
         }
