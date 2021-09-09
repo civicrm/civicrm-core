@@ -1431,7 +1431,7 @@ class CRM_Utils_Token {
    * @param array $contactDetails
    * @param array $greetingTokens
    */
-  private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
+  public static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
 
     // Only applies to contact tokens
     if (!array_key_exists('contact', $greetingTokens)) {

@@ -148,7 +148,73 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->string = \CRM_Utils_Token::replaceDomainTokens($e->string, $domain, $isHtml, $e->message['tokens'], $useSmarty);
 
     if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
+      // check if there are any tokens
+      $greetingTokens = \CRM_Utils_Token::getTokens($e->string);
+
+      if (!empty($greetingTokens)) {
+        // first use the existing contact object for token replacement
+        if (!empty($e->context['contact'])) {
+          $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], TRUE, $greetingTokens, TRUE, $useSmarty);
+        }
+
+        \CRM_Utils_Token::removeNullContactTokens($e->string, $e->context['contact'], $greetingTokens);
+        // check if there are any unevaluated tokens
+        $greetingTokens = \CRM_Utils_Token::getTokens($e->string);
+
+        // $greetingTokens not empty, means there are few tokens which are not
+        // evaluated, like custom data etc
+        // so retrieve it from database
+        if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
+          $greetingsReturnProperties = array_flip(\CRM_Utils_Array::value('contact', $greetingTokens));
+          $greetingsReturnProperties = array_fill_keys(array_keys($greetingsReturnProperties), 1);
+          $contactParams = ['contact_id' => $e->context['contact']['contact_id']];
+
+          $greetingDetails = \CRM_Utils_Token::getTokenDetails($contactParams,
+            $greetingsReturnProperties,
+            FALSE, FALSE, NULL,
+            $greetingTokens,
+            NULL
+          );
+
+          // again replace tokens
+          $e->string = \CRM_Utils_Token::replaceContactTokens($e->string,
+            $greetingDetails,
+            TRUE,
+            $greetingTokens,
+            TRUE,
+            $useSmarty
+          );
+        }
+
+        // check if there are still any unevaluated tokens
+        $remainingTokens = \CRM_Utils_Token::getTokens($e->string);
+
+        // $greetingTokens not empty, there are customized or hook tokens to replace
+        if (!empty($remainingTokens)) {
+          // Fill the return properties array
+          $greetingTokens = $remainingTokens;
+          reset($greetingTokens);
+          $greetingsReturnProperties = [];
+          foreach ($greetingTokens as $value) {
+            $props = array_flip($value);
+            $props = array_fill_keys(array_keys($props), 1);
+            $greetingsReturnProperties = $greetingsReturnProperties + $props;
+          }
+          $contactParams = ['contact_id' => $e->context['contact']['contact_id']];
+          $greetingDetails = \CRM_Utils_Token::getTokenDetails($contactParams,
+            $greetingsReturnProperties,
+            FALSE, FALSE, NULL,
+            $greetingTokens,
+            NULL
+          );
+          // Prepare variables for calling replaceHookTokens
+          $categories = array_keys($greetingTokens);
+          [$contact] = $greetingDetails;
+          // Replace tokens defined in Hooks.
+          $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $contact[$e->context['contact']['contact_id']], $categories);
+        }
+      }
+
       $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
 
       // FIXME: This may depend on $contact being merged with hook values.
