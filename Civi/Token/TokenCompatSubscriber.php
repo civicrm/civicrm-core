@@ -143,10 +143,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
 
     if (!empty($e->context['contact'])) {
       \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'], NULL, $useSmarty);
-      $e->string = \CRM_Utils_Token::replaceContactTokens($e->string, $e->context['contact'], $isHtml, $e->message['tokens'], TRUE, $useSmarty);
-
-      // FIXME: This may depend on $contact being merged with hook values.
-      $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $e->context['hookTokenCategories'], $isHtml, $useSmarty);
     }
 
     if ($useSmarty) {
