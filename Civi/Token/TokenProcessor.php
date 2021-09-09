@@ -384,6 +384,9 @@ class TokenProcessor {
 
 class TokenRowIterator extends \IteratorIterator {
 
+  /**
+   * @var \Civi\Token\TokenProcessor
+   */
   protected $tokenProcessor;
 
   /**
