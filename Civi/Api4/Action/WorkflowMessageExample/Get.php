@@ -33,6 +33,7 @@ class Get extends BasicGetAction {
   private $_scanner;
 
   public function _run(Result $result) {
+    $this->_scanner = new Examples();
     if ($this->select !== [] && !in_array('name', $this->select)) {
       $this->select[] = 'name';
     }
@@ -40,12 +41,7 @@ class Get extends BasicGetAction {
   }
 
   protected function getRecords() {
-    $this->_scanner = new Examples();
-    $all = $this->_scanner->findAll();
-    foreach ($all as &$example) {
-      $example['tags'] = !empty($example['tags']) ? \CRM_Utils_Array::implodePadded($example['tags']) : '';
-    }
-    return $all;
+    return $this->_scanner->findAll();
   }
 
   protected function selectArray($values) {

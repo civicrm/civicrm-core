@@ -60,8 +60,11 @@ class WorkflowMessageExample extends \Civi\Api4\Generic\AbstractEntity {
         [
           'name' => 'tags',
           'title' => 'Tags',
-          'data_type' => 'String',
-          'serialize' => \CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+          'data_type' => 'Array',
+          'options'  => [
+            'preview' => ts('Preview: Display as an example in the "Preview" dialog'),
+            'phpunit' => ts('PHPUnit: Run basic sniff tests in PHPUnit using this example'),
+          ],
         ],
         [
           'name' => 'data',
