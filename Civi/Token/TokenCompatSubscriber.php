@@ -113,12 +113,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = $row->context['contact'];
       }
 
-      if (!empty($row->context['tmpTokenParams'])) {
-        // merge activity tokens with contact array
-        // this is pretty weird.
-        $contact = array_merge($contact, $row->context['tmpTokenParams']);
-      }
-
       $contactArray = [$contactId => $contact];
       \CRM_Utils_Hook::tokenValues($contactArray,
         [$contactId],
