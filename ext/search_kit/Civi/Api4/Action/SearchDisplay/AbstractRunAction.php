@@ -364,7 +364,34 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     preg_match_all('/\\[([^]]+)\\]/', $possibleTokens, $tokens);
     // Only add fields not already in SELECT clause
     $additions = array_diff(array_merge($additions, $tokens[1]), $existing);
+    // Tokens for aggregated columns start with 'GROUP_CONCAT_'
+    foreach ($additions as $index => $alias) {
+      if (strpos($alias, 'GROUP_CONCAT_') === 0) {
+        $additions[$index] = 'GROUP_CONCAT(' . $this->getJoinFromAlias(explode('_', $alias, 3)[2]) . ') AS ' . $alias;
+      }
+    }
     $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions));
+  }
+
+  /**
+   * Given an alias like Contact_Email_01_location_type_id
+   * this will return Contact_Email_01.location_type_id
+   * @param string $alias
+   * @return string
+   */
+  protected function getJoinFromAlias(string $alias) {
+    $result = '';
+    foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+      $joinName = explode(' AS ', $join[0])[1];
+      if (strpos($alias, $joinName) === 0) {
+        $parsed = $joinName . '.' . substr($alias, strlen($joinName) + 1);
+        // Ensure we are using the longest match
+        if (strlen($parsed) > strlen($result)) {
+          $result = $parsed;
+        }
+      }
+    }
+    return $result;
   }
 
   /**

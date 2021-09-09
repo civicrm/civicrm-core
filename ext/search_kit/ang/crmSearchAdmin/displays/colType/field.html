@@ -1,4 +1,4 @@
-<div class="form-inline crm-search-admin-flex-row">
+<div class="form-inline crm-search-admin-flex-row" ng-if=":: $ctrl.parent.canBeLink(col)">
   <label title="{{:: ts('Display as clickable link') }}" >
     <input type="checkbox" ng-checked="col.link" ng-click="$ctrl.parent.toggleLink(col)" >
     {{:: ts('Link') }}

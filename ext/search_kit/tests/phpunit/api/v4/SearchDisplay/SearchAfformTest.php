@@ -35,7 +35,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
           'select' => [
             'id',
             'display_name',
-            'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_DISTINCT_Contact_Email_contact_id_01_email',
+            'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
           ],
           'orderBy' => [],
           'where' => [
@@ -77,7 +77,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
               'type' => 'field',
             ],
             [
-              'key' => 'GROUP_CONCAT_DISTINCT_Contact_Email_contact_id_01_email',
+              'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
               'label' => 'Emails',
               'dataType' => 'String',
               'type' => 'field',
