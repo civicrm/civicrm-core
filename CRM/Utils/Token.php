@@ -257,56 +257,11 @@ class CRM_Utils_Token {
    * @return null|string
    */
   public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE): ?string {
-    // check if the token we were passed is valid
-    // we have to do this because this function is
-    // called only when we find a token in the string
-
-    $loc = $domain->getLocationValues();
-
-    if (!in_array($token, self::$_tokens['domain'])) {
-      $value = "{domain.$token}";
-    }
-    elseif ($token === 'address') {
-      $cacheKey = __CLASS__ . 'address_token_cache' . CRM_Core_Config::domainID();
-      $addressCache = Civi::cache()->has($cacheKey) ? Civi::cache()->get($cacheKey) : [];
-
-      $fieldKey = $html ? 'address-html' : 'address-text';
-      if (array_key_exists($fieldKey, $addressCache)) {
-        return $addressCache[$fieldKey];
-      }
-
-      $value = NULL;
-      // Construct the address token
-
-      if (!empty($loc[$token])) {
-        if ($html) {
-          $value = str_replace("\n", '<br />', $loc[$token][1]['display']);
-        }
-        else {
-          $value = $loc[$token][1]['display_text'];
-        }
-        Civi::cache()->set($cacheKey, $addressCache);
-      }
-    }
-    elseif ($token === 'name' || $token === 'id' || $token === 'description') {
-      $value = $domain->$token;
-    }
-    elseif ($token === 'phone' || $token === 'email') {
-      // Construct the phone and email tokens
-
-      $value = NULL;
-      if (!empty($loc[$token])) {
-        foreach ($loc[$token] as $index => $entity) {
-          $value = $entity[$token];
-          break;
-        }
-      }
-    }
-
+    $tokens = self::getDomainTokens($domain->id, $html);
+    $value = $tokens[$token] ?? "{domain.$token}";
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
     }
-
     return $value;
   }
 
@@ -1960,6 +1915,46 @@ class CRM_Utils_Token {
         ],
       ],
     ];
+  }
+
+  /**
+   * Get the tokens available for the domain.
+   *
+   * @param int $domainID
+   * @param bool $html
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function getDomainTokens(int $domainID, bool $html): array {
+    $cacheKey = __CLASS__ . 'domain_tokens' . $html . '_' . $domainID . '_' . CRM_Core_I18n::getLocale();
+    if (!Civi::cache('metadata')->has($cacheKey)) {
+      if (CRM_Core_Config::domainID() === $domainID) {
+        $domain = CRM_Core_BAO_Domain::getDomain();
+      }
+      else {
+        $domain = new CRM_Core_BAO_Domain();
+        $domain->find(TRUE);
+      }
+      $tokens = [
+        'name' => $domain->name,
+        'id' => $domain->id,
+        'description' => $domain->description,
+      ];
+      $loc = $domain->getLocationValues();
+      if ($html) {
+        $tokens['address'] = str_replace("\n", '<br />', ($loc['address'][1]['display'] ?? ''));
+      }
+      else {
+        $tokens['address'] = $loc['address'][1]['display_text'] ?? '';
+      }
+      $phone = reset($loc['phone']);
+      $email = reset($loc['email']);
+      $tokens['phone'] = $phone['phone'] ?? '';
+      $tokens['email'] = $email['email'] ?? '';
+      Civi::cache('metadata')->set($cacheKey, $tokens);
+    }
+    return Civi::cache('metadata')->get($cacheKey);
   }
 
 }
