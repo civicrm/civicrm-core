@@ -48,6 +48,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
     $this->_job_id = $job_id = CRM_Utils_Request::retrieve('jid', 'Integer', $this);
     $this->_queue_id = $queue_id = CRM_Utils_Request::retrieve('qid', 'Integer', $this);
     $this->_hash = $hash = CRM_Utils_Request::retrieve('h', 'String', $this);
+    $isConfirm = CRM_Utils_Request::retrieveValue('confirm', 'Boolean', FALSE, FALSE, 'GET');
 
     if (!$job_id || !$queue_id || !$hash) {
       throw new CRM_Core_Exception(ts('Missing Parameters'));
@@ -74,8 +75,8 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
         $groupExist = TRUE;
       }
     }
-    if (!$groupExist) {
-      $statusMsg = ts('%1 has been unsubscribed.', [1 => $email]);
+    if (!$groupExist && !$isConfirm) {
+      $statusMsg = ts('%1 has already been unsubscribed.', [1 => $email]);
       CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
     $this->assign('groupExist', $groupExist);
@@ -112,7 +113,7 @@ class CRM_Mailing_Form_Unsubscribe extends CRM_Core_Form {
       CRM_Mailing_Event_BAO_Unsubscribe::send_unsub_response($this->_queue_id, $groups, FALSE, $this->_job_id);
     }
 
-    $statusMsg = ts('%1 is unsubscribed.', [1 => CRM_Utils_String::maskEmail($this->_email)]);
+    $statusMsg = ts('%1 has been unsubscribed successfully.', [1 => $this->_email]);
     CRM_Core_Session::setStatus($statusMsg, '', 'success');
   }
 
