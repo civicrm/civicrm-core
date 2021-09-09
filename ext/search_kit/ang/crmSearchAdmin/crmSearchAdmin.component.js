@@ -475,7 +475,7 @@
           // Add extra searchable fields from bridge entity
           if (join && join.bridge) {
             addFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
-              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity && !_.includes(field.name, '.'));
+              return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity);
             }));
           }
 
