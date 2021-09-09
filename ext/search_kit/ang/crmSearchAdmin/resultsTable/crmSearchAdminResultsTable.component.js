@@ -59,13 +59,15 @@
             style: 'secondary-outline',
             alignment: 'text-right',
             links: _.transform(links, function(links, link) {
-              links.push({
-                path: link.path,
-                text: link.title,
-                icon: link.icon,
-                style: link.style,
-                target: link.action === 'view' ? '_blank' : 'crm-popup'
-              });
+              if (!link.isAggregate) {
+                links.push({
+                  path: link.path,
+                  text: link.title,
+                  icon: link.icon,
+                  style: link.style,
+                  target: link.action === 'view' ? '_blank' : 'crm-popup'
+                });
+              }
             })
           });
         }
