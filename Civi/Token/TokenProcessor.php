@@ -360,22 +360,26 @@ class TokenProcessor {
     $row->fill($message['format']);
     $useSmarty = !empty($row->context['smarty']);
 
-    /**
-     *@FIXME preg_callback.
-     */
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $flatTokens = [];
-    \CRM_Utils_Array::flatten($tokens, $flatTokens, '', '.');
-    $filteredTokens = [];
-    foreach ($flatTokens as $k => $v) {
-      $filteredTokens['{' . $k . '}'] = ($useSmarty ? \CRM_Utils_Token::tokenEscapeSmarty($v) : $v);
-    }
+    $getToken = function($m) use ($tokens, $useSmarty) {
+      [$full, $entity, $field] = $m;
+      if (isset($tokens[$entity][$field])) {
+        $v = $tokens[$entity][$field];
+        if ($useSmarty) {
+          $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
+        }
+        return $v;
+      }
+      return $full;
+    };
 
     $event = new TokenRenderEvent($this);
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    $event->string = strtr($message['string'], $filteredTokens);
+    // Regex examples: '{foo.bar}'
+    // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}'
+    $event->string = preg_replace_callback(';\{(\w+)\.(\w+)\};', $getToken, $message['string']);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
   }
