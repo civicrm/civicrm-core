@@ -281,6 +281,35 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
+  public function testFilter() {
+    $exampleTokens['foo_bar']['whiz_bang'] = 'Some Text';
+    $exampleMessages = [
+      'This is {foo_bar.whiz_bang}.' => 'This is Some Text.',
+      'This is {foo_bar.whiz_bang|lower}...' => 'This is some text...',
+      'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
+    ];
+    $expectExampleCount = /* {#msgs} x {smarty:on,off} */ 6;
+    $actualExampleCount = 0;
+
+    foreach ($exampleMessages as $inputMessage => $expectOutput) {
+      foreach ([TRUE, FALSE] as $useSmarty) {
+        $p = new TokenProcessor($this->dispatcher, [
+          'controller' => __CLASS__,
+          'smarty' => $useSmarty,
+        ]);
+        $p->addMessage('example', $inputMessage, 'text/plain');
+        $p->addRow()
+          ->format('text/plain')->tokens($exampleTokens);
+        foreach ($p->evaluate()->getRows() as $key => $row) {
+          $this->assertEquals($expectOutput, $row->render('example'));
+          $actualExampleCount++;
+        }
+      }
+    }
+
+    $this->assertEquals($expectExampleCount, $actualExampleCount);
+  }
+
   public function onListTokens(TokenRegisterEvent $e) {
     $this->counts[__FUNCTION__]++;
     $e->register('custom', [
