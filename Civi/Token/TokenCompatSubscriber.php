@@ -70,8 +70,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
 
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    $returnProperties = array_fill_keys($messageTokens['contact'] ?? [], 1);
-    $returnProperties = array_merge(\CRM_Contact_BAO_Query::defaultReturnProperties(), $returnProperties);
+    $returnProperties = $this->getReturnFields($messageTokens['contact'] ?? []);
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
@@ -90,14 +89,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         [$contact] = \CRM_Contact_BAO_Query::apiQuery($params, $returnProperties ?? NULL);
         //CRM-4524
         $contact = reset($contact);
-        // Test cover for greeting in CRM_Core_BAO_ActionScheduleTest::testMailer
-        $contact['email_greeting'] = $contact['email_greeting_display'] ?? '';
-        $contact['postal_greeting'] = $contact['postal_greeting_display'] ?? '';
-        $contact['addressee'] = $contact['address_display'] ?? '';
-        if (!$contact || is_a($contact, 'CRM_Core_Error')) {
-          // FIXME: Need to differentiate errors which kill the batch vs the individual row.
-          \Civi::log()->debug('Failed to generate token data. Invalid contact ID: ' . $row->context['contactId']);
-          continue;
+        foreach ($this->getMappedFields() as $tokenName => $fieldName) {
+          if (!empty($contact[$fieldName])) {
+            $row->format('text/plain')->tokens('contact', $tokenName, (string) $contact[$fieldName]);
+          }
         }
 
         //update value of custom field token
@@ -170,6 +165,34 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         \CRM_Core_Smarty::singleton()->popScope();
       }
     }
+  }
+
+  /**
+   * @param $contact1
+   *
+   * @return array|int[]
+   */
+  protected function getReturnFields($contact1): array {
+    $returnProperties = array_fill_keys($contact1 ?? [], 1);
+    foreach ($this->getMappedFields() as $tokenName => $fieldName) {
+      if (isset($returnProperties[$tokenName])) {
+        unset($returnProperties[$tokenName]);
+        $returnProperties[$fieldName] = 1;
+      }
+    }
+    $returnProperties = array_merge(\CRM_Contact_BAO_Query::defaultReturnProperties(), $returnProperties);
+    return $returnProperties;
+  }
+
+  /**
+   * Get token names that are mapped to different 'real fields.
+   */
+  protected function getMappedFields(): array {
+    return [
+      'email_greeting' => 'email_greeting_display',
+      'postal_greeting' => 'postal_greeting_display',
+      'addressee' => 'address_display',
+    ];
   }
 
 }
