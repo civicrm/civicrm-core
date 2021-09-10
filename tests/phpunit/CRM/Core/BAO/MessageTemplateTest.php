@@ -201,6 +201,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * Test rendering of domain tokens.
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function testDomainTokens(): void {
     $values = $this->getDomainTokenData();
