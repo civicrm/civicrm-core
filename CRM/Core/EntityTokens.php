@@ -124,7 +124,30 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array|string[]
    */
   public function getAllTokens(): array {
-    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
+    $basicTokens = $this->getBasicTokens();
+    foreach (array_keys($basicTokens) as $fieldName) {
+      // The goal is to be able to render more complete tokens
+      // (eg. actual booleans, field names, raw ids) for a more
+      // advanced audiences - ie those using conditionals
+      // and to specify that audience in the api that retrieves.
+      // But, for now, let's not advertise, given that most of these fields
+      // aren't really needed even once...
+      if ($this->isBooleanField($fieldName)) {
+        unset($basicTokens[$fieldName]);
+      }
+    }
+    return array_merge($basicTokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
+  }
+
+  /**
+   * Is the given field a boolean field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isBooleanField(string $fieldName): bool {
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
   }
 
   /**
@@ -203,6 +226,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $fieldLabel = $this->fieldMetadata[$fieldName]['input_attrs']['label'] ?? $this->fieldMetadata[$fieldName]['label'];
         $return[$fieldName . ':label'] = $fieldLabel;
         $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $fieldLabel;
+      }
+      if ($this->isBooleanField($fieldName)) {
+        $return[$fieldName . ':label'] = $this->getFieldMetadata()[$fieldName]['title'];
       }
     }
     return $return;

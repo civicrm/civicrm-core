@@ -397,7 +397,9 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
     $allFields = [];
     foreach ($fields as $field) {
-      $allFields[$field['name']] = $field['title'];
+      if (!in_array($field['name'], ['is_test', 'is_pay_later', 'is_template'], TRUE)) {
+        $allFields[$field['name']] = $field['title'];
+      }
     }
     // contact ID is skipped.
     unset($allFields['contact_id']);
