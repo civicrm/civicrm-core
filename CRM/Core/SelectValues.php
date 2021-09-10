@@ -577,8 +577,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function contactTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
+    if (!isset(Civi::$statics[__CLASS__ . __FUNCTION__])) {
       $additionalFields = [
         'checksum' => ['title' => ts('Checksum')],
         'contact_id' => ['title' => ts('Internal Contact ID')],
@@ -644,9 +643,10 @@ class CRM_Core_SelectValues {
           $tokens[$key] = $value;
         }
       }
+      Civi::$statics[__CLASS__ . __FUNCTION__] = $tokens;
     }
 
-    return $tokens;
+    return Civi::$statics[__CLASS__ . __FUNCTION__];
   }
 
   /**

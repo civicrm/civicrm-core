@@ -285,10 +285,20 @@ London, 90210
     // Freeze the time at the start of the test, so checksums don't suffer from second rollovers.
     putenv('TIME_FUNC=frozen');
     CRM_Utils_Time::setTime(date('Y-m-d H:i:s'));
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
 
     $this->createCustomGroupWithFieldsOfAllTypes([]);
     $tokenData = $this->getAllContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
+    $advertisedTokens = CRM_Core_SelectValues::contactTokens();
+    $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
+
+    // Compare with our token data.
+    unset($advertisedTokens['{important_stuff.favourite_emoticon}']);
+    foreach (array_keys($advertisedTokens) as $token) {
+      $this->assertArrayKeyExists(substr($token, 9, -1), $tokenData);
+    }
 
     CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'wee');
     // This string contains the 4 types of possible replaces just to be sure they
@@ -329,6 +339,26 @@ Default Domain Name
     // reset time
     putenv('TIME_FUNC');
     CRM_Utils_Time::resetTime();
+  }
+
+  /**
+   * Implement token values hook.
+   *
+   * @param array $details
+   */
+  public function hookTokenValues(array &$details): void {
+    foreach ($details as $index => $detail) {
+      $details[$index]['favourite_emoticon'] = 'emo';
+    }
+  }
+
+  /**
+   * Hook to advertise tokens.
+   *
+   * @param array $hookTokens
+   */
+  public function hookTokens(array &$hookTokens): void {
+    $hookTokens['important_stuff'] = ['important_stuff.favourite_emoticon' => 'Best coolest emoticon'];
   }
 
   /**
@@ -388,6 +418,96 @@ Default Domain Name
       'email' => 'crown@example.com',
       'id' => CRM_Core_Config::domainID(),
       'description' => 'rather nice',
+    ];
+  }
+
+  public function getAdvertisedTokens() {
+    return [
+      '{contact.contact_type}' => 'Contact Type',
+      '{contact.do_not_email}' => 'Do Not Email',
+      '{contact.do_not_phone}' => 'Do Not Phone',
+      '{contact.do_not_mail}' => 'Do Not Mail',
+      '{contact.do_not_sms}' => 'Do Not Sms',
+      '{contact.do_not_trade}' => 'Do Not Trade',
+      '{contact.is_opt_out}' => 'No Bulk Emails (User Opt Out)',
+      '{contact.external_identifier}' => 'External Identifier',
+      '{contact.sort_name}' => 'Sort Name',
+      '{contact.display_name}' => 'Display Name',
+      '{contact.nick_name}' => 'Nickname',
+      '{contact.image_URL}' => 'Image Url',
+      '{contact.preferred_communication_method}' => 'Preferred Communication Method',
+      '{contact.preferred_language}' => 'Preferred Language',
+      '{contact.preferred_mail_format}' => 'Preferred Mail Format',
+      '{contact.hash}' => 'Contact Hash',
+      '{contact.contact_source}' => 'Contact Source',
+      '{contact.first_name}' => 'First Name',
+      '{contact.middle_name}' => 'Middle Name',
+      '{contact.last_name}' => 'Last Name',
+      '{contact.individual_prefix}' => 'Individual Prefix',
+      '{contact.individual_suffix}' => 'Individual Suffix',
+      '{contact.formal_title}' => 'Formal Title',
+      '{contact.communication_style}' => 'Communication Style',
+      '{contact.job_title}' => 'Job Title',
+      '{contact.gender}' => 'Gender ID',
+      '{contact.birth_date}' => 'Birth Date',
+      '{contact.current_employer_id}' => 'Current Employer ID',
+      '{contact.contact_is_deleted}' => 'Contact is in Trash',
+      '{contact.created_date}' => 'Created Date',
+      '{contact.modified_date}' => 'Modified Date',
+      '{contact.addressee}' => 'Addressee',
+      '{contact.email_greeting}' => 'Email Greeting',
+      '{contact.postal_greeting}' => 'Postal Greeting',
+      '{contact.current_employer}' => 'Current Employer',
+      '{contact.location_type}' => 'Location Type',
+      '{contact.address_id}' => 'Address ID',
+      '{contact.street_address}' => 'Street Address',
+      '{contact.street_number}' => 'Street Number',
+      '{contact.street_number_suffix}' => 'Street Number Suffix',
+      '{contact.street_name}' => 'Street Name',
+      '{contact.street_unit}' => 'Street Unit',
+      '{contact.supplemental_address_1}' => 'Supplemental Address 1',
+      '{contact.supplemental_address_2}' => 'Supplemental Address 2',
+      '{contact.supplemental_address_3}' => 'Supplemental Address 3',
+      '{contact.city}' => 'City',
+      '{contact.postal_code_suffix}' => 'Postal Code Suffix',
+      '{contact.postal_code}' => 'Postal Code',
+      '{contact.geo_code_1}' => 'Latitude',
+      '{contact.geo_code_2}' => 'Longitude',
+      '{contact.manual_geo_code}' => 'Is Manually Geocoded',
+      '{contact.address_name}' => 'Address Name',
+      '{contact.master_id}' => 'Master Address ID',
+      '{contact.county}' => 'County',
+      '{contact.state_province}' => 'State',
+      '{contact.country}' => 'Country',
+      '{contact.phone}' => 'Phone',
+      '{contact.phone_ext}' => 'Phone Extension',
+      '{contact.phone_type_id}' => 'Phone Type ID',
+      '{contact.phone_type}' => 'Phone Type',
+      '{contact.email}' => 'Email',
+      '{contact.on_hold}' => 'On Hold',
+      '{contact.signature_text}' => 'Signature Text',
+      '{contact.signature_html}' => 'Signature Html',
+      '{contact.im_provider}' => 'IM Provider',
+      '{contact.im}' => 'IM Screen Name',
+      '{contact.openid}' => 'OpenID',
+      '{contact.world_region}' => 'World Region',
+      '{contact.url}' => 'Website',
+      '{contact.custom_9}' => 'Contact reference field :: Custom Group',
+      '{contact.custom_7}' => 'Country :: Custom Group',
+      '{contact.custom_8}' => 'Country-multi :: Custom Group',
+      '{contact.custom_4}' => 'Enter integer here :: Custom Group',
+      '{contact.custom_1}' => 'Enter text here :: Custom Group',
+      '{contact.custom_6}' => 'My file :: Custom Group',
+      '{contact.custom_2}' => 'Pick Color :: Custom Group',
+      '{contact.custom_13}' => 'Pick Shade :: Custom Group',
+      '{contact.custom_10}' => 'State :: Custom Group',
+      '{contact.custom_11}' => 'State-multi :: Custom Group',
+      '{contact.custom_5}' => 'test_link :: Custom Group',
+      '{contact.custom_12}' => 'Yes No :: Custom Group',
+      '{contact.custom_3}' => 'Test Date :: Custom Group',
+      '{contact.checksum}' => 'Checksum',
+      '{contact.contact_id}' => 'Internal Contact ID',
+      '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
     ];
   }
 
@@ -497,6 +617,7 @@ Default Domain Name
       $this->getCustomFieldName('select_date') => '2021-01-20',
       $this->getCustomFieldName('int') => 999,
       $this->getCustomFieldName('link') => 'http://civicrm.org',
+      $this->getCustomFieldName('file') => '',
       $this->getCustomFieldName('country') => 'New Zealand',
       $this->getCustomFieldName('multi_country') => ['France', 'Canada'],
       $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
@@ -623,6 +744,7 @@ custom_2:Red
 custom_3:01/20/2021 12:00AM
 custom_4:999
 custom_5:<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_6:
 custom_7:New Zealand
 custom_8:France, Canada
 custom_9:Mr. Spider Man II
