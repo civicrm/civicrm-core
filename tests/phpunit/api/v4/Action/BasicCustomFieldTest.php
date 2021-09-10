@@ -247,6 +247,12 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->addValue('data_type', 'String')
       ->execute();
 
+    // Adding custom field to Relationship entity also adds it to RelationshipCache entity
+    $this->assertCount(1, RelationshipCache::getFields(FALSE)
+      ->addWhere('name', '=', "$cgName.PetName")
+      ->execute()
+    );
+
     $parent = Contact::create(FALSE)
       ->addValue('first_name', 'Parent')
       ->addValue('last_name', 'Tester')
@@ -261,13 +267,14 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
       ->execute()
       ->first()['id'];
 
-    $relationship = Relationship::create(FALSE)
+    Relationship::create(FALSE)
       ->addValue('contact_id_a', $parent)
       ->addValue('contact_id_b', $child)
       ->addValue('relationship_type_id', 1)
       ->addValue("$cgName.PetName", 'Buddy')
       ->execute();
 
+    // Test get directly from relationshipCache entity
     $results = RelationshipCache::get(FALSE)
       ->addSelect("$cgName.PetName")
       ->addWhere("$cgName.PetName", '=', 'Buddy')
@@ -275,6 +282,26 @@ class BasicCustomFieldTest extends BaseCustomValueTest {
 
     $this->assertCount(2, $results);
     $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
+
+    // Test get via bridge INNER join
+    $result = Contact::get(FALSE)
+      ->addSelect('relative.display_name', "relative.$cgName.PetName")
+      ->addJoin('Contact AS relative', 'INNER', 'RelationshipCache')
+      ->addWhere('id', '=', $parent)
+      ->addWhere('relative.relationship_type_id', '=', 1)
+      ->execute()->single();
+    $this->assertEquals('Child Tester', $result['relative.display_name']);
+    $this->assertEquals('Buddy', $result["relative.$cgName.PetName"]);
+
+    // Test get via bridge LEFT join
+    $result = Contact::get(FALSE)
+      ->addSelect('relative.display_name', "relative.$cgName.PetName")
+      ->addJoin('Contact AS relative', 'LEFT', 'RelationshipCache')
+      ->addWhere('id', '=', $parent)
+      ->addWhere('relative.relationship_type_id', '=', 1)
+      ->execute()->single();
+    $this->assertEquals('Child Tester', $result['relative.display_name']);
+    $this->assertEquals('Buddy', $result["relative.$cgName.PetName"]);
   }
 
   public function testMultipleJoinsToCustomTable() {
