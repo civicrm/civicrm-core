@@ -67,12 +67,14 @@ class ExampleData extends \Civi\Api4\Generic\AbstractEntity {
           ],
         ],
         [
+          'type' => 'Extra',
           'name' => 'data',
           'title' => 'Example data',
           'data_type' => 'String',
           'serialize' => \CRM_Core_DAO::SERIALIZE_JSON,
         ],
         [
+          'type' => 'Extra',
           'name' => 'asserts',
           'title' => 'Test assertions',
           'data_type' => 'String',
@@ -91,6 +93,15 @@ class ExampleData extends \Civi\Api4\Generic\AbstractEntity {
       "meta" => ["access CiviCRM"],
       "default" => ["administer CiviCRM"],
     ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['primary_key'] = ['name'];
+    return $info;
   }
 
 }
