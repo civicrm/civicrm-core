@@ -221,16 +221,16 @@ No
       'trxn_id' => 'Transaction ID',
       'invoice_id' => 'Invoice ID',
       'contribution_status_id' => 'Status',
-      'is_test' => 'Test',
+      'is_test:label' => 'Test',
       'cycle_day' => 'Cycle Day',
       'next_sched_contribution_date' => 'Next Scheduled Contribution Date',
       'failure_count' => 'Number of Failures',
       'failure_retry_date' => 'Retry Failed Attempt Date',
-      'auto_renew' => 'Auto Renew',
+      'auto_renew:label' => 'Auto Renew',
       'payment_processor_id' => 'Payment Processor ID',
       'financial_type_id' => 'Financial Type ID',
       'payment_instrument_id' => 'Payment Method',
-      'is_email_receipt' => 'Send email Receipt?',
+      'is_email_receipt:label' => 'Send email Receipt?',
       'frequency_unit:label' => 'Frequency Unit',
       'frequency_unit:name' => 'Machine name: Frequency Unit',
       'contribution_status_id:label' => 'Status',
@@ -309,22 +309,22 @@ abc
 123
 inv123
 2
-1
+Yes
 15
 
 0
 January 3rd, 2020 12:00 AM
-1
+Yes
 1
 2
 4
-1
+Yes
 year
 year
 Pending Label**
 Pending
-Dummy
-Dummy
+Dummy (test)
+Dummy (test)
 Member Dues
 Member Dues
 Check
