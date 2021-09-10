@@ -851,6 +851,45 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test importing fields with various options.
+   *
+   * Ensure we can import multiple preferred_communication_methods, single
+   * gender, and single preferred language using both labels and values.
+   *
+   * @throws \CRM_Core_Exception @throws \CiviCRM_API3_Exception
+   */
+  public function testImportFieldsWithVariousOptions() {
+    $processor = new CRM_Import_ImportProcessor();
+    $processor->setContactType('Individual');
+    $processor->setMappingFields(
+      [
+        ['name' => 'first_name'],
+        ['name' => 'last_name'],
+        ['name' => 'preferred_communication_method'],
+        ['name' => 'gender_id'],
+        ['name' => 'preferred_language'],
+      ],
+    );
+    $importer = $processor->getImporterObject();
+    $fields = ['Ima', 'Texter', "SMS,Phone", "Female", "Danish"];
+    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
+
+    $this->assertEquals([4, 1], $contact['preferred_communication_method'], "Import multiple preferred communication methods using labels.");
+    $this->assertEquals(1, $contact['gender_id'], "Import gender with label.");
+    $this->assertEquals('da_DK', $contact['preferred_language'], "Import preferred language with label.");
+
+    $importer = $processor->getImporterObject();
+    $fields = ['Ima', 'Texter', "4,1", "1", "da_DK"];
+    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $fields);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
+
+    $this->assertEquals([4, 1], $contact['preferred_communication_method'], "Import multiple preferred communication methods using values.");
+    $this->assertEquals(1, $contact['gender_id'], "Import gender with id.");
+    $this->assertEquals('da_DK', $contact['preferred_language'], "Import preferred language with value.");
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
