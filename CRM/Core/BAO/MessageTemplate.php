@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
 use Civi\Api4\MessageTemplate;
 use Civi\WorkflowMessage\WorkflowMessage;
 
@@ -369,16 +370,17 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $params['html'] = $mailContent['html'];
 
     if ($params['toEmail']) {
-      $contactParams = [['email', 'LIKE', $params['toEmail'], 0, 1]];
-      [$contact] = CRM_Contact_BAO_Query::apiQuery($contactParams);
+      // @todo - consider whether we really should be loading
+      // this based on 'the first email in the db that matches'.
+      // when we likely have the contact id. OTOH people probably barely
+      // use preferredMailFormat these days - the good fight against html
+      // emails was lost a decade ago...
+      $preferredMailFormat = Email::get(FALSE)->addWhere('email', '=', $params['toEmail'])->addSelect('contact_id.preferred_mail_format')->execute()->first()['contact_id.preferred_mail_format'];
 
-      $prefs = array_pop($contact);
-
-      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] === 'HTML') {
+      if ($preferredMailFormat === 'HTML') {
         $params['text'] = NULL;
       }
-
-      if (isset($prefs['preferred_mail_format']) and $prefs['preferred_mail_format'] === 'Text') {
+      if ($preferredMailFormat === 'Text') {
         $params['html'] = NULL;
       }
 
