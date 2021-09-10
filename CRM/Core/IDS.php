@@ -110,7 +110,8 @@ class CRM_Core_IDS {
         'filter_type' => 'xml',
         'filter_path' => "{$pkgs}/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
-        'HTML_Purifier_Path' => $pkgs . '/IDS/vendors/htmlpurifier/HTMLPurifier.auto.php',
+        // Ignored, uses autoloader
+        'HTML_Purifier_Path' => TRUE,
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
         'exceptions' => ['__utmz', '__utmc'],
