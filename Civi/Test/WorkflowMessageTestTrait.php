@@ -27,7 +27,7 @@ trait WorkflowMessageTestTrait {
    * @throws \API_Exception
    */
   protected function findExamples(): \Civi\Api4\Generic\AbstractGetAction {
-    return \Civi\Api4\WorkflowMessageExample::get(0)
+    return \Civi\Api4\ExampleData::get(0)
       ->setSelect(['name', 'title', 'workflow', 'tags', 'data', 'asserts'])
       ->addWhere('workflow', '=', $this->getWorkflowName())
       ->addWhere('tags', 'CONTAINS', 'phpunit');

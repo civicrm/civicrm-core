@@ -36,7 +36,7 @@ class WorkflowMessageTest extends UnitTestCase {
   }
 
   public function testRenderDefaultTemplate() {
-    $ex = \Civi\Api4\WorkflowMessageExample::get(0)
+    $ex = \Civi\Api4\ExampleData::get(0)
       ->addWhere('name', '=', 'case_activity.class_1')
       ->addSelect('data', 'workflow')
       ->addChain('render', WorkflowMessage::render()
@@ -49,7 +49,7 @@ class WorkflowMessageTest extends UnitTestCase {
   }
 
   public function testRenderCustomTemplate() {
-    $ex = \Civi\Api4\WorkflowMessageExample::get(0)
+    $ex = \Civi\Api4\ExampleData::get(0)
       ->addWhere('name', '=', 'case_activity.class_1')
       ->addSelect('data')
       ->execute()
@@ -66,7 +66,7 @@ class WorkflowMessageTest extends UnitTestCase {
   }
 
   public function testRenderExamples() {
-    $examples = \Civi\Api4\WorkflowMessageExample::get(0)
+    $examples = \Civi\Api4\ExampleData::get(0)
       ->addWhere('tags', 'CONTAINS', 'phpunit')
       ->addSelect('name', 'workflow', 'data', 'asserts')
       ->execute();

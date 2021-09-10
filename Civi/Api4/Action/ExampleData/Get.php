@@ -10,7 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Api4\Action\WorkflowMessageExample;
+namespace Civi\Api4\Action\ExampleData;
 
 use Civi\Api4\Generic\BasicGetAction;
 use Civi\Api4\Generic\Result;

@@ -21,7 +21,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
   }
 
   public function testAdhocClassEquiv() {
-    $examples = \Civi\Api4\WorkflowMessageExample::get(0)
+    $examples = \Civi\Api4\ExampleData::get(0)
       ->setSelect(['name', 'data'])
       ->addWhere('name', 'IN', ['case_activity.adhoc_1', 'case_activity.class_1'])
       ->execute()
@@ -58,7 +58,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
 
-    $get = \Civi\Api4\WorkflowMessageExample::get()
+    $get = \Civi\Api4\ExampleData::get()
       ->addWhere('name', '=', $name)
       ->execute()
       ->single();
@@ -66,7 +66,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
     $this->assertTrue(!isset($get['data']));
     $this->assertTrue(!isset($get['asserts']));
 
-    $get = \Civi\Api4\WorkflowMessageExample::get()
+    $get = \Civi\Api4\ExampleData::get()
       ->addWhere('name', '=', $name)
       ->addSelect('workflow', 'data')
       ->execute()

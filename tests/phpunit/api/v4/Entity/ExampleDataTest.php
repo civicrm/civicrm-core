@@ -24,7 +24,7 @@ use api\v4\UnitTestCase;
 /**
  * @group headless
  */
-class WorkflowMessageExampleTest extends UnitTestCase {
+class ExampleDataTest extends UnitTestCase {
 
   /**
    * Basic canary test fetching a specific example.
@@ -39,7 +39,7 @@ class WorkflowMessageExampleTest extends UnitTestCase {
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
 
-    $get = \Civi\Api4\WorkflowMessageExample::get()
+    $get = \Civi\Api4\ExampleData::get()
       ->addWhere('name', '=', $name)
       ->execute()
       ->single();
@@ -47,7 +47,7 @@ class WorkflowMessageExampleTest extends UnitTestCase {
     $this->assertTrue(!isset($get['data']));
     $this->assertTrue(!isset($get['asserts']));
 
-    $get = \Civi\Api4\WorkflowMessageExample::get()
+    $get = \Civi\Api4\ExampleData::get()
       ->addWhere('name', '=', $name)
       ->addSelect('workflow', 'data')
       ->execute()

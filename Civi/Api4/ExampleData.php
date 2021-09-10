@@ -18,14 +18,14 @@ namespace Civi\Api4;
  * @since 5.43
  * @package Civi\Api4
  */
-class WorkflowMessageExample extends \Civi\Api4\Generic\AbstractEntity {
+class ExampleData extends \Civi\Api4\Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
    * @return Generic\AbstractGetAction
    */
   public static function get($checkPermissions = TRUE) {
-    return (new Action\WorkflowMessageExample\Get(__CLASS__, __FILE__))
+    return (new Action\ExampleData\Get(__CLASS__, __FILE__))
       ->setCheckPermissions($checkPermissions);
   }
 
