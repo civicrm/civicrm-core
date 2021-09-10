@@ -39,7 +39,7 @@
 
     function requestStoredExample() {
       // For a dev working on example, it's easier if the example is always loaded fresh.
-      return crmApi4('WorkflowMessageExample', 'get', {
+      return crmApi4('ExampleData', 'get', {
         where: [["name", "=", model.examples[$ctrl.exampleId].name]],
         select: ['workflow', 'data'],
         chain: {
