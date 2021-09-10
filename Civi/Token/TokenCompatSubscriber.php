@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Token;
 
+use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,16 +21,199 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class TokenCompatSubscriber implements EventSubscriberInterface {
 
+  protected $entity = 'contact';
+
   /**
    * @inheritDoc
    */
-  public static function getSubscribedEvents() {
+  public static function getSubscribedEvents(): array {
     return [
       'civi.token.eval' => [
         ['setupSmartyAliases', 1000],
         ['onEvaluate'],
       ],
       'civi.token.render' => 'onRender',
+      'civi.token.list' => 'registerTokens',
+    ];
+  }
+
+  /**
+   * Register the declared tokens.
+   *
+   * @param \Civi\Token\Event\TokenRegisterEvent $e
+   *   The registration event. Add new tokens using register().
+   */
+  public function registerTokens(TokenRegisterEvent $e): void {
+    if (!$this->checkActive($e->getTokenProcessor())) {
+      return;
+    }
+    foreach (array_merge($this->getContactTokens(), $this->getCustomFieldTokens()) as $name => $label) {
+      $e->register([
+        'entity' => $this->entity,
+        'field' => $name,
+        'label' => $label,
+      ]);
+    }
+    foreach ($this->getLegacyHookTokens() as $legacyHookToken) {
+      $e->register([
+        'entity' => $legacyHookToken['category'],
+        'field' => $legacyHookToken['name'],
+        'label' => $legacyHookToken['label'],
+      ]);
+    }
+  }
+
+  /**
+   * Determine whether this token-handler should be used with
+   * the given processor.
+   *
+   * To short-circuit token-processing in irrelevant contexts,
+   * override this.
+   *
+   * @param \Civi\Token\TokenProcessor $processor
+   * @return bool
+   */
+  public function checkActive(\Civi\Token\TokenProcessor $processor) {
+    return in_array($this->getEntityIDField(), $processor->context['schema'], TRUE);
+  }
+
+  /**
+   * @return string
+   */
+  public function getEntityIDField(): string {
+    return 'contactId';
+  }
+
+  /**
+   * Get functions declared using the legacy hook.
+   *
+   * Note that these only extend the contact entity (
+   * ie they are based on having a contact ID which they.
+   * may or may not use, but they don't have other
+   * entity IDs.)
+   *
+   * @return array
+   */
+  public function getLegacyHookTokens(): array {
+    $tokens = [];
+    $hookTokens = [];
+    \CRM_Utils_Hook::tokens($hookTokens);
+    foreach ($hookTokens as $tokenValues) {
+      foreach ($tokenValues as $key => $value) {
+        if (is_numeric($key)) {
+          // This appears to be an attempt to compensate for
+          // inconsistencies described in https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_tokenValues/#example
+          // in effect there is a suggestion that
+          // Send an Email" and "CiviMail" send different parameters to the tokenValues hook
+          // As of now 'send an email' renders hooks through this class.
+          // CiviMail it depends on the use or otherwise of flexmailer.
+          $key = $value;
+        }
+        if (preg_match('/^\{([^\}]+)\}$/', $value, $matches)) {
+          $value = $matches[1];
+        }
+        $keyParts = explode('.', $key);
+        $tokens[$key] = [
+          'category' => $keyParts[0],
+          'name' => $keyParts[1],
+          'label' => $value,
+        ];
+      }
+    }
+    return $tokens;
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getCustomFieldTokens(): array {
+    $tokens = [];
+    $customFields = \CRM_Core_BAO_CustomField::getFields(['Individual', 'Address', 'Contact']);
+    foreach ($customFields as $customField) {
+      $tokens['custom_' . $customField['id']] = $customField['label'] . " :: " . $customField['groupTitle'];
+    }
+    return $tokens;
+  }
+
+  /**
+   * Get all tokens advertised as contact tokens.
+   *
+   * @return string[]
+   */
+  public function getContactTokens(): array {
+    return [
+      'contact_type' => 'Contact Type',
+      'do_not_email' => 'Do Not Email',
+      'do_not_phone' => 'Do Not Phone',
+      'do_not_mail' => 'Do Not Mail',
+      'do_not_sms' => 'Do Not Sms',
+      'do_not_trade' => 'Do Not Trade',
+      'is_opt_out' => 'No Bulk Emails (User Opt Out)',
+      'external_identifier' => 'External Identifier',
+      'sort_name' => 'Sort Name',
+      'display_name' => 'Display Name',
+      'nick_name' => 'Nickname',
+      'image_URL' => 'Image Url',
+      'preferred_communication_method' => 'Preferred Communication Method',
+      'preferred_language' => 'Preferred Language',
+      'preferred_mail_format' => 'Preferred Mail Format',
+      'hash' => 'Contact Hash',
+      'contact_source' => 'Contact Source',
+      'first_name' => 'First Name',
+      'middle_name' => 'Middle Name',
+      'last_name' => 'Last Name',
+      'individual_prefix' => 'Individual Prefix',
+      'individual_suffix' => 'Individual Suffix',
+      'formal_title' => 'Formal Title',
+      'communication_style' => 'Communication Style',
+      'job_title' => 'Job Title',
+      'gender' => 'Gender ID',
+      'birth_date' => 'Birth Date',
+      'current_employer_id' => 'Current Employer ID',
+      'contact_is_deleted' => 'Contact is in Trash',
+      'created_date' => 'Created Date',
+      'modified_date' => 'Modified Date',
+      'addressee' => 'Addressee',
+      'email_greeting' => 'Email Greeting',
+      'postal_greeting' => 'Postal Greeting',
+      'current_employer' => 'Current Employer',
+      'location_type' => 'Location Type',
+      'address_id' => 'Address ID',
+      'street_address' => 'Street Address',
+      'street_number' => 'Street Number',
+      'street_number_suffix' => 'Street Number Suffix',
+      'street_name' => 'Street Name',
+      'street_unit' => 'Street Unit',
+      'supplemental_address_1' => 'Supplemental Address 1',
+      'supplemental_address_2' => 'Supplemental Address 2',
+      'supplemental_address_3' => 'Supplemental Address 3',
+      'city' => 'City',
+      'postal_code_suffix' => 'Postal Code Suffix',
+      'postal_code' => 'Postal Code',
+      'geo_code_1' => 'Latitude',
+      'geo_code_2' => 'Longitude',
+      'manual_geo_code' => 'Is Manually Geocoded',
+      'address_name' => 'Address Name',
+      'master_id' => 'Master Address ID',
+      'county' => 'County',
+      'state_province' => 'State',
+      'country' => 'Country',
+      'phone' => 'Phone',
+      'phone_ext' => 'Phone Extension',
+      'phone_type_id' => 'Phone Type ID',
+      'phone_type' => 'Phone Type',
+      'email' => 'Email',
+      'on_hold' => 'On Hold',
+      'signature_text' => 'Signature Text',
+      'signature_html' => 'Signature Html',
+      'im_provider' => 'IM Provider',
+      'im' => 'IM Screen Name',
+      'openid' => 'OpenID',
+      'world_region' => 'World Region',
+      'url' => 'Website',
+      'checksum' => 'Checksum',
+      'contact_id' => 'Internal Contact ID',
     ];
   }
 
