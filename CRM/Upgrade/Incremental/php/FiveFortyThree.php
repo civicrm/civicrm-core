@@ -10,7 +10,8 @@
  */
 
 /**
- * Upgrade logic for FiveFortyThree */
+ * Upgrade logic for FiveFortyThree
+ */
 class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental_Base {
 
   /**
@@ -49,12 +50,6 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
-   */
-
   /**
    * Upgrade function.
    *
@@ -63,7 +58,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
   public function upgrade_5_43_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Fix DB Collation if needed on the relatonship cache table', 'fixRelationshipCacheTableCollation');
-
+    $this->addTask('Make mapping field foreign key cascade delete', 'alterMappingFK');
     $this->addTask('Replace legacy displayName smarty token in Online contribution workflow template',
       'updateMessageToken', 'contribution_online_receipt', '$displayName', 'contact.display_name', $rev
     );
@@ -73,6 +68,22 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Replace legacy last_name smarty token in Online contribution workflow template',
       'updateMessageToken', 'contribution_online_receipt', '$last_name', 'contact.last_name', $rev
     );
+  }
+
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   *
+   * @return bool
+   */
+  public static function alterMappingFK(CRM_Queue_TaskContext $ctx): bool {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_mapping_field', 'FK_civicrm_mapping_field_mapping_id');
+    CRM_Core_DAO::executeQuery('
+        ALTER TABLE civicrm_mapping_field
+        ADD CONSTRAINT `FK_civicrm_mapping_field_mapping_id`
+        FOREIGN KEY (`mapping_id`)
+        REFERENCES `civicrm_mapping`(`id`) ON DELETE CASCADE
+      ', [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
   }
 
   public static function fixRelationshipCacheTableCollation():bool {
