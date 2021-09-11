@@ -121,12 +121,14 @@ ORDER BY
   /**
    * Call common delete function.
    *
-   * @param int $id
+   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
    *
+   * @param int $id
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    return CRM_Contact_BAO_Contact::deleteObjectWithPrimary('OpenID', $id);
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }
