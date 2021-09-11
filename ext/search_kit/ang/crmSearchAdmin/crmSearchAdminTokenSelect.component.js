@@ -27,7 +27,7 @@
       };
 
       this.getTokens = function() {
-        var allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra']);
+        var allFields = ctrl.admin.getAllFields(ctrl.suffix || '', ['Field', 'Custom', 'Extra', 'Pseudo']);
         _.eachRight(ctrl.admin.savedSearch.api_params.select, function(fieldName) {
           allFields.unshift({
             id: fieldName,

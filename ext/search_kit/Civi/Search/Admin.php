@@ -11,6 +11,7 @@
 
 namespace Civi\Search;
 
+use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Tag;
 use CRM_Search_ExtensionUtil as E;
 
@@ -29,6 +30,7 @@ class Admin {
     return [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
+      'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
       'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),

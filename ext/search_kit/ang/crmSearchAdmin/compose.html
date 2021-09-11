@@ -41,7 +41,7 @@
           {{:: ts('Field Transformations') }}
         </legend>
         <div ng-if="!!controls.showFunctions">
-          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select">
+          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select" ng-if="!$ctrl.isPseudoField(col)">
             <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]"></crm-search-function>
           </fieldset>
         </div>

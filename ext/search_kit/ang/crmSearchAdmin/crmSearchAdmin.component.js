@@ -6,7 +6,7 @@
       savedSearch: '<'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdmin.html',
-    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta, formatForSelect2) {
+    controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
         fieldsForJoinGetters = {};
@@ -453,34 +453,37 @@
 
       this.getAllFields = function(suffix, allowedTypes, disabledIf, topJoin) {
         disabledIf = disabledIf || _.noop;
-        function formatFields(entityName, join) {
+
+        function formatEntityFields(entityName, join) {
           var prefix = join ? join.alias + '.' : '',
             result = [];
 
-          function addFields(fields) {
-            _.each(fields, function(field) {
-              var item = {
-                id: prefix + field.name + (field.options ? suffix : ''),
-                text: field.label,
-                description: field.description
-              };
-              if (disabledIf(item.id)) {
-                item.disabled = true;
-              }
-              if (!allowedTypes || _.includes(allowedTypes, field.type)) {
-                result.push(item);
-              }
-            });
-          }
-
           // Add extra searchable fields from bridge entity
           if (join && join.bridge) {
-            addFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
+            formatFields(_.filter(searchMeta.getEntity(join.bridge).fields, function(field) {
               return (field.name !== 'id' && field.name !== 'entity_id' && field.name !== 'entity_table' && !field.fk_entity);
-            }));
+            }), result, prefix);
           }
 
-          addFields(searchMeta.getEntity(entityName).fields);
+          formatFields(searchMeta.getEntity(entityName).fields, result, prefix);
+          return result;
+        }
+
+        function formatFields(fields, result, prefix) {
+          prefix = typeof prefix === 'undefined' ? '' : prefix;
+          _.each(fields, function(field) {
+            var item = {
+              id: prefix + field.name + (field.options ? suffix : ''),
+              text: field.label,
+              description: field.description
+            };
+            if (disabledIf(item.id)) {
+              item.disabled = true;
+            }
+            if (!allowedTypes || _.includes(allowedTypes, field.type)) {
+              result.push(item);
+            }
+          });
           return result;
         }
 
@@ -495,7 +498,7 @@
             text: joinInfo.label,
             description: joinInfo.description,
             icon: joinEntity.icon,
-            children: formatFields(joinEntity.name, joinInfo)
+            children: formatEntityFields(joinEntity.name, joinInfo)
           });
         }
 
@@ -508,8 +511,18 @@
         result.push({
           text: mainEntity.title_plural,
           icon: mainEntity.icon,
-          children: formatFields(ctrl.savedSearch.api_entity)
+          children: formatEntityFields(ctrl.savedSearch.api_entity)
         });
+
+        // Include SearchKit's pseudo-fields if specifically requested
+        if (allowedTypes && _.includes(allowedTypes, 'Pseudo')) {
+          result.push({
+            text: ts('Extra'),
+            icon: 'fa-gear',
+            children: formatFields(CRM.crmSearchAdmin.pseudoFields, [])
+          });
+        }
+
         _.each(joinEntities, addJoin);
         return result;
       };
@@ -528,6 +541,10 @@
           }
           fields.push(item);
         });
+      };
+
+      this.isPseudoField = function(name) {
+        return _.findIndex(CRM.crmSearchAdmin.pseudoFields, {name: name}) >= 0;
       };
 
       /**
@@ -646,7 +663,7 @@
         _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
           if (!_.includes(fieldName, ' AS ')) {
             var info = searchMeta.parseExpr(fieldName);
-            if (info.field && !info.suffix && !info.fn && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
+            if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
               var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
                 idField = searchMeta.parseExpr(idFieldName).field;
               if (!ctrl.canAggregate(idFieldName)) {
