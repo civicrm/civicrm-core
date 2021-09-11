@@ -30,4 +30,25 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
     ob_end_clean();
   }
 
+  /**
+   * Test dashboard with something actually on it.
+   */
+  public function testInvokeDashboardWithGettingStartedDashlet(): void {
+    $user_id = $this->createLoggedInUser();
+    $this->callAPISuccess('DashboardContact', 'create', [
+      'dashboard_id' => 2,
+      'contact_id' => $user_id,
+    ]);
+
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    $_SERVER['REQUEST_URI'] = 'civicrm/dashboard?reset=1';
+    $_GET['q'] = 'civicrm/dashboard';
+
+    $item = CRM_Core_Invoke::getItem(['civicrm/dashboard?reset=1']);
+    ob_start();
+    CRM_Core_Invoke::runItem($item);
+    ob_end_clean();
+  }
+
 }
