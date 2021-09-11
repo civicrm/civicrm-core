@@ -64,7 +64,8 @@ class CRM_Core_ManagedEntities {
    * @param array $modules
    *   CRM_Core_Module.
    * @param array $declarations
-   *   Per hook_civicrm_managed.
+   *   Per hook_civicrm_managed. Only ever passed in in unit tests - otherwise
+   *   calculated.
    */
   public function __construct($modules, $declarations) {
     $this->moduleIndex = $this->createModuleIndex($modules);
@@ -73,7 +74,7 @@ class CRM_Core_ManagedEntities {
       $this->declarations = $this->cleanDeclarations($declarations);
     }
     else {
-      $this->declarations = NULL;
+      $this->loadDeclarations();
     }
   }
 
@@ -379,15 +380,6 @@ class CRM_Core_ManagedEntities {
    * @return array|null
    */
   protected function getDeclarations() {
-    if ($this->declarations === NULL) {
-      $this->declarations = [];
-      foreach (CRM_Core_Component::getEnabledComponents() as $component) {
-        /** @var CRM_Core_Component_Info $component */
-        $this->declarations = array_merge($this->declarations, $component->getManagedEntities());
-      }
-      CRM_Utils_Hook::managed($this->declarations);
-      $this->declarations = $this->cleanDeclarations($this->declarations);
-    }
     return $this->declarations;
   }
 
@@ -535,6 +527,20 @@ class CRM_Core_ManagedEntities {
       }
     }
     return Civi::$statics[__CLASS__][__FUNCTION__][$entity_type];
+  }
+
+  /**
+   * Load declarations into the class property.
+   *
+   * This picks it up from hooks and enabled components.
+   */
+  protected function loadDeclarations(): void {
+    $this->declarations = [];
+    foreach (CRM_Core_Component::getEnabledComponents() as $component) {
+      $this->declarations = array_merge($this->declarations, $component->getManagedEntities());
+    }
+    CRM_Utils_Hook::managed($this->declarations);
+    $this->declarations = $this->cleanDeclarations($this->declarations);
   }
 
 }
