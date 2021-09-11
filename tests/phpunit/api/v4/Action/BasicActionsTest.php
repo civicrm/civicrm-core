@@ -158,7 +158,7 @@ class BasicActionsTest extends UnitTestCase {
   public function testGetFields() {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
-    $this->assertCount(7, $getFields);
+    $this->assertCount(8, $getFields);
     $this->assertEquals('Identifier', $getFields['identifier']['title']);
     // Ensure default data type is "String" when not specified
     $this->assertEquals('String', $getFields['color']['data_type']);

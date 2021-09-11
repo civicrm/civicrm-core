@@ -50,6 +50,7 @@ EOHTML;
     // Creating a custom group should automatically create an afform block
     $block = \Civi\Api4\Afform::get()
       ->addWhere('name', '=', 'afblockCustom_MyThings')
+      ->addSelect('layout', 'directive_name')
       ->setLayoutFormat('shallow')
       ->setFormatWhitespace(TRUE)
       ->execute()->single();

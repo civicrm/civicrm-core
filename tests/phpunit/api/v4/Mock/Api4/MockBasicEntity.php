@@ -61,6 +61,9 @@ class MockBasicEntity extends Generic\BasicEntity {
           'name' => 'size',
         ],
         [
+          'name' => 'foo',
+        ],
+        [
           'name' => 'weight',
           'data_type' => 'Integer',
         ],
