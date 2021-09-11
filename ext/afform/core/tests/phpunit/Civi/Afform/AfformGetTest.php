@@ -54,4 +54,21 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertArrayNotHasKey('has_local', $result);
   }
 
+  public function testGetSearchDisplays() {
+    Afform::create()
+      ->addValue('name', $this->formName)
+      ->addValue('title', 'Test Form')
+      ->addValue('layout', '<div><crm-search-display-grid search-name="foo" display-name="foo-bar" /></div>< crm-search-display-table search-name=\'foo\' display-name = \'bar-food\' >')
+      ->setLayoutFormat('html')
+      ->execute();
+
+    $result = Afform::get()
+      ->addSelect('name', 'search_displays')
+      ->addWhere('name', '=', $this->formName)
+      ->addWhere('search_displays', 'CONTAINS', 'foo.foo-bar')
+      ->execute()->single();
+
+    $this->assertEquals(['foo.foo-bar', 'foo.bar-food'], $result['search_displays']);
+  }
+
 }

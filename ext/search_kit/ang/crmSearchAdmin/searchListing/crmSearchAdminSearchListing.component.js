@@ -154,22 +154,21 @@
         }
         ctrl.afforms = null;
         crmApi4('Afform', 'get', {
-          select: ['layout', 'name', 'title', 'server_route'],
-          where: [['type', '=', 'search']],
-          layoutFormat: 'html'
+          select: ['search_displays', 'name', 'title', 'server_route'],
+          where: [['type', '=', 'search'], ['search_displays', 'IS NOT EMPTY']]
         }).then(function(afforms) {
           ctrl.afforms = {};
           _.each(afforms, function(afform) {
-            var searchName = afform.layout.match(/<crm-search-display-[^>]+search-name[ ]*=[ ]*['"]([^"']+)/);
-            if (searchName) {
-              ctrl.afforms[searchName[1]] = ctrl.afforms[searchName[1]] || [];
-              ctrl.afforms[searchName[1]].push({
+            _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
+              var searchName = searchNameDisplayName.split('.')[0];
+              ctrl.afforms[searchName] = ctrl.afforms[searchName] || [];
+              ctrl.afforms[searchName].push({
                 title: afform.title,
                 name: afform.name,
                 // FIXME: This is the view url, currently not exposed to the UI, as BS3 doesn't support submenus.
                 url: afform.server_route ? CRM.url(afform.server_route) : null
               });
-            }
+            });
           });
           updateAfformCounts();
         });
