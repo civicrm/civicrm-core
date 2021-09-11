@@ -249,6 +249,13 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'pledge_reminder', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.43.alpha1',
+        'upgrade_descriptor' => ts('Missed text version from 5.20'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+        ],
+      ],
     ];
   }
 
