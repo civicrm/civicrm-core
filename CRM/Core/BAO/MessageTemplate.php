@@ -375,7 +375,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       // when we likely have the contact id. OTOH people probably barely
       // use preferredMailFormat these days - the good fight against html
       // emails was lost a decade ago...
-      $preferredMailFormat = Email::get(FALSE)->addWhere('email', '=', $params['toEmail'])->addSelect('contact_id.preferred_mail_format')->execute()->first()['contact_id.preferred_mail_format'];
+      $preferredMailFormatArray = Email::get(FALSE)->addWhere('email', '=', $params['toEmail'])->addSelect('contact_id.preferred_mail_format')->execute()->first();
+      $preferredMailFormat = $preferredMailFormatArray['contact_id.preferred_mail_format'] ?? 'Both';
 
       if ($preferredMailFormat === 'HTML') {
         $params['text'] = NULL;
