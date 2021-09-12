@@ -99,6 +99,7 @@
         } else if (params.id) {
           apiCalls.deleteGroup = ['Group', 'delete', {where: [['saved_search_id', '=', params.id]]}];
         }
+        _.remove(params.displays, {trashed: true});
         if (params.displays && params.displays.length) {
           chain.displays = ['SearchDisplay', 'replace', {where: [['saved_search_id', '=', '$id']], records: params.displays}];
         } else if (params.id) {
