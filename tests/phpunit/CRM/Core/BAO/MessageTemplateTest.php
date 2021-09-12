@@ -214,14 +214,16 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'contact' => ['role' => 'Sand grain counter'],
     ];
 
+    $toContact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contact_id]);
+
     [, $subject, $message] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'valueName' => 'case_activity',
         'contactId' => $contact_id,
         'tplParams' => $tplParams,
         'from' => 'admin@example.com',
-        'toName' => 'Demo',
-        'toEmail' => 'admin@example.com',
+        'toName' => $toContact['display_name'],
+        'toEmail' => $toContact['email'],
         'attachments' => NULL,
       ]
     );
