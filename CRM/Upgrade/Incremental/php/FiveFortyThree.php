@@ -27,9 +27,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev === '5.43.alpha1' && !empty(CRM_Core_Component::getEnabledComponents()['CiviCase'])) {
+      $preUpgradeMessage .= '<p>' . ts('Minor changes have been made to how the tokens to render case.is_deleted, case.created_date and case.modified_date. See https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/ for more') . '</p>';
+    }
   }
 
   /**

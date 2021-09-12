@@ -41,8 +41,17 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     $fieldValue = $this->getFieldValue($row, $field);
 
     if ($this->isPseudoField($field)) {
+      if (!empty($fieldValue)) {
+        // If it's set here it has already been loaded in pre-fetch.
+        return $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
+      }
+      // Once prefetch is fully standardised we can remove this - as long
+      // as tests pass we should be fine as tests cover this.
       $split = explode(':', $field);
       return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
+    }
+    if ($this->isCustomField($field)) {
+      return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
       return $row->format('text/plain')->tokens($entity, $field,
@@ -51,12 +60,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($this->isDateField($field)) {
       return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
     }
-    if ($this->isCustomField($field)) {
-      $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
-    }
-    else {
-      $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
-    }
+    $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
   }
 
   /**
@@ -120,7 +124,30 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array|string[]
    */
   public function getAllTokens(): array {
-    return array_merge($this->getBasicTokens(), $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens('Contribution'));
+    $basicTokens = $this->getBasicTokens();
+    foreach (array_keys($basicTokens) as $fieldName) {
+      // The goal is to be able to render more complete tokens
+      // (eg. actual booleans, field names, raw ids) for a more
+      // advanced audiences - ie those using conditionals
+      // and to specify that audience in the api that retrieves.
+      // But, for now, let's not advertise, given that most of these fields
+      // aren't really needed even once...
+      if ($this->isBooleanField($fieldName)) {
+        unset($basicTokens[$fieldName]);
+      }
+    }
+    return array_merge($basicTokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
+  }
+
+  /**
+   * Is the given field a boolean field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isBooleanField(string $fieldName): bool {
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
   }
 
   /**
@@ -131,7 +158,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isDateField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Timestamp';
+    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
   }
 
   /**
@@ -199,6 +226,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $fieldLabel = $this->fieldMetadata[$fieldName]['input_attrs']['label'] ?? $this->fieldMetadata[$fieldName]['label'];
         $return[$fieldName . ':label'] = $fieldLabel;
         $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $fieldLabel;
+      }
+      if ($this->isBooleanField($fieldName)) {
+        $return[$fieldName . ':label'] = $this->getFieldMetadata()[$fieldName]['title'];
       }
     }
     return $return;
@@ -353,7 +383,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return string[]
    */
   public function getSkippedFields(): array {
-    $fields = ['contact_id'];
+    // tags is offered in 'case' & is one of the only fields that is
+    // 'not a real field' offered up by case - seems like an oddity
+    // we should skip at the top level for now.
+    $fields = ['contact_id', 'tags'];
     if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
       $fields[] = 'campaign_id';
     }
@@ -405,7 +438,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
-    return array_intersect($this->getActiveTokens($e), $this->getCurrencyFieldName(), array_keys($this->getAllTokens()));
+    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName()), array_keys($this->getAllTokens()));
   }
 
 }

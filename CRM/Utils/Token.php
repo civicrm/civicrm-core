@@ -1633,7 +1633,7 @@ class CRM_Utils_Token {
       return implode(', ', $ret);
     }
     // Format date fields
-    elseif ($entityArray[$token] && $fieldType == CRM_Utils_Type::T_DATE) {
+    elseif ($entityArray[$token] && in_array($fieldType, [CRM_Utils_Type::T_DATE, CRM_Utils_Type::T_TIMESTAMP, (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)])) {
       return CRM_Utils_Date::customFormat($entityArray[$token]);
     }
     return implode(', ', (array) $entityArray[$token]);
@@ -1829,7 +1829,7 @@ class CRM_Utils_Token {
     $customTokens = [];
     $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens[sprintf($tokenName, $id)] = $info['label'];
+      $customTokens[sprintf($tokenName, $id)] = $info['label'] . ' :: ' . $info['groupTitle'];
     }
 
     return $customTokens;
