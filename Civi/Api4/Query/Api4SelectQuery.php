@@ -1030,7 +1030,7 @@ class Api4SelectQuery {
       $joinPath = $joiner->getPath($explicitJoin['table'] ?? $this->getFrom(), $pathArray);
     }
     catch (\API_Exception $e) {
-      if ($explicitJoin['bridge']) {
+      if (!empty($explicitJoin['bridge'])) {
         // Try looking up custom field in bridge entity instead
         try {
           $useBridgeTable = TRUE;
