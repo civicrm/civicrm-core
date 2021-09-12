@@ -41,7 +41,7 @@ class CRM_Core_ManagedEntities {
   public static function singleton($fresh = FALSE) {
     static $singleton;
     if ($fresh || !$singleton) {
-      $singleton = new CRM_Core_ManagedEntities(CRM_Core_Module::getAll(), NULL);
+      $singleton = new CRM_Core_ManagedEntities(CRM_Core_Module::getAll());
     }
     return $singleton;
   }
@@ -63,19 +63,10 @@ class CRM_Core_ManagedEntities {
   /**
    * @param array $modules
    *   CRM_Core_Module.
-   * @param array $declarations
-   *   Per hook_civicrm_managed. Only ever passed in in unit tests - otherwise
-   *   calculated.
    */
-  public function __construct($modules, $declarations) {
+  public function __construct(array $modules) {
     $this->moduleIndex = $this->createModuleIndex($modules);
-
-    if ($declarations !== NULL) {
-      $this->declarations = $this->cleanDeclarations($declarations);
-    }
-    else {
-      $this->loadDeclarations();
-    }
+    $this->loadDeclarations();
   }
 
   /**
@@ -113,9 +104,10 @@ class CRM_Core_ManagedEntities {
   /**
    * Identify any enabled/disabled modules. Add new entities, update
    * existing entities, and remove orphaned (stale) entities.
+   *
    * @param bool $ignoreUpgradeMode
    *
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   public function reconcile($ignoreUpgradeMode = FALSE) {
     // Do not reconcile whilst we are in upgrade mode
@@ -123,7 +115,7 @@ class CRM_Core_ManagedEntities {
       return;
     }
     if ($error = $this->validate($this->getDeclarations())) {
-      throw new Exception($error);
+      throw new CRM_Core_Exception($error);
     }
     $this->reconcileEnabledModules();
     $this->reconcileDisabledModules();
