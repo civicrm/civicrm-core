@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * One place to store frequently used values in Select Elements. Note that
  * some of the below elements will be dynamic, so we'll probably have a
@@ -576,77 +578,9 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function contactTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $additionalFields = [
-        'checksum' => ['title' => ts('Checksum')],
-        'contact_id' => ['title' => ts('Internal Contact ID')],
-      ];
-      $exportFields = array_merge(CRM_Contact_BAO_Contact::exportableFields(), $additionalFields);
-
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      //FIXME:skipping some tokens for time being.
-      $skipTokens = [
-        'is_bulkmail',
-        'group',
-        'tag',
-        'contact_sub_type',
-        'note',
-        'is_deceased',
-        'deceased_date',
-        'legal_identifier',
-        'contact_sub_type',
-        'user_unique_id',
-        'addressee_id',
-        'email_greeting_id',
-        'postal_greeting_id',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields(['Individual', 'Address']);
-      $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
-
-      foreach ($values as $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($val);
-        if ($customFieldId) {
-          // CRM-15191 - if key is not in $customFields then the field is disabled and should be ignored
-          if (!empty($customFields[$customFieldId])) {
-            $tokens["{contact.$val}"] = $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'];
-          }
-        }
-        else {
-          // Support legacy token names
-          $tokenName = CRM_Utils_Array::value($val, $legacyTokenNames, $val);
-          $tokens["{contact.$tokenName}"] = $exportFields[$val]['title'];
-        }
-      }
-
-      // Get all the hook tokens too
-      $hookTokens = [];
-      CRM_Utils_Hook::tokens($hookTokens);
-      foreach ($hookTokens as $tokenValues) {
-        foreach ($tokenValues as $key => $value) {
-          if (is_numeric($key)) {
-            $key = $value;
-          }
-          if (!preg_match('/^\{[^\}]+\}$/', $key)) {
-            $key = '{' . $key . '}';
-          }
-          if (preg_match('/^\{([^\}]+)\}$/', $value, $matches)) {
-            $value = $matches[1];
-          }
-          $tokens[$key] = $value;
-        }
-      }
-    }
-
-    return $tokens;
+  public static function contactTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    return $tokenProcessor->listTokens();
   }
 
   /**
