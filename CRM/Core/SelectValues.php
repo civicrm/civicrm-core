@@ -630,28 +630,9 @@ class CRM_Core_SelectValues {
    * @param int $caseTypeId
    * @return array
    */
-  public static function caseTokens($caseTypeId = NULL) {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $tokens = [
-        '{case.id}' => 'Case ID',
-        '{case.case_type_id:label}' => 'Case Type',
-        '{case.subject}' => 'Case Subject',
-        '{case.start_date}' => 'Case Start Date',
-        '{case.end_date}' => 'Case End Date',
-        '{case.details}' => 'Details',
-        '{case.status_id:label}' => 'Case Status',
-        '{case.is_deleted:label}' => 'Case is in the Trash',
-        '{case.created_date}' => 'Created Date',
-        '{case.modified_date}' => 'Modified Date',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
-      foreach ($customFields as $id => $field) {
-        $tokens["{case.custom_$id}"] = "{$field['label']} :: {$field['groupTitle']}";
-      }
-    }
-    return $tokens;
+  public static function caseTokens($caseTypeId = NULL): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['caseId']]);
+    return $tokenProcessor->listTokens();
   }
 
   /**
