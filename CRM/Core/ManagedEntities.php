@@ -138,10 +138,8 @@ class CRM_Core_ManagedEntities {
   /**
    * For all enabled modules, add new entities, update
    * existing entities, and remove orphaned (stale) entities.
-   *
-   * @throws Exception
    */
-  public function reconcileEnabledModules() {
+  protected function reconcileEnabledModules(): void {
     // Note: any thing currently declared is necessarily from
     // an active module -- because we got it from a hook!
 
@@ -160,7 +158,7 @@ class CRM_Core_ManagedEntities {
    *
    * @param string $module
    */
-  public function reconcileEnabledModule(string $module): void {
+  protected function reconcileEnabledModule(string $module): void {
     foreach ($this->getManagedEntitiesToUpdate(['module' => $module]) as $todo) {
       $dao = new CRM_Core_DAO_Managed();
       $dao->module = $todo['module'];
@@ -242,7 +240,7 @@ class CRM_Core_ManagedEntities {
   /**
    * For all disabled modules, disable any managed entities.
    */
-  public function reconcileDisabledModules() {
+  protected function reconcileDisabledModules() {
     if (empty($this->moduleIndex[FALSE])) {
       return;
     }
@@ -262,7 +260,7 @@ class CRM_Core_ManagedEntities {
    * Remove any orphaned (stale) entities that are linked to
    * unknown modules.
    */
-  public function reconcileUnknownModules() {
+  protected function reconcileUnknownModules() {
     $knownModules = [];
     if (array_key_exists(0, $this->moduleIndex) && is_array($this->moduleIndex[0])) {
       $knownModules = array_merge($knownModules, array_keys($this->moduleIndex[0]));
@@ -313,7 +311,7 @@ class CRM_Core_ManagedEntities {
    * @param array $todo
    *   Entity specification (per hook_civicrm_managedEntities).
    */
-  public function updateExistingEntity($dao, $todo) {
+  protected function updateExistingEntity($dao, $todo) {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');
     $doUpdate = ($policy === 'always');
 
