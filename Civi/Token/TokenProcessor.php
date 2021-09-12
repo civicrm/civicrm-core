@@ -360,30 +360,71 @@ class TokenProcessor {
     $row->fill($message['format']);
     $useSmarty = !empty($row->context['smarty']);
 
-    /**
-     *@FIXME preg_callback.
-     */
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $flatTokens = [];
-    \CRM_Utils_Array::flatten($tokens, $flatTokens, '', '.');
-    $filteredTokens = [];
-    foreach ($flatTokens as $k => $v) {
-      $filteredTokens['{' . $k . '}'] = ($useSmarty ? \CRM_Utils_Token::tokenEscapeSmarty($v) : $v);
-    }
+    $getToken = function($m) use ($tokens, $useSmarty, $row) {
+      [$full, $entity, $field] = $m;
+      if (isset($tokens[$entity][$field])) {
+        $v = $tokens[$entity][$field];
+        if (isset($m[3])) {
+          $v = $this->filterTokenValue($v, $m[3], $row);
+        }
+        if ($useSmarty) {
+          $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
+        }
+        return $v;
+      }
+      return $full;
+    };
 
     $event = new TokenRenderEvent($this);
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    $event->string = strtr($message['string'], $filteredTokens);
+    // Regex examples: '{foo.bar}', '{foo.bar|whiz}'
+    // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
+    // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
+    $tokRegex = '([\w]+)\.([\w:]+)';
+    $filterRegex = '(\w+)';
+    $event->string = preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", $getToken, $message['string']);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
+  }
+
+  /**
+   * Given a token value, run it through any filters.
+   *
+   * @param mixed $value
+   *   Raw token value (e.g. from `$row->tokens['foo']['bar']`).
+   * @param string $filter
+   * @param TokenRow $row
+   *   The current target/row.
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function filterTokenValue($value, $filter, TokenRow $row) {
+    // KISS demonstration. This should change... e.g. provide a filter-registry or reuse Smarty's registry...
+    switch ($filter) {
+      case NULL:
+        return $value;
+
+      case 'upper':
+        return mb_strtoupper($value);
+
+      case 'lower':
+        return mb_strtolower($value);
+
+      default:
+        throw new \CRM_Core_Exception("Invalid token filter: $filter");
+    }
   }
 
 }
 
 class TokenRowIterator extends \IteratorIterator {
 
+  /**
+   * @var \Civi\Token\TokenProcessor
+   */
   protected $tokenProcessor;
 
   /**
