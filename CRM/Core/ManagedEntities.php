@@ -75,7 +75,6 @@ class CRM_Core_ManagedEntities {
    */
   public function __construct(array $modules) {
     $this->moduleIndex = $this->createModuleIndex($modules);
-    $this->loadDeclarations();
   }
 
   /**
@@ -125,7 +124,7 @@ class CRM_Core_ManagedEntities {
     if (CRM_Core_Config::singleton()->isUpgradeMode() && !$ignoreUpgradeMode) {
       return;
     }
-
+    $this->loadDeclarations();
     if ($error = $this->validate($this->getDeclarations())) {
       throw new CRM_Core_Exception($error);
     }
