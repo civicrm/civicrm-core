@@ -4,10 +4,11 @@
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
     templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
-    controller: function($scope, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
+    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait);
+        ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
+        afformLoad;
 
       this.searchDisplayPath = CRM.url('civicrm/search');
       this.afformPath = CRM.url('civicrm/admin/afform');
@@ -70,6 +71,40 @@
 
       this.encode = function(params) {
         return encodeURI(angular.toJson(params));
+      };
+
+      this.confirmDelete = function(search) {
+        function getConfirmationMsg() {
+          var msg = '<h4>' + _.escape(ts('Permanently delete this saved search?')) + '</h4>' +
+            '<ul>';
+          if (search.display_label.view && search.display_label.view.length === 1) {
+            msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
+          } else if (search.display_label.view && search.display_label.view.length > 1) {
+            msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.view.length})) + '</li>';
+          }
+          _.each(search.groups.view, function(smartGroup) {
+            msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
+          });
+          if (search.afform_count) {
+            _.each(ctrl.afforms[search.name.raw], function(afform) {
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+            });
+          }
+          return msg + '</ul>';
+        }
+
+        var dialog = CRM.confirm({
+          title: ts('Delete %1', {1: search.label.view}),
+          message: getConfirmationMsg(),
+        }).on('crmConfirm:yes', function() {
+          $scope.$apply(function() {
+            ctrl.deleteSearch(search);
+          });
+        }).block();
+
+        ctrl.loadAfforms().then(function() {
+          dialog.html(getConfirmationMsg()).unblock();
+        });
       };
 
       this.deleteSearch = function(search) {
@@ -148,12 +183,18 @@
         ctrl.settings = ctrl.display.settings;
       }
 
+      // @return {Promise}
       this.loadAfforms = function() {
-        if (ctrl.afforms || ctrl.afforms === null) {
-          return;
+        if (!ctrl.afformEnabled && !afformLoad) {
+          var deferred = $q.defer();
+          afformLoad = deferred.promise;
+          deferred.resolve([]);
+        }
+        if (afformLoad) {
+          return afformLoad;
         }
         ctrl.afforms = null;
-        crmApi4('Afform', 'get', {
+        afformLoad = crmApi4('Afform', 'get', {
           select: ['search_displays', 'name', 'title', 'server_route'],
           where: [['type', '=', 'search'], ['search_displays', 'IS NOT EMPTY']]
         }).then(function(afforms) {
@@ -172,6 +213,7 @@
           });
           updateAfformCounts();
         });
+        return afformLoad;
       };
 
       function updateAfformCounts() {
