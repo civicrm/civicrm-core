@@ -14,7 +14,7 @@
  * @subpackage API_Contribution
  * @group headless
  */
-class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
+class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
