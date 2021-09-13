@@ -339,6 +339,7 @@ London, 90210
     // work in combination.
     $tokenString = '{$pre_assigned_smarty}{$passed_smarty}
 {domain.name}
+{important_stuff.favourite_emoticon}
 ';
     foreach (array_keys($tokenData) as $key) {
       $tokenString .= "{$key}:{contact.{$key}}\n";
@@ -356,6 +357,7 @@ London, 90210
     ]);
     $expected = 'weewhoa
 Default Domain Name
+emo
 ';
     $expected .= $this->getExpectedContactOutput($address['id'], $tokenData, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['html']);
@@ -455,7 +457,12 @@ Default Domain Name
     ];
   }
 
-  public function getAdvertisedTokens() {
+  /**
+   * Get the tokens we expect to see advertised.
+   *
+   * @return string[]
+   */
+  public function getAdvertisedTokens(): array {
     return [
       '{contact.contact_type}' => 'Contact Type',
       '{contact.do_not_email}' => 'Do Not Email',
