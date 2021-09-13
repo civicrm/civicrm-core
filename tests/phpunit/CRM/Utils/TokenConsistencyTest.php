@@ -357,4 +357,72 @@ Check
 Check';
   }
 
+  /**
+   * Test that membership tokens are consistently rendered.
+   *
+   * @throws \API_Exception
+   */
+  public function testMembershipTokenConsistency(): void {
+    $this->createLoggedInUser();
+    $this->restoreMembershipTypes();
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
+    $tokens = CRM_Core_SelectValues::membershipTokens();
+    $this->assertEquals($this->getMembershipTokens(), $tokens);
+    $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
+    $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
+    $memberships = CRM_Utils_Token::getMembershipTokenDetails([$this->getMembershipID()]);
+    $messageToken = CRM_Utils_Token::getTokens($tokenString);
+    $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
+    $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
+  }
+
+  /**
+   * Get declared membership tokens.
+   *
+   * @return string[]
+   */
+  public function getMembershipTokens(): array {
+    return [
+      '{membership.id}' => 'Membership ID',
+      '{membership.status}' => 'Membership Status',
+      '{membership.type}' => 'Membership Type',
+      '{membership.start_date}' => 'Membership Start Date',
+      '{membership.join_date}' => 'Membership Join Date',
+      '{membership.end_date}' => 'Membership End Date',
+      '{membership.fee}' => 'Membership Fee',
+    ];
+  }
+
+  /**
+   * Get case ID.
+   *
+   * @return int
+   */
+  protected function getMembershipID(): int {
+    if (!isset($this->ids['Membership'][0])) {
+      $this->ids['Membership'][0] = $this->contactMembershipCreate(
+        ['contact_id' => $this->getContactID()]
+      );
+    }
+    return $this->ids['Membership'][0];
+  }
+
+  /**
+   * Get expected output from token parsing.
+   *
+   * @return string
+   */
+  protected function getExpectedMembershipTokenOutput(): string {
+    return '
+Expired
+General
+1
+Expired
+General
+January 21st, 2007
+January 21st, 2007
+December 21st, 2007
+100.00';
+  }
+
 }

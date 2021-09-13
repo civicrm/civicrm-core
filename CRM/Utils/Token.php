@@ -1535,21 +1535,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Store membership tokens on the static _tokens array.
-   */
-  protected static function _buildMembershipTokens() {
-    $key = 'membership';
-    if (!isset(self::$_tokens[$key]) || self::$_tokens[$key] == NULL) {
-      $membershipTokens = [];
-      $tokens = CRM_Core_SelectValues::membershipTokens();
-      foreach ($tokens as $token => $dontCare) {
-        $membershipTokens[] = substr($token, (strpos($token, '.') + 1), -1);
-      }
-      self::$_tokens[$key] = $membershipTokens;
-    }
-  }
-
-  /**
    * Replace tokens for an entity.
    * @param string $entity
    * @param array $entityArray
@@ -1705,6 +1690,14 @@ class CRM_Utils_Token {
   /**
    * Get replacement strings for any membership tokens (only a small number of tokens are implemnted in the first instance
    * - this is used by the pdfLetter task from membership search
+   *
+   * This is called via replaceEntityTokens.
+   *
+   * In the near term it will not be called at all from core as
+   * the pdf letter task is updated to use the processor.
+   *
+   * @deprecated
+   *
    * @param string $entity
    *   should always be "membership"
    * @param string $token
@@ -1714,13 +1707,29 @@ class CRM_Utils_Token {
    * @return string token replacement
    */
   public static function getMembershipTokenReplacement($entity, $token, $membership) {
-    self::_buildMembershipTokens();
+    $supportedTokens = [
+      'id',
+      'status',
+      'status_id',
+      'type',
+      'membership_type_id',
+      'start_date',
+      'join_date',
+      'end_date',
+      'fee',
+    ];
     switch ($token) {
       case 'type':
+        // membership_type_id would only be requested if the calling
+        // class is mapping it to '{membership:membership_type_id:label'}
+      case 'membership_type_id':
         $value = $membership['membership_name'];
         break;
 
       case 'status':
+        // status_id would only be requested if the calling
+        // class is mapping it to '{membership:status_id:label'}
+      case 'status_id':
         $statuses = CRM_Member_BAO_Membership::buildOptions('status_id');
         $value = $statuses[$membership['status_id']];
         break;
@@ -1741,7 +1750,7 @@ class CRM_Utils_Token {
         break;
 
       default:
-        if (in_array($token, self::$_tokens[$entity])) {
+        if (in_array($token, $supportedTokens)) {
           $value = $membership[$token];
           if (CRM_Utils_String::endsWith($token, '_date')) {
             $value = CRM_Utils_Date::customFormat($value);
