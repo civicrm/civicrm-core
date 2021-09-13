@@ -14,7 +14,7 @@
  * @subpackage API_Contribution
  * @group headless
  */
-class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
+class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
@@ -28,8 +28,14 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * Test token replacement for Print/Merge Task
    */
   public function testMembershipTokenReplacementInPDF(): void {
-    $membershipIds = $returnProperties = $categories = $expected = [];
+    $this->createLoggedInUser();
+    $expected = [];
     [$tokens, $htmlMessage] = self::getSampleHTML();
+
+    $searchFormValues = [
+      'radio_ts' => 'ts_sel',
+      'task' => CRM_Member_Task::PDF_LETTER,
+    ];
 
     $membershipDates = [
       date('Y-m-d'),
@@ -50,7 +56,7 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         'end_date' => date('Y-m-d', strtotime("{$date} +1 year")),
       ];
       $result = $this->callAPISuccess('membership', 'create', $params);
-      $membershipIds[] = $result['id'];
+      $searchFormValues['mark_x_' . $result['id']] = 1;
       $params = array_merge($params,
         [
           'fee' => '100.00',
@@ -70,23 +76,25 @@ class CRM_Member_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
         }
       }
     }
-    $messageToken = CRM_Utils_Token::getTokens($htmlMessage);
-    $form = new CRM_Member_Form_Task_PDFLetter();
-    $testHTML = $form->generateHTML($membershipIds,
-      $returnProperties,
-      NULL,
-      NULL,
-      $messageToken,
-      $htmlMessage,
-      $categories
-    );
+
+    $form = $this->getFormObject('CRM_Member_Form_Task_PDFLetter', [
+      'subject' => '{contact.first_name} {membership.source}',
+      'html_message' => $htmlMessage,
+    ], NULL, $searchFormValues);
+    $form->buildForm();
+    try {
+      $form->postProcess();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $testHTML = $e->errorData['html'];
+    }
 
     // Assert all membership tokens are replaced correctly.
     $expected = array_values($expected);
     foreach ($expected as $key => $dateVal) {
-      $this->assertStringContainsString('Anthony', $testHTML[$key]);
-      foreach ($tokens as $text => $token) {
-        $this->assertStringContainsString($dateVal[$token], $testHTML[$key]);
+      $this->assertStringContainsString('Anthony', $testHTML);
+      foreach ($tokens as $token) {
+        $this->assertStringContainsString($dateVal[$token], $testHTML);
       }
     }
   }

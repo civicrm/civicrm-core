@@ -3335,9 +3335,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param string $pageName
    *
+   * @param array $searchFormValues
+   *   Values for the search form if the form is a task eg.
+   *   for selected ids 6 & 8:
+   *   [
+   *      'radio_ts' => 'ts_sel',
+   *      'task' => CRM_Member_Task::PDF_LETTER,
+   *      'mark_x_6' => 1,
+   *      'mark_x_8' => 1,
+   *   ]
+   *
    * @return \CRM_Core_Form
    */
-  public function getFormObject($class, $formValues = [], $pageName = '') {
+  public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
     $_POST = $formValues;
     /* @var CRM_Core_Form $form */
     $form = new $class();
@@ -3356,6 +3366,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     }
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
     $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
+    if ($searchFormValues) {
+      $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = $searchFormValues;
+    }
     return $form;
   }
 
