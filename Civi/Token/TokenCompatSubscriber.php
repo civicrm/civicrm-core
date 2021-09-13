@@ -42,6 +42,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    *
    * @param \Civi\Token\Event\TokenRegisterEvent $e
    *   The registration event. Add new tokens using register().
+   *
+   * @throws \CRM_Core_Exception
    */
   public function registerTokens(TokenRegisterEvent $e): void {
     if (!$this->checkActive($e->getTokenProcessor())) {
@@ -254,8 +256,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
 
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    $returnProperties = array_fill_keys($messageTokens['contact'] ?? [], 1);
-    $returnProperties = array_merge(\CRM_Contact_BAO_Query::defaultReturnProperties(), $returnProperties);
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
@@ -268,25 +268,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $params = [
-          ['contact_id', '=', $contactId, 0, 0],
-        ];
-        [$contact] = \CRM_Contact_BAO_Query::apiQuery($params, $returnProperties ?? NULL);
-        //CRM-4524
-        $contact = reset($contact);
-        // Test cover for greeting in CRM_Core_BAO_ActionScheduleTest::testMailer
-        $contact['email_greeting'] = $contact['email_greeting_display'] ?? '';
-        $contact['postal_greeting'] = $contact['postal_greeting_display'] ?? '';
-        $contact['addressee'] = $contact['address_display'] ?? '';
-
-        //update value of custom field token
-        if (!empty($messageTokens['contact'])) {
-          foreach ($messageTokens['contact'] as $token) {
-            if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-              $contact[$token] = \CRM_Core_BAO_CustomField::displayValue($contact[$token], \CRM_Core_BAO_CustomField::getKeyID($token));
-            }
-          }
-        }
+        $contact = $this->getContact($contactId, $messageTokens['contact'] ?? [], TRUE);
       }
       else {
         $contact = $row->context['contact'];
@@ -314,7 +296,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * @param \Civi\Token\Event\TokenRenderEvent $e
    */
   public function onRender(TokenRenderEvent $e) {
-    $isHtml = ($e->message['format'] == 'text/html');
+    $isHtml = ($e->message['format'] === 'text/html');
     $useSmarty = !empty($e->context['smarty']);
 
     $domain = \CRM_Core_BAO_Domain::getDomain();
@@ -339,6 +321,118 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         \CRM_Core_Smarty::singleton()->popScope();
       }
     }
+  }
+
+  /**
+   * Get the contact for the row.
+   *
+   * @param int $contactId
+   * @param array $requiredFields
+   * @param bool $getAll
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getContact(int $contactId, array $requiredFields, bool $getAll = FALSE): array {
+    $returnProperties = array_fill_keys($requiredFields, 1);
+    $mappedFields = [
+      'email_greeting' => 'email_greeting_display',
+      'postal_greeting' => 'postal_greeting_display',
+      'addressee' => 'address_display',
+    ];
+    foreach ($mappedFields as $tokenName => $realName) {
+      if (in_array($tokenName, $requiredFields, TRUE)) {
+        $returnProperties[$realName] = 1;
+      }
+    }
+    if ($getAll) {
+      $returnProperties = array_merge($this->getAllContactReturnFields(), $returnProperties);
+    }
+
+    $params = [
+      ['contact_id', '=', $contactId, 0, 0],
+    ];
+    // @todo - map the parameters to apiv4 instead....
+    [$contact] = \CRM_Contact_BAO_Query::apiQuery($params, $returnProperties ?? NULL);
+    //CRM-4524
+    $contact = reset($contact);
+    foreach ($mappedFields as $tokenName => $realName) {
+      $contact[$tokenName] = $contact[$realName] ?? '';
+    }
+
+    //update value of custom field token
+    foreach ($requiredFields as $token) {
+      if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
+        $contact[$token] = \CRM_Core_BAO_CustomField::displayValue($contact[$token], \CRM_Core_BAO_CustomField::getKeyID($token));
+      }
+    }
+
+    return $contact;
+  }
+
+  /**
+   * Get the array of the return fields from 'get all'.
+   *
+   * This is the list from the BAO_Query object but copied
+   * here to be 'frozen in time'. The goal is to map to apiv4
+   * and stop using the legacy call to load the contact.
+   *
+   * @return array
+   */
+  protected function getAllContactReturnFields(): array {
+    return [
+      'image_URL' => 1,
+      'legal_identifier' => 1,
+      'external_identifier' => 1,
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'display_name' => 1,
+      'preferred_mail_format' => 1,
+      'nick_name' => 1,
+      'first_name' => 1,
+      'middle_name' => 1,
+      'last_name' => 1,
+      'prefix_id' => 1,
+      'suffix_id' => 1,
+      'formal_title' => 1,
+      'communication_style_id' => 1,
+      'birth_date' => 1,
+      'gender_id' => 1,
+      'street_address' => 1,
+      'supplemental_address_1' => 1,
+      'supplemental_address_2' => 1,
+      'supplemental_address_3' => 1,
+      'city' => 1,
+      'postal_code' => 1,
+      'postal_code_suffix' => 1,
+      'state_province' => 1,
+      'country' => 1,
+      'world_region' => 1,
+      'geo_code_1' => 1,
+      'geo_code_2' => 1,
+      'email' => 1,
+      'on_hold' => 1,
+      'phone' => 1,
+      'im' => 1,
+      'household_name' => 1,
+      'organization_name' => 1,
+      'deceased_date' => 1,
+      'is_deceased' => 1,
+      'job_title' => 1,
+      'legal_name' => 1,
+      'sic_code' => 1,
+      'current_employer' => 1,
+      'do_not_email' => 1,
+      'do_not_mail' => 1,
+      'do_not_sms' => 1,
+      'do_not_phone' => 1,
+      'do_not_trade' => 1,
+      'is_opt_out' => 1,
+      'contact_is_deleted' => 1,
+      'preferred_communication_method' => 1,
+      'preferred_language' => 1,
+    ];
   }
 
 }
