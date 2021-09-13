@@ -55,38 +55,25 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
 
   /**
    * @inheritDoc
-   */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    // Extracted from scheduled-reminders code. See the class description.
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_membership';
-  }
-
-  /**
-   * Alter action schedule query.
-   *
-   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
-   */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== 'civicrm_membership') {
-      return;
-    }
-    parent::alterActionScheduleQuery($e);
-    $e->query
-      ->select('mt.minimum_fee as ' . $this->getEntityAlias() . 'fee')
-      ->join('mt', '!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id');
-  }
-
-  /**
-   * @inheritDoc
+   * @throws \CiviCRM_API3_Exception
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     if ($field === 'fee') {
-      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->getFieldValue($row, $field)));
+      $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($this->getFieldValue($row, 'membership_type_id'));
+      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($membershipType['minimum_fee']));
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
     }
+  }
+
+  /**
+   * Get fields which need to be returned to render another token.
+   *
+   * @return array
+   */
+  public function getDependencies(): array {
+    return ['fee' => 'membership_type_id'];
   }
 
 }

@@ -45,14 +45,13 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_case', 'civicrm_case_type']);
+    $this->quickCleanup(['civicrm_case', 'civicrm_case_type'], TRUE);
     parent::tearDown();
   }
 
   /**
    * Test that case tokens are consistently rendered.
    *
-   * @throws \API_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function testCaseTokenConsistency(): void {
@@ -367,7 +366,8 @@ Check';
     $this->restoreMembershipTypes();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
     $tokens = CRM_Core_SelectValues::membershipTokens();
-    $this->assertEquals($this->getMembershipTokens(), $tokens);
+    $expectedTokens = $this->getMembershipTokens();
+    $this->assertEquals($expectedTokens, $tokens);
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
 
@@ -393,7 +393,25 @@ Check';
       'body_html' => $tokenString,
     ]);
     $this->callAPISuccess('job', 'send_reminder', []);
-    $mut->checkMailLog([$this->getExpectedMembershipTokenOutput() . "\nmy field"]);
+    $expected = $this->getExpectedMembershipTokenOutput();
+    // Unlike the legacy method custom fields are resolved by the processor.
+    $expected .= "\nmy field";
+    $mut->checkMailLog([$expected]);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['membershipId'],
+    ]);
+    $tokens = $tokenProcessor->listTokens();
+    // Add in custom tokens as token processor supports these.
+    $expectedTokens['{membership.custom_1}'] = 'Enter text here :: Group with field text';
+    $this->assertEquals($expectedTokens, $tokens);
+    $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
+    $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
+
   }
 
   /**

@@ -444,8 +444,38 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return CRM_Core_Config::singleton()->defaultCurrency;
   }
 
+  /**
+   * Get the fields required to prefetch the entity.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
+   * @return array
+   * @throws \API_Exception
+   */
   public function getPrefetchFields(TokenValueEvent $e): array {
-    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName(), ['id']), array_keys($this->getAllTokens()));
+    $allTokens = array_keys($this->getAllTokens());
+    $requiredFields = array_intersect($this->getActiveTokens($e), $allTokens);
+    if (empty($requiredFields)) {
+      return [];
+    }
+    $requiredFields = array_merge($requiredFields, array_intersect($allTokens, array_merge(['id'], $this->getCurrencyFieldName())));
+    foreach ($this->getDependencies() as $field => $required) {
+      if (in_array($field, $this->getActiveTokens($e), TRUE)) {
+        foreach ((array) $required as $key) {
+          $requiredFields[] = $key;
+        }
+      }
+    }
+    return $requiredFields;
+  }
+
+  /**
+   * Get fields which need to be returned to render another token.
+   *
+   * @return array
+   */
+  public function getDependencies(): array {
+    return [];
   }
 
 }
