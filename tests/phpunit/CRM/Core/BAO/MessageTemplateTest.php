@@ -384,7 +384,7 @@ emo
    */
   public function hookTokenValues(array &$details): void {
     foreach ($details as $index => $detail) {
-      $details[$index]['favourite_emoticon'] = 'emo';
+      $details[$index]['important_stuff.favourite_emoticon'] = 'emo';
     }
   }
 

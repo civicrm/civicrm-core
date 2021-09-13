@@ -288,7 +288,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       );
       foreach ($hookTokens as $hookToken) {
         foreach ($messageTokens[$hookToken] as $tokenName) {
-          $row->format('text/plain')->tokens($hookToken, $tokenName, $contactArray[$row->context['contactId']][$tokenName] ?? '');
+          $row->tokens($hookToken, $tokenName, $contactArray[$row->context['contactId']]["{$hookToken}.{$tokenName}"] ?? '');
         }
       }
     }
