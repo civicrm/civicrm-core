@@ -52,7 +52,15 @@ trait CRMTraits_Custom_CustomDataTrait {
       'max_multiple' => 0,
     ], $params);
     $identifier = $params['name'] ?? $params['title'];
-    $this->ids['CustomGroup'][$identifier] = CustomGroup::create(FALSE)->setValues($params)->execute()->first()['id'];
+    try {
+      $this->ids['CustomGroup'][$identifier] = CustomGroup::create(FALSE)
+        ->setValues($params)
+        ->execute()
+        ->first()['id'];
+    }
+    catch (API_Exception $e) {
+      $this->fail('Could not create group ' . $e->getMessage());
+    }
     return $this->ids['CustomGroup'][$identifier];
   }
 
@@ -90,7 +98,6 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @param array $fieldParams
    *
-   * @throws \API_Exception
    */
   public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
     $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
