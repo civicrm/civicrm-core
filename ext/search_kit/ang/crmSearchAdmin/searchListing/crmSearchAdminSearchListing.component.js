@@ -206,6 +206,7 @@
               ctrl.afforms[searchName].push({
                 title: afform.title,
                 name: afform.name,
+                link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
                 // FIXME: This is the view url, currently not exposed to the UI, as BS3 doesn't support submenus.
                 url: afform.server_route ? CRM.url(afform.server_route) : null
               });

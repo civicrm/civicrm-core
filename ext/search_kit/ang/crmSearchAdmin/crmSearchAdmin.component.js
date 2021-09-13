@@ -693,7 +693,7 @@
                   ctrl.afforms[displayName] = ctrl.afforms[displayName] || [];
                   ctrl.afforms[displayName].push({
                     title: afform.title,
-                    link: CRM.url('civicrm/admin/afform#/edit/' + afform.name),
+                    link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
                   });
                 });
               });
