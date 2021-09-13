@@ -228,12 +228,12 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $component->find(TRUE);
 
     $domain = CRM_Core_BAO_Domain::getDomain();
-    list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
+    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = [
       'subject' => $component->subject,
       'toEmail' => $to,
-      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
     ];

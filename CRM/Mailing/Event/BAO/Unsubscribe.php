@@ -384,7 +384,7 @@ WHERE  email = %2
 
     $params = [
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'toEmail' => $eq->email,
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
