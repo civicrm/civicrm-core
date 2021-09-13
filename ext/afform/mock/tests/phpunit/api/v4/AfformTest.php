@@ -53,7 +53,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
 
     $message = 'The initial Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $result = Civi\Api4\Afform::get()
+      ->addSelect('*', 'has_base', 'has_local')
+      ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);
@@ -75,7 +77,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals('The temporary description', $result[0]['description'], $message);
 
     $message = 'After updating, the Afform.get API should return blended data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $result = Civi\Api4\Afform::get()
+      ->addSelect('*', 'has_base', 'has_local')
+      ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals('The temporary description', $get($result[0], 'description'), $message);
@@ -88,7 +92,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $message = 'After reverting, the final Afform.get should return default data';
-    $result = Civi\Api4\Afform::get()->addWhere('name', '=', $formName)->execute();
+    $result = Civi\Api4\Afform::get()
+      ->addSelect('*', 'has_base', 'has_local')
+      ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
     $this->assertEquals($get($originalMetadata, 'description'), $get($result[0], 'description'), $message);

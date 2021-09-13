@@ -66,18 +66,32 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   }
 
   /**
-   * Adds all fields matched by the * wildcard
+   * Adds all standard fields matched by the * wildcard
+   *
+   * Note: this function only deals with simple wildcard expressions.
+   * It ignores those containing special characters like dots or parentheses,
+   * they are handled separately in Api4SelectQuery.
    *
    * @throws \API_Exception
    */
   protected function expandSelectClauseWildcards() {
+    if (!$this->select) {
+      $this->select = ['*'];
+    }
+    // Get expressions containing wildcards but no dots or parentheses
     $wildFields = array_filter($this->select, function($item) {
       return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
     });
-    foreach ($wildFields as $item) {
-      $pos = array_search($item, array_values($this->select));
-      $matches = SelectUtil::getMatchingFields($item, array_column($this->entityFields(), 'name'));
-      array_splice($this->select, $pos, 1, $matches);
+    if ($wildFields) {
+      // Wildcards should not match "Extra" fields
+      $standardFields = array_filter(array_map(function($field) {
+        return $field['type'] === 'Extra' ? NULL : $field['name'];
+      }, $this->entityFields()));
+      foreach ($wildFields as $item) {
+        $pos = array_search($item, array_values($this->select));
+        $matches = SelectUtil::getMatchingFields($item, $standardFields);
+        array_splice($this->select, $pos, 1, $matches);
+      }
     }
     $this->select = array_unique($this->select);
   }
