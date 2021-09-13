@@ -1829,18 +1829,14 @@ class CRM_Utils_Token {
    * Get all custom field tokens of $entity
    *
    * @param string $entity
-   * @param bool $usedForTokenWidget
-   *
    * @return array
    *   return custom field tokens in array('custom_N' => 'label') format
    */
-  public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {
+  public static function getCustomFieldTokens($entity) {
     $customTokens = [];
-    $tokenName = $usedForTokenWidget ? "{contribution.custom_%d}" : "custom_%d";
     foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens[sprintf($tokenName, $id)] = $info['label'] . ' :: ' . $info['groupTitle'];
+      $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
     }
-
     return $customTokens;
   }
 
