@@ -61,6 +61,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       return;
     }
 
+    CRM_Core_Error::deprecatedFunctionWarning('find tests.....');
     // FIXME: `select('e.*')` seems too broad.
     $e->query
       ->select('e.*')
