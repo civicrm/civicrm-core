@@ -132,19 +132,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
       $membership = $memberships[$membershipID];
       // get contact information
       $contactId = $membership['contact_id'];
-      $params = ['contact_id' => $contactId];
-      //getTokenDetails is much like calling the api contact.get function - but - with some minor
-      // special handlings. It precedes the existence of the api
-      [$contacts] = CRM_Utils_Token::getTokenDetails(
-        $params,
-        $returnProperties,
-        $skipOnHold,
-        $skipDeceased,
-        NULL,
-        $messageToken,
-        'CRM_Contribution_Form_Task_PDFLetterCommon'
-      );
-
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $html_message, $messageToken);
       $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $tokenHtml], 'contactId' => $contactId])['html'];
 
