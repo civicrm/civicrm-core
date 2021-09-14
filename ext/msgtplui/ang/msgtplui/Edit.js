@@ -268,8 +268,8 @@
       crmApi4({
         examples: ['ExampleData', 'get', {
           // FIXME: workflow name
-          where: [["tags", "CONTAINS", "preview"], ["workflow", "=", $ctrl.records.main.workflow_name]],
-          select: ['name', 'title', 'workflow', 'data']
+          where: [["tags", "CONTAINS", "preview"], ["name", "LIKE", "workflow/" + $ctrl.records.main.workflow_name + "/%"]],
+          select: ['name', 'title', 'data']
         }],
         adhoc: ['WorkflowMessage', 'getTemplateFields', {
           workflow: $ctrl.records.main.workflow_name,

@@ -29,7 +29,7 @@
         return $q.reject(ts('Malformed JSON example'));
       }
       return crmApi4('WorkflowMessage', 'render', {
-        workflow: adhocExample.workflow,
+        workflow: adhocExample.data.workflow,
         values: adhocExample.data.modelProps,
         messageTemplate: model.revisions[$ctrl.revisionId].rec
       }).then(function(response) {
@@ -41,10 +41,10 @@
       // For a dev working on example, it's easier if the example is always loaded fresh.
       return crmApi4('ExampleData', 'get', {
         where: [["name", "=", model.examples[$ctrl.exampleId].name]],
-        select: ['workflow', 'data'],
+        select: ['data'],
         chain: {
           "render": ["WorkflowMessage", "render", {
-            "workflow": "$workflow",
+            "workflow": "$data.workflow",
             "values": "$data.modelProps",
             "messageTemplate": model.revisions[$ctrl.revisionId].rec
           }]
