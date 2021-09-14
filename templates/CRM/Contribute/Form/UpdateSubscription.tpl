@@ -19,6 +19,12 @@
     </div>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {if $form.amount.frozen}
+  <div class="help">
+    {icon icon="fa-info-circle"}{/icon}
+    {ts}To change the amount you need to edit the template contribution. Click on "View Template" and then "Edit" from the list of recurring contributions{/ts}
+  </div>
+  {/if}
   <table class="form-layout">
     <tr>
       <td class="label">{$form.amount.label}</td>
