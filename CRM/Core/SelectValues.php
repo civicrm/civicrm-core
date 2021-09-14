@@ -523,11 +523,11 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function membershipTokens() {
+  public static function membershipTokens(): array {
     return [
       '{membership.id}' => ts('Membership ID'),
-      '{membership.status}' => ts('Membership Status'),
-      '{membership.type}' => ts('Membership Type'),
+      '{membership.status_id:label}' => ts('Membership Status'),
+      '{membership.membership_type_id:label}' => ts('Membership Type'),
       '{membership.start_date}' => ts('Membership Start Date'),
       '{membership.join_date}' => ts('Membership Join Date'),
       '{membership.end_date}' => ts('Membership End Date'),

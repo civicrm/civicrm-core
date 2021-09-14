@@ -68,6 +68,12 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Replace legacy last_name smarty token in Online contribution workflow template',
       'updateMessageToken', 'contribution_online_receipt', '$last_name', 'contact.last_name', $rev
     );
+    $this->addTask('Replace membership status token in action schedule',
+      'updateActionScheduleToken', 'membership.status', 'membership.status_id:label', $rev
+    );
+    $this->addTask('Replace membership type token in action schedule',
+      'updateActionScheduleToken', 'membership.type', 'membership.membership_type_id:label', $rev
+    );
   }
 
   /**
