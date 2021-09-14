@@ -122,8 +122,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * Get all the tokens supported by this processor.
    *
    * @return array|string[]
+   * @throws \API_Exception
    */
-  public function getAllTokens(): array {
+  protected function getAllTokens(): array {
     $basicTokens = $this->getBasicTokens();
     foreach (array_keys($basicTokens) as $fieldName) {
       // The goal is to be able to render more complete tokens
