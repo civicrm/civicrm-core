@@ -34,7 +34,7 @@ class ExampleDataTest extends UnitTestCase {
    */
   public function testGet() {
     $file = \Civi::paths()->getPath('[civicrm.root]/Civi/WorkflowMessage/GenericWorkflowMessage/Alex.ex.php');
-    $name = 'workflow/generic/alex';
+    $name = 'workflow/generic/Alex';
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
 

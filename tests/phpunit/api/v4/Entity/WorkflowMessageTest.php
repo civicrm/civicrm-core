@@ -37,10 +37,10 @@ class WorkflowMessageTest extends UnitTestCase {
 
   public function testRenderDefaultTemplate() {
     $ex = \Civi\Api4\ExampleData::get(0)
-      ->addWhere('name', '=', 'case_activity.class_1')
-      ->addSelect('data', 'workflow')
+      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
+      ->addSelect('data')
       ->addChain('render', WorkflowMessage::render()
-        ->setWorkflow('$workflow')
+        ->setWorkflow('$data.workflow')
         ->setValues('$data.modelProps'))
       ->execute()
       ->single();
@@ -50,7 +50,7 @@ class WorkflowMessageTest extends UnitTestCase {
 
   public function testRenderCustomTemplate() {
     $ex = \Civi\Api4\ExampleData::get(0)
-      ->addWhere('name', '=', 'case_activity.class_1')
+      ->addWhere('name', '=', 'workflow/case_activity/CaseModelExample')
       ->addSelect('data')
       ->execute()
       ->single();
@@ -68,14 +68,14 @@ class WorkflowMessageTest extends UnitTestCase {
   public function testRenderExamples() {
     $examples = \Civi\Api4\ExampleData::get(0)
       ->addWhere('tags', 'CONTAINS', 'phpunit')
-      ->addSelect('name', 'workflow', 'data', 'asserts')
+      ->addSelect('name', 'data', 'asserts')
       ->execute();
     $this->assertTrue($examples->rowCount >= 1);
     foreach ($examples as $example) {
       $this->assertTrue(!empty($example['data']['modelProps']), sprintf("Example (%s) is tagged phpunit. It should have modelProps.", $example['name']));
       $this->assertTrue(!empty($example['asserts']['default']), sprintf("Example (%s) is tagged phpunit. It should have assertions.", $example['name']));
       $result = \Civi\Api4\WorkflowMessage::render(0)
-        ->setWorkflow($example['workflow'])
+        ->setWorkflow($example['data']['workflow'])
         ->setValues($example['data']['modelProps'])
         ->execute()
         ->single();

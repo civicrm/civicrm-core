@@ -23,12 +23,12 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
   public function testAdhocClassEquiv() {
     $examples = \Civi\Api4\ExampleData::get(0)
       ->setSelect(['name', 'data'])
-      ->addWhere('name', 'IN', ['case_activity.adhoc_1', 'case_activity.class_1'])
+      ->addWhere('name', 'IN', ['workflow/case_activity/CaseAdhocExample', 'workflow/case_activity/CaseModelExample'])
       ->execute()
       ->indexBy('name')
       ->column('data');
-    $byAdhoc = Civi\WorkflowMessage\WorkflowMessage::create('case_activity', $examples['case_activity.adhoc_1']);
-    $byClass = new CRM_Case_WorkflowMessage_CaseActivity($examples['case_activity.class_1']);
+    $byAdhoc = Civi\WorkflowMessage\WorkflowMessage::create('case_activity', $examples['workflow/case_activity/CaseAdhocExample']);
+    $byClass = new CRM_Case_WorkflowMessage_CaseActivity($examples['workflow/case_activity/CaseModelExample']);
     $this->assertSameWorkflowMessage($byClass, $byAdhoc, 'Compare byClass and byAdhoc: ');
   }
 
@@ -52,9 +52,8 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testExampleGet() {
-    $file = \Civi::paths()->getPath('[civicrm.root]/CRM/Case/WorkflowMessage/CaseActivity/class_1.ex.php');
-    $workflow = 'case_activity';
-    $name = 'case_activity.class_1';
+    $file = \Civi::paths()->getPath('[civicrm.root]/CRM/Case/WorkflowMessage/CaseActivity/CaseModelExample.ex.php');
+    $name = 'workflow/case_activity/CaseModelExample';
 
     $this->assertTrue(file_exists($file), "Expect find canary file ($file)");
 
@@ -62,16 +61,16 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
       ->addWhere('name', '=', $name)
       ->execute()
       ->single();
-    $this->assertEquals($workflow, $get['workflow']);
+    $this->assertEquals($name, $get['name']);
     $this->assertTrue(!isset($get['data']));
     $this->assertTrue(!isset($get['asserts']));
 
     $get = \Civi\Api4\ExampleData::get()
       ->addWhere('name', '=', $name)
-      ->addSelect('workflow', 'data')
+      ->addSelect('data')
       ->execute()
       ->single();
-    $this->assertEquals($workflow, $get['workflow']);
+    $this->assertEquals($name, $get['name']);
     $this->assertEquals(100, $get['data']['modelProps']['contact']['contact_id']);
     $this->assertEquals('myrole', $get['data']['modelProps']['contact']['role']);
   }

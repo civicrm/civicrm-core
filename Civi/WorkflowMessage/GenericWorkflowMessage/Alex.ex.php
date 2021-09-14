@@ -1,8 +1,24 @@
 <?php
-return [
-  'tags' => [],
-  'data' => function(\Civi\WorkflowMessage\Examples $examples) {
-    return [
+
+namespace Civi\WorkflowMessage\GenericWorkflowMessage;
+
+class Alex extends \Civi\WorkflowMessage\WorkflowMessageExample {
+
+  /**
+   * @inheritDoc
+   */
+  public function getExamples(): iterable {
+    yield [
+      'name' => "workflow/{$this->wfName}/{$this->exName}",
+      'tags' => [],
+    ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function build(array &$example): void {
+    $example['data'] = [
       'modelProps' => [
         'contact' => [
           'contact_id' => '100',
@@ -75,5 +91,6 @@ return [
         ],
       ],
     ];
-  },
-];
+  }
+
+}

@@ -28,8 +28,8 @@ trait WorkflowMessageTestTrait {
    */
   protected function findExamples(): \Civi\Api4\Generic\AbstractGetAction {
     return \Civi\Api4\ExampleData::get(0)
-      ->setSelect(['name', 'title', 'workflow', 'tags', 'data', 'asserts'])
-      ->addWhere('workflow', '=', $this->getWorkflowName())
+      ->setSelect(['name', 'title', 'tags', 'data', 'asserts'])
+      ->addWhere('name', 'LIKE', 'workflow/' . $this->getWorkflowName() . '/%')
       ->addWhere('tags', 'CONTAINS', 'phpunit');
   }
 
