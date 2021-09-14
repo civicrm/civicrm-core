@@ -134,7 +134,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->getName());
-    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
     $isPDF = FALSE;
     $emailParams = [];
     if (!empty($formValues['email_options'])) {

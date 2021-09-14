@@ -10,7 +10,7 @@
  */
 
  /**
-  * Test class for CRM_Contact_Form_Task_PDFLetterCommon.
+  * Test class for CRM_Contact_Form_Task_PDF.
   * @group headless
   */
 class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
@@ -51,8 +51,12 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    */
   public function _testDocumentContent($formValues, $type) {
     $html = [];
-    $form = new CRM_Contact_Form_Task_PDFLetterCommon();
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = $form->processMessageTemplate($formValues);
+    /* @var CRM_Contact_Form_Task_PDF $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_PDF', [], NULL, [
+      'radio_ts' => 'ts_sel',
+      'task' => CRM_Member_Task::PDF_LETTER,
+    ]);
+    list($formValues, $html_message, $messageToken, $returnProperties) = $form->processMessageTemplate($formValues);
     list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
     foreach ($this->_contactIds as $item => $contactId) {

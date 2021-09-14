@@ -248,7 +248,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
   public function postProcess(): void {
     $form = $this;
     $formValues = $form->controller->exportValues($form->getName());
-    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
@@ -420,6 +420,145 @@ trait CRM_Contact_Form_Task_PDFTrait {
     }
 
     return $activityIds;
+  }
+
+  /**
+   * Handle the template processing part of the form
+   *
+   * @param array $formValues
+   *
+   * @return string $html_message
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function processTemplate(&$formValues) {
+    $html_message = $formValues['html_message'] ?? NULL;
+
+    // process message template
+    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
+      $messageTemplate = [
+        'msg_text' => NULL,
+        'msg_html' => $formValues['html_message'],
+        'msg_subject' => NULL,
+        'is_active' => TRUE,
+      ];
+
+      $messageTemplate['pdf_format_id'] = 'null';
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
+        $messageTemplate['pdf_format_id'] = $formValues['format_id'];
+      }
+      if (!empty($formValues['saveTemplate'])) {
+        $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+      }
+
+      if ($formValues['template'] && !empty($formValues['updateTemplate'])) {
+        $messageTemplate['id'] = $formValues['template'];
+
+        unset($messageTemplate['msg_title']);
+        CRM_Core_BAO_MessageTemplate::add($messageTemplate);
+      }
+    }
+    elseif (CRM_Utils_Array::value('template', $formValues) > 0) {
+      if (!empty($formValues['bind_format']) && $formValues['format_id']) {
+        $query = "UPDATE civicrm_msg_template SET pdf_format_id = {$formValues['format_id']} WHERE id = {$formValues['template']}";
+      }
+      else {
+        $query = "UPDATE civicrm_msg_template SET pdf_format_id = NULL WHERE id = {$formValues['template']}";
+      }
+      CRM_Core_DAO::executeQuery($query);
+
+      $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
+      foreach ((array) $documentInfo as $info) {
+        [$html_message, $formValues['document_type']] = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
+        $formValues['document_file_path'] = $info['fullPath'];
+      }
+    }
+    // extract the content of uploaded document file
+    elseif (!empty($formValues['document_file'])) {
+      [$html_message, $formValues['document_type']] = CRM_Utils_PDF_Document::docReader($formValues['document_file']['name'], $formValues['document_file']['type']);
+      $formValues['document_file_path'] = $formValues['document_file']['name'];
+    }
+
+    if (!empty($formValues['update_format'])) {
+      $bao = new CRM_Core_BAO_PdfFormat();
+      $bao->savePdfFormat($formValues, $formValues['format_id']);
+    }
+
+    return $html_message;
+  }
+
+  /**
+   * Part of the post process which prepare and extract information from the template.
+   *
+   *
+   * @param array $formValues
+   *
+   * @return array
+   *   [$categories, $html_message, $messageToken, $returnProperties]
+   */
+  public function processMessageTemplate($formValues) {
+    $html_message = $this->processTemplate($formValues);
+
+    //time being hack to strip '&nbsp;'
+    //from particular letter line, CRM-6798
+    $this->formatMessage($html_message);
+
+    $messageToken = CRM_Utils_Token::getTokens($html_message);
+
+    $returnProperties = [];
+    if (isset($messageToken['contact'])) {
+      foreach ($messageToken['contact'] as $key => $value) {
+        $returnProperties[$value] = 1;
+      }
+    }
+
+    return [$formValues, $html_message, $messageToken, $returnProperties];
+  }
+
+  /**
+   * @param $message
+   */
+  public function formatMessage(&$message) {
+    $newLineOperators = [
+      'p' => [
+        'oper' => '<p>',
+        'pattern' => '/<(\s+)?p(\s+)?>/m',
+      ],
+      'br' => [
+        'oper' => '<br />',
+        'pattern' => '/<(\s+)?br(\s+)?\/>/m',
+      ],
+    ];
+
+    $htmlMsg = preg_split($newLineOperators['p']['pattern'], $message);
+    foreach ($htmlMsg as $k => & $m) {
+      $messages = preg_split($newLineOperators['br']['pattern'], $m);
+      foreach ($messages as $key => & $msg) {
+        $msg = trim($msg);
+        $matches = [];
+        if (preg_match('/^(&nbsp;)+/', $msg, $matches)) {
+          $spaceLen = strlen($matches[0]) / 6;
+          $trimMsg = ltrim($msg, '&nbsp; ');
+          $charLen = strlen($trimMsg);
+          $totalLen = $charLen + $spaceLen;
+          if ($totalLen > 100) {
+            $spacesCount = 10;
+            if ($spaceLen > 50) {
+              $spacesCount = 20;
+            }
+            if ($charLen > 100) {
+              $spacesCount = 1;
+            }
+            $msg = str_repeat('&nbsp;', $spacesCount) . $trimMsg;
+          }
+        }
+      }
+      $m = implode($newLineOperators['br']['oper'], $messages);
+    }
+    $message = implode($newLineOperators['p']['oper'], $htmlMsg);
   }
 
 }

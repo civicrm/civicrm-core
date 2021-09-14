@@ -23,13 +23,19 @@
  * The intention is that common functionality can be moved here and the other
  * classes cleaned up.
  * Keep old-style token handling out of this class.
+ *
+ * @deprecated
  */
 class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * @var CRM_Core_Form $form
+   *
+   * @deprecated
    */
   public static function preProcess(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     $form->setTitle('Print/Merge Document');
   }
 
@@ -247,11 +253,15 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    *
    * @return string $html_message
    *
+   * @deprecated
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function processTemplate(&$formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     $html_message = $formValues['html_message'] ?? NULL;
 
     // process message template
@@ -309,6 +319,8 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   }
 
   /**
+   * @deprecated
+   *
    * @param $message
    */
   public static function formatMessage(&$message) {
