@@ -22,13 +22,24 @@
  * implementation which is not tied to scheduled reminders, although
  * that is outside the current scope.
  */
-class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Member_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Class constructor.
+   * Get the entity name for api v4 calls.
+   *
+   * @return string
    */
-  public function __construct() {
-    parent::__construct('membership', array_merge(
+  protected function getApiEntityName(): string {
+    return 'Membership';
+  }
+
+  /**
+   * Get all tokens.
+   *
+   * This function will be removed once the parent class can determine it.
+   */
+  public function getAllTokens(): array {
+    return array_merge(
       [
         'fee' => ts('Membership Fee'),
         'id' => ts('Membership ID'),
@@ -37,9 +48,11 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'end_date' => ts('Membership End Date'),
         'status' => ts('Membership Status'),
         'type' => ts('Membership Type'),
+        'status_id:label' => ts('Membership Status'),
+        'membership_type_id:label' => ts('Membership Type'),
       ],
       CRM_Utils_Token::getCustomFieldTokens('Membership')
-    ));
+    );
   }
 
   /**
@@ -56,7 +69,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
     if ($e->mapping->getEntity() !== 'civicrm_membership') {
       return;
     }
@@ -64,9 +77,9 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     // FIXME: `select('e.*')` seems too broad.
     $e->query
       ->select('e.*')
-      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, ms.name as status, mt.name as type')
-      ->join('mt', "!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id")
-      ->join('ms', "!casMailingJoinType civicrm_membership_status ms ON e.status_id = ms.id");
+      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, membership_type_id as Membership__membership_type_id, status_id as Membership__status_id, ms.name as status, mt.name as type')
+      ->join('mt', '!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id')
+      ->join('ms', '!casMailingJoinType civicrm_membership_status ms ON e.status_id = ms.id');
   }
 
   /**
@@ -88,7 +101,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
     }
     else {
-      $row->tokens($entity, $field, '');
+      parent::evaluateToken($row, $entity, $field, $prefetch);
     }
   }
 

@@ -374,6 +374,23 @@ Check';
     $messageToken = CRM_Utils_Token::getTokens($tokenString);
     $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
     $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
+
+    // Now compare with scheduled reminder
+    $mut = new CiviMailUtils($this);
+    CRM_Utils_Time::setTime('2007-01-22 15:00:00');
+    $this->callAPISuccess('action_schedule', 'create', [
+      'title' => 'job',
+      'subject' => 'job',
+      'entity_value' => 1,
+      'mapping_id' => 4,
+      'start_action_date' => 'membership_join_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'after',
+      'start_action_unit' => 'day',
+      'body_html' => $tokenString,
+    ]);
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $mut->checkMailLog([$this->getExpectedMembershipTokenOutput()]);
   }
 
   /**
