@@ -297,11 +297,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);
-      $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
     }
-    else {
-      $this->addDefaultButtons(ts('Send Email'), 'upload');
-    }
+    $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
 
     $fields = [
       'followup_assignee_contact_id' => [
