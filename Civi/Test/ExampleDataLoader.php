@@ -64,10 +64,7 @@ class ExampleDataLoader {
       return NULL;
     }
 
-    if ($example['file']) {
-      include_once $example['file'];
-    }
-    $obj = new $example['class']();
+    $obj = $this->createObj($example['file'], $example['class']);
     $obj->build($example);
     return $example;
   }
@@ -91,8 +88,7 @@ class ExampleDataLoader {
 
     $all = [];
     foreach ($classes as $file => $class) {
-      require_once $file;
-      $obj = new $class();
+      $obj = $this->createObj($file, $class);
       $offset = 0;
       foreach ($obj->getExamples() as $example) {
         $example['file'] = $file;
@@ -130,6 +126,17 @@ class ExampleDataLoader {
       }
     }
     return $r;
+  }
+
+  private function createObj(?string $file, ?string $class): ExampleDataInterface {
+    if ($file) {
+      include_once $file;
+    }
+    if (!class_exists($class)) {
+      throw new \CRM_Core_Exception("Failed to read example (class '{$class}' in file '{$file}')");
+    }
+
+    return new $class();
   }
 
 }
