@@ -11,6 +11,7 @@
  */
 
 use Civi\Token\AbstractTokenSubscriber;
+use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\TokenProcessor;
@@ -401,11 +402,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
   }
 
-  public function getEntityIDField() {
+  public function getEntityIDField(): string {
     return $this->getEntityName() . 'Id';
   }
 
-  public function prefetch(\Civi\Token\Event\TokenValueEvent $e): ?array {
+  public function prefetch(TokenValueEvent $e): ?array {
     $entityIDs = $e->getTokenProcessor()->getContextValues($this->getEntityIDField());
     if (empty($entityIDs)) {
       return [];
@@ -438,8 +439,8 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return CRM_Core_Config::singleton()->defaultCurrency;
   }
 
-  public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
-    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName()), array_keys($this->getAllTokens()));
+  public function getPrefetchFields(TokenValueEvent $e): array {
+    return array_intersect(array_merge($this->getActiveTokens($e), $this->getCurrencyFieldName(), ['id']), array_keys($this->getAllTokens()));
   }
 
 }

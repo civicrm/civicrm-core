@@ -17,6 +17,8 @@
  */
 class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
+
   /**
    * Contact ID.
    *
@@ -151,6 +153,59 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ], [$this->contactId]);
     $processedMessage = $this->submitForm($form)['html'];
     $this->assertStringContainsString('Logged In, Dear Logged In', $processedMessage);
+  }
+
+  /**
+   * Test case tokens are resolved in pdf letter.
+   */
+  public function testCaseTokensAreResolved() : void {
+    // @todo - find a better way to set case id....
+    $_REQUEST['caseid'] = $this->getCaseID();
+    $form = $this->getPDFForm([
+      'html_message' => '{contact.first_name}, {case.case_type_id:label} {case.' . $this->getCustomFieldName('text') . '}',
+    ], [$this->contactId]);
+    $processedMessage = $this->submitForm($form)['html'];
+    $this->assertStringContainsString('Logged In, Housing Support bb', $processedMessage);
+  }
+
+  /**
+   * Get case ID.
+   *
+   * @return int
+   */
+  protected function getCaseID(): int {
+    if (!isset($this->ids['Case'][0])) {
+      CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+      $this->createCustomGroupWithFieldOfType(['extends' => 'Case']);
+      $this->ids['Case'][0] = $this->callAPISuccess('Case', 'create', [
+        'case_type_id' => 'housing_support',
+        'activity_subject' => 'Case Subject',
+        'client_id' => $this->getContactID(),
+        'status_id' => 1,
+        'subject' => 'Case Subject',
+        'start_date' => '2021-07-23 15:39:20',
+        // Note end_date is inconsistent with status Ongoing but for the
+        // purposes of testing tokens is ok. Creating it with status Resolved
+        // then ignores our known fixed end date.
+        'end_date' => '2021-07-26 18:07:20',
+        'medium_id' => 2,
+        'details' => 'case details',
+        'activity_details' => 'blah blah',
+        'sequential' => 1,
+        $this->getCustomFieldName('text') => 'bb',
+      ])['id'];
+    }
+    return $this->ids['Case'][0];
+  }
+
+  /**
+   * @return int
+   */
+  protected function getContactID(): int {
+    if (!isset($this->ids['Contact'][0])) {
+      $this->ids['Contact'][0] = $this->individualCreate();
+    }
+    return $this->ids['Contact'][0];
   }
 
 }
