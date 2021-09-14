@@ -113,8 +113,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
+   *
+   * @deprecated
    */
   public static function postProcess(&$form): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $formValues = $form->controller->exportValues($form->getName());
     [$formValues, $categories, $html_message, $messageToken, $returnProperties] = self::processMessageTemplate($formValues);
     $html = $activityIds = [];
@@ -207,8 +210,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    *   and use-case.
    *
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
 
     $activityParams = [
       'subject' => $subject,
@@ -278,6 +284,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @param string $type
    * @return string
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   private static function getMimeType($type) {
     $mimeTypes = [
@@ -320,6 +328,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @return bool
    *   TRUE if the Download Document button was clicked (also defaults to TRUE
    *     if the form controller does not exist), else FALSE
+   *
+   * @deprecated
    */
   protected static function isLiveMode($form) {
     // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...

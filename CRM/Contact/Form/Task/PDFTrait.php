@@ -238,4 +238,188 @@ trait CRM_Contact_Form_Task_PDFTrait {
     return ($buttonName === '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
   }
 
+  /**
+   * Process the form after the input has been submitted and validated.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   */
+  public function postProcess(): void {
+    $form = $this;
+    $formValues = $form->controller->exportValues($form->getName());
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    $html = $activityIds = [];
+
+    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
+    if ($this->isLiveMode()) {
+      $activityIds = $this->createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+    }
+
+    if (!empty($formValues['document_file_path'])) {
+      [$html_message, $zip] = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
+    }
+
+    foreach ($form->_contactIds as $item => $contactId) {
+      $caseId = $form->getVar('_caseId');
+      if (empty($caseId) && !empty($form->_caseIds[$item])) {
+        $caseId = $form->_caseIds[$item];
+      }
+
+      $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'contactId' => $contactId,
+        'messageTemplate' => ['msg_html' => $html_message],
+        'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
+        'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
+      ])['html'];
+
+      $html[] = $tokenHtml;
+    }
+
+    $tee = NULL;
+    if ($this->isLiveMode() && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
+      if (count($activityIds) !== 1) {
+        throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
+      }
+      $tee = CRM_Utils_ConsoleTee::create()->start();
+    }
+
+    $type = $formValues['document_type'];
+    $mimeType = $this->getMimeType($type);
+    // ^^ Useful side-effect: consistently throws error for unrecognized types.
+
+    $fileName = method_exists($form, 'getFileName') ? ($form->getFileName() . '.' . $type) : 'CiviLetter.' . $type;
+
+    if ($type === 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
+    }
+    elseif (!empty($formValues['document_file_path'])) {
+      $fileName = pathinfo($formValues['document_file_path'], PATHINFO_FILENAME) . '.' . $type;
+      CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
+    }
+
+    if ($tee) {
+      $tee->stop();
+      $content = file_get_contents($tee->getFileName(), NULL, NULL, NULL, 5);
+      if (empty($content)) {
+        throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
+      }
+      foreach ($activityIds as $activityId) {
+        civicrm_api3('Attachment', 'create', [
+          'entity_table' => 'civicrm_activity',
+          'entity_id' => $activityId,
+          'name' => $fileName,
+          'mime_type' => $mimeType,
+          'options' => [
+            'move-file' => $tee->getFileName(),
+          ],
+        ]);
+      }
+    }
+
+    $form->postProcessHook();
+
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Convert from a vague-type/file-extension to mime-type.
+   *
+   * @param string $type
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMimeType($type) {
+    $mimeTypes = [
+      'pdf' => 'application/pdf',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'odt' => 'application/vnd.oasis.opendocument.text',
+      'html' => 'text/html',
+    ];
+    if (isset($mimeTypes[$type])) {
+      return $mimeTypes[$type];
+    }
+    else {
+      throw new \CRM_Core_Exception("Cannot determine mime type");
+    }
+  }
+
+  /**
+   * @param CRM_Core_Form $form
+   * @param string $html_message
+   * @param array $contactIds
+   * @param string $subject
+   * @param int $campaign_id
+   * @param array $perContactHtml
+   *
+   * @return array
+   *   List of activity IDs.
+   *   There may be 1 or more, depending on the system-settings
+   *   and use-case.
+   *
+   * @throws CRM_Core_Exception
+   */
+  public function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
+
+    $activityParams = [
+      'subject' => $subject,
+      'campaign_id' => $campaign_id,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID(),
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter'),
+      'activity_date_time' => date('YmdHis'),
+      'details' => $html_message,
+    ];
+    if (!empty($form->_activityId)) {
+      $activityParams += ['id' => $form->_activityId];
+    }
+
+    $activityIds = [];
+    switch (Civi::settings()->get('recordGeneratedLetters')) {
+      case 'none':
+        return [];
+
+      case 'multiple':
+        // One activity per contact.
+        foreach ($contactIds as $i => $contactId) {
+          $fullParams = ['target_contact_id' => $contactId] + $activityParams;
+          if (!empty($form->_caseId)) {
+            $fullParams['case_id'] = $form->_caseId;
+          }
+          elseif (!empty($form->_caseIds[$i])) {
+            $fullParams['case_id'] = $form->_caseIds[$i];
+          }
+
+          if (isset($perContactHtml[$contactId])) {
+            $fullParams['details'] = implode('<hr>', $perContactHtml[$contactId]);
+          }
+          $activity = civicrm_api3('Activity', 'create', $fullParams);
+          $activityIds[$contactId] = $activity['id'];
+        }
+
+        break;
+
+      case 'combined':
+      case 'combined-attached':
+        // One activity with all contacts.
+        $fullParams = ['target_contact_id' => $contactIds] + $activityParams;
+        if (!empty($form->_caseId)) {
+          $fullParams['case_id'] = $form->_caseId;
+        }
+        elseif (!empty($form->_caseIds)) {
+          $fullParams['case_id'] = $form->_caseIds;
+        }
+        $activity = civicrm_api3('Activity', 'create', $fullParams);
+        $activityIds[] = $activity['id'];
+        break;
+
+      default:
+        throw new CRM_Core_Exception("Unrecognized option in recordGeneratedLetters: " . Civi::settings()->get('recordGeneratedLetters'));
+    }
+
+    return $activityIds;
+  }
+
 }
