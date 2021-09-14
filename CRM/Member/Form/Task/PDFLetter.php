@@ -94,12 +94,8 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     $html
       = $this->generateHTML(
       $membershipIDs,
-      $returnProperties,
-      $skipOnHold,
-      $skipDeceased,
       $messageToken,
-      $html_message,
-      $categories
+      $html_message
     );
     CRM_Contact_Form_Task_PDFLetterCommon::createActivities($form, $html_message, $contactIDs, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     CRM_Utils_PDF_Utils::html2pdf($html, $this->getFileName() . '.pdf', FALSE, $formValues);
@@ -112,19 +108,17 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
   /**
    * Generate html for pdf letters.
    *
-   * @internal
-   *
    * @param array $membershipIDs
-   * @param array $returnProperties
-   * @param bool $skipOnHold
-   * @param bool $skipDeceased
    * @param array $messageToken
    * @param $html_message
-   * @param $categories
    *
    * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @internal
+   *
    */
-  public function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
+  public function generateHTML($membershipIDs, $messageToken, $html_message): array {
     $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
     $html = [];
 
@@ -133,7 +127,11 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
       // get contact information
       $contactId = $membership['contact_id'];
       $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $html_message, $messageToken);
-      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $tokenHtml], 'contactId' => $contactId])['html'];
+      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => ['msg_html' => $tokenHtml],
+        'contactId' => $contactId,
+        'disableSmarty' => !defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY,
+      ])['html'];
 
     }
     return $html;
