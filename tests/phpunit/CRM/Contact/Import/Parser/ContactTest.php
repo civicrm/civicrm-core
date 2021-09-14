@@ -868,7 +868,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         ['name' => 'preferred_communication_method'],
         ['name' => 'gender_id'],
         ['name' => 'preferred_language'],
-      ],
+      ]
     );
     $importer = $processor->getImporterObject();
     $fields = ['Ima', 'Texter', "SMS,Phone", "Female", "Danish"];
