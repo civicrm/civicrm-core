@@ -14,7 +14,7 @@ namespace Civi\Api4\Action\ExampleData;
 
 use Civi\Api4\Generic\BasicGetAction;
 use Civi\Api4\Generic\Result;
-use Civi\WorkflowMessage\Examples;
+use Civi\Test\ExampleDataLoader;
 
 /**
  * Get a list of example data-sets.
@@ -27,13 +27,7 @@ use Civi\WorkflowMessage\Examples;
  */
 class Get extends BasicGetAction {
 
-  /**
-   * @var \Civi\WorkflowMessage\Examples
-   */
-  private $_scanner;
-
   public function _run(Result $result) {
-    $this->_scanner = new Examples();
     if ($this->select !== [] && !in_array('name', $this->select)) {
       $this->select[] = 'name';
     }
@@ -41,16 +35,19 @@ class Get extends BasicGetAction {
   }
 
   protected function getRecords() {
-    return $this->_scanner->findAll();
+    return \Civi\Test::examples()->getMetas();
   }
 
   protected function selectArray($values) {
     $result = parent::selectArray($values);
 
-    $heavyFields = array_intersect(['data', 'asserts'], $this->select ?: []);
+    $heavyFields = array_intersect(
+      explode(',', ExampleDataLoader::HEAVY_FIELDS),
+      $this->select ?: []
+    );
     if (!empty($heavyFields)) {
       foreach ($result as &$item) {
-        $heavy = $this->_scanner->getHeavy($item['name']);
+        $heavy = \Civi\Test::examples()->getFull($item['name']);
         $item = array_merge($item, \CRM_Utils_Array::subset($heavy, $heavyFields));
       }
     }
