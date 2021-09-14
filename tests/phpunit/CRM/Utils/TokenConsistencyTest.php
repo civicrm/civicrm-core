@@ -425,4 +425,44 @@ December 21st, 2007
 100.00';
   }
 
+  /**
+   * Test that membership tokens are consistently rendered.
+   *
+   * @throws \API_Exception
+   */
+  public function testParticipantTokenConsistency(): void {
+    $this->createLoggedInUser();
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant']);
+    $tokens = CRM_Core_SelectValues::participantTokens();
+    $this->assertEquals($this->getParticipantTokens(), $tokens);
+  }
+
+  /**
+   * Get declared membership tokens.
+   *
+   * @return string[]
+   */
+  public function getParticipantTokens(): array {
+    return [
+      '{participant.participant_status_id}' => 'Status ID',
+      '{participant.participant_role_id}' => 'Participant Role (ID)',
+      '{participant.participant_register_date}' => 'Register date',
+      '{participant.participant_source}' => 'Participant Source',
+      '{participant.participant_fee_level}' => 'Fee level',
+      '{participant.participant_fee_amount}' => 'Fee Amount',
+      '{participant.participant_registered_by_id}' => 'Registered By Participant ID',
+      '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
+      '{participant.participant_role}' => 'Participant Role (label)',
+      '{participant.event_title}' => 'Event Title',
+      '{participant.event_start_date}' => 'Event Start Date',
+      '{participant.event_end_date}' => 'Event End Date',
+      '{participant.fee_label}' => 'Fee Label',
+      '{participant.default_role_id}' => 'Default Role',
+      '{participant.template_title}' => 'Event Template Title',
+      '{participant.currency}' => 'Currency',
+      '{participant.participant_note}' => 'Participant Note',
+      '{participant.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+    ];
+  }
+
 }
