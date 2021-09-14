@@ -710,7 +710,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'id' => $this->getCustomFieldID('link'),
         'label' => 'test_link',
         'groupTitle' => 'Custom Group',
-        'default_value' => 'http://civicrm.org',
+        'default_value' => 'https://civicrm.org',
         'custom_group_id' => $customGroupID,
         'extends' => 'Contact',
         'extends_entity_column_value' => NULL,

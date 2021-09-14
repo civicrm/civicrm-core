@@ -40,7 +40,7 @@ class CRM_Badge_BAO_Badge {
    * @param array $layoutInfo
    *   Associated array which contains meta data about format/layout.
    */
-  public function createLabels(&$participants, &$layoutInfo) {
+  public function createLabels($participants, &$layoutInfo) {
     $this->pdf = new CRM_Utils_PDF_Label($layoutInfo['format'], 'mm');
     $this->pdf->Open();
     $this->pdf->setPrintHeader(FALSE);
@@ -58,6 +58,9 @@ class CRM_Badge_BAO_Badge {
       $this->pdf->AddPdfLabel($formattedRow);
     }
 
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('pdf output called', ['formattedRow' => $formattedRow]);
+    }
     $this->pdf->Output(CRM_Utils_String::munge($layoutInfo['title'], '_', 64) . '.pdf', 'D');
     CRM_Utils_System::civiExit();
   }
