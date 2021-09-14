@@ -157,7 +157,7 @@ class CRM_Activity_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
     if (isset(self::$_tasks[$value])) {
-      return [[self::$_tasks[$value]['class']], self::$_tasks[$value]['result']];
+      return [(array) self::$_tasks[$value]['class'], self::$_tasks[$value]['result']];
     }
     return [[], NULL];
   }
