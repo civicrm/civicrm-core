@@ -201,6 +201,8 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     $deprecatedTokens = [
       '{case.status_id}' => '{case.status_id:label}',
       '{case.case_type_id}' => '{case.case_type_id:label}',
+      '{membership.status}' => '{membership.status_id:label}',
+      '{membership.type}' => '{membership.membership_type_id:label}',
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {

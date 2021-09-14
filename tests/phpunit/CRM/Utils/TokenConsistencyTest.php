@@ -401,8 +401,8 @@ Check';
   public function getMembershipTokens(): array {
     return [
       '{membership.id}' => 'Membership ID',
-      '{membership.status}' => 'Membership Status',
-      '{membership.type}' => 'Membership Type',
+      '{membership.status_id:label}' => 'Membership Status',
+      '{membership.membership_type_id:label}' => 'Membership Type',
       '{membership.start_date}' => 'Membership Start Date',
       '{membership.join_date}' => 'Membership Join Date',
       '{membership.end_date}' => 'Membership End Date',

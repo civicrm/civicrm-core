@@ -46,8 +46,6 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
         'join_date' => ts('Membership Join Date'),
         'start_date' => ts('Membership Start Date'),
         'end_date' => ts('Membership End Date'),
-        'status' => ts('Membership Status'),
-        'type' => ts('Membership Type'),
         'status_id:label' => ts('Membership Status'),
         'membership_type_id:label' => ts('Membership Type'),
       ],
@@ -77,9 +75,8 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
     // FIXME: `select('e.*')` seems too broad.
     $e->query
       ->select('e.*')
-      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, membership_type_id as Membership__membership_type_id, status_id as Membership__status_id, ms.name as status, mt.name as type')
-      ->join('mt', '!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id')
-      ->join('ms', '!casMailingJoinType civicrm_membership_status ms ON e.status_id = ms.id');
+      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, membership_type_id as Membership__membership_type_id, status_id as Membership__status_id')
+      ->join('mt', '!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id');
   }
 
   /**
