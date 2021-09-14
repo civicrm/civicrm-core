@@ -12,6 +12,7 @@
 
 namespace Civi\WorkflowMessage;
 
+use Civi\Api4\Utils\ReflectionUtils;
 use Civi\WorkflowMessage\Exception\WorkflowMessageException;
 
 /**
@@ -168,6 +169,40 @@ class WorkflowMessage {
       $cache->set($cacheKey, $map);
     }
     return $map;
+  }
+
+  /**
+   * Get general description of available workflow-messages.
+   *
+   * @return array
+   *   Array(string $workflowName => string $className).
+   *   Ex: ["case_activity" => ["name" => "case_activity", "group" => "msg_workflow_case"]
+   * @internal
+   */
+  public static function getWorkflowSpecs() {
+    $compute = function() {
+      $keys = ['name', 'group', 'class', 'description', 'comment', 'support'];
+      $list = [];
+      foreach (self::getWorkflowNameClassMap() as $name => $class) {
+        $specs = [
+          'name' => $name,
+          'group' => \CRM_Utils_Constant::value($class . '::GROUP'),
+          'class' => $class,
+        ];
+        $list[$name] = \CRM_Utils_Array::subset(
+          array_merge(ReflectionUtils::getCodeDocs(new \ReflectionClass($class)), $specs),
+          $keys);
+      }
+      return $list;
+    };
+
+    $cache = \Civi::cache('long');
+    $cacheKey = 'WorkflowMessage-' . __FUNCTION__;
+    $list = $cache->get($cacheKey);
+    if ($list === NULL) {
+      $cache->set($cacheKey, $list = $compute());
+    }
+    return $list;
   }
 
 }

@@ -183,6 +183,29 @@ class Test {
   }
 
   /**
+   * @return \Civi\Test\ExampleDataLoader
+   */
+  public static function examples(): \Civi\Test\ExampleDataLoader {
+    if (!isset(self::$singletons['examples'])) {
+      self::$singletons['examples'] = new \Civi\Test\ExampleDataLoader();
+    }
+    return self::$singletons['examples'];
+  }
+
+  /**
+   * @param string $name
+   *   Symbolic name of the data-set.
+   * @return array
+   */
+  public static function example(string $name): array {
+    $result = static::examples()->getFull($name);
+    if ($result === NULL) {
+      throw new \CRM_Core_Exception("Failed to load example data-set: $name");
+    }
+    return $result;
+  }
+
+  /**
    * Prepare and execute a batch of SQL statements.
    *
    * @param string $query

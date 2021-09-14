@@ -24,6 +24,10 @@ use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
  * @method int|null getContactId()
  * @method $this setContact(array|null $contact)
  * @method array|null getContact()
+ *
+ * @support template-only
+ * GenericWorkflowMessage should aim for "full" support, but it's prudent to keep
+ * it flexible for the first few months. Consider updating to "full" after Dec 2021.
  */
 class GenericWorkflowMessage implements WorkflowMessageInterface {
 
