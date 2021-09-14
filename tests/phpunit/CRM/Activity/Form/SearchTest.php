@@ -120,4 +120,45 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * This just checks there's no errors. It doesn't perform any tasks.
+   * It's a little bit like choosing an action from the dropdown.
+   * @dataProvider taskControllerProvider
+   * @param int $task
+   */
+  public function testTaskController(int $task) {
+    // It gets the task from the POST var
+    $oldtask = $_POST['task'] ?? NULL;
+    $_POST['task'] = $task;
+
+    // yes it's the string 'null'
+    new CRM_Activity_Controller_Search('Find Activities', TRUE, 'null');
+
+    // clean up
+    if (is_null($oldtask)) {
+      unset($_POST['task']);
+    }
+    else {
+      $_POST['task'] = $oldtask;
+    }
+  }
+
+  /**
+   * dataprovider for testTaskController
+   * @return array
+   */
+  public function taskControllerProvider(): array {
+    return [
+      [CRM_Activity_Task::TASK_DELETE],
+      [CRM_Activity_Task::TASK_PRINT],
+      [CRM_Activity_Task::TASK_EXPORT],
+      [CRM_Activity_Task::BATCH_UPDATE],
+      [CRM_Activity_Task::TASK_EMAIL],
+      [CRM_Activity_Task::PDF_LETTER],
+      [CRM_Activity_Task::TASK_SMS],
+      [CRM_Activity_Task::TAG_ADD],
+      [CRM_Activity_Task::TAG_REMOVE],
+    ];
+  }
+
 }
