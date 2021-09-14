@@ -23,7 +23,7 @@ use Civi\Api4\PledgePayment;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
+class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution implements Civi\Test\HookInterface {
 
   /**
    * Static field for all the contribution information that we can potentially import
@@ -605,6 +605,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
 
     return $contribution;
+  }
+
+  /**
+   * Event fired after modifying a contribution.
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    if ($event->action === 'edit') {
+      CRM_Contribute_BAO_ContributionRecur::updateOnTemplateUpdated($event->object);
+    }
   }
 
   /**

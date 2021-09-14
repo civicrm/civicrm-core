@@ -345,6 +345,47 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that is_template contribution is used where available
+   *
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testTemplateContributionUpdatesRecur(): void {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    $contributionRecur = reset($contributionRecur['values']);
+    // Create the template
+    $templateContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'source' => 'Template Contribution',
+      'payment_instrument_id' => 1,
+      'currency' => 'AUD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_template' => 1,
+    ]);
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $templateContrib['id'],
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '2.00',
+      'currency' => 'USD',
+    ]);
+    $updatedContributionRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contributionRecur['id'])
+      ->execute()
+      ->first();
+    $this->assertEquals('USD', $updatedContributionRecur['currency']);
+    $this->assertEquals('2.00', $updatedContributionRecur['amount']);
+    $this->assertGreaterThan(
+      strtotime($contributionRecur['modified_date']),
+      strtotime($updatedContributionRecur['modified_date'])
+    );
+  }
+
+  /**
    * Test to check if correct membership is auto renewed.
    *
    * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception

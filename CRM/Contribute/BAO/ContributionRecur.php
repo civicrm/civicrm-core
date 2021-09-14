@@ -978,6 +978,37 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * If a template contribution is updated we need to update the amount on the recurring contribution.
+   *
+   * @param \CRM_Contribute_DAO_Contribution $contribution
+   *
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function updateOnTemplateUpdated(CRM_Contribute_DAO_Contribution $contribution) {
+    if (empty($contribution->contribution_recur_id)) {
+      return;
+    }
+    $contributionRecur = ContributionRecur::get(FALSE)
+      ->addWhere('id', '=', $contribution->contribution_recur_id)
+      ->execute()
+      ->first();
+
+    if ($contribution->total_amount === NULL) {
+      $contribution->find(TRUE);
+    }
+
+    if (!CRM_Utils_Money::equals($contributionRecur['amount'], $contribution->total_amount, $contribution->currency)) {
+      ContributionRecur::update(FALSE)
+        ->addValue('amount', $contribution->total_amount)
+        ->addValue('currency', $contribution->currency)
+        ->addValue('modified_date', 'now')
+        ->addWhere('id', '=', $contributionRecur['id'])
+        ->execute();
+    }
+  }
+
+  /**
    * Is this recurring contribution now complete.
    *
    * Have all the payments expected been received now.
