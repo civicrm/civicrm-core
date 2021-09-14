@@ -560,17 +560,13 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Different type of Event Tokens.
+   * Different type of Contribution Tokens.
    *
    * @return array
    */
   public static function contributionTokens(): array {
-    $tokens = [];
-    $processor = new CRM_Contribute_Tokens();
-    foreach ($processor->getAllTokens() as $token => $title) {
-      $tokens['{contribution.' . $token . '}'] = $title;
-    }
-    return $tokens;
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
+    return $tokenProcessor->listTokens();
   }
 
   /**
