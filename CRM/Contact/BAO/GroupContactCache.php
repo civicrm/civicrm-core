@@ -248,6 +248,10 @@ WHERE  id IN ( $groupIDs )
    * clear.
    */
   protected static function flushCaches() {
+    if (!CRM_Core_Config::isPermitCacheFlushMode()) {
+      return;
+    }
+
     try {
       $lock = self::getLockForRefresh();
     }
