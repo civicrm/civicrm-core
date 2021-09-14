@@ -84,6 +84,8 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     $this->assign('self_service', $this->isSelfService());
+    $this->assign('recur_frequency_interval', $this->_subscriptionDetails->frequency_interval);
+    $this->assign('recur_frequency_unit', $this->_subscriptionDetails->frequency_unit);
 
     $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
 
