@@ -28,8 +28,8 @@
           <div class="input-group col-sm-9">
             <select class="form-control" ng-options="item.id as item.label for item in model.revisions" ng-model="$ctrl.revisionId"></select>
             <div class="input-group-btn">
-              <button class="btn btn-default" ng-click="$ctrl.cycle('revisionId', 'revisions', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="$ctrl.cycle('revisionId', 'revisions', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-disabled="model.revisions.length <= 1" ng-click="$ctrl.cycle('revisionId', 'revisions', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.revisions.length <= 1" ng-click="$ctrl.cycle('revisionId', 'revisions', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
@@ -40,8 +40,8 @@
             <select class="form-control" ng-options="item.id as item.title for item in model.examples" ng-model="$ctrl.exampleId"></select>
             <div class="input-group-btn">
               <!-- <button class="btn btn-default" ng-click="$ctrl.toggleAdhoc()" crm-icon="fa-pencil"></button> -->
-              <button class="btn btn-default" ng-click="$ctrl.cycle('exampleId', 'examples', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="$ctrl.cycle('exampleId', 'examples', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.examples.length <= 1" ng-click="$ctrl.cycle('exampleId', 'examples', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
@@ -63,8 +63,8 @@
           <div class="input-group col-sm-9">
             <select class="form-control" ng-options="item.id as item.label for item in model.formats" ng-model="$ctrl.formatId"></select>
             <div class="input-group-btn">
-              <button class="btn btn-default" ng-click="$ctrl.cycle('formatId', 'formats', -1)">&#xab;</button>
-              <button class="btn btn-default" ng-click="$ctrl.cycle('formatId', 'formats', +1)">&#xbb;</button>
+              <button class="btn btn-default" ng-disabled="model.formats.length <= 1" ng-click="$ctrl.cycle('formatId', 'formats', -1)">&#xab;</button>
+              <button class="btn btn-default" ng-disabled="model.formats.length <= 1" ng-click="$ctrl.cycle('formatId', 'formats', +1)">&#xbb;</button>
             </div>
           </div>
         </div>
