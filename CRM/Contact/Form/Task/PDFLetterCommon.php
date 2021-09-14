@@ -117,8 +117,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   public static function postProcess(&$form): void {
     $formValues = $form->controller->exportValues($form->getName());
     [$formValues, $categories, $html_message, $messageToken, $returnProperties] = self::processMessageTemplate($formValues);
-    $skipOnHold = $form->skipOnHold ?? FALSE;
-    $skipDeceased = $form->skipDeceased ?? TRUE;
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
@@ -131,32 +129,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     }
 
     foreach ($form->_contactIds as $item => $contactId) {
-      $caseId = NULL;
-      $params = ['contact_id' => $contactId];
-
       $caseId = $form->getVar('_caseId');
       if (empty($caseId) && !empty($form->_caseIds[$item])) {
         $caseId = $form->_caseIds[$item];
       }
 
-      [$contact] = CRM_Utils_Token::getTokenDetails($params,
-        $returnProperties,
-        $skipOnHold,
-        $skipDeceased,
-        NULL,
-        $messageToken,
-        'CRM_Contact_Form_Task_PDFLetterCommon'
-      );
-
-      if (civicrm_error($contact)) {
-        $notSent[] = $contactId;
-        continue;
-      }
-
       $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'contactId' => $contactId,
         'messageTemplate' => ['msg_html' => $html_message],
-        'tplParams' => ['contact' => $contact],
         'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
         'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
       ])['html'];
