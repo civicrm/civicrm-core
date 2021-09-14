@@ -328,7 +328,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   Id of the database record (null = new record).
    * @throws CRM_Core_Exception
    */
-  public function savePdfFormat(&$values, $id = NULL) {
+  public function savePdfFormat($values, $id = NULL) {
     // get the Option Group ID for PDF Page Formats (create one if it doesn't exist)
     $group_id = self::_getGid();
 
