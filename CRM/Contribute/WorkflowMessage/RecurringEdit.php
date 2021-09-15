@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @method array getContact()
+ * @method $this setContact(array $contact)
+ * @method array getContributionRecur()
+ * @method $this setContributionRecur(array $contributionRecur)
+ */
 class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\GenericWorkflowMessage {
   const WORKFLOW = 'contribution_recurring_edit';
 
@@ -19,11 +25,11 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
    *
    * @var array|null
    *
-   * @scope tokenContext
+   * @scope tokenContext as contribution_recur
    *
    * @required
    */
-  public $contribution_recur;
+  public $contributionRecur;
 
   protected function exportExtraTokenContext(array &$export): void {
     $export['smartyTokenAlias']['installments'] = 'contribution_recur.installments';
