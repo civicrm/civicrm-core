@@ -370,11 +370,14 @@ Check';
     $this->assertEquals($this->getMembershipTokens(), $tokens);
     $newStyleTokens = "\n{membership.status_id:label}\n{membership.membership_type_id:label}\n";
     $tokenString = $newStyleTokens . implode("\n", array_keys($this->getMembershipTokens()));
+
     $memberships = CRM_Utils_Token::getMembershipTokenDetails([$this->getMembershipID()]);
     $messageToken = CRM_Utils_Token::getTokens($tokenString);
     $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $memberships[$this->getMembershipID()], $tokenString, $messageToken);
     $this->assertEquals($this->getExpectedMembershipTokenOutput(), $tokenHtml);
 
+    // Custom fields work in the processor so test it....
+    $tokenString .= "\n{membership." . $this->getCustomFieldName('text') . '}';
     // Now compare with scheduled reminder
     $mut = new CiviMailUtils($this);
     CRM_Utils_Time::setTime('2007-01-22 15:00:00');
@@ -390,7 +393,7 @@ Check';
       'body_html' => $tokenString,
     ]);
     $this->callAPISuccess('job', 'send_reminder', []);
-    $mut->checkMailLog([$this->getExpectedMembershipTokenOutput()]);
+    $mut->checkMailLog([$this->getExpectedMembershipTokenOutput() . "\nmy field"]);
   }
 
   /**
@@ -417,9 +420,10 @@ Check';
    */
   protected function getMembershipID(): int {
     if (!isset($this->ids['Membership'][0])) {
-      $this->ids['Membership'][0] = $this->contactMembershipCreate(
-        ['contact_id' => $this->getContactID()]
-      );
+      $this->ids['Membership'][0] = $this->contactMembershipCreate([
+        'contact_id' => $this->getContactID(),
+        $this->getCustomFieldName('text') => 'my field',
+      ]);
     }
     return $this->ids['Membership'][0];
   }

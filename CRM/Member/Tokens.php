@@ -71,11 +71,9 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
     if ($e->mapping->getEntity() !== 'civicrm_membership') {
       return;
     }
-
-    // FIXME: `select('e.*')` seems too broad.
+    parent::alterActionScheduleQuery($e);
     $e->query
-      ->select('e.*')
-      ->select('mt.minimum_fee as fee, e.id as id , e.join_date, e.start_date, e.end_date, membership_type_id as Membership__membership_type_id, status_id as Membership__status_id')
+      ->select('mt.minimum_fee as ' . $this->getEntityAlias() . 'fee')
       ->join('mt', '!casMailingJoinType civicrm_membership_type mt ON e.membership_type_id = mt.id');
   }
 
@@ -83,19 +81,8 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    * @inheritDoc
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-
-    if (in_array($field, ['start_date', 'end_date', 'join_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
-    }
-    elseif ($field == 'fee') {
-      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($actionSearchResult->$field));
-    }
-    elseif (isset($actionSearchResult->$field)) {
-      $row->tokens($entity, $field, $actionSearchResult->$field);
-    }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->entity_id);
+    if ($field === 'fee') {
+      $row->tokens($entity, $field, \CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($this->getFieldValue($row, $field)));
     }
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
