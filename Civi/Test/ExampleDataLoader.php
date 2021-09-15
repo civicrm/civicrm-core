@@ -79,6 +79,7 @@ class ExampleDataLoader {
   protected function findMetas(): array {
     $classes = array_merge(
       // This scope of search is decidedly narrow - it should probably be expanded.
+      $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/Test/ExampleData', '\\'),
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'CRM/*/WorkflowMessage', '_'),
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/*/WorkflowMessage', '\\'),
       $this->scanExampleClasses(\Civi::paths()->getPath('[civicrm.root]/'), 'Civi/WorkflowMessage', '\\'),
