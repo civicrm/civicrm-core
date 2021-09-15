@@ -112,17 +112,24 @@ class ExampleDataLoader {
    * @param $classDelim
    *   Namespace separator, eg underscore or backslash.
    * @return array
-   *   Array(string $relativeFileName => string $className).
+   *   Array(string $includeFile => string $className).
    */
   private function scanExampleClasses($classRoot, $classDir, $classDelim): array {
+    $civiRoot = \Civi::paths()->getPath('[civicrm.root]/');
+    $classRoot = \CRM_Utils_File::addTrailingSlash($classRoot, '/');
+    // Prefer include-paths relative to civiRoot - eg make tests/phpunit/* loadable at runtime.
+    $includeRoot = \CRM_Utils_File::isChildPath($civiRoot, $classRoot) ? $civiRoot : $classRoot;
+
     $r = [];
     $exDirs = (array) glob($classRoot . $classDir);
     foreach ($exDirs as $exDir) {
       foreach (\CRM_Utils_File::findFiles($exDir, '*.ex.php') as $file) {
         $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
-        $file = \CRM_Utils_File::relativize($file, \CRM_Utils_File::addTrailingSlash($classRoot, '/'));
-        $class = str_replace('/', $classDelim, preg_replace('/\.ex\.php$/', '', $file));
-        $r[$file] = $class;
+        $includeFile = \CRM_Utils_File::relativize($file, $includeRoot);
+        $classFile = \CRM_Utils_File::relativize($file, $classRoot);
+        $class = str_replace('/', $classDelim, preg_replace('/\.ex\.php$/', '',
+          $classFile));
+        $r[$includeFile] = $class;
       }
     }
     return $r;
