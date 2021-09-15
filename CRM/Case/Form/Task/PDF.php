@@ -44,13 +44,6 @@ class CRM_Case_Form_Task_PDF extends CRM_Case_Form_Task {
   }
 
   /**
-   * Process the form after the input has been submitted and validated.
-   */
-  public function postProcess() {
-    CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);
-  }
-
-  /**
    * List available tokens for this form.
    *
    * @return array
