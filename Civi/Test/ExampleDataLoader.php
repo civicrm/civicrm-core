@@ -64,10 +64,7 @@ class ExampleDataLoader {
       return NULL;
     }
 
-    if ($example['file']) {
-      include_once $example['file'];
-    }
-    $obj = new $example['class']();
+    $obj = $this->createObj($example['file'], $example['class']);
     $obj->build($example);
     return $example;
   }
@@ -91,8 +88,7 @@ class ExampleDataLoader {
 
     $all = [];
     foreach ($classes as $file => $class) {
-      require_once $file;
-      $obj = new $class();
+      $obj = $this->createObj($file, $class);
       $offset = 0;
       foreach ($obj->getExamples() as $example) {
         $example['file'] = $file;
@@ -116,20 +112,38 @@ class ExampleDataLoader {
    * @param $classDelim
    *   Namespace separator, eg underscore or backslash.
    * @return array
-   *   Array(string $relativeFileName => string $className).
+   *   Array(string $includeFile => string $className).
    */
   private function scanExampleClasses($classRoot, $classDir, $classDelim): array {
+    $civiRoot = \Civi::paths()->getPath('[civicrm.root]/');
+    $classRoot = \CRM_Utils_File::addTrailingSlash($classRoot, '/');
+    // Prefer include-paths relative to civiRoot - eg make tests/phpunit/* loadable at runtime.
+    $includeRoot = \CRM_Utils_File::isChildPath($civiRoot, $classRoot) ? $civiRoot : $classRoot;
+
     $r = [];
     $exDirs = (array) glob($classRoot . $classDir);
     foreach ($exDirs as $exDir) {
       foreach (\CRM_Utils_File::findFiles($exDir, '*.ex.php') as $file) {
         $file = str_replace(DIRECTORY_SEPARATOR, '/', $file);
-        $file = \CRM_Utils_File::relativize($file, \CRM_Utils_File::addTrailingSlash($classRoot, '/'));
-        $class = str_replace('/', $classDelim, preg_replace('/\.ex\.php$/', '', $file));
-        $r[$file] = $class;
+        $includeFile = \CRM_Utils_File::relativize($file, $includeRoot);
+        $classFile = \CRM_Utils_File::relativize($file, $classRoot);
+        $class = str_replace('/', $classDelim, preg_replace('/\.ex\.php$/', '',
+          $classFile));
+        $r[$includeFile] = $class;
       }
     }
     return $r;
+  }
+
+  private function createObj(?string $file, ?string $class): ExampleDataInterface {
+    if ($file) {
+      include_once $file;
+    }
+    if (!class_exists($class)) {
+      throw new \CRM_Core_Exception("Failed to read example (class '{$class}' in file '{$file}')");
+    }
+
+    return new $class();
   }
 
 }

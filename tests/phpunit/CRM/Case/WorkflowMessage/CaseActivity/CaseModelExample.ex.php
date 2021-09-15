@@ -5,6 +5,9 @@ class CRM_Case_WorkflowMessage_CaseActivity_CaseModelExample extends \Civi\Workf
    * @inheritDoc
    */
   public function getExamples(): iterable {
+    if (!class_exists($this->wfClass)) {
+      return []; /* CaseActivity WfMsg is temporarily in tests/phpunit, so it's not reliably loadable.  Temp work-around. */
+    }
     yield [
       'name' => "workflow/{$this->wfName}/{$this->exName}",
       'title' => ts('Case Activity (Class-style example)'),
