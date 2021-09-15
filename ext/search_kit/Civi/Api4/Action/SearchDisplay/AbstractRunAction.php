@@ -429,10 +429,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
       foreach (\CRM_Utils_JS::decode($filterAttr) as $filterKey => $filterVal) {
         // Automatically apply filters from the markup if they have a value
-        // (if it's a javascript variable it will have come back from decode() as NULL and we'll ignore it).
-        unset($this->filters[$filterKey]);
-        if ($this->hasValue($filterVal)) {
-          $this->applyFilter(explode(',', $filterKey), $filterVal);
+        if ($filterVal !== NULL) {
+          unset($this->filters[$filterKey]);
+          if ($this->hasValue($filterVal)) {
+            $this->applyFilter(explode(',', $filterKey), $filterVal);
+          }
+        }
+        // If it's a javascript variable it will have come back from decode() as NULL;
+        // whitelist it to allow it to be passed to this api from javascript.
+        else {
+          $filterKeys[] = $filterKey;
         }
       }
     }
