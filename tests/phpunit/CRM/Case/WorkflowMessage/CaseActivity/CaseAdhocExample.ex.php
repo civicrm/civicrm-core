@@ -21,7 +21,7 @@ class CRM_Case_WorkflowMessage_CaseActivity_CaseAdhocExample extends \Civi\Workf
    */
   public function build(array &$example): void {
     $alex = \Civi\Test::example('workflow/generic/Alex');
-    $contact = $this->extend($alex['data']['modelProps']['contact'], [
+    $contact = $this->extend($alex['modelProps']['contact'], [
       'role' => 'myrole',
     ]);
     $example['data'] = [
