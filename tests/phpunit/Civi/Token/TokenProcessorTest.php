@@ -447,15 +447,20 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Process a message using mocked data.
    */
-  public function testMockData_Contribution() {
+  public function testMockData_ContactContribution() {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
 
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
-      'schema' => ['contributionId'],
+      'schema' => ['contributionId', 'contactId'],
     ]);
-    $p->addMessage('example', 'Invoice #{contribution.invoice_id}!', 'text/plain');
+    $p->addMessage('example', 'Invoice #{contribution.invoice_id} for {contact.display_name}!', 'text/plain');
     $p->addRow([
+      'contactId' => 11,
+      'contact' => [
+        'display_name' => 'The Override',
+      ],
       'contributionId' => 111,
       'contribution' => [
         'id' => 111,
@@ -464,6 +469,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ],
     ]);
     $p->addRow([
+      'contactId' => 22,
+      'contact' => [
+        'display_name' => 'Another Override',
+      ],
       'contributionId' => 222,
       'contribution' => [
         'id' => 111,
@@ -477,8 +486,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     foreach ($p->getRows() as $row) {
       $outputs[] = $row->render('example');
     }
-    $this->assertEquals('Invoice #11111!', $outputs[0]);
-    $this->assertEquals('Invoice #22222!', $outputs[1]);
+    $this->assertEquals('Invoice #11111 for The Override!', $outputs[0]);
+    $this->assertEquals('Invoice #22222 for Another Override!', $outputs[1]);
   }
 
   /**
