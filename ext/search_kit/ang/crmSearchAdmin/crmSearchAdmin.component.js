@@ -620,13 +620,16 @@
           var join = searchMeta.getJoin(joinClause[0]),
             joinEntity = searchMeta.getEntity(join.entity),
             primaryKey = joinEntity.primary_key[0],
+            // Links for aggregate columns get aggregated using GROUP_CONCAT
             isAggregate = ctrl.canAggregate(join.alias + '.' + primaryKey),
-            joinPrefix = (isAggregate ? 'GROUP_CONCAT_' : '') + join.alias + '.',
+            joinPrefix = (isAggregate ? ctrl.DEFAULT_AGGREGATE_FN + '_' : '') + join.alias + '.',
             bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
-            link.isAggregate = isAggregate;
-            link.path = link.path.replace(/\[/g, '[' + joinPrefix).replace(/[.:]/g, '_');
+            link.path = link.path.replace(/\[/g, '[' + joinPrefix);
+            if (isAggregate) {
+              link.path = link.path.replace(/[.:]/g, '_');
+            }
             link.join = join.alias;
             addTitle(link, join.label);
             links.push(link);
