@@ -445,6 +445,86 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Process a message using mocked data.
+   */
+  public function testMockData_Contribution() {
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId'],
+    ]);
+    $p->addMessage('example', 'Invoice #{contribution.invoice_id}!', 'text/plain');
+    $p->addRow([
+      'contributionId' => 111,
+      'contribution' => [
+        'id' => 111,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 11111,
+      ],
+    ]);
+    $p->addRow([
+      'contributionId' => 222,
+      'contribution' => [
+        'id' => 111,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 22222,
+      ],
+    ]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #11111!', $outputs[0]);
+    $this->assertEquals('Invoice #22222!', $outputs[1]);
+  }
+
+  /**
+   * Process a message using mocked data, accessed through a Smarty alias.
+   */
+  public function testMockData_SmartyAlias_Contribution() {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId'],
+      'smarty' => TRUE,
+      'smartyTokenAlias' => [
+        'theInvoiceId' => 'contribution.invoice_id',
+      ],
+    ]);
+    $p->addMessage('example', 'Invoice #{$theInvoiceId}!', 'text/plain');
+    $p->addRow([
+      'contributionId' => 333,
+      'contribution' => [
+        'id' => 333,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 33333,
+      ],
+    ]);
+    $p->addRow([
+      'contributionId' => 444,
+      'contribution' => [
+        'id' => 444,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 44444,
+      ],
+    ]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #33333!', $outputs[0]);
+    $this->assertEquals('Invoice #44444!', $outputs[1]);
+
+  }
+
+  /**
    * This defines a compatibility mechanism wherein an old Smarty expression can
    * be evaluated based on a newer token expression.
    *
