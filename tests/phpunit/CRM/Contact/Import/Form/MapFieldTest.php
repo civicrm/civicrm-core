@@ -129,10 +129,20 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param string $class
    * @param array $formValues
    * @param string $pageName
+   * @param array $searchFormValues
+   *   Values for the search form if the form is a task eg.
+   *   for selected ids 6 & 8:
+   *   [
+   *      'radio_ts' => 'ts_sel',
+   *      'task' => CRM_Member_Task::PDF_LETTER,
+   *      'mark_x_6' => 1,
+   *      'mark_x_8' => 1,
+   *   ]
+   *
    * @return \CRM_Core_Form
    * @throws \CRM_Core_Exception
    */
-  public function getFormObject($class, $formValues = [], $pageName = '') {
+  public function getFormObject($class, $formValues = [], $pageName = '', $searchFormValues = []) {
     $form = parent::getFormObject($class);
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = [];
