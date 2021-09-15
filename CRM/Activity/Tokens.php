@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Token\AbstractTokenSubscriber;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
@@ -33,15 +32,17 @@ use Civi\Token\TokenRow;
  *
  * This has been enhanced to work with PDF/letter merge
  */
-class CRM_Activity_Tokens extends AbstractTokenSubscriber {
+class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
 
   use CRM_Core_TokenTrait;
 
   /**
+   * Get the entity name for api v4 calls.
+   *
    * @return string
    */
-  private function getEntityName(): string {
-    return 'activity';
+  protected function getApiEntityName(): string {
+    return 'Activity';
   }
 
   /**
@@ -75,7 +76,7 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
   /**
    * @inheritDoc
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
     if ($e->mapping->getEntity() !== $this->getEntityTableName()) {
       return;
     }
@@ -85,42 +86,6 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
     // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
     $e->query->select('e.id AS tokenContext_' . $this->getEntityContextSchema());
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function prefetch(TokenValueEvent $e) {
-    // Find all the entity IDs
-    $entityIds = $e->getTokenProcessor()->getContextValues($this->getEntityContextSchema());
-
-    if (!$entityIds) {
-      return NULL;
-    }
-
-    // Get data on all activities for basic and customfield tokens
-    $prefetch['activity'] = civicrm_api3('Activity', 'get', [
-      'id' => ['IN' => $entityIds],
-      'options' => ['limit' => 0],
-      'return' => self::getReturnFields($this->activeTokens),
-    ])['values'];
-
-    // Store the activity types if needed
-    if (in_array('activity_type', $this->activeTokens, TRUE)) {
-      $this->activityTypes = \CRM_Core_OptionGroup::values('activity_type');
-    }
-
-    // Store the activity statuses if needed
-    if (in_array('status', $this->activeTokens, TRUE)) {
-      $this->activityStatuses = \CRM_Core_OptionGroup::values('activity_status');
-    }
-
-    // Store the campaigns if needed
-    if (in_array('campaign', $this->activeTokens, TRUE)) {
-      $this->campaigns = \CRM_Campaign_BAO_Campaign::getCampaigns();
-    }
-
-    return $prefetch;
   }
 
   /**
@@ -138,45 +103,37 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    // maps token name to api field
-    $mapping = [
-      'activity_id' => 'id',
-    ];
-
     $activityId = $row->context[$this->getEntityContextSchema()];
 
-    $activity = $prefetch['activity'][$activityId];
-
-    if (in_array($field, ['activity_date_time', 'created_date', 'modified_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity[$field]));
-    }
-    elseif (isset($mapping[$field]) and (isset($activity[$mapping[$field]]))) {
-      $row->tokens($entity, $field, $activity[$mapping[$field]]);
-    }
-    elseif (in_array($field, ['activity_type'])) {
-      $row->tokens($entity, $field, $this->activityTypes[$activity['activity_type_id']]);
-    }
-    elseif (in_array($field, ['status'])) {
-      $row->tokens($entity, $field, $this->activityStatuses[$activity['status_id']]);
-    }
-    elseif (in_array($field, ['campaign'])) {
-      $row->tokens($entity, $field, $this->campaigns[$activity['campaign_id']]);
+    if (!empty($this->getDeprecatedTokens()[$field])) {
+      $realField = $this->getDeprecatedTokens()[$field];
+      parent::evaluateToken($row, $entity, $realField, $prefetch);
+      $row->format('text/plain')->tokens($entity, $field, $row->tokens['activity'][$realField]);
     }
     elseif (in_array($field, ['case_id'])) {
       // An activity can be linked to multiple cases so case_id is always an array.
       // We just return the first case ID for the token.
-      $row->tokens($entity, $field, is_array($activity['case_id']) ? reset($activity['case_id']) : $activity['case_id']);
+      // this weird hack might exist because apiv3 is weird &
+      $caseID = CRM_Core_DAO::singleValueQuery('SELECT case_id FROM civicrm_case_activity WHERE activity_id = %1 LIMIT 1', [1 => [$activityId, 'Integer']]);
+      $row->tokens($entity, $field, $caseID ?? '');
     }
-    elseif (array_key_exists($field, $this->customFieldTokens)) {
-      $row->tokens($entity, $field,
-        isset($activity[$field])
-          ? \CRM_Core_BAO_CustomField::displayValue($activity[$field], $field)
-          : ''
-      );
+    else {
+      parent::evaluateToken($row, $entity, $field, $prefetch);
     }
-    elseif (isset($activity[$field])) {
-      $row->tokens($entity, $field, $activity[$field]);
+  }
+
+  /**
+   * Get all the tokens supported by this processor.
+   *
+   * @return array|string[]
+   * @throws \API_Exception
+   */
+  protected function getAllTokens(): array {
+    $tokens = parent::getAllTokens();
+    if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
+      $tokens['case_id'] = ts('Activity Case ID');
     }
+    return $tokens;
   }
 
   /**
@@ -184,29 +141,84 @@ class CRM_Activity_Tokens extends AbstractTokenSubscriber {
    *
    * @return array token name => token label
    */
-  protected function getBasicTokens(): array {
+  public function getBasicTokens(): array {
     if (!isset($this->basicTokens)) {
       $this->basicTokens = [
-        'activity_id' => ts('Activity ID'),
-        'activity_type' => ts('Activity Type'),
+        'id' => ts('Activity ID'),
         'subject' => ts('Activity Subject'),
         'details' => ts('Activity Details'),
         'activity_date_time' => ts('Activity Date-Time'),
         'created_date' => ts('Activity Created Date'),
         'modified_date' => ts('Activity Modified Date'),
         'activity_type_id' => ts('Activity Type ID'),
-        'status' => ts('Activity Status'),
         'status_id' => ts('Activity Status ID'),
         'location' => ts('Activity Location'),
         'duration' => ts('Activity Duration'),
-        'campaign' => ts('Activity Campaign'),
-        'campaign_id' => ts('Activity Campaign ID'),
       ];
-      if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
-        $this->basicTokens['case_id'] = ts('Activity Case ID');
+      if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
+        $this->basicTokens['campaign_id'] = ts('Campaign ID');
       }
     }
     return $this->basicTokens;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getActiveTokens(TokenValueEvent $e) {
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    if (!isset($messageTokens[$this->entity])) {
+      return NULL;
+    }
+
+    $activeTokens = [];
+    // if message token contains '_\d+_', then treat as '_N_'
+    foreach ($messageTokens[$this->entity] as $msgToken) {
+      if (array_key_exists($msgToken, $this->tokenNames)) {
+        $activeTokens[] = $msgToken;
+      }
+      elseif (in_array($msgToken, ['campaign', 'activity_id', 'status', 'activity_type', 'case_id'])) {
+        $activeTokens[] = $msgToken;
+      }
+      else {
+        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
+        if (array_key_exists($altToken, $this->tokenNames)) {
+          $activeTokens[] = $msgToken;
+        }
+      }
+    }
+    return array_unique($activeTokens);
+  }
+
+  public function getPrefetchFields(TokenValueEvent $e): array {
+    $tokens = parent::getPrefetchFields($e);
+    $active = $this->getActiveTokens($e);
+    foreach ($this->getDeprecatedTokens() as $old => $new) {
+      if (in_array($old, $active, TRUE) && !in_array($new, $active, TRUE)) {
+        $tokens[] = $new;
+      }
+    }
+    return $tokens;
+  }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * We will actively remove from the following places
+   * - scheduled reminders
+   * - add to 'blocked' on pdf letter & email
+   *
+   * & then at some point start issuing warnings for them.
+   *
+   * @return string[]
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'activity_id' => 'id',
+      'activity_type' => 'activity_type_id:label',
+      'status' => 'status_id:label',
+      'campaign' => 'campaign_id:label',
+    ];
   }
 
 }
