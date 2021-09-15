@@ -76,4 +76,11 @@ abstract class WorkflowMessageExample implements ExampleDataInterface {
     return $base;
   }
 
+  protected function toArray(\Civi\WorkflowMessage\WorkflowMessageInterface $wfMsg) {
+    return [
+      'workflow' => $this->wfName,
+      'modelProps' => $wfMsg->export('modelProps'),
+    ];
+  }
+
 }
