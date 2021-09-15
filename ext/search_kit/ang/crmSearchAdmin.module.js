@@ -193,6 +193,9 @@
         if (defaults.label === true) {
           values.label = getDefaultLabel(fieldExpr);
         }
+        if (defaults.sortable) {
+          values.sortable = (info.field.type === 'Field');
+        }
         return values;
       }
       return {

@@ -37,7 +37,7 @@
             classes: ['table', 'table-striped'],
             button: ts('Search'),
             columns: _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
-              var column = {label: true},
+              var column = {label: true, sortable: true},
                 link = getViewLink(fieldExpr, links);
               if (link) {
                 column.title = link.title;
