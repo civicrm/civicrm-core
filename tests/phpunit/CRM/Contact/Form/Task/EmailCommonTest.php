@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testPostProcessWithSignature() {
+  public function testPostProcessWithSignature(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $bcc1 = $this->individualCreate(['email' => 'bcc1@example.com']);
     $bcc2 = $this->individualCreate(['email' => 'bcc2@example.com']);

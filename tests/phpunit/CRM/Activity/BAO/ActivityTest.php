@@ -1223,7 +1223,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testSendEmailBasic(): void {
-    $contactId = $this->individualCreate();
+    $contactId = $this->getContactID();
 
     // create a logged in USER since the code references it for sendEmail user.
     $loggedInUser = $this->createLoggedInUser();
@@ -1255,8 +1255,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
 
     $subject = __FUNCTION__ . ' subject';
-    $html = __FUNCTION__ . ' html {contact.display_name}';
-    $text = __FUNCTION__ . ' text {contact.display_name}';
+    $html = __FUNCTION__ . ' html {contact.display_name} {case.case_type_id:label}';
+    $text = __FUNCTION__ . ' text {contact.display_name} {case.case_type_id:label}';
     $userID = $loggedInUser;
 
     $mut = new CiviMailUtils($this, TRUE);
@@ -1271,22 +1271,64 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       NULL,
       NULL,
       NULL,
-      [$contactId]
+      [$contactId],
+      NULL,
+      NULL,
+      NULL,
+      $this->getCaseID()
     );
 
     $activity = $this->callAPISuccessGetSingle('Activity', ['id' => $activity_ids[0], 'return' => ['details', 'subject']]);
     $details = '-ALTERNATIVE ITEM 0-
-' . __FUNCTION__ . ' html ' . $contact['display_name'] . '
+' . __FUNCTION__ . ' html ' . $contact['display_name'] . ' Housing Support
 -ALTERNATIVE ITEM 1-
-' . __FUNCTION__ . ' text ' . $contact['display_name'] . '
+' . __FUNCTION__ . ' text ' . $contact['display_name'] . ' Housing Support
 -ALTERNATIVE END-
 ';
-    $this->assertEquals($details, $activity['details'], 'Activity details does not match.');
-    $this->assertEquals($subject, $activity['subject'], 'Activity subject does not match.');
+    $this->assertEquals($details, $activity['details'], 'Activity details do not match.');
+    $this->assertEquals($subject, $activity['subject'], 'Activity subject do not match.');
     $mut->checkMailLog([
-      'Mr. Anthony Anderson',
+      'Mr. Anthony Anderson II Housing Support',
     ]);
     $mut->stop();
+  }
+
+  /**
+   * Get case ID.
+   *
+   * @return int
+   */
+  protected function getCaseID(): int {
+    if (!isset($this->ids['Case'][0])) {
+      CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+      $this->ids['Case'][0] = $this->callAPISuccess('Case', 'create', [
+        'case_type_id' => 'housing_support',
+        'activity_subject' => 'Case Subject',
+        'client_id' => $this->getContactID(),
+        'status_id' => 1,
+        'subject' => 'Case Subject',
+        'start_date' => '2021-07-23 15:39:20',
+        // Note end_date is inconsistent with status Ongoing but for the
+        // purposes of testing tokens is ok. Creating it with status Resolved
+        // then ignores our known fixed end date.
+        'end_date' => '2021-07-26 18:07:20',
+        'medium_id' => 2,
+        'details' => 'case details',
+        'activity_details' => 'blah blah',
+        'sequential' => 1,
+      ])['id'];
+    }
+    return $this->ids['Case'][0];
+  }
+
+  /**
+   * @return int
+   */
+  protected function getContactID(): int {
+    if (!isset($this->ids['Contact'][0])) {
+      $this->ids['Contact'][0] = $this->individualCreate();
+    }
+    return $this->ids['Contact'][0];
   }
 
   /**

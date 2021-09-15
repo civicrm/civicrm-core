@@ -1571,6 +1571,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param int $caseId
    * @param string $str
    * @param array $knownTokens
