@@ -87,7 +87,7 @@
 
       // Make a sql-friendly alias for this expression
       function makeAlias() {
-        return (ctrl.fn + '_' + (ctrl.modifier ? ctrl.modifier + '_' : '') + ctrl.path).replace(/[.:]/g, '_');
+        return (ctrl.fn + '_' + ctrl.path).replace(/[.:]/g, '_');
       }
 
       this.writeExpr = function() {

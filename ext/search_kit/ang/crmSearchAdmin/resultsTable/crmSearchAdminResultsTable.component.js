@@ -19,7 +19,7 @@
       function getViewLink(fieldExpr, links) {
         var info = searchMeta.parseExpr(fieldExpr),
           entity = searchMeta.getEntity(info.field.entity);
-        if (!info.fn && entity && info.field.fieldName === entity.label_field) {
+        if (entity && info.field.fieldName === entity.label_field) {
           var joinEntity = searchMeta.getJoinEntity(info);
           return _.find(links, {join: joinEntity, action: 'view'});
         }

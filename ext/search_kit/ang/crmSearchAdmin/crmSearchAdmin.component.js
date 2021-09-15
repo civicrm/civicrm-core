@@ -301,7 +301,7 @@
           if (ctrl.canAggregate(col)) {
             // Ensure all non-grouped columns are aggregated if using GROUP BY
             if (!info.fn || info.fn.category !== 'aggregate') {
-              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + fieldExpr + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_DISTINCT_' + fieldExpr.replace(/[.:]/g, '_');
+              ctrl.savedSearch.api_params.select[pos] = ctrl.DEFAULT_AGGREGATE_FN + '(DISTINCT ' + fieldExpr + ') AS ' + ctrl.DEFAULT_AGGREGATE_FN + '_' + fieldExpr.replace(/[.:]/g, '_');
             }
           } else {
             // Remove aggregate functions when no grouping
@@ -621,11 +621,12 @@
             joinEntity = searchMeta.getEntity(join.entity),
             primaryKey = joinEntity.primary_key[0],
             isAggregate = ctrl.canAggregate(join.alias + '.' + primaryKey),
+            joinPrefix = (isAggregate ? 'GROUP_CONCAT_' : '') + join.alias + '.',
             bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
           _.each(joinEntity.paths, function(path) {
             var link = _.cloneDeep(path);
             link.isAggregate = isAggregate;
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+            link.path = link.path.replace(/\[/g, '[' + joinPrefix).replace(/[.:]/g, '_');
             link.join = join.alias;
             addTitle(link, join.label);
             links.push(link);

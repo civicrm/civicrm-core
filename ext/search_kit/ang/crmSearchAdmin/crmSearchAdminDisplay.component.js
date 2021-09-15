@@ -181,6 +181,14 @@
         return !col.image && !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
       };
 
+      // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT
+      // which gets special treatment in APIv4 to convert it to an array.
+      this.canBeLink = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
+      };
+
       this.toggleLink = function(column) {
         if (column.link) {
           ctrl.onChangeLink(column, column.link.path, '');
