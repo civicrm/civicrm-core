@@ -30,33 +30,56 @@
 [~] - add rendering assertions for stock template
 [x] wfmsgexample api test
 
-= near =
-
-[ ] MR for devdocs msgtpl
-
 [x] render api
 [x] render ui-api (hookup)
 [~] api - get example fields; json
 [~] render - edit example,
 [x] default/autogen example? or maybe hide preview?
 
-[ ] rough token list via api
-[ ] metadata for available tokens
-[ ] real token list via api
+[x] MR for devdocs msgtpl
+[x] split exploratory pr
+[x] token list api - finish agreeing contract https://lab.civicrm.org/dev/core/-/issues/2788
+
+[x] wf msg apis - review process
+[x] - rework as ExampleData API
+[x] - Type=>Array
+[x] - NFC: Some more docblocks,
+[x] - move CaseAct into `tests/`
+
+[x] contribution recur wf msg
+
+= near =
+
+[~] date and money formatting - design
+[~] date and money formatting - impl
+
+[ ] msgtplui - allow other/non-UI languages (or maybe override/different setting)
+[ ] msgtplui - better failure when no example-data available
+[ ] submit msgtplui as hidden ext
+
+[ ] generate wf boilerplate
 
 = mid =
 
+[ ] token list api
 [ ] try to reproduce/debug issue crashiness after browsing multiple msgtpl txs
+[ ] sendTemplate() / renderTemplate(): Override loading to make use of the translations
 
 = far =
-[ ] contributionId / tokenprocessor PR
+
+[ ] merge devdocs MR
+[ ] presentation
+
+[ ] docs for ExampleData
 [ ] switch User Templates to angular editor
 [ ] - add "Message Source"
 [ ] - add "PDF Layout"
 [ ] bootstrap token picker - or fix btn-group/select2 interaction
 
-
 = wishlist =
+
+[ ] token list api - add more metadata+filters (eg support visibility/verbosity/audience, grouping/section)
 [ ] better syntax highlighting and autocomplete for smarty
 [ ] diff button
 [ ] indicate unsaved changes
+[ ] api explorer, workflow-field, other-fields
