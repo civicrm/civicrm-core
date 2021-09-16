@@ -211,7 +211,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     }
     elseif ($updateSubscription) {
       $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_subscriptionDetails->contact_id, 'contact_type');
-      $contact = &CRM_Contact_BAO_Contact::createProfileContact($params,
+      CRM_Contact_BAO_Contact::createProfileContact($params,
         $fields,
         $this->_subscriptionDetails->contact_id,
         NULL,
@@ -227,7 +227,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         $tplParams['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
         $tplParams['membershipType'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $tplParams['membership_type_id']);
         $status = ts('Billing details for your automatically renewed %1 membership have been updated.',
-          array(1 => $tplParams['membershipType'])
+          [1 => $tplParams['membershipType']]
         );
         $msgTitle = ts('Details Updated');
         $msgType = 'success';
