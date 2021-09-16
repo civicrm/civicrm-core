@@ -146,55 +146,147 @@
           return {field: field, join: join};
         }
       }
+      function parseFnArgs(info, expr) {
+        var fnName = expr.split('(')[0],
+          argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
+        info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName});
+
+        function getKeyword(whitelist) {
+          var keyword;
+          _.each(whitelist, function(flag) {
+            if (argString.indexOf(flag) === 0) {
+              keyword = flag;
+              argString = _.trim(argString.substr(flag.length));
+              return false;
+            }
+          });
+          return keyword;
+        }
+
+        function getExpr() {
+          var expr;
+          if (argString.indexOf('"') === 0) {
+            // Match double-quoted string
+            expr = argString.match(/"([^"\\]|\\.)*"/)[0];
+          } else if (argString.indexOf("'") === 0) {
+            // Match single-quoted string
+            expr = argString.match(/'([^'\\]|\\.)*'/)[0];
+          } else {
+            // Match anything else
+            expr = argString.match(/[^ ,]+/)[0];
+          }
+          if (expr) {
+            argString = _.trim(argString.substr(expr.length));
+            return parseArg(expr);
+          }
+        }
+
+        _.each(info.fn.params, function(param, index) {
+          var exprCount = 0,
+            expr, flagBefore;
+          argString = _.trim(argString);
+          if (!argString.length || (param.name && !getKeyword(param.name))) {
+            return false;
+          }
+          flagBefore = getKeyword(_.keys(param.flag_before || {}));
+          if (param.max_expr) {
+            while (++exprCount <= param.max_expr && argString.length) {
+              expr = getExpr();
+              if (expr) {
+                expr.param = param.name || index;
+                expr.flag_before = flagBefore;
+                info.args.push(expr);
+              }
+              // Only continue if an expression was found and followed by a comma
+              if (!expr || !getKeyword([','])) {
+                break;
+              }
+            }
+            if (expr && !_.isEmpty(expr.flag_after)) {
+              _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
+            }
+          }
+        });
+      }
+      // @param {String} arg
+      function parseArg(arg) {
+        arg = _.trim(arg);
+        if (arg && !isNaN(arg)) {
+          return {
+            type: 'number',
+            value: +arg
+          };
+        } else if (_.includes(['"', "'"], arg.substr(0, 1))) {
+          return {
+            type: 'string',
+            value: arg.substr(1, arg.length - 2)
+          };
+        } else if (arg) {
+          var fieldAndJoin = getFieldAndJoin(arg, searchEntity);
+          if (fieldAndJoin) {
+            var split = arg.split(':'),
+              prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
+            return {
+              type: 'field',
+              value: arg,
+              path: split[0],
+              field: fieldAndJoin.field,
+              join: fieldAndJoin.join,
+              prefix: prefixPos > 0 ? split[0].substring(0, prefixPos) : '',
+              suffix: !split[1] ? '' : ':' + split[1]
+            };
+          }
+        }
+      }
       function parseExpr(expr) {
         if (!expr) {
           return;
         }
         var splitAs = expr.split(' AS '),
-          info = {fn: null, modifier: '', field: {}, alias: _.last(splitAs)},
-          fieldName = splitAs[0],
-          bracketPos = splitAs[0].indexOf('(');
-        if (bracketPos >= 0) {
-          var parsed = splitAs[0].substr(bracketPos).match(/[ ]?([A-Z]+[ ]+)?([\w.:]+)/);
-          fieldName = parsed[2];
-          info.fn = _.find(CRM.crmSearchAdmin.functions, {name: expr.substring(0, bracketPos)});
-          info.modifier = _.trim(parsed[1]);
-        }
-        var fieldAndJoin = getFieldAndJoin(fieldName, searchEntity);
-        if (fieldAndJoin) {
-          var split = fieldName.split(':'),
-            prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
-          info.path = split[0];
-          info.prefix = prefixPos > 0 ? info.path.substring(0, prefixPos) : '';
-          info.suffix = !split[1] ? '' : ':' + split[1];
-          info.field = fieldAndJoin.field;
-          info.join = fieldAndJoin.join;
+          info = {fn: null, args: [], alias: _.last(splitAs)},
+          bracketPos = expr.indexOf('(');
+        if (bracketPos > 0) {
+          parseFnArgs(info, splitAs[0]);
+        } else {
+          var arg = parseArg(splitAs[0]);
+          if (arg) {
+            arg.param = 0;
+            info.args.push(arg);
+          }
         }
         return info;
       }
       function getDefaultLabel(col) {
         var info = parseExpr(col),
-          label = info.field.label;
+          label = '';
         if (info.fn) {
-          label = '(' + info.fn.title + ') ' + label;
+          label = '(' + info.fn.title + ')';
         }
-        if (info.join) {
-          label = info.join.label + ': ' + label;
-        }
+        _.each(info.args, function(arg) {
+          if (arg.join) {
+            label += (label ? ' ' : '') + arg.join.label + ':';
+          }
+          if (arg.field) {
+            label += (label ? ' ' : '') + arg.field.label;
+          } else {
+            label += (label ? ' ' : '') + arg.value;
+          }
+        });
         return label;
       }
       function fieldToColumn(fieldExpr, defaults) {
         var info = parseExpr(fieldExpr),
+          field = _.findWhere(info.args, {type: 'field'}) || {},
           values = _.merge({
             type: 'field',
             key: info.alias,
-            dataType: (info.fn && info.fn.dataType) || (info.field && info.field.data_type)
+            dataType: (info.fn && info.fn.dataType) || field.data_type
           }, defaults);
         if (defaults.label === true) {
           values.label = getDefaultLabel(fieldExpr);
         }
         if (defaults.sortable) {
-          values.sortable = (info.field.type === 'Field');
+          values.sortable = field.type === 'Field';
         }
         return values;
       }
@@ -236,10 +328,12 @@
         },
         // Returns name of explicit or implicit join, for links
         getJoinEntity: function(info) {
-          if (info.field.fk_entity || info.field.name !== info.field.fieldName) {
-            return info.prefix + (info.field.fk_entity ? info.field.name : info.field.name.substr(0, info.field.name.lastIndexOf('.')));
-          } else if (info.prefix) {
-            return info.prefix.replace('.', '');
+          var arg = _.findWhere(info.args, {type: 'field'}) || {},
+            field = arg.field || {};
+          if (field.fk_entity || field.name !== field.fieldName) {
+            return arg.prefix + (field.fk_entity ? field.name : field.name.substr(0, field.name.lastIndexOf('.')));
+          } else if (arg.prefix) {
+            return arg.prefix.replace('.', '');
           }
           return '';
         },

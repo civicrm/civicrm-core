@@ -18,8 +18,9 @@
       // Output user-facing name/label fields as a link, if possible
       function getViewLink(fieldExpr, links) {
         var info = searchMeta.parseExpr(fieldExpr),
-          entity = searchMeta.getEntity(info.field.entity);
-        if (entity && info.field.fieldName === entity.label_field) {
+          firstField = _.findWhere(info.args, {type: 'field'}),
+          entity = firstField && searchMeta.getEntity(firstField.field.entity);
+        if (entity && firstField.field.fieldName === entity.label_field) {
           var joinEntity = searchMeta.getJoinEntity(info);
           return _.find(links, {join: joinEntity, action: 'view'});
         }

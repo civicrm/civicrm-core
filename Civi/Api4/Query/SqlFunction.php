@@ -147,7 +147,6 @@ abstract class SqlFunction extends SqlExpression {
    * @return string
    */
   private function captureExpression($arg) {
-    $chars = str_split($arg);
     $isEscaped = $quote = NULL;
     $item = '';
     $quotes = ['"', "'"];
@@ -155,7 +154,7 @@ abstract class SqlFunction extends SqlExpression {
       ')' => '(',
     ];
     $enclosures = array_fill_keys($brackets, 0);
-    foreach ($chars as $index => $char) {
+    foreach (str_split($arg) as $char) {
       if (!$isEscaped && in_array($char, $quotes, TRUE)) {
         // Open quotes - we'll ignore everything inside
         if (!$quote) {

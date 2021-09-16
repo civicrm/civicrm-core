@@ -297,7 +297,7 @@
       function reconcileAggregateColumns() {
         _.each(ctrl.savedSearch.api_params.select, function(col, pos) {
           var info = searchMeta.parseExpr(col),
-            fieldExpr = info.path + info.suffix;
+            fieldExpr = (_.findWhere(info.args, {type: 'field'}) || {}).value;
           if (ctrl.canAggregate(col)) {
             // Ensure all non-grouped columns are aggregated if using GROUP BY
             if (!info.fn || info.fn.category !== 'aggregate') {
@@ -405,14 +405,18 @@
         if (!ctrl.savedSearch.api_params.groupBy.length) {
           return false;
         }
-        var info = searchMeta.parseExpr(col);
+        var arg = _.findWhere(searchMeta.parseExpr(col).args, {type: 'field'}) || {};
+        // If the column is not a database field, no
+        if (!arg.field || !arg.field.entity || arg.field.type !== 'Field') {
+          return false;
+        }
         // If the column is used for a groupBy, no
-        if (ctrl.savedSearch.api_params.groupBy.indexOf(info.path) > -1) {
+        if (ctrl.savedSearch.api_params.groupBy.indexOf(arg.path) > -1) {
           return false;
         }
         // If the entity this column belongs to is being grouped by primary key, then also no
-        var idField = searchMeta.getEntity(info.field.entity).primary_key[0];
-        return ctrl.savedSearch.api_params.groupBy.indexOf(info.prefix + idField) < 0;
+        var idField = searchMeta.getEntity(arg.field.entity).primary_key[0];
+        return ctrl.savedSearch.api_params.groupBy.indexOf(arg.prefix + idField) < 0;
       };
 
       $scope.fieldsForGroupBy = function() {
@@ -534,7 +538,7 @@
           var item = {
             id: info.alias,
             text: ctrl.getFieldLabel(name),
-            description: info.field && info.field.description
+            description: info.fn ? info.fn.description : info.args[0].field && info.args[0].field.description
           };
           if (disabledIf(item.id)) {
             item.disabled = true;
@@ -662,10 +666,10 @@
         // Links to implicit joins
         _.each(ctrl.savedSearch.api_params.select, function(fieldName) {
           if (!_.includes(fieldName, ' AS ')) {
-            var info = searchMeta.parseExpr(fieldName);
+            var info = searchMeta.parseExpr(fieldName).args[0];
             if (info.field && !info.suffix && !info.fn && info.field.type === 'Field' && (info.field.fk_entity || info.field.name !== info.field.fieldName)) {
               var idFieldName = info.field.fk_entity ? fieldName : fieldName.substr(0, fieldName.lastIndexOf('.')),
-                idField = searchMeta.parseExpr(idFieldName).field;
+                idField = searchMeta.parseExpr(idFieldName).args[0].field;
               if (!ctrl.canAggregate(idFieldName)) {
                 var joinEntity = searchMeta.getEntity(idField.fk_entity),
                   label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
