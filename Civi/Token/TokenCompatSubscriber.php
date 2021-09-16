@@ -30,6 +30,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     return [
       'civi.token.eval' => [
         ['setupSmartyAliases', 1000],
+        ['evaluateLegacyHookTokens', 500],
         ['onEvaluate'],
       ],
       'civi.token.render' => 'onRender',
@@ -243,6 +244,57 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Load token data from legacy hooks.
+   *
+   * While our goal is for people to move towards implementing
+   * toke processors the old-style hooks can extend contact
+   * token data.
+   *
+   * When that is happening we need to load the full contact record
+   * to send to the hooks (not great for performance but the
+   * fix is to move away from implementing legacy style hooks).
+   *
+   * Consistent with prior behaviour we only load the contact it it
+   * is already loaded. In that scenario we also load any extra fields
+   * that might be wanted for the contact tokens.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   * @throws TokenException
+   */
+  public function evaluateLegacyHookTokens(TokenValueEvent $e): void {
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    $hookTokens = array_intersect(\CRM_Utils_Token::getTokenCategories(), array_keys($messageTokens));
+    if (empty($hookTokens)) {
+      return;
+    }
+    foreach ($e->getRows() as $row) {
+      if (empty($row->context['contactId'])) {
+        continue;
+      }
+      unset($swapLocale);
+      $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+      if (empty($row->context['contact'])) {
+        // If we don't have the contact already load it now, getting full
+        // details for hooks and anything the contact token resolution might
+        // want later.
+        $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens['contact'] ?? [], TRUE);
+      }
+      $contactArray = [$row->context['contactId'] => $row->context['contact']];
+      \CRM_Utils_Hook::tokenValues($contactArray,
+        [$row->context['contactId']],
+        empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
+        $messageTokens,
+        $row->context['controller']
+      );
+      foreach ($hookTokens as $hookToken) {
+        foreach ($messageTokens[$hookToken] as $tokenName) {
+          $row->format('text/html')->tokens($hookToken, $tokenName, $contactArray[$row->context['contactId']]["{$hookToken}.{$tokenName}"] ?? '');
+        }
+      }
+    }
+  }
+
+  /**
    * Load token data.
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
@@ -255,7 +307,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
 
     $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
 
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
@@ -268,23 +320,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $contact = $this->getContact($contactId, $messageTokens['contact'] ?? [], TRUE);
+        $contact = $this->getContact($contactId, $messageTokens);
       }
       else {
         $contact = $row->context['contact'];
-      }
-
-      $contactArray = [$contactId => $contact];
-      \CRM_Utils_Hook::tokenValues($contactArray,
-        [$contactId],
-        empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
-        $messageTokens,
-        $row->context['controller']
-      );
-
-      // merge the custom tokens in the $contact array
-      if (!empty($contactArray[$contactId])) {
-        $contact = array_merge($contact, $contactArray[$contactId]);
       }
       $row->context('contact', $contact);
     }
