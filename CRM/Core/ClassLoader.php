@@ -133,8 +133,6 @@ class CRM_Core_ClassLoader {
       '.',
       $civicrm_base_path,
       $packages_path,
-      // dev/core#2812 Ensure that the database upgrade script can run if dataprocessor extension is enabled. It relies on the legacy custom searches which have been moved into this extension
-      implode(DIRECTORY_SEPARATOR, [$civicrm_base_path, 'ext', 'legacycustomsearches']),
     ];
     $include_paths = implode(PATH_SEPARATOR, $include_paths);
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
