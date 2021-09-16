@@ -53,7 +53,7 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
 
     $form->postProcessHook();
 
-    CRM_Utils_System::civiExit(1);
+    CRM_Utils_System::civiExit(0);
   }
 
   /**
