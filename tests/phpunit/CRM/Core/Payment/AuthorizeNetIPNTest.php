@@ -10,6 +10,16 @@ use Civi\Api4\Contribution;
 class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
 
+  /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
   protected $_contributionID;
   protected $_invoiceID = 'c2r9c15f7be20b4f3fef1f77e4c37424';
   protected $_financialTypeID = 1;
@@ -41,16 +51,19 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->restoreMembershipTypes();
+    parent::tearDown();
   }
 
   /**
    * Ensure recurring contributions from Contribution Pages
    * with receipt turned off don't send a receipt.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public function testIPNPaymentRecurNoReceipt() {
+  public function testIPNPaymentRecurNoReceipt(): void {
     $mut = new CiviMailUtils($this, TRUE);
     // Turn off receipts in contribution page.
     $api_params = [
@@ -107,7 +120,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     catch (PaymentProcessorException $e) {
       $this->markTestSkipped('Error from A.net - cannot proceed');
     }
-    $this->_contributionID = $contribution->id;
+
     $this->ids['Contribution'][0] = $contribution->id;
     $this->_contributionRecurID = $contribution->contribution_recur_id;
 
@@ -148,7 +161,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testIPNPaymentRecurSuccess() {
+  public function testIPNPaymentRecurSuccess(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     $this->setupRecurringPaymentProcessorTransaction();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
@@ -189,7 +202,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
   }
@@ -197,7 +210,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testIPNPaymentRecurSuccessSuppliedReceiveDate() {
     $this->setupRecurringPaymentProcessorTransaction();
@@ -207,7 +222,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $this->assertEquals('6511143069', $contribution['trxn_id']);
     // source gets set by processor
-    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $this->assertEquals('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN(array_merge(['receive_date' => '2010-07-01'], $this->getRecurSubsequentTransaction()));

@@ -2582,7 +2582,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @param array $recurParams (Optional)
    * @param array $contributionParams (Optional)
    */
-  public function setupRecurringPaymentProcessorTransaction($recurParams = [], $contributionParams = []): void {
+  public function setupRecurringPaymentProcessorTransaction(array $recurParams = [], array $contributionParams = []): void {
     $this->ids['campaign'][0] = $this->callAPISuccess('Campaign', 'create', ['title' => 'get the money'])['id'];
     $contributionParams = array_merge([
       'total_amount' => '200',
