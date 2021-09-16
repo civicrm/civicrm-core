@@ -298,17 +298,15 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * Load token data.
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
+   *
    * @throws TokenException
+   * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
-    // For reasons unknown, replaceHookTokens used to require a pre-computed list of
-    // hook *categories* (aka entities aka namespaces). We cache
-    // this in the TokenProcessor's context but can likely remove it now.
-
-    $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
-
     $messageTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
-
+    if (empty($messageTokens)) {
+      return;
+    }
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
         continue;
@@ -317,15 +315,24 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       unset($swapLocale);
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
-      /** @var int $contactId */
-      $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $contact = $this->getContact($contactId, $messageTokens);
+        $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
       }
-      else {
-        $contact = $row->context['contact'];
+      foreach ($messageTokens as $token) {
+        if ($token === 'checksum') {
+          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
+            NULL,
+            NULL,
+            $row->context['hash'] ?? NULL
+          );
+          $row->format('text/html')
+            ->tokens('contact', $token, "cs={$cs}");
+        }
+        else {
+          $row->format('text/html')
+            ->tokens('contact', $token, $row->context['contact'][$token] ?? '');
+        }
       }
-      $row->context('contact', $contact);
     }
   }
 
@@ -333,13 +340,22 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * Apply the various CRM_Utils_Token helpers.
    *
    * @param \Civi\Token\Event\TokenRenderEvent $e
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function onRender(TokenRenderEvent $e) {
+  public function onRender(TokenRenderEvent $e): void {
     $isHtml = ($e->message['format'] === 'text/html');
     $useSmarty = !empty($e->context['smarty']);
 
     if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'] ?? $e->context['contactId'], NULL, $useSmarty);
+      // @todo - remove this - it simply removes the last unresolved tokens before
+      // they break smarty.
+      // historically it was only called when context['contact'] so that is
+      // retained but it only works because it's almost always true.
+      $remainingTokens = array_keys(\CRM_Utils_Token::getTokens($e->string));
+      if (!empty($remainingTokens)) {
+        $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $remainingTokens);
+      }
     }
 
     if ($useSmarty) {
@@ -374,8 +390,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $mappedFields = [
       'email_greeting' => 'email_greeting_display',
       'postal_greeting' => 'postal_greeting_display',
-      'addressee' => 'address_display',
+      'addressee' => 'addressee_display',
     ];
+    if (!empty($returnProperties['checksum'])) {
+      $returnProperties['hash'] = 1;
+    }
+
     foreach ($mappedFields as $tokenName => $realName) {
       if (in_array($tokenName, $requiredFields, TRUE)) {
         $returnProperties[$realName] = 1;

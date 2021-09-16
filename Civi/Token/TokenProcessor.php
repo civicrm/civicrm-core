@@ -383,7 +383,7 @@ class TokenProcessor {
     // Regex examples: '{foo.bar}', '{foo.bar|whiz}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
-    $tokRegex = '([\w]+)\.([\w:]+)';
+    $tokRegex = '([\w]+)\.([\w:\.]+)';
     $filterRegex = '(\w+)';
     $event->string = preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", $getToken, $message['string']);
     $this->dispatcher->dispatch('civi.token.render', $event);

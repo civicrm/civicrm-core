@@ -62,7 +62,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testNewPriceField() {
+  public function testNewPriceField(): void {
     $this->createLoggedInUser();
 
     $priceSetId = $this->callAPISuccess('PriceSet', 'create', [
