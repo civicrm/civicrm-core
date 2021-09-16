@@ -286,28 +286,19 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
         [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
 
-        $tplParams = [
-          'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
-          'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
-          'amount' => CRM_Utils_Money::format($params['amount']),
-          'installments' => $params['installments'],
-        ];
-
-        $tplParams['contact'] = ['display_name' => $donorDisplayName];
-        $tplParams['receipt_from_email'] = $receiptFrom;
-
         $sendTemplateParams = [
           'groupName' => 'msg_tpl_workflow_contribution',
           'valueName' => 'contribution_recurring_edit',
           'contactId' => $contactID,
-          'tplParams' => $tplParams,
+          'tplParams' => ['receipt_from_email' => $receiptFrom],
           'isTest' => $this->_subscriptionDetails->is_test,
           'PDFFilename' => 'receipt.pdf',
           'from' => $receiptFrom,
           'toName' => $donorDisplayName,
           'toEmail' => $donorEmail,
+          'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
         ];
-        [$sent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+        CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
       }
     }
 

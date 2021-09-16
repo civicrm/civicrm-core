@@ -20,7 +20,7 @@ class CRM_Case_WorkflowMessage_CaseActivity_CaseModelExample extends \Civi\Workf
    */
   public function build(array &$example): void {
     $alex = \Civi\Test::example('workflow/generic/Alex');
-    $example['data'] = $this->extend($alex['data'], [
+    $example['data'] = $this->extend($alex, [
       'workflow' => $this->wfName,
       'modelProps' => [
         'contact' => [
