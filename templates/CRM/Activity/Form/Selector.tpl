@@ -102,7 +102,14 @@
 
     <td>{$row.activity_status}</td>
 
-    <td>{$row.action|replace:'xx':$row.id}</td>
+    <td>
+      {if (!empty($row.id))}
+        {$row.action|replace:'xx':$row.id}
+      {else}
+        {$row.action}
+      {/if}
+    </td>
+
   </tr>
   {/foreach}
 
