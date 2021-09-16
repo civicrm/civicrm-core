@@ -158,26 +158,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     CRM_Mailing_BAO_Mailing::commonCompose($form);
 
-    $buttons = [];
-    if ($form->get('action') != CRM_Core_Action::VIEW) {
-      $buttons[] = [
-        'type' => 'upload',
-        'name' => ts('Download Document'),
-        'isDefault' => TRUE,
-        'icon' => 'fa-download',
-      ];
-      $buttons[] = [
-        'type' => 'submit',
-        'name' => ts('Preview'),
-        'subName' => 'preview',
-        'icon' => 'fa-search',
-        'isDefault' => FALSE,
-      ];
-    }
-    $buttons[] = [
-      'type' => 'cancel',
-      'name' => $form->get('action') == CRM_Core_Action::VIEW ? ts('Done') : ts('Cancel'),
-    ];
+    $buttons = $this->getButtons($form);
     $form->addButtons($buttons);
 
     $form->addFormRule(['CRM_Core_Form_Task_PDFLetterCommon', 'formRule'], $form);
@@ -232,10 +213,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
    *     if the form controller does not exist), else FALSE
    */
   protected function isLiveMode(): bool {
-    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
-    $buttonName = $this->controller->getButtonName();
-    $c = $this->controller->container();
-    return ($buttonName === '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
+    return strpos($this->controller->getButtonName(), '_preview') === FALSE;
   }
 
   /**
@@ -559,6 +537,44 @@ trait CRM_Contact_Form_Task_PDFTrait {
       $m = implode($newLineOperators['br']['oper'], $messages);
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
+  }
+
+  /**
+   * Get the buttons to display.
+   *
+   * @return array
+   */
+  protected function getButtons(): array {
+    $buttons = [];
+    if (!$this->isFormInViewMode()) {
+      $buttons[] = [
+        'type' => 'upload',
+        'name' => $this->getMainSubmitButtonName(),
+        'isDefault' => TRUE,
+        'icon' => 'fa-download',
+      ];
+      $buttons[] = [
+        'type' => 'submit',
+        'name' => ts('Preview'),
+        'subName' => 'preview',
+        'icon' => 'fa-search',
+        'isDefault' => FALSE,
+      ];
+    }
+    $buttons[] = [
+      'type' => 'cancel',
+      'name' => $this->isFormInViewMode() ? ts('Done') : ts('Cancel'),
+    ];
+    return $buttons;
+  }
+
+  /**
+   * Get the name for the main submit button.
+   *
+   * @return string
+   */
+  protected function getMainSubmitButtonName(): string {
+    return ts('Download Document');
   }
 
 }

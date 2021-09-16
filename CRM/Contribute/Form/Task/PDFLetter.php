@@ -112,18 +112,17 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     }
     $this->addElement('select', 'email_options', ts('Print and email options'), $emailOptions, [], "<br/>", FALSE);
 
-    $this->addButtons([
-      [
-        'type' => 'upload',
-        'name' => ts('Make Thank-you Letters'),
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => 'cancel',
-        'name' => ts('Done'),
-      ],
-    ]);
+    $this->addButtons($this->getButtons());
 
+  }
+
+  /**
+   * Get the name for the main submit button.
+   *
+   * @return string
+   */
+  protected function getMainSubmitButtonName(): string {
+    return ts('Make Thank-you Letters');
   }
 
   /**
@@ -206,7 +205,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       if (empty($groupBy) || empty($contact['is_sent'][$groupBy][$groupByID])) {
         $html[$contributionId] = $this->generateHtml($contact, $contribution, $groupBy, $contributions, $realSeparator, $tableSeparators, $messageToken, $html_message, $separator, $grouped, $groupByID);
         $contactHtml[$contact['contact_id']][] = $html[$contributionId];
-        if (!empty($formValues['email_options'])) {
+        if ($this->isSendEmails()) {
           if ($this->emailLetter($contact, $html[$contributionId], $isPDF, $formValues, $emailParams)) {
             $emailed++;
             if (!stristr($formValues['email_options'], 'both')) {
@@ -216,23 +215,28 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         }
         $contact['is_sent'][$groupBy][$groupByID] = TRUE;
       }
-      // Update receipt/thankyou dates
-      $contributionParams = ['id' => $contributionId];
-      if ($receipt_update) {
-        $contributionParams['receipt_date'] = $nowDate;
-      }
-      if ($thankyou_update) {
-        $contributionParams['thankyou_date'] = $nowDate;
-      }
-      if ($receipt_update || $thankyou_update) {
-        civicrm_api3('Contribution', 'create', $contributionParams);
-        $receipts = ($receipt_update ? $receipts + 1 : $receipts);
-        $thanks = ($thankyou_update ? $thanks + 1 : $thanks);
+      if ($this->isLiveMode()) {
+        // Update receipt/thankyou dates
+        $contributionParams = ['id' => $contributionId];
+        if ($receipt_update) {
+          $contributionParams['receipt_date'] = $nowDate;
+        }
+        if ($thankyou_update) {
+          $contributionParams['thankyou_date'] = $nowDate;
+        }
+        if ($receipt_update || $thankyou_update) {
+          civicrm_api3('Contribution', 'create', $contributionParams);
+          $receipts = ($receipt_update ? $receipts + 1 : $receipts);
+          $thanks = ($thankyou_update ? $thanks + 1 : $thanks);
+        }
       }
     }
 
     $contactIds = array_keys($contacts);
-    $this->createActivities($this, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+    // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
+    if ($this->isLiveMode()) {
+      $this->createActivities($this, $html_message, $contactIds, CRM_Utils_Array::value('subject', $formValues, ts('Thank you letter')), CRM_Utils_Array::value('campaign_id', $formValues), $contactHtml);
+    }
     $html = array_diff_key($html, $emailedHtml);
 
     //CRM-19761
@@ -265,6 +269,15 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
       // ie. we have only sent emails - lets no show a white screen
       CRM_Utils_System::civiExit();
     }
+  }
+
+  /**
+   * Are emails to be sent out?
+   *
+   * @return bool
+   */
+  protected function isSendEmails(): bool {
+    return $this->isLiveMode() && $this->getSubmittedValue('email_options');
   }
 
   /**
