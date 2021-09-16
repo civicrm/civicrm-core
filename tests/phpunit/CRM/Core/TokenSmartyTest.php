@@ -56,7 +56,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * A template that specifically opts out of Smarty.
    */
-  public function testDisableSmarty() {
+  public function testDisableSmarty(): void {
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_subject' => 'First name is {contact.first_name}. ExtraFoo is {$extra.foo}.'],
       ['contactId' => $this->contactId, 'smarty' => FALSE],
@@ -66,9 +66,39 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test smarty rendered dates using the setting short name.
+   *
+   * @param string $format
+   * @param string $expected
+   *
+   * @dataProvider getDateFormats
+   */
+  public function testSmartySettingDates(string $format, string $expected = ''): void {
+    $date = '2010-09-19 13:34:45';
+    CRM_Core_Smarty::singleton()->assign('date', $date);
+    $string = '{$date|crmDate:' . $format . '}';
+    $this->assertEquals($expected, CRM_Utils_String::parseOneOffStringThroughSmarty($string));
+  }
+
+  /**
+   * Get date formats to test.
+   */
+  public function getDateFormats(): array {
+    return [
+      ['Full', 'September 19th, 2010'],
+      ['Datetime', 'September 19th, 2010  1:34 PM'],
+      ['Partial', 'September 2010'],
+      ['Time', ' 1:34 PM'],
+      ['Year', '2010'],
+      ['FinancialBatch', '09/19/2010'],
+      ['shortdate', '09/19/2010'],
+    ];
+  }
+
+  /**
    * Someone malicious gives cutesy expressions (via token-content) that tries to provoke extra evaluation.
    */
-  public function testCutesyTokenData() {
+  public function testCutesyTokenData(): void {
     $cutesyContactId = $this->individualCreate([
       'first_name' => '{$extra.foo}{contact.last_name}',
       'last_name' => 'Roberts',
@@ -84,7 +114,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * Someone malicious gives cutesy expressions (via Smarty-content) that tries to provoke extra evaluation.
    */
-  public function testCutesySmartyData() {
+  public function testCutesySmartyData(): void {
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_subject' => 'First name is {contact.first_name}. ExtraFoo is {$extra.foo}.'],
       ['contactId' => $this->contactId],
@@ -96,7 +126,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
   /**
    * The same tokens are used in multiple parts of the template - without redundant evaluation.
    */
-  public function testDataLoadCount() {
+  public function testDataLoadCount(): void {
     // Define a token `{counter.i}` which increments whenever tokens are evaluated.
     Civi::dispatcher()->addListener('civi.token.eval', function (\Civi\Token\Event\TokenValueEvent $e) {
       static $i;
