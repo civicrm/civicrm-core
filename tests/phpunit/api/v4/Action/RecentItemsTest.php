@@ -30,21 +30,32 @@ class RecentItemsTest extends UnitTestCase {
   public function testAddDeleteActivity(): void {
     $cid = $this->createLoggedInUser();
 
-    $aid = Activity::create(FALSE)
+    $aid1 = Activity::create(FALSE)
       ->addValue('activity_type_id:name', 'Meeting')
       ->addValue('source_contact_id', $cid)
       ->addValue('subject', 'Hello recent!')
       ->execute()->first()['id'];
-
-    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid]));
-
+    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid1]));
     $this->assertStringContainsString('Hello recent!', \CRM_Utils_Recent::get()[0]['title']);
 
-    Activity::delete(FALSE)->addWhere('id', '=', $aid)->execute();
+    $aid2 = Activity::create(FALSE)
+      ->addValue('activity_type_id:name', 'Meeting')
+      ->addValue('source_contact_id', $cid)
+      ->addValue('subject', 'Goodbye recent!')
+      ->execute()->first()['id'];
+    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid2]));
+    $this->assertStringContainsString('Goodbye recent!', \CRM_Utils_Recent::get()[0]['title']);
 
-    $this->assertEquals(0, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid]));
+    Activity::delete(FALSE)->addWhere('id', '=', $aid1)->execute();
+
+    $this->assertEquals(0, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid1]));
+    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid2]));
   }
 
+  /**
+   * @param array $props
+   * @return int
+   */
   private function getRecentItemCount($props) {
     $count = 0;
     foreach (\CRM_Utils_Recent::get() as $item) {
