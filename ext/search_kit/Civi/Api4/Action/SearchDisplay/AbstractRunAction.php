@@ -121,18 +121,41 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $select[$expr->getAlias()] = $item;
     }
     $formatted = [];
-    foreach ($result as $data) {
+    foreach ($result as $index => $data) {
       $row = [];
       foreach ($select as $key => $item) {
-        $raw = $data[$key] ?? NULL;
-        $row[$key] = [
-          'raw' => $raw,
-          'view' => $this->formatViewValue($item['dataType'], $raw),
-        ];
+        $row[$key] = $this->getValue($key, $data, $item['dataType'], $index);
       }
       $formatted[] = $row;
     }
     return $formatted;
+  }
+
+  /**
+   * @param $key
+   * @param $data
+   * @param $dataType
+   * @param $index
+   * @return array
+   */
+  private function getValue($key, $data, $dataType, $index) {
+    // Get value from api result unless this is a pseudo-field which gets a calculated value
+    switch ($key) {
+      case 'result_row_num':
+        $raw = $index + 1 + ($this->savedSearch['api_params']['offset'] ?? 0);
+        break;
+
+      case 'user_contact_id':
+        $raw = \CRM_Core_Session::getLoggedInContactID();
+        break;
+
+      default:
+        $raw = $data[$key] ?? NULL;
+    }
+    return [
+      'raw' => $raw,
+      'view' => $this->formatViewValue($dataType, $raw),
+    ];
   }
 
   /**
@@ -465,6 +488,35 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $this->_afform;
+  }
+
+  /**
+   * Extra calculated fields provided by SearchKit
+   * @return array[]
+   */
+  public static function getPseudoFields(): array {
+    return [
+      [
+        'name' => 'result_row_num',
+        'fieldName' => 'result_row_num',
+        'title' => ts('Row Number'),
+        'label' => ts('Row Number'),
+        'description' => ts('Index of each row, starting from 1 on the first page'),
+        'type' => 'Pseudo',
+        'data_type' => 'Integer',
+        'readonly' => TRUE,
+      ],
+      [
+        'name' => 'user_contact_id',
+        'fieldName' => 'result_row_num',
+        'title' => ts('Current User ID'),
+        'label' => ts('Current User ID'),
+        'description' => ts('Contact ID of the current user if logged in'),
+        'type' => 'Pseudo',
+        'data_type' => 'Integer',
+        'readonly' => TRUE,
+      ],
+    ];
   }
 
 }

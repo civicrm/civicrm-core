@@ -10,6 +10,10 @@
 
       sort: [],
 
+      isSortable: function(col) {
+        return col.type === 'field' && col.sortable !== false;
+      },
+
       getSort: function(col) {
         var dir = _.reduce(this.sort, function(dir, item) {
           return item[0] === col.key ? item[1] : dir;
@@ -21,7 +25,7 @@
       },
 
       setSort: function(col, $event) {
-        if (col.type !== 'field') {
+        if (!this.isSortable(col)) {
           return;
         }
         var dir = this.getSort(col) === 'fa-sort-asc' ? 'DESC' : 'ASC';

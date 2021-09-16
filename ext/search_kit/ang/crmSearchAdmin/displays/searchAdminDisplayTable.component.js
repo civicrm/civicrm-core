@@ -43,7 +43,7 @@
         }
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];
-        ctrl.parent.initColumns({label: true});
+        ctrl.parent.initColumns({label: true, sortable: true});
       };
 
     }

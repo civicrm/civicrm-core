@@ -37,7 +37,7 @@
             classes: ['table', 'table-striped'],
             button: ts('Search'),
             columns: _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
-              var column = {label: true},
+              var column = {label: true, sortable: true},
                 link = getViewLink(fieldExpr, links);
               if (link) {
                 column.title = link.title;
@@ -111,7 +111,7 @@
       };
 
       $scope.fieldsForSelect = function() {
-        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra'], function(key) {
+        return {results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra', 'Pseudo'], function(key) {
             return _.contains(ctrl.search.api_params.select, key);
           })
         };
