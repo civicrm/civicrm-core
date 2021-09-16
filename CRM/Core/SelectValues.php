@@ -584,41 +584,32 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function participantTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $exportFields = CRM_Event_BAO_Participant::exportableFields();
+  public static function participantTokens(): array {
+    $tokens = [
+      '{participant.participant_status_id}' => 'Status ID',
+      '{participant.participant_role_id}' => 'Participant Role (ID)',
+      '{participant.participant_register_date}' => 'Register date',
+      '{participant.participant_source}' => 'Participant Source',
+      '{participant.participant_fee_level}' => 'Fee level',
+      '{participant.participant_fee_amount}' => 'Fee Amount',
+      '{participant.participant_registered_by_id}' => 'Registered By Participant ID',
+      '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
+      '{participant.participant_role}' => 'Participant Role (label)',
+      '{participant.event_title}' => 'Event Title',
+      '{participant.event_start_date}' => 'Event Start Date',
+      '{participant.event_end_date}' => 'Event End Date',
+      '{participant.fee_label}' => 'Fee Label',
+      '{participant.default_role_id}' => 'Default Role',
+      '{participant.template_title}' => 'Event Template Title',
+      '{participant.currency}' => 'Currency',
+      '{participant.participant_note}' => 'Participant Note',
+    ];
+    $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
 
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      // skipping some tokens for time being.
-      $skipTokens = [
-        'event_id',
-        'participant_is_pay_later',
-        'participant_is_test',
-        'participant_contact_id',
-        'participant_fee_currency',
-        'participant_campaign_id',
-        'participant_status',
-        'participant_discount_name',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
-
-      foreach ($values as $key => $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{participant.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
-        }
-        else {
-          $tokens["{participant.$val}"] = $exportFields[$val]['title'];
-        }
-      }
+    foreach ($customFields as $customField) {
+      $tokens['{participant.custom_' . $customField['id'] . '}'] = $customField['label'] . " :: " . $customField['groupTitle'];
     }
+
     return $tokens;
   }
 
