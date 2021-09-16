@@ -45,7 +45,7 @@ class Run extends AbstractRunAction {
         break;
 
       default:
-        if (!empty($settings['pager']) && preg_match('/^page:\d+$/', $this->return)) {
+        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^page:\d+$/', $this->return)) {
           $page = explode(':', $this->return)[1];
         }
         $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
