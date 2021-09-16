@@ -43,19 +43,19 @@ abstract class SqlFunction extends SqlExpression {
     $arg = trim(substr($this->expr, strpos($this->expr, '(') + 1, -1));
     foreach ($this->getParams() as $idx => $param) {
       $prefix = NULL;
-      if ($param['prefix']) {
-        $prefix = $this->captureKeyword([$param['prefix']], $arg);
+      if ($param['name']) {
+        $prefix = $this->captureKeyword([$param['name']], $arg);
         // Supply api_default
         if (!$prefix && isset($param['api_default'])) {
           $this->args[$idx] = [
-            'prefix' => $param['api_default']['prefix'] ?? [$param['prefix']],
+            'prefix' => [$param['name']],
             'expr' => array_map([parent::class, 'convert'], $param['api_default']['expr']),
-            'suffix' => $param['api_default']['suffix'] ?? [],
+            'suffix' => [],
           ];
           continue;
         }
         if (!$prefix && !$param['optional']) {
-          throw new \API_Exception("Missing {$param['prefix']} for SQL function " . static::getName());
+          throw new \API_Exception("Missing {$param['name']} for SQL function " . static::getName());
         }
       }
       elseif ($param['flag_before']) {
@@ -66,7 +66,7 @@ abstract class SqlFunction extends SqlExpression {
         'expr' => [],
         'suffix' => [],
       ];
-      if ($param['max_expr'] && (!$param['prefix'] || $param['prefix'] === $prefix)) {
+      if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
         $exprs = $this->captureExpressions($arg, $param['must_be'], $param['cant_be']);
         if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
           throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
@@ -195,9 +195,8 @@ abstract class SqlFunction extends SqlExpression {
    */
   public function render(array $fieldList): string {
     $output = '';
-    $params = $this->getParams();
-    foreach ($this->args as $index => $arg) {
-      $rendered = $this->renderArg($arg, $params[$index], $fieldList);
+    foreach ($this->args as $arg) {
+      $rendered = $this->renderArg($arg, $fieldList);
       if (strlen($rendered)) {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
@@ -207,11 +206,10 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param array $param
    * @param array $fieldList
    * @return string
    */
-  private function renderArg($arg, $param, $fieldList): string {
+  private function renderArg($arg, $fieldList): string {
     $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {
@@ -250,7 +248,7 @@ abstract class SqlFunction extends SqlExpression {
     foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
-        'prefix' => NULL,
+        'name' => NULL,
         'min_expr' => 1,
         'max_expr' => 1,
         'flag_before' => [],

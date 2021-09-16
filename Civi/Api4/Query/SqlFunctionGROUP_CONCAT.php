@@ -29,14 +29,14 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
         'optional' => FALSE,
       ],
       [
-        'prefix' => 'ORDER BY',
+        'name' => 'ORDER BY',
         'max_expr' => 1,
         'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
         'must_be' => ['SqlField'],
         'optional' => TRUE,
       ],
       [
-        'prefix' => 'SEPARATOR',
+        'name' => 'SEPARATOR',
         'max_expr' => 1,
         'must_be' => ['SqlString'],
         'optional' => TRUE,
