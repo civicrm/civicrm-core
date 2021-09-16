@@ -32,6 +32,8 @@ class SpecFormatter {
         $field->setName($data['custom_group_id.name'] . '.' . $data['name']);
       }
       else {
+        // Fields belonging to custom entities are treated as normal; type = Field instead of Custom
+        $field->setType('Field');
         $field->setTableName($data['custom_group_id.table_name']);
       }
       $field->setColumnName($data['column_name']);
