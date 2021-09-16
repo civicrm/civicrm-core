@@ -152,11 +152,11 @@ class CRM_Utils_Recent {
 
     self::$_recent = array_filter(self::$_recent, function($item) use ($props) {
       foreach ($props as $key => $val) {
-        if (isset($item[$key]) && $item[$key] == $val) {
-          return FALSE;
+        if (isset($item[$key]) && $item[$key] != $val) {
+          return TRUE;
         }
       }
-      return TRUE;
+      return FALSE;
     });
   }
 
