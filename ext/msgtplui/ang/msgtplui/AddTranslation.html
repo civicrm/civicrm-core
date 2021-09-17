@@ -27,6 +27,7 @@
           name="selectedOther"
           ng-model="model.selectedOther"
           ng-change="model.selected='other'">
+          <!-- "ng-click" might be better than "ng-select" but doesn't seem to work w/select2 variant -->
           <option value=""></option>
           <option ng-repeat="item in model.langs | orderBy:'label'" value="{{item.name}}" ng-disabled="!item.is_allowed">{{item.label}}</option>
         </select>
