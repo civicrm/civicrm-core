@@ -190,10 +190,16 @@ class CRM_Contribute_Form_AdditionalInfo {
     if (!empty($options[$selectedProductID])) {
       $dao->product_option = $options[$selectedProductID][$selectedProductOptionID];
     }
-    if ($premiumID) {
+
+    // This IF condition codeblock does the following:
+    // 1. If premium is present then get previous contribution-product mapping record (if any) based on contribtuion ID.
+    //   If found and the product chosen doesn't matches with old done, then delete or else set the ID for update
+    // 2. If no product is chosen theb delete the previous contribution-product mapping record based on contribtuion ID.
+    if ($premiumID || empty($selectedProductID)) {
       $ContributionProduct = new CRM_Contribute_DAO_ContributionProduct();
-      $ContributionProduct->id = $premiumID;
+      $ContributionProduct->contribution_id = $contributionID;
       $ContributionProduct->find(TRUE);
+      // here $selectedProductID can be 0 in case one unselect the premium product on backoffice update form
       if ($ContributionProduct->product_id == $selectedProductID) {
         $dao->id = $premiumID;
       }
@@ -203,7 +209,11 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    $dao->save();
+    // only add/update contribution product when a product is selected
+    if (!empty($selectedProductID)) {
+      $dao->save();
+    }
+
     //CRM-11106
     if ($premiumID == NULL || $isDeleted) {
       $premiumParams = [
