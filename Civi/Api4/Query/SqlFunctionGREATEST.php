@@ -36,4 +36,11 @@ class SqlFunctionGREATEST extends SqlFunction {
     return ts('Greatest');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The largest of all provided values.');
+  }
+
 }

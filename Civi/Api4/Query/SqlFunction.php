@@ -283,4 +283,9 @@ abstract class SqlFunction extends SqlExpression {
    */
   abstract public static function getTitle(): string;
 
+  /**
+   * @return string
+   */
+  abstract public static function getDescription(): string;
+
 }

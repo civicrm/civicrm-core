@@ -36,4 +36,11 @@ class SqlFunctionUPPER extends SqlFunction {
     return ts('Uppercase');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Uppercase version of text.');
+  }
+
 }

@@ -38,4 +38,11 @@ class SqlFunctionCOUNT extends SqlFunction {
     return ts('Count');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The number of items in the grouping.');
+  }
+
 }

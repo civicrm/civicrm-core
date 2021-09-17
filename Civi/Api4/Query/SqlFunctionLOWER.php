@@ -36,4 +36,11 @@ class SqlFunctionLOWER extends SqlFunction {
     return ts('Lowercase');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Lowercase version of text.');
+  }
+
 }

@@ -34,7 +34,14 @@ class SqlFunctionIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('If');
+    return ts('If/Else');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('If the field is empty, the first value, otherwise the second.');
   }
 
 }

@@ -36,4 +36,11 @@ class SqlFunctionCOALESCE extends SqlFunction {
     return ts('Coalesce');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The first value that is not null.');
+  }
+
 }

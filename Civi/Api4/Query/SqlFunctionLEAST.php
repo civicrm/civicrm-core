@@ -36,4 +36,11 @@ class SqlFunctionLEAST extends SqlFunction {
     return ts('Least');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The smallest of all provided values.');
+  }
+
 }

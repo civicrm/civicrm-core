@@ -80,4 +80,11 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
     return ts('List');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('All values in the grouping.');
+  }
+
 }

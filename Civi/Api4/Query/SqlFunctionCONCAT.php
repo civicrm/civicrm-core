@@ -34,7 +34,14 @@ class SqlFunctionCONCAT extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Combine');
+    return ts('Combine text');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Multiple values concatenated into a single string.');
   }
 
 }

@@ -33,7 +33,14 @@ class SqlFunctionTIME extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Time Only');
+    return ts('Time only');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Only the time portaion of a date/time.');
   }
 
 }

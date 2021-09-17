@@ -34,7 +34,14 @@ class SqlFunctionNULLIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Null if');
+    return ts('Unequal');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The first value, only if it is not equal to the second.');
   }
 
 }

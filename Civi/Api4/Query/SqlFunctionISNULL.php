@@ -35,4 +35,11 @@ class SqlFunctionISNULL extends SqlFunction {
     return ts('Is null');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('TRUE if the value is NULL, otherwise FALSE.');
+  }
+
 }

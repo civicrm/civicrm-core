@@ -26,7 +26,14 @@ class SqlFunctionRAND extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Random Number');
+    return ts('Random number');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Generates a random number between 0 and 1.');
   }
 
 }

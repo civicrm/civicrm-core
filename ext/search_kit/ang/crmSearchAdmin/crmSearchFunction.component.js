@@ -69,7 +69,7 @@
             });
             functions.push({
               text: allTypes[type],
-              children: formatForSelect2(allowedFunctions, 'name', 'title')
+              children: formatForSelect2(allowedFunctions, 'name', 'title', ['description'])
             });
           });
         }

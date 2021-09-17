@@ -34,4 +34,11 @@ class SqlFunctionSUM extends SqlFunction {
     return ts('Sum');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The sum of all values in the grouping.');
+  }
+
 }
