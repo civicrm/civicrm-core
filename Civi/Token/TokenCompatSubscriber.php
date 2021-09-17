@@ -307,6 +307,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     if (empty($messageTokens)) {
       return;
     }
+    $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
+
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
         continue;
@@ -318,6 +320,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       if (empty($row->context['contact'])) {
         $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
       }
+
       foreach ($messageTokens as $token) {
         if ($token === 'checksum') {
           $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
@@ -328,12 +331,81 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
           $row->format('text/html')
             ->tokens('contact', $token, "cs={$cs}");
         }
+        elseif (!empty($row->context['contact'][$token]) &&
+          $this->isDateField($token)
+        ) {
+          // Handle dates here, for now. Standardise with other token entities next round
+          $row->format('text/plain')->tokens('contact', $token, \CRM_Utils_Date::customFormat($row->context['contact'][$token]));
+        }
+        elseif (
+          ($row->context['contact'][$token] ?? '') == 0
+          && $this->isBooleanField($token)) {
+          // Note this will be the default behaviour once we fetch with apiv4.
+          $row->format('text/plain')->tokens('contact', $token, '');
+        }
+        elseif ($token === 'signature_html') {
+          $text = html_entity_decode($row->context['contact'][$token]);
+          $row->format('text/html')->tokens('contact', $token, $value);
+        }
         else {
           $row->format('text/html')
             ->tokens('contact', $token, $row->context['contact'][$token] ?? '');
         }
       }
     }
+  }
+
+  /**
+   * Is the given field a boolean field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isBooleanField(string $fieldName): bool {
+    // no metadata for these 2 non-standard fields
+    // @todo - fix to api v4 & have metadata for all fields. Migrate contact_is_deleted
+    // to {contact.is_deleted}. on hold feels like a token that exists by
+    // accident & could go.... since it's not from the main entity.
+    if (in_array($fieldName, ['contact_is_deleted', 'on_hold'])) {
+      return TRUE;
+    }
+    if (empty($this->getFieldMetadata()[$fieldName])) {
+      return FALSE;
+    }
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
+  }
+
+  /**
+   * Is the given field a date field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isDateField(string $fieldName): bool {
+    if (empty($this->getFieldMetadata()[$fieldName])) {
+      return FALSE;
+    }
+    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
+  }
+
+  /**
+   * Get the metadata for the available fields.
+   *
+   * @return array
+   */
+  protected function getFieldMetadata(): array {
+    if (empty($this->fieldMetadata)) {
+      try {
+        // Tests fail without checkPermissions = FALSE
+        $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
+      }
+      catch (\API_Exception $e) {
+        $this->fieldMetadata = [];
+      }
+    }
+    return $this->fieldMetadata;
   }
 
   /**

@@ -768,7 +768,7 @@ state_province:TX
 country:United States
 phone:123-456
 phone_ext:77
-phone_type_id:
+phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
 on_hold:
