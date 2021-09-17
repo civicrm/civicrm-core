@@ -1276,6 +1276,8 @@ class CRM_Utils_Token {
    * Get Membership Token Details.
    * @param array $membershipIDs
    *   Array of membership IDS.
+   *
+   * @deprecated
    */
   public static function getMembershipTokenDetails($membershipIDs) {
     $memberships = civicrm_api3('membership', 'get', [

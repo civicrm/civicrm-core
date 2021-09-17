@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Membership;
+
 /**
  * This class provides the functionality to create PDF letter for a group of
  * contacts or a single contact.
@@ -119,20 +121,19 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
    *
    */
   public function generateHTML($membershipIDs, $messageToken, $html_message): array {
-    $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
+    $memberships = Membership::get(FALSE)
+      ->addWhere('id', 'IN', $membershipIDs)
+      ->addSelect('contact_id')->execute();
     $html = [];
 
-    foreach ($membershipIDs as $membershipID) {
-      $membership = $memberships[$membershipID];
-      // get contact information
-      $contactId = $membership['contact_id'];
-      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $html_message, $messageToken);
+    foreach ($memberships as $membership) {
       $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate([
-        'messageTemplate' => ['msg_html' => $tokenHtml],
-        'contactId' => $contactId,
+        'messageTemplate' => ['msg_html' => $html_message],
+        'contactId' => $membership['contact_id'],
+        'schema' => ['contactId', 'membershipId'],
+        'tokenContext' => ['membershipId' => $membership['id']],
         'disableSmarty' => !defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY,
       ])['html'];
-
     }
     return $html;
   }
