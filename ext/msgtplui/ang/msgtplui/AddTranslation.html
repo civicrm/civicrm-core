@@ -8,17 +8,17 @@
 
     <label>{{:: ts('Locale')}} <span class="crm-marker">*</span></label>
 
-    <div class="radio" ng-repeat="lang in model.mainLangs | orderBy:['label']">
-      <label ng-class="{disabled: !lang.is_active}">
-        <input type="radio" ng-model="model.selected" ng-value="lang.name" name="lang" ng-disabled="!lang.is_active"/>
+    <div class="radio" ng-repeat="lang in model.langs | orderBy:['label']">
+      <label ng-if="lang.is_encouraged" ng-class="{disabled: !lang.is_allowed}">
+        <input type="radio" ng-model="model.selected" ng-value="lang.name" name="lang" ng-disabled="!lang.is_allowed"/>
         {{:: lang.label}}
-        <span ng-if="!lang.is_active"><em>({{:: ts('existing')}})</em></span>
+        <span ng-if="!lang.is_allowed"><em>({{:: ts('existing')}})</em></span>
       </label>
     </div>
 
-    <div class="radio" ng-if="!!model.altLangs">
+    <div class="radio" ng-if="!!model.langs">
       <label>
-        <input type="radio" ng-model="model.selected" value="other" name="lang" ng-disabled="!model.altLangs"/>
+        <input type="radio" ng-model="model.selected" value="other" name="lang" ng-disabled="!model.langs"/>
         {{:: ts('Other')}}
 
         <select
@@ -28,7 +28,7 @@
           ng-model="model.selectedOther"
           ng-change="model.selected='other'">
           <option value=""></option>
-          <option ng-repeat="item in model.altLangs | orderBy:'label'" value="{{item.name}}">{{item.label}}</option>
+          <option ng-repeat="item in model.langs | orderBy:'label'" value="{{item.name}}" ng-disabled="!item.is_allowed">{{item.label}}</option>
         </select>
 
       </label>

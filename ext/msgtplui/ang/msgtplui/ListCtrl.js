@@ -80,18 +80,20 @@
 
     $ctrl.addTranslation = function(record) {
       var existing = findTranslations(record), activeLangs = findActiveLangs();
-      var mainLangs = [], altLangs = [{label: ts('- select -'), name: ''}];
-      angular.forEach(CRM.msgtplui.allLanguages, function(label, value){
-        var lang = {label: label, name: value, is_active: !existing[value]};
-        if (activeLangs[value] || CRM.msgtplui.uiLanguages[value]) mainLangs.push(lang);
-        if (!existing[value]) altLangs.push(lang);
+      var langs = [];
+      angular.forEach(CRM.msgtplui.allLanguages, function (label, value) {
+        langs.push({
+          name: value,
+          label: label,
+          is_allowed: !existing[value],
+          is_encouraged: !!(activeLangs[value] || CRM.msgtplui.uiLanguages[value])
+        });
       });
       var model = {
         msgtpl: record,
-        selected: (_.head(_.filter(mainLangs, {'is_active': true}))||{}).name,
+        selected: (_.head(_.filter(langs, {is_allowed: true, is_encouraged: true}))||{}).name,
         selectedOther: '',
-        mainLangs: mainLangs,
-        altLangs: altLangs
+        langs: langs
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
