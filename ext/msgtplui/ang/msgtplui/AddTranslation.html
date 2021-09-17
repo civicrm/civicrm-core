@@ -20,7 +20,17 @@
       <label>
         <input type="radio" ng-model="model.selected" value="other" name="lang" ng-disabled="!model.altLangs"/>
         {{:: ts('Other')}}
-        <select class="form-control" ng-options="item.name as item.label for item in model.altLangs" ng-model="model.selectedOther" ng-change="model.selected='other'"></select>
+
+        <select
+          class="form-control"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('- select -')}"
+          name="selectedOther"
+          ng-model="model.selectedOther"
+          ng-change="model.selected='other'">
+          <option value=""></option>
+          <option ng-repeat="item in model.altLangs | orderBy:'label'" value="{{item.name}}">{{item.label}}</option>
+        </select>
+
       </label>
     </div>
 
