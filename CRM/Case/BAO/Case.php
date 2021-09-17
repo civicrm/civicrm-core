@@ -416,6 +416,8 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       "GROUP_CONCAT(DISTINCT IF(case_relationship.contact_id_b = $userID, case_relation_type.label_a_b, case_relation_type.label_b_a) SEPARATOR ', ') as case_role",
       't_act.activity_date_time as activity_date_time',
       't_act.id as activity_id',
+      'case_status.label AS case_status',
+      'civicrm_case_type.title AS case_type',
     ];
 
     $query = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, 'case_id');
@@ -424,6 +426,11 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       FROM civicrm_case
         INNER JOIN civicrm_case_contact ON civicrm_case.id = civicrm_case_contact.case_id
         INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id
+        LEFT JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id
+        LEFT JOIN civicrm_option_group option_group_case_status ON ( option_group_case_status.name = 'case_status' )
+        LEFT JOIN civicrm_option_value case_status ON ( civicrm_case.status_id = case_status.value
+          AND option_group_case_status.id = case_status.option_group_id )
+
 HERESQL;
 
     // 'upcoming' and 'recent' show the next scheduled and most recent
