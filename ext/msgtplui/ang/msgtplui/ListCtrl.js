@@ -82,12 +82,9 @@
       var existing = findTranslations(record), activeLangs = findActiveLangs();
       var mainLangs = [], altLangs = [{label: ts('- select -'), name: ''}];
       angular.forEach(CRM.msgtplui.allLanguages, function(label, value){
-        if (activeLangs[value] || CRM.msgtplui.uiLanguages[value]) {
-          mainLangs.push({label: label, name: value, is_active: !existing[value]});
-        }
-        else {
-          altLangs.push({label: label, name: value});
-        }
+        var lang = {label: label, name: value, is_active: !existing[value]};
+        if (activeLangs[value] || CRM.msgtplui.uiLanguages[value]) mainLangs.push(lang);
+        if (!existing[value]) altLangs.push(lang);
       });
       var model = {
         msgtpl: record,
