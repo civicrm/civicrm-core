@@ -394,7 +394,7 @@ campaign : Big one
     $this->mut = new CiviMailUtils($this, TRUE);
     $this->_individualId = $this->individualCreate();
     $this->_individualId2 = $this->individualCreate();
-    $htmlMessage = "{aggregate.rendered_token}";
+    $htmlMessage = '{aggregate.rendered_token}';
     $formValues = [
       'group_by' => 'contact_id',
       'html_message' => $htmlMessage,
@@ -505,9 +505,8 @@ campaign : Big one
     $this->assertEquals($html[2], $activities['values'][1]['details']);
     // Checking it is not called multiple times.
     // once for each contact create + once for the activities.
-    // & once for the token processor, for now.
     // By calling the cached function we can get this down to 1
-    $this->assertEquals(4, $this->hookTokensCalled);
+    $this->assertEquals(3, $this->hookTokensCalled);
     $this->mut->checkAllMailLog($html);
 
   }

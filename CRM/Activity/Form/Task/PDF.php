@@ -46,7 +46,7 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
     $form = $this;
     $activityIds = $form->_activityHolderIds;
     $formValues = $form->controller->exportValues($form->getName());
-    $html_message = CRM_Core_Form_Task_PDFLetterCommon::processTemplate($formValues);
+    $html_message = $this->processTemplate($formValues);
 
     // Do the rest in another function to make testing easier
     $form->createDocument($activityIds, $html_message, $formValues);
