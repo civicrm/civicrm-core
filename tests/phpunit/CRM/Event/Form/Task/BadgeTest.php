@@ -12,6 +12,11 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_participant', 'civicrm_print_label'], TRUE);
+    parent::tearDown();
+  }
+
   /**
    * Test the the submit function on the event participant submit function.
    */
@@ -25,7 +30,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
 
     $badgeLayout = PrintLabel::get()->addSelect('data')->execute()->first();
     $values = [
-      'data' => array_merge($badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => []])
+      'data' => array_merge($badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => []]),
     ];
     foreach (array_keys($this->getAvailableTokens()) as $id => $token) {
       $index = $id + 1;
@@ -65,7 +70,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
         'text_alignment' => 'C',
         'token' => '{event.title}',
       ], $tokens[1]);
-      $index =1;
+      $index = 1;
       foreach ($this->getAvailableTokens() as $token => $expected) {
         $this->assertEquals($expected, $tokens[$index]['value'], 'failure in token ' . $token);
         $index++;

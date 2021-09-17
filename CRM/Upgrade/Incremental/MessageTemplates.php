@@ -322,7 +322,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   public function replaceTokenInPrintLabel(string $old, string $new): void {
     $oldToken = '{' . $old . '}';
     $newToken = '{' . $new . '}';
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_action_schedule
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_print_label
       SET
         data = REPLACE(data, '$oldToken', '$newToken')
     ");

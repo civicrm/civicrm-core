@@ -598,8 +598,6 @@ class CRM_Core_SelectValues {
       '{participant.fee_label}' => 'Fee Label',
       '{participant.default_role_id}' => 'Default Role',
       '{participant.template_title}' => 'Event Template Title',
-      '{participant.currency}' => 'Currency',
-      '{participant.participant_note}' => 'Participant Note',
     ];
     $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
 

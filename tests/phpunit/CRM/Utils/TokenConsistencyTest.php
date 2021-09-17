@@ -495,8 +495,6 @@ December 21st, 2007
       '{participant.fee_label}' => 'Fee Label',
       '{participant.default_role_id}' => 'Default Role',
       '{participant.template_title}' => 'Event Template Title',
-      '{participant.currency}' => 'Currency',
-      '{participant.participant_note}' => 'Participant Note',
       '{participant.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }
