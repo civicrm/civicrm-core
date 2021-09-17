@@ -278,12 +278,13 @@
       }).then(function(resp) {
         console.log('resp',resp);
         if ((!resp.examples || resp.examples.length === 0) && resp.adhoc) {
-          resp.examples = [{
-            name: 'auto',
-            title: ts('Empty example'),
-            workflow: $ctrl.records.main.workflow_name,
-            data: {modelProps: resp.adhoc[0]}
-          }];
+          // In the future, if Preview dialog allows editing adhoc examples, then we can show the dialog. But for now, it won't work without explicit examples.
+          crmUiAlert({
+            title: ts('Preview unavailable'),
+            text: ts('Generating a preview for this message requires example data. Please talk to a developer about adding example data for "%1".', {1: $ctrl.records.main.workflow_name}),
+            type: 'error'
+          });
+          return;
         }
         defaults.exampleName = resp.examples.length > 0  ? (resp.examples)[0].name : null;
         var i = 0;
