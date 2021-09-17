@@ -494,14 +494,12 @@ class CRM_Core_SelectValues {
    * Domain tokens
    *
    * @return array
+   *
+   * @deprecated
    */
   public static function domainTokens() {
-    return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => ts('Domain (organization) email'),
-    ];
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
+    return $tokenProcessor->listTokens();
   }
 
   /**
@@ -562,21 +560,37 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Contribution Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function contributionTokens(): array {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
-    return $tokenProcessor->listTokens();
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
   }
 
   /**
    * Different type of Contact Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function contactTokens(): array {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
-    return $tokenProcessor->listTokens();
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
   }
 
   /**

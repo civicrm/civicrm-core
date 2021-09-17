@@ -308,7 +308,7 @@ London, 90210
   }
 
   /**
-   * Test rendering of domain tokens.
+   * Test rendering of contact tokens.
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception

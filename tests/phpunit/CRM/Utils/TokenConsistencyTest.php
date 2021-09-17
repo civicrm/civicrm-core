@@ -85,7 +85,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
       'smarty' => FALSE,
       'schema' => ['caseId'],
     ]);
-    $this->assertEquals($expectedTokens, $tokenProcessor->listTokens());
+    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
     $tokenProcessor->addRow([
       'caseId' => $this->getCaseID(),
     ]);
@@ -203,7 +203,7 @@ No
       'smarty' => FALSE,
       'schema' => ['contribution_recurId'],
     ]);
-    $this->assertEquals($this->getContributionRecurTokens(), $tokenProcessor->listTokens());
+    $this->assertEquals(array_merge($this->getContributionRecurTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
     $tokenString = implode("\n", array_keys($this->getContributionRecurTokens()));
 
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
@@ -406,7 +406,7 @@ Check';
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens['{membership.custom_1}'] = 'Enter text here :: Group with field text';
-    $this->assertEquals($expectedTokens, $tokens);
+    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
     $tokenProcessor->evaluate();
@@ -477,7 +477,7 @@ December 21st, 2007
   }
 
   /**
-   * Get declared membership tokens.
+   * Get declared participant tokens.
    *
    * @return string[]
    */
@@ -501,6 +501,37 @@ December 21st, 2007
       '{participant.currency}' => 'Currency',
       '{participant.participant_note}' => 'Participant Note',
       '{participant.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+    ];
+  }
+
+  /**
+   * Test that domain tokens are consistently rendered.
+   */
+  public function testDomainTokenConsistency(): void {
+    $tokens = CRM_Core_SelectValues::domainTokens();
+    $this->assertEquals($this->getDomainTokens(), $tokens);
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
+    $tokens['{domain.id}'] = 'Domain ID';
+    $tokens['{domain.description}'] = 'Domain Description';
+    $this->assertEquals($tokens, $tokenProcessor->listTokens());
+  }
+
+  /**
+   * Get declared participant tokens.
+   *
+   * @return string[]
+   */
+  public function getDomainTokens(): array {
+    return [
+      '{domain.name}' => ts('Domain name'),
+      '{domain.address}' => ts('Domain (organization) address'),
+      '{domain.phone}' => ts('Domain (organization) phone'),
+      '{domain.email}' => 'Domain (organization) email',
+      '{domain.id}' => ts('Domain ID'),
+      '{domain.description}' => ts('Domain Description'),
     ];
   }
 
