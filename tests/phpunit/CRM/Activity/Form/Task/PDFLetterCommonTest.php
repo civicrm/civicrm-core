@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class CRM_Activity_Form_Task_PDFLetterCommonTest
  * @group headless
@@ -21,7 +23,10 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testCreateDocumentBasicTokens(): void {
-    $activity = $this->activityCreate();
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    $this->enableCiviCampaign();
+
+    $activity = $this->activityCreate(['campaign_id' => $this->campaignCreate()]);
     $data = [
       ['Subject: {activity.subject}', 'Subject: Discussion on warm beer'],
       ['Date: {activity.activity_date_time}', 'Date: ' . CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM'],
@@ -29,11 +34,18 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       ['Location: {activity.location}', 'Location: Baker Street'],
       ['Details: {activity.details}', 'Details: Lets schedule a meeting'],
       ['Status ID: {activity.status_id}', 'Status ID: 1'],
-      ['Status: {activity.status}', 'Status: Scheduled'],
+      ['(legacy) Status: {activity.status}', '(legacy) Status: Scheduled'],
+      ['Status: {activity.status_id:label}', 'Status: Scheduled'],
       ['Activity Type ID: {activity.activity_type_id}', 'Activity Type ID: 1'],
-      ['Activity Type: {activity.activity_type}', 'Activity Type: Meeting'],
-      ['Activity ID: {activity.activity_id}', 'Activity ID: ' . $activity['id']],
+      ['(legacy) Activity Type: {activity.activity_type}', '(legacy) Activity Type: Meeting'],
+      ['Activity Type: {activity.activity_type_id:label}', 'Activity Type: Meeting'],
+      ['(legacy) Activity ID: {activity.activity_id}', '(legacy) Activity ID: ' . $activity['id']],
+      ['Activity ID: {activity.id}', 'Activity ID: ' . $activity['id']],
+      ['(just weird) Case ID: {activity.case_id}', '(just weird) Case ID: ' . ''],
     ];
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
+
+    $this->assertEquals($this->getActivityTokens(), $tokenProcessor->listTokens());
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
@@ -42,6 +54,34 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     foreach ($data as $line) {
       $this->assertStringContainsString("\n" . $line[1] . "\n", $output[0]);
     }
+  }
+
+  /**
+   * Get expected activity Tokens.
+   *
+   * @return string[]
+   */
+  protected function getActivityTokens(): array {
+    return [
+      '{activity.id}' => 'Activity ID',
+      '{activity.subject}' => 'Activity Subject',
+      '{activity.details}' => 'Activity Details',
+      '{activity.activity_date_time}' => 'Activity Date-Time',
+      '{activity.created_date}' => 'Activity Created Date',
+      '{activity.modified_date}' => 'Activity Modified Date',
+      '{activity.activity_type_id}' => 'Activity Type ID',
+      '{activity.status_id}' => 'Activity Status ID',
+      '{activity.location}' => 'Activity Location',
+      '{activity.duration}' => 'Activity Duration',
+      '{activity.activity_type_id:label}' => 'Activity Type',
+      '{activity.activity_type_id:name}' => 'Machine name: Activity Type',
+      '{activity.status_id:label}' => 'Activity Status',
+      '{activity.status_id:name}' => 'Machine name: Activity Status',
+      '{activity.campaign_id:label}' => 'Campaign',
+      '{activity.campaign_id:name}' => 'Machine name: Campaign',
+      '{activity.campaign_id}' => 'Campaign ID',
+      '{activity.case_id}' => 'Activity Case ID',
+    ];
   }
 
   public function testCreateDocumentCustomFieldTokens() {
