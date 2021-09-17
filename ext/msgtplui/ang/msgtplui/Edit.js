@@ -157,7 +157,7 @@
     var $ctrl = this;
     var args = $location.search();
 
-    $ctrl.locales = CRM.msgtplui.uiLanguages;
+    $ctrl.locales = CRM.msgtplui.allLanguages;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
     if (args.lang) {

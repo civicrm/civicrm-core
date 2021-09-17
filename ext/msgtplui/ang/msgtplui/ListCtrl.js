@@ -49,6 +49,15 @@
       }, {});
     }
 
+    function findActiveLangs() {
+      return _.reduce($ctrl.records, function(langs, rec){
+        if (rec._is_translation) {
+          langs[rec.tx_language] = true;
+        }
+        return langs;
+      }, {});
+    }
+
     /**
      *
      * @param record
@@ -70,15 +79,22 @@
     };
 
     $ctrl.addTranslation = function(record) {
-      var existing = findTranslations(record);
-      var available = _.reduce(CRM.msgtplui.uiLanguages, function(acc, label, name) {
-        if (!existing[name]) acc.push({label: label, name: name});
-        return acc;
-      }, []);
+      var existing = findTranslations(record), activeLangs = findActiveLangs();
+      var mainLangs = [], altLangs = [{label: ts('- select -'), name: ''}];
+      angular.forEach(CRM.msgtplui.allLanguages, function(label, value){
+        if (activeLangs[value] || CRM.msgtplui.uiLanguages[value]) {
+          mainLangs.push({label: label, name: value, is_active: !existing[value]});
+        }
+        else {
+          altLangs.push({label: label, name: value});
+        }
+      });
       var model = {
         msgtpl: record,
-        selected: (_.head(available)||{}).name,
-        langs: available
+        selected: (_.head(_.filter(mainLangs, {'is_active': true}))||{}).name,
+        selectedOther: '',
+        mainLangs: mainLangs,
+        altLangs: altLangs
       };
       var options = CRM.utils.adjustDialogDefaults({
         autoOpen: false,
@@ -88,7 +104,8 @@
       });
       return dialogService.open('addTranslationDlg', '~/msgtplui/AddTranslation.html', model, options)
         .then(function(){
-          window.location = $ctrl.editUrl({id: record.id, tx_language: model.selected});
+          var selection = (model.selected === 'other') ? model.selectedOther : model.selected;
+          window.location = $ctrl.editUrl({id: record.id, tx_language: selection});
         });
     };
 

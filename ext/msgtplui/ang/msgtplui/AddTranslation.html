@@ -8,12 +8,23 @@
 
     <label>{{:: ts('Locale')}} <span class="crm-marker">*</span></label>
 
-    <div class="radio" ng-repeat="lang in model.langs | orderBy:['label']">
-      <label>
-        <input type="radio" ng-model="model.selected" ng-value="lang.name" name="lang"/>
+    <div class="radio" ng-repeat="lang in model.mainLangs | orderBy:['label']">
+      <label ng-class="{disabled: !lang.is_active}">
+        <input type="radio" ng-model="model.selected" ng-value="lang.name" name="lang" ng-disabled="!lang.is_active"/>
         {{:: lang.label}}
+        <span ng-if="!lang.is_active"><em>({{:: ts('existing')}})</em></span>
       </label>
     </div>
+
+    <div class="radio" ng-if="!!model.altLangs">
+      <label>
+        <input type="radio" ng-model="model.selected" value="other" name="lang" ng-disabled="!model.altLangs"/>
+        {{:: ts('Other')}}
+        <select class="form-control" ng-options="item.name as item.label for item in model.altLangs" ng-model="model.selectedOther" ng-change="model.selected='other'"></select>
+      </label>
+    </div>
+
+    <span ng-model="placeholder" crm-ui-validate="!(model.selected === 'other' && model.selectedOther === '')"></span>
 
     <crm-dialog-button text="ts('Add')" icons="{primary: 'fa-plus'}" on-click="addTranslationDlg.close()" disabled="!addTranslationForm.$valid" />
     <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="addTranslationDlg.cancel()" />
