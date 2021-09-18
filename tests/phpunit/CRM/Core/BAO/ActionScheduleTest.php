@@ -880,8 +880,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       '{contact.display_name}',
       // funny legacy contact token
       '{contact.gender}',
-      // funny legacy contact token
-      '{contact.gender_id}',
       // domain token
       '{domain.name}',
       // action-scheduler token
@@ -896,7 +894,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
     // Note: The behavior of domain-tokens on a scheduled reminder is undefined. All we
     // can really do is check that it has something.
-    $someTokensExpected = 'Churmondleia Ōtākou;;Female;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
+    $someTokensExpected = 'Churmondleia Ōtākou;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
     $manyTokensExpected = sprintf('%s;;Dear Churmondleia;;%s', $someTokensExpected, '{contactCustomTokenValue}');
 
     // In this example, we use a lot of tokens cutting across multiple components.
