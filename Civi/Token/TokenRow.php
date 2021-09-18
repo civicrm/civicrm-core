@@ -283,15 +283,18 @@ class TokenRow {
         // HTML => Plain.
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
+            if (!$value instanceof \DateTime) {
+              $value = html_entity_decode(strip_tags($value));
+            }
             if (!isset($textTokens[$entity][$field])) {
-              $textTokens[$entity][$field] = html_entity_decode(strip_tags($value));
+              $textTokens[$entity][$field] = $value;
             }
           }
         }
         break;
 
       default:
-        throw new \RuntimeException("Invalid format");
+        throw new \RuntimeException('Invalid format');
     }
 
     return $this;

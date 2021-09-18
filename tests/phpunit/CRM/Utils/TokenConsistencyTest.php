@@ -509,7 +509,31 @@ December 21st, 2007
     ]);
     $tokens['{domain.id}'] = 'Domain ID';
     $tokens['{domain.description}'] = 'Domain Description';
+    $tokens['domain.now'] = 'Current time/date';
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
+  }
+
+  /**
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testDomainNow(): void {
+    putenv('TIME_FUNC=frozen');
+    CRM_Utils_Time::setTime('2021-21-18 11:58:00');
+    $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => [
+        'msg_text' => '{domain.now|crmDate:short}',
+      ],
+    ])['text'];
+    $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
+    $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => [
+        'msg_text' => '{domain.now}',
+      ],
+    ])['text'];
+    $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
+
+    $b1 = 1;
   }
 
   /**
@@ -525,6 +549,7 @@ December 21st, 2007
       '{domain.email}' => 'Domain (organization) email',
       '{domain.id}' => ts('Domain ID'),
       '{domain.description}' => ts('Domain Description'),
+      '{domain.now}' => 'Current time/date',
     ];
   }
 

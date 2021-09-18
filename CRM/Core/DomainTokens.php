@@ -47,6 +47,7 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
       'email' => ts('Domain (organization) email'),
       'id' => ts('Domain ID'),
       'description' => ts('Domain Description'),
+      'now' => ts('Current time/date'),
     ];
   }
 
@@ -55,6 +56,10 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
+    if ($field === 'now') {
+      $row->format('text/html')->tokens($entity, $field, new DateTime());
+      return;
+    }
     $row->format('text/html')->tokens($entity, $field, self::getDomainTokenValues()[$field]);
     $row->format('text/plain')->tokens($entity, $field, self::getDomainTokenValues(NULL, FALSE)[$field]);
   }

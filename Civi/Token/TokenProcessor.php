@@ -365,6 +365,11 @@ class TokenProcessor {
       [$full, $entity, $field] = $m;
       if (isset($tokens[$entity][$field])) {
         $v = $tokens[$entity][$field];
+        if ($v instanceof \DateTime) {
+          if (!isset($m[3])) {
+            $m[3] = 'crmDate';
+          }
+        }
         if (isset($m[3])) {
           $v = $this->filterTokenValue($v, $m[3], $row);
         }
@@ -384,7 +389,7 @@ class TokenProcessor {
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
     $tokRegex = '([\w]+)\.([\w:\.]+)';
-    $filterRegex = '(\w+)';
+    $filterRegex = '(\w+:?\w+)';
     $event->string = preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", $getToken, $message['string']);
     $this->dispatcher->dispatch('civi.token.render', $event);
     return $event->string;
@@ -412,6 +417,13 @@ class TokenProcessor {
 
       case 'lower':
         return mb_strtolower($value);
+
+      case 'crmDate':
+        if ($value instanceof \DateTime) {
+          // @todo cludgey.
+          require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
+          return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'));
+        }
 
       default:
         throw new \CRM_Core_Exception("Invalid token filter: $filter");
