@@ -297,19 +297,19 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <body>
     <div id="crm-container">
 id : 1
-total_amount : € 9,999.99
-fee_amount : € 1,111.11
-net_amount : € 7,777.78
-non_deductible_amount : € 2,222.22
+total_amount : &euro; 9,999.99
+fee_amount : &euro; 1,111.11
+net_amount : &euro; 7,777.78
+non_deductible_amount : &euro; 2,222.22
 receive_date : July 20th, 2018 12:00 AM
 payment_instrument_id:label : Check
 trxn_id : 1234
 invoice_id : 568
 currency : EUR
-cancel_date : 2019-12-30 00:00:00
+cancel_date : December 30th, 2019 12:00 AM
 cancel_reason : Contribution Cancel Reason
 receipt_date : October 30th, 2019 12:00 AM
-thankyou_date : 2019-11-30 00:00:00
+thankyou_date : November 30th, 2019 12:00 AM
 source : Contribution Source
 amount_level : Amount Level
 contribution_status_id : 2

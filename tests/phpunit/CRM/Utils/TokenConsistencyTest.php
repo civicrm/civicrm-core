@@ -470,8 +470,8 @@ event description
 Emerald City, Maine 90210
 
 $ 50.00
-' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&amp;reset=1&amp;id=1
-' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&amp;reset=1&amp;id=1
+' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
+' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
 
 my field';
   }
