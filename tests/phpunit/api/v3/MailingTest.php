@@ -33,8 +33,6 @@
 class api_v3_MailingTest extends CiviUnitTestCase {
   protected $_groupID;
   protected $_email;
-  protected $_apiversion = 3;
-  protected $_params = [];
   protected $_entity = 'Mailing';
   protected $_contactID;
 
@@ -256,12 +254,15 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertEquals([$contactIDs['b']], $getRecipient3_ids);
   }
 
-  public function testMailerPreview() {
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailerPreview(): void {
     // BEGIN SAMPLE DATA
     $contactID = $this->individualCreate();
     $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
     $displayName = $displayName['values'][$contactID]['display_name'];
-    $this->assertTrue(!empty($displayName));
+    $this->assertNotEmpty($displayName);
 
     $params = $this->_params;
     $params['api.Mailing.preview'] = [
@@ -295,7 +296,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
   }
 
-  public function testMailerPreviewUnknownContact() {
+  public function testMailerPreviewUnknownContact(): void {
     $params = $this->_params;
     $params['api.Mailing.preview'] = [
       'id' => '$value.id',
@@ -307,12 +308,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // unknown-contact. However, changes should be purposeful, so we'll test
     // for the current behavior (i.e. returning blanks).
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals("Hello ", $previewResult['values']['subject']);
-    $this->assertStringContainsString("This is .", $previewResult['values']['body_text']);
-    $this->assertStringContainsString("<p>This is .</p>", $previewResult['values']['body_html']);
+    $this->assertEquals('Hello ', $previewResult['values']['subject']);
+    $this->assertStringContainsString('This is .', $previewResult['values']['body_text']);
+    $this->assertStringContainsString('<p>This is .</p>', $previewResult['values']['body_html']);
   }
 
-  public function testMailerPreviewRecipients() {
+  public function testMailerPreviewRecipients(): void {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(['name' => 'Example include group', 'title' => 'Example include group']);
     $groupIDs['exc'] = $this->groupCreate(['name' => 'Example exclude group', 'title' => 'Example exclude group']);
@@ -547,7 +548,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       [],
       ['scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'],
       // expectedFailure
-      "/Failed to determine current user/",
+      '/Failed to determine current user/',
       // expectedJobCount
       0,
     ];
@@ -569,7 +570,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       [],
       [],
       // expectedFailure
-      "/Missing parameter scheduled_date and.or approval_date/",
+      '/Missing parameter scheduled_date and.or approval_date/',
       // expectedJobCount
       0,
     ];
@@ -652,7 +653,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @dataProvider submitProvider
    * @throws \CRM_Core_Exception
    */
-  public function testMailerSubmit($useLogin, $createParams, $submitParams, $expectedFailure, $expectedJobCount) {
+  public function testMailerSubmit($useLogin, array $createParams, $submitParams, $expectedFailure, $expectedJobCount): void {
     if ($useLogin) {
       $this->createLoggedInUser();
     }
@@ -669,9 +670,9 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       $this->assertRegExp($expectedFailure, $submitResult['error_message']);
     }
     else {
-      $submitResult = $this->callAPIAndDocument('mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
-      $this->assertTrue(is_numeric($submitResult['id']));
-      $this->assertTrue(is_numeric($submitResult['values'][$id]['scheduled_id']));
+      $submitResult = $this->callAPIAndDocument('Mailing', 'submit', $submitParams, __FUNCTION__, __FILE__);
+      $this->assertIsNumeric($submitResult['id']);
+      $this->assertIsNumeric($submitResult['values'][$id]['scheduled_id']);
       $this->assertEquals($submitParams['scheduled_date'], $submitResult['values'][$id]['scheduled_date']);
     }
     $this->assertDBQuery($expectedJobCount, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
