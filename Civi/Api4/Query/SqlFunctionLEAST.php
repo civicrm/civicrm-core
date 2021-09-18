@@ -24,6 +24,7 @@ class SqlFunctionLEAST extends SqlFunction {
     return [
       [
         'max_expr' => 99,
+        'min_expr' => 2,
         'optional' => FALSE,
       ],
     ];

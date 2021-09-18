@@ -67,7 +67,7 @@ abstract class SqlFunction extends SqlExpression {
         'suffix' => [],
       ];
       if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
-        $exprs = $this->captureExpressions($arg, $param['must_be'], $param['cant_be']);
+        $exprs = $this->captureExpressions($arg, $param['must_be']);
         if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
           throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
         }
@@ -116,17 +116,16 @@ abstract class SqlFunction extends SqlExpression {
    *
    * @param string $arg
    * @param array $mustBe
-   * @param array $cantBe
    * @return array
    * @throws \API_Exception
    */
-  private function captureExpressions(&$arg, $mustBe, $cantBe) {
+  private function captureExpressions(&$arg, $mustBe) {
     $captured = [];
     $arg = ltrim($arg);
     while ($arg) {
       $item = $this->captureExpression($arg);
       $arg = ltrim(substr($arg, strlen($item)));
-      $expr = SqlExpression::convert($item, FALSE, $mustBe, $cantBe);
+      $expr = SqlExpression::convert($item, FALSE, $mustBe);
       $this->fields = array_merge($this->fields, $expr->getFields());
       $captured[] = $expr;
       // Keep going if we have a comma indicating another expression follows
@@ -253,8 +252,7 @@ abstract class SqlFunction extends SqlExpression {
         'flag_before' => [],
         'flag_after' => [],
         'optional' => FALSE,
-        'must_be' => [],
-        'cant_be' => ['SqlWild'],
+        'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'api_default' => NULL,
       ];
     }

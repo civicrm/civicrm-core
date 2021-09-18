@@ -108,6 +108,8 @@
           if (!ui.item.sortable.dropindex && ctrl.crmSearchAdmin.groupExists) {
             ui.item.sortable.cancel();
           }
+          // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when rearranging the array
+          ctrl.crmSearchAdmin.hideFuncitons();
         }
       };
 

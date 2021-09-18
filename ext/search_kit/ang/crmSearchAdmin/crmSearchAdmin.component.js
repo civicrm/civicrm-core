@@ -383,7 +383,15 @@
 
       // Deletes an item from an array param
       this.clearParam = function(name, idx) {
+        if (name === 'select') {
+          // Function selectors use `ng-repeat` with `track by $index` so must be refreshed when splicing the array
+          ctrl.hideFuncitons();
+        }
         ctrl.savedSearch.api_params[name].splice(idx, 1);
+      };
+
+      this.hideFuncitons = function() {
+        $scope.controls.showFunctions = false;
       };
 
       function onChangeSelect(newSelect, oldSelect) {

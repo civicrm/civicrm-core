@@ -26,7 +26,6 @@ class SqlFunctionCOUNT extends SqlFunction {
         'flag_before' => ['DISTINCT' => ts('Distinct')],
         'max_expr' => 1,
         'must_be' => ['SqlField', 'SqlWild'],
-        'cant_be' => [],
       ],
     ];
   }
