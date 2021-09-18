@@ -40,6 +40,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $this->prefetch = (array) $prefetch;
     $fieldValue = $this->getFieldValue($row, $field);
+    if (is_array($fieldValue)) {
+      // eg. role_id for participant would be an array here.
+      $fieldValue = implode(',', $fieldValue);
+    }
 
     if ($this->isPseudoField($field)) {
       if (!empty($fieldValue)) {

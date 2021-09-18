@@ -483,18 +483,16 @@ December 21st, 2007
    */
   public function getParticipantTokens(): array {
     return [
-      '{participant.participant_status_id}' => 'Status ID',
-      '{participant.participant_role_id}' => 'Participant Role (ID)',
-      '{participant.participant_register_date}' => 'Register date',
-      '{participant.participant_source}' => 'Participant Source',
-      '{participant.participant_fee_level}' => 'Fee level',
-      '{participant.participant_fee_amount}' => 'Fee Amount',
-      '{participant.participant_registered_by_id}' => 'Registered By Participant ID',
+      '{participant.status_id}' => 'Status ID',
+      '{participant.role_id}' => 'Participant Role (ID)',
+      '{participant.register_date}' => 'Register date',
+      '{participant.source}' => 'Participant Source',
+      '{participant.fee_level}' => 'Fee level',
+      '{participant.fee_amount}' => 'Fee Amount',
+      '{participant.registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
-      '{participant.participant_role}' => 'Participant Role (label)',
+      '{participant.role_id:label}' => 'Participant Role (label)',
       '{participant.fee_label}' => 'Fee Label',
-      '{participant.default_role_id}' => 'Default Role',
-      '{participant.template_title}' => 'Event Template Title',
       '{participant.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }

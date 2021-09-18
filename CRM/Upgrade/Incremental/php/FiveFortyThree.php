@@ -83,6 +83,31 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Replace duplicate event end date token in event badges',
       'updatePrintLabelToken', 'participant.event_end_date', 'event.end_date', $rev
     );
+    $this->addTask('Update participant status id token in event badges',
+      'updatePrintLabelToken', 'participant.participant_status_id', 'participant.status_id', $rev
+    );
+    $this->addTask('Update participant role id token in event badges',
+      'updatePrintLabelToken', 'participant.participant_role_id', 'participant.role_id', $rev
+    );
+    $this->addTask('Update participant role label token in event badges',
+      'updatePrintLabelToken', 'participant.participant_role', 'participant.role_id:label', $rev
+    );
+    $this->addTask('Update participant register date token in event badges',
+      'updatePrintLabelToken', 'participant.participant_register_date', 'participant.register_date', $rev
+    );
+    $this->addTask('Update participant source token in event badges',
+      'updatePrintLabelToken', 'participant.participant_source', 'participant.source', $rev
+    );
+    $this->addTask('Update participant fee level token in event badges',
+      'updatePrintLabelToken', 'participant.participant_fee_level', 'participant.fee_level', $rev
+    );
+    $this->addTask('Update participant fee amount token in event badges',
+      'updatePrintLabelToken', 'participant.participant_fee_amount', 'participant.fee_amount', $rev
+    );
+    $this->addTask('Update participant registered by id token in event badges',
+      'updatePrintLabelToken', 'participant.participant_registered_by_id', 'participant.registered_by_id', $rev
+    );
+
   }
 
   /**
