@@ -186,7 +186,7 @@ class TokenRow {
       $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
     }
 
-    return $this->tokens($entity, $customFieldName, $fieldValue);
+    return $this->format('text/html')->tokens($entity, $customFieldName, $fieldValue);
   }
 
   /**
