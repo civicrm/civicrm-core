@@ -310,7 +310,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
 
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId'])) {
+      if (empty($row->context['contactId']) && empty($row->context['contact'])) {
         continue;
       }
 
@@ -344,8 +344,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
           $row->format('text/plain')->tokens('contact', $token, '');
         }
         elseif ($token === 'signature_html') {
-          $text = html_entity_decode($row->context['contact'][$token]);
-          $row->format('text/html')->tokens('contact', $token, $value);
+          $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
         }
         else {
           $row->format('text/html')
