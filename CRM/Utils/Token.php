@@ -1777,7 +1777,7 @@ class CRM_Utils_Token {
    * @return mixed|string
    * @throws \CRM_Core_Exception
    */
-  public static function getContributionTokenReplacement($token, &$contribution, $html = FALSE, $escapeSmarty = FALSE) {
+  public static function getContributionTokenReplacement($token, $contribution, $html = FALSE, $escapeSmarty = FALSE) {
     self::_buildContributionTokens();
 
     switch ($token) {
@@ -1796,6 +1796,10 @@ class CRM_Utils_Token {
         $value = CRM_Utils_Array::retrieveValueRecursive($contribution, $token);
         $config = CRM_Core_Config::singleton();
         $value = CRM_Utils_Date::customFormat($value, $config->dateformatDatetime);
+        break;
+
+      case 'source':
+        $value = CRM_Utils_Array::retrieveValueRecursive($contribution, 'contribution_source');
         break;
 
       default:

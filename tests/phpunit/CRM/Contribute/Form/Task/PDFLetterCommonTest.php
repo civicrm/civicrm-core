@@ -265,7 +265,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testAllContributionTokens(): void {
     $this->createLoggedInUser();
@@ -281,7 +280,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     }
     /* @var $form CRM_Contribute_Form_Task_PDFLetter */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
-    $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign']], $tokens))]);
+    $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
     try {
       $form->postProcess();
     }
@@ -297,13 +296,13 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 ' . "    \n" . '  </head>
   <body>
     <div id="crm-container">
-contribution_id : 1
+id : 1
 total_amount : € 9,999.99
 fee_amount : € 1,111.11
 net_amount : € 7,777.78
 non_deductible_amount : € 2,222.22
 receive_date : July 20th, 2018 12:00 AM
-payment_instrument : Check
+payment_instrument_id:label : Check
 trxn_id : 1234
 invoice_id : 568
 currency : EUR
@@ -311,11 +310,11 @@ cancel_date : 2019-12-30 00:00:00
 cancel_reason : Contribution Cancel Reason
 receipt_date : October 30th, 2019 12:00 AM
 thankyou_date : 2019-11-30 00:00:00
-contribution_source : Contribution Source
+source : Contribution Source
 amount_level : Amount Level
 contribution_status_id : 2
 check_number : 6789
-campaign : Big one
+campaign_id:label : Big one
 ' . $this->getCustomFieldName('text') . ' : Bobsled
 ' . $this->getCustomFieldName('select_string') . ' : Red
 ' . $this->getCustomFieldName('select_date') . ' : 01/20/2021 12:00AM
@@ -337,17 +336,16 @@ campaign : Big one
    * Get all the tokens available to contributions.
    *
    * @return array
-   * @throws \CiviCRM_API3_Exception
    */
   public function getAllContributionTokens(): array {
     return [
-      'contribution_id' => '',
+      'id' => '',
       'total_amount' => '9999.99',
       'fee_amount' => '1111.11',
       'net_amount' => '7777.78',
       'non_deductible_amount' => '2222.22',
       'receive_date' => '2018-07-20',
-      'payment_instrument' => 'Check',
+      'payment_instrument_id:label' => 'Check',
       'trxn_id' => '1234',
       'invoice_id' => '568',
       'currency' => 'EUR',
@@ -355,11 +353,11 @@ campaign : Big one
       'cancel_reason' => 'Contribution Cancel Reason',
       'receipt_date' => '2019-10-30',
       'thankyou_date' => '2019-11-30',
-      'contribution_source' => 'Contribution Source',
+      'source' => 'Contribution Source',
       'amount_level' => 'Amount Level',
       'contribution_status_id' => 'Pending',
       'check_number' => '6789',
-      'campaign' => 'Big one',
+      'campaign_id:label' => 'Big one',
       $this->getCustomFieldName('text') => 'Bobsled',
       $this->getCustomFieldName('select_string') => 'R',
       $this->getCustomFieldName('select_date') => '2021-01-20',
@@ -373,7 +371,6 @@ campaign : Big one
       $this->getCustomFieldName('boolean') => TRUE,
       $this->getCustomFieldName('checkbox') => 'P',
       $this->getCustomFieldName('contact_reference') => $this->individualCreate(['first_name' => 'Spider', 'last_name' => 'Man']),
-
     ];
   }
 
@@ -675,6 +672,7 @@ value=$contact_aggregate+$contribution.total_amount}
       'contact_id' => $this->individualCreate(),
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
+      'source' => 'Contribution Source',
     ], $contributionParams);
     return $this->callAPISuccess('Contribution', 'create', $contributionParams)['id'];
   }

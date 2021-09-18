@@ -692,6 +692,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $deprecatedTokens = [
       '{case.status_id}' => '{case.status_id:label}',
       '{case.case_type_id}' => '{case.case_type_id:label}',
+      '{contribution.campaign}' => '{contribution.campaign_id:label}',
+      '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
+      '{contribution.contribution_id}' => '{contribution.id}',
+      '{contribution.contribution_source}' => '{contribution.source}',
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
