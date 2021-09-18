@@ -296,6 +296,7 @@ class CRM_Utils_Token {
    *   The processed string
    */
   public static function replaceOrgTokens($str, &$org, $html = FALSE, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     self::$_tokens['org']
       = array_merge(
         array_keys(CRM_Contact_BAO_Contact::importableFields('Organization')),
@@ -776,6 +777,7 @@ class CRM_Utils_Token {
    * @param string $entityType
    * @return string
    *   html parsed through smarty
+   * @deprecated
    */
   public static function parseThroughSmarty($tokenHtml, $entity, $entityType = 'contact') {
     if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
@@ -821,6 +823,8 @@ class CRM_Utils_Token {
    * for example {{token}}  or \{token}  will result in {token} in the final email
    *
    * this routine will remove the extra backslashes and braces
+   *
+   * @deprecated
    *
    * @param $str ref to the string that will be scanned and modified
    */
@@ -1021,8 +1025,11 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated
    */
-  public static function &replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
+  public static function replaceComponentTokens(&$str, $contact, $components, $escapeSmarty = FALSE, $returnEmptyToken = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
     if (!is_array($components) || empty($contact)) {
       return $str;
     }
@@ -1593,6 +1600,8 @@ class CRM_Utils_Token {
 
   /**
    * Generic function for formatting token replacement for an api field
+   *
+   * @deprecated
    *
    * @param string $entity
    * @param string $token
