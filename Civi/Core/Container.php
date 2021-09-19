@@ -337,6 +337,10 @@ class Container {
       'CRM_Contribute_RecurTokens',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
+    $container->setDefinition('crm_domain_tokens', new Definition(
+      'CRM_Core_DomainTokens',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
     $dispatcherDefn = $container->getDefinition('dispatcher');
     foreach (\CRM_Core_DAO_AllCoreTables::getBaoClasses() as $baoEntity => $baoClass) {

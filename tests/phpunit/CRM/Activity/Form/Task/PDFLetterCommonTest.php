@@ -45,7 +45,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['activityId']]);
 
-    $this->assertEquals($this->getActivityTokens(), $tokenProcessor->listTokens());
+    $this->assertEquals(array_merge($this->getActivityTokens(), CRM_Core_SelectValues::domainTokens()), $tokenProcessor->listTokens());
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);

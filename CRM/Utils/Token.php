@@ -257,7 +257,7 @@ class CRM_Utils_Token {
    * @return null|string
    */
   public static function getDomainTokenReplacement($token, $domain, $html = FALSE, $escapeSmarty = FALSE): ?string {
-    $tokens = self::getDomainTokens($domain->id, $html);
+    $tokens = CRM_Core_DomainTokens::getDomainTokenValues($domain->id, $html);
     $value = $tokens[$token] ?? "{domain.$token}";
     if ($escapeSmarty) {
       $value = self::tokenEscapeSmarty($value);
@@ -1931,46 +1931,6 @@ class CRM_Utils_Token {
         ],
       ],
     ];
-  }
-
-  /**
-   * Get the tokens available for the domain.
-   *
-   * @param int $domainID
-   * @param bool $html
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected static function getDomainTokens(int $domainID, bool $html): array {
-    $cacheKey = __CLASS__ . 'domain_tokens' . $html . '_' . $domainID . '_' . CRM_Core_I18n::getLocale();
-    if (!Civi::cache('metadata')->has($cacheKey)) {
-      if (CRM_Core_Config::domainID() === $domainID) {
-        $domain = CRM_Core_BAO_Domain::getDomain();
-      }
-      else {
-        $domain = new CRM_Core_BAO_Domain();
-        $domain->find(TRUE);
-      }
-      $tokens = [
-        'name' => $domain->name,
-        'id' => $domain->id,
-        'description' => $domain->description,
-      ];
-      $loc = $domain->getLocationValues();
-      if ($html) {
-        $tokens['address'] = str_replace("\n", '<br />', ($loc['address'][1]['display'] ?? ''));
-      }
-      else {
-        $tokens['address'] = $loc['address'][1]['display_text'] ?? '';
-      }
-      $phone = reset($loc['phone']);
-      $email = reset($loc['email']);
-      $tokens['phone'] = $phone['phone'] ?? '';
-      $tokens['email'] = $email['email'] ?? '';
-      Civi::cache('metadata')->set($cacheKey, $tokens);
-    }
-    return Civi::cache('metadata')->get($cacheKey);
   }
 
 }
