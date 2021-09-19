@@ -435,9 +435,10 @@
       };
 
       function getFieldsForJoin(joinEntity) {
-        return {results: ctrl.getAllFields(':name', ['Field', 'Custom'], null, joinEntity)};
+        return {results: ctrl.getAllFields(':name', ['Field'], null, joinEntity)};
       }
 
+      // @return {function}
       $scope.fieldsForJoin = function(joinEntity) {
         if (!fieldsForJoinGetters[joinEntity]) {
           fieldsForJoinGetters[joinEntity] = _.wrap(joinEntity, getFieldsForJoin);
