@@ -550,7 +550,7 @@ class CRM_Core_SelectValues {
       '{event.contact_phone}' => ts('Event Contact Phone'),
       '{event.description}' => ts('Event Description'),
       '{event.location}' => ts('Event Location'),
-      '{event.fee_amount}' => ts('Event Fees'),
+      '{event.fee_amount}' => ts('Event Fee'),
       '{event.info_url}' => ts('Event Info URL'),
       '{event.registration_url}' => ts('Event Registration URL'),
       '{event.balance}' => ts('Event Balance'),
