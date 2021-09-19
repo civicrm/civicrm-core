@@ -74,6 +74,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $contributionRecur['id']);
 
+    if (isset($contributionRecur['trxn_id']) && ($contributionRecur['processor_id'] === $contributionRecur['trxn_id'])) {
+      unset($contributionRecur['trxn_id']);
+    }
     $this->assign('recur', $contributionRecur);
 
     $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($this->getEntityId());
