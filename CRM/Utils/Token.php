@@ -237,7 +237,7 @@ class CRM_Utils_Token {
     ) {
       return $str;
     }
-
+    CRM_Core_Error::deprecatedFunctionWarning('find tests');
     $str = preg_replace_callback(
       self::tokenRegex($key),
       function ($matches) use ($domain, $html, $escapeSmarty) {
