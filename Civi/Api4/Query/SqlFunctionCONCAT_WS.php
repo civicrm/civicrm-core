@@ -14,22 +14,21 @@ namespace Civi\Api4\Query;
 /**
  * Sql function
  */
-class SqlFunctionIF extends SqlFunction {
+class SqlFunctionCONCAT_WS extends SqlFunction {
 
-  protected static $category = self::CATEGORY_COMPARISON;
+  protected static $category = self::CATEGORY_STRING;
 
   protected static $dataType = 'String';
 
   protected static function params(): array {
     return [
       [
-        'min_expr' => 3,
-        'max_expr' => 3,
+        'max_expr' => 99,
         'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
         'ui_defaults' => [
-          ['type' => 'SqlField', 'placeholder' => ts('If')],
-          ['type' => 'SqlField', 'placeholder' => ts('Then')],
-          ['type' => 'SqlField', 'placeholder' => ts('Else')],
+          ['type' => 'SqlString', 'placeholder' => ts('Separator')],
+          ['type' => 'SqlField', 'placeholder' => ts('Plus')],
         ],
       ],
     ];
@@ -39,14 +38,14 @@ class SqlFunctionIF extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('If/Else');
+    return ts('Combine text');
   }
 
   /**
    * @return string
    */
   public static function getDescription(): string {
-    return ts('If the field is empty, the first value, otherwise the second.');
+    return ts('Every non-null value joined by a separator.');
   }
 
 }

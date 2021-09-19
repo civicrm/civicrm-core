@@ -25,6 +25,10 @@ class SqlFunctionROUND extends SqlFunction {
         'min_expr' => 1,
         'max_expr' => 2,
         'must_be' => ['SqlNumber', 'SqlField'],
+        'ui_defaults' => [
+          ['type' => 'SqlField', 'placeholder' => ts('Number')],
+          ['type' => 'SqlNumber', 'placeholder' => ts('Decimals')],
+        ],
       ],
     ];
   }

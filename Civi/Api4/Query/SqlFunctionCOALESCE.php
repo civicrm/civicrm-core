@@ -25,6 +25,10 @@ class SqlFunctionCOALESCE extends SqlFunction {
       [
         'max_expr' => 99,
         'optional' => FALSE,
+        'ui_defaults' => [
+          ['type' => 'SqlField', 'placeholder' => ts('If')],
+          ['type' => 'SqlField', 'placeholder' => ts('Else')],
+        ],
       ],
     ];
   }
