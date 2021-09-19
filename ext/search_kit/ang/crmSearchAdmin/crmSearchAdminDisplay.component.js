@@ -158,19 +158,25 @@
         }
 
         var info = searchMeta.parseExpr(col.key),
+          field = info.args[0] && info.args[0].field,
           value = col.key.split(':')[0];
+        if (!field || info.fn) {
+          delete col.editable;
+          return;
+        }
         // If field is an implicit join, use the original fk field
-        if (info.field.name !== info.field.fieldName) {
+        if (field.name !== field.fieldName) {
           value = value.substr(0, value.lastIndexOf('.'));
           info = searchMeta.parseExpr(value);
+          field = info.args[0].field;
         }
         col.editable = {
-          entity: info.field.baseEntity,
-          options: !!info.field.options,
-          serialize: !!info.field.serialize,
-          fk_entity: info.field.fk_entity,
+          entity: field.baseEntity,
+          options: !!field.options,
+          serialize: !!field.serialize,
+          fk_entity: field.fk_entity,
           id: info.prefix + 'id',
-          name: info.field.name,
+          name: field.name,
           value: value
         };
       };
@@ -178,7 +184,7 @@
       this.isEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.image && !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
+        return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
       // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT

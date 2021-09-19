@@ -73,11 +73,10 @@ abstract class SqlExpression {
    * @param string $expression
    * @param bool $parseAlias
    * @param array $mustBe
-   * @param array $cantBe
    * @return SqlExpression
    * @throws \API_Exception
    */
-  public static function convert(string $expression, $parseAlias = FALSE, $mustBe = [], $cantBe = ['SqlWild']) {
+  public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []) {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
     $expr = $as ? substr($expression, 0, $as) : $expression;
     $alias = $as ? \CRM_Utils_String::munge(substr($expression, $as + 4), '_', 256) : NULL;
@@ -114,11 +113,6 @@ abstract class SqlExpression {
       throw new \API_Exception('Unable to parse sql expression: ' . $expression);
     }
     $sqlExpression = new $className($expr, $alias);
-    foreach ($cantBe as $cant) {
-      if (is_a($sqlExpression, __NAMESPACE__ . '\\' . $cant)) {
-        throw new \API_Exception('Illegal sql expression.');
-      }
-    }
     if ($mustBe) {
       foreach ($mustBe as $must) {
         if (is_a($sqlExpression, __NAMESPACE__ . '\\' . $must)) {

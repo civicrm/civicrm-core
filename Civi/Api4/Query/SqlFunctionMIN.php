@@ -36,4 +36,11 @@ class SqlFunctionMIN extends SqlFunction {
     return ts('Min');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The smallest value in the grouping.');
+  }
+
 }

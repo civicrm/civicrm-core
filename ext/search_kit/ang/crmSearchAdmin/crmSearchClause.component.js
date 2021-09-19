@@ -63,14 +63,14 @@
 
       this.getField = function(expr) {
         if (!meta[expr]) {
-          meta[expr] = searchMeta.parseExpr(expr);
+          meta[expr] = searchMeta.parseExpr(expr).args[0];
         }
         return meta[expr].field;
       };
 
       this.getOptionKey = function(expr) {
         if (!meta[expr]) {
-          meta[expr] = searchMeta.parseExpr(expr);
+          meta[expr] = _.findWhere(searchMeta.parseExpr(expr).args, {type: 'field'});
         }
         return meta[expr].suffix ? meta[expr].suffix.slice(1) : 'id';
       };

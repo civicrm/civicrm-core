@@ -34,4 +34,11 @@ class SqlFunctionBINARY extends SqlFunction {
     return ts('Binary');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Case-sensitive string treatment.');
+  }
+
 }

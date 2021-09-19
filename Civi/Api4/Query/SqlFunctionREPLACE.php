@@ -24,7 +24,7 @@ class SqlFunctionREPLACE extends SqlFunction {
         'min_expr' => 3,
         'max_expr' => 3,
         'optional' => FALSE,
-        'must_be' => ['SqlField', 'SqlString'],
+        'must_be' => ['SqlString', 'SqlField'],
       ],
     ];
   }
@@ -33,7 +33,14 @@ class SqlFunctionREPLACE extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Replace');
+    return ts('Replace text');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Substitutes one value for another in the text.');
   }
 
 }
