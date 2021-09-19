@@ -17,7 +17,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
       </thead>
       <tbody>
         {foreach from=$remoteExtensionRows key=extKey item=row}
-        {if $localExtensionRows[$extKey]}
+        {if !empty($localExtensionRows[$extKey])}
           {continue}
         {/if}
         <tr id="addnew-row_{$row.file}" class="crm-extensions crm-extensions_{$row.file}">
