@@ -22,7 +22,7 @@
       {/if}
       {foreach from=$columnHeaders item=header}
         <th scope="col">
-          {if $header.sort}
+          {if isset($header.sort)}
             {assign var='key' value=$header.sort}
             {$sort->_response.$key.link}
           {else}
