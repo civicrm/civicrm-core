@@ -536,25 +536,19 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function eventTokens() {
-    return [
-      '{event.event_id}' => ts('Event ID'),
-      '{event.title}' => ts('Event Title'),
-      '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date'),
-      '{event.event_type}' => ts('Event Type'),
-      '{event.summary}' => ts('Event Summary'),
-      '{event.contact_email}' => ts('Event Contact Email'),
-      '{event.contact_phone}' => ts('Event Contact Phone'),
-      '{event.description}' => ts('Event Description'),
-      '{event.location}' => ts('Event Location'),
-      '{event.fee_amount}' => ts('Event Fee'),
-      '{event.info_url}' => ts('Event Info URL'),
-      '{event.registration_url}' => ts('Event Registration URL'),
-      '{event.balance}' => ts('Event Balance'),
-    ];
+  public static function eventTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
   }
 
   /**
