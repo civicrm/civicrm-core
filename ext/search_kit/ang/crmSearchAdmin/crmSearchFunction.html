@@ -1,15 +1,15 @@
 <div class="form-inline">
   <input class="form-control" style="width: 15em;" ng-model="$ctrl.fnName" crm-ui-select="{data: $ctrl.getFunctions, placeholder: ts('Function')}" ng-change="$ctrl.selectFunction()">
-  <label>{{ $ctrl.args[0].field.label }}</label>
+  <label>{{ $ctrl.fieldArg.field.label }}</label>
   <label ng-if="$ctrl.modifierName">
     <input type="checkbox" ng-checked="!!$ctrl.modifier" ng-click="$ctrl.toggleModifier()">
     {{ $ctrl.modifierLabel }}
   </label>
-  <div class="form-group" ng-repeat="arg in $ctrl.args" ng-if="$index">
+  <div class="form-group" ng-repeat="arg in $ctrl.args" ng-if="arg !== $ctrl.fieldArg">
     <span ng-switch="arg.type">
-      <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
-      <input ng-switch-when="string" class="form-control" ng-model="arg.value" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
-      <input ng-switch-default class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: ts('Field')}" ng-change="$ctrl.changeArg($index)">
+      <input ng-switch-when="number" class="form-control" type="number" ng-model="arg.value" placeholder="{{ $ctrl.getUiDefault($index).placeholder }}" ng-change="$ctrl.changeArg($index)" ng-model-options="{updateOn: 'blur'}">
+      <input ng-switch-when="string" class="form-control" ng-model="arg.value" placeholder="{{ $ctrl.getUiDefault($index).placeholder }}" ng-change="$ctrl.changeArg($index)" ng-trim="false" ng-model-options="{updateOn: 'blur'}">
+      <input ng-switch-default class="form-control" ng-model="arg.value" crm-ui-select="{data: $ctrl.getFields, placeholder: $ctrl.getUiDefault($index).placeholder}" ng-change="$ctrl.changeArg($index)">
     </span>
   </div>
   <div class="btn-group" ng-if="$ctrl.args.length < $ctrl.fn.params[0].max_expr">

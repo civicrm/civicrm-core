@@ -191,6 +191,22 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
   }
 
+  public function testStringFunctions() {
+    $sampleData = [
+      ['first_name' => 'abc', 'middle_name' => 'q', 'last_name' => 'tester1', 'source' => '123'],
+    ];
+    $cid = Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute()->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('CONCAT_WS("|", first_name, middle_name, last_name) AS concat_ws')
+      ->execute()->first();
+
+    $this->assertEquals('abc|q|tester1', $result['concat_ws']);
+  }
+
   public function testIncorrectNumberOfArguments() {
     try {
       Activity::get(FALSE)

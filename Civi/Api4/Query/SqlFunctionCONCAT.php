@@ -26,6 +26,9 @@ class SqlFunctionCONCAT extends SqlFunction {
         'max_expr' => 99,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
+        'ui_defaults' => [
+          ['placeholder' => ts('Plus')],
+        ],
       ],
     ];
   }
@@ -34,14 +37,14 @@ class SqlFunctionCONCAT extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Combine text');
+    return ts('Combine if');
   }
 
   /**
    * @return string
    */
   public static function getDescription(): string {
-    return ts('Multiple values concatenated into a single string.');
+    return ts('Joined text, only if all values are not null.');
   }
 
 }

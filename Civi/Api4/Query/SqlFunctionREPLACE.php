@@ -25,6 +25,11 @@ class SqlFunctionREPLACE extends SqlFunction {
         'max_expr' => 3,
         'optional' => FALSE,
         'must_be' => ['SqlString', 'SqlField'],
+        'ui_defaults' => [
+          ['type' => 'SqlField', 'placeholder' => ts('Source')],
+          ['type' => 'SqlString', 'placeholder' => ts('Find')],
+          ['type' => 'SqlString', 'placeholder' => ts('Replace')],
+        ],
       ],
     ];
   }

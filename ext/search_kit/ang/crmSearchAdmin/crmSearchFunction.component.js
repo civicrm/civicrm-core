@@ -13,6 +13,8 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      var defaultUiDefaults = {type: 'SqlField', placeholder: ts('Select')};
+
       var allTypes = {
         aggregate: ts('Aggregate'),
         comparison: ts('Comparison'),
@@ -29,6 +31,7 @@
 
       this.$onInit = function() {
         var info = searchMeta.parseExpr(ctrl.expr);
+        ctrl.fieldArg = _.findWhere(info.args, {type: 'field'});
         ctrl.args = info.args;
         ctrl.fn = info.fn;
         ctrl.fnName = !info.fn ? '' : info.fn.name;
@@ -36,7 +39,7 @@
       };
 
       this.addArg = function(exprType) {
-        exprType = exprType || ctrl.fn.params[0].must_be[0];
+        exprType = exprType || ctrl.getUiDefault(ctrl.args.length).type;
         ctrl.args.push({
           type: ctrl.exprTypes[exprType].type,
           value: exprType === 'SqlNumber' ? 0 : ''
@@ -55,23 +58,32 @@
           ctrl.modifierName = null;
           ctrl.modifier = null;
         }
+        // Push args to reach the minimum
         while (ctrl.args.length < ctrl.fn.params[0].min_expr) {
           ctrl.addArg();
         }
       }
 
+      this.getUiDefault = function(index) {
+        if (ctrl.fn.params[0].ui_defaults) {
+          return ctrl.fn.params[0].ui_defaults[index] || _.last(ctrl.fn.params[0].ui_defaults);
+        }
+        defaultUiDefaults.type = ctrl.fn.params[0].must_be[0];
+        return defaultUiDefaults;
+      };
+
       // On-demand options for dropdown function selector
       this.getFunctions = function() {
         var allowedTypes = [], functions = [];
-        if (ctrl.expr && ctrl.args[0] && ctrl.args[0].field) {
+        if (ctrl.expr && ctrl.fieldArg) {
           if (ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.args[0].field.data_type)) {
+            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
             }
-            if (_.includes(['Date', 'Timestamp'], ctrl.args[0].field.data_type)) {
+            if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('date');
             }
           }
@@ -99,8 +111,21 @@
 
       this.selectFunction = function() {
         ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
-        ctrl.args.length = 1;
-        initFunction();
+        ctrl.args = [ctrl.fieldArg];
+        if (ctrl.fn) {
+          var exprType, pos = 0,
+            uiDefaults = ctrl.fn.params[0].ui_defaults || [];
+          // Add non-field args to the beginning if needed
+          while (uiDefaults[pos] && uiDefaults[pos].type && uiDefaults[pos].type !== 'SqlField') {
+            exprType = uiDefaults[pos].type;
+            ctrl.args.splice(pos, 0, {
+              type: ctrl.exprTypes[exprType].type,
+              value: exprType === 'SqlNumber' ? 0 : ''
+            });
+            ++pos;
+          }
+          initFunction();
+        }
         ctrl.writeExpr();
       };
 
@@ -112,7 +137,7 @@
       this.changeArg = function(index) {
         var val = ctrl.args[index].value;
         // Delete empty value
-        if (!val && ctrl.args.length > ctrl.fn.params[0].min_expr) {
+        if (index && !val && ctrl.args.length > ctrl.fn.params[0].min_expr) {
           ctrl.args.splice(index, 1);
         }
         ctrl.writeExpr();
