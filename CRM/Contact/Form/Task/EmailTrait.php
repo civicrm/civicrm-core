@@ -138,24 +138,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // are having to re-write contactIds afterwards due to this inappropriate variable setting
     // If we don't have any contact IDs, use the logged in contact ID
     $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
-
-    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
-
-    if (empty($fromEmailValues)) {
-      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
-    }
-
-    $form->_emails = $fromEmailValues;
-    $defaults = [];
-    $form->_fromEmails = $fromEmailValues;
-    if (is_numeric(key($form->_fromEmails))) {
-      $emailID = (int) key($form->_fromEmails);
-      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
-    }
-    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
-    }
-    $form->setDefaults($defaults);
   }
 
   /**
@@ -269,7 +251,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->add('text', 'subject', ts('Subject'), ['size' => 50, 'maxlength' => 254], TRUE);
 
-    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From'), $this->getFromEmails(), TRUE);
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
 
@@ -354,6 +336,27 @@ trait CRM_Contact_Form_Task_EmailTrait {
   }
 
   /**
+   * Set relevant default values.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function setDefaultValues(): array {
+    $defaults = parent::setDefaultValues();
+    $fromEmails = $this->getFromEmails();
+    if (is_numeric(key($fromEmails))) {
+      $emailID = (int) key($fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+    }
+    return $defaults;
+  }
+
+  /**
    * Process the form after the input has been submitted and validated.
    *
    * @throws \CRM_Core_Exception
@@ -375,7 +378,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @param int $count
    *  The number of emails the user is attempting to send
    */
-  protected function bounceIfSimpleMailLimitExceeded($count) {
+  protected function bounceIfSimpleMailLimitExceeded($count): void {
     $limit = Civi::settings()->get('simple_mail_limit');
     if ($count > $limit) {
       CRM_Core_Error::statusBounce(ts('Please do not use this task to send a lot of emails (greater than %1). Many countries have legal requirements when sending bulk emails and the CiviMail framework has opt out functionality and domain tokens to help meet these.',
@@ -396,7 +399,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \API_Exception
    */
-  public function submit($formValues) {
+  public function submit($formValues): void {
     $this->saveMessageTemplate($formValues);
 
     $from = $formValues['from_email_address'] ?? NULL;
@@ -724,6 +727,18 @@ trait CRM_Contact_Form_Task_EmailTrait {
       return (int) $caseID;
     }
     return NULL;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getFromEmails(): array {
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+    return $fromEmailValues;
   }
 
 }
