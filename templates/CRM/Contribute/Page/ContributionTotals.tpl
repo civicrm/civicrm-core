@@ -8,10 +8,10 @@
  +--------------------------------------------------------------------+
 *}
 {*Table displays contribution totals for a contact or search result-set *}
-{if $annual.count OR $contributionSummary.total.count OR $contributionSummary.cancel.count OR $contributionSummary.soft_credit.count}
+{if !empty($annual.count) OR $contributionSummary.total.count OR $contributionSummary.cancel.count OR $contributionSummary.soft_credit.count}
     <table class="form-layout-compressed">
 
-    {if $annual.count}
+    {if !empty($annual.count)}
         <tr>
             <th class="contriTotalLeft right">{ts}Current Year-to-Date{/ts} &ndash; {$annual.amount}</th>
             <th class="right"> &nbsp; {ts}# Completed Contributions{/ts} &ndash; {$annual.count}</th>
@@ -29,11 +29,11 @@
             <th class="right"> &nbsp; {ts}# Completed{/ts} &ndash; {$contributionSummary.total.count}</th>
             <th class="right contriTotalRight"> &nbsp; {ts}Avg{/ts} &ndash; {$contributionSummary.total.avg}</th>
           {/if}
-          {if $contributionSummary.cancel.amount}
+          {if isset($contributionSummary.cancel.amount)}
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Cancelled/Refunded{/ts} &ndash; {$contributionSummary.cancel.amount}</th>
           {/if}
       </tr>
-      {if $contributionSummary.soft_credit.count}
+      {if isset($contributionSummary.soft_credit.count)}
         {include file="CRM/Contribute/Page/ContributionSoftTotals.tpl" softCreditTotals=$contributionSummary.soft_credit}
       {/if}
     {/if}
