@@ -59,7 +59,7 @@
         {assign var='columnName' value=$column.field_name}
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
         {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
-        {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
+        {elseif isset($column.type) && $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
         {elseif $columnName == 'contribution_status'}
           <td class="crm-contribution-status">
             {$row.contribution_status}<br/>
@@ -73,8 +73,8 @@
               {$row.$columnName|crmDate}
             </td>
           {else}
-          <td class="crm-{$columnName} crm-{$columnName}_{$row.columnName}">
-            {$row.$columnName}
+          <td class="crm-{$columnName} crm-{$columnName}_{if isset($row.columnName)}{$row.columnName}{/if}">
+            {if isset($row.$columnName)}{$row.$columnName}{/if}
           </td>
           {/if}
         {/if}
