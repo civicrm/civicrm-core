@@ -67,7 +67,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     if ($e->mapping->getEntity() !== 'civicrm_participant') {
       return;
     }
-
+    CRM_Core_Error::deprecatedFunctionWarning('find tests');
     // FIXME: seems too broad.
     $e->query->select('e.*');
     $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
