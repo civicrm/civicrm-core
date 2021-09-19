@@ -206,10 +206,11 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     // if this is an update of an existing recurring contribution, pass the ID
-    $params['id'] = $this->getContributionRecurID();
+    $params['contributionRecurID'] = $params['id'] = $this->getContributionRecurID();
     $message = '';
 
-    $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+    $params['recurProcessorID'] = $params['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+
     $updateSubscription = TRUE;
     if ($this->_paymentProcessorObj->supports('changeSubscriptionAmount')) {
       try {
@@ -315,15 +316,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/subscriptionstatus',
         "reset=1&task=update&result=1"));
     }
-  }
-
-  /**
-   * Get the recurring contribution ID.
-   *
-   * @return int
-   */
-  protected function getContributionRecurID(): int {
-    return $this->_subscriptionDetails->recur_id;
   }
 
 }
