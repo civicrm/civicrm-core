@@ -289,9 +289,9 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       else {
         $calcDates = [];
       }
-      $params['start_date'] = $params['start_date'] ?? ($calcDates['start_date'] ?? 'null');
-      $params['end_date'] = $params['end_date'] ?? ($calcDates['end_date'] ?? 'null');
-      $params['join_date'] = $params['join_date'] ?? ($calcDates['join_date'] ?? 'null');
+      $params['start_date'] = empty($params['start_date']) ? ($calcDates['start_date'] ?? 'null') : $params['start_date'];
+      $params['end_date'] = empty($params['end_date']) ? ($calcDates['end_date'] ?? 'null') : $params['end_date'];
+      $params['join_date'] = empty($params['join_date']) ? ($calcDates['join_date'] ?? 'null') : $params['join_date'];
 
       //fix for CRM-3570, during import exclude the statuses those having is_admin = 1
       $excludeIsAdmin = $params['exclude_is_admin'] ?? FALSE;

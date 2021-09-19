@@ -1059,6 +1059,26 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the constructed line items formatted for the v3 Order api.
+   *
+   * @return array
+   *
+   * @internal core tested code only.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getLineItemForV3OrderApi(): array {
+    $lineItems = [];
+    foreach ($this->getLineItems() as $key => $line) {
+      $lineItems[] = [
+        'line_item' => [$line['price_field_value_id'] => $line],
+        'params' => $this->entityParameters[$key] ?? [],
+      ];
+    }
+    return $lineItems;
+  }
+
+  /**
    * @return array
    * @throws \API_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
