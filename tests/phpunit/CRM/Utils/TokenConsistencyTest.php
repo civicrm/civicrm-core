@@ -535,4 +535,42 @@ December 21st, 2007
     ];
   }
 
+  /**
+   * Test that domain tokens are consistently rendered.
+   */
+  public function testEventTokenConsistency(): void {
+    $tokens = CRM_Core_SelectValues::eventTokens();
+    $this->assertEquals($this->getEventTokens(), $tokens);
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['eventId'],
+    ]);
+    $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
+  }
+
+  /**
+   * Get expected event tokens.
+   *
+   * @return string[]
+   */
+  protected function getEventTokens(): array {
+    return [
+      '{event.event_id}' => 'Event ID',
+      '{event.title}' => 'Event Title',
+      '{event.start_date}' => 'Event Start Date',
+      '{event.end_date}' => 'Event End Date',
+      '{event.event_type}' => 'Event Type',
+      '{event.summary}' => 'Event Summary',
+      '{event.contact_email}' => 'Event Contact Email',
+      '{event.contact_phone}' => 'Event Contact Phone',
+      '{event.description}' => 'Event Description',
+      '{event.location}' => 'Event Location',
+      '{event.fee_amount}' => 'Event Fee',
+      '{event.info_url}' => 'Event Info URL',
+      '{event.registration_url}' => 'Event Registration URL',
+      '{event.balance}' => 'Event Balance',
+    ];
+  }
+
 }

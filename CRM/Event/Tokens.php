@@ -10,6 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\ActionSchedule\Event\MailingQueryEvent;
+
 /**
  * Class CRM_Event_Tokens
  *
@@ -22,13 +24,24 @@
  * implementation which is not tied to scheduled reminders, although
  * that is outside the current scope.
  */
-class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Event_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Class constructor.
+   * Get the entity name for api v4 calls.
+   *
+   * @return string
    */
-  public function __construct() {
-    parent::__construct('event', array_merge(
+  protected function getApiEntityName(): string {
+    return 'Event';
+  }
+
+  /**
+   * Get all tokens.
+   *
+   * This function will be removed once the parent class can determine it.
+   */
+  public function getAllTokens(): array {
+    return array_merge(
       [
         'event_type' => ts('Event Type'),
         'title' => ts('Event Title'),
@@ -41,12 +54,12 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'info_url' => ts('Event Info URL'),
         'registration_url' => ts('Event Registration URL'),
         'fee_amount' => ts('Event Fee'),
-        'contact_email' => ts('Event Contact (Email)'),
-        'contact_phone' => ts('Event Contact (Phone)'),
+        'contact_email' => ts('Event Contact Email'),
+        'contact_phone' => ts('Event Contact Phone'),
         'balance' => ts('Event Balance'),
       ],
       CRM_Utils_Token::getCustomFieldTokens('Event')
-    ));
+    );
   }
 
   /**
@@ -54,8 +67,9 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
-    return !empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_participant';
+    return ((!empty($processor->context['actionMapping'])
+      && $processor->context['actionMapping']->getEntity() === 'civicrm_participant'))
+      || in_array($this->getEntityIDField(), $processor->context['schema'], TRUE);
   }
 
   /**
@@ -63,7 +77,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e) {
+  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
     if ($e->mapping->getEntity() !== 'civicrm_participant') {
       return;
     }
