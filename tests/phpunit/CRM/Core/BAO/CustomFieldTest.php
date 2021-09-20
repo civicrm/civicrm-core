@@ -15,18 +15,16 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
   /**
    * Clean up after test.
-   *
-   * @throws \Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup([], TRUE);
+    $this->quickCleanup(['civicrm_file', 'civicrm_entity_file'], TRUE);
     parent::tearDown();
   }
 
   /**
    * Test creating a custom field.
    */
-  public function testCreateCustomField() {
+  public function testCreateCustomField(): void {
     $customGroup = $this->createCustomField();
     $customFieldID = $this->assertDBNotNull('CRM_Core_DAO_CustomField', $customGroup['id'], 'id', 'custom_group_id',
       'Database check for created CustomField.'
@@ -984,7 +982,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
   /**
    * Check that outputting the display value for a file field with No description doesn't generate error
    */
-  public function testFileDisplayValueNoDescription() {
+  public function testFileDisplayValueNoDescription(): void {
     $customGroup = $this->customGroupCreate([
       'extends' => 'Individual',
       'title' => 'Test Contact File Custom Group',

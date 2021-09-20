@@ -20,8 +20,6 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
 
   /**
    * Clean up DB.
-   *
-   * @throws \CRM_Core_Exception|\API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -31,7 +29,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   /**
    * Test that correct contribution status is fetched for both live and test contributions.
    */
-  public function testLiveAndTestContributionStatus() {
+  public function testLiveAndTestContributionStatus(): void {
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, FALSE);
