@@ -516,7 +516,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    *  Common teardown functions for all unit tests.
    *
-   * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
   protected function tearDown(): void {
@@ -1857,13 +1856,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $tablesToTruncate
    * @param bool $dropCustomValueTables
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \API_Exception
    */
-  public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
+  public function quickCleanup(array $tablesToTruncate, $dropCustomValueTables = FALSE): void {
     if ($this->tx) {
-      throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
+      $this->fail('CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()');
     }
     if ($dropCustomValueTables) {
       $this->cleanupCustomGroups();
@@ -1874,20 +1870,18 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     $tablesToTruncate = array_unique(array_merge($this->_tablesToTruncate, $tablesToTruncate));
 
-    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0;');
     foreach ($tablesToTruncate as $table) {
       $sql = "TRUNCATE TABLE $table";
       CRM_Core_DAO::executeQuery($sql);
     }
-    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
   }
 
   /**
    * Clean up financial entities after financial tests (so we remember to get all the tables :-))
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function quickCleanUpFinancialEntities() {
+  public function quickCleanUpFinancialEntities(): void {
     $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',
@@ -1923,9 +1917,19 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $this->restoreDefaultPriceSetConfig();
     $this->disableTaxAndInvoicing();
     $this->setCurrencySeparators(',');
-    FinancialType::delete(FALSE)->addWhere(
-      'name', 'NOT IN', ['Donation' , 'Member Dues', 'Campaign Contribution', 'Event Fee']
-    )->execute();
+    try {
+      FinancialType::delete(FALSE)->addWhere(
+        'name', 'NOT IN', [
+          'Donation',
+          'Member Dues',
+          'Campaign Contribution',
+          'Event Fee',
+        ]
+      )->execute();
+    }
+    catch (API_Exception $e) {
+      $this->fail('failed to cleanup financial types ' . $e->getMessage());
+    }
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
     // @fixme this parameter is leaking - it should not be defined as a class static
@@ -3923,19 +3927,22 @@ WHERE a1.is_primary = 0
 
   /**
    * Delete any existing custom data groups.
-   *
-   * @throws \API_Exception
    */
   protected function cleanupCustomGroups(): void {
-    CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
-      ->addChain('delete_options', OptionGroup::delete()
-        ->addWhere('id', '=', '$option_group_id')
-      )
-      ->addChain('delete_fields', CustomField::delete()
-        ->addWhere('id', '=', '$id')
-      )->execute();
+    try {
+      CustomField::get(FALSE)->setSelect(['option_group_id', 'custom_group_id'])
+        ->addChain('delete_options', OptionGroup::delete()
+          ->addWhere('id', '=', '$option_group_id')
+        )
+        ->addChain('delete_fields', CustomField::delete()
+          ->addWhere('id', '=', '$id')
+        )->execute();
 
-    CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+      CustomGroup::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    }
+    catch (API_Exception $e) {
+      $this->fail('failed to cleanup custom groups ' . $e->getMessage());
+    }
   }
 
   /**

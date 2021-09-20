@@ -90,6 +90,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_website',
       'civicrm_relationship',
       'civicrm_uf_match',
+      'civicrm_file',
+      'civicrm_entity_file',
       'civicrm_phone',
       'civicrm_address',
       'civicrm_acl_contact_cache',

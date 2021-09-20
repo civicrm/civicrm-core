@@ -40,6 +40,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'civicrm_uf_match',
       'civicrm_campaign',
       'civicrm_email',
+      'civicrm_file',
+      'civicrm_entity_file',
     ];
     $this->quickCleanup($tablesToTruncate);
     $this->cleanUpAfterACLs();
