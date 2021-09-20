@@ -114,7 +114,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print" aria-hidden="true"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid2\'',
       'Pay Now',
     ];
 
