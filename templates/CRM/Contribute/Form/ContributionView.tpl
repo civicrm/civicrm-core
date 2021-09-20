@@ -38,11 +38,11 @@
     {if $invoicing && empty($is_template)}
       <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
-          <i class="crm-i fa-print" aria-hidden="true"></i>
+          <i class="crm-i fa-download" aria-hidden="true"></i>
         {if $contribution_status != 'Refunded' && $contribution_status != 'Cancelled' }
-          {ts}Print Invoice{/ts}</a>
+          {ts}Download Invoice{/ts}</a>
         {else}
-          {ts}Print Invoice and Credit Note{/ts}</a>
+          {ts}Download Invoice and Credit Note{/ts}</a>
         {/if}
         <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
           <i class="crm-i fa-paper-plane" aria-hidden="true"></i>
