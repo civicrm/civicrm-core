@@ -598,4 +598,41 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertNull($dao->expired_date);
   }
 
+  public function testHtmlEscapeInput() {
+    $contact = new CRM_Contact_DAO_Contact();
+    $contact->contact_type = 'Individual';
+    $contact->first_name = 'Greater > Than';
+    $contact->last_name = 'Less < Than';
+    $contact->middle_name = '&';
+    $contact->save();
+
+    $legacyQueryGet = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_contact WHERE id = ' . $contact->id);
+    $legacyQueryGet->fetch();
+    $this->assertEquals('Greater &gt; Than', $legacyQueryGet->first_name);
+    $this->assertEquals('Less &lt; Than', $legacyQueryGet->last_name);
+    $this->assertEquals('&', $legacyQueryGet->middle_name);
+
+    $legacyDaoGet = new CRM_Contact_DAO_Contact();
+    $legacyDaoGet->id = $contact->id;
+    $legacyDaoGet->find(TRUE);
+    $this->assertEquals('Greater &gt; Than', $legacyDaoGet->first_name);
+    $this->assertEquals('Less &lt; Than', $legacyDaoGet->last_name);
+    $this->assertEquals('&', $legacyDaoGet->middle_name);
+
+    $queryGet = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_contact WHERE id = ' . $contact->id);
+    $queryGet->setLegacyCrmMode(FALSE);
+    $queryGet->fetch();
+    $this->assertEquals('Greater > Than', $queryGet->first_name);
+    $this->assertEquals('Less < Than', $queryGet->last_name);
+    $this->assertEquals('&', $queryGet->middle_name);
+
+    $daoGet = new CRM_Contact_DAO_Contact();
+    $daoGet->id = $contact->id;
+    $daoGet->setLegacyCrmMode(FALSE);
+    $daoGet->find(TRUE);
+    $this->assertEquals('Greater > Than', $daoGet->first_name);
+    $this->assertEquals('Less < Than', $daoGet->last_name);
+    $this->assertEquals('&', $daoGet->middle_name);
+  }
+
 }
