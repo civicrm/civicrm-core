@@ -3373,6 +3373,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if ($searchFormValues) {
       $_SESSION['_' . $form->controller->_name . '_container']['values']['Search'] = $searchFormValues;
     }
+    if (isset($formValues['_qf_button_name'])) {
+      $_SESSION['_' . $form->controller->_name . '_container']['_qf_button_name'] = $formValues['_qf_button_name'];
+    }
     return $form;
   }
 

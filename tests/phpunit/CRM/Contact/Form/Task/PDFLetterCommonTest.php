@@ -136,9 +136,7 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'pdf_file_name' => 'pdf_file_name',
       'subject' => 'subject',
       'document_type' => 'pdf',
-      'buttons' => [
-        '_qf_PDF_upload' => $isLiveMode,
-      ],
+      '_qf_button_name' => ('_qf_PDF_upload' . (!$isLiveMode ? '_preview' : '')),
     ], $formValues));
     $form->_contactIds = $contactIDs;
     return $form;
