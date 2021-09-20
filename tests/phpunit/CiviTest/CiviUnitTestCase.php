@@ -487,36 +487,37 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   /**
    * Create default domain contacts for the two domains added during test class.
    * database population.
-   *
-   * @throws \API_Exception
    */
   public function createDomainContacts(): void {
-    $this->organizationCreate(['api.Email.create' => ['email' => 'fixme.domainemail@example.org']]);
-    $this->organizationCreate([
-      'organization_name' => 'Second Domain',
-      'api.Email.create' => ['email' => 'domainemail2@example.org'],
-      'api.Address.create' => [
-        'street_address' => '15 Main St',
-        'location_type_id' => 1,
-        'city' => 'Collinsville',
-        'country_id' => 1228,
-        'state_province_id' => 1003,
-        'postal_code' => 6022,
-      ],
-    ]);
-    OptionValue::replace(FALSE)->addWhere(
-      'option_group_id:name', '=', 'from_email_address'
-    )->setDefaults([
-      'is_default' => 1,
-      'name' => '"FIXME" <info@EXAMPLE.ORG>',
-      'label' => '"FIXME" <info@EXAMPLE.ORG>',
-    ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
+    try {
+      $this->organizationCreate(['api.Email.create' => ['email' => 'fixme.domainemail@example.org']]);
+      $this->organizationCreate([
+        'organization_name' => 'Second Domain',
+        'api.Email.create' => ['email' => 'domainemail2@example.org'],
+        'api.Address.create' => [
+          'street_address' => '15 Main St',
+          'location_type_id' => 1,
+          'city' => 'Collinsville',
+          'country_id' => 1228,
+          'state_province_id' => 1003,
+          'postal_code' => 6022,
+        ],
+      ]);
+      OptionValue::replace(FALSE)->addWhere(
+        'option_group_id:name', '=', 'from_email_address'
+      )->setDefaults([
+        'is_default' => 1,
+        'name' => '"FIXME" <info@EXAMPLE.ORG>',
+        'label' => '"FIXME" <info@EXAMPLE.ORG>',
+      ])->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
+    }
+    catch (API_Exception $e) {
+      $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
+    }
   }
 
   /**
    *  Common teardown functions for all unit tests.
-   *
-   * @throws \API_Exception
    */
   protected function tearDown(): void {
     $this->_apiversion = 3;

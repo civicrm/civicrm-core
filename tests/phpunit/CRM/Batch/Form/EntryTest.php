@@ -165,12 +165,10 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     if ($this->callAPISuccessGetCount('membership', ['id' => $this->_membershipTypeID])) {
       $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     }
-    if ($this->callAPISuccessGetCount('MembershipStatus', ['id' => $this->_membershipStatusID])) {
-      $this->membershipStatusDelete($this->_membershipStatusID);
-    }
     $this->contactDelete($this->_contactID);
     $this->contactDelete($this->_contactID2);
     $this->contactDelete($this->_orgContactID);
+    parent::tearDown();
   }
 
   /**
