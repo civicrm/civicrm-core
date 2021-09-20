@@ -251,9 +251,12 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       ],
       [
         'version' => '5.43.alpha1',
-        'upgrade_descriptor' => ts('Missed text version from 5.20'),
+        'upgrade_descriptor' => ts('Missed templates from earlier versions'),
         'templates' => [
           ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'case_activity', 'type' => 'html'],
+          ['name' => 'case_activity', 'type' => 'text'],
+          ['name' => 'case_activity', 'type' => 'subject'],
         ],
       ],
     ];
