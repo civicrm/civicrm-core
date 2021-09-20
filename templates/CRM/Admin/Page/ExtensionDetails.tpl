@@ -60,7 +60,7 @@
         </td>
     </tr>
     <tr>
-      <td class="label">{ts}Local path{/ts}</td><td>{$extension.path|escape}</td>
+      <td class="label">{ts}Local path{/ts}</td><td>{if !empty($extension.path)}{$extension.path|escape}{/if}</td>
     </tr>
     {if !empty($extension.downloadUrl)}
     <tr>
