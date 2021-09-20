@@ -18,6 +18,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'civicrm_case_contact',
       'civicrm_case_activity',
       'civicrm_case_type',
+      'civicrm_file',
+      'civicrm_entity_file',
       'civicrm_activity_contact',
       'civicrm_managed',
       'civicrm_relationship',
@@ -37,7 +39,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   /**
    * Make sure that the latest case activity works accurately.
    */
-  public function testCaseActivity() {
+  public function testCaseActivity(): void {
     $userID = $this->createLoggedInUser();
 
     $addTimeline = civicrm_api3('Case', 'addtimeline', [
@@ -57,8 +59,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   protected function tearDown(): void {
-    parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   public function testAddCaseToContact() {

@@ -35,10 +35,11 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
    * Cleanup after test.
    *
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function tearDown(): void {
-    parent::tearDown();
     $this->quickCleanup(['civicrm_batch']);
+    parent::tearDown();
   }
 
   /**

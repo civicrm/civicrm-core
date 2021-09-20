@@ -20,9 +20,12 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
 
   /**
    * Clean up DB.
+   *
+   * @throws \CRM_Core_Exception|\API_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**

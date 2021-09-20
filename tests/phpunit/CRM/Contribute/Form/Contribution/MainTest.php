@@ -23,6 +23,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
