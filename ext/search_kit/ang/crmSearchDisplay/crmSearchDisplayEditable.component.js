@@ -23,7 +23,8 @@
         initialValue = _.cloneDeep(this.row[col.editable.value].raw);
 
         this.field = {
-          data_type: col.dataType,
+          data_type: col.editable.data_type,
+          input_type: col.editable.input_type,
           name: col.editable.name,
           options: col.editable.options,
           fk_entity: col.editable.fk_entity,

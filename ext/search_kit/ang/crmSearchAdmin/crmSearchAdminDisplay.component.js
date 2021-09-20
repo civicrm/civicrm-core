@@ -158,25 +158,28 @@
         }
 
         var info = searchMeta.parseExpr(col.key),
-          field = info.args[0] && info.args[0].field,
+          arg = _.findWhere(info.args, {type: 'field'}) || {},
           value = col.key.split(':')[0];
-        if (!field || info.fn) {
+        if (!arg.field || info.fn) {
           delete col.editable;
           return;
         }
         // If field is an implicit join, use the original fk field
-        if (field.name !== field.fieldName) {
+        if (arg.field.name !== arg.field.fieldName) {
           value = value.substr(0, value.lastIndexOf('.'));
           info = searchMeta.parseExpr(value);
-          field = info.args[0].field;
+          arg = info.args[0];
         }
         col.editable = {
-          entity: field.baseEntity,
-          options: !!field.options,
-          serialize: !!field.serialize,
-          fk_entity: field.fk_entity,
-          id: info.prefix + 'id',
-          name: field.name,
+          // Hack to support editing relationships
+          entity: arg.field.entity.replace('RelationshipCache', 'Relationship'),
+          input_type: arg.field.input_type,
+          data_type: arg.field.data_type,
+          options: !!arg.field.options,
+          serialize: !!arg.field.serialize,
+          fk_entity: arg.field.fk_entity,
+          id: arg.prefix + searchMeta.getEntity(arg.field.entity).primary_key[0],
+          name: arg.field.name,
           value: value
         };
       };
