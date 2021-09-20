@@ -258,13 +258,10 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * All local rules are added near the element
    *
    * @param $fields
-   * @param $files
-   * @param $errors
    *
    * @return bool|array
-   * @see valid_date
    */
-  public static function formRule($fields, $files, $errors) {
+  public static function formRule($fields) {
     $errors = [];
 
     // Validate start/end date inputs
