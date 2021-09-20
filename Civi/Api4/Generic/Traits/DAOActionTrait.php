@@ -149,6 +149,7 @@ trait DAOActionTrait {
       }
 
       $result[] = $this->baoToArray($createResult, $item);
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
     }
 
     // Use bulk `writeRecords` method if the BAO doesn't have a create or add method
