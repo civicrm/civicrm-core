@@ -46,15 +46,26 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
     ]);
     $contribution1 = $this->contributionCreate(['contact_id' => $contact2]);
     $contribution2 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1]);
-    $form = $this->getFormObject('CRM_Contribute_Form_Task_Email', ['cc_id' => '', 'bcc_id' => ''], [], [
+    $form = $this->getFormObject('CRM_Contribute_Form_Task_Email', [
+      'cc_id' => '',
+      'bcc_id' => '',
+      'to' => implode(',', [
+        $contact1 . '::teresajensen-nielsen65@spamalot.co.in',
+        $contact2 . '::bob@example.com',
+      ]),
+      'subject' => '{contact.display_name}',
+      'text_message' => '{contribution.total_amount}',
+      'html_message' => '{domain.name}',
+    ], [], [
       'radio_ts' => 'ts_sel',
-      'task' => CRM_Contribute_Task::TASK_EMAIL,
+      'task' => CRM_Core_Task::TASK_EMAIL,
       'mark_x_' . $contribution1 => 1,
       'mark_x_' . $contribution2 => 1,
     ]);
     $form->set('cid', $contact1 . ',' . $contact2);
     $form->buildForm();
     $this->assertEquals('<br/><br/>--Benny, Benny', $form->_defaultValues['html_message']);
+    $form->postProcess();
   }
 
 }

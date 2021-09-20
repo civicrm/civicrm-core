@@ -38,6 +38,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_templates;
 
   /**
+   * Email addresses to send to.
+   *
+   * @var array
+   */
+  protected $emails = [];
+
+  /**
    * Store "to" contact details.
    * @var array
    */
@@ -190,10 +197,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if ($to->getValue()) {
       foreach ($this->getEmails($to) as $value) {
         $contactId = $value['contact_id'];
-        $email = $value['email'];
         if ($contactId) {
           $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-          $this->_toContactEmails[] = $email;
           $this->_allContactIds[] = $contactId;
         }
       }
@@ -366,8 +371,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   public function postProcess() {
     $this->bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
-
-    // check and ensure that
     $formValues = $this->controller->exportValues($this->getName());
     $this->submit($formValues);
   }
@@ -424,7 +427,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       if (!isset($this->_contactDetails[$contactId])) {
         continue;
       }
-      $email = $this->_toContactEmails[$key];
+      $email = $this->getEmail($key);
       // prevent duplicate emails if same email address is selected CRM-4067
       // we should allow same emails for different contacts
       $details = $this->_contactDetails[$contactId];
@@ -739,6 +742,24 @@ trait CRM_Contact_Form_Task_EmailTrait {
       CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
     }
     return $fromEmailValues;
+  }
+
+  /**
+   * Get the relevant emails.
+   *
+   * @param int $index
+   *
+   * @return string
+   */
+  protected function getEmail(int $index): string {
+    if (empty($this->emails)) {
+      $toEmails = explode(',', $this->getSubmittedValue('to'));
+      foreach ($toEmails as $value) {
+        $parts = explode('::', $value);
+        $this->emails[] = $parts[1];
+      }
+    }
+    return $this->emails[$index];
   }
 
 }
