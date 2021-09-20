@@ -603,14 +603,9 @@ class CRM_Core_SelectValues {
       '{participant.participant_registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
       '{participant.participant_role}' => 'Participant Role (label)',
-      '{participant.event_title}' => 'Event Title',
-      '{participant.event_start_date}' => 'Event Start Date',
-      '{participant.event_end_date}' => 'Event End Date',
       '{participant.fee_label}' => 'Fee Label',
       '{participant.default_role_id}' => 'Default Role',
       '{participant.template_title}' => 'Event Template Title',
-      '{participant.currency}' => 'Currency',
-      '{participant.participant_note}' => 'Participant Note',
     ];
     $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
 

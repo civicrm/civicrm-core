@@ -317,6 +317,21 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option in a print label.
+   *
+   * @param string $old
+   * @param string $new
+   */
+  public function replaceTokenInPrintLabel(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_print_label
+      SET
+        data = REPLACE(data, '$oldToken', '$newToken')
+    ");
+  }
+
+  /**
    * Get the upgrade messages.
    */
   public function getUpgradeMessages() {

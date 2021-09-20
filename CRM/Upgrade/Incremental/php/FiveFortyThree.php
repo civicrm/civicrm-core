@@ -74,6 +74,15 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Replace membership type token in action schedule',
       'updateActionScheduleToken', 'membership.type', 'membership.membership_type_id:label', $rev
     );
+    $this->addTask('Replace duplicate event title token in event badges',
+      'updatePrintLabelToken', 'participant.event_title', 'event.title', $rev
+    );
+    $this->addTask('Replace duplicate event start date token in event badges',
+      'updatePrintLabelToken', 'participant.event_start_date', 'event.start_date', $rev
+    );
+    $this->addTask('Replace duplicate event end date token in event badges',
+      'updatePrintLabelToken', 'participant.event_end_date', 'event.end_date', $rev
+    );
   }
 
   /**
