@@ -449,7 +449,8 @@ trait CRM_Contact_Form_Task_PDFTrait {
       CRM_Core_DAO::executeQuery($query);
 
       $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $formValues['template']);
-      foreach ((array) $documentInfo as $info) {
+      if ($documentInfo) {
+        $info = reset($documentInfo);
         [$html_message, $formValues['document_type']] = CRM_Utils_PDF_Document::docReader($info['fullPath'], $info['mime_type']);
         $formValues['document_file_path'] = $info['fullPath'];
       }
