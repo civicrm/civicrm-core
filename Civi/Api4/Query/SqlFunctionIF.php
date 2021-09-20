@@ -26,6 +26,7 @@ class SqlFunctionIF extends SqlFunction {
         'min_expr' => 3,
         'max_expr' => 3,
         'optional' => FALSE,
+        'must_be' => ['SqlEquation', 'SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'ui_defaults' => [
           ['type' => 'SqlField', 'placeholder' => ts('If')],
           ['type' => 'SqlField', 'placeholder' => ts('Then')],
