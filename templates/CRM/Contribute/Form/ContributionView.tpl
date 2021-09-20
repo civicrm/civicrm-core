@@ -32,7 +32,6 @@
           <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span>
       </a>
     {/if}
-    {include file="CRM/common/formButtons.tpl" location="top"}
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
     {if $invoicing && empty($is_template)}
@@ -49,6 +48,7 @@
           {ts}Email Invoice{/ts}</a>
       </div>
     {/if}
+    {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
 </div>
 <table class="crm-info-panel">
