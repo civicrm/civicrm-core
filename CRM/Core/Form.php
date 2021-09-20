@@ -71,6 +71,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $_action;
 
   /**
+   * Monetary fields that may be submitted.
+   *
+   * Any fields in this list will be converted to non-localised format
+   * if retrieved by `getSubmittedValue`
+   *
+   * @var array
+   */
+  protected $submittableMoneyFields = [];
+
+  /**
    * Available payment processors.
    *
    * As part of trying to consolidate various payment pages we store processors here & have functions
@@ -2746,7 +2756,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (empty($this->exportedValues)) {
       $this->exportedValues = $this->controller->exportValues($this->_name);
     }
-    return $this->exportedValues[$fieldName] ?? NULL;
+    $value = $this->exportedValues[$fieldName] ?? NULL;
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+    return $value;
   }
 
   /**
