@@ -344,10 +344,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $params = array_merge($modelDefaults, $viewDefaults, $envelopeDefaults, $params);
 
     CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-    if (!is_int($params['messageTemplateID']) && !is_null($params['messageTemplateID'])) {
-      CRM_Core_Error::deprecatedWarning('message template id should be an integer');
-      $params['messageTemplateID'] = (int) $params['messageTemplateID'];
-    }
     $mailContent = self::loadTemplate((string) $params['valueName'], $params['isTest'], $params['messageTemplateID'] ?? NULL, $params['groupName'] ?? '', $params['messageTemplate'], $params['subject'] ?? NULL);
 
     $params['tokenContext'] = array_merge([
