@@ -298,48 +298,135 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * Load token data.
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
+   *
    * @throws TokenException
+   * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
-    // For reasons unknown, replaceHookTokens used to require a pre-computed list of
-    // hook *categories* (aka entities aka namespaces). We cache
-    // this in the TokenProcessor's context but can likely remove it now.
-
-    $e->getTokenProcessor()->context['hookTokenCategories'] = \CRM_Utils_Token::getTokenCategories();
-
     $messageTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
+    if (empty($messageTokens)) {
+      return;
+    }
+    $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
 
     foreach ($e->getRows() as $row) {
-      if (empty($row->context['contactId'])) {
+      if (empty($row->context['contactId']) && empty($row->context['contact'])) {
         continue;
       }
 
       unset($swapLocale);
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
-      /** @var int $contactId */
-      $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $contact = $this->getContact($contactId, $messageTokens);
+        $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
       }
-      else {
-        $contact = $row->context['contact'];
+
+      foreach ($messageTokens as $token) {
+        if ($token === 'checksum') {
+          $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
+            NULL,
+            NULL,
+            $row->context['hash'] ?? NULL
+          );
+          $row->format('text/html')
+            ->tokens('contact', $token, "cs={$cs}");
+        }
+        elseif (!empty($row->context['contact'][$token]) &&
+          $this->isDateField($token)
+        ) {
+          // Handle dates here, for now. Standardise with other token entities next round
+          $row->format('text/plain')->tokens('contact', $token, \CRM_Utils_Date::customFormat($row->context['contact'][$token]));
+        }
+        elseif (
+          ($row->context['contact'][$token] ?? '') == 0
+          && $this->isBooleanField($token)) {
+          // Note this will be the default behaviour once we fetch with apiv4.
+          $row->format('text/plain')->tokens('contact', $token, '');
+        }
+        elseif ($token === 'signature_html') {
+          $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
+        }
+        else {
+          $row->format('text/html')
+            ->tokens('contact', $token, $row->context['contact'][$token] ?? '');
+        }
       }
-      $row->context('contact', $contact);
     }
+  }
+
+  /**
+   * Is the given field a boolean field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isBooleanField(string $fieldName): bool {
+    // no metadata for these 2 non-standard fields
+    // @todo - fix to api v4 & have metadata for all fields. Migrate contact_is_deleted
+    // to {contact.is_deleted}. on hold feels like a token that exists by
+    // accident & could go.... since it's not from the main entity.
+    if (in_array($fieldName, ['contact_is_deleted', 'on_hold'])) {
+      return TRUE;
+    }
+    if (empty($this->getFieldMetadata()[$fieldName])) {
+      return FALSE;
+    }
+    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
+  }
+
+  /**
+   * Is the given field a date field.
+   *
+   * @param string $fieldName
+   *
+   * @return bool
+   */
+  public function isDateField(string $fieldName): bool {
+    if (empty($this->getFieldMetadata()[$fieldName])) {
+      return FALSE;
+    }
+    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
+  }
+
+  /**
+   * Get the metadata for the available fields.
+   *
+   * @return array
+   */
+  protected function getFieldMetadata(): array {
+    if (empty($this->fieldMetadata)) {
+      try {
+        // Tests fail without checkPermissions = FALSE
+        $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
+      }
+      catch (\API_Exception $e) {
+        $this->fieldMetadata = [];
+      }
+    }
+    return $this->fieldMetadata;
   }
 
   /**
    * Apply the various CRM_Utils_Token helpers.
    *
    * @param \Civi\Token\Event\TokenRenderEvent $e
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function onRender(TokenRenderEvent $e) {
+  public function onRender(TokenRenderEvent $e): void {
     $isHtml = ($e->message['format'] === 'text/html');
     $useSmarty = !empty($e->context['smarty']);
 
     if (!empty($e->context['contact'])) {
-      \CRM_Utils_Token::replaceGreetingTokens($e->string, $e->context['contact'], $e->context['contact']['contact_id'] ?? $e->context['contactId'], NULL, $useSmarty);
+      // @todo - remove this - it simply removes the last unresolved tokens before
+      // they break smarty.
+      // historically it was only called when context['contact'] so that is
+      // retained but it only works because it's almost always true.
+      $remainingTokens = array_keys(\CRM_Utils_Token::getTokens($e->string));
+      if (!empty($remainingTokens)) {
+        $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $remainingTokens);
+      }
     }
 
     if ($useSmarty) {
@@ -374,8 +461,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $mappedFields = [
       'email_greeting' => 'email_greeting_display',
       'postal_greeting' => 'postal_greeting_display',
-      'addressee' => 'address_display',
+      'addressee' => 'addressee_display',
     ];
+    if (!empty($returnProperties['checksum'])) {
+      $returnProperties['hash'] = 1;
+    }
+
     foreach ($mappedFields as $tokenName => $realName) {
       if (in_array($tokenName, $requiredFields, TRUE)) {
         $returnProperties[$realName] = 1;

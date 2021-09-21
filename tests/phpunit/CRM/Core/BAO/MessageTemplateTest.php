@@ -360,6 +360,16 @@ emo
 ';
     $expected .= $this->getExpectedContactOutput($address['id'], $tokenData, $messageContent['html']);
     $this->assertEquals($expected, $messageContent['html']);
+    $textDifferences = [
+      '<p>',
+      '</p>',
+      '<a href="http://civicrm.org" ',
+      'target="_blank">',
+      '</a>',
+    ];
+    foreach ($textDifferences as $html) {
+      $expected = str_replace($html, '', $expected);
+    }
     $this->assertEquals($expected, $messageContent['text']);
     $checksum_position = strpos($messageContent['subject'], 'cs=');
     $this->assertTrue($checksum_position !== FALSE);
@@ -768,12 +778,12 @@ state_province:TX
 country:United States
 phone:123-456
 phone_ext:77
-phone_type_id:
+phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
 on_hold:
 signature_text:Yours sincerely
-signature_html:&lt;p&gt;Yours&lt;/p&gt;
+signature_html:<p>Yours</p>
 im_provider:1
 im:IM Screen Name
 openid:OpenID
