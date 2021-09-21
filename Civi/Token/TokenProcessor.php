@@ -138,10 +138,14 @@ class TokenProcessor {
    * @return TokenProcessor
    */
   public function addMessage($name, $value, $format) {
+    $tokens = [];
+    $this->visitTokens($value ?: '', function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$tokens) {
+      $tokens[$entity][] = $field;
+    });
     $this->messages[$name] = [
       'string' => $value,
       'format' => $format,
-      'tokens' => \CRM_Utils_Token::getTokens($value),
+      'tokens' => $tokens,
     ];
     return $this;
   }
@@ -361,38 +365,37 @@ class TokenProcessor {
     $useSmarty = !empty($row->context['smarty']);
 
     $tokens = $this->rowValues[$row->tokenRow][$message['format']];
-    $getToken = function($m) use ($tokens, $useSmarty, $row) {
-      [$full, $entity, $field] = $m;
+    $getToken = function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use ($tokens, $useSmarty, $row) {
       if (isset($tokens[$entity][$field])) {
         $v = $tokens[$entity][$field];
-        if ($v instanceof \DateTime) {
-          if (!isset($m[3])) {
-            $m[3] = 'crmDate';
-          }
-        }
-        if (isset($m[3])) {
-          $v = $this->filterTokenValue($v, $m[3], $row);
-        }
+        $v = $this->filterTokenValue($v, $modifier, $row);
         if ($useSmarty) {
           $v = \CRM_Utils_Token::tokenEscapeSmarty($v);
         }
         return $v;
       }
-      return $full;
+      return $fullToken;
     };
 
     $event = new TokenRenderEvent($this);
     $event->message = $message;
     $event->context = $row->context;
     $event->row = $row;
-    // Regex examples: '{foo.bar}', '{foo.bar|whiz}'
+    $event->string = $this->visitTokens($message['string'] ?? '', $getToken);
+    $this->dispatcher->dispatch('civi.token.render', $event);
+    return $event->string;
+  }
+
+  private function visitTokens(string $expression, callable $callback): string {
+    // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:bang}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
     $tokRegex = '([\w]+)\.([\w:\.]+)';
-    $filterRegex = '(\w+:?\w+)';
-    $event->string = preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", $getToken, $message['string']);
-    $this->dispatcher->dispatch('civi.token.render', $event);
-    return $event->string;
+    $filterRegex = '(\w+:?\w*)';
+    return preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", function($m) use ($callback) {
+      $filterParts = isset($m[3]) ? explode(':', $m[3]) : NULL;
+      return $callback($m[0] ?? NULL, $m[1] ?? NULL, $m[2] ?? NULL, $filterParts);
+    }, $expression);
   }
 
   /**
@@ -400,15 +403,20 @@ class TokenProcessor {
    *
    * @param mixed $value
    *   Raw token value (e.g. from `$row->tokens['foo']['bar']`).
-   * @param string $filter
+   * @param array|null $filter
    * @param TokenRow $row
    *   The current target/row.
    * @return string
    * @throws \CRM_Core_Exception
    */
-  private function filterTokenValue($value, $filter, TokenRow $row) {
+  private function filterTokenValue($value, ?array $filter, TokenRow $row) {
     // KISS demonstration. This should change... e.g. provide a filter-registry or reuse Smarty's registry...
-    switch ($filter) {
+
+    if ($value instanceof \DateTime && $filter === NULL) {
+      $filter = ['crmDate'];
+    }
+
+    switch ($filter[0]) {
       case NULL:
         return $value;
 
