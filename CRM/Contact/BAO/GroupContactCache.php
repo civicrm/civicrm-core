@@ -246,19 +246,32 @@ WHERE  id IN ( $groupIDs )
       // Someone else is kindly doing the refresh for us right now.
       return;
     }
+
+    // Get the list of expired smart groups that may need flushing
     $params = [1 => [self::getCacheInvalidDateTime(), 'String']];
-    $groupsDAO = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_group WHERE cache_date <= %1", $params);
+    $groupsThatMayNeedToBeFlushedSQL = "SELECT id FROM civicrm_group WHERE (saved_search_id IS NOT NULL OR children <> '') AND (cache_date <= %1 OR cache_date IS NULL)";
+    $groupsDAO = CRM_Core_DAO::executeQuery($groupsThatMayNeedToBeFlushedSQL, $params);
     $expiredGroups = [];
     while ($groupsDAO->fetch()) {
       $expiredGroups[] = $groupsDAO->id;
     }
-    if (!empty($expiredGroups)) {
-      $expiredGroups = implode(',', $expiredGroups);
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN ({$expiredGroups})");
+    if (empty($expiredGroups)) {
+      // There are no expired smart groups to flush
+      return;
+    }
+
+    $expiredGroupsCSV = implode(',', $expiredGroups);
+    $flushSQLParams = [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']];
+    // Now check if we actually have any entries in the smart groups to flush
+    $groupsHaveEntriesToFlushSQL = 'SELECT group_id FROM civicrm_group_contact_cache gc WHERE group_id IN (%1) LIMIT 1';
+    $groupsHaveEntriesToFlush = (bool) CRM_Core_DAO::singleValueQuery($groupsHaveEntriesToFlushSQL, $flushSQLParams);
+
+    if ($groupsHaveEntriesToFlush) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN (%1)", [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']]);
 
       // Clear these out without resetting them because we are not building caches here, only clearing them,
       // so the state is 'as if they had never been built'.
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL WHERE id IN ({$expiredGroups})");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL WHERE id IN (%1)", [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']]);
     }
     $lock->release();
   }
