@@ -855,7 +855,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * @return int
    *   $id of participant created
    */
-  public function participantCreate($params = []) {
+  public function participantCreate(array $params = []) {
     if (empty($params['contact_id'])) {
       $params['contact_id'] = $this->individualCreate();
     }
@@ -1097,9 +1097,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *   Name-value pair for an event.
    *
    * @return array
-   * @throws \CRM_Core_Exception
    */
-  public function eventCreate($params = []) {
+  public function eventCreate(array $params = []): array {
     // if no contact was passed, make up a dummy event creator
     if (!isset($params['contact_id'])) {
       $params['contact_id'] = $this->_contactCreate([
@@ -1113,7 +1112,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $params = array_merge([
       'title' => 'Annual CiviCRM meet',
       'summary' => 'If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now',
-      'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
+      'description' => 'This event is intended to give brief idea about progress of CiviCRM and giving solutions to common user issues',
       'event_type_id' => 1,
       'is_public' => 1,
       'start_date' => 20081021,
@@ -1129,7 +1128,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_email_confirm' => 1,
     ], $params);
 
-    return $this->callAPISuccess('Event', 'create', $params);
+    $event = $this->callAPISuccess('Event', 'create', $params);
+    $this->ids['event'][] = $event['id'];
+    return $event;
   }
 
   /**
