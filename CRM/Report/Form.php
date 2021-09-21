@@ -626,6 +626,10 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       // set qfkey so that pager picks it up and use it in the "Next > Last >>" links.
       // FIXME: Note setting it in $_GET doesn't work, since pager generates link based on QUERY_STRING
+      if (!isset($_SERVER['QUERY_STRING'])) {
+        // in php 7.4 can do this with less lines with ??=
+        $_SERVER['QUERY_STRING'] = '';
+      }
       $_SERVER['QUERY_STRING'] .= "&qfKey={$this->controller->_key}";
     }
 
