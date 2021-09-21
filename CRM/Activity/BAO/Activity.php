@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Contribution;
 
 /**
  *
@@ -990,29 +991,29 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param $html
    * @param string $emailAddress
    *   Use this 'to' email address instead of the default Primary address.
-   * @param int $userID
+   * @param int|null $userID
    *   Use this userID if set.
-   * @param string $from
-   * @param array $attachments
+   * @param string|null $from
+   * @param array|null $attachments
    *   The array of attachments if any.
-   * @param string $cc
+   * @param string|null $cc
    *   Cc recipient.
-   * @param string $bcc
+   * @param string|null $bcc
    *   Bcc recipient.
-   * @param array $contactIds
-   *   Contact ids.
-   * @param string $additionalDetails
+   * @param array|null $contactIds
+   *   unused.
+   * @param string|null $additionalDetails
    *   The additional information of CC and BCC appended to the activity Details.
-   * @param array $contributionIds
-   * @param int $campaignId
-   * @param int $caseId
+   * @param array|null $contributionIds
+   * @param int|null $campaignId
+   * @param int|null $caseId
    *
    * @return array
    *   bool $sent FIXME: this only indicates the status of the last email sent.
    *   array $activityIds The activity ids created, one per "To" recipient.
    *
+   * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public static function sendEmail(
     $contactDetails,
@@ -1036,7 +1037,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $userID = CRM_Core_Session::getLoggedInContactID();
     }
 
-    list($fromDisplayName, $fromEmail, $fromDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
+    [$fromDisplayName, $fromEmail, $fromDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($userID);
     if (!$fromEmail) {
       return [count($contactDetails), 0, count($contactDetails)];
     }
@@ -1044,35 +1045,21 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       $fromDisplayName = $fromEmail;
     }
 
-    // CRM-4575
-    // token replacement of addressee/email/postal greetings
-    // get the tokens added in subject and message
-    $subjectToken = CRM_Utils_Token::getTokens($subject);
-    $messageToken = CRM_Utils_Token::getTokens($text);
-    $messageToken = array_merge($messageToken, CRM_Utils_Token::getTokens($html));
-    $allTokens = CRM_Utils_Array::crmArrayMerge($messageToken, $subjectToken);
-
     if (!$from) {
       $from = "$fromDisplayName <$fromEmail>";
     }
 
-    $escapeSmarty = FALSE;
-    if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
-      $smarty = CRM_Core_Smarty::singleton();
-      $escapeSmarty = TRUE;
-    }
-
     $contributionDetails = [];
     if (!empty($contributionIds)) {
-      $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
-        $contributionIds,
-        $subject,
-        $subjectToken,
-        $text,
-        $html,
-        $messageToken,
-        $escapeSmarty
-      );
+      $contributionDetails = Contribution::get(FALSE)
+        ->setSelect(['contact_id'])
+        ->addWhere('id', 'IN', $contributionIds)
+        ->execute()
+        // Note that this indexing means that only the last
+        // contribution per contact is resolved to tokens.
+        // this is long-standing functionality, albeit possibly
+        // not thought through.
+        ->indexBy('contact_id');
     }
 
     $sent = $notSent = [];
@@ -1080,13 +1067,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $activityIds = [];
     $firstActivityCreated = FALSE;
     foreach ($contactDetails as $values) {
+      $tokenContext = $caseId ? ['caseId' => $caseId] : [];
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
 
       if (!empty($contributionDetails)) {
-        $subject = $contributionDetails[$contactId]['subject'];
-        $text = $contributionDetails[$contactId]['text'];
-        $html = $contributionDetails[$contactId]['html'];
+        $tokenContext['contributionId'] = $contributionDetails[$contactId]['id'];
       }
 
       $tokenSubject = $subject;
@@ -1099,7 +1085,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           'msg_html' => $tokenHtml,
           'msg_subject' => $tokenSubject,
         ],
-        'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
+        'tokenContext' => $tokenContext,
         'contactId' => $contactId,
         'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
       ]);
@@ -1263,7 +1249,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     // get token details for contacts, call only if tokens are used
     $tokenDetails = [];
     if (!empty($returnProperties) || !empty($tokens)) {
-      list($tokenDetails) = CRM_Utils_Token::getTokenDetails($contactIds,
+      [$tokenDetails] = CRM_Utils_Token::getTokenDetails($contactIds,
         $returnProperties,
         NULL, NULL, FALSE,
         $messageToken,
@@ -1430,7 +1416,7 @@ WHERE entity_id =%1 AND entity_table = %2";
     $cc = NULL,
     $bcc = NULL
   ) {
-    list($toDisplayName, $toEmail, $toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($toID);
+    [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
     if ($emailAddress) {
       $toEmail = trim($emailAddress);
     }
@@ -1711,7 +1697,7 @@ WHERE      activity.id IN ($activityIds)";
         }
 
         if ($entityObj->owner_membership_id) {
-          list($displayName) = CRM_Contact_BAO_Contact::getDisplayAndImage(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $entityObj->owner_membership_id, 'contact_id'));
+          [$displayName] = CRM_Contact_BAO_Contact::getDisplayAndImage(CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $entityObj->owner_membership_id, 'contact_id'));
           $subject .= sprintf(' (by %s)', $displayName);
         }
 
