@@ -80,19 +80,6 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
     Civi::settings()->set('allow_mail_from_logged_in_contact', 1);
     $loggedInContactID = $this->createLoggedInUser();
-    /* @var CRM_Contact_Form_Task_Email $form*/
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
-
-    for ($i = 0; $i < 27; $i++) {
-      $email = 'spy' . $i . '@secretsquirrels.com';
-      $contactID = $this->individualCreate(['email' => $email]);
-      $form->_contactIds[$contactID] = $contactID;
-      $form->_toContactEmails[$this->callAPISuccessGetValue('Email', ['return' => 'id', 'email' => $email])] = $email;
-    }
-    $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
-    $form->_contactIds[$deceasedContactID] = $deceasedContactID;
-    $form->_toContactEmails[$this->callAPISuccessGetValue('Email', ['return' => 'id', 'email' => 'dead@example.com'])] = 'dead@example.com';
-
     $loggedInEmail = $this->callAPISuccess('Email', 'create', [
       'email' => 'mickey@mouse.com',
       'location_type_id' => 1,
@@ -101,15 +88,35 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
       'signature_text' => 'This is a test Signature',
       'signature_html' => '<p>This is a test Signature</p>',
     ]);
+
+    $to = $form_contactIds = $form_toContactEmails = [];
+    for ($i = 0; $i < 27; $i++) {
+      $email = 'spy' . $i . '@secretsquirrels.com';
+      $contactID = $this->individualCreate(['email' => $email]);
+      $form_contactIds[$contactID] = $contactID;
+      $to[] = $contactID . '::' . $email;
+    }
+    $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
+    $to[] = $deceasedContactID . '::' . 'email@example.com';
+    /* @var CRM_Contact_Form_Task_Email $form*/
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'to' => implode(',', $to),
+    ]);
+    $form->_contactIds = $form_contactIds;
+    $form->_contactIds[$deceasedContactID] = $deceasedContactID;
+
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
-    $form->_emails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     // This rule somehow disappears if there's a form-related test before us,
     // so register it again. See packages/HTML/QuickForm/file.php.
+    // update - actually - it's never registered. Even in form made
+    // I can see it missing - It's really weird.
     $form->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
     $form->isSearchContext = FALSE;
     $form->buildForm();
     $form->submit(array_merge($form->_defaultValues, [
+      // @todo - it's better to pass these into getForm
+      // and access them on the form using $this->getSubmittedValue().
       'from_email_address' => $loggedInEmail['id'],
       'subject' => 'Really interesting stuff',
       'bcc_id' => $bcc,
