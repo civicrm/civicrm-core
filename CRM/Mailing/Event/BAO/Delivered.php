@@ -288,6 +288,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
               AND       civicrm_mailing_job.status = 'Complete'
               AND       civicrm_mailing_job.end_date BETWEEN DATE_SUB(NOW(), INTERVAL $maxDays day) AND DATE_SUB(NOW(), INTERVAL $minDays day)
               AND       (civicrm_email.reset_date IS NULL OR civicrm_email.reset_date < civicrm_mailing_job.start_date)
+              AND       civicrm_email.on_hold != 2
             GROUP BY    civicrm_email.id
          ";
     CRM_Core_DAO::executeQuery($query);
