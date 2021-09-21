@@ -34,10 +34,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   protected $_params;
 
   public function setUp(): void {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->_entity = 'participant';
-    $event = $this->eventCreate(NULL);
+    $event = $this->eventCreate();
     $this->_eventID = $event['id'];
 
     $this->_contactID = $this->individualCreate();
@@ -80,12 +79,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**
    * Check that getCount can count past 25.
    */
-  public function testGetCountLimit() {
+  public function testGetCountLimit(): void {
     $contactIDs = [];
 
     for ($count = $this->callAPISuccessGetCount('Participant', []); $count < 27; $count++) {
@@ -102,7 +102,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   /**
    * Test get participants with role_id.
    */
-  public function testGetParticipantWithRole() {
+  public function testGetParticipantWithRole(): void {
     $roleId = [1, 2, 3];
     foreach ($roleId as $role) {
       $this->participantCreate([
@@ -118,7 +118,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('participant', 'get', $params);
     //Assert all the returned participants has a role_id of 2
     foreach ($result['values'] as $pid => $values) {
-      $this->assertEquals($values['participant_role_id'], 2);
+      $this->assertEquals(2, $values['participant_role_id']);
     }
 
     $this->participantCreate([
@@ -131,8 +131,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'IS NULL' => 1,
     ];
     $result = $this->callAPISuccess('participant', 'get', $params);
-    foreach ($result['values'] as $pid => $values) {
-      $this->assertEquals($values['participant_role_id'], NULL);
+    foreach ($result['values'] as $values) {
+      $this->assertEquals(NULL, $values['participant_role_id']);
     }
 
   }
@@ -143,18 +143,18 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
    */
-  public function testCreateWithCustom() {
+  public function testCreateWithCustom(): void {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
-    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
 
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
 
     $check = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -176,8 +176,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertAPISuccess($result, " in line " . __LINE__);
     $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
-    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
+    $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->_participantID]['participant_register_date']);
+    $this->assertEquals('Wimbeldon', $result['values'][$this->_participantID]['participant_source']);
     $params = [
       'id' => $this->_participantID,
       'return' => 'id,participant_register_date,event_id',
@@ -229,38 +229,38 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   /**
    * Check with params id.
    */
-  public function testGetNestedEventGet() {
+  public function testGetNestedEventGet(): void {
     //create a second event & add participant to it.
-    $event = $this->eventCreate(NULL);
-    $this->callAPISuccess('participant', 'create', [
+    $event = $this->eventCreate();
+    $this->callAPISuccess('Participant', 'create', [
       'event_id' => $event['id'],
       'contact_id' => $this->_contactID,
     ]);
 
-    $description = "Demonstrates use of nested get to fetch event data with participant records.";
-    $subfile = "NestedEventGet";
+    $description = 'Demonstrates use of nested get to fetch event data with participant records.';
+    $subfile = 'NestedEventGet';
     $params = [
       'id' => $this->_participantID,
       'api.event.get' => 1,
     ];
-    $result = $this->callAPIAndDocument('participant', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals($result['values'][$this->_participantID]['event_id'], $this->_eventID);
-    $this->assertEquals($result['values'][$this->_participantID]['participant_register_date'], '2007-02-19 00:00:00');
-    $this->assertEquals($result['values'][$this->_participantID]['participant_source'], 'Wimbeldon');
-    $this->assertEquals($this->_eventID, $result['values'][$this->_participantID]['api.event.get']['id']);
+    $result = $this->callAPIAndDocument('participant', 'get', $params, __FUNCTION__, __FILE__, $description, $subfile)['values'];
+    $this->assertEquals($this->_eventID, $result[$this->_participantID]['event_id']);
+    $this->assertEquals('2007-02-19 00:00:00', $result[$this->_participantID]['participant_register_date']);
+    $this->assertEquals('Wimbeldon', $result[$this->_participantID]['participant_source']);
+    $this->assertEquals($this->_eventID, $result[$this->_participantID]['api.event.get']['id']);
   }
 
   /**
    * Check Participant Get respects return properties.
    */
-  public function testGetWithReturnProperties() {
+  public function testGetWithReturnProperties(): void {
     $params = [
       'contact_id' => $this->_contactID,
       'return.status_id' => 1,
       'return.participant_status_id' => 1,
       'options' => ['limit' => 1],
     ];
-    $result = $this->callAPISuccess('participant', 'get', $params);
+    $result = $this->callAPISuccess('Participant', 'get', $params);
     $this->assertArrayHasKey('participant_status_id', $result['values'][$result['id']]);
   }
 
