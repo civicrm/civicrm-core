@@ -429,16 +429,18 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *   name of the relevant table.
    * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
-   *
-   * @return bool
    */
-  public function fixSchemaDifferencesFor($table, $cols = []) {
-    if (empty($table)) {
-      return FALSE;
+  public function fixSchemaDifferencesFor(string $table, array $cols = []): void {
+    if (!in_array($table, $this->tables, TRUE)) {
+      // Create the table if the log table does not exist and
+      // the table is in 'this->tables'. This latter array
+      // could have been altered by a hook if the site does not
+      // want to log a specific table.
+      return;
     }
     if (empty($this->logs[$table])) {
       $this->createLogTableFor($table);
-      return TRUE;
+      return;
     }
 
     if (empty($cols)) {
@@ -480,8 +482,6 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     }
 
     $this->resetSchemaCacheForTable("log_$table");
-
-    return TRUE;
   }
 
   /**

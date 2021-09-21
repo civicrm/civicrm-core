@@ -932,7 +932,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return static[]
    * @throws CRM_Core_Exception
    */
-  public static function writeRecords(array $records) {
+  public static function writeRecords(array $records): array {
     $results = [];
     foreach ($records as $record) {
       $results[] = static::writeRecord($record);
