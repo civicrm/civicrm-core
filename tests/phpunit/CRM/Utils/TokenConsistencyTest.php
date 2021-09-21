@@ -519,7 +519,7 @@ December 21st, 2007
    */
   public function testDomainNow(): void {
     putenv('TIME_FUNC=frozen');
-    CRM_Utils_Time::setTime('2021-21-18 11:58:00');
+    CRM_Utils_Time::setTime('2021-09-18 23:58:00');
     $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'messageTemplate' => [
         'msg_text' => '{domain.now|crmDate:short}',
