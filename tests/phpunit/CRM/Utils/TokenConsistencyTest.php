@@ -509,7 +509,7 @@ December 21st, 2007
     ]);
     $tokens['{domain.id}'] = 'Domain ID';
     $tokens['{domain.description}'] = 'Domain Description';
-    $tokens['domain.now'] = 'Current time/date';
+    $tokens['{domain.now}'] = 'Current time/date';
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
   }
 
