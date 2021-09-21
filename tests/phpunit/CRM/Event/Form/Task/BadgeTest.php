@@ -84,27 +84,24 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
    * @return string[]
    */
   protected function getAvailableTokens(): array {
-    $tokens = [
+    return [
       '{event.title}' => 'Annual CiviCRM meet',
       '{contact.display_name}' => 'Mr. Anthony Anderson II',
       '{contact.current_employer}' => 'Default Organization',
       '{event.start_date}' => 'October 21st',
-      '{participant.participant_status_id}' => 2,
-      '{participant.participant_role_id}' => 1,
-      '{participant.participant_register_date}' => 'February 19th',
-      '{participant.participant_source}' => 'Wimbeldon',
-      '{participant.participant_fee_level}' => 'low',
-      '{participant.participant_fee_amount}' => NULL,
-      '{participant.participant_registered_by_id}' => NULL,
+      '{participant.status_id}' => 2,
+      '{participant.role_id}' => 1,
+      '{participant.register_date}' => 'February 19th, 2007 12:00 AM',
+      '{participant.source}' => 'Wimbeldon',
+      '{participant.fee_level}' => 'low',
+      '{participant.fee_amount}' => NULL,
+      '{participant.registered_by_id}' => NULL,
       '{participant.transferred_to_contact_id}' => NULL,
-      '{participant.participant_role}' => 'Attendee',
+      '{participant.role_id:label}' => 'Attendee',
       '{participant.fee_label}' => NULL,
-      '{participant.default_role_id}' => 1,
-      '{participant.template_title}' => NULL,
       '{event.end_date}' => 'October 23rd',
       '{event.id}' => 1,
     ];
-    return $tokens;
   }
 
 }

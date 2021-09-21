@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * Class CRM_Badge_Format_Badge.
  *
@@ -87,7 +89,7 @@ class CRM_Badge_BAO_Badge {
         if ($element) {
           $value = $row[$element];
           // hack to fix date field display format
-          if (strpos($element, '_date')) {
+          if (in_array($element, ['event_start_date', 'event_end_date'], TRUE)) {
             $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
           }
         }
@@ -369,7 +371,7 @@ class CRM_Badge_BAO_Badge {
     $this->imgRes = 300;
 
     if ($img) {
-      list($w, $h) = self::getImageProperties($img, $this->imgRes, $w, $h);
+      [$w, $h] = self::getImageProperties($img, $this->imgRes, $w, $h);
       $this->pdf->Image($img, $x, $y, $w, $h, '', '', '', FALSE, 72, '', FALSE,
         FALSE, $this->debug, FALSE, FALSE, FALSE);
     }
@@ -402,39 +404,36 @@ class CRM_Badge_BAO_Badge {
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
-
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['participantId'], 'smarty' => FALSE]);
     // split/get actual field names from token and individual contact image URLs
-    $returnProperties = [];
+    $returnProperties = $processorTokens = [];
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
-        $element = '';
         if ($value) {
           $token = CRM_Utils_Token::getTokens($value);
-          if (key($token) == 'contact') {
-            $element = $token['contact'][0];
-          }
-          elseif (key($token) == 'event') {
+          if (strpos($value, '{event.') === 0) {
             $element = $token['event'][0];
             //FIX ME - we need to standardize event token names
             if (substr($element, 0, 6) != 'event_') {
+              // legacy style.
               $element = 'event_' . $element;
+              $returnProperties[$element] = 1;
+              // add actual field name to row element
+              $layoutInfo['data']['rowElements'][$index] = $element;
             }
           }
-          elseif (key($token) == 'participant') {
-            $element = $token['participant'][0];
+          else {
+            $tokenName = str_replace(['}', '{contact.', '{participant.'], '', $value);
+            $tokenProcessor->addMessage($tokenName, $value, 'text/plain');
+            $processorTokens[] = $tokenName;
+            $layoutInfo['data']['rowElements'][$index] = $tokenName;
           }
-
-          // build returnproperties for query
-          $returnProperties[$element] = 1;
         }
-
-        // add actual field name to row element
-        $layoutInfo['data']['rowElements'][$index] = $element;
       }
     }
 
     // add additional required fields for query execution
-    $additionalFields = ['participant_register_date', 'participant_id', 'event_id', 'contact_id', 'image_URL'];
+    $additionalFields = ['participant_id', 'event_id', 'contact_id'];
     foreach ($additionalFields as $field) {
       $returnProperties[$field] = 1;
     }
@@ -450,7 +449,7 @@ class CRM_Badge_BAO_Badge {
       CRM_Contact_BAO_Query::MODE_EVENT
     );
 
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     if (empty($where)) {
       $where = "WHERE {$form->_componentClause}";
     }
@@ -469,16 +468,19 @@ class CRM_Badge_BAO_Badge {
 
     $dao = CRM_Core_DAO::executeQuery($queryString);
     $rows = [];
+
     while ($dao->fetch()) {
-      $query->convertToPseudoNames($dao);
+      $tokenProcessor->addRow(['contactId' => $dao->contact_id, 'participantId' => $dao->participant_id]);
       $rows[$dao->participant_id] = [];
       foreach ($returnProperties as $key => $dontCare) {
-        $value = $dao->$key ?? NULL;
-        // Format custom fields
-        if (strstr($key, 'custom_') && isset($value)) {
-          $value = CRM_Core_BAO_CustomField::displayValue($value, substr($key, 7), $dao->contact_id);
-        }
-        $rows[$dao->participant_id][$key] = $value;
+        // we are now only resolving the 4 event tokens here.
+        $rows[$dao->participant_id][$key] = $dao->$key ?? NULL;
+      }
+    }
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      foreach ($processorTokens as $processorToken) {
+        $rows[$row->context['participantId']][$processorToken] = $row->render($processorToken);
       }
     }
 
