@@ -57,7 +57,8 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
     if ($field === 'now') {
-      $row->format('text/html')->tokens($entity, $field, new DateTime());
+      $nowObj = (new \DateTime())->setTimestamp(\CRM_Utils_Time::time());
+      $row->format('text/html')->tokens($entity, $field, $nowObj);
       return;
     }
     $row->format('text/html')->tokens($entity, $field, self::getDomainTokenValues()[$field]);
