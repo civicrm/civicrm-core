@@ -275,6 +275,7 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
       ->createWithColumns('id int primary key, reset_date datetime');
     $temporaryTableName = $temporaryTable->getName();
 
+    // also exclude on_hold = opt-out (2)
     $query = "
             INSERT INTO {$temporaryTableName} (id, reset_date)
             SELECT      civicrm_email.id as email_id,
