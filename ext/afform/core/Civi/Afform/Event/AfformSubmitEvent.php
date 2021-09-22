@@ -108,6 +108,33 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
+   * Get the id of a saved record
+   * @param int $index
+   * @return mixed
+   */
+  public function getEntityId(int $index = 0) {
+    $idField = CoreUtil::getIdFieldName($this->entityName);
+    return $this->entityIds[$this->entityName][$index][$idField] ?? NULL;
+  }
+
+  /**
+   * Get records to be saved
+   * @return array
+   */
+  public function getRecords(): array {
+    return $this->records;
+  }
+
+  /**
+   * @param array $records
+   * @return $this
+   */
+  public function setRecords(array $records) {
+    $this->records = $records;
+    return $this;
+  }
+
+  /**
    * @param int $index
    * @param string $joinEntity
    * @param array $joinIds
