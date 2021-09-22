@@ -2558,6 +2558,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
    */
   protected function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
+    $row[$selectedfield . '_pristine'] = $value;
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield . '_hover'] = ts("%1 for this state.", [
       1 => $value,
