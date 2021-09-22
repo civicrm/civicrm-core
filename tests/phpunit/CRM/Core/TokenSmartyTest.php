@@ -58,6 +58,9 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
    * A template which uses token-data as part of a Smarty expression.
    */
   public function testTokenInSmarty() {
+    \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
+    $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
+
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_html' => '<p>{assign var="greeting" value="{contact.email_greeting}"}Greeting: {$greeting}!</p>'],
       ['contactId' => $this->contactId],
@@ -71,6 +74,20 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       []
     );
     $this->assertEquals('<p>Yes CID</p>', $rendered['msg_html']);
+
+    $rendered = CRM_Core_TokenSmarty::render(
+      ['msg_html' => '<p>{assign var="greeting" value="hey yo {contact.first_name|upper} {contact.last_name|upper} circa {domain.now|crmDate:"%m/%Y"}"}My Greeting: {$greeting}!</p>'],
+      ['contactId' => $this->contactId],
+      []
+    );
+    $this->assertEquals('<p>My Greeting: hey yo BOB ROBERTS circa 04/2022!</p>', $rendered['msg_html']);
+
+    $rendered = CRM_Core_TokenSmarty::render(
+      ['msg_html' => '<p>{assign var="greeting" value="hey yo {contact.first_name} {contact.last_name|upper} circa {domain.now|crmDate:"shortdate"}"}My Greeting: {$greeting|capitalize}!</p>'],
+      ['contactId' => $this->contactId],
+      []
+    );
+    $this->assertEquals('<p>My Greeting: Hey Yo Bob ROBERTS Circa 04/08/2022!</p>', $rendered['msg_html']);
   }
 
   /**
