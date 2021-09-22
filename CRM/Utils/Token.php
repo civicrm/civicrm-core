@@ -1304,6 +1304,8 @@ class CRM_Utils_Token {
    * ::replaceContactTokens() may need to be called after this method, to
    * replace tokens supplied from this method.
    *
+   * @deprecated
+   *
    * @param string $tokenString
    * @param array $contactDetails
    * @param int $contactId
@@ -1315,73 +1317,11 @@ class CRM_Utils_Token {
     if (!$contactDetails && !$contactId) {
       return;
     }
-
-    // check if there are any tokens
-    $greetingTokens = self::getTokens($tokenString);
-
-    if (!empty($greetingTokens)) {
-      // first use the existing contact object for token replacement
-      if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
-      }
-
-      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
-      // check if there are any unevaluated tokens
-      $greetingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, means there are few tokens which are not
-      // evaluated, like custom data etc
-      // so retrieve it from database
-      if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
-        $greetingsReturnProperties = array_flip(CRM_Utils_Array::value('contact', $greetingTokens));
-        $greetingsReturnProperties = array_fill_keys(array_keys($greetingsReturnProperties), 1);
-        $contactParams = ['contact_id' => $contactId];
-
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-
-        // again replace tokens
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
-          $greetingDetails,
-          TRUE,
-          $greetingTokens,
-          TRUE,
-          $escapeSmarty
-        );
-      }
-
-      // check if there are still any unevaluated tokens
-      $remainingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens)) {
-        // Fill the return properties array
-        $greetingTokens = $remainingTokens;
-        reset($greetingTokens);
-        $greetingsReturnProperties = [];
-        foreach ($greetingTokens as $value) {
-          $props = array_flip($value);
-          $props = array_fill_keys(array_keys($props), 1);
-          $greetingsReturnProperties = $greetingsReturnProperties + $props;
-        }
-        $contactParams = ['contact_id' => $contactId];
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-        // Prepare variables for calling replaceHookTokens
-        $categories = array_keys($greetingTokens);
-        [$contact] = $greetingDetails;
-        // Replace tokens defined in Hooks.
-        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
-      }
-    }
+    $tokenString = CRM_Core_TokenSmarty::render(['text' => $tokenString], [
+      'smarty' => (bool) FALSE,
+      'contactId' => $contactId,
+      'contact' => $contactDetails[0][$contactId] ?? [],
+    ])['text'];
   }
 
   /**
