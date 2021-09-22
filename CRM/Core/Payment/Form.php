@@ -222,13 +222,12 @@ class CRM_Core_Payment_Form {
     }
 
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
-      return NULL;
+      return;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID);
     self::addCommonFields($form, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
-    return (!empty($form->_paymentFields));
   }
 
   /**
