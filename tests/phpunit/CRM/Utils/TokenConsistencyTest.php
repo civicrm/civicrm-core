@@ -520,20 +520,23 @@ December 21st, 2007
   public function testDomainNow(): void {
     putenv('TIME_FUNC=frozen');
     CRM_Utils_Time::setTime('2021-09-18 23:58:00');
-    $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
-      'messageTemplate' => [
-        'msg_text' => '{domain.now|crmDate:short}',
-      ],
-    ])['text'];
-    $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
+    $modifiers = [
+      'shortdate' => '09/18/2021',
+    ];
+    foreach ($modifiers as $filter => $expected) {
+      $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => [
+          'msg_text' => '{domain.now|crmDate:' . $filter . '}',
+        ],
+      ])['text'];
+      $this->assertEquals('09/18/2021', $resolved);
+    }
     $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'messageTemplate' => [
         'msg_text' => '{domain.now}',
       ],
     ])['text'];
     $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
-
-    $b1 = 1;
   }
 
   /**

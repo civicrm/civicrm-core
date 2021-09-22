@@ -430,7 +430,7 @@ class TokenProcessor {
         if ($value instanceof \DateTime) {
           // @todo cludgey.
           require_once 'CRM/Core/Smarty/plugins/modifier.crmDate.php';
-          return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'));
+          return \smarty_modifier_crmDate($value->format('Y-m-d H:i:s'), $filter[1] ?? NULL);
         }
 
       default:
