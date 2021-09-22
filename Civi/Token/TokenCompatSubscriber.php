@@ -411,21 +411,18 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * Apply the various CRM_Utils_Token helpers.
    *
    * @param \Civi\Token\Event\TokenRenderEvent $e
-   *
-   * @throws \CRM_Core_Exception
    */
   public function onRender(TokenRenderEvent $e): void {
-    $isHtml = ($e->message['format'] === 'text/html');
     $useSmarty = !empty($e->context['smarty']);
+    $remainingTokens = \CRM_Utils_Token::getTokens($e->string);
 
-    if (!empty($e->context['contact'])) {
-      // @todo - remove this - it simply removes the last unresolved tokens before
-      // they break smarty.
-      // historically it was only called when context['contact'] so that is
-      // retained but it only works because it's almost always true.
-      $remainingTokens = array_keys(\CRM_Utils_Token::getTokens($e->string));
-      if (!empty($remainingTokens)) {
-        $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $remainingTokens);
+    if ($remainingTokens) {
+      foreach ($remainingTokens as $part1 => $part2) {
+        $e->string = preg_replace(
+          '/(?<!\{|\\\\)\{' . $part1 . '\.([\w]+(:|\.)?\w*(\-[\w\s]+)?)\}(?!\})/',
+          '',
+          $e->string
+        );
       }
     }
 

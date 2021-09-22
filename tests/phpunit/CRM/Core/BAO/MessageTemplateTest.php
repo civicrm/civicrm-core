@@ -398,6 +398,20 @@ emo
   }
 
   /**
+   * Test that unresolved tokens are not causing a fatal error in smarty.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testUnresolvedTokens(): void {
+    CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => [
+        'msg_text' => '{contact.blah}',
+      ],
+    ])['text'];
+  }
+
+  /**
    * Hook to advertise tokens.
    *
    * @param array $hookTokens
