@@ -67,7 +67,7 @@ abstract class SqlFunction extends SqlExpression {
         'suffix' => [],
       ];
       if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
-        $exprs = $this->captureExpressions($arg, $param['must_be']);
+        $exprs = $this->captureExpressions($arg, $param['must_be'], TRUE);
         if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
           throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
         }
@@ -91,98 +91,6 @@ abstract class SqlFunction extends SqlExpression {
       $dataType = static::$dataType;
     }
     return $value;
-  }
-
-  /**
-   * Shift a keyword off the beginning of the argument string and return it.
-   *
-   * @param array $keywords
-   *   Whitelist of keywords
-   * @param string $arg
-   * @return mixed|null
-   */
-  private function captureKeyword($keywords, &$arg) {
-    foreach ($keywords as $key) {
-      if (strpos($arg, $key . ' ') === 0) {
-        $arg = ltrim(substr($arg, strlen($key)));
-        return $key;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * Shifts 0 or more expressions off the argument string and returns them
-   *
-   * @param string $arg
-   * @param array $mustBe
-   * @return array
-   * @throws \API_Exception
-   */
-  private function captureExpressions(&$arg, $mustBe) {
-    $captured = [];
-    $arg = ltrim($arg);
-    while ($arg) {
-      $item = $this->captureExpression($arg);
-      $arg = ltrim(substr($arg, strlen($item)));
-      $expr = SqlExpression::convert($item, FALSE, $mustBe);
-      $this->fields = array_merge($this->fields, $expr->getFields());
-      $captured[] = $expr;
-      // Keep going if we have a comma indicating another expression follows
-      if (substr($arg, 0, 1) === ',') {
-        $arg = ltrim(substr($arg, 1));
-      }
-      else {
-        break;
-      }
-    }
-    return $captured;
-  }
-
-  /**
-   * Scans the beginning of a string for an expression; stops when it hits delimiter
-   *
-   * @param $arg
-   * @return string
-   */
-  private function captureExpression($arg) {
-    $isEscaped = $quote = NULL;
-    $item = '';
-    $quotes = ['"', "'"];
-    $brackets = [
-      ')' => '(',
-    ];
-    $enclosures = array_fill_keys($brackets, 0);
-    foreach (str_split($arg) as $char) {
-      if (!$isEscaped && in_array($char, $quotes, TRUE)) {
-        // Open quotes - we'll ignore everything inside
-        if (!$quote) {
-          $quote = $char;
-        }
-        // Close quotes
-        elseif ($char === $quote) {
-          $quote = NULL;
-        }
-      }
-      if (!$quote) {
-        // Delineates end of expression
-        if (($char == ',' || $char == ' ') && !array_filter($enclosures)) {
-          return $item;
-        }
-        // Open brackets - we'll ignore delineators inside
-        if (isset($enclosures[$char])) {
-          $enclosures[$char]++;
-        }
-        // Close brackets
-        if (isset($brackets[$char]) && $enclosures[$brackets[$char]]) {
-          $enclosures[$brackets[$char]]--;
-        }
-      }
-      $item .= $char;
-      // We are escaping the next char if this is a backslash not preceded by an odd number of backslashes
-      $isEscaped = $char === '\\' && ((strlen($item) - strlen(rtrim($item, '\\'))) % 2);
-    }
-    return $item;
   }
 
   /**
