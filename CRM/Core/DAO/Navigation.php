@@ -250,7 +250,7 @@ class CRM_Core_DAO_Navigation extends CRM_Core_DAO {
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
           'where' => 'civicrm_navigation.icon',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_navigation',
           'entity' => 'Navigation',
           'bao' => 'CRM_Core_BAO_Navigation',

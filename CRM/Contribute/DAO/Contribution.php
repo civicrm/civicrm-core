@@ -611,7 +611,7 @@ class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO {
           'headerPattern' => '/cur(rency)?/i',
           'dataPattern' => '/^[A-Z]{3}$/i',
           'export' => TRUE,
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_contribution',
           'entity' => 'Contribution',
           'bao' => 'CRM_Contribute_BAO_Contribution',

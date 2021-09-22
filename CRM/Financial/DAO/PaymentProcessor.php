@@ -566,7 +566,7 @@ class CRM_Financial_DAO_PaymentProcessor extends CRM_Core_DAO {
           'title' => ts('Accepted Credit Cards'),
           'description' => ts('array of accepted credit card types'),
           'where' => 'civicrm_payment_processor.accepted_credit_cards',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_payment_processor',
           'entity' => 'PaymentProcessor',
           'bao' => 'CRM_Financial_BAO_PaymentProcessor',

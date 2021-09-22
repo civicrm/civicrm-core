@@ -491,7 +491,7 @@ class CRM_Grant_DAO_Grant extends CRM_Core_DAO {
           'title' => ts('Financial Type ID'),
           'description' => ts('FK to Financial Type.'),
           'where' => 'civicrm_grant.financial_type_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_grant',
           'entity' => 'Grant',
           'bao' => 'CRM_Grant_BAO_Grant',

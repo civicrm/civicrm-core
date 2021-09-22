@@ -378,7 +378,7 @@ class CRM_Pledge_DAO_Pledge extends CRM_Core_DAO {
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
           'where' => 'civicrm_pledge.currency',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_pledge',
           'entity' => 'Pledge',
           'bao' => 'CRM_Pledge_BAO_Pledge',

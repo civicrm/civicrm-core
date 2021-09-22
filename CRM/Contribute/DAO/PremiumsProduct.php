@@ -176,7 +176,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'title' => ts('Financial Type ID'),
           'description' => ts('FK to Financial Type.'),
           'where' => 'civicrm_premiums_product.financial_type_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',

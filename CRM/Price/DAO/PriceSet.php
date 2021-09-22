@@ -337,7 +337,7 @@ class CRM_Price_DAO_PriceSet extends CRM_Core_DAO {
           'title' => ts('Financial Type ID'),
           'description' => ts('FK to Financial Type(for membership price sets only).'),
           'where' => 'civicrm_price_set.financial_type_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_price_set',
           'entity' => 'PriceSet',
           'bao' => 'CRM_Price_BAO_PriceSet',

@@ -338,7 +338,7 @@ class CRM_Contribute_DAO_ContributionRecur extends CRM_Core_DAO {
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
           'where' => 'civicrm_contribution_recur.currency',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_contribution_recur',
           'entity' => 'ContributionRecur',
           'bao' => 'CRM_Contribute_BAO_ContributionRecur',

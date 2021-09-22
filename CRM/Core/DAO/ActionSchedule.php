@@ -763,7 +763,7 @@ class CRM_Core_DAO_ActionSchedule extends CRM_Core_DAO {
           'title' => ts('Record Activity for Reminder?'),
           'description' => ts('Record Activity for this reminder?'),
           'where' => 'civicrm_action_schedule.record_activity',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_action_schedule',
           'entity' => 'ActionSchedule',
           'bao' => 'CRM_Core_BAO_ActionSchedule',

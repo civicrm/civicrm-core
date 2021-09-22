@@ -355,7 +355,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Case ID'),
           'description' => ts('FK to civicrm_case'),
           'where' => 'civicrm_relationship.case_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
