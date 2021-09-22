@@ -171,20 +171,23 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   public function testRenderLocalizedSmarty() {
+    \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
+    $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
+    $this->dispatcher->addSubscriber(new \CRM_Core_DomainTokens());
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'smarty' => TRUE,
     ]);
-    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts}', 'text/plain');
+    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts} {domain.now|crmDate:"%B"}', 'text/plain');
     $p->addRow([]);
     $p->addRow(['locale' => 'fr_FR']);
     $p->addRow(['locale' => 'es_MX']);
 
     $expectText = [
-      'Yes No',
-      'Oui Non',
-      'Sí No',
+      'Yes No April',
+      'Oui Non Avril',
+      'Sí No Abril',
     ];
 
     $rowCount = 0;
