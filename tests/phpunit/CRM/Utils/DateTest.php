@@ -306,4 +306,22 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ], $date);
   }
 
+  public function testLocalizeConsts() {
+    $expect['en_US'] = ['Jan', 'Tue', 'March', 'Thursday'];
+    $expect['fr_FR'] = ['janv.', 'mar.', 'Mars', 'jeudi'];
+    $expect['es_MX'] = ['ene', 'mar', 'Marzo', 'jueves'];
+
+    foreach ($expect as $lang => $expectNames) {
+      $useLocale = CRM_Utils_AutoClean::swapLocale($lang);
+      $actualNames = [
+        CRM_Utils_Date::getAbbrMonthNames()[1],
+        CRM_Utils_Date::getAbbrWeekdayNames()[2],
+        CRM_Utils_Date::getFullMonthNames()[3],
+        CRM_Utils_Date::getFullWeekdayNames()[4],
+      ];
+      $this->assertEquals($expectNames, $actualNames, "Check temporal names in $lang");
+      unset($useLocale);
+    }
+  }
+
 }
