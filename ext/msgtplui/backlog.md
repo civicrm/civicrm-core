@@ -47,16 +47,14 @@
 [x] - move CaseAct into `tests/`
 
 [x] contribution recur wf msg
+[x] msgtplui - allow other/non-UI languages (or maybe override/different setting)
+[x] msgtplui - better failure when no example-data available
+[x] date and money formatting - design
+[x] date and money formatting - impl
 
 = near =
 
-[~] date and money formatting - design
-[~] date and money formatting - impl
-
-[ ] msgtplui - allow other/non-UI languages (or maybe override/different setting)
-[ ] msgtplui - better failure when no example-data available
 [ ] submit msgtplui as hidden ext
-
 [ ] generate wf boilerplate
 
 = mid =
