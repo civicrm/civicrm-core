@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Token;
 
+use Civi\Test\Invasive;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -28,6 +29,36 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'onListTokens' => 0,
       'onEvalTokens' => 0,
     ];
+  }
+
+  /**
+   * The visitTokens() method is internal - but it is important basis for other methods.
+   * Specifically, it parses all token expressions and invokes a callback for each.
+   *
+   * Ensure these callbacks get the expected data (with various quirky notations).
+   */
+  public function testVisitTokens() {
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+    ]);
+    $examples = [
+      '{foo.bar}' => ['foo', 'bar', NULL],
+      '{foo.bar|whiz}' => ['foo', 'bar', ['whiz']],
+      '{foo.bar|whiz:"bang"}' => ['foo', 'bar', ['whiz', 'bang']],
+      '{love.shack|place:"bang":"b@ng, on +he/([do0r])?!"}' => ['love', 'shack', ['place', 'bang', 'b@ng, on +he/([do0r])?!']],
+    ];
+    foreach ($examples as $input => $expected) {
+      array_unshift($expected, $input);
+      $log = [];
+      Invasive::call([$p, 'visitTokens'], [
+        $input,
+        function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$log) {
+          $log[] = [$fullToken, $entity, $field, $modifier];
+        },
+      ]);
+      $this->assertEquals(1, count($log), "Should receive one callback on expression: $input");
+      $this->assertEquals($expected, $log[0]);
+    }
   }
 
   /**

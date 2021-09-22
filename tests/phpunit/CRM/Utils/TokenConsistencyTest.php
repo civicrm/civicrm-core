@@ -522,14 +522,15 @@ December 21st, 2007
     CRM_Utils_Time::setTime('2021-09-18 23:58:00');
     $modifiers = [
       'shortdate' => '09/18/2021',
+      '%B %Y' => 'September 2021',
     ];
     foreach ($modifiers as $filter => $expected) {
       $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => [
-          'msg_text' => '{domain.now|crmDate:' . $filter . '}',
+          'msg_text' => '{domain.now|crmDate:"' . $filter . '"}',
         ],
       ])['text'];
-      $this->assertEquals('09/18/2021', $resolved);
+      $this->assertEquals($expected, $resolved);
     }
     $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
       'messageTemplate' => [
@@ -537,6 +538,19 @@ December 21st, 2007
       ],
     ])['text'];
     $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
+
+    // This example is malformed - no quotes
+    try {
+      $resolved = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => [
+          'msg_text' => '{domain.now|crmDate:shortdate}',
+        ],
+      ])['text'];
+      $this->fail("Expected unquoted parameter to fail");
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertRegExp(';Malformed token param;', $e->getMessage());
+    }
   }
 
   /**

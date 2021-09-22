@@ -32,6 +32,26 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['extra' => ['foo' => 'foobar']]
     );
     $this->assertEquals('First name is Bob. ExtraFoo is foobar.', $rendered['msg_subject']);
+
+    try {
+      $modifiers = [
+        '|crmDate:"shortdate"' => '02/01/2020',
+        '|crmDate:"%B %Y"' => 'February 2020',
+        '|crmDate' => 'February 1st, 2020  3:04 AM',
+      ];
+      foreach ($modifiers as $modifier => $expected) {
+        CRM_Utils_Time::setTime('2020-02-01 03:04:05');
+        $rendered = CRM_Core_TokenSmarty::render(
+          ['msg_subject' => "Now is the token, {domain.now$modifier}! No, now is the smarty-pants, {\$extra.now$modifier}!"],
+          ['contactId' => $this->contactId],
+          ['extra' => ['now' => '2020-02-01 03:04:05']]
+        );
+        $this->assertEquals("Now is the token, $expected! No, now is the smarty-pants, $expected!", $rendered['msg_subject']);
+      }
+    }
+    finally {
+      \CRM_Utils_Time::resetTime();
+    }
   }
 
   /**

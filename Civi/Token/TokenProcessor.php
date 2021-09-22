@@ -387,13 +387,29 @@ class TokenProcessor {
   }
 
   private function visitTokens(string $expression, callable $callback): string {
-    // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:bang}'
+    // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:"bang"}', '{foo.bar|whiz:"bang":"bang"}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
-    $tokRegex = '([\w]+)\.([\w:\.]+)';
-    $filterRegex = '(\w+:?\w*)';
+    $tokRegex = '([\w]+)\.([\w:\.]+)'; /* EX: 'foo.bar' in '{foo.bar|whiz:"bang":"bang"}' */
+    $argRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* EX: ':"bang":"bang"' in '{foo.bar|whiz:"bang":"bang"}' */
+    // Debatable: Maybe relax to this: $argRegex = ':[^{}\n]*'; /* EX: ':"bang":"bang"' in '{foo.bar|whiz:"bang":"bang"}' */
+    $filterRegex = "(\w+(?:$argRegex)?)"; /* EX: 'whiz:"bang"' in '{foo.bar|whiz:"bang"' */
     return preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", function($m) use ($callback) {
-      $filterParts = isset($m[3]) ? explode(':', $m[3]) : NULL;
+      $filterParts = NULL;
+      if (isset($m[3])) {
+        $filterParts = [];
+        $enqueue = function($m) use (&$filterParts) {
+          $filterParts[] = $m[1];
+          return '';
+        };
+        $unmatched = preg_replace_callback_array([
+          '/^(\w+)/' => $enqueue,
+          '/:"([^"]+)"/' => $enqueue,
+        ], $m[3]);
+        if ($unmatched) {
+          throw new \CRM_Core_Exception("Malformed token parameters (" . $m[0] . ")");
+        }
+      }
       return $callback($m[0] ?? NULL, $m[1] ?? NULL, $m[2] ?? NULL, $filterParts);
     }, $expression);
   }
