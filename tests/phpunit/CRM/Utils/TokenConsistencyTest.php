@@ -10,6 +10,10 @@
  */
 
 use Civi\Token\TokenProcessor;
+use Civi\Api4\LocBlock;
+use Civi\Api4\Email;
+use Civi\Api4\Phone;
+use Civi\Api4\Address;
 
 /**
  * CRM_Utils_TokenConsistencyTest
@@ -451,6 +455,32 @@ Check';
    *
    * @return string
    */
+  protected function getExpectedEventTokenOutput(): string {
+    return '
+1
+Annual CiviCRM meet
+October 21st, 2008 12:00 AM
+October 23rd, 2008 12:00 AM
+Conference
+If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
+event@example.com
+456 789
+event description
+15 Walton St
+Emerald City, Maine 90210
+
+$ 50.00
+' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&amp;reset=1&amp;id=1
+' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&amp;reset=1&amp;id=1
+
+my field';
+  }
+
+  /**
+   * Get expected output from token parsing.
+   *
+   * @return string
+   */
   protected function getExpectedMembershipTokenOutput(): string {
     return '
 Expired
@@ -532,6 +562,9 @@ December 21st, 2007
    * Test that domain tokens are consistently rendered.
    */
   public function testEventTokenConsistency(): void {
+    $mut = new CiviMailUtils($this);
+    $this->setupParticipantScheduledReminder();
+
     $tokens = CRM_Core_SelectValues::eventTokens();
     $this->assertEquals($this->getEventTokens(), $tokens);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
@@ -540,6 +573,57 @@ December 21st, 2007
       'schema' => ['eventId'],
     ]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $expected = $this->getExpectedEventTokenOutput();
+    $mut->checkMailLog([$expected]);
+  }
+
+  /**
+   * Set up scheduled reminder for participants.
+   *
+   * @throws \API_Exception
+   */
+  public function setupParticipantScheduledReminder(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
+    $emailID = Email::create()->setValues(['email' => 'event@example.com'])->execute()->first()['id'];
+    $addressID = Address::create()->setValues([
+      'street_address' => '15 Walton St',
+      'supplemental_address_1' => 'up the road',
+      'city' => 'Emerald City',
+      'state_province_id:label' => 'Maine',
+      'postal_code' => 90210,
+    ])->execute()->first()['id'];
+    $phoneID = Phone::create()->setValues(['phone' => '456 789'])->execute()->first()['id'];
+
+    $locationBlockID = LocBlock::save(FALSE)->setRecords([
+      [
+        'email_id' => $emailID,
+        'address_id' => $addressID,
+        'phone_id' => $phoneID,
+      ],
+    ])->execute()->first()['id'];
+    $event = $this->eventCreate([
+      'description' => 'event description',
+      $this->getCustomFieldName('text') => 'my field',
+      'loc_block_id' => $locationBlockID,
+    ]);
+    // Create an unrelated participant record so that the ids don't match.
+    // this prevents things working just because the id 'happens to be valid'
+    $this->participantCreate(['register_date' => '2020-01-01', 'event_id' => $event['id']]);
+    $this->participantCreate(['event_id' => $event['id'], 'fee_amount' => 50]);
+    CRM_Utils_Time::setTime('2007-02-20 15:00:00');
+    $this->callAPISuccess('action_schedule', 'create', [
+      'title' => 'job',
+      'subject' => 'job',
+      'entity_value' => 1,
+      'mapping_id' => 2,
+      'start_action_date' => 'register_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'after',
+      'start_action_unit' => 'day',
+      'body_html' => implode("\n", array_keys($this->getEventTokens())),
+    ]);
   }
 
   /**
@@ -563,6 +647,7 @@ December 21st, 2007
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
       '{event.balance}' => 'Event Balance',
+      '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }
 
