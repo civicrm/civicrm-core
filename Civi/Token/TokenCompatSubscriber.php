@@ -158,28 +158,28 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       'display_name' => 'Display Name',
       'nick_name' => 'Nickname',
       'image_URL' => 'Image Url',
-      'preferred_communication_method' => 'Preferred Communication Method',
-      'preferred_language' => 'Preferred Language',
-      'preferred_mail_format' => 'Preferred Mail Format',
+      'preferred_communication_method:label' => 'Preferred Communication Method',
+      'preferred_language:label' => 'Preferred Language',
+      'preferred_mail_format:label' => 'Preferred Mail Format',
       'hash' => 'Contact Hash',
-      'contact_source' => 'Contact Source',
+      'source' => 'Contact Source',
       'first_name' => 'First Name',
       'middle_name' => 'Middle Name',
       'last_name' => 'Last Name',
-      'individual_prefix' => 'Individual Prefix',
-      'individual_suffix' => 'Individual Suffix',
+      'prefix_id:label' => 'Individual Prefix',
+      'suffix_id:label' => 'Individual Suffix',
       'formal_title' => 'Formal Title',
-      'communication_style' => 'Communication Style',
+      'communication_style_id:label' => 'Communication Style',
       'job_title' => 'Job Title',
-      'gender' => 'Gender ID',
+      'gender_id:label' => 'Gender ID',
       'birth_date' => 'Birth Date',
       'current_employer_id' => 'Current Employer ID',
-      'contact_is_deleted' => 'Contact is in Trash',
+      'is_deleted:label' => 'Contact is in Trash',
       'created_date' => 'Created Date',
       'modified_date' => 'Modified Date',
-      'addressee' => 'Addressee',
-      'email_greeting' => 'Email Greeting',
-      'postal_greeting' => 'Postal Greeting',
+      'addressee_display' => 'Addressee',
+      'email_greeting_display' => 'Email Greeting',
+      'postal_greeting_display' => 'Postal Greeting',
       'current_employer' => 'Current Employer',
       'location_type' => 'Location Type',
       'address_id' => 'Address ID',
@@ -216,7 +216,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       'world_region' => 'World Region',
       'url' => 'Website',
       'checksum' => 'Checksum',
-      'contact_id' => 'Internal Contact ID',
+      'id' => 'Internal Contact ID',
     ];
   }
 
@@ -348,10 +348,39 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         }
         else {
           $row->format('text/html')
-            ->tokens('contact', $token, $row->context['contact'][$token] ?? '');
+            ->tokens('contact', $token, $this->getFieldValue($row, $token));
         }
       }
     }
+  }
+
+  /**
+   * Get the field value.
+   *
+   * @param \Civi\Token\TokenRow $row
+   * @param string $field
+   * @return string|int
+   */
+  protected function getFieldValue(TokenRow $row, string $field) {
+    $entityName = 'contact';
+    if (isset($this->getDeprecatedTokens()[$field])) {
+      // Check the non-deprecated location first, fall back to deprecated
+      // this is important for the greetings because - they are weird in the query object.
+      $possibilities = [$this->getDeprecatedTokens()[$field], $field];
+    }
+    else {
+      $possibilities = [$field];
+      if (in_array($field, $this->getDeprecatedTokens(), TRUE)) {
+        $possibilities[] = array_search($field, $this->getDeprecatedTokens(), TRUE);
+      }
+    }
+
+    foreach ($possibilities as $possibility) {
+      if (isset($row->context[$entityName][$possibility])) {
+        return $row->context[$entityName][$possibility];
+      }
+    }
+    return '';
   }
 
   /**
@@ -458,18 +487,15 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   protected function getContact(int $contactId, array $requiredFields, bool $getAll = FALSE): array {
     $returnProperties = array_fill_keys($requiredFields, 1);
-    $mappedFields = [
-      'email_greeting' => 'email_greeting_display',
-      'postal_greeting' => 'postal_greeting_display',
-      'addressee' => 'addressee_display',
-    ];
+    $mappedFields = array_flip($this->getDeprecatedTokens());
+
     if (!empty($returnProperties['checksum'])) {
       $returnProperties['hash'] = 1;
     }
 
-    foreach ($mappedFields as $tokenName => $realName) {
+    foreach ($mappedFields as $tokenName => $api3Name) {
       if (in_array($tokenName, $requiredFields, TRUE)) {
-        $returnProperties[$realName] = 1;
+        $returnProperties[$api3Name] = 1;
       }
     }
     if ($getAll) {
@@ -483,8 +509,14 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     [$contact] = \CRM_Contact_BAO_Query::apiQuery($params, $returnProperties ?? NULL);
     //CRM-4524
     $contact = reset($contact);
-    foreach ($mappedFields as $tokenName => $realName) {
-      $contact[$tokenName] = $contact[$realName] ?? '';
+    foreach ($mappedFields as $tokenName => $apiv3Name) {
+      // it would be set already with the right value for a greeting token
+      // the query object returns the db value for email_greeting_display
+      // and a numeric value for email_greeting if you put email_greeting
+      // in the return properties.
+      if (!isset($contact[$tokenName])) {
+        $contact[$tokenName] = $contact[$apiv3Name] ?? '';
+      }
     }
 
     //update value of custom field token
@@ -559,6 +591,36 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       'contact_is_deleted' => 1,
       'preferred_communication_method' => 1,
       'preferred_language' => 1,
+    ];
+  }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * We can remove from the following places
+   * - scheduled reminders
+   * - add to 'blocked' on pdf letter & email
+   *
+   * & then at some point start issuing warnings for them
+   * but contact tokens are pretty central so it might be
+   * a bit drawn out.
+   *
+   * @return string[]
+   *   Keys are deprecated tokens and values are their replacements.
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'individual_prefix' => 'prefix_id:label',
+      'individual_suffix' => 'suffix_id:label',
+      'gender' => 'gender_id:label',
+      'communication_style' => 'communication_style_id:label',
+      'preferred_communication_method' => 'preferred_communication_method:label',
+      'email_greeting' => 'email_greeting_display',
+      'postal_greeting' => 'postal_greeting_display',
+      'addressee' => 'addressee_display',
+      'contact_id' => 'id',
+      'contact_source' => 'source',
+      'contact_is_deleted' => 'is_deleted:label',
     ];
   }
 

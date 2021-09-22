@@ -2,6 +2,7 @@
 
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\MessageTemplate;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -110,7 +111,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 
-      \Civi\Api4\MessageTemplate::update()
+      MessageTemplate::update()
         ->addWhere('workflow_name', '=', 'case_activity')
         ->addWhere('is_reserved', '=', 0)
         ->setValues([
@@ -147,7 +148,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     CRM_Core_Transaction::create(TRUE)->run(function(CRM_Core_Transaction $tx) {
       $tx->rollback();
 
-      \Civi\Api4\MessageTemplate::update()
+      MessageTemplate::update()
         ->addWhere('workflow_name', '=', 'case_activity')
         ->addWhere('is_reserved', '=', 0)
         ->setValues([
@@ -327,12 +328,6 @@ London, 90210
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
 
-    // Compare with our token data.
-    unset($advertisedTokens['{important_stuff.favourite_emoticon}']);
-    foreach (array_keys($advertisedTokens) as $token) {
-      $this->assertArrayKeyExists(substr($token, 9, -1), $tokenData);
-    }
-
     CRM_Core_Smarty::singleton()->assign('pre_assigned_smarty', 'wee');
     // This string contains the 4 types of possible replaces just to be sure they
     // work in combination.
@@ -384,6 +379,36 @@ emo
     // reset time
     putenv('TIME_FUNC');
     CRM_Utils_Time::resetTime();
+  }
+
+  /**
+   * Test that old contact tokens still work, as we add new-style support.
+   */
+  public function testLegacyTokens(): void {
+    $contactID = $this->individualCreate(['gender_id' => 'Female', 'communication_style' => 1, 'preferred_communication_method' => 'Phone']);
+    $mappings = [
+      ['old' => '{contact.individual_prefix}', 'new' => '{contact.prefix_id:label}', 'output' => 'Mr.'],
+      ['old' => '{contact.individual_suffix}', 'new' => '{contact.suffix_id:label}', 'output' => 'II'],
+      ['old' => '{contact.gender}', 'new' => '{contact.gender_id:label}', 'output' => 'Female'],
+      ['old' => '{contact.communication_style}', 'new' => '{contact.communication_style_id:label}', 'output' => 'Formal'],
+      ['old' => '{contact.preferred_communication_method}', 'new' => '{contact.preferred_communication_method:label}', 'output' => 'Phone'],
+      ['old' => '{contact.contact_id}', 'new' => '{contact.id}', 'output' => $contactID],
+      ['old' => '{contact.email_greeting}', 'new' => '{contact.email_greeting_display}', 'output' => 'Dear Anthony'],
+      ['old' => '{contact.postal_greeting}', 'new' => '{contact.postal_greeting_display}', 'output' => 'Dear Anthony'],
+      ['old' => '{contact.addressee}', 'new' => '{contact.addressee_display}', 'output' => 'Mr. Anthony J. Anderson II'],
+    ];
+
+    foreach ($mappings as $mapping) {
+      foreach (['old', 'new'] as $type) {
+        $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([
+          'contactId' => $contactID,
+          'messageTemplate' => [
+            'msg_text' => $mapping[$type],
+          ],
+        ])['text'];
+        $this->assertEquals($mapping['output'], $messageContent, 'could not resolve ' . $mapping[$type]);
+      }
+    }
   }
 
   /**
@@ -485,28 +510,28 @@ emo
       '{contact.display_name}' => 'Display Name',
       '{contact.nick_name}' => 'Nickname',
       '{contact.image_URL}' => 'Image Url',
-      '{contact.preferred_communication_method}' => 'Preferred Communication Method',
-      '{contact.preferred_language}' => 'Preferred Language',
-      '{contact.preferred_mail_format}' => 'Preferred Mail Format',
+      '{contact.preferred_communication_method:label}' => 'Preferred Communication Method',
+      '{contact.preferred_language:label}' => 'Preferred Language',
+      '{contact.preferred_mail_format:label}' => 'Preferred Mail Format',
       '{contact.hash}' => 'Contact Hash',
-      '{contact.contact_source}' => 'Contact Source',
+      '{contact.source}' => 'Contact Source',
       '{contact.first_name}' => 'First Name',
       '{contact.middle_name}' => 'Middle Name',
       '{contact.last_name}' => 'Last Name',
-      '{contact.individual_prefix}' => 'Individual Prefix',
-      '{contact.individual_suffix}' => 'Individual Suffix',
+      '{contact.prefix_id:label}' => 'Individual Prefix',
+      '{contact.suffix_id:label}' => 'Individual Suffix',
       '{contact.formal_title}' => 'Formal Title',
-      '{contact.communication_style}' => 'Communication Style',
+      '{contact.communication_style_id:label}' => 'Communication Style',
       '{contact.job_title}' => 'Job Title',
-      '{contact.gender}' => 'Gender ID',
+      '{contact.gender_id:label}' => 'Gender ID',
       '{contact.birth_date}' => 'Birth Date',
       '{contact.current_employer_id}' => 'Current Employer ID',
-      '{contact.contact_is_deleted}' => 'Contact is in Trash',
+      '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
       '{contact.modified_date}' => 'Modified Date',
-      '{contact.addressee}' => 'Addressee',
-      '{contact.email_greeting}' => 'Email Greeting',
-      '{contact.postal_greeting}' => 'Postal Greeting',
+      '{contact.addressee_display}' => 'Addressee',
+      '{contact.email_greeting_display}' => 'Email Greeting',
+      '{contact.postal_greeting_display}' => 'Postal Greeting',
       '{contact.current_employer}' => 'Current Employer',
       '{contact.location_type}' => 'Location Type',
       '{contact.address_id}' => 'Address ID',
@@ -556,7 +581,7 @@ emo
       '{contact.custom_12}' => 'Yes No :: Custom Group',
       '{contact.custom_3}' => 'Test Date :: Custom Group',
       '{contact.checksum}' => 'Checksum',
-      '{contact.contact_id}' => 'Internal Contact ID',
+      '{contact.id}' => 'Internal Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
     ];
   }
