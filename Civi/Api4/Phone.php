@@ -17,6 +17,8 @@ namespace Civi\Api4;
  *
  * Creating a new phone of a contact, requires at minimum a contact's ID and phone number
  *
+ * @ui_join_filters is_primary
+ *
  * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
