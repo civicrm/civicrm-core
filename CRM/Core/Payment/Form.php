@@ -211,8 +211,6 @@ class CRM_Core_Payment_Form {
    *   entering details but once again the issue is not back office but 'another user'.
    * @param int $paymentInstrumentID
    *   Payment instrument ID.
-   *
-   * @return bool
    */
   public static function buildPaymentForm(&$form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID = NULL) {
     //if the form has address fields assign to the template so the js can decide what billing fields to show
@@ -222,13 +220,12 @@ class CRM_Core_Payment_Form {
     }
 
     if (!empty($processor['object']) && $processor['object']->buildForm($form)) {
-      return NULL;
+      return;
     }
 
     self::setPaymentFieldsByProcessor($form, $processor, $billing_profile_id, $isBackOffice, $paymentInstrumentID);
     self::addCommonFields($form, $form->_paymentFields);
     self::addRules($form, $form->_paymentFields);
-    return (!empty($form->_paymentFields));
   }
 
   /**
