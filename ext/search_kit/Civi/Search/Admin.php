@@ -355,13 +355,20 @@ class Admin {
     foreach ($entities as $entity) {
       foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
         $field = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['options'],
+          'select' => ['options', 'data_type'],
           'where' => [['name', '=', $fieldName]],
           'loadOptions' => ['name'],
         ])->first();
-        $value = isset($field['options'][0]) ? json_encode($field['options'][0]['name']) : '';
+        $value = '';
+        if ($field['data_type'] === 'Boolean') {
+          $value = TRUE;
+        }
+        elseif (isset($field['options'][0])) {
+          $fieldName .= ':name';
+          $value = json_encode($field['options'][0]['name']);
+        }
         $conditions[] = [
-          $alias . '.' . $fieldName . ($value ? ':name' : ''),
+          $alias . '.' . $fieldName,
           '=',
           $value,
         ];
