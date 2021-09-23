@@ -411,29 +411,17 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * Apply the various CRM_Utils_Token helpers.
    *
    * @param \Civi\Token\Event\TokenRenderEvent $e
-   *
-   * @throws \CRM_Core_Exception
    */
   public function onRender(TokenRenderEvent $e): void {
-    $isHtml = ($e->message['format'] === 'text/html');
     $useSmarty = !empty($e->context['smarty']);
-
-    if (!empty($e->context['contact'])) {
-      // @todo - remove this - it simply removes the last unresolved tokens before
-      // they break smarty.
-      // historically it was only called when context['contact'] so that is
-      // retained but it only works because it's almost always true.
-      $remainingTokens = array_keys(\CRM_Utils_Token::getTokens($e->string));
-      if (!empty($remainingTokens)) {
-        $e->string = \CRM_Utils_Token::replaceHookTokens($e->string, $e->context['contact'], $remainingTokens);
-      }
-    }
+    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function() {
+      // For historical consistency, we filter out unrecognized tokens.
+      return '';
+    });
 
     if ($useSmarty) {
       $smartyVars = [];
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
-        // Note: $e->row->tokens resolves event-based tokens (eg CRM_*_Tokens). But if the target token relies on the
-        // above bits (replaceGreetingTokens=>replaceContactTokens=>replaceHookTokens) then this lookup isn't sufficient.
         $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName));
       }
       \CRM_Core_Smarty::singleton()->pushScope($smartyVars);

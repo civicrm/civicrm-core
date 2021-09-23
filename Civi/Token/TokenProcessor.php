@@ -386,15 +386,37 @@ class TokenProcessor {
     return $event->string;
   }
 
-  private function visitTokens(string $expression, callable $callback): string {
+  /**
+   * Examine a token string and filter each token expression.
+   *
+   * @internal
+   *   This function is only intended for use within civicrm-core. The name/location/callback-signature may change.
+   * @param string $expression
+   *   Ex: 'Hello {foo.bar} and {whiz.bang|filter:"arg"}!'
+   * @param callable $callback
+   *   A function which visits (and substitutes) each token.
+   *   function(?string $fullToken, ?string $entity, ?string $field, ?array $modifier)
+   * @return string
+   */
+  public function visitTokens(string $expression, callable $callback): string {
     // Regex examples: '{foo.bar}', '{foo.bar|whiz}', '{foo.bar|whiz:"bang"}', '{foo.bar|whiz:"bang":"bang"}'
     // Regex counter-examples: '{foobar}', '{foo bar}', '{$foo.bar}', '{$foo.bar|whiz}', '{foo.bar|whiz{bang}}'
     // Key observations: Civi tokens MUST have a `.` and MUST NOT have a `$`. Civi filters MUST NOT have `{}`s or `$`s.
-    $tokRegex = '([\w]+)\.([\w:\.]+)'; /* EX: 'foo.bar' in '{foo.bar|whiz:"bang":"bang"}' */
-    $argRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* EX: ':"bang":"bang"' in '{foo.bar|whiz:"bang":"bang"}' */
-    // Debatable: Maybe relax to this: $argRegex = ':[^{}\n]*'; /* EX: ':"bang":"bang"' in '{foo.bar|whiz:"bang":"bang"}' */
-    $filterRegex = "(\w+(?:$argRegex)?)"; /* EX: 'whiz:"bang"' in '{foo.bar|whiz:"bang"' */
-    return preg_replace_callback(";\{$tokRegex(?:\|$filterRegex)?\};", function($m) use ($callback) {
+
+    static $fullRegex = NULL;
+    if ($fullRegex === NULL) {
+      // The regex is a bit complicated, we so break it down into fragments.
+      // Consider the example '{foo.bar|whiz:"bang":"bang"}'. Each fragment matches the following:
+
+      $tokenRegex = '([\w]+)\.([\w:\.]+)'; /* MATCHES: 'foo.bar' */
+      $filterArgRegex = ':[\w": %\-_()\[\]\+/#@!,\.\?]*'; /* MATCHES: ':"bang":"bang"' */
+      // Key rule of filterArgRegex is to prohibit '{}'s because they may parse ambiguously. So you *might* relax it to:
+      // $filterArgRegex = ':[^{}\n]*'; /* MATCHES: ':"bang":"bang"' */
+      $filterNameRegex = "\w+"; /* MATCHES: 'whiz' */
+      $filterRegex = "\|($filterNameRegex(?:$filterArgRegex)?)"; /* MATCHES: '|whiz:"bang":"bang"' */
+      $fullRegex = ";\{$tokenRegex(?:$filterRegex)?\};";
+    }
+    return preg_replace_callback($fullRegex, function($m) use ($callback) {
       $filterParts = NULL;
       if (isset($m[3])) {
         $filterParts = [];

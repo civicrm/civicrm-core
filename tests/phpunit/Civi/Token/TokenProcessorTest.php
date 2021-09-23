@@ -1,7 +1,6 @@
 <?php
 namespace Civi\Token;
 
-use Civi\Test\Invasive;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -45,19 +44,23 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       '{foo.bar}' => ['foo', 'bar', NULL],
       '{foo.bar|whiz}' => ['foo', 'bar', ['whiz']],
       '{foo.bar|whiz:"bang"}' => ['foo', 'bar', ['whiz', 'bang']],
-      '{love.shack|place:"bang":"b@ng, on +he/([do0r])?!"}' => ['love', 'shack', ['place', 'bang', 'b@ng, on +he/([do0r])?!']],
+      '{FoO.bAr|whiz:"bang"}' => ['FoO', 'bAr', ['whiz', 'bang']],
+      '{oo_f.ra_b|b_52:"bang":"b@ng, on +he/([do0r])?!"}' => ['oo_f', 'ra_b', ['b_52', 'bang', 'b@ng, on +he/([do0r])?!']],
+      '{foo.bar.whiz}' => ['foo', 'bar.whiz', NULL],
+      '{foo.bar.whiz|bang}' => ['foo', 'bar.whiz', ['bang']],
+      '{foo.bar:label}' => ['foo', 'bar:label', NULL],
+      '{foo.bar:label|truncate:"10"}' => ['foo', 'bar:label', ['truncate', '10']],
     ];
     foreach ($examples as $input => $expected) {
       array_unshift($expected, $input);
       $log = [];
-      Invasive::call([$p, 'visitTokens'], [
-        $input,
-        function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$log) {
-          $log[] = [$fullToken, $entity, $field, $modifier];
-        },
-      ]);
+      $filtered = $p->visitTokens($input, function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$log) {
+        $log[] = [$fullToken, $entity, $field, $modifier];
+        return 'Replaced!';
+      });
       $this->assertEquals(1, count($log), "Should receive one callback on expression: $input");
       $this->assertEquals($expected, $log[0]);
+      $this->assertEquals('Replaced!', $filtered);
     }
   }
 

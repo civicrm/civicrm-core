@@ -140,15 +140,16 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   }
 
   /**
+   * Unknown tokens are removed at the very end.
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function testCreateDocumentUnknownTokens(): void {
     $activity = $this->activityCreate();
-    $html_message = 'Unknown token: {activity.something_unknown}';
+    $html_message = 'Unknown token: ';
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
-    // Unknown tokens should be left alone
     $this->assertEquals($html_message, $output[0]);
   }
 
