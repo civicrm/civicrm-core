@@ -209,6 +209,10 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       '{case.case_type_id}' => '{case.case_type_id:label}',
       '{membership.status}' => '{membership.status_id:label}',
       '{membership.type}' => '{membership.membership_type_id:label}',
+      '{contribution.campaign}' => '{contribution.campaign_id:label}',
+      '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
+      '{contribution.contribution_id}' => '{contribution.id}',
+      '{contribution.contribution_source}' => '{contribution.source}',
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {
