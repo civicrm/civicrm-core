@@ -432,7 +432,7 @@ class TokenProcessor {
       $filter = ['crmDate'];
     }
 
-    switch ($filter[0]) {
+    switch ($filter[0] ?? NULL) {
       case NULL:
         return $value;
 
