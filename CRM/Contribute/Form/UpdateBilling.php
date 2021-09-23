@@ -197,8 +197,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       list($key) = explode('-', $key);
       $processorParams[$key] = $val;
     }
-    $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
-    $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
+    $processorParams['billingStateProvince'] = $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
+    $processorParams['billingCountry'] = $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
     $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
     $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
     $processorParams['recurProcessorID'] = $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
