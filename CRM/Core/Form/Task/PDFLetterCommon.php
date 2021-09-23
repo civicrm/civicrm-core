@@ -377,19 +377,12 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    *   The values submitted through the form
    *
    * @deprecated
-   *
-   * @return array
-   *   If formValues['is_unit_test'] is true, otherwise outputs document to browser
    */
-  public static function renderFromRows($rows, $msgPart, $formValues) {
+  public static function renderFromRows($rows, $msgPart, $formValues): void {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $html = [];
     foreach ($rows as $row) {
       $html[] = $row->render($msgPart);
-    }
-
-    if (!empty($formValues['is_unit_test'])) {
-      return $html;
     }
 
     if (!empty($html)) {

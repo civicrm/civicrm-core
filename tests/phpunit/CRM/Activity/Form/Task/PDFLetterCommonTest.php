@@ -48,8 +48,12 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->assertEquals(array_merge($this->getActivityTokens(), CRM_Core_SelectValues::domainTokens()), $tokenProcessor->listTokens());
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
-    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
-
+    try {
+      $output = $form->createDocument([$activity['id']], $html_message, []);
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $output = $e->errorData['html'];
+    }
     // Check some basic fields
     foreach ($data as $line) {
       $this->assertStringContainsString("\n" . $line[1] . "\n", $output[0]);
@@ -100,7 +104,12 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $html_message = "Custom: {activity.$cf}";
     $activityIds = CRM_Utils_Array::collect('id', $activities);
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
-    $output = $form->createDocument($activityIds, $html_message, ['is_unit_test' => TRUE]);
+    try {
+      $output = $form->createDocument($activityIds, $html_message, []);
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $output = $e->errorData['html'];
+    }
     // Should have one row of output per activity
     $this->assertCount(count($activities), $output);
 
@@ -132,7 +141,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
-    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
+    $output = $form->createDocument([$activity['id']], $html_message, []);
 
     foreach ($data as $line) {
       $this->assertContains("\n" . $line[1] . "\n", $output[0]);
@@ -147,10 +156,19 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    */
   public function testCreateDocumentUnknownTokens(): void {
     $activity = $this->activityCreate();
-    $html_message = 'Unknown token: ';
-    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
-    $output = $form->createDocument([$activity['id']], $html_message, ['is_unit_test' => TRUE]);
-    $this->assertEquals($html_message, $output[0]);
+    $html_message = 'Unknown token:{activity.something_unknown}';
+    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF', ['document_type' => 'pdf']);
+    try {
+      $form->createDocument([$activity['id']], $html_message, []);
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $html = $e->errorData['html'];
+      $this->assertStringContainsString('<div id="crm-container">
+Unknown token:
+    </div>', $html);
+      return;
+    }
+    $this->fail('should be unreachable');
   }
 
 }
