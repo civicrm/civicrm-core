@@ -268,7 +268,12 @@ class PropertyBag implements \ArrayAccess {
     if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
       && isset(static::$propMap[substr($prop, 0, -2)])
     ) {
-      $newName = substr($prop, 0, -2);
+      $billingAddressProp = substr($prop, 0, -2);
+      $newName = static::$propMap[$billingAddressProp] ?? NULL;
+      if ($newName === TRUE) {
+        // Good, modern name.
+        return $billingAddressProp;
+      }
     }
 
     if ($newName === NULL) {
