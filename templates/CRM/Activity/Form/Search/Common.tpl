@@ -8,8 +8,13 @@
  +--------------------------------------------------------------------+
 *}
 <tr>
-  <td colspan="2">
+  <td>
     {$form.activity_role.html}
+    </span>
+  </td>
+    <td>
+    <label>{$form.contact_id.label}</label><br />
+    {$form.contact_id.html}
     </span>
   </td>
 </tr>

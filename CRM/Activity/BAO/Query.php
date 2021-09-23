@@ -438,6 +438,7 @@ class CRM_Activity_BAO_Query {
     $form->addSearchFieldMetadata(['Activity' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
 
+    $form->add('number', 'contact_id', ts('Contact ID'), array('class' => 'four', 'min' => 1));
     $followUpActivity = [
       1 => ts('Yes'),
       2 => ts('No'),
