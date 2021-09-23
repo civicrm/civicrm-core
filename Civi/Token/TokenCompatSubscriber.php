@@ -414,17 +414,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    */
   public function onRender(TokenRenderEvent $e): void {
     $useSmarty = !empty($e->context['smarty']);
-    $remainingTokens = \CRM_Utils_Token::getTokens($e->string);
-
-    if ($remainingTokens) {
-      foreach ($remainingTokens as $part1 => $part2) {
-        $e->string = preg_replace(
-          '/(?<!\{|\\\\)\{' . $part1 . '\.([\w]+(:|\.)?\w*(\-[\w\s]+)?)\}(?!\})/',
-          '',
-          $e->string
-        );
-      }
-    }
+    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function() {
+      // For historical consistency, we filter out unrecognized tokens.
+      return '';
+    });
 
     if ($useSmarty) {
       $smartyVars = [];
