@@ -288,6 +288,7 @@ No
         'start_date' => '2021-07-23 15:39:20',
         'end_date' => '2021-07-26 18:07:20',
         'cancel_date' => '2021-08-19 09:12:45',
+        'next_sched_contribution_date' => '2021-09-08',
         'cancel_reason' => 'Because',
         'amount' => 5990.99,
         'currency' => 'EUR',
@@ -340,9 +341,9 @@ inv123
 2
 Yes
 15
-
+September 8th, 2021
 0
-January 3rd, 2020 12:00 AM
+January 3rd, 2020
 Yes
 1
 2
@@ -602,6 +603,8 @@ December 21st, 2007
 
   /**
    * Test that domain tokens are consistently rendered.
+   *
+   * @throws \API_Exception
    */
   public function testEventTokenConsistency(): void {
     $mut = new CiviMailUtils($this);

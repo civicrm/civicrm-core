@@ -63,7 +63,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         \CRM_Utils_Money::format($fieldValue, $this->getCurrency($row)));
     }
     if ($this->isDateField($field)) {
-      return $row->format('text/plain')->tokens($entity, $field, \CRM_Utils_Date::customFormat($fieldValue));
+      try {
+        return $row->format('text/plain')
+          ->tokens($entity, $field, new DateTime($fieldValue));
+      }
+      catch (Exception $e) {
+        Civi::log()->info('invalid date token');
+      }
     }
     $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
   }

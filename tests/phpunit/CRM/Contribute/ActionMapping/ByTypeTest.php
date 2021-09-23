@@ -297,13 +297,13 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
       'first name = Alice',
-      'receive_date = February 1st, 2015 12:00 AM',
+      'receive_date = February 1st, 2015',
       'contribution status id = 1',
       'new style status = Completed',
       'new style label = Completed Label**',
       'id ' . $this->ids['Contribution']['alice'],
       'id  - not valid for action schedule',
-      'cancel date August 9th, 2021 12:00 AM',
+      'cancel date August 9th, 2021',
       'source SSF',
       'financial type id = 1',
       'financial type name = Donation',
@@ -349,7 +349,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       TRUE
     );
     $expected = [
-      'receive_date = February 1st, 2015 12:00 AM',
+      'receive_date = February 1st, 2015',
       'new style status = Completed',
       'contribution status id = 1',
       'id ' . $this->ids['Contribution']['alice'],

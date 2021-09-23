@@ -29,7 +29,7 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $activity = $this->activityCreate(['campaign_id' => $this->campaignCreate()]);
     $data = [
       ['Subject: {activity.subject}', 'Subject: Discussion on warm beer'],
-      ['Date: {activity.activity_date_time}', 'Date: ' . CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM'],
+      ['Date: {activity.activity_date_time}', 'Date: ' . CRM_Utils_Date::customFormat(date('Ymd'))],
       ['Duration: {activity.duration}', 'Duration: 90'],
       ['Location: {activity.location}', 'Location: Baker Street'],
       ['Details: {activity.details}', 'Details: Lets schedule a meeting'],
@@ -127,17 +127,17 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->markTestIncomplete('special tokens not yet merged - see https://github.com/civicrm/civicrm-core/pull/12012');
     $activity = $this->activityCreate();
     $data = [
-      ['Source First Name: {activity.source_first_name}', "Source First Name: Anthony"],
-      ['Target N First Name: {activity.target_N_first_name}', "Target N First Name: Julia"],
-      ['Target 0 First Name: {activity.target_0_first_name}', "Target 0 First Name: Julia"],
-      ['Target 1 First Name: {activity.target_1_first_name}', "Target 1 First Name: Julia"],
-      ['Target 2 First Name: {activity.target_2_first_name}', "Target 2 First Name: "],
-      ['Assignee N First Name: {activity.target_N_first_name}', "Assignee N First Name: Julia"],
-      ['Assignee 0 First Name: {activity.target_0_first_name}', "Assignee 0 First Name: Julia"],
-      ['Assignee 1 First Name: {activity.target_1_first_name}', "Assignee 1 First Name: Julia"],
-      ['Assignee 2 First Name: {activity.target_2_first_name}', "Assignee 2 First Name: "],
-      ['Assignee Count: {activity.assignees_count}', "Assignee Count: 1"],
-      ['Target Count: {activity.targets_count}', "Target Count: 1"],
+      ['Source First Name: {activity.source_first_name}', 'Source First Name: Anthony'],
+      ['Target N First Name: {activity.target_N_first_name}', 'Target N First Name: Julia'],
+      ['Target 0 First Name: {activity.target_0_first_name}', 'Target 0 First Name: Julia'],
+      ['Target 1 First Name: {activity.target_1_first_name}', 'Target 1 First Name: Julia'],
+      ['Target 2 First Name: {activity.target_2_first_name}', 'Target 2 First Name: '],
+      ['Assignee N First Name: {activity.target_N_first_name}', 'Assignee N First Name: Julia'],
+      ['Assignee 0 First Name: {activity.target_0_first_name}', 'Assignee 0 First Name: Julia'],
+      ['Assignee 1 First Name: {activity.target_1_first_name}', 'Assignee 1 First Name: Julia'],
+      ['Assignee 2 First Name: {activity.target_2_first_name}', 'Assignee 2 First Name: '],
+      ['Assignee Count: {activity.assignees_count}', 'Assignee Count: 1'],
+      ['Target Count: {activity.targets_count}', 'Target Count: 1'],
     ];
     $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
