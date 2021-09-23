@@ -12,7 +12,7 @@
 /**
  * Class CRM_Contribute_Form_UpdateSubscriptionTest
  */
-class CRM_Contribute_Form_UpdateSubscriptionTest extends CRM_Contribute_Form_RecurForms {
+class CRM_Contribute_Form_CancelSubscriptionTest extends CRM_Contribute_Form_RecurForms {
 
   /**
    * Test the mail sent on update.
@@ -22,8 +22,8 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CRM_Contribute_Form_Rec
   public function testMail(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $this->addContribution();
-    /* @var CRM_Contribute_Form_UpdateSubscription $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_UpdateSubscription', ['is_notify' => TRUE]);
+    /* @var CRM_Contribute_Form_CancelSubscription $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE]);
     $form->set('crid', $this->getContributionRecurID());
     $form->buildForm();
     try {
@@ -46,12 +46,10 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CRM_Contribute_Form_Rec
       'MIME-Version: 1.0',
       'From: "Bob" <bob@example.org>',
       'To: Anthony Anderson <anthony_anderson@civicrm.org>',
-      'Subject: Recurring Contribution Update Notification - Mr. Anthony Anderson II',
+      "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\n Anderson II",
       'Return-Path: bob@example.org',
       'Dear Anthony,',
-      'Your recurring contribution has been updated as requested:',
-      'Recurring contribution is for $ 10.00, every 1 month(s) for 12 installments.',
-      'If you have questions please contact us at "Bob" <bob@example.org>.',
+      'Your recurring contribution of $ 10.00, every 1 month has been cancelled as requested',
     ];
   }
 
