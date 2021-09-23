@@ -422,8 +422,6 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     if ($useSmarty) {
       $smartyVars = [];
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
-        // Note: $e->row->tokens resolves event-based tokens (eg CRM_*_Tokens). But if the target token relies on the
-        // above bits (replaceGreetingTokens=>replaceContactTokens=>replaceHookTokens) then this lookup isn't sufficient.
         $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName));
       }
       \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
