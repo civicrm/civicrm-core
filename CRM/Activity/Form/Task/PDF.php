@@ -108,20 +108,12 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    *   The name registered with the TokenProcessor
    * @param array $formValues
    *   The values submitted through the form
-   *
-   * @return string
-   *   If formValues['is_unit_test'] is true, otherwise outputs document to browser
    */
-  public function renderFromRows($rows, $msgPart, $formValues) {
+  public function renderFromRows($rows, $msgPart, $formValues): void {
     $html = [];
     foreach ($rows as $row) {
       $html[] = $row->render($msgPart);
     }
-
-    if (!empty($formValues['is_unit_test'])) {
-      return $html;
-    }
-
     if (!empty($html)) {
       $this->outputFromHtml($formValues, $html);
     }
@@ -133,13 +125,13 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    * @param array $formValues
    * @param array $html
    */
-  protected function outputFromHtml($formValues, array $html) {
+  protected function outputFromHtml(array $formValues, array $html): void {
     $fileName = $this->getFileName();
-    if ($formValues['document_type'] === 'pdf') {
+    if ($this->getSubmittedValue('document_type') === 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
     }
     else {
-      CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $formValues['document_type'], $formValues);
+      CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $this->getSubmittedValue('document_type'), $formValues);
     }
   }
 
