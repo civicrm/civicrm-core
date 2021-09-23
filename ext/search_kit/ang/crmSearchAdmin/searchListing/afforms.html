@@ -16,9 +16,9 @@
         <em ng-if="$ctrl.afforms && !$ctrl.afforms[row.name.raw]">{{:: ts('None Found') }}</em>
       </a>
     </li>
-    <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[row.name.raw]" title="{{:: ts('Edit form') }}">
-      <a target="_blank" href="{{:: $ctrl.afformPath + '#/edit/' + afform.name }}">
-        <i class="crm-i fa-pencil-square-o"></i>
+    <li ng-if="$ctrl.afforms" ng-repeat="afform in $ctrl.afforms[row.name.raw]" title="{{:: $ctrl.afformAdminEnabled ? ts('Edit form') : '' }}">
+      <a target="_blank" ng-href="{{:: afform.link }}">
+        <i class="crm-i {{:: $ctrl.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}"></i>
         {{:: afform.title }}
       </a>
     </li>

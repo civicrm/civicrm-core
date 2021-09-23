@@ -221,6 +221,13 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Boolean',
           'readonly' => TRUE,
         ];
+        $fields[] = [
+          'name' => 'search_displays',
+          'type' => 'Extra',
+          'data_type' => 'Array',
+          'readonly' => TRUE,
+          'description' => 'Embedded search displays, formatted like ["search-name.display-name"]',
+        ];
       }
 
       return $fields;

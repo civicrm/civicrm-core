@@ -115,4 +115,12 @@ function search_kit_civicrm_pre($op, $entity, $id, &$params) {
       $params['name'] = \CRM_Utils_String::munge($params['label']);
     }
   }
+  // When deleting a saved search, also delete the displays
+  // This would happen anyway in sql because of the ON DELETE CASCADE foreign key,
+  // But this ensures that pre and post hooks are called
+  if ($entity === 'SavedSearch' && $op === 'delete') {
+    \Civi\Api4\SearchDisplay::delete(FALSE)
+      ->addWhere('saved_search_id', '=', $id)
+      ->execute();
+  }
 }

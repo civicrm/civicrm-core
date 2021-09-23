@@ -9,10 +9,12 @@
     controller: function($scope, $element, $location, $timeout, crmApi4, dialogService, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this,
+        afformLoad,
         fieldsForJoinGetters = {};
 
       this.DEFAULT_AGGREGATE_FN = 'GROUP_CONCAT';
-
+      this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
+      this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
 
       $scope.controls = {tab: 'compose', joinType: 'LEFT'};
@@ -73,6 +75,7 @@
         });
 
         loadFieldOptions();
+        loadAfforms();
       };
 
       function onChangeAnything() {
@@ -150,6 +153,16 @@
             $scope.selectTab('compose');
           } else if (!display.trashed) {
             $scope.selectTab('display_' + index);
+          }
+          if (display.trashed && afformLoad) {
+            afformLoad.then(function() {
+              if (ctrl.afforms[display.name]) {
+                var msg = ctrl.afforms[display.name].length === 1 ?
+                  ts('Form "%1" will be deleted if the embedded display "%2" is deleted.', {1: ctrl.afforms[display.name][0].title, 2: display.label}) :
+                  ts('%1 forms will be deleted if the embedded display "%2" is deleted.', {1: ctrl.afforms[display.name].length, 2: display.label});
+                CRM.alert(msg, ts('Display embedded'), 'alert');
+              }
+            });
           }
         } else {
           $scope.selectTab('compose');
@@ -695,6 +708,39 @@
         });
         return _.uniq(links, 'path');
       };
+
+      function loadAfforms() {
+        if (ctrl.afformEnabled && ctrl.savedSearch.id) {
+          var findDisplays = _.transform(ctrl.savedSearch.displays, function(findDisplays, display) {
+            if (display.id && display.name) {
+              findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearch.name + '.' + display.name]);
+            }
+          }, []);
+          if (findDisplays.length) {
+            afformLoad = crmApi4('Afform', 'get', {
+              select: ['name', 'title', 'search_displays'],
+              where: [['OR', findDisplays]]
+            }).then(function(afforms) {
+              ctrl.afforms = {};
+              _.each(afforms, function(afform) {
+                _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
+                  var displayName = searchNameDisplayName.split('.')[1];
+                  ctrl.afforms[displayName] = ctrl.afforms[displayName] || [];
+                  ctrl.afforms[displayName].push({
+                    title: afform.title,
+                    link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
+                  });
+                });
+              });
+            });
+          }
+        }
+      }
+
+      // Creating an Afform opens a new tab, so when switching back to this tab, re-check for Afforms
+      $(window).on('focus', _.debounce(function() {
+        $scope.$apply(loadAfforms);
+      }, 10000, {leading: true, trailing: false}));
 
     }
   });

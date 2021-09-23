@@ -519,6 +519,22 @@ function afform_civicrm_preProcess($formName, &$form) {
   }
 }
 
+/**
+ * Implements hook_civicrm_pre().
+ */
+function afform_civicrm_pre($op, $entity, $id, &$params) {
+  // When deleting a searchDisplay, also delete any Afforms the display is embedded within
+  if ($entity === 'SearchDisplay' && $op === 'delete') {
+    $display = \Civi\Api4\SearchDisplay::get(FALSE)
+      ->addSelect('saved_search_id.name', 'name')
+      ->addWhere('id', '=', $id)
+      ->execute()->first();
+    \Civi\Api4\Afform::revert(FALSE)
+      ->addWhere('search_displays', 'CONTAINS', $display['saved_search_id.name'] . ".{$display['name']}")
+      ->execute();
+  }
+}
+
 // Wordpress only: Register callback for rendering shortcodes
 if (function_exists('add_filter')) {
   add_filter('civicrm_shortcode_get_markup', 'afform_shortcode_content', 10, 4);
