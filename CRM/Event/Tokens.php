@@ -11,6 +11,7 @@
  */
 
 use Civi\ActionSchedule\Event\MailingQueryEvent;
+use Civi\Api4\Event;
 
 /**
  * Class CRM_Event_Tokens
@@ -101,30 +102,24 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
+    $eventID = $row->context['eventId'] ?? $actionSearchResult->event_id;
+    if (array_key_exists($field, $this->getEventTokenValues($eventID))) {
+      foreach ($this->getEventTokenValues($eventID)[$field] as $format => $value) {
+        $row->format($format)->tokens($entity, $field, $value);
+      }
+      return;
+    }
 
-    if ($field == 'location') {
-      $loc = [];
-      $stateProvince = \CRM_Core_PseudoConstant::stateProvince();
-      $loc['street_address'] = $actionSearchResult->street_address;
-      $loc['city'] = $actionSearchResult->city;
-      $loc['state_province'] = $stateProvince[$actionSearchResult->state_province_id] ?? NULL;
-      $loc['postal_code'] = $actionSearchResult->postal_code;
-      //$entityTokenParams[$tokenEntity][$field] = \CRM_Utils_Address::format($loc);
-      $row->tokens($entity, $field, \CRM_Utils_Address::format($loc));
+    if ($field === 'event_id') {
+      // @todo - migrate this to 'id'
+      $row->tokens($entity, $field, $eventID);
     }
-    elseif ($field == 'info_url') {
-      $row
-        ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
+    elseif ($field === 'event_type') {
+      // temporary - @todo db update to event_type_id:label
+      $row->tokens($entity, $field, $this->getEventTokenValues($eventID)['event_type_id:label']['text/html']);
     }
-    elseif ($field == 'registration_url') {
-      $row
-        ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
-    }
-    elseif (in_array($field, ['start_date', 'end_date'])) {
-      $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
-    }
-    elseif ($field == 'balance') {
-      if ($actionSearchResult->entityTable == 'civicrm_contact') {
+    elseif ($field === 'balance') {
+      if ($actionSearchResult->entityTable === 'civicrm_contact') {
         $balancePay = 'N/A';
       }
       elseif (!empty($actionSearchResult->entityID)) {
@@ -134,18 +129,80 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       }
       $row->tokens($entity, $field, $balancePay);
     }
-    elseif ($field == 'fee_amount') {
+    elseif ($field === 'fee_amount') {
       $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field));
     }
-    elseif (isset($actionSearchResult->$field)) {
-      $row->tokens($entity, $field, $actionSearchResult->$field);
-    }
-    elseif ($cfID = \CRM_Core_BAO_CustomField::getKeyID($field)) {
+    elseif ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
       $row->customToken($entity, $cfID, $actionSearchResult->event_id);
     }
     else {
-      $row->tokens($entity, $field, '');
+      parent::evaluateToken($row, $entity, $field, $prefetch);
     }
+  }
+
+  /**
+   * Get the tokens available for the event.
+   *
+   * Cache by event as it's l
+   *
+   * @param int|null $eventID
+   *
+   * @return array
+   *
+   * @throws \API_Exception|\CRM_Core_Exception
+   *
+   * @internal
+   */
+  protected function getEventTokenValues(int $eventID = NULL): array {
+    $cacheKey = __CLASS__ . 'event_tokens' . $eventID . '_' . CRM_Core_I18n::getLocale();
+    if (!Civi::cache('metadata')->has($cacheKey)) {
+      $event = Event::get(FALSE)->addWhere('id', '=', $eventID)
+        ->setSelect([
+          'event_type_id',
+          'title',
+          'id',
+          'start_date',
+          'end_date',
+          'summary',
+          'description',
+          'loc_block_id',
+          'loc_block_id.address_id.street_address',
+          'loc_block_id.address_id.city',
+          'loc_block_id.address_id.state_province_id:label',
+          'loc_block_id.address_id.postal_code',
+          'loc_block_id.email_id.email',
+          'loc_block_id.phone_id.phone',
+          'custom.*',
+        ])
+        ->execute()->first();
+      $tokens['location']['text/plain'] = \CRM_Utils_Address::format([
+        'street_address' => $event['loc_block_id.address_id.street_address'],
+        'city' => $event['loc_block_id.address_id.city'],
+        'state_province' => $event['loc_block_id.address_id.state_province_id:label'],
+        'postal_code' => $event['loc_block_id.address_id.postal_code'],
+
+      ]);
+      $tokens['info_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE);
+      $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE);
+      $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';
+      $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
+      $tokens['event_type_id:label']['text/html'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
+      $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
+      $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
+
+      foreach (array_keys($this->getAllTokens()) as $field) {
+        if (!isset($tokens[$field]) && isset($event[$field])) {
+          if ($this->isCustomField($field)) {
+            $tokens[$field]['text/html'] = CRM_Core_BAO_CustomField::displayValue($event[$field], str_replace('custom_', '', $field));
+          }
+          else {
+            $tokens[$field]['text/html'] = $event[$field];
+          }
+        }
+      }
+      Civi::cache('metadata')->set($cacheKey, $tokens);
+    }
+    return Civi::cache('metadata')->get($cacheKey);
   }
 
 }

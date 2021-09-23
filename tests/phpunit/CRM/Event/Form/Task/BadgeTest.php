@@ -30,7 +30,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
 
     $badgeLayout = PrintLabel::get()->addSelect('data')->execute()->first();
     $values = [
-      'data' => array_merge($badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => []]),
+      'data' => array_merge((array) $badgeLayout['data'], ['token' => [], 'font_name' => [''], 'font_size' => [], 'text_alignment' => []]),
     ];
     foreach (array_keys($this->getAvailableTokens()) as $id => $token) {
       $index = $id + 1;
@@ -88,7 +88,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{event.title}' => 'Annual CiviCRM meet',
       '{contact.display_name}' => 'Mr. Anthony Anderson II',
       '{contact.current_employer}' => 'Default Organization',
-      '{event.start_date}' => 'October 21st',
+      '{event.start_date|crmDate:"%B %E%f"}' => 'October 21st',
       '{participant.status_id}' => 2,
       '{participant.role_id}' => 1,
       '{participant.register_date}' => 'February 19th, 2007',
@@ -99,8 +99,8 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{participant.transferred_to_contact_id}' => NULL,
       '{participant.role_id:label}' => 'Attendee',
       '{participant.fee_label}' => NULL,
-      '{event.end_date}' => 'October 23rd',
-      '{event.id}' => 1,
+      '{event.end_date|crmDate:"%B %E%f"}' => 'October 23rd',
+      '{participant.event_id}' => 1,
     ];
   }
 

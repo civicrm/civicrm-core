@@ -25,7 +25,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    *   a version number, e.g. '4.4.alpha1', '4.4.beta3', '4.4.0'.
    * @param null $currentVer
    */
-  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
     // Example: Generate a pre-upgrade message.
     if ($rev === '5.43.alpha1' && !empty(CRM_Core_Component::getEnabledComponents()['CiviCase'])) {
       $preUpgradeMessage .= '<p>' . ts('Minor changes have been made to how the tokens to render case.is_deleted, case.created_date and case.modified_date. See https://docs.civicrm.org/sysadmin/en/latest/upgrade/version-specific/ for more') . '</p>';
@@ -43,7 +43,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
     // Example: Generate a post-upgrade message.
     // if ($rev == '5.12.34') {
     //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
@@ -57,7 +57,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    */
   public function upgrade_5_43_alpha1(string $rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-    $this->addTask('Fix DB Collation if needed on the relatonship cache table', 'fixRelationshipCacheTableCollation');
+    $this->addTask('Fix DB Collation if needed on the relationship cache table', 'fixRelationshipCacheTableCollation');
     $this->addTask('Make mapping field foreign key cascade delete', 'alterMappingFK');
     $this->addTask('Replace legacy displayName smarty token in Online contribution workflow template',
       'updateMessageToken', 'contribution_online_receipt', '$displayName', 'contact.display_name', $rev
@@ -111,7 +111,15 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
       'updateMessageToken', '', 'contribution.contribution_status', 'contribution.contribution_status_id:label', $rev
     );
     $this->addTask('Update campaign token in saved message templates',
-      'updateMessageToken', '', 'contribution.campaign', 'contribution.campaign_id:label', $rev
+      'updateMessageToken', '', 'contribution.campaign', 'contribution.campaign_id:label', $rev);
+    $this->addTask('Update start date token in event badges',
+      'updatePrintLabelToken', 'event.start_date', 'event.start_date|crmDate:"%B %E%f', $rev
+    );
+    $this->addTask('Update end date token in event badges',
+      'updatePrintLabelToken', 'event.end_date', 'event.end_date|crmDate:"%B %E%f', $rev
+    );
+    $this->addTask('Update event id token in event badges',
+      'updatePrintLabelToken', 'event.event_id', 'participant.event_id', $rev
     );
   }
 
