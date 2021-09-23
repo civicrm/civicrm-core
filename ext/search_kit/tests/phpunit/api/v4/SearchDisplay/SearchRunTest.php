@@ -497,4 +497,75 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertStringContainsString('failed', $error);
   }
 
+  /**
+   * Test running a searchDisplay with random sorting.
+   */
+  public function testSortByRand() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+      ['first_name' => 'Four', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'first_name', 'last_name'],
+          'where' => [['last_name', '=', $lastName]],
+        ],
+      ],
+      'display' => [
+        'type' => 'list',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First Name',
+              'dataType' => 'String',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [
+            ['RAND()', 'ASC'],
+          ],
+        ],
+      ],
+      'afform' => NULL,
+    ];
+
+    // Without seed, results are returned in unpredictable order
+    // (hard to test this, but we can at least assert we get the correct number of results back)
+    $unseeded = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertCount(4, $unseeded);
+
+    // Seed must be an integer
+    $params['seed'] = 'hello';
+    try {
+      civicrm_api4('SearchDisplay', 'run', $params);
+      $this->fail();
+    }
+    catch (\API_Exception $e) {
+    }
+
+    // With a random seed, results should be shuffled in stable order
+    $params['seed'] = 12345678987654321;
+    $seeded = civicrm_api4('SearchDisplay', 'run', $params);
+
+    // Same seed, same order every time
+    for ($i = 0; $i <= 9; ++$i) {
+      $repeat = civicrm_api4('SearchDisplay', 'run', $params);
+      $this->assertEquals($seeded->column('id'), $repeat->column('id'));
+    }
+  }
+
 }
