@@ -23,15 +23,19 @@ class SqlFunctionIF extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'min_expr' => 3,
-        'max_expr' => 3,
         'optional' => FALSE,
-        'must_be' => ['SqlEquation', 'SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
-        'ui_defaults' => [
-          ['type' => 'SqlField', 'placeholder' => ts('If')],
-          ['type' => 'SqlField', 'placeholder' => ts('Then')],
-          ['type' => 'SqlField', 'placeholder' => ts('Else')],
-        ],
+        'must_be' => ['SqlEquation', 'SqlField'],
+        'label' => ts('If'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'label' => ts('Then'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'],
+        'label' => ts('Else'),
       ],
     ];
   }

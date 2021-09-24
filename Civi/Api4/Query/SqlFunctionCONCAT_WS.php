@@ -23,13 +23,15 @@ class SqlFunctionCONCAT_WS extends SqlFunction {
   protected static function params(): array {
     return [
       [
+        'optional' => FALSE,
+        'must_be' => ['SqlString'],
+        'label' => ts('Separator'),
+      ],
+      [
         'max_expr' => 99,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
-        'ui_defaults' => [
-          ['type' => 'SqlString', 'placeholder' => ts('Separator')],
-          ['type' => 'SqlField', 'placeholder' => ts('Plus')],
-        ],
+        'label' => ts('Plus'),
       ],
     ];
   }

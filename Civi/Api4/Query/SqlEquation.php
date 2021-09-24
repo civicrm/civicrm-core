@@ -53,7 +53,7 @@ class SqlEquation extends SqlExpression {
     $permitted = ['SqlField', 'SqlString', 'SqlNumber', 'SqlNull'];
     $operators = array_merge(self::$arithmeticOperators, self::$comparisonOperators);
     while (strlen($arg)) {
-      $this->args = array_merge($this->args, $this->captureExpressions($arg, $permitted, FALSE));
+      $this->args = array_merge($this->args, $this->captureExpressions($arg, $permitted, 1));
       $op = $this->captureKeyword($operators, $arg);
       if ($op) {
         $this->args[] = $op;

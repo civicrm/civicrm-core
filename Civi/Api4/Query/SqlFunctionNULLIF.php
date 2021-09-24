@@ -26,10 +26,7 @@ class SqlFunctionNULLIF extends SqlFunction {
         'min_expr' => 2,
         'max_expr' => 2,
         'optional' => FALSE,
-        'ui_defaults' => [
-          ['type' => 'SqlField', 'placeholder' => ts('Preferred')],
-          ['type' => 'SqlField', 'placeholder' => ts('Alternate')],
-        ],
+        'label' => ts('Compare with'),
       ],
     ];
   }

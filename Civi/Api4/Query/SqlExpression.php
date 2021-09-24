@@ -188,7 +188,8 @@ abstract class SqlExpression {
    */
   protected function captureKeyword($keywords, &$arg) {
     foreach ($keywords as $key) {
-      if (strpos($arg, $key . ' ') === 0) {
+      // Match keyword followed by a space or eol
+      if (strpos($arg, $key . ' ') === 0 || rtrim($arg) === $key) {
         $arg = ltrim(substr($arg, strlen($key)));
         return $key;
       }
@@ -201,11 +202,11 @@ abstract class SqlExpression {
    *
    * @param string $arg
    * @param array $mustBe
-   * @param bool $multi
+   * @param int $max
    * @return SqlExpression[]
    * @throws \API_Exception
    */
-  protected function captureExpressions(string &$arg, array $mustBe, bool $multi) {
+  protected function captureExpressions(string &$arg, array $mustBe, int $max) {
     $captured = [];
     $arg = ltrim($arg);
     while ($arg) {
@@ -215,7 +216,7 @@ abstract class SqlExpression {
       $this->fields = array_merge($this->fields, $expr->getFields());
       $captured[] = $expr;
       // Keep going if we have a comma indicating another expression follows
-      if ($multi && substr($arg, 0, 1) === ',') {
+      if (count($captured) < $max && substr($arg, 0, 1) === ',') {
         $arg = ltrim(substr($arg, 1));
       }
       else {

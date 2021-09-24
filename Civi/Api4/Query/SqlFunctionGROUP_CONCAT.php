@@ -30,6 +30,7 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
       ],
       [
         'name' => 'ORDER BY',
+        'label' => ts('Order by'),
         'max_expr' => 1,
         'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
         'must_be' => ['SqlField'],

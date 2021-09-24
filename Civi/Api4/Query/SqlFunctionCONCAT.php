@@ -26,9 +26,7 @@ class SqlFunctionCONCAT extends SqlFunction {
         'max_expr' => 99,
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlString'],
-        'ui_defaults' => [
-          ['placeholder' => ts('Plus')],
-        ],
+        'label' => ts('And'),
       ],
     ];
   }
