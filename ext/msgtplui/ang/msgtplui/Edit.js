@@ -179,7 +179,7 @@
     $ctrl.switchTab = function switchTab(tgt) {
       $ctrl.tab = tgt;
       // Experimenting with action buttons in the tab-bar. This makes the scroll unnecessary.
-      // $('html, body').animate({scrollTop: $("a[name=msgtplui-tabs]").offset().top - $('#civicrm-menu').height()}, 200);
+      // $('html, body').animate({scrollTop: $("a[name=crm-msgadm-tabs]").offset().top - $('#civicrm-menu').height()}, 200);
     };
     $ctrl.allowDraft = function allowDraft() {
       return !!$ctrl.lang;
@@ -295,7 +295,7 @@
 
         var model = angular.extend({}, defaults, args);
         var options = CRM.utils.adjustDialogDefaults({
-          dialogClass: 'msgtplui-dialog',
+          dialogClass: 'crm-msgadm-dialog',
           autoOpen: false,
           height: '90%',
           width: '90%'

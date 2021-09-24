@@ -20,7 +20,7 @@
       <!-- TODO: Pretty name -->
     </div>
 
-    <a name="msgtplui-tabs"></a>
+    <a name="crm-msgadm-tabs"></a>
     <div class="panel panel-info">
       <div class="panel-heading" role="navigation">
         <ul class="nav nav-pills">
@@ -67,8 +67,8 @@
         </ul>
       </div>
       <div class="panel-body">
-        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList, disabled: true}" ng-if="$ctrl.tab==='original'"></msgtplui-edit-content>
-        <msgtplui-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList}" ng-if="$ctrl.tab!=='original'"></msgtplui-edit-content>
+        <crm-msgadm-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList, disabled: true}" ng-if="$ctrl.tab==='original'"></crm-msgadm-edit-content>
+        <crm-msgadm-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList}" ng-if="$ctrl.tab!=='original'"></crm-msgadm-edit-content>
       </div>
     </div>
 

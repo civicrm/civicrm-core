@@ -36,7 +36,7 @@
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},
-          dialogClass: 'msgtplui-dialog',
+          dialogClass: 'crm-msgadm-dialog',
           autoOpen: false,
           height: '90%',
           width: '90%'
