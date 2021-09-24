@@ -979,7 +979,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
-   * Send the message to all the contacts.
+   * DO NOT USE THIS FUNCTION - DEPRECATED.
    *
    * Also insert a contact activity in each contacts record.
    *
@@ -1012,6 +1012,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   bool $sent FIXME: this only indicates the status of the last email sent.
    *   array $activityIds The activity ids created, one per "To" recipient.
    *
+   * @deprecated
+   *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
@@ -1032,6 +1034,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     $campaignId = NULL,
     $caseId = NULL
   ) {
+    // @todo add noisy deprecation.
+    // This function is no longer called from core.
+    // I just left off the noisy deprecation for now as there
+    // are already a lot of other noisy deprecation points in 5.43.
     // get the contact details of logged in contact, which we set as from email
     if ($userID == NULL) {
       $userID = CRM_Core_Session::getLoggedInContactID();
@@ -1142,10 +1148,12 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param array $attachments
    *   Attachments.
    *
+   * @internal
+   *
    * @return array
    *   Array of attachment key versus file Id.
    */
-  private static function getAttachmentFileIds($activityID, $attachments) {
+  public static function getAttachmentFileIds($activityID, $attachments) {
     $queryParams = [1 => [$activityID, 'Positive'], 2 => [CRM_Activity_DAO_Activity::getTableName(), 'String']];
     $query = "SELECT file_id, uri FROM civicrm_entity_file INNER JOIN civicrm_file ON civicrm_entity_file.file_id = civicrm_file.id
 WHERE entity_id =%1 AND entity_table = %2";

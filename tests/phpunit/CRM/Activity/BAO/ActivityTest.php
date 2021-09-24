@@ -1261,8 +1261,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $text = __FUNCTION__ . ' text {contact.display_name} {case.case_type_id:label}';
     $userID = $loggedInUser;
 
+    /* @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
     $mut = new CiviMailUtils($this, TRUE);
-    [$sent, $activity_ids] = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activity_ids] = $form->sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1375,9 +1377,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-
+    /* @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
     $mut = new CiviMailUtils($this, TRUE);
-    [$sent, $activity_ids] = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activity_ids] = $form->sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1441,8 +1444,10 @@ $text
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
     $userID = $loggedInUser;
+    /* @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
 
-    [$sent, $activity_ids] = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activity_ids] = $email_result = $form->sendEmail(
       $contactDetails,
       $subject,
       $text,
@@ -1701,7 +1706,9 @@ $text
     $text = __FUNCTION__ . ' text';
 
     $mut = new CiviMailUtils($this, TRUE);
-    [$sent, $activity_ids] = $email_result = CRM_Activity_BAO_Activity::sendEmail(
+    /* @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    [$sent, $activity_ids] = $form->sendEmail(
       $contact['values'],
       $subject,
       $text,
@@ -1750,7 +1757,9 @@ $text
     $text = __FUNCTION__ . ' text' . '{contact.display_name}';
     $userID = $loggedInUser;
 
-    CRM_Activity_BAO_Activity::sendEmail(
+    /* @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form->sendEmail(
       $contact['values'],
       $subject,
       $text,
