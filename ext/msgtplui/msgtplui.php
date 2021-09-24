@@ -10,8 +10,8 @@ use CRM_Msgtplui_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
-function msgtplui_civicrm_config(&$config) {
-  _msgtplui_civix_civicrm_config($config);
+function message_admin_civicrm_config(&$config) {
+  _message_admin_civix_civicrm_config($config);
 }
 
 /**
@@ -19,8 +19,8 @@ function msgtplui_civicrm_config(&$config) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
  */
-function msgtplui_civicrm_xmlMenu(&$files) {
-  _msgtplui_civix_civicrm_xmlMenu($files);
+function message_admin_civicrm_xmlMenu(&$files) {
+  _message_admin_civix_civicrm_xmlMenu($files);
 }
 
 /**
@@ -28,8 +28,8 @@ function msgtplui_civicrm_xmlMenu(&$files) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
  */
-function msgtplui_civicrm_install() {
-  _msgtplui_civix_civicrm_install();
+function message_admin_civicrm_install() {
+  _message_admin_civix_civicrm_install();
 }
 
 /**
@@ -37,8 +37,8 @@ function msgtplui_civicrm_install() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
  */
-function msgtplui_civicrm_postInstall() {
-  _msgtplui_civix_civicrm_postInstall();
+function message_admin_civicrm_postInstall() {
+  _message_admin_civix_civicrm_postInstall();
 }
 
 /**
@@ -46,8 +46,8 @@ function msgtplui_civicrm_postInstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
  */
-function msgtplui_civicrm_uninstall() {
-  _msgtplui_civix_civicrm_uninstall();
+function message_admin_civicrm_uninstall() {
+  _message_admin_civix_civicrm_uninstall();
 }
 
 /**
@@ -55,8 +55,8 @@ function msgtplui_civicrm_uninstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
-function msgtplui_civicrm_enable() {
-  _msgtplui_civix_civicrm_enable();
+function message_admin_civicrm_enable() {
+  _message_admin_civix_civicrm_enable();
 }
 
 /**
@@ -64,8 +64,8 @@ function msgtplui_civicrm_enable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
  */
-function msgtplui_civicrm_disable() {
-  _msgtplui_civix_civicrm_disable();
+function message_admin_civicrm_disable() {
+  _message_admin_civix_civicrm_disable();
 }
 
 /**
@@ -73,8 +73,8 @@ function msgtplui_civicrm_disable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
  */
-function msgtplui_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _msgtplui_civix_civicrm_upgrade($op, $queue);
+function message_admin_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  return _message_admin_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -85,8 +85,8 @@ function msgtplui_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
  */
-function msgtplui_civicrm_managed(&$entities) {
-  _msgtplui_civix_civicrm_managed($entities);
+function message_admin_civicrm_managed(&$entities) {
+  _message_admin_civix_civicrm_managed($entities);
 }
 
 /**
@@ -98,8 +98,8 @@ function msgtplui_civicrm_managed(&$entities) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
  */
-function msgtplui_civicrm_caseTypes(&$caseTypes) {
-  _msgtplui_civix_civicrm_caseTypes($caseTypes);
+function message_admin_civicrm_caseTypes(&$caseTypes) {
+  _message_admin_civix_civicrm_caseTypes($caseTypes);
 }
 
 /**
@@ -112,8 +112,8 @@ function msgtplui_civicrm_caseTypes(&$caseTypes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
-function msgtplui_civicrm_angularModules(&$angularModules) {
-  _msgtplui_civix_civicrm_angularModules($angularModules);
+function message_admin_civicrm_angularModules(&$angularModules) {
+  _message_admin_civix_civicrm_angularModules($angularModules);
 }
 
 /**
@@ -121,8 +121,8 @@ function msgtplui_civicrm_angularModules(&$angularModules) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
  */
-function msgtplui_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  _msgtplui_civix_civicrm_alterSettingsFolders($metaDataFolders);
+function message_admin_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _message_admin_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**
@@ -132,15 +132,15 @@ function msgtplui_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
-function msgtplui_civicrm_entityTypes(&$entityTypes) {
-  _msgtplui_civix_civicrm_entityTypes($entityTypes);
+function message_admin_civicrm_entityTypes(&$entityTypes) {
+  _message_admin_civix_civicrm_entityTypes($entityTypes);
 }
 
 /**
  * Implements hook_civicrm_themes().
  */
-function msgtplui_civicrm_themes(&$themes) {
-  _msgtplui_civix_civicrm_themes($themes);
+function message_admin_civicrm_themes(&$themes) {
+  _message_admin_civix_civicrm_themes($themes);
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
@@ -150,7 +150,7 @@ function msgtplui_civicrm_themes(&$themes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_preProcess
  */
-//function msgtplui_civicrm_preProcess($formName, &$form) {
+//function message_admin_civicrm_preProcess($formName, &$form) {
 //
 //}
 
@@ -159,8 +159,8 @@ function msgtplui_civicrm_themes(&$themes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_navigationMenu
  */
-//function msgtplui_civicrm_navigationMenu(&$menu) {
-//  _msgtplui_civix_insert_navigation_menu($menu, 'Mailings', array(
+//function message_admin_civicrm_navigationMenu(&$menu) {
+//  _message_admin_civix_insert_navigation_menu($menu, 'Mailings', array(
 //    'label' => E::ts('New subliminal message'),
 //    'name' => 'mailing_subliminal_message',
 //    'url' => 'civicrm/mailing/subliminal',
@@ -168,14 +168,14 @@ function msgtplui_civicrm_themes(&$themes) {
 //    'operator' => 'OR',
 //    'separator' => 0,
 //  ));
-//  _msgtplui_civix_navigationMenu($menu);
+//  _message_admin_civix_navigationMenu($menu);
 //}
 
 /**
  * Mark these fields as translateable.
  * @see CRM_Utils_Hook::translateFields
  */
-function msgtplui_civicrm_translateFields(&$fields) {
+function message_admin_civicrm_translateFields(&$fields) {
   $fields['civicrm_msg_template']['msg_subject'] = TRUE;
   $fields['civicrm_msg_template']['msg_text'] = TRUE;
   $fields['civicrm_msg_template']['msg_html'] = TRUE;
