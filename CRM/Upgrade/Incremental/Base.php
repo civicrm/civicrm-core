@@ -264,7 +264,12 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function updateMessageToken($ctx, string $workflowName, string $old, string $new, $version):bool {
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
-    $messageObj->replaceTokenInTemplate($workflowName, $old, $new);
+    if (!empty($workflowName)) {
+      $messageObj->replaceTokenInTemplate($workflowName, $old, $new);
+    }
+    else {
+      $messageObj->replaceTokenInMessageTemplates($old, $new);
+    }
     return TRUE;
   }
 
