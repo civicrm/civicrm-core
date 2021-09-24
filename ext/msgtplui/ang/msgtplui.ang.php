@@ -27,7 +27,7 @@ return [
     'ngRoute',
     'ngSanitize',
     'api4',
-    'ui.bootstrap'
+    'ui.bootstrap',
   ],
   'settings' => [],
   'basePages' => [],
