@@ -29,10 +29,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
    * @throws \Exception
    */
   public function run() {
-    // lets get around the time limit issue if possible for upgrades
-    if (!ini_get('safe_mode')) {
-      set_time_limit(0);
-    }
+    set_time_limit(0);
 
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 

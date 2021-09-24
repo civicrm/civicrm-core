@@ -95,13 +95,7 @@ class CRM_Core_Smarty extends Smarty {
       exit();
     }
 
-    //Check for safe mode CRM-2207
-    if (ini_get('safe_mode')) {
-      $this->use_sub_dirs = FALSE;
-    }
-    else {
-      $this->use_sub_dirs = TRUE;
-    }
+    $this->use_sub_dirs = TRUE;
 
     $customPluginsDir = NULL;
     if (isset($config->customPHPPathDir)) {
