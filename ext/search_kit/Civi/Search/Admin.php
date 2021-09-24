@@ -12,6 +12,8 @@
 namespace Civi\Search;
 
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
+use Civi\Api4\Query\SqlEquation;
+use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\Tag;
 use CRM_Search_ExtensionUtil as E;
 
@@ -32,7 +34,7 @@ class Admin {
       'joins' => self::getJoins($schema),
       'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
-      'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
+      'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
@@ -375,6 +377,43 @@ class Admin {
       }
     }
     return $conditions;
+  }
+
+  private static function getSqlFunctions() {
+    $functions = \CRM_Api4_Page_Api4Explorer::getSqlFunctions();
+    // Add faux function "e" for SqlEquations
+    $functions[] = [
+      'name' => 'e',
+      'title' => ts('Arithmetic'),
+      'description' => ts('Add, subtract, multiply, divide'),
+      'category' => SqlFunction::CATEGORY_MATH,
+      'dataType' => 'Number',
+      'params' => [
+        [
+          'label' => ts('Value'),
+          'min_expr' => 1,
+          'max_expr' => 1,
+          'must_be' => ['SqlField', 'SqlNumber'],
+        ],
+        [
+          'label' => ts('Value'),
+          'min_expr' => 1,
+          'max_expr' => 99,
+          'flag_before' => array_combine(SqlEquation::$arithmeticOperators, SqlEquation::$arithmeticOperators),
+          'must_be' => ['SqlField', 'SqlNumber'],
+        ],
+      ],
+    ];
+    // Filter out empty param properties (simplifies the javascript which treats empty arrays/objects as != null)
+    foreach ($functions as &$function) {
+      foreach ($function['params'] as $i => $param) {
+        $function['params'][$i] = array_filter($param);
+      }
+    }
+    usort($functions, function($a, $b) {
+      return $a['title'] <=> $b['title'];
+    });
+    return $functions;
   }
 
 }

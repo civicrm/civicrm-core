@@ -149,7 +149,7 @@
       function parseFnArgs(info, expr) {
         var fnName = expr.split('(')[0],
           argString = expr.substr(fnName.length + 1, expr.length - fnName.length - 2);
-        info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName});
+        info.fn = _.find(CRM.crmSearchAdmin.functions, {name: fnName || 'e'});
 
         function getKeyword(whitelist) {
           var keyword;
@@ -188,9 +188,9 @@
           if (!argString.length || (param.name && !getKeyword(param.name))) {
             return false;
           }
-          flagBefore = getKeyword(_.keys(param.flag_before || {}));
           if (param.max_expr) {
             while (++exprCount <= param.max_expr && argString.length) {
+              flagBefore = getKeyword(_.keys(param.flag_before || {}));
               expr = getExpr();
               if (expr) {
                 expr.param = param.name || index;
@@ -198,9 +198,10 @@
                 info.args.push(expr);
               }
               // Only continue if an expression was found and followed by a comma
-              if (!expr || !getKeyword([','])) {
+              if (!expr) {
                 break;
               }
+              getKeyword([',']);
             }
             if (expr && !_.isEmpty(expr.flag_after)) {
               _.last(info.args).flag_after = getKeyword(_.keys(param.flag_after));
@@ -245,7 +246,7 @@
         var splitAs = expr.split(' AS '),
           info = {fn: null, args: [], alias: _.last(splitAs)},
           bracketPos = expr.indexOf('(');
-        if (bracketPos > 0) {
+        if (bracketPos >= 0) {
           parseFnArgs(info, splitAs[0]);
         } else {
           var arg = parseArg(splitAs[0]);
