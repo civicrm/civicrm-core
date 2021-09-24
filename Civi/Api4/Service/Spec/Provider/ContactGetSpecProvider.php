@@ -57,7 +57,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
     $tempTable = \CRM_Utils_SQL_TempTable::build();
     $tempTable->createWithColumns('contact_id INT');
     $tableName = $tempTable->getName();
-    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups($value, $tableName);
+    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups((array) $value, $tableName);
     // SQL optimization - use INNER JOIN if the base table is Contact & this clause is not nested
     if ($fieldAlias === '`a`.`id`' && $operator === "IN" && !$depth) {
       $query->getQuery()->join($tableName, "INNER JOIN `$tableName` ON $fieldAlias = `$tableName`.contact_id");
