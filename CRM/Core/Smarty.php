@@ -98,7 +98,7 @@ class CRM_Core_Smarty extends Smarty {
     $this->use_sub_dirs = TRUE;
 
     $customPluginsDir = NULL;
-    if (isset($config->customPHPPathDir)) {
+    if (!empty($config->customPHPPathDir) || $config->customPHPPathDir === '0') {
       $customPluginsDir
         = $config->customPHPPathDir . DIRECTORY_SEPARATOR .
         'CRM' . DIRECTORY_SEPARATOR .
