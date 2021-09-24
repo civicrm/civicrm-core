@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<extension key="msgtplui" type="module">
-  <file>msgtplui</file>
-  <name>Message Template Editor</name>
-  <description>Rich interface for editing, previewing, and translating message templates</description>
+<extension key="message_admin" type="module">
+  <file>message_admin</file>
+  <name>Message Administration</name>
+  <description>Rich interface for browsing, editing, previewing, and translating message templates</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>CiviCRM</author>

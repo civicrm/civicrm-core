@@ -1,4 +1,4 @@
-Package: msgtplui
+Package: message_admin
 Copyright (C) 2021, Tim Otten <totten@civicrm.org>
 Licensed under the GNU Affero Public License 3.0 (below).
 

@@ -1,4 +1,4 @@
-# msgtplui
+# message_admin
 
 ![Screenshot](/images/screenshot.png)
 
@@ -22,7 +22,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl msgtplui@https://github.com/FIXME/msgtplui/archive/master.zip
+cv dl message_admin@https://github.com/FIXME/message_admin/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
@@ -31,8 +31,8 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/msgtplui.git
-cv en msgtplui
+git clone https://github.com/FIXME/message_admin.git
+cv en message_admin
 ```
 
 ## Getting Started
