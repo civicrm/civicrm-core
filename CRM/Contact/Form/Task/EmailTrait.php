@@ -690,6 +690,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
   /**
    * Prevent submission of deprecated tokens.
    *
+   * Note this rule can be removed after a transition period.
+   * It's mostly to help to ensure users don't get missing tokens
+   * or unexpected output after the 5.43 upgrade until any
+   * old templates have aged out.
+   *
    * @param array $fields
    *
    * @return bool|string[]
@@ -702,6 +707,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
       '{contribution.contribution_id}' => '{contribution.id}',
       '{contribution.contribution_source}' => '{contribution.source}',
+      '{contribution.contribution_status}' => '{contribution.contribution_status_id:label}',
+      '{contribution.contribution_cancel_date}' => '{contribution.cancel_date}',
+      '{contribution.type}' => '{contribution.financial_type_id:label}',
+      '{contribution.contribution_page_id}' => '{contribution.contribution_page_id:label}',
     ];
     $tokenErrors = [];
     foreach ($deprecatedTokens as $token => $replacement) {

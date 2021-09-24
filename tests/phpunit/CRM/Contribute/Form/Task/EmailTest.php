@@ -35,8 +35,9 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
   public function testEmailTokens(): void {
     Civi::settings()->set('max_attachments', 0);
     $contact1 = $this->individualCreate();
-    $contact2 = $this->individualCreate();
+    $contact2 = $this->individualCreate(['first_name' => 'Elton']);
     $userID = $this->createLoggedInUser();
+    $mut = new CiviMailUtils($this);
     Civi::settings()->set('allow_mail_from_logged_in_contact', TRUE);
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $userID,
@@ -44,8 +45,9 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
       'signature_html' => 'Benny, Benny',
       'is_primary' => 1,
     ]);
-    $contribution1 = $this->contributionCreate(['contact_id' => $contact2]);
-    $contribution2 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1]);
+    $contribution1 = $this->contributionCreate(['contact_id' => $contact2, 'invoice_number' => 'soy']);
+    $contribution2 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1, 'invoice_number' => 'saucy']);
+    $contribution3 = $this->contributionCreate(['total_amount' => 999, 'contact_id' => $contact1, 'invoice_number' => 'ranch']);
     $form = $this->getFormObject('CRM_Contribute_Form_Task_Email', [
       'cc_id' => '',
       'bcc_id' => '',
@@ -53,19 +55,28 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
         $contact1 . '::teresajensen-nielsen65@spamalot.co.in',
         $contact2 . '::bob@example.com',
       ]),
-      'subject' => '{contact.display_name}',
-      'text_message' => '{contribution.total_amount}',
+      'subject' => '{contact.display_name} {contribution.total_amount}',
+      'text_message' => '{contribution.financial_type_id:label} {contribution.invoice_number}',
       'html_message' => '{domain.name}',
     ], [], [
       'radio_ts' => 'ts_sel',
       'task' => CRM_Core_Task::TASK_EMAIL,
       'mark_x_' . $contribution1 => 1,
       'mark_x_' . $contribution2 => 1,
+      'mark_x_' . $contribution3 => 1,
     ]);
     $form->set('cid', $contact1 . ',' . $contact2);
     $form->buildForm();
     $this->assertEquals('<br/><br/>--Benny, Benny', $form->_defaultValues['html_message']);
     $form->postProcess();
+    $mut->assertSubjects(['Mr. Anthony Anderson II $ 999.00', 'Mr. Elton Anderson II $ 100.00']);
+    $mut->checkAllMailLog([
+      'Subject: Mr. Anthony Anderson II',
+      '$ 999.0',
+      'Default Domain Name',
+      'Donation soy',
+      'Donation ranch',
+    ]);
   }
 
 }
