@@ -1,8 +1,8 @@
 (function(angular, $, _) {
 
-  angular.module('msgtplui').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q) {
-    var ts = $scope.ts = CRM.ts('msgtplui');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/msgtplui'}); // See: templates/CRM/MessageAdmin/msgtplui.hlp
+  angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q) {
+    var ts = $scope.ts = CRM.ts('crmMsgadm');
+    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/crmMsgadm'}); // See: templates/CRM/MessageAdmin/crmMsgadm.hlp
 
     var $ctrl = this, model = $scope.model;
 

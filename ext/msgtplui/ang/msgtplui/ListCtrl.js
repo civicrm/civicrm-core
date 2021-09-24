@@ -16,8 +16,8 @@
     return newRec;
   }
 
-  angular.module('msgtplui').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location, dialogService) {
-    var ts = $scope.ts = CRM.ts('msgtplui');
+  angular.module('crmMsgadm').controller('MsgtpluiListCtrl', function($scope, $route, crmApi4, crmStatus, crmUiAlert, crmUiHelp, prefetch, $location, dialogService) {
+    var ts = $scope.ts = CRM.ts('crmMsgadm');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/User'}); // See: templates/CRM/MessageAdmin/User.hlp
     $scope.crmUrl = CRM.url;
     $scope.crmUiAlert = crmUiAlert;
@@ -81,12 +81,12 @@
     $ctrl.addTranslation = function(record) {
       var existing = findTranslations(record), activeLangs = findActiveLangs();
       var langs = [];
-      angular.forEach(CRM.msgtplui.allLanguages, function (label, value) {
+      angular.forEach(CRM.crmMsgadm.allLanguages, function (label, value) {
         langs.push({
           name: value,
           label: label,
           is_allowed: !existing[value],
-          is_encouraged: !!(activeLangs[value] || CRM.msgtplui.uiLanguages[value])
+          is_encouraged: !!(activeLangs[value] || CRM.crmMsgadm.uiLanguages[value])
         });
       });
       var model = {
@@ -101,7 +101,7 @@
         width: '50%',
         title: ts('Add Translation')
       });
-      return dialogService.open('addTranslationDlg', '~/msgtplui/AddTranslation.html', model, options)
+      return dialogService.open('addTranslationDlg', '~/crmMsgadm/AddTranslation.html', model, options)
         .then(function(){
           var selection = (model.selected === 'other') ? model.selectedOther : model.selected;
           window.location = $ctrl.editUrl({id: record.id, tx_language: selection});

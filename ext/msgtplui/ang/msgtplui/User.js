@@ -1,12 +1,12 @@
 (function(angular, $, _) {
 
   // Display a list of user-driven message-templates.
-  angular.module('msgtplui').config(function($routeProvider) {
+  angular.module('crmMsgadm').config(function($routeProvider) {
       $routeProvider.when('/user', {
         reloadOnSearch: false,
         controller: 'MsgtpluiListCtrl',
         controllerAs: '$ctrl',
-        templateUrl: '~/msgtplui/User.html',
+        templateUrl: '~/crmMsgadm/User.html',
         resolve: {
           prefetch: function(crmApi4, crmStatus) {
             var q = crmApi4({

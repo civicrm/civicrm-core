@@ -1,12 +1,12 @@
 (function (angular, $, _) {
-  angular.module('msgtplui').component('msgtpluiEditContent', {
+  angular.module('crmMsgadm').component('crmMsgadmEditContent', {
     bindings: {
       onPreview: '&',
       options: '='
     },
-    templateUrl: '~/msgtplui/EditContent.html',
+    templateUrl: '~/crmMsgadm/EditContent.html',
     controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService, $rootScope) {
-      var ts = $scope.ts = CRM.ts('msgtplui');
+      var ts = $scope.ts = CRM.ts('crmMsgadm');
       var $ctrl = this;
 
       $ctrl.isDisabled = function() {
@@ -41,7 +41,7 @@
           height: '90%',
           width: '90%'
         });
-        return dialogService.open('expandedEditDlg', '~/msgtplui/ExpandedEdit.html', model, options)
+        return dialogService.open('expandedEditDlg', '~/crmMsgadm/ExpandedEdit.html', model, options)
           // Nothing to do but hide warnings. The field was edited live.
           .then(function(){}, function(){});
       };

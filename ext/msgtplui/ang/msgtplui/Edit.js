@@ -103,11 +103,11 @@
     });
   }
 
-  angular.module('msgtplui').config(function($routeProvider) {
+  angular.module('crmMsgadm').config(function($routeProvider) {
       $routeProvider.when('/edit', {
         controller: 'MsgtpluiEdit',
         controllerAs: '$ctrl',
-        templateUrl: '~/msgtplui/Edit.html',
+        templateUrl: '~/crmMsgadm/Edit.html',
 
         // If you need to look up data when opening the page, list it out
         // under "resolve".
@@ -150,14 +150,14 @@
     }
   );
 
-  angular.module('msgtplui').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService) {
+  angular.module('crmMsgadm').controller('MsgtpluiEdit', function($q, $scope, crmApi4, crmBlocker, crmStatus, crmUiAlert, crmUiHelp, $location, prefetch, tokenList, $rootScope, dialogService) {
     var block = $scope.block = crmBlocker();
-    var ts = $scope.ts = CRM.ts('msgtplui');
+    var ts = $scope.ts = CRM.ts('crmMsgadm');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/Edit'}); // See: templates/CRM/MessageAdmin/Edit.hlp
     var $ctrl = this;
     var args = $location.search();
 
-    $ctrl.locales = CRM.msgtplui.allLanguages;
+    $ctrl.locales = CRM.crmMsgadm.allLanguages;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
     if (args.lang) {
@@ -300,7 +300,7 @@
           height: '90%',
           width: '90%'
         });
-        return dialogService.open('previewMsgDlg', '~/msgtplui/Preview.html', model, options)
+        return dialogService.open('previewMsgDlg', '~/crmMsgadm/Preview.html', model, options)
           // Nothing to do but hide warnings. The field was edited live.
           .then(function(){}, function(){});
       }, function(failure) {

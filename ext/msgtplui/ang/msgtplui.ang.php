@@ -4,15 +4,15 @@
 // \https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules/n
 return [
   'js' => [
-    'ang/msgtplui.js',
-    'ang/msgtplui/*.js',
-    'ang/msgtplui/*/*.js',
+    'ang/crmMsgadm.js',
+    'ang/crmMsgadm/*.js',
+    'ang/crmMsgadm/*/*.js',
   ],
   'css' => [
-    'ang/msgtplui.css',
+    'ang/crmMsgadm.css',
   ],
   'partials' => [
-    'ang/msgtplui',
+    'ang/crmMsgadm',
   ],
   'bundles' => [
     'bootstrap3',

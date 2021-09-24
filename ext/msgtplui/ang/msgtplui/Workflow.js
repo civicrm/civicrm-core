@@ -1,7 +1,7 @@
 (function(angular, $, _) {
 
   // Display a list of system-workflow message-templates.
-  angular.module('msgtplui').config(function($routeProvider) {
+  angular.module('crmMsgadm').config(function($routeProvider) {
       $routeProvider.when('/workflow', {
         reloadOnSearch: false,
         controller: 'MsgtpluiListCtrl',
@@ -9,12 +9,12 @@
         templateUrl: function() {
           // The original drafts had a mode where the "Translate" button was conditioned on some kind of language-opt-in.
           // However, uiLanguages isn't giving that signal anymore, and that opt-in isn't strictly needed since htis
-          // is currently packaged as an opt-in extension. Maybe we should just remove `~/msgtplui/Workflow.html` in a few months.
+          // is currently packaged as an opt-in extension. Maybe we should just remove `~/crmMsgadm/Workflow.html` in a few months.
           // But for the moment, keep it around it in case we have to pivot.
 
-          // var supportsTranslation = CRM.msgtplui.uiLanguages && _.size(CRM.msgtplui.uiLanguages) > 1;
-          // return supportsTranslation ? '~/msgtplui/WorkflowTranslated.html' : '~/msgtplui/Workflow.html';
-          return '~/msgtplui/WorkflowTranslated.html';
+          // var supportsTranslation = CRM.crmMsgadm.uiLanguages && _.size(CRM.crmMsgadm.uiLanguages) > 1;
+          // return supportsTranslation ? '~/crmMsgadm/WorkflowTranslated.html' : '~/crmMsgadm/Workflow.html';
+          return '~/crmMsgadm/WorkflowTranslated.html';
         },
         resolve: {
           prefetch: function(crmApi4, crmStatus) {

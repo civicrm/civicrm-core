@@ -1,4 +1,4 @@
 (function(angular, $, _) {
   // Declare a list of dependencies.
-  angular.module('msgtplui', CRM.angRequires('msgtplui'));
+  angular.module('crmMsgadm', CRM.angRequires('crmMsgadm'));
 })(angular, CRM.$, CRM._);
