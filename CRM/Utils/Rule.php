@@ -874,7 +874,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function settingPath($path) {
-    return is_dir(Civi::paths()->getPath($path));
+    return @is_dir(Civi::paths()->getPath($path));
   }
 
   /**

@@ -29,18 +29,18 @@ function civicrm_setup($filesDirectory) {
   $sqlPath = $crmPath . DIRECTORY_SEPARATOR . 'sql';
   $tplPath = $crmPath . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR;
 
-  if (!is_dir($filesDirectory)) {
+  if (!@is_dir($filesDirectory)) {
     mkdir($filesDirectory, 0777);
     chmod($filesDirectory, 0777);
   }
 
   $scratchDir = $filesDirectory . DIRECTORY_SEPARATOR . 'civicrm';
-  if (!is_dir($scratchDir)) {
+  if (!@is_dir($scratchDir)) {
     mkdir($scratchDir, 0777);
   }
 
   $compileDir = $scratchDir . DIRECTORY_SEPARATOR . 'templates_c' . DIRECTORY_SEPARATOR;
-  if (!is_dir($compileDir)) {
+  if (!@is_dir($compileDir)) {
     mkdir($compileDir, 0777);
   }
   $compileDir = addslashes($compileDir);

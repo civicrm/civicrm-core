@@ -129,7 +129,7 @@ class CRM_Extension_System {
       // At time of writing, D6, D7, and WP support cmsRootPath() but J does not
       if (NULL !== $this->parameters['cmsRootPath']) {
         $vendorPath = $this->parameters['cmsRootPath'] . DIRECTORY_SEPARATOR . 'vendor';
-        if (is_dir($vendorPath)) {
+        if (@is_dir($vendorPath)) {
           $containers['cmsvendor'] = new CRM_Extension_Container_Basic(
             $vendorPath,
             CRM_Utils_File::addTrailingSlash($this->parameters['userFrameworkBaseURL'], '/') . 'vendor',

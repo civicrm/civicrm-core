@@ -87,7 +87,7 @@ class SettingsMetadata {
     $loadedFolders = [];
     foreach ($metaDataFolders as $metaDataFolder) {
       $realFolder = realpath($metaDataFolder);
-      if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
+      if (@is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
         $loadedFolders[$realFolder] = TRUE;
         $settingsMetadata = $settingsMetadata + self::loadSettingsMetadata($metaDataFolder);
       }

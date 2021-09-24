@@ -52,7 +52,7 @@ class CRM_Extension_Browser {
     $this->repoUrl = $repoUrl;
     $this->cacheDir = $cacheDir;
     $this->indexPath = empty($indexPath) ? self::SINGLE_FILE_PATH : $indexPath;
-    if ($cacheDir && !file_exists($cacheDir) && is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
+    if ($cacheDir && !file_exists($cacheDir) && @is_dir(dirname($cacheDir)) && is_writable(dirname($cacheDir))) {
       CRM_Utils_File::createDir($cacheDir, FALSE);
     }
   }
@@ -99,7 +99,7 @@ class CRM_Extension_Browser {
 
     $errors = [];
 
-    if (!$this->cacheDir || !is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
+    if (!$this->cacheDir || !@is_dir($this->cacheDir) || !is_writable($this->cacheDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
       $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
       $errors[] = array(

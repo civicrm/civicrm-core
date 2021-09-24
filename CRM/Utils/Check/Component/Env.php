@@ -542,7 +542,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       return $messages;
     }
 
-    if (!is_dir($basedir)) {
+    if (!@is_dir($basedir)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('Your extensions directory path points to %1, which is not a directory.  Please check your file system.',

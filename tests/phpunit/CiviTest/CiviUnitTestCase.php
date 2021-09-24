@@ -2185,7 +2185,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       return;
     }
     foreach ($this->tempDirs as $tempDir) {
-      if (is_dir($tempDir)) {
+      if (@is_dir($tempDir)) {
         CRM_Utils_File::cleanDir($tempDir, TRUE, FALSE);
       }
     }

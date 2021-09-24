@@ -92,7 +92,7 @@ class CRM_Utils_File {
    *   FALSE: Creation failed.
    */
   public static function createDir($path, $abort = TRUE) {
-    if (is_dir($path) || empty($path)) {
+    if (@is_dir($path) || empty($path)) {
       return NULL;
     }
 
@@ -133,7 +133,7 @@ class CRM_Utils_File {
         if (!in_array($sibling, $exceptions)) {
           $object = $target . DIRECTORY_SEPARATOR . $sibling;
 
-          if (is_dir($object)) {
+          if (@is_dir($object)) {
             CRM_Utils_File::cleanDir($object, $rmdir, $verbose);
           }
           elseif (is_file($object)) {
@@ -190,7 +190,7 @@ class CRM_Utils_File {
       @mkdir($destination);
       while (FALSE !== ($file = readdir($dh))) {
         if (($file != '.') && ($file != '..')) {
-          if (is_dir($source . DIRECTORY_SEPARATOR . $file)) {
+          if (@is_dir($source . DIRECTORY_SEPARATOR . $file)) {
             CRM_Utils_File::copyDir($source . DIRECTORY_SEPARATOR . $file, $destination . DIRECTORY_SEPARATOR . $file);
           }
           else {
@@ -528,7 +528,7 @@ class CRM_Utils_File {
     // note: empty value for $dir can play havoc, since that might result in putting '.htaccess' to root dir
     // of site, causing site to stop functioning.
     // FIXME: we should do more checks here -
-    if (!empty($dir) && is_dir($dir)) {
+    if (!empty($dir) && @is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
 # Apache 2.2
@@ -559,7 +559,7 @@ HTACCESS;
    * @param $publicDir
    */
   public static function restrictBrowsing($publicDir) {
-    if (!is_dir($publicDir) || !is_writable($publicDir)) {
+    if (!@is_dir($publicDir) || !is_writable($publicDir)) {
       return;
     }
 
@@ -572,7 +572,7 @@ HTACCESS;
     // child dirs
     $dir = new RecursiveDirectoryIterator($publicDir);
     foreach ($dir as $name => $object) {
-      if (is_dir($name) && $name != '..') {
+      if (@is_dir($name) && $name != '..') {
         $nobrowse = realpath($name) . '/index.html';
         if (!file_exists($nobrowse)) {
           @file_put_contents($nobrowse, '');
@@ -742,7 +742,7 @@ HTACCESS;
    * @return array(string)
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
-    if (!is_dir($dir) || !is_readable($dir)) {
+    if (!@is_dir($dir) || !is_readable($dir)) {
       return [];
     }
     // Which dirs should we exclude from our searches?
@@ -760,7 +760,7 @@ HTACCESS;
       $matches = glob("$subdir/$pattern");
       if (is_array($matches)) {
         foreach ($matches as $match) {
-          if (!is_dir($match)) {
+          if (!@is_dir($match)) {
             $result[] = $relative ? CRM_Utils_File::relativize($match, "$dir/") : $match;
           }
         }
@@ -777,7 +777,7 @@ HTACCESS;
             $entry !== '.'
             && $entry !== '..'
             && (empty($excludeDirsPattern) || !preg_match($excludeDirsPattern, $path))
-            && is_dir($path)
+            && @is_dir($path)
             && is_readable($path)
           ) {
             $todos[] = $path;
@@ -834,7 +834,7 @@ HTACCESS;
    *   TRUE on success
    */
   public static function replaceDir($fromDir, $toDir, $verbose = FALSE) {
-    if (is_dir($toDir)) {
+    if (@is_dir($toDir)) {
       if (!self::cleanDir($toDir, TRUE, $verbose)) {
         return FALSE;
       }

@@ -237,7 +237,7 @@ function _sequentialcreditnotes_civix_find_files($dir, $pattern) {
   while (!empty($todos)) {
     $subdir = array_shift($todos);
     foreach (_sequentialcreditnotes_civix_glob("$subdir/$pattern") as $match) {
-      if (!is_dir($match)) {
+      if (!@is_dir($match)) {
         $result[] = $match;
       }
     }
@@ -246,7 +246,7 @@ function _sequentialcreditnotes_civix_find_files($dir, $pattern) {
         $path = $subdir . DIRECTORY_SEPARATOR . $entry;
         if ($entry[0] == '.') {
         }
-        elseif (is_dir($path)) {
+        elseif (@is_dir($path)) {
           $todos[] = $path;
         }
       }
@@ -290,7 +290,7 @@ function _sequentialcreditnotes_civix_civicrm_managed(&$entities) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
  */
 function _sequentialcreditnotes_civix_civicrm_caseTypes(&$caseTypes) {
-  if (!is_dir(__DIR__ . '/xml/case')) {
+  if (!@is_dir(__DIR__ . '/xml/case')) {
     return;
   }
 
@@ -318,7 +318,7 @@ function _sequentialcreditnotes_civix_civicrm_caseTypes(&$caseTypes) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
 function _sequentialcreditnotes_civix_civicrm_angularModules(&$angularModules) {
-  if (!is_dir(__DIR__ . '/ang')) {
+  if (!@is_dir(__DIR__ . '/ang')) {
     return;
   }
 
@@ -459,7 +459,7 @@ function _sequentialcreditnotes_civix_fixNavigationMenuItems(&$nodes, &$maxNavID
  */
 function _sequentialcreditnotes_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   $settingsDir = __DIR__ . DIRECTORY_SEPARATOR;
-  if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
+  if (!in_array($settingsDir, $metaDataFolders) && @is_dir($settingsDir)) {
     $metaDataFolders[] = $settingsDir;
   }
 }

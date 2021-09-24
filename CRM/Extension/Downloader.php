@@ -51,7 +51,7 @@ class CRM_Extension_Downloader {
   public function checkRequirements($extensionInfo = NULL) {
     $errors = [];
 
-    if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
+    if (!$this->containerDir || !@is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
       $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination=${civicrmDestination}");
       $errors[] = array(
@@ -166,7 +166,7 @@ class CRM_Extension_Downloader {
         return FALSE;
       }
       $extractedZipPath = $this->tmpDir . DIRECTORY_SEPARATOR . $zipSubDir;
-      if (is_dir($extractedZipPath)) {
+      if (@is_dir($extractedZipPath)) {
         if (!CRM_Utils_File::cleanDir($extractedZipPath, TRUE, FALSE)) {
           CRM_Core_Session::setStatus(ts('Unable to extract the extension: %1 cannot be cleared', array(1 => $extractedZipPath)), ts('Installation Error'), 'error');
           return FALSE;

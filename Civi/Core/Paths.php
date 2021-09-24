@@ -84,7 +84,7 @@ class Paths {
       ->register('civicrm.l10n', function () {
         $dir = defined('CIVICRM_L10N_BASEDIR') ? CIVICRM_L10N_BASEDIR : \Civi::paths()->getPath('[civicrm.private]/l10n');
         return [
-          'path' => is_dir($dir) ? $dir : \Civi::paths()->getPath('[civicrm.root]/l10n'),
+          'path' => @is_dir($dir) ? $dir : \Civi::paths()->getPath('[civicrm.root]/l10n'),
         ];
       })
       ->register('cms', function () {

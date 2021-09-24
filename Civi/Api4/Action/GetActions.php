@@ -60,7 +60,7 @@ class GetActions extends BasicGetAction {
    */
   private function scanDir($dir, $nameSpace) {
     $dir .= str_replace('\\', '/', $nameSpace);
-    if (is_dir($dir)) {
+    if (@is_dir($dir)) {
       foreach (glob("$dir/*.php") as $file) {
         $actionName = basename($file, '.php');
         $actionClass = new \ReflectionClass($nameSpace . '\\' . $actionName);

@@ -86,7 +86,7 @@ putenv("CIVICRM_UF=$CIVICRM_UF");
 // Transition: Make sure we use phpunit code from PATH, not
 // civicrm-packages.  This will be unnecessary once civicrm-packages is
 // updated.
-if (is_dir('packages/PHPUnit/')) {
+if (@is_dir('packages/PHPUnit/')) {
   if (!rename('packages/PHPUnit', 'packages/PHPUnit.bak')) {
     echo "Failed to move aside stale copy of PHPUnit.\n";
     exit(1);

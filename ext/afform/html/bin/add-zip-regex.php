@@ -26,7 +26,7 @@ foreach ($files as $file) {
   }
   $file = preg_replace(':^\./:', '', $file);
   $internalName = preg_replace($argv[2], $argv[3], $file);
-  if (file_exists($file) && is_dir($file)) {
+  if (file_exists($file) && @is_dir($file)) {
     $zip->addEmptyDir($internalName);
   }
   else {

@@ -71,7 +71,7 @@ class ManagerTest extends \CiviUnitTestCase {
       if (isset($module['partials'])) {
         $this->assertTrue(is_array($module['partials']));
         foreach ((array) $module['partials'] as $basedir) {
-          $this->assertTrue(is_dir($this->res->getPath($module['ext']) . '/' . $basedir));
+          $this->assertTrue(@is_dir($this->res->getPath($module['ext']) . '/' . $basedir));
           $counts['partials']++;
         }
       }

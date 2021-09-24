@@ -605,7 +605,7 @@ SET    version = '$version'
     $files = $source->findOrphanedFiles();
     $errors = [];
     foreach ($files as $file) {
-      if (is_dir($file['path'])) {
+      if (@is_dir($file['path'])) {
         @rmdir($file['path']);
       }
       else {

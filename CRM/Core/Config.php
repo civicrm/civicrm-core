@@ -166,7 +166,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       $this->configAndLogDir,
       $this->customFileUploadDir,
     ] as $dir) {
-      if ($dir && is_dir($dir)) {
+      if ($dir && @is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
       }
     }

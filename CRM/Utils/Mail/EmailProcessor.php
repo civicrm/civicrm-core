@@ -54,7 +54,7 @@ class CRM_Utils_Mail_EmailProcessor {
    */
   public static function cleanupDir($dir, $age = 5184000) {
     // return early if we can’t read/write the dir
-    if (!is_writable($dir) or !is_readable($dir) or !is_dir($dir)) {
+    if (!is_writable($dir) or !is_readable($dir) or !@is_dir($dir)) {
       return;
     }
 
@@ -69,7 +69,7 @@ class CRM_Utils_Mail_EmailProcessor {
       }
 
       // it’s an old file/dir, so delete/recurse
-      is_dir("$dir/$file") ? self::cleanupDir("$dir/$file", $age) : unlink("$dir/$file");
+      @is_dir("$dir/$file") ? self::cleanupDir("$dir/$file", $age) : unlink("$dir/$file");
     }
   }
 

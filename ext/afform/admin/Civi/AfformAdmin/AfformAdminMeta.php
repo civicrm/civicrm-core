@@ -180,7 +180,7 @@ class AfformAdminMeta {
     // Scan all extensions for entities & input types
     foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
       $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath']));
-      if (is_dir($dir)) {
+      if (@is_dir($dir)) {
         // Scan for entities
         foreach (glob($dir . 'afformEntities/*.php') as $file) {
           $entityInfo = include $file;

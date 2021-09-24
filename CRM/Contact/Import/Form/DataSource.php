@@ -223,7 +223,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     global $civicrm_root;
     $dataSourceDir = $civicrm_root . DIRECTORY_SEPARATOR . 'CRM' . DIRECTORY_SEPARATOR . 'Import' . DIRECTORY_SEPARATOR . 'DataSource' . DIRECTORY_SEPARATOR;
     $dataSources = [];
-    if (!is_dir($dataSourceDir)) {
+    if (!@is_dir($dataSourceDir)) {
       $this->invalidConfig("Import DataSource directory $dataSourceDir does not exist");
     }
     if (!$dataSourceHandle = opendir($dataSourceDir)) {

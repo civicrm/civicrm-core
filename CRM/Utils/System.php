@@ -1756,7 +1756,7 @@ class CRM_Utils_System {
     $inc_dirs = explode(PATH_SEPARATOR, get_include_path());
     foreach ($inc_dirs as $inc_dir) {
       $target_dir = $inc_dir . DIRECTORY_SEPARATOR . $relpath;
-      if (is_dir($target_dir)) {
+      if (@is_dir($target_dir)) {
         $cur_list = scandir($target_dir);
         foreach ($cur_list as $fname) {
           if ($fname != '.' && $fname != '..') {

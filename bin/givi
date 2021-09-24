@@ -215,7 +215,7 @@ class Givi {
 
     // Filter branch list based on what repos actually exist
     foreach (array_keys($this->repos) as $repo) {
-      if (!is_dir($this->repos[$repo])) {
+      if (!@is_dir($this->repos[$repo])) {
         unset($this->repos[$repo]);
       }
     }

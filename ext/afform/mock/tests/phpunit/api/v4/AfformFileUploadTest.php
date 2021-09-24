@@ -149,7 +149,7 @@ EOHTML;
    */
   protected function mockUploadFile() {
     $tmpDir = sys_get_temp_dir();
-    $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
+    $this->assertTrue($tmpDir && @is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     $fileName = uniqid() . '.txt';
     $filePath = $tmpDir . '/' . $fileName;
     file_put_contents($filePath, 'Hello');

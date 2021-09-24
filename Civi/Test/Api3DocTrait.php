@@ -120,7 +120,7 @@ trait Api3DocTrait {
 
     global $civicrm_root;
     if (file_exists($civicrm_root . '/tests/templates/documentFunction.tpl')) {
-      if (!is_dir($civicrm_root . "/api/v3/examples/$entity")) {
+      if (!@is_dir($civicrm_root . "/api/v3/examples/$entity")) {
         mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
       $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.ex.php", "w+b");

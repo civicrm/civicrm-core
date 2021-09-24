@@ -242,7 +242,7 @@ class CRM_Core_Config_MagicMerge {
         if ($value) {
           $value = CRM_Utils_File::addTrailingSlash($value);
           if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
-            if (!is_dir($value) && !CRM_Utils_File::createDir($value, FALSE)) {
+            if (!@is_dir($value) && !CRM_Utils_File::createDir($value, FALSE)) {
               CRM_Core_Session::setStatus(ts('Failed to make directory (%1) at "%2". Please update the settings or file permissions.', [
                 1 => $k,
                 2 => $value,

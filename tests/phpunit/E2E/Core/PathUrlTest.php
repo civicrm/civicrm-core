@@ -59,7 +59,7 @@ class PathUrlTest extends \CiviEndToEndTestCase {
 
     foreach (array_merge($pathOnly, $pathAndUrl) as $var) {
       $path = \Civi::paths()->getVariable($var, 'path');
-      $this->assertTrue(file_exists($path) && is_dir($path), "The path for $var should be a valid directory.");
+      $this->assertTrue(file_exists($path) && @is_dir($path), "The path for $var should be a valid directory.");
     }
 
     foreach (array_merge($urlOnly, $pathAndUrl) as $var) {

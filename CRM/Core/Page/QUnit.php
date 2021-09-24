@@ -32,7 +32,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
     }
 
     $path = CRM_Extension_System::singleton()->getMapper()->keyToBasePath($ext);
-    if (!is_dir("$path/tests/qunit/$suite")) {
+    if (!@is_dir("$path/tests/qunit/$suite")) {
       throw new CRM_Core_Exception("Failed to locate test suite");
     }
 

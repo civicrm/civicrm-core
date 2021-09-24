@@ -211,7 +211,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
           'text' => ucfirst($name),
           'icon' => NULL,
         ];
-        if (is_dir($dir . "icons")) {
+        if (@is_dir($dir . "icons")) {
           if (is_file($dir . "icons/$name.png")) {
             $plugins[$name]['icon'] = "bower_components/ckeditor/plugins/$name/icons/$name.png";
           }
@@ -311,7 +311,7 @@ class CRM_Ckeditor4_Form_CKEditorConfig extends CRM_Core_Form {
     if (!self::getConfigFile()) {
       $config = self::fileHeader() . "CKEDITOR.editorConfig = function( config ) {\n\tconfig.allowedContent = true;\n};\n";
       // Make sure directories exist
-      if (!is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
+      if (!@is_dir(Civi::paths()->getPath('[civicrm.files]/persist'))) {
         mkdir(Civi::paths()->getPath('[civicrm.files]/persist'));
       }
       $newFileName = Civi::paths()->getPath(self::CONFIG_FILEPATH . 'default.js');

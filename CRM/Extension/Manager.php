@@ -537,7 +537,7 @@ class CRM_Extension_Manager {
       while ($dao->fetch()) {
         try {
           $path = $this->fullContainer->getPath($dao->full_name);
-          $codeExists = !empty($path) && is_dir($path);
+          $codeExists = !empty($path) && @is_dir($path);
         }
         catch (CRM_Extension_Exception $e) {
           $codeExists = FALSE;

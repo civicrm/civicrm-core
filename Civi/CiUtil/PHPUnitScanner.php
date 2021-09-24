@@ -37,7 +37,7 @@ class PHPUnitScanner {
     $finder = new Finder();
 
     foreach ($paths as $path) {
-      if (is_dir($path)) {
+      if (@is_dir($path)) {
         foreach ($finder->files()->in($paths)->name('*Test.php') as $file) {
           $testClass = self::_findTestClasses((string) $file);
           if (count($testClass) == 1) {

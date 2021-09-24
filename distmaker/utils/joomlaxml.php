@@ -27,7 +27,7 @@ generateJoomlaConfig($version);
  * @internal param \mode $peram for that directory
  */
 function createDir($dir, $perm = 0755) {
-  if (!is_dir($dir)) {
+  if (!@is_dir($dir)) {
     echo "Outdir: $dir\n";
     mkdir($dir, $perm, TRUE);
   }

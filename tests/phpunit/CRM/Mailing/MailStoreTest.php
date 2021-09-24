@@ -16,7 +16,7 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
 
   public function tearDown(): void {
     parent::tearDown();
-    if (is_dir($this->workDir)) {
+    if (@is_dir($this->workDir)) {
       CRM_Utils_File::cleanDir($this->workDir);
     }
   }

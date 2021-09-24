@@ -89,7 +89,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       );
       foreach ($locations as $location) {
         $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
-        if (is_dir($dir)) {
+        if (@is_dir($dir)) {
           foreach (glob("$dir/*.php") as $file) {
             $className = 'Civi\Api4\\' . basename($file, '.php');
             if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {

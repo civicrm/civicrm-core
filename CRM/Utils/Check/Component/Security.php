@@ -302,7 +302,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    * @return bool
    */
   public function isBrowsable($dir, $url) {
-    if (empty($dir) || empty($url) || !is_dir($dir)) {
+    if (empty($dir) || empty($url) || !@is_dir($dir)) {
       return FALSE;
     }
 
@@ -337,7 +337,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
    */
   public function isDirAccessible($dir, $url) {
     $url = rtrim($url, '/');
-    if (empty($dir) || empty($url) || !is_dir($dir)) {
+    if (empty($dir) || empty($url) || !@is_dir($dir)) {
       return FALSE;
     }
 

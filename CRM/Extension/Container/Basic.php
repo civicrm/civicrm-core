@@ -102,7 +102,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public function checkRequirements() {
     $errors = [];
 
-    if (empty($this->baseDir) || !is_dir($this->baseDir)) {
+    if (empty($this->baseDir) || !@is_dir($this->baseDir)) {
       $errors[] = [
         'title' => ts('Invalid Base Directory'),
         'message' => ts('An extension container has been defined with a blank directory.'),

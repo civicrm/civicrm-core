@@ -693,7 +693,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    */
   protected function tmpFile($name) {
     $tmpDir = sys_get_temp_dir();
-    $this->assertTrue($tmpDir && is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
+    $this->assertTrue($tmpDir && @is_dir($tmpDir), 'Tmp dir must exist: ' . $tmpDir);
     return $tmpDir . '/' . self::getFilePrefix() . $name;
   }
 
