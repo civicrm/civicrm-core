@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_Msgtplui_ExtensionUtil {
+class CRM_MessageAdmin_ExtensionUtil {
   const SHORT_NAME = 'message_admin';
   const LONG_NAME = 'message_admin';
-  const CLASS_PREFIX = 'CRM_Msgtplui';
+  const CLASS_PREFIX = 'CRM_MessageAdmin';
 
   /**
    * Translate a string using the extension's domain.
@@ -77,7 +77,7 @@ class CRM_Msgtplui_ExtensionUtil {
 
 }
 
-use CRM_Msgtplui_ExtensionUtil as E;
+use CRM_MessageAdmin_ExtensionUtil as E;
 
 /**
  * (Delegated) Implements hook_civicrm_config().
@@ -206,14 +206,14 @@ function _message_admin_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL
 }
 
 /**
- * @return CRM_Msgtplui_Upgrader
+ * @return CRM_MessageAdmin_Upgrader
  */
 function _message_admin_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/Msgtplui/Upgrader.php')) {
+  if (!file_exists(__DIR__ . '/CRM/MessageAdmin/Upgrader.php')) {
     return NULL;
   }
   else {
-    return CRM_Msgtplui_Upgrader_Base::instance();
+    return CRM_MessageAdmin_Upgrader_Base::instance();
   }
 }
 

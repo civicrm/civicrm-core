@@ -1,6 +1,6 @@
 <?php
 
-class CRM_Msgtplui_Settings {
+class CRM_MessageAdmin_Settings {
 
   public static function getAll() {
     $allLangs = \Civi\Api4\OptionValue::get()

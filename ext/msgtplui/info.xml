@@ -31,6 +31,6 @@
     <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
   <civix>
-    <namespace>CRM/Msgtplui</namespace>
+    <namespace>CRM/MessageAdmin</namespace>
   </civix>
 </extension>

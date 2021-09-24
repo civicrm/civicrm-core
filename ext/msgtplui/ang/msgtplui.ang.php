@@ -37,5 +37,5 @@ return [
     'edit system workflow message templates',
     'access CiviMail',
   ],
-  'settingsFactory' => ['CRM_Msgtplui_Settings', 'getAll'],
+  'settingsFactory' => ['CRM_MessageAdmin_Settings', 'getAll'],
 ];

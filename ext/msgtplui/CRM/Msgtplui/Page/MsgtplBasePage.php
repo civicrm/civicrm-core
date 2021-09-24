@@ -1,7 +1,7 @@
 <?php
-use CRM_Msgtplui_ExtensionUtil as E;
+use CRM_MessageAdmin_ExtensionUtil as E;
 
-class CRM_Msgtplui_Page_MsgtplBasePage extends CRM_Core_Page {
+class CRM_MessageAdmin_Page_MsgtplBasePage extends CRM_Core_Page {
 
   public function run() {
     // Did we get an old school URL? Translate to preferred format.

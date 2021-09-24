@@ -2,7 +2,7 @@
 
   angular.module('msgtplui').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q) {
     var ts = $scope.ts = CRM.ts('msgtplui');
-    var hs = $scope.hs = crmUiHelp({file: 'CRM/Msgtplui/msgtplui'}); // See: templates/CRM/Msgtplui/msgtplui.hlp
+    var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/msgtplui'}); // See: templates/CRM/MessageAdmin/msgtplui.hlp
 
     var $ctrl = this, model = $scope.model;
 

@@ -2,7 +2,7 @@
 
 require_once 'message_admin.civix.php';
 // phpcs:disable
-use CRM_Msgtplui_ExtensionUtil as E;
+use CRM_MessageAdmin_ExtensionUtil as E;
 // phpcs:enable
 
 /**
