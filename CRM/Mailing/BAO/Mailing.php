@@ -304,25 +304,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         ->execute();
     }
 
-    // Construct the filtered search queries.
-    $dao = CRM_Utils_SQL_Select::from('civicrm_mailing_group')
-      ->select('search_id, search_args, entity_id')
-      ->where('search_id IS NOT NULL AND mailing_id = #mailingID')
-      ->param('#mailingID', $mailingID)
-      ->execute();
-    while ($dao->fetch()) {
-      $customSQL = CRM_Contact_BAO_SearchCustom::civiMailSQL($dao->search_id,
-        $dao->search_args,
-        $dao->entity_id
-      );
-      $query = "REPLACE INTO {$includedTempTablename} ($entityColumn, contact_id) {$customSQL} ";
-      $mailingGroup->query($query);
-    }
-
     list($aclFrom, $aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause();
 
     // clear all the mailing recipients before populating
-    CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ", [
+    CRM_Core_DAO::executeQuery(' DELETE FROM civicrm_mailing_recipients WHERE  mailing_id = %1 ', [
       1 => [
         $mailingID,
         'Integer',
