@@ -141,9 +141,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * e.g on a form declare $_dateFields = array(
    *  'receive_date' => array('default' => 'now'),
    *  );
-   *  then in postProcess call $this->convertDateFieldsToMySQL($formValues)
-   *  to have the time field re-incorporated into the field & 'now' set if
-   *  no value has been passed in
    */
   protected $_dateFields = [];
 
@@ -2147,35 +2144,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $props['data-create-links'] = json_encode($props['create']);
     }
     CRM_Utils_Array::remove($props, 'multiple', 'select', 'api', 'entity', 'create');
-  }
-
-  /**
-   * Convert all date fields within the params to mysql date ready for the
-   * BAO layer. In this case fields are checked against the $_datefields defined for the form
-   * and if time is defined it is incorporated
-   *
-   * @param array $params
-   *   Input params from the form.
-   *
-   * @todo it would probably be better to work on $this->_params than a passed array
-   * @todo standardise the format which dates are passed to the BAO layer in & remove date
-   * handling from BAO
-   */
-  public function convertDateFieldsToMySQL(&$params) {
-    foreach ($this->_dateFields as $fieldName => $specs) {
-      if (!empty($params[$fieldName])) {
-        $params[$fieldName] = CRM_Utils_Date::isoToMysql(
-          CRM_Utils_Date::processDate(
-            $params[$fieldName],
-            CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
-        );
-      }
-      else {
-        if (isset($specs['default'])) {
-          $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
-        }
-      }
-    }
   }
 
   /**
