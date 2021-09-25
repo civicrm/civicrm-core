@@ -316,21 +316,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
       CRM_Activity_BAO_Activity::create($activityParams);
 
-      // send notification
-      if ($this->getSubscriptionDetails()->contribution_page_id) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
-          $this->getSubscriptionDetails()->contribution_page_id, $value, array(
-            'title',
-            'receipt_from_name',
-            'receipt_from_email',
-          )
-        );
-        $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->getSubscriptionDetails()->contribution_page_id]) . '" <' . $value[$this->getSubscriptionDetails()->contribution_page_id]['receipt_from_email'] . '>';
-      }
-      else {
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-      }
       list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->getSubscriptionDetails()->contact_id);
       $tplParams['contact'] = array('display_name' => $donorDisplayName);
 
@@ -343,7 +328,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'tplParams' => $tplParams,
         'isTest' => $this->getSubscriptionDetails()->is_test,
         'PDFFilename' => 'receipt.pdf',
-        'from' => $receiptFrom,
+        'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       );
