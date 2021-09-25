@@ -2067,7 +2067,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
 
     if (is_array($memberships)) {
       foreach ($memberships as $membership) {
-        if ($membership) {
+        if ($membership && CRM_Member_StatusOverrideTypes::isNo($membership->is_override)) {
           $format = '%Y%m%d';
 
           //CRM-4523

@@ -65,7 +65,7 @@ class CRM_Member_StatusOverrideTypes {
    * @return bool
    */
   public static function isOverridden($overrideType) {
-    if ($overrideType == self::NO) {
+    if (self::isNo($overrideType)) {
       return FALSE;
     }
 
@@ -73,11 +73,11 @@ class CRM_Member_StatusOverrideTypes {
   }
 
   public static function isNo($overrideType) {
-    if ($overrideType != self::NO) {
-      return FALSE;
+    if (empty($overrideType) || $overrideType == self::NO) {
+      return TRUE;
     }
 
-    return TRUE;
+    return FALSE;
   }
 
   public static function isPermanent($overrideType) {
