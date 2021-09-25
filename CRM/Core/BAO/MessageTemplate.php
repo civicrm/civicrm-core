@@ -291,7 +291,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     $modelDefaults = [
       // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
       'model' => NULL,
-      // Symbolic name of the workflow step. Matches the option-value-name of the template.
+      // Symbolic name of the workflow step.
+      // workflow is preferred but either is accepted.
+      'workflow' => NULL,
       'valueName' => NULL,
       // additional template params (other than the ones already set in the template singleton)
       'tplParams' => [],
@@ -334,8 +336,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'PDFFilename' => NULL,
     ];
 
+    $workflow = $params['workflow'] ?? ($params['valueName'] ?? NULL);
     // Allow WorkflowMessage to run any filters/mappings/cleanups.
-    $model = $params['model'] ?? WorkflowMessage::create($params['valueName'] ?? 'UNKNOWN');
+    $model = $params['model'] ?? WorkflowMessage::create($workflow ?? 'UNKNOWN');
     $params = WorkflowMessage::exportAll(WorkflowMessage::importAll($model, $params));
     unset($params['model']);
     // Subsequent hooks use $params. Retaining the $params['model'] might be nice - but don't do it unless you figure out how to ensure data-consistency (eg $params['tplParams'] <=> $params['model']).
