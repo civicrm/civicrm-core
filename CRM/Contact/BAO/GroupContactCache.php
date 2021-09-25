@@ -835,7 +835,7 @@ ORDER BY   gc.contact_id, g.children
       if ($savedSearch['api_entity']) {
         $sql = self::getApiSQL($savedSearch, $groupID);
       }
-      elseif (!empty($savedSearch['form_values']['customSearchID'])) {
+      elseif (!empty($savedSearch['search_custom_id'])) {
         $sql = self::getCustomSearchSQL($savedSearch, $groupID);
       }
       else {
