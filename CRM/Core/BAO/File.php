@@ -570,8 +570,8 @@ AND       CEF.entity_id    = %2";
 
         CRM_Utils_File::formatFile($formValues, $attachName, $extraParams);
 
-        // set the formatted attachment attributes to $params, later used by
-        // CRM_Activity_BAO_Activity::sendEmail(...) to send mail with desired attachments
+        // set the formatted attachment attributes to $params, later used
+        // to send mail with desired attachments
         if (!empty($formValues[$attachName])) {
           $params[$attachName] = $formValues[$attachName];
         }
