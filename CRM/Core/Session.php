@@ -555,12 +555,25 @@ class CRM_Core_Session {
   /**
    * Retrieve contact id of the logged in user.
    *
+   * @param bool $returnChecksumContactID
+   *   Whether to return a contact ID if we are "logged in" via checksum.
+   *
    * @return int|null
    *   contact ID of logged in user
    */
-  public static function getLoggedInContactID() {
+  public static function getLoggedInContactID(bool $returnChecksumContactID = FALSE) {
     $session = CRM_Core_Session::singleton();
     if (!is_numeric($session->get('userID'))) {
+      if ($returnChecksumContactID && !empty($_REQUEST['cs'])) {
+        // If user is accessing via a "checksum" link validate that and return their contact ID.
+        $userChecksum = CRM_Utils_Request::retrieveValue('cs', 'String');
+        $checksumCID = CRM_Utils_Request::retrieveValue('cid', 'Positive');
+        $validUser = CRM_Contact_BAO_Contact_Utils::validChecksum($checksumCID, $userChecksum);
+
+        if ($validUser) {
+          return (int) $checksumCID;
+        }
+      }
       return NULL;
     }
     return (int) $session->get('userID');
