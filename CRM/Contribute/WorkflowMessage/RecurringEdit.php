@@ -7,7 +7,9 @@
  * @method array getContributionRecur()
  */
 class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\GenericWorkflowMessage {
-  const WORKFLOW = 'contribution_recurring_edit';
+  use CRM_Contribute_WorkflowMessage_RecurringTrait;
+
+  public const WORKFLOW = 'contribution_recurring_edit';
 
   /**
    * The recurring contribution contact.
@@ -21,23 +23,6 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
   public $contact;
 
   /**
-   * The recurring contribution.
-   *
-   * @var array|null
-   *
-   * @scope tokenContext as contribution_recur
-   *
-   * @required
-   */
-  public $contributionRecur;
-
-  /**
-   * @var int
-   * @scope tokenContext as contribution_recurId
-   */
-  public $contributionRecurId;
-
-  /**
    * Smarty template historically defined a property 'receipt_from_email'.
    * (Note the asymmetric lack of 'receipt_from_name'.)
    *
@@ -47,14 +32,6 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
    * @scope tplParams as receipt_from_email
    */
   public $receiptFromEmail;
-
-  public function setContributionRecur(array $contributionRecur) {
-    $this->contributionRecur = $contributionRecur;
-    if (!empty($contributionRecur['id'])) {
-      $this->contributionRecurId = $contributionRecur['id'];
-    }
-    return $this;
-  }
 
   protected function exportExtraTokenContext(array &$export): void {
     $export['smartyTokenAlias']['installments'] = 'contribution_recur.installments';

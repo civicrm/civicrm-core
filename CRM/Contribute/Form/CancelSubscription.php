@@ -239,15 +239,11 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         $msgType = 'info';
       }
       else {
-        $tplParams['recur_frequency_interval'] = $this->getSubscriptionDetails()->frequency_interval;
-        $tplParams['recur_frequency_unit'] = $this->getSubscriptionDetails()->frequency_unit;
-        $tplParams['amount'] = CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency);
-        $tplParams['contact'] = ['display_name' => $this->_donorDisplayName];
         $status = ts('The recurring contribution of %1, every %2 %3 has been cancelled.',
           [
-            1 => $tplParams['amount'],
-            2 => $tplParams['recur_frequency_interval'],
-            3 => $tplParams['recur_frequency_unit'],
+            1 => CRM_Utils_Money::format($this->getSubscriptionDetails()->amount, $this->getSubscriptionDetails()->currency),
+            2 => $this->getSubscriptionDetails()->frequency_interval,
+            3 => $this->getSubscriptionDetails()->frequency_unit,
           ]
         );
         $msgTitle = 'Contribution Cancelled';
@@ -262,6 +258,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
             'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
             'contactId' => $this->getSubscriptionDetails()->contact_id,
             'tplParams' => $tplParams,
+            'tokenContext' => ['contribution_recurId' => $this->getContributionRecurID()],
             //'isTest'    => $isTest, set this from _objects
             'PDFFilename' => 'receipt.pdf',
             'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
