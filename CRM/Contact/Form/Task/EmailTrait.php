@@ -443,13 +443,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $this->getSubject($formValues['subject']),
       $formValues['text_message'],
       $formValues['html_message'],
-      NULL,
-      NULL,
       $from,
       $this->getAttachments($formValues),
       $cc,
       $bcc,
-      array_keys($this->_toContactDetails),
       $additionalDetails,
       $this->getContributionIDs(),
       CRM_Utils_Array::value('campaign_id', $formValues),
@@ -781,6 +778,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * Do not use this function outside of core tested code. It will change.
    *
+   * It will also become protected once tests no longer call it.
+   *
    * @internal
    *
    * Also insert a contact activity in each contacts record.
@@ -791,10 +790,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *   The subject of the message.
    * @param $text
    * @param $html
-   * @param string $emailAddress
-   *   Use this 'to' email address instead of the default Primary address.
-   * @param int|null $userID
-   *   Use this userID if set.
    * @param string|null $from
    * @param array|null $attachments
    *   The array of attachments if any.
@@ -802,8 +797,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *   Cc recipient.
    * @param string|null $bcc
    *   Bcc recipient.
-   * @param array|null $contactIds
-   *   unused.
    * @param string|null $additionalDetails
    *   The additional information of CC and BCC appended to the activity Details.
    * @param array|null $contributionIds
@@ -816,28 +809,28 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @internal
+   *
+   * Also insert a contact activity in each contacts record.
+   *
    */
   public function sendEmail(
     $contactDetails,
     $subject,
     $text,
     $html,
-    $emailAddress,
-    $userID = NULL,
     $from = NULL,
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
-    $contactIds = NULL,
     $additionalDetails = NULL,
     $contributionIds = NULL,
     $campaignId = NULL,
     $caseId = NULL
   ) {
-    // get the contact details of logged in contact, which we set as from email
-    if ($userID == NULL) {
-      $userID = CRM_Core_Session::getLoggedInContactID();
-    }
+
+    $userID = CRM_Core_Session::getLoggedInContactID();
 
     [$fromDisplayName, $fromEmail, $fromDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($userID);
     if (!$fromEmail) {
