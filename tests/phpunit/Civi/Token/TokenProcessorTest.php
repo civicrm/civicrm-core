@@ -178,6 +178,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
     $this->dispatcher->addSubscriber(new \CRM_Core_DomainTokens());
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'smarty' => TRUE,
@@ -203,10 +204,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(3, $rowCount);
   }
 
-  public function testRenderLocalizedHookToken() {
+  public function testRenderLocalizedHookToken(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
       $e->tokens['trans'] = [
         'trans.affirm' => ts('Translated affirmation'),
@@ -380,6 +382,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
       $e->tokens['fruit'] = [
         'fruit.apple' => ts('Apple'),
@@ -420,10 +424,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Define extended tokens with funny symbols
    */
-  public function testHookTokenExtraChar() {
+  public function testHookTokenExtraChar(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function ($e) {
       $e->tokens['food'] = [
         'food.fruit.apple' => ts('Apple'),
@@ -487,7 +492,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   public function testMockData_ContactContribution() {
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
-
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'schema' => ['contributionId', 'contactId'],
@@ -530,9 +535,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Process a message using mocked data, accessed through a Smarty alias.
    */
-  public function testMockData_SmartyAlias_Contribution() {
+  public function testMockData_SmartyAlias_Contribution(): void {
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
 
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
@@ -576,11 +582,12 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    *
    * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
    */
-  public function testSmartyTokenAlias_Contribution() {
+  public function testSmartyTokenAlias_Contribution(): void {
     $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => 100, 'trxn_id' => 1000]);
     $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => 200, 'trxn_id' => 1]);
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
 
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
