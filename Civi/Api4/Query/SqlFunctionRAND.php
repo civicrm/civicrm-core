@@ -19,7 +19,12 @@ class SqlFunctionRAND extends SqlFunction {
   protected static $category = self::CATEGORY_MATH;
 
   protected static function params(): array {
-    return [];
+    return [
+      [
+        'optional' => TRUE,
+        'must_be' => ['SqlNumber'],
+      ],
+    ];
   }
 
   /**

@@ -4,7 +4,8 @@
   // Trait provides base methods and properties common to all search display types
   angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4) {
     var ts = CRM.ts('org.civicrm.search_kit'),
-      runCount = 0;
+      runCount = 0,
+      seed = Date.now();
 
     // Replace tokens keyed to rowData.
     // Pass view=true to replace with view value, otherwise raw value is used.
@@ -73,6 +74,7 @@
         var ctrl = this;
         this.limit = this.settings.limit;
         this.sort = this.settings.sort ? _.cloneDeep(this.settings.sort) : [];
+        this.seed = Date.now();
 
         this.getResults = _.debounce(function() {
           $scope.$apply(function() {
@@ -129,6 +131,7 @@
           display: this.display,
           sort: this.sort,
           limit: this.limit,
+          seed: this.seed,
           filters: _.assign({}, (this.afFieldset ? this.afFieldset.getFieldData() : {}), this.filters),
           afform: this.afFieldset ? this.afFieldset.getFormName() : null
         };

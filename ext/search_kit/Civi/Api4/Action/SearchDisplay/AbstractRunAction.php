@@ -349,6 +349,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
     $orderBy = [];
     foreach ($currentSort ?: $defaultSort as $item) {
+      // Apply seed to random sorting
+      if ($item[0] === 'RAND()' && isset($this->seed)) {
+        $item[0] = 'RAND(' . $this->seed . ')';
+      }
       $orderBy[$item[0]] = $item[1];
     }
     return $orderBy;

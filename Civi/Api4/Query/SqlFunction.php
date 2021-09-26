@@ -68,7 +68,10 @@ abstract class SqlFunction extends SqlExpression {
       ];
       if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
         $exprs = $this->captureExpressions($arg, $param['must_be'], TRUE);
-        if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
+        if (
+          (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) &&
+          !(!$exprs && $param['optional'])
+        ) {
           throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
