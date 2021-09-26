@@ -1,10 +1,10 @@
 <div class="crm-flex-1 input-group" >
   <input type="text" class="form-control" ng-if="!$ctrl.getLink($ctrl.link.path)" ng-model="$ctrl.link.path" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChange({before: 'civicrm/', after: $ctrl.link.path})">
   <div class="input-group-btn" style="{{ $ctrl.getLink($ctrl.link.path) ? '' : 'width:27px' }}">
-    <button type="button" class="btn btn-default-outline dropdown-toggle" style="min-width: 200px; text-align: left;" ng-if="$ctrl.getLink($ctrl.link.path)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-sm btn-secondary-outline dropdown-toggle" style="min-width: 200px; text-align: left;" ng-if="$ctrl.getLink($ctrl.link.path)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       {{ $ctrl.getLink($ctrl.link.path).title }}
     </button>
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu {{ $ctrl.getLink($ctrl.link.path) ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">
