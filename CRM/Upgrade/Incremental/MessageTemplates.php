@@ -300,6 +300,24 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option in non-workflow templates.
+   *
+   * @param string $old
+   * @param string $new
+   */
+  public function replaceTokenInMessageTemplates(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_msg_template
+      SET
+        msg_text = REPLACE(msg_text, '$oldToken', '$newToken'),
+        msg_subject = REPLACE(msg_subject, '$oldToken', '$newToken'),
+        msg_html = REPLACE(msg_html, '$oldToken', '$newToken')
+      WHERE workflow_name IS NULL
+    ");
+  }
+
+  /**
    * Replace a token with the new preferred option.
    *
    * @param string $old

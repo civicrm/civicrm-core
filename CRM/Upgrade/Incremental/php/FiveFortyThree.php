@@ -107,7 +107,12 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Update participant registered by id token in event badges',
       'updatePrintLabelToken', 'participant.participant_registered_by_id', 'participant.registered_by_id', $rev
     );
-
+    $this->addTask('Update contribution status token in saved message templates',
+      'updateMessageToken', '', 'contribution.contribution_status', 'contribution.contribution_status_id:label', $rev
+    );
+    $this->addTask('Update campaign token in saved message templates',
+      'updateMessageToken', '', 'contribution.campaign', 'contribution.campaign_id:label', $rev
+    );
   }
 
   /**
