@@ -75,13 +75,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $manager = \Civi::service('settings_manager');
     $settings = ($contactID === NULL) ? $manager->getBagByDomain($domainID) : $manager->getBagByContact($domainID, $contactID);
     if ($name === NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name should be provided.\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name should be provided.\n");
     }
     if ($componentID !== NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Component should be omitted\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name='$name'. Component should be omitted\n");
     }
     if ($defaultValue !== NULL) {
-      CRM_Core_Error::debug_log_message("Deprecated: Group='$group'. Name='$name'. Defaults should come from metadata\n");
+      CRM_Core_Error::deprecatedWarning("Deprecated: Group='$group'. Name='$name'. Defaults should come from metadata\n");
     }
     return $name ? $settings->get($name) : $settings->all();
   }
