@@ -632,21 +632,22 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function on the contribution page using numerical from email address.
    */
-  public function testSubmitEmailReceiptUserEmailFromAddress() {
-    $form = new CRM_Contribute_Form_Contribution();
-    $mut = new CiviMailUtils($this, TRUE);
+  public function testSubmitEmailReceiptUserEmailFromAddress(): void {
     $email = $this->callAPISuccess('Email', 'create', [
       'contact_id' => $this->_userId,
       'email' => 'testLoggedIn@example.com',
     ]);
-    $form->testSubmit([
+    $mut = new CiviMailUtils($this, TRUE);
+    $form = $this->getContributionForm([
+      'contribution_status_id' => 1,
       'total_amount' => 50,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => $email['id'],
-      'contribution_status_id' => 1,
-    ], CRM_Core_Action::ADD);
+    ]);
+
+    $form->postProcess();
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
       'Below you will find a receipt for this contribution.',
@@ -1034,20 +1035,18 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testPartialPaymentWithCreditCard() {
+  public function testPartialPaymentWithCreditCard(): void {
     // create a partially paid contribution by using back-office form
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit(
-      [
-        'total_amount' => 50,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'check_number' => substr(sha1(rand()), 0, 7),
-        'billing_city-5' => 'Vancouver',
-        'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
-      ], CRM_Core_Action::ADD
-    );
+    $form = $this->getContributionForm([
+      'total_amount' => 50,
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'check_number' => '7890',
+      'billing_city-5' => 'Vancouver',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+    ]);
+    $form->postProcess();
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->callAPISuccess('Payment', 'create', ['contribution_id' => $contribution['id'], 'total_amount' => 10, 'payment_instrument_id' => 'Cash']);
@@ -1332,21 +1331,18 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   /**
    * function to test card_type and pan truncation.
    */
-  public function testCardTypeAndPanTruncation() {
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit(
-      [
-        'total_amount' => 100,
-        'financial_type_id' => 3,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
-        'contribution_status_id' => 1,
-        'credit_card_type' => 'Visa',
-        'pan_truncation' => 4567,
-        'price_set_id' => 0,
-      ],
-      CRM_Core_Action::ADD
-    );
+  public function testCardTypeAndPanTruncation(): void {
+    $form = $this->getContributionForm([
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'credit_card_type' => 'Visa',
+      'pan_truncation' => 4567,
+      'price_set_id' => 0,
+    ]);
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $this->_individualId,
@@ -1361,8 +1357,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
         'return' => ['card_type_id.label', 'pan_truncation'],
       ]
     );
-    $this->assertEquals(CRM_Utils_Array::value('card_type_id.label', $financialTrxn), 'Visa');
-    $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 4567);
+    $this->assertEquals('Visa', $financialTrxn['card_type_id.label']);
+    $this->assertEquals(4567, $financialTrxn['pan_truncation']);
   }
 
   /**
@@ -2179,6 +2175,20 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     $form = new CRM_Contribute_Form_Contribution();
     $this->assertEquals(['trxn_id' => "Transaction ID's must be unique. Transaction '1234' already exists in your database."], $form->formRule($fields, [], $form));
+  }
+
+  /**
+   * Get the contribution form object.
+   *
+   * @param array $formValues
+   *
+   * @return \CRM_Contribute_Form_Contribution
+   */
+  protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
+    $form->buildForm();
+    return $form;
   }
 
 }

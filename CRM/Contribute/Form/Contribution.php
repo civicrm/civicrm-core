@@ -1493,7 +1493,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
+    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id'] ?? []));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
       civicrm_api3('ContributionSoft', 'get', ['contribution_id' => $this->_id, 'pcp_id' => ['IS NULL' => 1], 'api.ContributionSoft.delete' => 1]);
     }
