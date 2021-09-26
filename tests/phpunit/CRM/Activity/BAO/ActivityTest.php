@@ -1228,7 +1228,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $contactId = $this->getContactID();
 
     // create a logged in USER since the code references it for sendEmail user.
-    $loggedInUser = $this->createLoggedInUser();
+    $this->createLoggedInUser();
 
     $contactDetailsIntersectKeys = [
       'contact_id' => '',
@@ -1259,7 +1259,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html {contact.display_name} {case.case_type_id:label}';
     $text = __FUNCTION__ . ' text {contact.display_name} {case.case_type_id:label}';
-    $userID = $loggedInUser;
 
     /* @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
@@ -1269,13 +1268,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $subject,
       $text,
       $html,
-      $contact['email'],
-      $userID,
-      $from = __FUNCTION__ . '@example.com',
+      __FUNCTION__ . '@example.com',
       NULL,
       NULL,
       NULL,
-      [$contactId],
       NULL,
       NULL,
       NULL,
@@ -1385,8 +1381,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $subject,
       $text,
       $html,
-      $contact['email'],
-      $loggedInUser,
       $from = __FUNCTION__ . '@example.com'
     );
 
@@ -1452,14 +1446,11 @@ $text
       $subject,
       $text,
       $html,
-      $contact['email'],
-      $userID,
-      $from = __FUNCTION__ . '@example.com',
+      __FUNCTION__ . '@example.com',
       $attachments = NULL,
       $cc = NULL,
       $bcc = NULL,
       $contactIds = NULL,
-      $additionalDetails = NULL,
       NULL,
       $campaign_id
     );
@@ -1713,13 +1704,10 @@ $text
       $subject,
       $text,
       $html,
-      $contact['values'][$contactId]['email'],
-      $loggedInUser,
       $from = __FUNCTION__ . '@example.com',
       NULL,
       NULL,
       NULL,
-      [$contactId],
       NULL,
       NULL,
       NULL,
@@ -1755,7 +1743,6 @@ $text
     $subject = __FUNCTION__ . ' subject' . '{contact.display_name}';
     $html = __FUNCTION__ . ' html' . '{contact.display_name}';
     $text = __FUNCTION__ . ' text' . '{contact.display_name}';
-    $userID = $loggedInUser;
 
     /* @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
@@ -1764,13 +1751,10 @@ $text
       $subject,
       $text,
       $html,
-      $contact['values'][0]['email'],
-      $userID,
-      $from = __FUNCTION__ . '@example.com',
+    __FUNCTION__ . '@example.com',
       $attachments = NULL,
       $cc = NULL,
       $bcc = NULL,
-      $contactIds = array_column($contact['values'], 'id'),
       $additionalDetails = NULL,
       NULL,
       $campaign_id
