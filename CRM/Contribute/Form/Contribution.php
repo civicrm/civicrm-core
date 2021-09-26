@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -199,6 +200,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var bool
    */
   public $submitOnce = TRUE;
+
+  /**
+   * Status of contribution prior to edit.
+   *
+   * @var string
+   */
+  protected $previousContributionStatus;
 
   /**
    * Explicitly declare the form context.
@@ -459,6 +467,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function buildQuickForm() {
     if ($this->_id) {
@@ -653,21 +662,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $component = 'contribution';
     $componentDetails = [];
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-      if (!empty($componentDetails['membership'])) {
-        $component = 'membership';
-      }
-      elseif (!empty($componentDetails['participant'])) {
-        $component = 'participant';
-      }
     }
-    if ($this->_ppID) {
-      $component = 'pledge';
-    }
-    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($component, $this->_id);
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('contribution', $this->getPreviousContributionStatus());
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = [];
@@ -1826,6 +1825,33 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
       ));
     }
+  }
+
+  /**
+   * Get the contribution ID.
+   *
+   * @return int|null
+   */
+  protected function getContributionID(): ?int {
+    return $this->_id;
+  }
+
+  /**
+   * Get the selected contribution status.
+   *
+   * @return string
+   *
+   * @throws \API_Exception
+   */
+  protected function getPreviousContributionStatus(): string {
+    if (!$this->previousContributionStatus) {
+      $this->previousContributionStatus = Contribution::get(FALSE)
+        ->addWhere('id', '=', $this->getContributionID())
+        ->addSelect('contribution_status_id:name')
+        ->execute()
+        ->first()['contribution_status_id:name'];
+    }
+    return $this->previousContributionStatus;
   }
 
 }
