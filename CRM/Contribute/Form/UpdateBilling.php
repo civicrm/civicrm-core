@@ -66,8 +66,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     $this->assignBillingType();
 
-    $this->assign('frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
-    $this->assign('frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
+    $this->assign('recur_frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
+    $this->assign('recur_frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
     $this->assign('amount', $this->getSubscriptionDetails()->amount);
     $this->assign('installments', $this->getSubscriptionDetails()->installments);
     $this->assign('mode', $this->_mode);
