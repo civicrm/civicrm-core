@@ -1094,8 +1094,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->set('params', $this->_params);
-
-    $this->assign('receive_date', $this->_params['receive_date']);
+    // It actually makes no sense that we would set receive_date in params
+    // for credit card payments....
+    $this->assign('receive_date', $this->_params['receive_date'] ?? date('Y-m-d H:i:s'));
 
     // Result has all the stuff we need
     // lets archive it to a financial transaction
