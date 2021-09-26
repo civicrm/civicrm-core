@@ -3472,8 +3472,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     /* @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 20,
-      'net_amount' => 20,
-      'fee_amount' => 0,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 1,

@@ -4167,18 +4167,21 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Update the memberships associated with a contribution if it has been completed.
+   * Update the memberships associated with a contribution if it has been
+   * completed.
    *
-   * Note that the way in which $memberships are loaded as objects is pretty messy & I think we could just
-   * load them in this function. Code clean up would compensate for any minor performance implication.
+   * Note that the way in which $memberships are loaded as objects is pretty
+   * messy & I think we could just load them in this function. Code clean up
+   * would compensate for any minor performance implication.
    *
    * @param int $contributionID
    * @param string $changeDate
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
-  public static function updateMembershipBasedOnCompletionOfContribution($contributionID, $changeDate) {
+  public static function updateMembershipBasedOnCompletionOfContribution(int $contributionID, $changeDate) {
     $memberships = self::getRelatedMemberships((int) $contributionID);
     foreach ($memberships as $membership) {
       $membershipParams = [

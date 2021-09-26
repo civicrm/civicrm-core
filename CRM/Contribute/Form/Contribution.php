@@ -80,12 +80,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * The contribution values if an existing contribution
+   *
    * @var array
    */
   public $_values;
 
   /**
    * The pledge values if this contribution is associated with pledge
+   *
    * @var array
    */
   public $_pledgeValues;
@@ -96,6 +98,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Parameter with confusing name.
+   *
    * @var string
    * @todo what is it?
    */
@@ -105,6 +108,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Possible From email addresses
+   *
    * @var array
    */
   public $_fromEmails;
@@ -118,12 +122,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Store the line items if price set used.
+   *
    * @var array
    */
   public $_lineItems;
 
   /**
    * Line item
+   *
    * @var array
    * @todo explain why we use lineItem & lineItems
    */
@@ -145,8 +151,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @var array
    */
   public $_paymentFields = [];
+
   /**
    * Logged in user's email.
+   *
    * @var string
    */
   public $userEmail;
@@ -160,6 +168,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
   /**
    * Price set as an array
+   *
    * @var array
    */
   public $_priceSet;
@@ -1601,7 +1610,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       else {
         $entityTable = 'contribution';
-        $entityID = $this->_id;
+        $entityID = $this->getContributionID();
       }
 
       $lineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, $entityTable, FALSE, TRUE, $isRelatedId);
@@ -1721,7 +1730,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       $fields = [
         'financial_type_id',
-        'contribution_status_id',
         'payment_instrument_id',
         'cancel_reason',
         'source',
@@ -1742,7 +1750,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $params['receipt_date'] = date("Y-m-d");
       }
 
-      if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($params['contribution_status_id'])
+      if (CRM_Contribute_BAO_Contribution::isContributionStatusNegative($this->getSubmittedValue('contribution_status_id'))
       ) {
         if (CRM_Utils_System::isNull(CRM_Utils_Array::value('cancel_date', $params))) {
           $params['cancel_date'] = date('YmdHis');
@@ -1754,10 +1762,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
       // Set is_pay_later flag for back-office offline Pending status contributions CRM-8996
       // else if contribution_status is changed to Completed is_pay_later flag is changed to 0, CRM-15041
-      if ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+      if ('Pending' === $this->getSubmittedContributionStatus()) {
         $params['is_pay_later'] = 1;
       }
-      elseif ($params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+      elseif ('Completed' === $this->getSubmittedContributionStatus()) {
         // @todo - if the contribution is new then it should be Pending status & then we use
         // Payment.create to update to Completed.
         $params['is_pay_later'] = 0;
@@ -1782,22 +1790,24 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // we are already handling note below, so to avoid duplicate notes against $contribution
       if (!empty($params['note']) && !empty($submittedValues['note'])) {
         unset($params['note']);
+      };
+      if (!$this->isContributionBeingCompleted()) {
+        $params['contribution_status_id'] = $this->getSubmittedValue('contribution_status_id');
       }
-      $contribution = CRM_Contribute_BAO_Contribution::create($params);
+      else {
+        // This will be done through Payment.create.
+        unset($params['contribution_status_id']);
+      }
 
-      // process associated membership / participant, CRM-4395
-      if ($contribution->id && $action & CRM_Core_Action::UPDATE) {
-        // @todo use Payment.create to do this, remove transitioncomponents function
-        // if contribution is being created with a completed status it should be
-        // created pending & then Payment.create adds the payment
-        CRM_Contribute_BAO_Contribution::transitionComponents([
-          'contribution_id' => $contribution->id,
-          'contribution_status_id' => $contribution->contribution_status_id,
-          'previous_contribution_status_id' => $this->_values['contribution_status_id'] ?? NULL,
-          'receive_date' => $contribution->receive_date,
+      $contribution = CRM_Contribute_BAO_Contribution::create($params);
+      if ($this->isContributionBeingCompleted()) {
+        civicrm_api3('Payment', 'create', [
+          'contribution_id' => $this->getContributionID(),
+          'trxn_date' => $this->getSubmittedValue('receive_date') ?? 'now',
+          'is_send_contribution_notification' => FALSE,
+          'total_amount' => CRM_Contribute_BAO_Contribution::getContributionBalance($this->getContributionID()),
         ]);
       }
-
       array_unshift($this->statusMessage, ts('The contribution record has been saved.'));
 
       $this->invoicingPostProcessHook($submittedValues, $action, $lineItem);
@@ -2016,7 +2026,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   }
 
   /**
-   * Get the selected contribution status.
+   * Get the prior contribution status.
    *
    * @return string|null
    *
@@ -2126,6 +2136,27 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   protected function getPriceSetID() {
     return $this->getSubmittedValue('price_set_id');
+  }
+
+  /**
+   * @return string
+   */
+  protected function getSubmittedContributionStatus(): string {
+    return CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+  }
+
+  /**
+   * Is this a case of a payment being added to update a contribution to completed.
+   *
+   * @return bool
+   * @throws \API_Exception
+   */
+  protected function isContributionBeingCompleted(): bool {
+    return $this->getContributionID()
+      && $this->_action & CRM_Core_Action::UPDATE &&
+      $this->getSubmittedContributionStatus() === 'Completed'
+      && in_array($this->getPreviousContributionStatus(), ['Pending', 'Partially paid']
+    );
   }
 
 }
