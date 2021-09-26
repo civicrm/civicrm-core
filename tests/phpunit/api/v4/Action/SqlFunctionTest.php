@@ -193,7 +193,7 @@ class SqlFunctionTest extends UnitTestCase {
 
   public function testStringFunctions() {
     $sampleData = [
-      ['first_name' => 'abc', 'middle_name' => 'q', 'last_name' => 'tester1', 'source' => '123'],
+      ['first_name' => 'abc', 'middle_name' => 'Q', 'last_name' => 'tester1', 'source' => '123'],
     ];
     $cid = Contact::save(FALSE)
       ->setRecords($sampleData)
@@ -202,9 +202,15 @@ class SqlFunctionTest extends UnitTestCase {
     $result = Contact::get(FALSE)
       ->addWhere('id', '=', $cid)
       ->addSelect('CONCAT_WS("|", first_name, middle_name, last_name) AS concat_ws')
+      ->addSelect('REPLACE(first_name, "c", "cdef") AS new_first')
+      ->addSelect('UPPER(first_name)')
+      ->addSelect('LOWER(middle_name)')
       ->execute()->first();
 
-    $this->assertEquals('abc|q|tester1', $result['concat_ws']);
+    $this->assertEquals('abc|Q|tester1', $result['concat_ws']);
+    $this->assertEquals('abcdef', $result['new_first']);
+    $this->assertEquals('ABC', $result['UPPER:first_name']);
+    $this->assertEquals('q', $result['LOWER:middle_name']);
   }
 
   public function testIncorrectNumberOfArguments() {
@@ -215,7 +221,7 @@ class SqlFunctionTest extends UnitTestCase {
       $this->fail('Api should have thrown exception');
     }
     catch (\API_Exception $e) {
-      $this->assertEquals('Incorrect number of arguments for SQL function IF', $e->getMessage());
+      $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
     }
 
     try {
@@ -225,7 +231,17 @@ class SqlFunctionTest extends UnitTestCase {
       $this->fail('Api should have thrown exception');
     }
     catch (\API_Exception $e) {
-      $this->assertEquals('Incorrect number of arguments for SQL function NULLIF', $e->getMessage());
+      $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
+    }
+
+    try {
+      Activity::get(FALSE)
+        ->addSelect('CONCAT_WS(",", ) AS whoops')
+        ->execute();
+      $this->fail('Api should have thrown exception');
+    }
+    catch (\API_Exception $e) {
+      $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
     }
   }
 

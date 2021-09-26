@@ -43,19 +43,23 @@ abstract class SqlFunction extends SqlExpression {
     $arg = trim(substr($this->expr, strpos($this->expr, '(') + 1, -1));
     foreach ($this->getParams() as $idx => $param) {
       $prefix = NULL;
-      if ($param['name']) {
-        $prefix = $this->captureKeyword([$param['name']], $arg);
+      $name = $param['name'] ?: ($idx + 1);
+      // If this isn't the first param it needs to start with something;
+      // either the name (e.g. "ORDER BY") if it has one, or a comma separating it from the previous param.
+      $start = $param['name'] ?: ($idx ? ',' : NULL);
+      if ($start) {
+        $prefix = $this->captureKeyword([$start], $arg);
         // Supply api_default
         if (!$prefix && isset($param['api_default'])) {
           $this->args[$idx] = [
-            'prefix' => [$param['name']],
+            'prefix' => [$start],
             'expr' => array_map([parent::class, 'convert'], $param['api_default']['expr']),
             'suffix' => [],
           ];
           continue;
         }
         if (!$prefix && !$param['optional']) {
-          throw new \API_Exception("Missing {$param['name']} for SQL function " . static::getName());
+          throw new \API_Exception("Missing param $name for SQL function " . static::getName());
         }
       }
       elseif ($param['flag_before']) {
@@ -67,17 +71,20 @@ abstract class SqlFunction extends SqlExpression {
         'suffix' => [],
       ];
       if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
-        $exprs = $this->captureExpressions($arg, $param['must_be'], TRUE);
+        $exprs = $this->captureExpressions($arg, $param['must_be'], $param['max_expr']);
         if (
-          (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) &&
+          count($exprs) < $param['min_expr'] &&
           !(!$exprs && $param['optional'])
         ) {
-          throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
+          throw new \API_Exception("Too few arguments to param $name for SQL function " . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
 
         $this->args[$idx]['suffix'] = (array) $this->captureKeyword(array_keys($param['flag_after']), $arg);
       }
+    }
+    if (trim($arg)) {
+      throw new \API_Exception("Too many arguments given for SQL function " . static::getName());
     }
   }
 
@@ -158,6 +165,7 @@ abstract class SqlFunction extends SqlExpression {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
         'name' => NULL,
+        'label' => ts('Select'),
         'min_expr' => 1,
         'max_expr' => 1,
         'flag_before' => [],

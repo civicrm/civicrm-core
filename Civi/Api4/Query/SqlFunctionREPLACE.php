@@ -21,15 +21,19 @@ class SqlFunctionREPLACE extends SqlFunction {
   protected static function params(): array {
     return [
       [
-        'min_expr' => 3,
-        'max_expr' => 3,
+        'optional' => FALSE,
+        'must_be' => ['SqlField', 'SqlString'],
+        'label' => ts('Source'),
+      ],
+      [
         'optional' => FALSE,
         'must_be' => ['SqlString', 'SqlField'],
-        'ui_defaults' => [
-          ['type' => 'SqlField', 'placeholder' => ts('Source')],
-          ['type' => 'SqlString', 'placeholder' => ts('Find')],
-          ['type' => 'SqlString', 'placeholder' => ts('Replace')],
-        ],
+        'label' => ts('Find'),
+      ],
+      [
+        'optional' => FALSE,
+        'must_be' => ['SqlString', 'SqlField'],
+        'label' => ts('Replace'),
       ],
     ];
   }

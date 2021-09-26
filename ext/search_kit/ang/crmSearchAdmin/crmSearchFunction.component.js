@@ -13,8 +13,6 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      var defaultUiDefaults = {type: 'SqlField', placeholder: ts('Select')};
-
       var allTypes = {
         aggregate: ts('Aggregate'),
         comparison: ts('Comparison'),
@@ -39,9 +37,10 @@
       };
 
       this.addArg = function(exprType) {
-        exprType = exprType || ctrl.getUiDefault(ctrl.args.length).type;
+        var param = ctrl.getParam(ctrl.args.length);
         ctrl.args.push({
           type: ctrl.exprTypes[exprType].type,
+          flag_before: _.keys(param.flag_before)[0],
           value: exprType === 'SqlNumber' ? 0 : ''
         });
       };
@@ -50,26 +49,34 @@
         if (!ctrl.fn) {
           return;
         }
-        if (ctrl.fn && ctrl.fn.params[0] && !_.isEmpty(ctrl.fn.params[0].flag_before)) {
-          ctrl.modifierName = _.keys(ctrl.fn.params[0].flag_before)[0];
-          ctrl.modifierLabel = ctrl.fn.params[0].flag_before[ctrl.modifierName];
-        }
-        else {
-          ctrl.modifierName = null;
-          ctrl.modifier = null;
-        }
         // Push args to reach the minimum
-        while (ctrl.args.length < ctrl.fn.params[0].min_expr) {
-          ctrl.addArg();
-        }
+        _.each(ctrl.fn.params, function(param, index) {
+          while (
+            (ctrl.args.length - index < param.min_expr) &&
+            // TODO: Handle named params like "ORDER BY"
+            !param.name &&
+            (!param.optional || param.must_be.length === 1)
+          ) {
+            ctrl.addArg(param.must_be[0]);
+          }
+        });
       }
 
-      this.getUiDefault = function(index) {
-        if (ctrl.fn.params[0].ui_defaults) {
-          return ctrl.fn.params[0].ui_defaults[index] || _.last(ctrl.fn.params[0].ui_defaults);
+      this.getParam = function(index) {
+        return ctrl.fn.params[index] || _.last(ctrl.fn.params);
+      };
+
+      this.canAddArg = function() {
+        if (!ctrl.fn) {
+          return false;
         }
-        defaultUiDefaults.type = ctrl.fn.params[0].must_be[0];
-        return defaultUiDefaults;
+        var param = ctrl.getParam(ctrl.args.length),
+          index = ctrl.fn.params.indexOf(param);
+        // TODO: Handle named params like "ORDER BY"
+        if (param.name) {
+          return false;
+        }
+        return ctrl.args.length - index < param.max_expr;
       };
 
       // On-demand options for dropdown function selector
@@ -80,7 +87,7 @@
             allowedTypes.push('aggregate');
           } else {
             allowedTypes.push('comparison', 'string');
-            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
+            if (_.includes(['Integer', 'Float', 'Date', 'Timestamp', 'Money'], ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
             }
             if (_.includes(['Date', 'Timestamp'], ctrl.fieldArg.field.data_type)) {
@@ -89,10 +96,7 @@
           }
           _.each(allowedTypes, function(type) {
             var allowedFunctions = _.filter(CRM.crmSearchAdmin.functions, function(fn) {
-              return fn.category === type &&
-                fn.params.length &&
-                fn.params[0].min_expr > 0 &&
-                _.includes(fn.params[0].must_be, 'SqlField');
+              return fn.category === type && fn.params.length;
             });
             functions.push({
               text: allTypes[type],
@@ -111,6 +115,7 @@
 
       this.selectFunction = function() {
         ctrl.fn = _.find(CRM.crmSearchAdmin.functions, {name: ctrl.fnName});
+        delete ctrl.fieldArg.flag_before;
         ctrl.args = [ctrl.fieldArg];
         if (ctrl.fn) {
           var exprType, pos = 0,
@@ -126,11 +131,6 @@
           }
           initFunction();
         }
-        ctrl.writeExpr();
-      };
-
-      this.toggleModifier = function() {
-        ctrl.modifier = ctrl.modifier ? null : ctrl.modifierName;
         ctrl.writeExpr();
       };
 
@@ -151,12 +151,16 @@
 
       this.writeExpr = function() {
         if (ctrl.fnName) {
-          var args = _.transform(ctrl.args, function(args, arg) {
+          var args = _.transform(ctrl.args, function(args, arg, index) {
             if (arg.value) {
-              args.push(arg.type === 'string' ? JSON.stringify(arg.value) : arg.value);
+              var prefix = arg.flag_before ? (index ? ' ' : '') + arg.flag_before + ' ' : (index ? ', ' : '');
+              args.push(prefix + (arg.type === 'string' ? JSON.stringify(arg.value) : arg.value));
             }
           });
-          ctrl.expr = ctrl.fnName + '(' + (ctrl.modifier ? ctrl.modifier + ' ' : '') + args.join(', ') + ') AS ' + makeAlias();
+          // Replace fake function "e"
+          ctrl.expr = (ctrl.fnName === 'e' ? '' : ctrl.fnName) + '(';
+          ctrl.expr += args.join('');
+          ctrl.expr += ') AS ' + makeAlias();
         } else {
           ctrl.expr = ctrl.args[0].value;
         }

@@ -22,13 +22,13 @@ class SqlFunctionROUND extends SqlFunction {
     return [
       [
         'optional' => FALSE,
-        'min_expr' => 1,
-        'max_expr' => 2,
-        'must_be' => ['SqlNumber', 'SqlField'],
-        'ui_defaults' => [
-          ['type' => 'SqlField', 'placeholder' => ts('Number')],
-          ['type' => 'SqlNumber', 'placeholder' => ts('Decimals')],
-        ],
+        'must_be' => ['SqlField', 'SqlNumber'],
+        'label' => ts('Number'),
+      ],
+      [
+        'optional' => TRUE,
+        'must_be' => ['SqlNumber'],
+        'label' => ts('Decimal places'),
       ],
     ];
   }
