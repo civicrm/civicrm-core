@@ -116,6 +116,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
         if (!isset($info['blocks'][$blockTag])) {
           // Load full contents of block used on the form, then recurse into it
           $embeddedForm = Afform::get($this->checkPermissions)
+            ->addSelect('*', 'directive_name')
             ->setFormatWhitespace(TRUE)
             ->setLayoutFormat('shallow')
             ->addWhere('directive_name', '=', $blockTag)
