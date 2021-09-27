@@ -260,7 +260,7 @@ class CRM_Import_DataSource_CSV extends CRM_Import_DataSource {
    * @param string $string
    * @return string The trimmed string
    */
-  public static function trimNonBreakingSpaces(string $string): string {
+  public static function trimNonBreakingSpaces($string): string {
     $encoding = mb_detect_encoding($string, NULL, TRUE);
     if ($encoding === FALSE) {
       // This could mean a couple things. One is that the string is
