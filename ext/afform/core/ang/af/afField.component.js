@@ -99,15 +99,35 @@
           }
           // Set default value based on url
           if (urlArgs && urlArgs[uniquePrefix + ctrl.fieldName]) {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[uniquePrefix + ctrl.fieldName];
+            setValue(urlArgs[uniquePrefix + ctrl.fieldName]);
           }
           // Set default value based on field defn
           else if (ctrl.defn.afform_default) {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = ctrl.defn.afform_default;
+            setValue(ctrl.defn.afform_default);
           }
         });
-
       };
+
+      // Set default value; ensure data type matches input type
+      function setValue(value) {
+        if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
+          if (!_.isPlainObject(value)) {
+            value = {
+              '>=': +(('' + value).split('-')[0] || 0),
+              '<=': +(('' + value).split('-')[1] || 0),
+            };
+          }
+        } else if (ctrl.defn.input_type === 'Number') {
+          value = +value;
+        } else if (ctrl.defn.search_range && !_.isPlainObject(value)) {
+          value = {
+            '>=': ('' + value).split('-')[0],
+            '<=': ('' + value).split('-')[1] || '',
+          };
+        }
+
+        $scope.dataProvider.getFieldData()[ctrl.fieldName] = value;
+      }
 
       // Get the repeat index of the entity fieldset (not the join)
       ctrl.getEntityIndex = function() {
