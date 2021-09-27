@@ -621,6 +621,12 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
         ->setLoadOptions(TRUE)
         ->execute()->indexBy('name');
       foreach ($fields as $fieldName => $fieldSpec) {
+        if (isset($formatted[$fieldName]) && is_array($formatted[$fieldName])) {
+          // If we have an array at this stage, it's probably a multi-select
+          // field that has already been parsed properly into the value that
+          // should be inserted into the database.
+          continue;
+        }
         if (!empty($formatted[$fieldName])
           && empty($fieldSpec['options'][$formatted[$fieldName]])) {
           $formatted[$fieldName] = array_search($formatted[$fieldName], $fieldSpec['options'], TRUE) ?? $formatted[$fieldName];
