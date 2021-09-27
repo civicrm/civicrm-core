@@ -12,7 +12,7 @@
       fieldName: '@name',
       defn: '='
     },
-    controller: function($scope, $element, crmApi4, $timeout) {
+    controller: function($scope, $element, crmApi4, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
         boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
@@ -86,13 +86,26 @@
           });
         }
 
-        // Set default value
-        if (ctrl.defn.afform_default) {
-          // Wait for parent controllers to initialize
-          $timeout(function() {
+        // Wait for parent controllers to initialize
+        $timeout(function() {
+          // Unique field name = entity_name index . join . field_name
+          var entityName = ctrl.afFieldset.getName(),
+            joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
+            uniquePrefix = '',
+            urlArgs = $location.search();
+          if (entityName) {
+            var index = ctrl.getEntityIndex();
+            uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
+          }
+          // Set default value based on url
+          if (urlArgs && urlArgs[uniquePrefix + ctrl.fieldName]) {
+            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[uniquePrefix + ctrl.fieldName];
+          }
+          // Set default value based on field defn
+          else if (ctrl.defn.afform_default) {
             $scope.dataProvider.getFieldData()[ctrl.fieldName] = ctrl.defn.afform_default;
-          });
-        }
+          }
+        });
 
       };
 
