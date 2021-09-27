@@ -1840,11 +1840,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Get the selected contribution status.
    *
-   * @return string
+   * @return string|null
    *
    * @throws \API_Exception
    */
-  protected function getPreviousContributionStatus(): string {
+  protected function getPreviousContributionStatus(): ?string {
+    if (!$this->getContributionID()) {
+      return NULL;
+    }
     if (!$this->previousContributionStatus) {
       $this->previousContributionStatus = Contribution::get(FALSE)
         ->addWhere('id', '=', $this->getContributionID())
