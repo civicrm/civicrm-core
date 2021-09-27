@@ -1389,6 +1389,8 @@ WHERE entity_id =%1 AND entity_table = %2";
   }
 
   /**
+   * DO Not use this function. Under deprecation, no active core use.
+   *
    * Send the message to a specific contact.
    *
    * @param string $from
@@ -1410,6 +1412,8 @@ WHERE entity_id =%1 AND entity_table = %2";
    *
    * @return bool
    *   TRUE if successful else FALSE.
+   *
+   * @deprecated
    */
   public static function sendMessage(
     $from,
