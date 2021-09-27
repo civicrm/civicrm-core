@@ -406,7 +406,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public function submit($formValues): void {
     $this->saveMessageTemplate($formValues);
 
-    $from = $formValues['from_email_address'] ?? NULL;
+    $from = $formValues['from_email_address'];
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
@@ -790,7 +790,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *   The subject of the message.
    * @param $text
    * @param $html
-   * @param string|null $from
+   * @param string $from
    * @param array|null $attachments
    *   The array of attachments if any.
    * @param string|null $cc
@@ -820,7 +820,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $subject,
     $text,
     $html,
-    $from = NULL,
+    $from,
     $attachments = NULL,
     $cc = NULL,
     $bcc = NULL,
@@ -831,18 +831,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
   ) {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
-
-    [$fromDisplayName, $fromEmail, $fromDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($userID);
-    if (!$fromEmail) {
-      return [count($contactDetails), 0, count($contactDetails)];
-    }
-    if (!trim($fromDisplayName)) {
-      $fromDisplayName = $fromEmail;
-    }
-
-    if (!$from) {
-      $from = "$fromDisplayName <$fromEmail>";
-    }
 
     $contributionDetails = [];
     if (!empty($contributionIds)) {
