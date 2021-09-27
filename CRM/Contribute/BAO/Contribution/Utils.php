@@ -208,13 +208,13 @@ LIMIT 1
    * Get contribution statuses by entity e.g. contribution, membership or 'participant'
    *
    * @param string $usedFor
-   * @param int $id
+   * @param string $name
    *   Contribution ID
    *
    * @return array
    *   Array of contribution statuses in array('status id' => 'label') format
    */
-  public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
+  public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
     if ($usedFor === 'pledge') {
       $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
     }
@@ -232,7 +232,7 @@ LIMIT 1
       'Template',
     ];
     // on create fetch statuses on basis of component
-    if (!$id) {
+    if (!$name) {
       $statusNamesToUnset = array_merge($statusNamesToUnset, [
         'Refunded',
         'Chargeback',
@@ -266,8 +266,7 @@ LIMIT 1
       }
     }
     else {
-      $contributionStatus = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $id, 'contribution_status_id');
-      $name = $statusNames[$contributionStatus] ?? NULL;
+
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
