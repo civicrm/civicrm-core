@@ -11,7 +11,6 @@
  */
 
 use Civi\Token\Event\TokenRegisterEvent;
-use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenProcessor;
 use Civi\Token\TokenRow;
@@ -441,33 +440,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       }
     }
     return $this->fieldMetadata;
-  }
-
-  /**
-   * Apply the various CRM_Utils_Token helpers.
-   *
-   * @param \Civi\Token\Event\TokenRenderEvent $e
-   */
-  public function onRender(TokenRenderEvent $e): void {
-    $useSmarty = !empty($e->context['smarty']);
-    $e->string = $e->getTokenProcessor()->visitTokens($e->string, function() {
-      // For historical consistency, we filter out unrecognized tokens.
-      return '';
-    });
-
-    if ($useSmarty) {
-      $smartyVars = [];
-      foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
-        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName));
-      }
-      \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
-      try {
-        $e->string = \CRM_Utils_String::parseOneOffStringThroughSmarty($e->string);
-      }
-      finally {
-        \CRM_Core_Smarty::singleton()->popScope();
-      }
-    }
   }
 
   /**
