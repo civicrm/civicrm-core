@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceSet;
+
 /**
  *  Test APIv3 civicrm_contribute_* functions
  *
@@ -149,14 +151,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    */
   public function testSubmit(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+    $form = $this->getContributionForm([
       'total_amount' => $this->formatMoneyInput(1234),
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrument('Check'),
       'contribution_status_id' => 1,
-    ], CRM_Core_Action::ADD);
+    ]);
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_individualId]);
     $this->assertEmpty($contribution['amount_level']);
     $this->assertEquals(1234, $contribution['total_amount']);
@@ -658,27 +660,22 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Ensure that price field are shown during pay later/pending Contribution
+   *
+   * @throws \API_Exception
    */
-  public function testEmailReceiptOnPayLater() {
+  public function testEmailReceiptOnPayLater(): void {
     $donationFT = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Donation', 'id', 'name');
-    $paramsSet = [
-      'title' => 'Price Set' . substr(sha1(rand()), 0, 4),
+    $priceSetID = PriceSet::create(FALSE)->setValues([
+      'title' => 'Price Set abcd',
       'is_active' => TRUE,
-      'financial_type_id' => $donationFT,
+      'financial_type_id:name' => 'Donation',
       'extends' => 2,
-    ];
-    $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
+      'name' => 'price_set_abcd',
+    ])->execute()->first()['id'];
 
-    $priceset = CRM_Price_BAO_PriceSet::create($paramsSet);
-    $priceSetId = $priceset->id;
-
-    //Checking for priceset added in the table.
-    $this->assertDBCompareValue('CRM_Price_BAO_PriceSet', $priceSetId, 'title',
-      'id', $paramsSet['title'], 'Check DB for created priceset'
-    );
     $paramsField = [
       'label' => 'Price Field',
-      'name' => CRM_Utils_String::titleToVar('Price Field'),
+      'name' => 'price_field',
       'html_type' => 'CheckBox',
       'option_label' => ['1' => 'Price Field 1', '2' => 'Price Field 2'],
       'option_value' => ['1' => 100, '2' => 200],
@@ -689,7 +686,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'weight' => 1,
       'options_per_line' => 1,
       'is_active' => ['1' => 1, '2' => 1],
-      'price_set_id' => $priceset->id,
+      'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
       'financial_type_id' => $donationFT,
     ];
@@ -702,7 +699,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
-      'price_set_id' => $priceSetId,
+      'price_set_id' => $priceSetID,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     ];
 
@@ -711,10 +708,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         $params['price_' . $priceField->id] = [$id => 1];
       }
     }
-    $form = new CRM_Contribute_Form_Contribution();
+    $form = $this->getContributionForm($params);
     $mut = new CiviMailUtils($this, TRUE);
-    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    $form->testSubmit($params, CRM_Core_Action::ADD);
+    $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetID));
+    $form->postProcess();
 
     $mut->checkMailLog([
       'Financial Type: Donation
@@ -2189,6 +2186,20 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
     $form->buildForm();
     return $form;
+  }
+
+  /**
+   * Get the payment instrument ID.
+   *
+   * Function just exists to avoid line-wrapping hell with the
+   * longer function it calls.
+   *
+   * @param string $name
+   *
+   * @return int
+   */
+  protected function getPaymentInstrument(string $name): int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $name);
   }
 
 }
