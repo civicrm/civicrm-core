@@ -11,15 +11,18 @@
         var self = ctrls[0];
         self.afFormCtrl = ctrls[1];
       },
-      controller: function($scope) {
+      controller: function($scope, $element) {
         var ctrl = this,
           localData = [];
 
         this.getData = function() {
           return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
         };
+        // Get name of afform entity or search display
         this.getName = function() {
-          return this.modelName;
+          return this.modelName ||
+            // If there is no Afform entity, get the name of embedded search display
+            $element.find('[search-name][display-name]').attr('display-name');
         };
         this.getEntityType = function() {
           return this.afFormCtrl.getEntity(this.modelName).type;
