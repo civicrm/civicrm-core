@@ -824,6 +824,10 @@
   name        : Franky Van Liedekerke
   organization: E-Dynamics
 
+- github      : lisandro-compucorp
+  organization: CompuCorp
+  name        : Lisandro
+
 - github      : litespeedmarc
   name        : Marc Brazeau
 
@@ -1154,6 +1158,8 @@
 - github      : reecebenson
   name        : Reece Benson
   organization: Circle Interactive
+
+- github      : redcuillin
 
 - name        : Renaee Churches
   organization: Play Australia
