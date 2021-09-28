@@ -102,13 +102,14 @@
   <field>
     <name>role_id</name>
     <uniqueName>participant_role_id</uniqueName>
-    <title>Participant Role</title>
+    <title>Participant Role ID</title>
     <pseudoconstant>
       <optionGroupName>participant_role</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
       <multiple>1</multiple>
+      <label>Participant Role</label>
     </html>
     <serialize>SEPARATOR_TRIMMED</serialize>
     <headerPattern>/(participant.)?(role)$/i</headerPattern>
