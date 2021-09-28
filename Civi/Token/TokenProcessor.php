@@ -452,6 +452,10 @@ class TokenProcessor {
 
     if ($value instanceof \DateTime && $filter === NULL) {
       $filter = ['crmDate'];
+      if ($value->format('His') === '000000') {
+        // if time is 'midnight' default to just date.
+        $filter[1] = 'Full';
+      }
     }
 
     switch ($filter[0] ?? NULL) {

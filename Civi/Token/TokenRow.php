@@ -272,7 +272,7 @@ class TokenRow {
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = htmlentities($value);
+                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value);
               }
             }
           }
