@@ -262,6 +262,22 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @see sendTemplate()
    */
   public static function renderTemplate($params) {
+    [$mailContent, $params] = self::renderTemplateRaw($params);
+    return CRM_Utils_Array::subset($mailContent, ['subject', 'text', 'html']);
+  }
+
+  /**
+   * Render a message template.
+   *
+   * @param array $params
+   *   Mixed render parameters. See sendTemplate() for more details.
+   * @return array
+   *   Tuple of [$mailContent, $updatedParams].
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @see sendTemplate()
+   */
+  protected static function renderTemplateRaw($params) {
     $modelDefaults = [
       // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
       'model' => NULL,
@@ -329,7 +345,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $rendered['subject'] = trim(preg_replace('/[\r\n]+/', ' ', $rendered['subject']));
     }
     $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
-    return array_merge($nullSet, $mailContent, $rendered);
+    $mailContent = array_merge($nullSet, $mailContent, $rendered);
+    return [$mailContent, $params];
   }
 
   /**
@@ -344,7 +361,13 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @throws \API_Exception
    */
   public static function sendTemplate($params) {
-    $params = array_merge($params, self::renderTemplate($params));
+    [$mailContent, $params] = self::renderTemplateRaw($params);
+
+    // create the params array
+    $params['subject'] = $mailContent['subject'];
+    $params['text'] = $mailContent['text'];
+    $params['html'] = $mailContent['html'];
+
     // send the template, honouring the target user’s preferences (if any)
     $sent = FALSE;
     if (!empty($params['toEmail'])) {
@@ -370,7 +393,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
         if (empty($params['attachments'])) {
           $params['attachments'] = [];
         }
-        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $params['format']);
+        $params['attachments'][] = CRM_Utils_Mail::appendPDF('Invoice.pdf', $pdfHtml, $mailContent['format']);
       }
       $pdf_filename = '';
       if ($config->doNotAttachPDFReceipt &&
@@ -394,7 +417,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
     }
 
-    return [$sent, $params['subject'], $params['text'], $params['html']];
+    return [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']];
   }
 
   /**
