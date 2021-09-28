@@ -115,8 +115,10 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     $this->assertEquals([], $unknownKeys, "$msg: Unrecognized keys: " . implode(', ', $unknownKeys) . "\n$dump");
 
     foreach ($params as $key => $value) {
-      $this->assertType($paramSpecs[$key]['type'], $value, "$msg: Bad data-type found in param ($key)\n$dump");
-      if (isset($paramSpecs[$key]['regex'])) {
+      if (isset($paramSpecs[$key]['type'])) {
+        $this->assertType($paramSpecs[$key]['type'], $value, "$msg: Bad data-type found in param ($key)\n$dump");
+      }
+      if (isset($paramSpecs[$key]['regex']) && $value !== NULL) {
         $this->assertRegExp($paramSpecs[$key]['regex'], $value, "Parameter [$key => $value] should match regex ({$paramSpecs[$key]['regex']})");
       }
     }
