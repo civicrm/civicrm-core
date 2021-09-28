@@ -511,7 +511,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @return array
    */
-  public function listTokens() {
+  public function listTokens(): array {
     return CRM_Core_SelectValues::contactTokens();
   }
 

@@ -590,28 +590,19 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Participant Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
   public static function participantTokens(): array {
-    $tokens = [
-      '{participant.status_id}' => 'Status ID',
-      '{participant.role_id}' => 'Participant Role (ID)',
-      '{participant.register_date}' => 'Register date',
-      '{participant.source}' => 'Participant Source',
-      '{participant.fee_level}' => 'Fee level',
-      '{participant.fee_amount}' => 'Fee Amount',
-      '{participant.registered_by_id}' => 'Registered By Participant ID',
-      '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
-      '{participant.role_id:label}' => 'Participant Role (label)',
-      '{participant.fee_label}' => 'Fee Label',
-    ];
-    $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
-
-    foreach ($customFields as $customField) {
-      $tokens['{participant.custom_' . $customField['id'] . '}'] = $customField['label'] . " :: " . $customField['groupTitle'];
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
     }
-
-    return $tokens;
+    return $allTokens;
   }
 
   /**

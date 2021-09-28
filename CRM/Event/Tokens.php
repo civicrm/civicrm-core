@@ -10,8 +10,8 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Api4\Event;
+use Civi\Token\TokenRow;
 
 /**
  * Class CRM_Event_Tokens
@@ -44,9 +44,9 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
   public function getAllTokens(): array {
     return array_merge(
       [
-        'event_type' => ts('Event Type'),
+        'event_type_id:label' => ts('Event Type'),
         'title' => ts('Event Title'),
-        'event_id' => ts('Event ID'),
+        'id' => ts('Event ID'),
         'start_date' => ts('Event Start Date'),
         'end_date' => ts('Event End Date'),
         'summary' => ts('Event Summary'),
@@ -54,10 +54,8 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'location' => ts('Event Location'),
         'info_url' => ts('Event Info URL'),
         'registration_url' => ts('Event Registration URL'),
-        'fee_amount' => ts('Event Fee'),
         'contact_email' => ts('Event Contact Email'),
         'contact_phone' => ts('Event Contact Phone'),
-        'balance' => ts('Event Balance'),
       ],
       CRM_Utils_Token::getCustomFieldTokens('Event')
     );
@@ -65,78 +63,17 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
 
   /**
    * @inheritDoc
+   * @throws \API_Exception
    */
-  public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    // Extracted from scheduled-reminders code. See the class description.
-    return ((!empty($processor->context['actionMapping'])
-      && $processor->context['actionMapping']->getEntity() === 'civicrm_participant'))
-      || in_array($this->getEntityIDField(), $processor->context['schema'], TRUE);
-  }
-
-  /**
-   * Alter action schedule query.
-   *
-   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
-   */
-  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== 'civicrm_participant') {
-      return;
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
+    $eventID = $this->getFieldValue($row, 'id');
+    if (!$eventID) {
+      $eventID = $row->context['actionSearchResult']->event_id;
     }
-
-    // FIXME: seems too broad.
-    $e->query->select('e.*');
-    $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
-    $e->query->join('participant_stuff', "
-!casMailingJoinType civicrm_event ev ON e.event_id = ev.id
-!casMailingJoinType civicrm_option_group og ON og.name = 'event_type'
-!casMailingJoinType civicrm_option_value ov ON ev.event_type_id = ov.value AND ov.option_group_id = og.id
-LEFT JOIN civicrm_loc_block lb ON lb.id = ev.loc_block_id
-LEFT JOIN civicrm_address address ON address.id = lb.address_id
-LEFT JOIN civicrm_email email ON email.id = lb.email_id
-LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
-");
-  }
-
-  /**
-   * @inheritDoc
-   */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $eventID = $row->context['eventId'] ?? $actionSearchResult->event_id;
     if (array_key_exists($field, $this->getEventTokenValues($eventID))) {
       foreach ($this->getEventTokenValues($eventID)[$field] as $format => $value) {
         $row->format($format)->tokens($entity, $field, $value);
       }
-      return;
-    }
-
-    if ($field === 'event_id') {
-      // @todo - migrate this to 'id'
-      $row->tokens($entity, $field, $eventID);
-    }
-    elseif ($field === 'event_type') {
-      // temporary - @todo db update to event_type_id:label
-      $row->tokens($entity, $field, $this->getEventTokenValues($eventID)['event_type_id:label']['text/html']);
-    }
-    elseif ($field === 'balance') {
-      if ($actionSearchResult->entityTable === 'civicrm_contact') {
-        $balancePay = 'N/A';
-      }
-      elseif (!empty($actionSearchResult->entityID)) {
-        $info = \CRM_Contribute_BAO_Contribution::getPaymentInfo($actionSearchResult->entityID, 'event');
-        $balancePay = $info['balance'] ?? NULL;
-        $balancePay = \CRM_Utils_Money::format($balancePay);
-      }
-      $row->tokens($entity, $field, $balancePay);
-    }
-    elseif ($field === 'fee_amount') {
-      $row->tokens($entity, $field, \CRM_Utils_Money::format($actionSearchResult->$field));
-    }
-    elseif ($cfID = CRM_Core_BAO_CustomField::getKeyID($field)) {
-      $row->customToken($entity, $cfID, $actionSearchResult->event_id);
-    }
-    else {
-      parent::evaluateToken($row, $entity, $field, $prefetch);
     }
   }
 
@@ -191,9 +128,10 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
 
       foreach (array_keys($this->getAllTokens()) as $field) {
-        if (!isset($tokens[$field]) && isset($event[$field])) {
+        if (!isset($tokens[$field])) {
           if ($this->isCustomField($field)) {
-            $tokens[$field]['text/html'] = CRM_Core_BAO_CustomField::displayValue($event[$field], str_replace('custom_', '', $field));
+            $this->prefetch[$eventID] = $event;
+            $tokens[$field]['text/html'] = $this->getCustomFieldValue($eventID, $field);
           }
           else {
             $tokens[$field]['text/html'] = $event[$field];
