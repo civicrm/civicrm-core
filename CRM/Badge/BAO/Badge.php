@@ -88,10 +88,6 @@ class CRM_Badge_BAO_Badge {
         $value = '';
         if ($element) {
           $value = $row[$element];
-          // hack to fix date field display format
-          if (in_array($element, ['event_start_date', 'event_end_date'], TRUE)) {
-            $value = CRM_Utils_Date::customFormat($value, "%B %E%f");
-          }
         }
 
         $formattedRow['token'][$key] = [
@@ -404,40 +400,33 @@ class CRM_Badge_BAO_Badge {
   public static function buildBadges(&$params, &$form) {
     // get name badge layout info
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
-    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['participantId'], 'smarty' => FALSE]);
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['participantId', 'eventId'], 'smarty' => FALSE]);
     // split/get actual field names from token and individual contact image URLs
-    $returnProperties = $processorTokens = [];
+    $processorTokens = [];
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
         if ($value) {
-          $token = CRM_Utils_Token::getTokens($value);
-          if (strpos($value, '{event.') === 0) {
-            $element = $token['event'][0];
-            //FIX ME - we need to standardize event token names
-            if (substr($element, 0, 6) != 'event_') {
-              // legacy style.
-              $element = 'event_' . $element;
-              $returnProperties[$element] = 1;
-              // add actual field name to row element
-              $layoutInfo['data']['rowElements'][$index] = $element;
-            }
-          }
-          else {
-            $tokenName = str_replace(['}', '{contact.', '{participant.'], '', $value);
-            $tokenProcessor->addMessage($tokenName, $value, 'text/plain');
-            $processorTokens[] = $tokenName;
-            $layoutInfo['data']['rowElements'][$index] = $tokenName;
-          }
+          $tokenName = str_replace(['}', '{contact.', '{participant.', '{event.'], '', $value);
+          $tokenProcessor->addMessage($tokenName, $value, 'text/plain');
+          $processorTokens[] = $tokenName;
+          $layoutInfo['data']['rowElements'][$index] = $tokenName;
         }
       }
     }
 
-    // add additional required fields for query execution
-    $additionalFields = ['participant_id', 'event_id', 'contact_id'];
-    foreach ($additionalFields as $field) {
-      $returnProperties[$field] = 1;
-    }
+    $returnProperties = [
+      'participant_id' => 1,
+      'event_id' => 1,
+      'contact_id' => 1,
+    ];
+    $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
 
+    if ($sortOrder) {
+      $sortField = explode(' ', $sortOrder)[0];
+      // Add to select so aliaising is handled.
+      $returnProperties[trim(str_replace('`', ' ', $sortField))] = 1;
+      $sortOrder = " ORDER BY $sortOrder";
+    }
     if ($form->_single) {
       $queryParams = NULL;
     }
@@ -457,25 +446,13 @@ class CRM_Badge_BAO_Badge {
       $where .= " AND {$form->_componentClause}";
     }
 
-    $sortOrder = NULL;
-    if ($form->get(CRM_Utils_Sort::SORT_ORDER)) {
-      $sortOrder = $form->get(CRM_Utils_Sort::SORT_ORDER);
-      if (!empty($sortOrder)) {
-        $sortOrder = " ORDER BY $sortOrder";
-      }
-    }
     $queryString = "$select $from $where $having $sortOrder";
 
     $dao = CRM_Core_DAO::executeQuery($queryString);
     $rows = [];
 
     while ($dao->fetch()) {
-      $tokenProcessor->addRow(['contactId' => $dao->contact_id, 'participantId' => $dao->participant_id]);
-      $rows[$dao->participant_id] = [];
-      foreach ($returnProperties as $key => $dontCare) {
-        // we are now only resolving the 4 event tokens here.
-        $rows[$dao->participant_id][$key] = $dao->$key ?? NULL;
-      }
+      $tokenProcessor->addRow(['contactId' => $dao->contact_id, 'participantId' => $dao->participant_id, 'eventId' => $dao->event_id]);
     }
     $tokenProcessor->evaluate();
     foreach ($tokenProcessor->getRows() as $row) {
