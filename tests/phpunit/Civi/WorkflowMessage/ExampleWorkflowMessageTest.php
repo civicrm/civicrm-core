@@ -259,22 +259,52 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue(!isset($envelope['myProtectedInt']));
   }
 
+  public function testExampleRender() {
+    $hookCount = 0;
+    $rand = rand(0, 1000);
+    $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
+    /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
+    $ex = $this->createExample();
+    \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
+      $hookCount++;
+      $this->assertEquals('my_example_wf', $e->params['valueName'], 'ExampleWorkflow::WORKFLOW should propagate to params[valueName]');
+      $this->assertEquals('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');
+    });
+    $this->assertEquals(0, $hookCount);
+    $rendered = $ex->renderTemplate([
+      'messageTemplate' => [
+        'msg_subject' => 'Hello {contact.display_name}',
+      ],
+    ]);
+    $this->assertEquals(1, $hookCount);
+    $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
+  }
+
   public function testImpromptuRender() {
+    $hookCount = 0;
     $rand = rand(0, 1000);
     $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
     /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
     $ex = WorkflowMessage::create('some_impromptu_wf', [
       'tokenContext' => ['contactId' => $cid],
     ]);
+    \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
+      $hookCount++;
+      $this->assertEquals('some_impromptu_wf', $e->params['valueName'], 'Adhoc name should propagate to params[valueName]');
+      $this->assertEquals('some_impromptu_wf', $e->params['workflow'], 'Adhoc name should propagate to params[workflow]');
+    });
+    $this->assertEquals(0, $hookCount);
     $rendered = $ex->renderTemplate([
       'messageTemplate' => [
         'msg_subject' => 'Hello {contact.display_name}',
       ],
     ]);
+    $this->assertEquals(1, $hookCount);
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
   public function testRenderStoredTemplate() {
+    $hookCount = 0;
     $rand = rand(0, 1000);
     $cid = $this->individualCreate(['first_name' => 'Foo', 'last_name' => 'Bar' . $rand, 'prefix_id' => NULL, 'suffix_id' => NULL]);
     /** @var \Civi\WorkflowMessage\GenericWorkflowMessage $ex */
@@ -287,7 +317,15 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
         'survey_id' => NULL,
       ],
     ]);
+
+    \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
+      $hookCount++;
+      $this->assertEquals('petition_sign', $e->params['valueName']);
+      $this->assertEquals('petition_sign', $e->params['workflow']);
+    });
+    $this->assertEquals(0, $hookCount);
     $rendered = $ex->renderTemplate();
+    $this->assertEquals(1, $hookCount);
     $this->assertStringContainsString('Foo Bar' . $rand, $rendered['subject']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['html']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['text']);
