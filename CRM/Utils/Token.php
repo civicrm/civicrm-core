@@ -1636,6 +1636,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Replace Contribution tokens in html.
    *
    * @param string $str
@@ -1643,6 +1645,8 @@ class CRM_Utils_Token {
    * @param bool|string $html
    * @param string $knownTokens
    * @param bool|string $escapeSmarty
+   *
+   * @deprecated
    *
    * @return mixed
    */
@@ -1685,9 +1689,12 @@ class CRM_Utils_Token {
    * @param array $contributions
    * @param array $knownTokens
    *
+   * @deprecated
+   *
    * @return string
    */
   public static function replaceMultipleContributionTokens(string $separator, string $str, array $contributions, array $knownTokens): string {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     foreach ($knownTokens['contribution'] ?? [] as $token) {
       $resolvedTokens = [];
       foreach ($contributions as $contribution) {
@@ -1778,10 +1785,14 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * @param $token
    * @param $contribution
    * @param bool $html
    * @param bool $escapeSmarty
+   *
+   * @deprecated
    *
    * @return mixed|string
    * @throws \CRM_Core_Exception

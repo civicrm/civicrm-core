@@ -48,7 +48,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    CRM_Utils_Token::$_tokens['contribution'] = NULL;
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match', 'civicrm_campaign'], TRUE);
     CRM_Utils_Hook::singleton()->reset();
@@ -78,6 +77,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'receive_date' => '2021-02-01 2:21',
       'currency' => 'USD',
     ])['id'];
+    /* @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', [
       'campaign_id' => '',
       'subject' => '',
@@ -139,7 +139,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       'total_amount' => 6,
       'campaign_id' => $this->campaignCreate(['title' => $campaignTitle], FALSE),
       'financial_type_id' => 'Donation',
-      $customFieldKey => 'Text_' . substr(sha1(rand()), 0, 7),
+      $customFieldKey => 'Text_',
     ];
     $contributionIDs = $returnProperties = [];
     $result = $this->callAPISuccess('Contribution', 'create', $params);
@@ -301,15 +301,15 @@ total_amount : &euro; 9,999.99
 fee_amount : &euro; 1,111.11
 net_amount : &euro; 7,777.78
 non_deductible_amount : &euro; 2,222.22
-receive_date : July 20th, 2018 12:00 AM
+receive_date : July 20th, 2018
 payment_instrument_id:label : Check
 trxn_id : 1234
 invoice_id : 568
 currency : EUR
-cancel_date : December 30th, 2019 12:00 AM
+cancel_date : December 30th, 2019
 cancel_reason : Contribution Cancel Reason
-receipt_date : October 30th, 2019 12:00 AM
-thankyou_date : November 30th, 2019 12:00 AM
+receipt_date : October 30th, 2019
+thankyou_date : November 30th, 2019
 source : Contribution Source
 amount_level : Amount Level
 contribution_status_id : 2

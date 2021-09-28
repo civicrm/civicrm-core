@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -133,7 +135,17 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    */
   public function postProcess() {
     $formValues = $this->controller->exportValues($this->getName());
-    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
+    [$formValues, $html_message] = $this->processMessageTemplate($formValues);
+
+    $messageToken = CRM_Utils_Token::getTokens($html_message);
+
+    $returnProperties = [];
+    if (isset($messageToken['contact'])) {
+      foreach ($messageToken['contact'] as $key => $value) {
+        $returnProperties[$value] = 1;
+      }
+    }
+
     $isPDF = FALSE;
     $emailParams = [];
     if (!empty($formValues['email_options'])) {
@@ -427,7 +439,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         CRM_Core_Session::setStatus(ts('You have selected the table cell separator, but one or more token fields are not placed inside a table cell. This would result in invalid HTML, so comma separators have been used instead.'));
       }
       $validated = TRUE;
-      $html = str_replace($separator, $realSeparator, $this->resolveTokens($html_message, $contact, $contribution, $messageToken, $grouped, $separator, $groupedContributions));
+      $html = str_replace($separator, $realSeparator, $this->resolveTokens($html_message, $contact, $contribution['id'], $grouped, $separator, $groupedContributions));
     }
 
     return $html;
@@ -535,8 +547,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @param string $html_message
    * @param array $contact
-   * @param array $contribution
-   * @param array $messageToken
+   * @param int $contributionID
    * @param bool $grouped
    *   Does this letter represent more than one contribution.
    * @param string $separator
@@ -545,20 +556,44 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    *
    * @return string
    */
-  protected function resolveTokens(string $html_message, $contact, $contribution, $messageToken, $grouped, $separator, $contributions): string {
+  protected function resolveTokens(string $html_message, $contact, $contributionID, $grouped, $separator, $contributions): string {
     $tokenContext = [
       'smarty' => (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY),
       'contactId' => $contact['contact_id'],
+      'schema' => ['contributionId'],
     ];
     if ($grouped) {
-      $html_message = CRM_Utils_Token::replaceMultipleContributionTokens($separator, $html_message, $contributions, $messageToken);
+      // First replace the contribution tokens. These are pretty ... special.
+      // if the text looks like `<td>{contribution.currency} {contribution.total_amount}</td>'
+      // and there are 2 rows with a currency separator of
+      // you wind up with a string like
+      // '<td>USD</td><td>USD></td> <td>$50</td><td>$89</td>
+      // see https://docs.civicrm.org/user/en/latest/contributions/manual-receipts-and-thank-yous/#grouped-contribution-thank-you-letters
+      $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), $tokenContext);
+      $contributionTokens = CRM_Utils_Token::getTokens($html_message)['contribution'] ?? [];
+      foreach ($contributionTokens as $token) {
+        $tokenProcessor->addMessage($token, '{contribution.' . $token . '}', 'text/html');
+      }
+
+      foreach ($contributions as $contribution) {
+        $tokenProcessor->addRow([
+          'contributionId' => $contribution['id'],
+          'contribution' => $contribution,
+        ]);
+      }
+      $tokenProcessor->evaluate();
+      $resolvedTokens = [];
+      foreach ($contributionTokens as $token) {
+        foreach ($tokenProcessor->getRows() as $row) {
+          $resolvedTokens[$token][$row->context['contributionId']] = $row->render($token);
+        }
+        // We've resolved the value for each row - resorting to swapping them out
+        // with the old function.
+        $html_message = CRM_Utils_Token::token_replace('contribution', $token, implode($separator, $resolvedTokens[$token]), $html_message);
+      }
     }
-    else {
-      $tokenContext['schema'] = ['contributionId'];
-      $tokenContext['contributionId'] = $contribution['id'];
-    }
-    $smarty = ['contact' => $contact];
-    return CRM_Core_TokenSmarty::render(['html' => $html_message], $tokenContext, $smarty)['html'];
+    $tokenContext['contributionId'] = $contributionID;
+    return CRM_Core_TokenSmarty::render(['html' => $html_message], $tokenContext)['html'];
   }
 
 }
