@@ -552,9 +552,7 @@ MODIFY      {$columnName} varchar( $length )
    * @return bool TRUE if FK is found
    */
   public static function checkFKExists($table_name, $constraint_name) {
-    $config = CRM_Core_Config::singleton();
-    $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
-    $dbUf = DB::parseDSN($dsn);
+    $dao = new CRM_Core_DAO();
     $query = "
       SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
       WHERE TABLE_SCHEMA = %1
@@ -563,7 +561,7 @@ MODIFY      {$columnName} varchar( $length )
       AND CONSTRAINT_TYPE = 'FOREIGN KEY'
     ";
     $params = [
-      1 => [$dbUf['database'], 'String'],
+      1 => [$dao->_database, 'String'],
       2 => [$table_name, 'String'],
       3 => [$constraint_name, 'String'],
     ];
