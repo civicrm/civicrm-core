@@ -66,7 +66,7 @@ class WorkflowMessage {
   public static function create(string $wfName, array $imports = []) {
     $classMap = static::getWorkflowNameClassMap();
     $class = $classMap[$wfName] ?? 'Civi\WorkflowMessage\GenericWorkflowMessage';
-    $imports['envelope']['valueName'] = $wfName;
+    $imports['envelope']['workflow'] = $wfName;
     $model = new $class();
     static::importAll($model, $imports);
     return $model;
@@ -95,7 +95,6 @@ class WorkflowMessage {
       }
       unset($params['model']);
     }
-
 
     if (isset($params['tplParams'])) {
       $model->import('tplParams', $params['tplParams']);

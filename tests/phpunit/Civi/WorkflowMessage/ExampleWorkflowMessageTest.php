@@ -33,7 +33,11 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
       const WORKFLOW = 'my_example_wf';
 
-      const GROUP = 'my_example_grp';
+      /**
+       * Use this to provide interop with old-style `groupName`.
+       * @deprecated
+       */
+      const GROUP = 'msg_old_style_grp';
 
       /**
        * @var string
@@ -189,8 +193,8 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertEquals(100, $tpl['some_extra_tpl_stuff']);
 
     $envelope = $ex->export('envelope');
-    $this->assertEquals('my_example_wf', $envelope['valueName']);
-    $this->assertEquals('my_example_grp', $envelope['groupName']);
+    $this->assertEquals('my_example_wf', $envelope['workflow']);
+    $this->assertEquals('msg_old_style_grp', $envelope['groupName']);
   }
 
   /**
@@ -247,10 +251,10 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $tpl = $ex->export('tplParams');
     $this->assertEquals(456, $tpl['myImpromputInt']);
     $this->assertEquals(['is not mentioned anywhere'], $tpl['impromptu_smarty_data']);
-    $this->assertTrue(!isset($tpl['valueName']));
+    $this->assertTrue(!isset($tpl['workflow']));
 
     $envelope = $ex->export('envelope');
-    $this->assertEquals('some_impromptu_wf', $envelope['valueName']);
+    $this->assertEquals('some_impromptu_wf', $envelope['workflow']);
     $this->assertEquals('foo@example.com', $envelope['from']);
     $this->assertTrue(!isset($envelope['myProtectedInt']));
 
@@ -267,7 +271,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $ex = $this->createExample()->setContactId($cid);
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('my_example_wf', $e->params['valueName'], 'ExampleWorkflow::WORKFLOW should propagate to params[valueName]');
+      $this->assertEquals('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');
     });
     $this->assertEquals(0, $hookCount);
     $rendered = $ex->renderTemplate([
@@ -289,7 +293,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     ]);
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('some_impromptu_wf', $e->params['valueName'], 'Adhoc name should propagate to params[workflow]');
+      $this->assertEquals('some_impromptu_wf', $e->params['workflow'], 'Adhoc name should propagate to params[workflow]');
     });
     $this->assertEquals(0, $hookCount);
     $rendered = $ex->renderTemplate([
@@ -318,7 +322,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('petition_sign', $e->params['valueName']);
+      $this->assertEquals('petition_sign', $e->params['workflow']);
     });
     $this->assertEquals(0, $hookCount);
     $rendered = $ex->renderTemplate();
