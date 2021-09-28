@@ -262,32 +262,22 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @see sendTemplate()
    */
   public static function renderTemplate($params) {
-    $forbidden = ['from', 'toName', 'toEmail', 'cc', 'bcc', 'replyTo'];
-    $intersect = array_intersect($forbidden, array_keys($params));
-    if (!empty($intersect)) {
-      throw new \CRM_Core_Exception(sprintf("renderTemplate() received forbidden fields (%s)",
-        implode(',', $intersect)));
-    }
-
-    $mailContent = [];
-    // sendTemplate has had an obscure feature - if you omit `toEmail`, then it merely renders.
-    // At some point, we may want to invert the relation between renderTemplate/sendTemplate, but for now this is a smaller patch.
-    [$sent, $mailContent['subject'], $mailContent['text'], $mailContent['html']] = static::sendTemplate($params);
-    return $mailContent;
+    [$mailContent, $params] = self::renderTemplateRaw($params);
+    return CRM_Utils_Array::subset($mailContent, ['subject', 'text', 'html']);
   }
 
   /**
-   * Send an email from the specified template based on an array of params.
+   * Render a message template.
    *
    * @param array $params
-   *   A string-keyed array of function params, see function body for details.
-   *
+   *   Mixed render parameters. See sendTemplate() for more details.
    * @return array
-   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
-   * @throws \CRM_Core_Exception
+   *   Tuple of [$mailContent, $updatedParams].
    * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @see sendTemplate()
    */
-  public static function sendTemplate($params) {
+  protected static function renderTemplateRaw($params) {
     $modelDefaults = [
       // instance of WorkflowMessageInterface, containing a list of data to provide to the message-template
       'model' => NULL,
@@ -356,16 +346,31 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
     $nullSet = ['subject' => NULL, 'text' => NULL, 'html' => NULL];
     $mailContent = array_merge($nullSet, $mailContent, $rendered);
+    return [$mailContent, $params];
+  }
 
-    // send the template, honouring the target user’s preferences (if any)
-    $sent = FALSE;
+  /**
+   * Send an email from the specified template based on an array of params.
+   *
+   * @param array $params
+   *   A string-keyed array of function params, see function body for details.
+   *
+   * @return array
+   *   Array of four parameters: a boolean whether the email was sent, and the subject, text and HTML templates
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   */
+  public static function sendTemplate($params) {
+    [$mailContent, $params] = self::renderTemplateRaw($params);
 
     // create the params array
     $params['subject'] = $mailContent['subject'];
     $params['text'] = $mailContent['text'];
     $params['html'] = $mailContent['html'];
 
-    if ($params['toEmail']) {
+    // send the template, honouring the target user’s preferences (if any)
+    $sent = FALSE;
+    if (!empty($params['toEmail'])) {
       // @todo - consider whether we really should be loading
       // this based on 'the first email in the db that matches'.
       // when we likely have the contact id. OTOH people probably barely
