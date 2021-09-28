@@ -46,6 +46,11 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     'tokenContext' => ['type' => 'array', 'for' => 'messageTemplate'],
     'tplParams' => ['type' => 'array', 'for' => 'messageTemplate'],
     'contactId' => ['type' => 'int|NULL', 'for' => 'messageTemplate' /* deprecated in favor of tokenContext[contactId] */],
+    'workflow' => [
+      'regex' => '/^([a-zA-Z_]+)$/',
+      'type' => 'string',
+      'for' => 'messageTemplate',
+    ],
     'valueName' => [
       'regex' => '/^([a-zA-Z_]+)$/',
       'type' => 'string',
@@ -124,7 +129,11 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     }
 
     if ($context === 'messageTemplate') {
-      $this->assertTrue(!empty($params['valueName']), "$msg: Message templates must always specify the name of the workflow step\n$dump");
+      $this->assertTrue(!empty($params['workflow']), "$msg: Message templates must always specify a symbolic name of the step/task\n$dump");
+      if (isset($params['valueName'])) {
+        // This doesn't require that valueName be supplied - but if it is supplied, it must match the workflow name.
+        $this->assertEquals($params['workflow'], $params['valueName'], "$msg: If given, workflow and valueName must match\n$dump");
+      }
       $this->assertEquals($params['contactId'] ?? NULL, $params['tokenContext']['contactId'] ?? NULL, "$msg: contactId moved to tokenContext, but legacy value should be equivalent\n$dump");
 
       // This assertion is surprising -- yet true. We should perhaps check if it was true in past releases...

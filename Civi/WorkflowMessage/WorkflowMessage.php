@@ -96,12 +96,6 @@ class WorkflowMessage {
       unset($params['model']);
     }
 
-    \CRM_Utils_Array::pathMove($params, ['contactId'], ['tokenContext', 'contactId']);
-
-    // Core#644 - handle Email ID passed as "From".
-    if (isset($params['from'])) {
-      $params['from'] = \CRM_Utils_Mail::formatFromAddress($params['from']);
-    }
 
     if (isset($params['tplParams'])) {
       $model->import('tplParams', $params['tplParams']);
