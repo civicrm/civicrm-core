@@ -32,7 +32,6 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     // @todo - more of the handling in this function should be move to the trait. Notably the title part is
     //  not set on other forms that share the trait.
     // store case id if present
-    $this->_caseId = CRM_Utils_Request::retrieve('caseid', 'String', $this, FALSE);
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
 
     $cid = CRM_Utils_Request::retrieve('cid', 'String', $this, FALSE);
@@ -81,23 +80,5 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * @todo move some code from preProcess into here.
    */
   public function setContactIDs() {}
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-
-    if (isset($this->_caseId) || isset($this->_caseIds)) {
-      // For a single case, list tokens relevant for only that case type
-      $caseTypeId = isset($this->_caseId) ? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $this->_caseId, 'case_type_id') : NULL;
-      $tokens += CRM_Core_SelectValues::caseTokens($caseTypeId);
-    }
-
-    return $tokens;
-  }
 
 }

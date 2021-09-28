@@ -239,15 +239,10 @@ trait CRM_Contact_Form_Task_PDFTrait {
     }
 
     foreach ($form->_contactIds as $item => $contactId) {
-      $caseId = $form->getVar('_caseId');
-      if (empty($caseId) && !empty($form->_caseIds[$item])) {
-        $caseId = $form->_caseIds[$item];
-      }
-
       $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'contactId' => $contactId,
         'messageTemplate' => ['msg_html' => $html_message],
-        'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
+        'tokenContext' => $this->getTokenContext($contactId),
         'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
       ])['html'];
 

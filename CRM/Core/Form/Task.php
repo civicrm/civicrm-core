@@ -338,4 +338,19 @@ SELECT contact_id
     return $this::$entityShortname . '_id';
   }
 
+  /**
+   * Get the schema for token rendering.
+   *
+   * Contact is included by default.
+   *
+   * e.g return ['contributionId' => 3]
+   *
+   * @param int $contactID
+   *
+   * @return array
+   */
+  protected function getTokenContext(int $contactID): array {
+    return [];
+  }
+
 }

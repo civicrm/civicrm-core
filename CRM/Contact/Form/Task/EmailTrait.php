@@ -17,6 +17,7 @@
 
 use Civi\Api4\Email;
 use Civi\Api4\Contribution;
+use Civi\Token\TokenProcessor;
 
 /**
  * This class provides the common functionality for tasks that send emails.
@@ -250,7 +251,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if ($this->_single) {
       CRM_Core_Session::singleton()->replaceUserContext($this->getRedirectUrl());
     }
-    $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
+   $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
 
     $fields = [
       'followup_assignee_contact_id' => [
@@ -413,8 +414,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $bcc,
       $additionalDetails,
       $this->getContributionIDs(),
-      CRM_Utils_Array::value('campaign_id', $formValues),
-      $this->getCaseID()
+      CRM_Utils_Array::value('campaign_id', $formValues)
     );
 
     if ($sent) {
@@ -476,7 +476,18 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @return array
    */
   public function listTokens(): array {
-    return CRM_Core_SelectValues::contactTokens();
+    $tokenProcessor = $this->getTokenProcessor();
+    return $tokenProcessor->listTokens();
+  }
+
+  /**
+   * Get the schema that defines the available tokens.
+   *
+   * @return array
+   */
+  protected function getTokenSchema(): array {
+    return [];
+>>>>>>> Move case schema bit to case class
   }
 
   /**
@@ -578,14 +589,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @param string $subject
    *
    * @return string
-   * @throws \CRM_Core_Exception
    */
   protected function getSubject(string $subject):string {
-    // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
-    if ($this->getCaseID()) {
-      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->getCaseID()), 0, 7);
-      $subject = "[case #$hash] $subject";
-    }
     return $subject;
   }
 
@@ -693,21 +698,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
   }
 
   /**
-   * Get case ID - if any.
-   *
-   * @return int|null
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getCaseID(): ?int {
-    $caseID = CRM_Utils_Request::retrieve('caseid', 'String', $this);
-    if ($caseID) {
-      return (int) $caseID;
-    }
-    return NULL;
-  }
-
-  /**
    * @return array
    */
   protected function getFromEmails(): array {
@@ -790,8 +780,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $bcc = NULL,
     $additionalDetails = NULL,
     $contributionIds = NULL,
-    $campaignId = NULL,
-    $caseId = NULL
+    $campaignId = NULL
   ) {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
@@ -814,7 +803,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $activityIds = [];
     $firstActivityCreated = FALSE;
     foreach ($contactDetails as $values) {
-      $tokenContext = $caseId ? ['caseId' => $caseId] : [];
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
 

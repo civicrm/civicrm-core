@@ -45,7 +45,7 @@
             {foreach from=$caseRoles.client item=client}
               <tr class="crm-case-caseview-display_name">
                 <td class="label-left bold" style="padding: 0px; border: none;">
-                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/activity/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts 1=$client.email|escape}Email: %1{/ts}"><i class="crm-i fa-envelope" aria-hidden="true"></i></a></span>{/if}
+                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>{if $client.email}{crmAPI var='email_type_id' entity='OptionValue' action='getsingle' return="value" name="Email" option_group_id="activity_type"}<span class="crm-case-caseview-email"><a class="crm-hover-button crm-popup" href="{crmURL p='civicrm/case/email/add' q="reset=1&action=add&atype=`$email_type_id.value`&cid=`$client.contact_id`&caseid=`$caseId`"}" title="{ts 1=$client.email|escape}Email: %1{/ts}"><i class="crm-i fa-envelope" aria-hidden="true"></i></a></span>{/if}
                 </td>
               </tr>
               {if $client.phone}

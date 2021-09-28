@@ -251,7 +251,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $activityLinks = ['' => ts('Add Activity')];
     foreach ($aTypes as $type => $label) {
       if ($type == $emailActivityType) {
-        $url = CRM_Utils_System::url('civicrm/activity/email/add',
+        $url = CRM_Utils_System::url('civicrm/case/email/add',
           "action=add&context=standalone&reset=1&caseid={$this->_caseID}&atype=$type",
           FALSE, NULL, FALSE
         );
