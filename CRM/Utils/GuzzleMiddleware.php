@@ -9,6 +9,106 @@ use Psr\Http\Message\RequestInterface;
 class CRM_Utils_GuzzleMiddleware {
 
   /**
+   * The authx middleware sends authenticated requests via JWT.
+   *
+   * To add an authentication token to a specific request, the `$options`
+   * must specify `authx_user` or `authx_contact_id`. Examples:
+   *
+   * $http = new GuzzleHttp\Client(['authx_user' => 'admin']);
+   * $http->post('civicrm/admin', ['authx_user' => 'admin']);
+   *
+   * Supported options:
+   *   - authx_ttl (int): Seconds of validity for JWT's
+   *   - authx_host (string): Only send tokens for the given host.
+   *   - authx_contact_id (int): The CiviCRM contact to authenticate with
+   *   - authx_user (string): The CMS user to authenticate with
+   *   - authx_flow (string): How to format the auth token. One of: 'param', 'xheader', 'header'.
+   *
+   * @return \Closure
+   */
+  public static function authx($defaults = []) {
+    $defaults = array_merge([
+      'authx_ttl' => 60,
+      'authx_host' => parse_url(CIVICRM_UF_BASEURL, PHP_URL_HOST),
+      'authx_contact_id' => NULL,
+      'authx_user' => NULL,
+      'authx_flow' => 'param',
+    ], $defaults);
+    return function(callable $handler) use ($defaults) {
+      return function (RequestInterface $request, array $options) use ($handler, $defaults) {
+        if ($request->getUri()->getHost() !== $defaults['authx_host']) {
+          return $handler($request, $options);
+        }
+
+        $options = array_merge($defaults, $options);
+        if (!empty($options['authx_contact_id'])) {
+          $cid = $options['authx_contact_id'];
+        }
+        elseif (!empty($options['authx_user'])) {
+          $r = civicrm_api3("Contact", "get", ["id" => "@user:" . $options['authx_user']]);
+          foreach ($r['values'] as $id => $value) {
+            $cid = $id;
+            break;
+          }
+          if (empty($cid)) {
+            throw new \RuntimeException("Failed to identify user ({$options['authx_user']})");
+          }
+        }
+        else {
+          $cid = NULL;
+        }
+
+        if ($cid) {
+          if (!CRM_Extension_System::singleton()->getMapper()->isActiveModule('authx')) {
+            throw new \RuntimeException("Authx is not enabled. Authenticated requests will not work.");
+          }
+          $tok = \Civi::service('crypto.jwt')->encode([
+            'exp' => time() + $options['authx_ttl'],
+            'sub' => 'cid:' . $cid,
+            'scope' => 'authx',
+          ]);
+
+          switch ($options['authx_flow']) {
+            case 'header':
+              $request = $request->withHeader('Authorization', "Bearer $tok");
+              break;
+
+            case 'xheader':
+              $request = $request->withHeader('X-Civi-Auth', "Bearer $tok");
+              break;
+
+            case 'param':
+              if ($request->getMethod() === 'POST') {
+                if (!empty($request->getHeader('Content-Type')) && !preg_grep(';application/x-www-form-urlencoded;', $request->getHeader('Content-Type'))) {
+                  throw new \RuntimeException("Cannot append authentication credentials to HTTP POST. Unrecognized content type.");
+                }
+                $query = (string) $request->getBody();
+                $request = $request->withHeader('Content-Type', 'application/x-www-form-urlencoded');
+                $request = new GuzzleHttp\Psr7\Request(
+                  $request->getMethod(),
+                  $request->getUri(),
+                  $request->getHeaders(),
+                  http_build_query(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
+                );
+              }
+              else {
+                $query = $request->getUri()->getQuery();
+                $request = $request->withUri($request->getUri()->withQuery(
+                  http_build_query(['_authx' => "Bearer $tok"]) . ($query ? '&' : '') . $query
+                ));
+              }
+              break;
+
+            default:
+              throw new \RuntimeException("Unrecognized authx flow: {$options['authx_flow']}");
+          }
+        }
+        return $handler($request, $options);
+      };
+    };
+  }
+
+  /**
    * Add this as a Guzzle handler/middleware if you wish to simplify
    * the construction of Civi-related URLs. It enables URL schemes for:
    *
