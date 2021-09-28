@@ -213,6 +213,16 @@ class Test {
   }
 
   /**
+   * @return \Civi\Test\EventChecker
+   */
+  public static function eventChecker() {
+    if (!isset(self::$singletons['eventChecker'])) {
+      self::$singletons['eventChecker'] = new \Civi\Test\EventChecker();
+    }
+    return self::$singletons['eventChecker'];
+  }
+
+  /**
    * Prepare and execute a batch of SQL statements.
    *
    * @param string $query

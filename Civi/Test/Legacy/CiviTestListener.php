@@ -55,9 +55,24 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     else {
       $this->tx = NULL;
     }
+
+    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+      \Civi\Test::eventChecker()->start($test);
+    }
   }
 
   public function endTest(\PHPUnit_Framework_Test $test, $time) {
+    $exception = NULL;
+
+    if ($this->isCiviTest($test) || $test instanceof \CiviUnitTestCase) {
+      try {
+        \Civi\Test::eventChecker()->stop($test);
+      }
+      catch (\Exception $e) {
+        $exception = $e;
+      }
+    }
+
     if ($test instanceof \Civi\Test\TransactionalInterface) {
       $this->tx->rollback()->commit();
       $this->tx = NULL;
@@ -70,6 +85,10 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
       unset($GLOBALS['CIVICRM_TEST_CASE']);
       error_reporting(E_ALL & ~E_NOTICE);
       $this->errorScope = NULL;
+    }
+
+    if ($exception) {
+      throw $exception;
     }
   }
 
