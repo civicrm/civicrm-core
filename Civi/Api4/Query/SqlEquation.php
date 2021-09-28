@@ -70,7 +70,17 @@ class SqlEquation extends SqlExpression {
   public function render(array $fieldList): string {
     $output = [];
     foreach ($this->args as $arg) {
-      $output[] = is_string($arg) ? $arg : $arg->render($fieldList);
+      // Just an operator
+      if (is_string($arg)) {
+        $output[] = $arg;
+      }
+      // Surround fields with COALESCE to handle null values
+      elseif (is_a($arg, SqlField::class)) {
+        $output[] = 'COALESCE(' . $arg->render($fieldList) . ', 0)';
+      }
+      else {
+        $output[] = $arg->render($fieldList);
+      }
     }
     return '(' . implode(' ', $output) . ')';
   }

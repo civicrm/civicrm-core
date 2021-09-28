@@ -108,7 +108,10 @@ class SqlExpressionTest extends UnitTestCase {
         '(5 > 11) AS five_greater_eleven',
         '(5 <= 11) AS five_less_eleven',
         '(1 BETWEEN 0 AND contact_id) AS is_between',
+        // These fields don't exist
         '(illegal * stuff) AS illegal_stuff',
+        // This field will be null
+        '(hold_date + 5) AS null_plus_five',
       ])
       ->addWhere('contact_id', '=', $contact['id'])
       ->setLimit(1)
@@ -121,6 +124,7 @@ class SqlExpressionTest extends UnitTestCase {
     $this->assertTrue($result['five_less_eleven']);
     $this->assertTrue($result['is_between']);
     $this->assertArrayNotHasKey('illegal_stuff', $result);
+    $this->assertEquals('5', $result['null_plus_five']);
   }
 
 }
