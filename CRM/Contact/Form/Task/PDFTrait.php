@@ -84,7 +84,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       ts('Paper Size'),
       [0 => ts('- default -')] + CRM_Core_BAO_PaperSize::getList(TRUE),
       FALSE,
-      ['onChange' => "selectPaper( this.value ); showUpdateFormatChkBox();"]
+      ['onChange' => 'selectPaper( this.value ); showUpdateFormatChkBox();']
     );
     $form->add(
       'select',
@@ -92,7 +92,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       ts('Orientation'),
       CRM_Core_BAO_PdfFormat::getPageOrientations(),
       FALSE,
-      ['onChange' => "updatePaperDimensions(); showUpdateFormatChkBox();"]
+      ['onChange' => 'updatePaperDimensions(); showUpdateFormatChkBox();']
     );
     $form->add(
       'select',
@@ -225,13 +225,13 @@ trait CRM_Contact_Form_Task_PDFTrait {
    */
   public function postProcess(): void {
     $form = $this;
-    $formValues = $form->controller->exportValues($form->getName());
-    [$formValues, $html_message, $messageToken, $returnProperties] = $this->processMessageTemplate($formValues);
+    $formValues = $this->controller->exportValues($this->getName());
+    [$formValues, $html_message] = $this->processMessageTemplate($formValues);
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $activityIds = $this->createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+      $activityIds = $this->createActivities($html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
     if (!empty($formValues['document_file_path'])) {
@@ -257,7 +257,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $tee = NULL;
     if ($this->isLiveMode() && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
-        throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
+        throw new CRM_Core_Exception('When recordGeneratedLetters=combined-attached, there should only be one activity.');
       }
       $tee = CRM_Utils_ConsoleTee::create()->start();
     }
@@ -326,7 +326,6 @@ trait CRM_Contact_Form_Task_PDFTrait {
   }
 
   /**
-   * @param CRM_Core_Form $form
    * @param string $html_message
    * @param array $contactIds
    * @param string $subject
@@ -340,8 +339,8 @@ trait CRM_Contact_Form_Task_PDFTrait {
    *
    * @throws CRM_Core_Exception
    */
-  public function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
-
+  protected function createActivities($html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
+    $form = $this;
     $activityParams = [
       'subject' => $subject,
       'campaign_id' => $campaign_id,
