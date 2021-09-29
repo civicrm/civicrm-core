@@ -1,5 +1,9 @@
 <?php
-return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInterface {
+
+use Civi\Test\EventCheck;
+use Civi\Test\HookInterface;
+
+return new class() extends EventCheck implements HookInterface {
 
   private $paramSpecs = [
 
@@ -85,7 +89,7 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     'disableSmarty' => ['type' => 'bool|int', 'for' => 'messageTemplate'],
   ];
 
-  public function isSupported($test) {
+  public function isSupported($test): bool {
     // MailTest does intentionally breaky things to provoke+ensure decent error-handling.
     //So we will not enforce generic rules on it.
     return !($test instanceof CRM_Utils_MailTest);
@@ -96,8 +100,8 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
    *
    * @see \CRM_Utils_Hook::alterMailParams()
    */
-  public function hook_civicrm_alterMailParams(&$params, $context = NULL) {
-    $msg = "Non-conformant hook_civicrm_alterMailParams(..., $context)";
+  public function hook_civicrm_alterMailParams(&$params, $context = NULL): void {
+    $msg = 'Non-conforming hook_civicrm_alterMailParams(..., $context)';
     $dump = print_r($params, 1);
 
     $this->assertRegExp('/^(messageTemplate|civimail|singleEmail|flexmailer)$/',
@@ -129,7 +133,7 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     }
 
     if ($context === 'messageTemplate') {
-      $this->assertTrue(!empty($params['workflow']), "$msg: Message templates must always specify a symbolic name of the step/task\n$dump");
+      $this->assertNotEmpty($params['workflow'], "$msg: Message templates must always specify a symbolic name of the step/task\n$dump");
       if (isset($params['valueName'])) {
         // This doesn't require that valueName be supplied - but if it is supplied, it must match the workflow name.
         $this->assertEquals($params['workflow'], $params['valueName'], "$msg: If given, workflow and valueName must match\n$dump");
@@ -145,8 +149,8 @@ return new class() extends \Civi\Test\EventCheck implements \Civi\Test\HookInter
     }
 
     if (isset($params['groupName']) && $params['groupName'] === 'Scheduled Reminder Sender') {
-      $this->assertTrue(!empty($params['entity']), "$msg: Scheduled reminders should have entity\n$dump");
-      $this->assertTrue(!empty($params['entity_id']), "$msg: Scheduled reminders should have entity_id\n$dump");
+      $this->assertNotEmpty($params['entity'], "$msg: Scheduled reminders should have entity\n$dump");
+      $this->assertNotEmpty($params['entity_id'], "$msg: Scheduled reminders should have entity_id\n$dump");
     }
   }
 
