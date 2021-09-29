@@ -112,7 +112,7 @@
         {foreach from=$allTabs item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all{if isset($tabValue.count)} crm-count-{$tabValue.count}{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{if !empty($tabValue.template)}#contact-{$tabValue.id}{else}{$tabValue.url}{/if}" title="{$tabValue.title|escape}">
-              <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
+              <i class="{if !empty($tabValue.icon)}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}" aria-hidden="true"></i>
               <span>{$tabValue.title}</span>
               {if empty($tabValue.hideCount)}<em>{if isset($tabValue.count)}{$tabValue.count}{/if}</em>{/if}
             </a>
