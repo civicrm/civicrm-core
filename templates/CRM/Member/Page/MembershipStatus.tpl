@@ -43,7 +43,7 @@
           <td class="nowrap crmf-start_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.start_event)}{$row.start_event}{/if}</td>
           <td class="nowrap crmf-start_event_adjust_unit_interval">{if !empty($row.start_event_adjust_unit_interval)}{$row.start_event_adjust_unit_interval}{/if}</td>
           <td class="nowrap crmf-end_event crm-editable" data-type="select" data-empty-option="{ts}- none -{/ts}">{if !empty($row.end_event)}{$row.end_event}{/if}</td>
-          <td class="nowrap crmf-end_event_adjust_interval">{if !empty($row.end_event_adjust_unit_interval)}{$row.end_event_adjust_interval}{/if}</td>
+          <td class="nowrap crmf-end_event_adjust_interval">{if !empty($row.end_event_adjust_interval)}{$row.end_event_adjust_interval}{/if}</td>
           <td class="crmf-is_current_member crm-editable" data-type="boolean">{if $row.is_current_member eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="nowrap crmf-weight">{$row.weight}</td>
