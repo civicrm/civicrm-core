@@ -130,7 +130,6 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
       $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => ['msg_html' => $html_message],
         'contactId' => $membership['contact_id'],
-        'schema' => ['contactId', 'membershipId'],
         'tokenContext' => ['membershipId' => $membership['id']],
         'disableSmarty' => !defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY,
       ])['html'];
