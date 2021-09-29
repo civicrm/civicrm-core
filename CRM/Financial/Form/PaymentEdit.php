@@ -17,6 +17,16 @@
 class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
   /**
+   * Should financials be checked after the test but before tear down.
+   *
+   * Ideally all tests (or at least all that call any financial api calls ) should do this but there
+   * are some test data issues and some real bugs currently blocking.
+   *
+   * @var bool
+   */
+  protected $isValidateFinancialsOnPostAssert = TRUE;
+
+  /**
    * The id of the financial trxn.
    *
    * @var int
