@@ -250,7 +250,7 @@ trait ReflectiveWorkflowTrait {
    */
   protected function exportExtraEnvelope(array &$export): void {
     if ($wfName = \CRM_Utils_Constant::value(static::CLASS . '::WORKFLOW')) {
-      $export['valueName'] = $wfName;
+      $export['workflow'] = $wfName;
     }
     if ($wfGroup = \CRM_Utils_Constant::value(static::CLASS . '::GROUP')) {
       $export['groupName'] = $wfGroup;
@@ -292,8 +292,8 @@ trait ReflectiveWorkflowTrait {
    */
   protected function importExtraEnvelope(array &$values): void {
     if ($wfName = \CRM_Utils_Constant::value(static::CLASS . '::WORKFLOW')) {
-      if (isset($values['valueName']) && $wfName === $values['valueName']) {
-        unset($values['valueName']);
+      if (isset($values['workflow']) && $wfName === $values['workflow']) {
+        unset($values['workflow']);
       }
     }
     if ($wfGroup = \CRM_Utils_Constant::value(static::CLASS . '::GROUP')) {

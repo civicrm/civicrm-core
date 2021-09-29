@@ -1168,6 +1168,38 @@ class CRM_Utils_Array {
   }
 
   /**
+   * Attempt to synchronize or fill aliased items.
+   *
+   * If $canonPath is set, copy to $altPath; or...
+   * If $altPath is set, copy to $canonPath.
+   *
+   * @param array $params
+   *   Data-tree
+   * @param string[] $canonPath
+   *   Preferred path
+   * @param string[] $altPath
+   *   Old/alternate/deprecated path.
+   * @param callable|null $filter
+   *   Optional function to filter the value as it passes through (canonPath=>altPath or altPath=>canonPath).
+   *   function(mixed $v, bool $isCanon): mixed
+   */
+  public static function pathSync(&$params, $canonPath, $altPath, ?callable $filter = NULL) {
+    $MISSING = new \stdClass();
+
+    $v = static::pathGet($params, $canonPath, $MISSING);
+    if ($v !== $MISSING) {
+      static::pathSet($params, $altPath, $filter ? $filter($v, TRUE) : $v);
+      return;
+    }
+
+    $v = static::pathGet($params, $altPath, $MISSING);
+    if ($v !== $MISSING) {
+      static::pathSet($params, $canonPath, $filter ? $filter($v, FALSE) : $v);
+      return;
+    }
+  }
+
+  /**
    * Convert a simple dictionary into separate key+value records.
    *
    * @param array $array

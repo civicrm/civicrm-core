@@ -66,7 +66,7 @@ class WorkflowMessage {
   public static function create(string $wfName, array $imports = []) {
     $classMap = static::getWorkflowNameClassMap();
     $class = $classMap[$wfName] ?? 'Civi\WorkflowMessage\GenericWorkflowMessage';
-    $imports['envelope']['valueName'] = $wfName;
+    $imports['envelope']['workflow'] = $wfName;
     $model = new $class();
     static::importAll($model, $imports);
     return $model;
@@ -94,13 +94,6 @@ class WorkflowMessage {
         throw new WorkflowMessageException(sprintf("%s: Cannot apply mismatched model", get_class($model)));
       }
       unset($params['model']);
-    }
-
-    \CRM_Utils_Array::pathMove($params, ['contactId'], ['tokenContext', 'contactId']);
-
-    // Core#644 - handle Email ID passed as "From".
-    if (isset($params['from'])) {
-      $params['from'] = \CRM_Utils_Mail::formatFromAddress($params['from']);
     }
 
     if (isset($params['tplParams'])) {
