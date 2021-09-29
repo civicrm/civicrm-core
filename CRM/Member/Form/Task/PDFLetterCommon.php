@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Membership;
+
 /**
  * This class provides the common functionality for creating PDF letter for
  * members
@@ -24,7 +26,7 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
   public static function postProcessMembers(&$form, $membershipIDs, $skipOnHold, $skipDeceased, $contactIDs) {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $formValues = $form->controller->exportValues($form->getName());
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = CRM_Contact_Form_Task_PDFLetterCommon::processMessageTemplate($formValues);
 
     $html
       = self::generateHTML(
@@ -64,35 +66,27 @@ class CRM_Member_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDFLett
    * @param $html_message
    * @param $categories
    *
-   * @deprecated
-   *
    * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @deprecated
    */
   public static function generateHTML($membershipIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $html_message, $categories) {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    $memberships = CRM_Utils_Token::getMembershipTokenDetails($membershipIDs);
+    $memberships = Membership::get(FALSE)
+      ->addWhere('id', 'IN', $membershipIDs)
+      ->addSelect('contact_id')->execute();
     $html = [];
 
-    foreach ($membershipIDs as $membershipID) {
-      $membership = $memberships[$membershipID];
-      // get contact information
-      $contactId = $membership['contact_id'];
-      $params = ['contact_id' => $contactId];
-      //getTokenDetails is much like calling the api contact.get function - but - with some minor
-      // special handlings. It precedes the existence of the api
-      list($contacts) = CRM_Utils_Token::getTokenDetails(
-        $params,
-        $returnProperties,
-        $skipOnHold,
-        $skipDeceased,
-        NULL,
-        $messageToken,
-        'CRM_Contribution_Form_Task_PDFLetterCommon'
-      );
-
-      $tokenHtml = CRM_Utils_Token::replaceEntityTokens('membership', $membership, $html_message, $messageToken);
-      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_html' => $tokenHtml], 'contactId' => $contactId])['html'];
-
+    foreach ($memberships as $membership) {
+      $html[] = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => ['msg_html' => $html_message],
+        'contactId' => $membership['contact_id'],
+        'schema' => ['contactId', 'membershipId'],
+        'tokenContext' => ['membershipId' => $membership['id']],
+        'disableSmarty' => !defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY,
+      ])['html'];
     }
     return $html;
   }

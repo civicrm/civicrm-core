@@ -60,8 +60,8 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
       $params = array_merge($params,
         [
           'fee' => '100.00',
-          'type' => 'General',
-          'status' => 'New',
+          'membership_type_id:label' => 'General',
+          'status_id:label' => 'New',
         ]
       );
 
@@ -105,8 +105,8 @@ class CRM_Member_Form_Task_PDFLetterTest extends CiviUnitTestCase {
   public static function getSampleHTML() {
     $tokens = [
       'Test Fee' => 'fee',
-      'Test Type' => 'type',
-      'Test Status' => 'status',
+      'Test Type' => 'membership_type_id:label',
+      'Test Status' => 'status_id:label',
       'Test Join Date' => 'join_date',
       'Test Start Date' => 'start_date',
       'Test End Date' => 'end_date',
