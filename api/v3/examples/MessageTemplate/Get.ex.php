@@ -11,7 +11,7 @@ function message_template_get_example() {
     'msg_subject' => 'msg_subject_472',
     'msg_text' => 'msg_text_472',
     'msg_html' => 'msg_html_472',
-    'workflow_id' => 472,
+    'workflow_name' => 'contribution_online_invoice',
     'is_default' => '1',
     'is_reserved' => 1,
   ];
