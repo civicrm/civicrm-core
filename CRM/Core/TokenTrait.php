@@ -84,7 +84,10 @@ trait CRM_Core_TokenTrait {
    */
   protected function getCustomFieldTokens(): array {
     if (!isset($this->customFieldTokens)) {
-      $this->customFieldTokens = \CRM_Utils_Token::getCustomFieldTokens(ucfirst($this->getEntityName()));
+      $this->customFieldTokens = [];
+      foreach (CRM_Core_BAO_CustomField::getFields(ucfirst($this->getEntityName())) as $id => $info) {
+        $this->customFieldTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
+      }
     }
     return $this->customFieldTokens;
   }
