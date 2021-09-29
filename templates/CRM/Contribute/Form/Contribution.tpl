@@ -11,7 +11,7 @@
 
 {if $priceSetId}
   {include file="CRM/Price/Form/PriceSet.tpl" context="standalone" extends="Contribution"}
-{elseif $showAdditionalInfo and $formType }
+{elseif !empty($showAdditionalInfo) and !empty($formType)}
   {include file="CRM/Contribute/Form/AdditionalInfo/$formType.tpl"}
 {else}
   {include file="CRM/Contribute/Form/AdditionalInfo/Payment.tpl"}
@@ -58,7 +58,7 @@
       <div class="crm-submit-buttons">
         {include file="CRM/common/formButtons.tpl"}
       </div>
-      {if $isOnline}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
+      {if !empty($isOnline)}{assign var=valueStyle value=" class='view-value'"}{else}{assign var=valueStyle value=""}{/if}
       <table class="form-layout-compressed">
         <tr class="crm-contribution-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
@@ -66,7 +66,7 @@
         </tr>
         <tr class="crm-contribution-form-block-contribution_type_id crm-contribution-form-block-financial_type_id">
           <td class="label">{$form.financial_type_id.label}</td><td{$valueStyle}>{$form.financial_type_id.html}&nbsp;
-            {if $is_test}
+            {if !empty($is_test)}
               {ts}(test){/ts}
             {/if} {help id="id-financial_type"}
           </td>
@@ -81,17 +81,17 @@
             <td class="label">{$form.total_amount.label}</td>
             <td {$valueStyle}>
               <span id='totalAmount'>{$form.currency.html|crmAddClass:eight}&nbsp;{$form.total_amount.html|crmAddClass:eight}</span>
-              {if $freezeFinancialType}
+              {if !empty($freezeFinancialType)}
                 {help id="id-total_amount"}
               {/if}
-              {if !$payNow}
+              {if !empty($payNow)}
                 {if $hasPriceSets}
                   <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
                   <span id='selectPriceSet'>{$form.price_set_id.html}</span>
                   <div id="priceset" class="hiddenElement"></div>
                 {/if}
 
-                {if $ppID}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
+                {if !empty($ppID)}{ts}<a class='action-item crm-hover-button' onclick='adjustPayment();'>adjust payment amount</a>{/ts}{help id="adjust-payment-amount"}{/if}
                 <div id="totalAmountBlock">
                   {if $hasPriceSets}<span class="description">{ts}Alternatively, you can use a price set.{/ts}</span>{/if}
                   <div id="totalTaxAmount" class="label"></div>
@@ -100,7 +100,7 @@
             </td>
           </tr>
 
-          {if $buildRecurBlock && !$payNow}
+          {if $buildRecurBlock && !empty($payNow)}
             <tr id='recurringPaymentBlock'>
               <td></td>
               <td>
@@ -148,7 +148,7 @@
               {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
-              {if !$isUsePaymentBlock && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+              {if !empty($isUsePaymentBlock) && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
                 {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
                 <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
               {/if}
