@@ -410,7 +410,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function processTemplate(&$formValues) {
+  public function processTemplate(&$formValues): ?string {
     $html_message = $formValues['html_message'] ?? NULL;
 
     // process message template
@@ -484,16 +484,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     //from particular letter line, CRM-6798
     $this->formatMessage($html_message);
 
-    $messageToken = CRM_Utils_Token::getTokens($html_message);
-
-    $returnProperties = [];
-    if (isset($messageToken['contact'])) {
-      foreach ($messageToken['contact'] as $key => $value) {
-        $returnProperties[$value] = 1;
-      }
-    }
-
-    return [$formValues, $html_message, $messageToken, $returnProperties];
+    return [$formValues, $html_message];
   }
 
   /**

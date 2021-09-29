@@ -56,7 +56,7 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
       'radio_ts' => 'ts_sel',
       'task' => CRM_Member_Task::PDF_LETTER,
     ]);
-    list($formValues, $html_message, $messageToken, $returnProperties) = $form->processMessageTemplate($formValues);
+    list($formValues) = $form->processMessageTemplate($formValues);
     list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
     foreach ($this->_contactIds as $item => $contactId) {
