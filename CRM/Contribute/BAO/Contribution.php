@@ -4858,6 +4858,8 @@ LIMIT 1;";
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Function to replace contribution tokens.
    *
    * @param array $contributionIds
@@ -4873,6 +4875,8 @@ LIMIT 1;";
    * @param array $messageToken
    *
    * @param bool $escapeSmarty
+   *
+   * @deprecated
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
