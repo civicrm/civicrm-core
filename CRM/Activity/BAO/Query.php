@@ -450,7 +450,7 @@ class CRM_Activity_BAO_Query {
       1 => ts('Added by'),
     ];
     $form->addRadio('activity_role', NULL, $activityRoles, ['allowClear' => TRUE]);
-    $form->setDefaults(['activity_role' => 3]);
+
     $activityStatus = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'status_id', [
       'flip' => 1,
       'labelColumn' => 'name',
