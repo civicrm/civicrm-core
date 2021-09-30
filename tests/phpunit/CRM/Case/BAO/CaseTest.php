@@ -1234,4 +1234,42 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertCount(31, CRM_Case_BAO_Case::getCaseRoles($individual, $caseId), 'Why not just make ten louder?');
   }
 
+  /**
+   * Test that creating a regular activity with a subject including `[case #X]`
+   * gets filed on case X.
+   */
+  public function testFileOnCaseBySubject() {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $caseObj = $this->createCase($clientId, $loggedInUserId);
+    $subject = 'This should get filed on [case #' . $caseObj->id . ']';
+    $form = $this->getFormObject('CRM_Activity_Form_Activity', [
+      'source_contact_id' => $loggedInUserId,
+      // target is comma-separated string, by the way
+      'target_contact_id' => $clientId,
+      'subject' => $subject,
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'activity_type_id' => 1,
+    ]);
+    $form->postProcess();
+
+    $activity = $this->callAPISuccess('Activity', 'getsingle', [
+      'subject' => $subject,
+      'return' => ['case_id'],
+    ]);
+    // Note it's an array
+    $this->assertEquals([$caseObj->id], $activity['case_id']);
+
+    // Double-check
+    $queryParams = [1 => [$subject, 'String']];
+    $this->assertEquals(
+      $caseObj->id,
+      CRM_Core_DAO::singleValueQuery('SELECT ca.case_id
+        FROM civicrm_case_activity ca
+        INNER JOIN civicrm_activity a ON ca.activity_id = a.id
+        WHERE a.subject = %1
+        AND a.is_deleted = 0 AND a.is_current_revision = 1', $queryParams)
+    );
+  }
+
 }
