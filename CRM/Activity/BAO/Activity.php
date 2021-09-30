@@ -924,6 +924,10 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
   }
 
   /**
+   * DO NOT USE.
+   *
+   * Deprecated from core - will be removed.
+   *
    * @param int $sourceContactID
    *   The contact ID of the email "from".
    * @param string $subject
@@ -934,6 +938,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    * @param int $campaignID
    * @param array $attachments
    * @param int $caseID
+   *
+   * @deprecated
    *
    * @return int
    *   The created activity ID
