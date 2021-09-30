@@ -123,7 +123,8 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       case 'idname':
         $map = self::getWorkflowNameIdMap();
         if ($map[$params['workflow_name']] != $params['workflow_id']) {
-          throw new CRM_Core_Exception("The workflow_id and workflow_name are mismatched. Note: You only need to submit one or the other.");
+          unset($params['workflow_id']);
+          Civi::log()->info('The workflow_id and workflow_name are mismatched. Note: You only need to submit one or the other.');
         }
         break;
 
