@@ -654,6 +654,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
           'definition',
         ],
       ],
+      'ContributionRecur' => [
+        'break_return' => [
+          'contribution_recur_modified_date',
+        ],
+      ],
       'Domain' => ['cant_update' => ['domain_version']],
       'MembershipBlock' => [
         'cant_update' => [
