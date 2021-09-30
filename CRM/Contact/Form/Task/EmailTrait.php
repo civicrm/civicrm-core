@@ -889,7 +889,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
         $firstActivityCreated = TRUE;
       }
 
-      if (CRM_Activity_BAO_Activity::sendMessage(
+      if ($this->sendMessage(
         $from,
         $userID,
         $contactId,
@@ -909,6 +909,83 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     return [$sent, $activityIds];
+  }
+
+  /**
+   * Send message - under refactor.
+   *
+   * @param $from
+   * @param $fromID
+   * @param $toID
+   * @param $subject
+   * @param $text_message
+   * @param $html_message
+   * @param $emailAddress
+   * @param $activityID
+   * @param null $attachments
+   * @param null $cc
+   * @param null $bcc
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \PEAR_Exception
+   */
+  protected function sendMessage(
+    $from,
+    $fromID,
+    $toID,
+    &$subject,
+    &$text_message,
+    &$html_message,
+    $emailAddress,
+    $activityID,
+    $attachments = NULL,
+    $cc = NULL,
+    $bcc = NULL
+  ) {
+    [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
+    if ($emailAddress) {
+      $toEmail = trim($emailAddress);
+    }
+
+    // make sure both email addresses are valid
+    // and that the recipient wants to receive email
+    if (empty($toEmail) or $toDoNotEmail) {
+      return FALSE;
+    }
+    if (!trim($toDisplayName)) {
+      $toDisplayName = $toEmail;
+    }
+
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
+    // create the params array
+    $mailParams = [
+      'groupName' => 'Activity Email Sender',
+      'from' => $from,
+      'toName' => $toDisplayName,
+      'toEmail' => $toEmail,
+      'subject' => $subject,
+      'cc' => $cc,
+      'bcc' => $bcc,
+      'text' => $text_message,
+      'html' => $html_message,
+      'attachments' => $attachments,
+    ];
+
+    if (!CRM_Utils_Mail::send($mailParams)) {
+      return FALSE;
+    }
+
+    // add activity target record for every mail that is send
+    $activityTargetParams = [
+      'activity_id' => $activityID,
+      'contact_id' => $toID,
+      'record_type_id' => $targetID,
+    ];
+    CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
+    return TRUE;
   }
 
 }
