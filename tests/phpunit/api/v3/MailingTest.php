@@ -690,8 +690,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // Create set of groups and add a contact to both of them.
     $groupID2 = $this->groupCreate(['name' => 'Test group 2', 'title' => 'group title 2']);
     $groupID3 = $this->groupCreate(['name' => 'Test group 3', 'title' => 'group title 3']);
+    $smartGroupParams = ['form_values' => ['contact_type' => ['IN' => ['Household']]]];
+    $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
+    $groupID4 = $this->groupCreate(['name' => 'Test group 4', 'title' => 'group title 4', 'saved_search_id' => $savedSearch->id]);
+
     $contactId = $this->individualCreate();
-    foreach ([$groupID2, $groupID3] as $grp) {
+    foreach ([$groupID2, $groupID3, $groupID4] as $grp) {
       $params = [
         'contact_id' => $contactId,
         'group_id' => $grp,
@@ -710,7 +714,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'entity_id' => $groupID3,
       'group_type' => 'Include',
     ];
-    $mailingGroup = $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    $this->callAPISuccess('MailingGroup', 'create', $mgParams);
+    $mgParams = [
+      'mailing_id' => $mail['id'],
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $groupID4,
+      'group_type' => 'Include',
+    ];
+    $this->callAPISuccess('MailingGroup', 'create', $mgParams);
     unset(Civi::$statics['CRM_Core_Permission_Base']);
 
     //Include previous mail in the mailing group.
@@ -730,10 +741,17 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $jobId = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingJob', $mail2['id'], 'id', 'mailing_id');
     $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'hash', 'job_id');
     $queueId = CRM_Core_DAO::getFieldValue('CRM_Mailing_Event_DAO_Queue', $jobId, 'id', 'job_id');
-    $group = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
-    //Assert only one group returns in the unsubscribe list.
-    $this->assertCount(1, $group);
-    $this->assertEquals($groupID3, key($group));
+    // This gets the list of groups to unsubscribe but does NOT actually unsubcribe from groups (because return=TRUE)
+    $beforeUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    // Assert that there are two groups in the unsubscribe list.
+    $this->assertCount(2, $beforeUnsubscribeGroups);
+    $this->assertArrayHasKey($groupID3, $beforeUnsubscribeGroups);
+    $this->assertArrayHasKey($groupID4, $beforeUnsubscribeGroups);
+    // Do the actual unsubscribe
+    CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, FALSE);
+    // Assert that there are now no groups in the unsubscribe list.
+    $afterUnsubscribeGroups = CRM_Mailing_Event_BAO_Unsubscribe::unsub_from_mailing($jobId, $queueId, $hash, TRUE);
+    $this->assertCount(0, $afterUnsubscribeGroups);
   }
 
   /**
