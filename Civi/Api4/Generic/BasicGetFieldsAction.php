@@ -88,7 +88,7 @@ class BasicGetFieldsAction extends BasicGetAction {
     catch (NotImplementedException $e) {
     }
     if (isset($actionClass) && method_exists($actionClass, 'fields')) {
-      $values = $actionClass->fields();
+      $values = $actionClass->fields($this);
     }
     else {
       $values = $this->getRecords();
