@@ -230,7 +230,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     $orig = new CRM_Core_BAO_MessageTemplate();
-    $orig->workflow_id = $diverted->workflow_id;
+    $orig->workflow_name = $diverted->workflow_name;
     $orig->is_reserved = 1;
     $orig->find(1);
 
