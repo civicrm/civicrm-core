@@ -120,7 +120,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \API_Exception
    */
   protected function traitPreProcess() {
-    $this->preProcessFromAddress();
     if ($this->isSearchContext()) {
       // Currently only the contact email form is callable outside search context.
       parent::preProcess();
@@ -130,22 +129,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $this->assign('isAdmin', 1);
     }
-  }
-
-  /**
-   * Pre Process Form Addresses to be used in Quickform
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   */
-  protected function preProcessFromAddress(): void {
-    $form = $this;
-    $form->_emails = [];
-
-    // @TODO remove these line and to it somewhere more appropriate. Currently some classes (e.g Case
-    // are having to re-write contactIds afterwards due to this inappropriate variable setting
-    // If we don't have any contact IDs, use the logged in contact ID
-    $form->_contactIds = $form->_contactIds ?: [CRM_Core_Session::getLoggedInContactID()];
   }
 
   /**
