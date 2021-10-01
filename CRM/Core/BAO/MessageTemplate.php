@@ -111,7 +111,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     }
 
     // The workflow_id and workflow_name should be sync'd. But what mix of inputs do we have to work with?
-    switch ((empty($params['workflow_id']) ? '' : 'id') . (empty($params['workflow_name']) ? '' : 'name')) {
+    $empty = function ($key) use (&$params) {
+      return empty($params[$key]) || $params[$key] === 'null';
+    };
+    switch (($empty('workflow_id') ? '' : 'id') . ($empty('workflow_name') ? '' : 'name')) {
       case 'id':
         $params['workflow_name'] = array_search($params['workflow_id'], self::getWorkflowNameIdMap());
         break;
