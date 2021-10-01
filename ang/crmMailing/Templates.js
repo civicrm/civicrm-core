@@ -72,8 +72,8 @@
                     }
 
                     rcpAjaxState.page_i = page_num - rcpAjaxState.page_n;
-                    var filterParams = { is_active: 1, workflow_id: { "IS NULL": 1 } };
-                    
+                    var filterParams = { is_active: 1, workflow_name: { "IS NULL": 1 } };
+
                     var params = {
                       input: input,
                       page_num: rcpAjaxState.page_i,
