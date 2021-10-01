@@ -118,7 +118,7 @@
         </div><!-- /.crm-accordion-body -->
       </div><!-- /.crm-accordion-wrapper -->
 
-      {if !$workflow_id}
+      {if !$isWorkflow}
         <table class="form-layout-compressed">
           <tr>
             <td class="label-left">{$form.is_active.label}</td>

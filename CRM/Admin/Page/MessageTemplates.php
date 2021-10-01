@@ -51,7 +51,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $sql = '
             SELECT diverted.id, orig.id orig_id
             FROM civicrm_msg_template diverted JOIN civicrm_msg_template orig ON (
-                diverted.workflow_id = orig.workflow_id AND
+                diverted.workflow_name = orig.workflow_name AND
                 orig.is_reserved = 1                    AND (
                     diverted.msg_subject != orig.msg_subject OR
                     diverted.msg_text    != orig.msg_text    OR
@@ -134,7 +134,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
    * @param bool $forceAction
    */
   public function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
-    if ($object->workflow_id) {
+    if ($object->workflow_name) {
       // do not expose action link for reverting to default if the template did not diverge or we just reverted it now
       if (!array_key_exists($object->id, $this->_revertible) or
         ($this->_action & CRM_Core_Action::REVERT and $object->id == $this->_revertedId)
@@ -145,7 +145,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
 
       // default workflow templates shouldn’t be deletable
       // workflow templates shouldn’t have disable/enable actions (at least for CiviCRM 3.1)
-      if ($object->workflow_id) {
+      if ($object->workflow_name) {
         $action &= ~CRM_Core_Action::DISABLE;
         $action &= ~CRM_Core_Action::DELETE;
       }
