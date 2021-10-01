@@ -58,12 +58,14 @@
 </tr>
 <tr>
   <td>
-    {$form.contribution_or_softcredits.label} <br />
-    {$form.contribution_or_softcredits.html}<br />
-    <div class="float-left" id="contribution_soft_credit_type_wrapper">
-      {$form.contribution_soft_credit_type_id.label} <br />
-      {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
-    </div>
+    {if !empty($form.contribution_or_softcredits)}
+      {$form.contribution_or_softcredits.label} <br />
+      {$form.contribution_or_softcredits.html}<br />
+      <div class="float-left" id="contribution_soft_credit_type_wrapper">
+        {$form.contribution_soft_credit_type_id.label} <br />
+        {$form.contribution_soft_credit_type_id.html|crmAddClass:twenty}
+      </div>
+    {/if}
   </td>
   <td>
     {$form.invoice_number.label} <br />
