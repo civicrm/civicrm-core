@@ -248,26 +248,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     CRM_Core_BAO_File::buildAttachment($this, NULL);
 
     if ($this->_single) {
-      // also fix the user context stack
-      if ($this->getCaseID()) {
-        $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $this->_caseId,
-          'contact_id', 'case_id'
-        );
-        $url = CRM_Utils_System::url('civicrm/contact/view/case',
-          "&reset=1&action=view&cid={$ccid}&id=" . $this->getCaseID()
-        );
-      }
-      elseif ($this->_context) {
-        $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-      }
-      else {
-        $url = CRM_Utils_System::url('civicrm/contact/view',
-          "&show=1&action=browse&cid={$this->_contactIds[0]}&selectedChild=activity"
-        );
-      }
-
-      $session = CRM_Core_Session::singleton();
-      $session->replaceUserContext($url);
+      CRM_Core_Session::singleton()->replaceUserContext($this->getRedirectUrl());
     }
     $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
 
@@ -1024,6 +1005,33 @@ trait CRM_Contact_Form_Task_EmailTrait {
     ];
     CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
     return TRUE;
+  }
+
+  /**
+   * Get the url to redirect the user's browser to.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRedirectUrl(): string {
+    // also fix the user context stack
+    if ($this->getCaseID()) {
+      $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $this->_caseId,
+        'contact_id', 'case_id'
+      );
+      $url = CRM_Utils_System::url('civicrm/contact/view/case',
+        "&reset=1&action=view&cid={$ccid}&id=" . $this->getCaseID()
+      );
+    }
+    elseif ($this->_context) {
+      $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
+    }
+    else {
+      $url = CRM_Utils_System::url('civicrm/contact/view',
+        "&show=1&action=browse&cid={$this->_contactIds[0]}&selectedChild=activity"
+      );
+    }
+    return $url;
   }
 
 }
