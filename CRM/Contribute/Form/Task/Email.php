@@ -32,15 +32,4 @@ class CRM_Contribute_Form_Task_Email extends CRM_Contribute_Form_Task {
     return $this->getIDs();
   }
 
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    $tokens = array_merge(CRM_Core_SelectValues::contributionTokens(), $tokens);
-    return $tokens;
-  }
-
 }

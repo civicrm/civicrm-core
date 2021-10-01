@@ -57,15 +57,6 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
   }
 
   /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    return $this->createTokenProcessor()->listTokens();
-  }
-
-  /**
    * Create a token processor
    *
    * @return \Civi\Token\TokenProcessor

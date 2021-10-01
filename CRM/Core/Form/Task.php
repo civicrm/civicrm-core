@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -336,6 +338,25 @@ SELECT contact_id
   public function getEntityAliasField() {
     CRM_Core_Error::deprecatedFunctionWarning('function should be overridden');
     return $this::$entityShortname . '_id';
+  }
+
+  /**
+   * List available tokens for this form.
+   *
+   * @return array
+   */
+  public function listTokens() {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => $this->getTokenSchema()]);
+    return $tokenProcessor->listTokens();
+  }
+
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  protected function getTokenSchema(): array {
+    return ['contactId'];
   }
 
 }

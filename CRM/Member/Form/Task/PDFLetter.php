@@ -137,15 +137,4 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     return $html;
   }
 
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens() {
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    $tokens = array_merge(CRM_Core_SelectValues::membershipTokens(), $tokens);
-    return $tokens;
-  }
-
 }
