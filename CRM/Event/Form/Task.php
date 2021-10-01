@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Participant;
+
 /**
  * Class for event form task actions.
  * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
@@ -27,6 +29,16 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
    * @var array
    */
   protected $_participantIds;
+
+  /**
+   * Rows to act on.
+   *
+   * Each row will have a participant ID & a contact ID using
+   * the keys the token processor expects.
+   *
+   * @var array
+   */
+  protected $rows = [];
 
   /**
    * Build all the data structures needed to build the form.
@@ -84,13 +96,35 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
+   * Get the participant IDs.
+   *
+   * @return array
+   */
+  public function getIDs(): array {
+    return $this->_participantIds;
+  }
+
+  /**
    * Given the participant id, compute the contact id
    * since its used for things like send email
    */
-  public function setContactIDs() {
-    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_participantIds,
-      'civicrm_participant'
-    );
+  public function setContactIDs(): void {
+    $this->_contactIds = $this->getContactIDs();
+  }
+
+  /**
+   * Get the relevant contact IDs.
+   *
+   * @return array
+   */
+  protected function getContactIDs(): array {
+    if (isset($this->_contactIds)) {
+      return $this->_contactIds;
+    }
+    foreach ($this->getRows() as $row) {
+      $this->_contactIds[] = $row['contactId'];
+    }
+    return $this->_contactIds;
   }
 
   /**
@@ -117,6 +151,37 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
         'name' => ts('Cancel'),
       ],
     ]);
+  }
+
+  /**
+   * Get the rows form the search, keyed to make the token processor happy.
+   *
+   * @throws \API_Exception
+   */
+  public function getRows(): array {
+    if (empty($this->rows)) {
+      // checkPermissions set to false - in case form is bypassing in some way.
+      $participants = Participant::get(FALSE)
+        ->addWhere('id', 'IN', $this->getIDs())
+        ->setSelect(['id', 'contact_id'])->execute();
+      foreach ($participants as $participant) {
+        $this->rows[] = [
+          // We map to this funky format for the token processor :-(
+          'contactId' => $participant['contact_id'],
+          'participantId' => $participant['id'],
+        ];
+      }
+    }
+    return $this->rows;
+  }
+
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  public function getTokenSchema(): array {
+    return ['participantId', 'contactId', 'eventId'];
   }
 
 }

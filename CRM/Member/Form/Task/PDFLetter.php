@@ -137,4 +137,13 @@ class CRM_Member_Form_Task_PDFLetter extends CRM_Member_Form_Task {
     return $html;
   }
 
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  public function getTokenSchema(): array {
+    return ['membershipId', 'contactId'];
+  }
+
 }

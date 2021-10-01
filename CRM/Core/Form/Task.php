@@ -359,4 +359,26 @@ SELECT contact_id
     return ['contactId'];
   }
 
+  /**
+   * Get the rows from the results.
+   *
+   * @return array
+   */
+  protected function getRows(): array {
+    $rows = [];
+    foreach ($this->getContactIDs() as $contactID) {
+      $rows[] = ['contactId' => $contactID];
+    }
+    return $rows;
+  }
+
+  /**
+   * Get the relevant contact IDs.
+   *
+   * @return array
+   */
+  protected function getContactIDs(): array {
+    return $this->_contactIds ?? [];
+  }
+
 }

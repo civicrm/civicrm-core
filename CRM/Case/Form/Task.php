@@ -69,6 +69,23 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   }
 
   /**
+   * Get the rows from the results to be pdf-d.
+   *
+   * @return array
+   */
+  protected function getRows(): array {
+    $rows = [];
+    foreach ($this->_contactIds as $index => $contactID) {
+      $caseID = $this->getVar('_caseId');
+      if (empty($caseID) && !empty($this->_caseIds[$index])) {
+        $caseID = $this->_caseIds[$index];
+      }
+      $rows[] = ['contactId' => $contactID, 'caseId' => $caseID];
+    }
+    return $rows;
+  }
+
+  /**
    * Get the name of the table for the relevant entity.
    *
    * @return string
