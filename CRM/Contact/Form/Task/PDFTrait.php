@@ -414,7 +414,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $html_message = $formValues['html_message'] ?? NULL;
 
     // process message template
-    if (!empty($formValues['saveTemplate']) || !empty($formValues['updateTemplate'])) {
+    if (!empty($this->getSubmittedValue('saveTemplate')) || !empty($formValues['updateTemplate'])) {
       $messageTemplate = [
         'msg_text' => NULL,
         'msg_html' => $formValues['html_message'],
@@ -426,8 +426,8 @@ trait CRM_Contact_Form_Task_PDFTrait {
       if (!empty($formValues['bind_format']) && $formValues['format_id']) {
         $messageTemplate['pdf_format_id'] = $formValues['format_id'];
       }
-      if (!empty($formValues['saveTemplate'])) {
-        $messageTemplate['msg_title'] = $formValues['saveTemplateName'];
+      if ($this->getSubmittedValue('saveTemplate')) {
+        $messageTemplate['msg_title'] = $this->getSubmittedValue('saveTemplateName');
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
 
