@@ -38,6 +38,10 @@ function civicrm_api3_mailing_event_subscribe_create($params) {
     throw new API_Exception('Invalid Group id');
   }
 
+  if (substr($group->visibility, 0, 6) != 'Public') {
+    throw new API_Exception('Group is not Public. Contact cannot be subscribed to this Group.');
+  }
+
   $subscribe = CRM_Mailing_Event_BAO_Subscribe::subscribe($group_id, $email, $contact_id);
 
   if ($subscribe !== NULL) {
