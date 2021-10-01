@@ -12,15 +12,14 @@
 use Civi\Api4\Activity;
 
 /**
- * Test class for CRM_Contact_Form_Task_EmailCommon.
+ * Test class for CRM_Contact_Form_Task_Email.
  * @group headless
  */
-class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
+class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
 
   /**
    * Set up for tests.
    *
-   * @throws \CRM_Core_Exception
    */
   protected function setUp(): void {
     parent::setUp();
@@ -46,16 +45,14 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
   /**
    * Test generating domain emails
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testDomainEmailGeneration() {
+  public function testDomainEmailGeneration(): void {
     $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
     $optionValue = $this->callAPISuccess('OptionValue', 'Get', [
       'id' => $this->_optionValue['id'],
     ]);
-    $this->assertTrue(array_key_exists('"Seamus Lee" <seamus@example.com>', $emails));
+    $this->assertArrayHasKey('"Seamus Lee" <seamus@example.com>', $emails);
     $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
   }
 
@@ -89,7 +86,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
       'signature_html' => '<p>This is a test Signature</p>',
     ]);
 
-    $to = $form_contactIds = $form_toContactEmails = [];
+    $to = $form_contactIds = [];
     for ($i = 0; $i < 27; $i++) {
       $email = 'spy' . $i . '@secretsquirrels.com';
       $contactID = $this->individualCreate(['email' => $email]);
