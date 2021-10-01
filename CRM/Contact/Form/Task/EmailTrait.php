@@ -874,7 +874,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
       if ($this->sendMessage(
         $from,
-        $userID,
         $contactId,
         $renderedTemplate['subject'],
         $renderedTemplate['text'],
@@ -953,7 +952,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * Send message - under refactor.
    *
    * @param $from
-   * @param $fromID
    * @param $toID
    * @param $subject
    * @param $text_message
@@ -970,11 +968,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   protected function sendMessage(
     $from,
-    $fromID,
     $toID,
-    &$subject,
-    &$text_message,
-    &$html_message,
+    $subject,
+    $text_message,
+    $html_message,
     $emailAddress,
     $activityID,
     $attachments = NULL,
