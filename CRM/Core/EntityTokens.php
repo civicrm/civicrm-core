@@ -11,6 +11,7 @@
  */
 
 use Civi\Token\AbstractTokenSubscriber;
+use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
@@ -32,6 +33,27 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @var array
    */
   protected $prefetch = [];
+
+  /**
+   * Register the declared tokens.
+   *
+   * @param \Civi\Token\Event\TokenRegisterEvent $e
+   *   The registration event. Add new tokens using register().
+   */
+  public function registerTokens(TokenRegisterEvent $e) {
+    if (!$this->checkActive($e->getTokenProcessor())) {
+      return;
+    }
+    foreach ($this->getAllTokens() as $name => $label) {
+      if (!in_array($name, $this->getHiddenTokens(), TRUE)) {
+        $e->register([
+          'entity' => $this->entity,
+          'field' => $name,
+          'label' => $label,
+        ]);
+      }
+    }
+  }
 
   /**
    * @inheritDoc
@@ -56,6 +78,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
     }
     if ($this->isCustomField($field)) {
+      $prefetchedValue = $this->getCustomFieldValue($this->getFieldValue($row, 'id'), $field);
+      if ($prefetchedValue) {
+        return $row->format('text/html')->tokens($entity, $field, $prefetchedValue);
+      }
       return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
@@ -148,7 +174,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         unset($basicTokens[$fieldName]);
       }
     }
-    return array_merge($basicTokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
+    return array_merge($basicTokens, $this->getPseudoTokens(), $this->getBespokeTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
   }
 
   /**
@@ -247,6 +273,13 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
+   * Get any tokens with custom calculation.
+   */
+  public function getBespokeTokens(): array {
+    return [];
+  }
+
+  /**
    * Is this a field we should add pseudo-tokens to?
    *
    * Pseudo-tokens allow access to name and label fields - e.g
@@ -256,7 +289,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param string $fieldName
    */
   public function isAddPseudoTokens($fieldName): bool {
-    if ($fieldName === 'currency') {
+    if (in_array($fieldName, $this->getCurrencyFieldName())) {
       // 'currency' is manually added to the skip list as an anomaly.
       // name & label aren't that suitable for 'currency' (symbol, which
       // possibly maps to 'abbr' would be) and we can't gather that
@@ -314,6 +347,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $actionSearchResult->{$aliasedField};
     }
     $entityID = $row->context[$this->getEntityIDField()];
+    if ($field === 'id') {
+      return $entityID;
+    }
     return $this->prefetch[$entityID][$field] ?? '';
   }
 
@@ -351,6 +387,17 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     foreach ($this->getReturnFields() as $token) {
       $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
     }
+  }
+
+  /**
+   * Get tokens to be suppressed from the widget.
+   *
+   * Note this is expected to be an interim function. Now we are no
+   * longer working around the parent function we can just define them once...
+   * with metadata, in a future refactor.
+   */
+  protected function getHiddenTokens(): array {
+    return [];
   }
 
   /**
@@ -486,6 +533,37 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   public function getDependencies(): array {
     return [];
+  }
+
+  /**
+   * Get the apiv4 style custom field name.
+   *
+   * @param int $id
+   *
+   * @return string
+   */
+  protected function getCustomFieldName(int $id): string {
+    foreach ($this->getFieldMetadata() as $key => $field) {
+      if (($field['custom_field_id'] ?? NULL) === $id) {
+        return $key;
+      }
+    }
+  }
+
+  /**
+   * @param $entityID
+   * @param string $field eg. 'custom_1'
+   *
+   * @return array|string|void|null $mixed
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getCustomFieldValue($entityID, string $field) {
+    $id = str_replace('custom_', '', $field);
+    $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? NULL;
+    if ($value !== NULL) {
+      return CRM_Core_BAO_CustomField::displayValue($value, $id);
+    }
   }
 
 }

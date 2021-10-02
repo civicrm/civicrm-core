@@ -44,12 +44,9 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
 
   /**
    * Post test cleanup.
-   *
-   * @throws \API_Exception
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_case', 'civicrm_case_type'], TRUE);
+    $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
     parent::tearDown();
   }
 
@@ -456,9 +453,35 @@ Check';
    *
    * @return string
    */
-  protected function getExpectedEventTokenOutput(): string {
-    return '
+  protected function getExpectedParticipantTokenOutput(): string {
+    return '2
 1
+February 19th, 2007
+Wimbeldon
+steep
+$ 50.00
+
+
+Attendee
+
+99999
+2
+USD
+
+Attended
+Attended
+Attendee
+No
+';
+  }
+
+  /**
+   * Get expected output from token parsing.
+   *
+   * @return string
+   */
+  protected function getExpectedEventTokenOutput(): string {
+    return $this->ids['event'][0] . '
 Annual CiviCRM meet
 October 21st, 2008
 October 23rd, 2008
@@ -470,10 +493,8 @@ event description
 15 Walton St
 Emerald City, Maine 90210
 
-$ 50.00
 ' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
 ' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
-
 my field';
   }
 
@@ -502,9 +523,29 @@ December 21st, 2007
    */
   public function testParticipantTokenConsistency(): void {
     $this->createLoggedInUser();
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant']);
+    $this->setupParticipantScheduledReminder();
+
     $tokens = CRM_Core_SelectValues::participantTokens();
     $this->assertEquals($this->getParticipantTokens(), $tokens);
+
+    $mut = new CiviMailUtils($this);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['participantId'],
+    ]);
+    $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $expected = $this->getExpectedParticipantTokenOutput();
+    $mut->checkMailLog([$expected]);
+
+    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getParticipantTokens())), 'text/plain');
+    $tokenProcessor->addRow(['participantId' => $this->ids['participant'][0]]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
+
   }
 
   /**
@@ -515,16 +556,24 @@ December 21st, 2007
   public function getParticipantTokens(): array {
     return [
       '{participant.status_id}' => 'Status ID',
-      '{participant.role_id}' => 'Participant Role (ID)',
+      '{participant.role_id}' => 'Participant Role ID',
       '{participant.register_date}' => 'Register date',
       '{participant.source}' => 'Participant Source',
       '{participant.fee_level}' => 'Fee level',
       '{participant.fee_amount}' => 'Fee Amount',
       '{participant.registered_by_id}' => 'Registered By Participant ID',
       '{participant.transferred_to_contact_id}' => 'Transferred to Contact ID',
-      '{participant.role_id:label}' => 'Participant Role (label)',
-      '{participant.fee_label}' => 'Fee Label',
-      '{participant.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
+      '{participant.role_id:label}' => 'Participant Role',
+      '{participant.balance}' => 'Event Balance',
+      '{participant.' . $this->getCustomFieldName('participant_int') . '}' => 'Enter integer here :: participant_Group with field int',
+      '{participant.id}' => 'Participant ID',
+      '{participant.fee_currency}' => 'Fee Currency',
+      '{participant.discount_amount}' => 'Discount Amount',
+      '{participant.status_id:label}' => 'Status',
+      '{participant.status_id:name}' => 'Machine name: Status',
+      '{participant.role_id:name}' => 'Machine name: Participant Role',
+      '{participant.is_test:label}' => 'Test',
+      '{participant.must_wait}' => 'Must Wait on List',
     ];
   }
 
@@ -577,7 +626,7 @@ December 21st, 2007
           'msg_text' => '{domain.now|crmDate:shortdate}',
         ],
       ])['text'];
-      $this->fail("Expected unquoted parameter to fail");
+      $this->fail('Expected unquoted parameter to fail');
     }
     catch (\CRM_Core_Exception $e) {
       $this->assertRegExp(';Malformed token param;', $e->getMessage());
@@ -602,7 +651,7 @@ December 21st, 2007
   }
 
   /**
-   * Test that domain tokens are consistently rendered.
+   * Test that event tokens are consistently rendered.
    *
    * @throws \API_Exception
    */
@@ -621,7 +670,38 @@ December 21st, 2007
 
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = $this->getExpectedEventTokenOutput();
+    $mut->checkMailLog([$expected, $this->getExpectedParticipantTokenOutput()]);
+
+    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getEventTokens())), 'text/plain');
+    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
+  }
+
+  /**
+   * Test that event tokens work absent participant tokens.
+   *
+   * @throws \API_Exception
+   */
+  public function testEventTokenConsistencyNoParticipantTokens(): void {
+    $mut = new CiviMailUtils($this);
+    $this->setupParticipantScheduledReminder(FALSE);
+
+    $this->callAPISuccess('job', 'send_reminder', []);
+    $expected = $this->getExpectedEventTokenOutput();
     $mut->checkMailLog([$expected]);
+
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['eventId'],
+    ]);
+
+    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getEventTokens())), 'text/plain');
+    $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
+
   }
 
   /**
@@ -629,8 +709,18 @@ December 21st, 2007
    *
    * @throws \API_Exception
    */
-  public function setupParticipantScheduledReminder(): void {
+  public function setupParticipantScheduledReminder($includeParticipant = TRUE): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'int', 'participant_');
+
+    if ($includeParticipant) {
+      $html = implode("\n", array_keys(array_merge($this->getEventTokens(), $this->getParticipantTokens())));
+    }
+    else {
+      $html = implode("\n", array_keys($this->getEventTokens()));
+
+    }
+
     $emailID = Email::create()->setValues(['email' => 'event@example.com'])->execute()->first()['id'];
     $addressID = Address::create()->setValues([
       'street_address' => '15 Walton St',
@@ -648,15 +738,20 @@ December 21st, 2007
         'phone_id' => $phoneID,
       ],
     ])->execute()->first()['id'];
-    $event = $this->eventCreate([
+    $this->ids['event'][0] = $this->eventCreate([
       'description' => 'event description',
       $this->getCustomFieldName('text') => 'my field',
       'loc_block_id' => $locationBlockID,
-    ]);
+    ])['id'];
     // Create an unrelated participant record so that the ids don't match.
     // this prevents things working just because the id 'happens to be valid'
-    $this->participantCreate(['register_date' => '2020-01-01', 'event_id' => $event['id']]);
-    $this->participantCreate(['event_id' => $event['id'], 'fee_amount' => 50]);
+    $this->participantCreate(['register_date' => '2020-01-01', 'event_id' => $this->ids['event'][0]]);
+    $this->ids['participant'][0] = $this->participantCreate([
+      'event_id' => $this->ids['event'][0],
+      'fee_amount' => 50,
+      'fee_level' => 'steep',
+      $this->getCustomFieldName('participant_int') => '99999',
+    ]);
     CRM_Utils_Time::setTime('2007-02-20 15:00:00');
     $this->callAPISuccess('action_schedule', 'create', [
       'title' => 'job',
@@ -667,7 +762,7 @@ December 21st, 2007
       'start_action_offset' => 1,
       'start_action_condition' => 'after',
       'start_action_unit' => 'day',
-      'body_html' => implode("\n", array_keys($this->getEventTokens())),
+      'body_html' => $html,
     ]);
   }
 
@@ -678,20 +773,18 @@ December 21st, 2007
    */
   protected function getEventTokens(): array {
     return [
-      '{event.event_id}' => 'Event ID',
+      '{event.id}' => 'Event ID',
       '{event.title}' => 'Event Title',
       '{event.start_date}' => 'Event Start Date',
       '{event.end_date}' => 'Event End Date',
-      '{event.event_type}' => 'Event Type',
+      '{event.event_type_id:label}' => 'Event Type',
       '{event.summary}' => 'Event Summary',
       '{event.contact_email}' => 'Event Contact Email',
       '{event.contact_phone}' => 'Event Contact Phone',
       '{event.description}' => 'Event Description',
       '{event.location}' => 'Event Location',
-      '{event.fee_amount}' => 'Event Fee',
       '{event.info_url}' => 'Event Info URL',
       '{event.registration_url}' => 'Event Registration URL',
-      '{event.balance}' => 'Event Balance',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
   }

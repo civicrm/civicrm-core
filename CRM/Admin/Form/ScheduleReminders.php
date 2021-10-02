@@ -698,7 +698,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     $tokenProcessor = new \Civi\Token\TokenProcessor(\Civi::dispatcher(), [
       'controller' => get_class(),
       'smarty' => FALSE,
-      'schema' => ['activityId'],
+      'schema' => ['activityId', 'participantId'],
     ]);
     $tokens = $tokenProcessor->listTokens();
 
