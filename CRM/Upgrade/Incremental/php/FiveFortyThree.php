@@ -136,6 +136,24 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Update event id token in event badges',
       'updatePrintLabelToken', 'event.event_id', 'participant.event_id', $rev
     );
+    //  prefix_id was a short lived variant around civicrm 4.4 - it's unlikely any
+    // cases exist, but they will resolve as an integer if not updated
+    $this->addTask('Update legacy prefix id token in greetings (use {contact.prefix_id:label})',
+      'updateGreetingOptions', 'contact.prefix_id', 'contact.prefix_id:label', $rev
+    );
+    //  suffix_id was a short lived variant around civicrm 4.4 - it's unlikely any
+    //  cases exist, but they will resolve as an integer if not updated
+    $this->addTask('Update legacy suffix id token in greetings  (use {contact.suffix_id:label})',
+      'updateGreetingOptions', 'contact.suffix_id', 'contact.suffix_id:label', $rev
+    );
+    //  individual_prefix still works but is now deprecated
+    $this->addTask('Update individual_prefix token in greetings (use {contact.prefix_id:label})',
+      'updateGreetingOptions', 'contact.individual_prefix', 'contact.prefix_id:label', $rev
+    );
+    //  individual_prefix still works but is now deprecated
+    $this->addTask('Update individual_suffix token in greetings (use {contact.suffix_id:label})',
+      'updateGreetingOptions', 'contact.individual_suffix', 'contact.suffix_id:label', $rev
+    );
   }
 
   /**

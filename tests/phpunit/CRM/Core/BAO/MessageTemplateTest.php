@@ -649,7 +649,7 @@ emo
       'contact_is_deleted' => 0,
       'created_date' => '2020-01-01',
       'modified_date' => '2020-01-01',
-      'addressee' => '{contact.individual_prefix}{ } {contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}',
+      'addressee' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
       'email_greeting' => 'Dear {contact.first_name}',
       'postal_greeting' => 'Dear {contact.first_name}',
       'current_employer' => 'Unit Test Organization',
