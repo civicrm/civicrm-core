@@ -3,6 +3,7 @@
     bindings: {
       onPreview: '&',
       tokenList: '<',
+      disabled: '<',
       options: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',
@@ -11,7 +12,7 @@
       var $ctrl = this;
 
       $ctrl.isDisabled = function() {
-        return $ctrl.options.disabled;
+        return $ctrl.disabled;
       };
 
       $ctrl.monacoOptions = function (opts) {
