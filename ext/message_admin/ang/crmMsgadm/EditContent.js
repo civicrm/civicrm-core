@@ -4,7 +4,7 @@
       onPreview: '&',
       tokenList: '<',
       disabled: '<',
-      options: '='
+      msgtpl: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',
     controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService, $rootScope) {
@@ -31,7 +31,7 @@
           openPreview: function(options) {
             return $ctrl.openPreview(options);
           },
-          record: $ctrl.options.record,
+          record: $ctrl.msgtpl,
           field: fld,
           tokenList: $ctrl.tokenList
         };
