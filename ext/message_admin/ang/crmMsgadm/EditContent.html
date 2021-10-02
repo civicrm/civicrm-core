@@ -18,6 +18,7 @@
       <div ng-model="$ctrl.options.record.msg_subject"
            crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
            crm-monaco-insert-rx="insert:msg_subject"
+           ng-disabled="$ctrl.isDisabled()"
       ></div>
       <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
     </div>
@@ -47,6 +48,7 @@
       <div ng-model="$ctrl.options.record.msg_html"
            crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_html"
+           ng-disabled="$ctrl.isDisabled()"
       ></div>
     </div>
   </div>
@@ -75,6 +77,7 @@
       <div ng-model="$ctrl.options.record.msg_text"
            crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
            crm-monaco-insert-rx="insert:msg_text"
+           ng-disabled="$ctrl.isDisabled()"
       ></div>
     </div>
   </div>

@@ -15,7 +15,6 @@
 
       $ctrl.monacoOptions = function (opts) {
         return angular.extend({}, {
-          readOnly: $ctrl.isDisabled(),
           wordWrap: 'wordWrapColumn',
           wordWrapColumn: 100,
           wordWrapMinified: false,
