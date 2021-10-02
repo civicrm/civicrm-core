@@ -172,6 +172,11 @@ abstract class SqlExpression {
   }
 
   /**
+   * @return string
+   */
+  abstract public static function getTitle(): string;
+
+  /**
    * @return string|NULL
    */
   public static function getDataType():? string {

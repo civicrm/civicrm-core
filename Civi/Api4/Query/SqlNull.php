@@ -23,4 +23,8 @@ class SqlNull extends SqlExpression {
     return 'NULL';
   }
 
+  public static function getTitle(): string {
+    return ts('Null');
+  }
+
 }

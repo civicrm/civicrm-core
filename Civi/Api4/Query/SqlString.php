@@ -31,4 +31,8 @@ class SqlString extends SqlExpression {
     return '"' . \CRM_Core_DAO::escapeString($this->expr) . '"';
   }
 
+  public static function getTitle(): string {
+    return ts('Text');
+  }
+
 }

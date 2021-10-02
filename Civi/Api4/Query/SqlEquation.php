@@ -116,4 +116,8 @@ class SqlEquation extends SqlExpression {
     return $value;
   }
 
+  public static function getTitle(): string {
+    return ts('Equation');
+  }
+
 }

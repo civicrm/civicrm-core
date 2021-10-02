@@ -26,4 +26,8 @@ class SqlNumber extends SqlExpression {
     return $this->expr;
   }
 
+  public static function getTitle(): string {
+    return ts('Number');
+  }
+
 }

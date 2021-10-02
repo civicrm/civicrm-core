@@ -41,4 +41,8 @@ class SqlField extends SqlExpression {
     return $fieldList[$this->expr]['sql_name'];
   }
 
+  public static function getTitle(): string {
+    return ts('Field');
+  }
+
 }
