@@ -91,7 +91,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($this->isDateField($field)) {
       try {
         return $row->format('text/plain')
-          ->tokens($entity, $field, new DateTime($fieldValue));
+          ->tokens($entity, $field, ($fieldValue ? new DateTime($fieldValue) : $fieldValue));
       }
       catch (Exception $e) {
         Civi::log()->info('invalid date token');
