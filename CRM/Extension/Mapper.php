@@ -362,7 +362,8 @@ class CRM_Extension_Mapper {
           $urls[$module->name] = $this->keyToUrl($module->name);
         }
         catch (CRM_Extension_Exception_MissingException $e) {
-          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory') . ':' . $module->name);
+          // This could happen if there was a dirty removal (i.e. deleting ext-code before uninstalling).
+          continue;
         }
       }
     }

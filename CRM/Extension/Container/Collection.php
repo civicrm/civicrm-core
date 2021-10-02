@@ -106,7 +106,13 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @throws \CRM_Extension_Exception_MissingException
    */
   public function getPath($key) {
-    return $this->getContainer($key)->getPath($key);
+    try {
+      return $this->getContainer($key)->getPath($key);
+    }
+    catch (CRM_Extension_Exception_MissingException $e) {
+      // This could happen if there was a dirty removal (i.e. deleting ext-code before uninstalling).
+      return;
+    }
   }
 
   /**

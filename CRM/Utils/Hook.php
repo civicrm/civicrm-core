@@ -312,10 +312,7 @@ abstract class CRM_Utils_Hook {
     $civiModules = CRM_Core_PseudoConstant::getModuleExtensions();
     foreach ($civiModules as $civiModule) {
       if (!file_exists($civiModule['filePath'])) {
-        CRM_Core_Session::setStatus(
-          ts('Error loading module file (%1). Please restore the file or disable the module.',
-            [1 => $civiModule['filePath']]),
-          ts('Warning'), 'error');
+        // This could happen if there was a dirty removal (i.e. deleting ext-code before uninstalling).
         continue;
       }
       include_once $civiModule['filePath'];
