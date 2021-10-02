@@ -2,6 +2,7 @@
   angular.module('crmMsgadm').component('crmMsgadmEditContent', {
     bindings: {
       onPreview: '&',
+      tokenList: '<',
       options: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',
@@ -31,7 +32,7 @@
           },
           record: $ctrl.options.record,
           field: fld,
-          tokenList: $ctrl.options.tokenList
+          tokenList: $ctrl.tokenList
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},

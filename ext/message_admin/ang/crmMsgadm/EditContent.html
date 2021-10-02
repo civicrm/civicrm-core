@@ -8,7 +8,7 @@
       <input class="form-control pull-right crm-action-menu fa-code"
              tabindex="-1"
              style="z-index:1"
-             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_subject', selection)"
              ng-show="accordions.msg_subject && !$ctrl.isDisabled()"
       />
@@ -30,7 +30,7 @@
       <input class="form-control pull-right crm-action-menu fa-code"
              tabindex="-1"
              style="z-index:1"
-             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_html', selection)"
              ng-show="accordions.msg_html && !$ctrl.isDisabled()"
       />
@@ -59,7 +59,7 @@
       <input class="form-control pull-right crm-action-menu fa-code"
              tabindex="-1"
              style="z-index:1"
-             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.options.tokenList, width: '12em', dropdownAutoWidth: true}"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_text', selection)"
              ng-show="accordions.msg_text && !$ctrl.isDisabled()"
       />

@@ -66,9 +66,8 @@
           </li>
         </ul>
       </div>
-      <div class="panel-body">
-        <crm-msgadm-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList, disabled: true}" ng-if="$ctrl.tab==='original'"></crm-msgadm-edit-content>
-        <crm-msgadm-edit-content options="{record: $ctrl.records[$ctrl.tab], tokenList: $ctrl.tokenList}" ng-if="$ctrl.tab!=='original'"></crm-msgadm-edit-content>
+      <div class="panel-body" ng-hide="$ctrl.loading">
+        <crm-msgadm-edit-content options="{record: $ctrl.records[$ctrl.tab], disabled: ($ctrl.tab==='original')}" token-list="$ctrl.tokenList"></crm-msgadm-edit-content>
       </div>
     </div>
 
