@@ -15,7 +15,7 @@
  *
  * @group headless
  */
-class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
+class CRM_Contact_Form_Task_PDFTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
 
