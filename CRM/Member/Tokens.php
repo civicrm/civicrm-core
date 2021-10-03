@@ -43,10 +43,10 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
       [
         'fee' => ts('Membership Fee'),
         'id' => ts('Membership ID'),
-        'join_date' => ts('Membership Join Date'),
+        'join_date' => ts('Member Since'),
         'start_date' => ts('Membership Start Date'),
-        'end_date' => ts('Membership End Date'),
-        'status_id:label' => ts('Membership Status'),
+        'end_date' => ts('Membership Expiration Date'),
+        'status_id:label' => ts('Status'),
         'membership_type_id:label' => ts('Membership Type'),
       ],
       CRM_Utils_Token::getCustomFieldTokens('Membership')

@@ -62,7 +62,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     $tokens = CRM_Core_SelectValues::caseTokens();
     $this->assertEquals($this->getCaseTokens(), $tokens);
     $caseID = $this->getCaseID();
-    $tokenString = implode("\n", array_keys($this->getCaseTokens()));
+    $tokenString = $this->getTokenString(array_keys($this->getCaseTokens()));
     $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, $tokenString, ['case' => $this->getCaseTokenKeys()]);
     $this->assertEquals($this->getExpectedCaseTokenOutput(), $tokenHtml);
     // Now do the same without passing in 'knownTokens'
@@ -105,16 +105,17 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * @return string
    */
   protected function getExpectedCaseTokenOutput(): string {
-    return '1
-Housing Support
-Case Subject
-July 23rd, 2021
-July 26th, 2021
-case details
-Ongoing
-No
-' . CRM_Utils_Date::customFormat($this->case['created_date']) . '
-' . CRM_Utils_Date::customFormat($this->case['modified_date']) . '
+    return 'case.id :1
+case.case_type_id:label :Housing Support
+case.subject :Case Subject
+case.start_date :July 23rd, 2021
+case.end_date :July 26th, 2021
+case.details :case details
+case.status_id:label :Ongoing
+case.is_deleted:label :No
+case.created_date :' . CRM_Utils_Date::customFormat($this->case['created_date']) . '
+case.modified_date :' . CRM_Utils_Date::customFormat($this->case['modified_date']) . '
+case.custom_1 :' . '
 ';
   }
 
@@ -205,7 +206,7 @@ No
       'schema' => ['contribution_recurId'],
     ]);
     $this->assertEquals(array_merge($this->getContributionRecurTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
-    $tokenString = implode("\n", array_keys($this->getContributionRecurTokens()));
+    $tokenString = $this->getTokenString(array_keys($this->getContributionRecurTokens()));
 
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
@@ -319,43 +320,45 @@ No
    * @return string
    */
   protected function getExpectedContributionRecurTokenOutPut(): string {
-    return $this->getContributionRecurID() . '
-€ 5,990.99
-EUR
-year
-2
-24
-July 23rd, 2021  3:39 PM
-' . CRM_Utils_Date::customFormat($this->contributionRecur['create_date']) . '
-' . CRM_Utils_Date::customFormat($this->contributionRecur['modified_date']) . '
-August 19th, 2021  9:12 AM
-Because
-July 26th, 2021  6:07 PM
-abc
-1
-123
-inv123
-2
-Yes
-15
-September 8th, 2021
-0
-January 3rd, 2020
-Yes
-1
-2
-4
-Yes
-year
-year
-Pending Label**
-Pending
-Dummy (test)
-Dummy (test)
-Member Dues
-Member Dues
-Check
-Check';
+    return 'contribution_recur.id :' . $this->getContributionRecurID() . '
+contribution_recur.amount :€ 5,990.99
+contribution_recur.currency :EUR
+contribution_recur.frequency_unit :year
+contribution_recur.frequency_interval :2
+contribution_recur.installments :24
+contribution_recur.start_date :July 23rd, 2021  3:39 PM
+contribution_recur.create_date :' . CRM_Utils_Date::customFormat($this->contributionRecur['create_date']) . '
+contribution_recur.modified_date :' . CRM_Utils_Date::customFormat($this->contributionRecur['modified_date']) . '
+contribution_recur.cancel_date :August 19th, 2021  9:12 AM
+contribution_recur.cancel_reason :Because
+contribution_recur.end_date :July 26th, 2021  6:07 PM
+contribution_recur.processor_id :abc
+contribution_recur.payment_token_id :1
+contribution_recur.trxn_id :123
+contribution_recur.invoice_id :inv123
+contribution_recur.contribution_status_id :2
+contribution_recur.is_test:label :Yes
+contribution_recur.cycle_day :15
+contribution_recur.next_sched_contribution_date :September 8th, 2021
+contribution_recur.failure_count :0
+contribution_recur.failure_retry_date :January 3rd, 2020
+contribution_recur.auto_renew:label :Yes
+contribution_recur.payment_processor_id :1
+contribution_recur.financial_type_id :2
+contribution_recur.payment_instrument_id :4
+contribution_recur.is_email_receipt:label :Yes
+contribution_recur.frequency_unit:label :year
+contribution_recur.frequency_unit:name :year
+contribution_recur.contribution_status_id:label :Pending Label**
+contribution_recur.contribution_status_id:name :Pending
+contribution_recur.payment_processor_id:label :Dummy (test)
+contribution_recur.payment_processor_id:name :Dummy (test)
+contribution_recur.financial_type_id:label :Member Dues
+contribution_recur.financial_type_id:name :Member Dues
+contribution_recur.payment_instrument_id:label :Check
+contribution_recur.payment_instrument_id:name :Check
+';
+
   }
 
   /**
@@ -424,11 +427,11 @@ Check';
   public function getMembershipTokens(): array {
     return [
       '{membership.id}' => 'Membership ID',
-      '{membership.status_id:label}' => 'Membership Status',
+      '{membership.status_id:label}' => 'Status',
       '{membership.membership_type_id:label}' => 'Membership Type',
       '{membership.start_date}' => 'Membership Start Date',
-      '{membership.join_date}' => 'Membership Join Date',
-      '{membership.end_date}' => 'Membership End Date',
+      '{membership.join_date}' => 'Member Since',
+      '{membership.end_date}' => 'Membership Expiration Date',
       '{membership.fee}' => 'Membership Fee',
     ];
   }
@@ -454,24 +457,25 @@ Check';
    * @return string
    */
   protected function getExpectedParticipantTokenOutput(): string {
-    return '2
-1
-February 19th, 2007
-Wimbeldon
-steep
-$ 50.00
-
-
-Attendee
-
-99999
-2
-USD
-
-Attended
-Attended
-Attendee
-No
+    return 'participant.status_id :2
+participant.role_id :1
+participant.register_date :February 19th, 2007
+participant.source :Wimbeldon
+participant.fee_level :steep
+participant.fee_amount :$ 50.00
+participant.registered_by_id :
+participant.transferred_to_contact_id :
+participant.role_id:label :Attendee
+participant.balance :
+participant.custom_2 :99999
+participant.id :2
+participant.fee_currency :USD
+participant.discount_amount :
+participant.status_id:label :Attended
+participant.status_id:name :Attended
+participant.role_id:name :Attendee
+participant.is_test:label :No
+participant.must_wait :
 ';
   }
 
@@ -481,21 +485,22 @@ No
    * @return string
    */
   protected function getExpectedEventTokenOutput(): string {
-    return $this->ids['event'][0] . '
-Annual CiviCRM meet
-October 21st, 2008
-October 23rd, 2008
-Conference
-If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
-event@example.com
-456 789
-event description
-15 Walton St
+    return 'event.id :' . $this->ids['event'][0] . '
+event.title :Annual CiviCRM meet
+event.start_date :October 21st, 2008
+event.end_date :October 23rd, 2008
+event.event_type_id:label :Conference
+event.summary :If you have any CiviCRM related issues or want to track where CiviCRM is heading, Sign up now
+event.contact_email :event@example.com
+event.contact_phone :456 789
+event.description :event description
+event.location :15 Walton St
 Emerald City, Maine 90210
 
-' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
-' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
-my field';
+event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
+event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
+event.custom_1 :my field
+';
   }
 
   /**
@@ -541,7 +546,7 @@ December 21st, 2007
     $expected = $this->getExpectedParticipantTokenOutput();
     $mut->checkMailLog([$expected]);
 
-    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getParticipantTokens())), 'text/plain');
+    $tokenProcessor->addMessage('html', $this->getTokenString(array_keys($this->getParticipantTokens())), 'text/plain');
     $tokenProcessor->addRow(['participantId' => $this->ids['participant'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
@@ -668,14 +673,19 @@ December 21st, 2007
     ]);
     $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
 
+    $expectedEventString = $this->getExpectedEventTokenOutput();
     $this->callAPISuccess('job', 'send_reminder', []);
-    $expected = $this->getExpectedEventTokenOutput();
-    $mut->checkMailLog([$expected, $this->getExpectedParticipantTokenOutput()]);
-
-    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getEventTokens())), 'text/plain');
+    $expectedParticipantString = $this->getExpectedParticipantTokenOutput();
+    $toCheck = array_merge(explode("\n", $expectedEventString), explode("\n", $expectedParticipantString));
+    $toCheck[] = $expectedEventString;
+    $toCheck[] = $expectedParticipantString;
+    $mut->checkMailLog($toCheck);
+    $tokens = array_keys($this->getEventTokens());
+    $html = $this->getTokenString($tokens);
+    $tokenProcessor->addMessage('html', $html, 'text/plain');
     $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
     $tokenProcessor->evaluate();
-    $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
+    $this->assertEquals($expectedEventString, $tokenProcessor->getRow(0)->render('html'));
   }
 
   /**
@@ -689,15 +699,20 @@ December 21st, 2007
 
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = $this->getExpectedEventTokenOutput();
-    $mut->checkMailLog([$expected]);
+    // Checking these individually is easier to decipher discrepancies
+    // but we also want to check in entirety.
+    $toCheck = explode("\n", $expected);
+    $toCheck[] = $expected;
+    $mut->checkMailLog($toCheck);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
       'schema' => ['eventId'],
     ]);
+    $html = $this->getTokenString(array_keys($this->getEventTokens()));
 
-    $tokenProcessor->addMessage('html', implode("\n", array_keys($this->getEventTokens())), 'text/plain');
+    $tokenProcessor->addMessage('html', $html, 'text/plain');
     $tokenProcessor->addRow(['eventId' => $this->ids['event'][0]]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
@@ -712,15 +727,12 @@ December 21st, 2007
   public function setupParticipantScheduledReminder($includeParticipant = TRUE): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'int', 'participant_');
-
+    $html = '';
+    $tokens = array_keys($this->getEventTokens());
     if ($includeParticipant) {
-      $html = implode("\n", array_keys(array_merge($this->getEventTokens(), $this->getParticipantTokens())));
+      $tokens = array_keys(array_merge($this->getEventTokens(), $this->getParticipantTokens()));
     }
-    else {
-      $html = implode("\n", array_keys($this->getEventTokens()));
-
-    }
-
+    $html = $this->getTokenString($tokens);
     $emailID = Email::create()->setValues(['email' => 'event@example.com'])->execute()->first()['id'];
     $addressID = Address::create()->setValues([
       'street_address' => '15 Walton St',
@@ -787,6 +799,19 @@ December 21st, 2007
       '{event.registration_url}' => 'Event Registration URL',
       '{event.' . $this->getCustomFieldName('text') . '}' => 'Enter text here :: Group with field text',
     ];
+  }
+
+  /**
+   * @param array $tokens
+   *
+   * @return string
+   */
+  protected function getTokenString(array $tokens): string {
+    $html = '';
+    foreach ($tokens as $token) {
+      $html .= substr($token, 1, -1) . ' :' . $token . "\n";
+    }
+    return $html;
   }
 
 }
