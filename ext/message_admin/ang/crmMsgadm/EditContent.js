@@ -2,7 +2,9 @@
   angular.module('crmMsgadm').component('crmMsgadmEditContent', {
     bindings: {
       onPreview: '&',
-      options: '='
+      tokenList: '<',
+      disabled: '<',
+      msgtpl: '='
     },
     templateUrl: '~/crmMsgadm/EditContent.html',
     controller: function ($scope, $element, crmStatus, crmUiAlert, dialogService, $rootScope) {
@@ -10,12 +12,11 @@
       var $ctrl = this;
 
       $ctrl.isDisabled = function() {
-        return $ctrl.options.disabled;
+        return $ctrl.disabled;
       };
 
       $ctrl.monacoOptions = function (opts) {
         return angular.extend({}, {
-          readOnly: $ctrl.isDisabled(),
           wordWrap: 'wordWrapColumn',
           wordWrapColumn: 100,
           wordWrapMinified: false,
@@ -30,9 +31,9 @@
           openPreview: function(options) {
             return $ctrl.openPreview(options);
           },
-          record: $ctrl.options.record,
+          record: $ctrl.msgtpl,
           field: fld,
-          tokenList: $ctrl.options.tokenList
+          tokenList: $ctrl.tokenList
         };
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},
