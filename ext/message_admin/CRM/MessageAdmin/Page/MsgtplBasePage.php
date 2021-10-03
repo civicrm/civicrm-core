@@ -14,8 +14,15 @@ class CRM_MessageAdmin_Page_MsgtplBasePage extends CRM_Core_Page {
         break;
     }
 
-    /** @var \Civi\Angular\AngularLoader $loader */
     CRM_Utils_System::setTitle(ts('Message Templates'));
+
+    $breadCrumb = [
+      'title' => E::ts('Message Templates'),
+      'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates', NULL, FALSE, '/user'),
+    ];
+    CRM_Utils_System::appendBreadCrumb([$breadCrumb]);
+
+    /** @var \Civi\Angular\AngularLoader $loader */
     $loader = \Civi::service('angularjs.loader');
     $loader->addModules(['crmMsgadm']);
     $loader->useApp(array(

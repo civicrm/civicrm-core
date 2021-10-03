@@ -11,20 +11,21 @@
         </div>
         <div class="navbar-form navbar-right">
           <div class="form-group">
-            <button crm-icon="fa-eye" type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
-              {{::ts('Preview')}}
+            <button type="button" class="btn btn-default" ng-click="model.openPreview({formatName: model.field})">
+              <i class="crm-i fa-eye"></i>
+              {{ ::ts('Preview') }}
             </button>
 
-            <!-- class='fa-code' is unhappy here. At least in Firefox. -->
-            <input class="form-control crm-action-menu"
+            <input class="form-control crm-action-menu fa-code"
                    tabindex="-1"
                    style="z-index:1"
                    crm-ui-select="{placeholder: ts('Token'), data: model.tokenList, width: '12em', dropdownAutoWidth: true}"
                    on-crm-ui-select="$broadcast('insert:expanded', selection)"
             />
 
-            <button crm-icon="fa-times" type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
-              {{::ts('Close')}}
+            <button type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
+              <i class="crm-i fa-times"></i>
+              {{ ::ts('Close') }}
             </button>
 
           </div>
