@@ -73,7 +73,13 @@ if (!defined('CIVICRM_UF')) {
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
 if (!defined('CIVICRM_UF_DSN') && CIVICRM_UF !== 'UnitTests') {
-  define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true%%CMSdbSSL%%');
+  // The SSL variables are only defined when using civicrm-setup, so make sure
+  // this %% variable gets replaced with blank otherwise.
+  if (!defined('_CIVICRM_CMSdbSSL')) {
+    define('_CIVICRM_CMSdbSSL', '%%CMSdbSSL%%');
+  }
+  $CMSdbSSL = (_CIVICRM_CMSdbSSL === '%%' . 'CMSdbSSL' . '%%') ? '' : _CIVICRM_CMSdbSSL;
+  define( 'CIVICRM_UF_DSN'           , 'mysql://%%CMSdbUser%%:%%CMSdbPass%%@%%CMSdbHost%%/%%CMSdbName%%?new_link=true' . $CMSdbSSL);
 }
 
 // %%extraSettings%%
@@ -106,7 +112,13 @@ if (!defined('CIVICRM_DSN')) {
     define('CIVICRM_DSN', $GLOBALS['_CV']['TEST_DB_DSN']);
   }
   else {
-    define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true%%dbSSL%%');
+    // The SSL variables are only defined when using civicrm-setup, so make sure
+    // this %% variable gets replaced with blank otherwise.
+    if (!defined('_CIVICRM_dbSSL')) {
+      define('_CIVICRM_dbSSL', '%%dbSSL%%');
+    }
+    $dbSSL = (_CIVICRM_dbSSL === '%%' . 'dbSSL' . '%%') ? '' : _CIVICRM_dbSSL;
+    define('CIVICRM_DSN', 'mysql://%%dbUser%%:%%dbPass%%@%%dbHost%%/%%dbName%%?new_link=true' . $dbSSL);
   }
 }
 

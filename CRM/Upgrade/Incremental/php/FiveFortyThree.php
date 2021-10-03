@@ -44,10 +44,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
+    if ($rev == '5.43.alpha1') {
+      $postUpgradeMessage .= $this->checkIfSettingsFileContainsPercentVariables();
+    }
   }
 
   /**
@@ -167,6 +166,20 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
       CRM_Core_BAO_SchemaHandler::migrateUtf8mb4(($characterSet === 'utf8mb4' ? FALSE : TRUE), ['%civicrm_relationship_cache%']);
     }
     return TRUE;
+  }
+
+  /**
+   * Depending on how it was installed the civicrm.settings.php might still
+   * have %%CMSdbSSL%% or %%dbSSL%% left unreplaced in the file.
+   * We may not (shouldn't) have write access to the file so display a message
+   * instead.
+   * @return string
+   */
+  private function checkIfSettingsFileContainsPercentVariables(): string {
+    if (strpos(CIVICRM_UF_DSN, '%%CMSdbSSL%%') === FALSE && strpos(CIVICRM_DSN, '%%dbSSL%%') === FALSE) {
+      return '';
+    }
+    return '<ul><li>' . ts('Your civicrm.settings.php file contains unreplaced variables %1 and %2 in the CIVICRM_UF_DSN and CIVICRM_DSN strings from when it was first installed. You should remove the %1 and %2 from the strings.', [1 => '%%CMSdbSSL%%', 2 => '%%dbSSL%%']) . '</li></ul>';
   }
 
 }
