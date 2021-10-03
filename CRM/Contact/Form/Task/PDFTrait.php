@@ -224,24 +224,23 @@ trait CRM_Contact_Form_Task_PDFTrait {
    * @throws \API_Exception
    */
   public function postProcess(): void {
-    $form = $this;
     $formValues = $this->controller->exportValues($this->getName());
     [$formValues, $html_message] = $this->processMessageTemplate($formValues);
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
     if ($this->isLiveMode()) {
-      $activityIds = $this->createActivities($html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
+      $activityIds = $this->createActivities($html_message, $this->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
     if (!empty($formValues['document_file_path'])) {
       [$html_message, $zip] = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
     }
 
-    foreach ($form->_contactIds as $item => $contactId) {
-      $caseId = $form->getVar('_caseId');
-      if (empty($caseId) && !empty($form->_caseIds[$item])) {
-        $caseId = $form->_caseIds[$item];
+    foreach ($this->_contactIds as $item => $contactId) {
+      $caseId = $this->getVar('_caseId');
+      if (empty($caseId) && !empty($this->_caseIds[$item])) {
+        $caseId = $this->_caseIds[$item];
       }
 
       $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
@@ -266,7 +265,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $mimeType = $this->getMimeType($type);
     // ^^ Useful side-effect: consistently throws error for unrecognized types.
 
-    $fileName = method_exists($form, 'getFileName') ? ($form->getFileName() . '.' . $type) : 'CiviLetter.' . $type;
+    $fileName = $this->getFileName();
 
     if ($type === 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
@@ -298,7 +297,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       }
     }
 
-    $form->postProcessHook();
+    $this->postProcessHook();
 
     CRM_Utils_System::civiExit();
   }
@@ -337,10 +336,10 @@ trait CRM_Contact_Form_Task_PDFTrait {
    *   There may be 1 or more, depending on the system-settings
    *   and use-case.
    *
-   * @throws CRM_Core_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected function createActivities($html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
-    $form = $this;
+  protected function createActivities($html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []): array {
     $activityParams = [
       'subject' => $subject,
       'campaign_id' => $campaign_id,
@@ -349,8 +348,8 @@ trait CRM_Contact_Form_Task_PDFTrait {
       'activity_date_time' => date('YmdHis'),
       'details' => $html_message,
     ];
-    if (!empty($form->_activityId)) {
-      $activityParams += ['id' => $form->_activityId];
+    if (!empty($this->_activityId)) {
+      $activityParams += ['id' => $this->_activityId];
     }
 
     $activityIds = [];
@@ -362,11 +361,11 @@ trait CRM_Contact_Form_Task_PDFTrait {
         // One activity per contact.
         foreach ($contactIds as $i => $contactId) {
           $fullParams = ['target_contact_id' => $contactId] + $activityParams;
-          if (!empty($form->_caseId)) {
-            $fullParams['case_id'] = $form->_caseId;
+          if (!empty($this->_caseId)) {
+            $fullParams['case_id'] = $this->_caseId;
           }
-          elseif (!empty($form->_caseIds[$i])) {
-            $fullParams['case_id'] = $form->_caseIds[$i];
+          elseif (!empty($this->_caseIds[$i])) {
+            $fullParams['case_id'] = $this->_caseIds[$i];
           }
 
           if (isset($perContactHtml[$contactId])) {
@@ -382,18 +381,18 @@ trait CRM_Contact_Form_Task_PDFTrait {
       case 'combined-attached':
         // One activity with all contacts.
         $fullParams = ['target_contact_id' => $contactIds] + $activityParams;
-        if (!empty($form->_caseId)) {
-          $fullParams['case_id'] = $form->_caseId;
+        if (!empty($this->_caseId)) {
+          $fullParams['case_id'] = $this->_caseId;
         }
-        elseif (!empty($form->_caseIds)) {
-          $fullParams['case_id'] = $form->_caseIds;
+        elseif (!empty($this->_caseIds)) {
+          $fullParams['case_id'] = $this->_caseIds;
         }
         $activity = civicrm_api3('Activity', 'create', $fullParams);
         $activityIds[] = $activity['id'];
         break;
 
       default:
-        throw new CRM_Core_Exception("Unrecognized option in recordGeneratedLetters: " . Civi::settings()->get('recordGeneratedLetters'));
+        throw new CRM_Core_Exception('Unrecognized option in recordGeneratedLetters: ' . Civi::settings()->get('recordGeneratedLetters'));
     }
 
     return $activityIds;
