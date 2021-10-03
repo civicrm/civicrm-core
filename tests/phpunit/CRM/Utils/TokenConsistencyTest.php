@@ -72,21 +72,12 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
     // And check our deprecated tokens still work.
     $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseID, '{case.case_type_id} {case.status_id}');
     $this->assertEquals('Housing Support Ongoing', $tokenHtml);
-
-    $additionalTokensFromProcessor = [
-      '{case.case_type_id}' => 'Case Type ID',
-      '{case.status_id}' => 'Case Status',
-      '{case.case_type_id:name}' => 'Machine name: Case Type',
-      '{case.status_id:name}' => 'Machine name: Case Status',
-    ];
-    $expectedTokens = array_merge($this->getCaseTokens(), $additionalTokensFromProcessor);
-
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
       'schema' => ['caseId'],
     ]);
-    $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
+    $this->assertEquals(array_merge($this->getCaseTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
     $tokenProcessor->addRow([
       'caseId' => $this->getCaseID(),
     ]);
@@ -205,7 +196,8 @@ case.custom_1 :' . '
       'smarty' => FALSE,
       'schema' => ['contribution_recurId'],
     ]);
-    $this->assertEquals(array_merge($this->getContributionRecurTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
+    $expectedTokens = array_merge($this->getContributionRecurTokens(), $this->getDomainTokens());
+    $this->assertEquals(array_diff_key($expectedTokens, $this->getUnadvertisedTokens()), $tokenProcessor->listTokens());
     $tokenString = $this->getTokenString(array_keys($this->getContributionRecurTokens()));
 
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
@@ -225,6 +217,20 @@ case.custom_1 :' . '
       '{membership.membership_type_id}' => 'Membership Type ID',
       '{membership.status_id:name}' => 'Machine name: Status',
       '{membership.membership_type_id:name}' => 'Machine name: Membership Type',
+      '{contribution_recur.frequency_unit}' => 'Frequency Unit',
+      '{contribution_recur.contribution_status_id}' => 'Status',
+      '{contribution_recur.payment_processor_id}' => 'Payment Processor ID',
+      '{contribution_recur.financial_type_id}' => 'Financial Type ID',
+      '{contribution_recur.payment_instrument_id}' => 'Payment Method',
+      '{contribution_recur.frequency_unit:name}' => 'Machine name: Frequency Unit',
+      '{contribution_recur.payment_instrument_id:name}' => 'Machine name: Payment Method',
+      '{contribution_recur.contribution_status_id:name}' => 'Machine name: Status',
+      '{contribution_recur.payment_processor_id:name}' => 'Machine name: Payment Processor',
+      '{contribution_recur.financial_type_id:name}' => 'Machine name: Financial Type',
+      '{participant.status_id:name}' => 'Machine name: Status',
+      '{participant.role_id:name}' => 'Machine name: Participant Role',
+      '{participant.status_id}' => 'Status ID',
+      '{participant.role_id}' => 'Participant Role ID',
     ];
   }
 
@@ -424,15 +430,26 @@ contribution_recur.payment_instrument_id:name :Check
     ]);
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
-    $expectedTokens['{membership.custom_1}'] = 'Enter text here :: Group with field text';
-    // Add in unadvertised tokens - for now they are included.
-    $expectedTokens = array_merge($expectedTokens, $this->getUnadvertisedTokens());
+    $expectedTokens = array_merge($expectedTokens, $this->getTokensAdvertisedByTokenProcessorButNotLegacy());
     $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
     $tokenProcessor->evaluate();
     $this->assertEquals($expected, $tokenProcessor->getRow(0)->render('html'));
 
+  }
+
+  /**
+   * Get the advertised tokens the legacy function doesn't know about.
+   *
+   * @return string[]
+   */
+  public function getTokensAdvertisedByTokenProcessorButNotLegacy(): array {
+    return [
+      '{membership.custom_1}' => 'Enter text here :: Group with field text',
+      '{membership.source}' => 'Source',
+      '{membership.status_override_end_date}' => 'Status Override End Date',
+    ];
   }
 
   /**
@@ -547,7 +564,7 @@ December 21st, 2007
     $this->setupParticipantScheduledReminder();
 
     $tokens = CRM_Core_SelectValues::participantTokens();
-    $this->assertEquals($this->getParticipantTokens(), $tokens);
+    $this->assertEquals(array_diff_key($this->getParticipantTokens(), $this->getUnadvertisedTokens()), $tokens);
 
     $mut = new CiviMailUtils($this);
 
@@ -699,11 +716,7 @@ December 21st, 2007
     $this->setupParticipantScheduledReminder();
 
     $tokens = CRM_Core_SelectValues::eventTokens();
-    $unadvertisedTokens = [
-      '{event.event_type_id}' => 'Event Type',
-      '{event.event_type_id:name}' => 'Machine name: Event Type',
-    ];
-    $this->assertEquals(array_merge($this->getEventTokens(), $unadvertisedTokens), $tokens);
+    $this->assertEquals(array_merge($this->getEventTokens()), $tokens);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,

@@ -30,9 +30,22 @@ use Civi\Token\TokenProcessor;
 class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
 
   /**
+   * Metadata about all tokens.
+   *
+   * @var array
+   */
+  protected $tokensMetadata = [];
+  /**
    * @var array
    */
   protected $prefetch = [];
+
+  /**
+   * Should permissions be checked when loading tokens.
+   *
+   * @var bool
+   */
+  protected $checkPermissions = FALSE;
 
   /**
    * Register the declared tokens.
@@ -44,15 +57,86 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    foreach ($this->getAllTokens() as $name => $label) {
-      if (!in_array($name, $this->getHiddenTokens(), TRUE)) {
+    foreach ($this->getTokenMetadata() as $field) {
+      if ($field['audience'] === 'user') {
         $e->register([
           'entity' => $this->entity,
-          'field' => $name,
-          'label' => $label,
+          'field' => $field['name'],
+          'label' => $field['title'],
         ]);
       }
     }
+  }
+
+  /**
+   * Get the metadata about the available tokens
+   *
+   * @return array
+   */
+  protected function getTokenMetadata(): array {
+    if (empty($this->tokensMetadata)) {
+      $cacheKey = __CLASS__ . 'token_metadata' . $this->getApiEntityName() . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
+      if ($this->checkPermissions) {
+        $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
+      }
+      if (Civi::cache('metadata')->has($cacheKey)) {
+        $this->tokensMetadata = Civi::cache('metadata')->get($cacheKey);
+      }
+      else {
+        foreach (array_merge($this->getFieldMetadata(), $this->getBespokeTokens()) as $field) {
+          if (
+            $field['type'] === 'Custom'
+            || !empty($this->getBespokeTokens()[$field['name']])
+            || in_array($field['name'], $this->getExposedFields(), TRUE)
+          ) {
+            $field['audience'] = 'user';
+            if ($field['name'] === 'contact_id') {
+              // Since {contact.id} is almost always present don't confuse users
+              // by also adding (e.g {participant.contact_id)
+              $field['audience'] = 'sysadmin';
+            }
+            if (!empty($this->getTokenMetadataOverrides()[$field['name']])) {
+              $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
+            }
+            if ($field['type'] === 'Custom') {
+              // Convert to apiv3 style for now. Later we can add v4 with
+              // portable naming & support for labels/ dates etc so let's leave
+              // the space open for that.
+              // Not the existing quickform widget has handling for the custom field
+              // format based on the title using this syntax.
+              $field['name'] = 'custom_' . $field['custom_field_id'];
+              $parts = explode(': ', $field['label']);
+              $field['title'] = "{$parts[1]} :: {$parts[0]}";
+            }
+            if (
+              ($field['options'] || !empty($field['suffixes']))
+              // At the time of writing currency didn't have a label option - this may have changed.
+              && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
+            ) {
+              $this->tokensMetadata[$field['name'] . ':label'] = $this->tokensMetadata[$field['name'] . ':name'] = $field;
+              $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
+              $this->tokensMetadata[$field['name'] . ':label']['name'] = $field['name'] . ':label';
+              $this->tokensMetadata[$field['name'] . ':name']['name'] = $field['name'] . ':name';
+              $this->tokensMetadata[$field['name'] . ':name']['audience'] = 'sysadmin';
+              $this->tokensMetadata[$field['name'] . ':label']['title'] = $fieldLabel;
+              $this->tokensMetadata[$field['name'] . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
+              $field['audience'] = 'sysadmin';
+            }
+            if ($field['data_type'] === 'Boolean') {
+              $this->tokensMetadata[$field['name'] . ':label'] = $field;
+              $this->tokensMetadata[$field['name'] . ':label']['name'] = $field['name'] . ':label';
+              $field['audience'] = 'sysadmin';
+            }
+            $this->tokensMetadata[$field['name']] = $field;
+          }
+        }
+        foreach ($this->getHiddenTokens() as $name) {
+          $this->tokensMetadata[$name]['audience'] = 'hidden';
+        }
+        Civi::cache('metadata')->set($cacheKey, $this->tokensMetadata);
+      }
+    }
+    return $this->tokensMetadata;
   }
 
   /**
@@ -153,31 +237,6 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   public function getReturnFields(): array {
     return array_keys($this->getBasicTokens());
-  }
-
-  /**
-   * Get all the tokens supported by this processor.
-   *
-   * @return array|string[]
-   * @throws \API_Exception
-   */
-  protected function getAllTokens(): array {
-    $basicTokens = $this->getBasicTokens();
-    foreach (array_keys($basicTokens) as $fieldName) {
-      // The goal is to be able to render more complete tokens
-      // (eg. actual booleans, field names, raw ids) for a more
-      // advanced audiences - ie those using conditionals
-      // and to specify that audience in the api that retrieves.
-      // But, for now, let's not advertise, given that most of these fields
-      // aren't really needed even once...
-      if ($this->isBooleanField($fieldName)) {
-        unset($basicTokens[$fieldName]);
-      }
-    }
-    foreach ($this->getBespokeTokens() as $token) {
-      $basicTokens[$token['name']] = $token['title'];
-    }
-    return array_merge($basicTokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
   }
 
   /**
@@ -360,8 +419,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    $tokens = $this->getAllTokens();
-    parent::__construct($this->getEntityName(), $tokens);
+    parent::__construct($this->getEntityName(), []);
   }
 
   /**
@@ -449,11 +507,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return string[]
    */
-  public function getSkippedFields(): array {
+  protected function getSkippedFields(): array {
     // tags is offered in 'case' & is one of the only fields that is
     // 'not a real field' offered up by case - seems like an oddity
     // we should skip at the top level for now.
-    $fields = ['contact_id', 'tags'];
+    $fields = ['tags'];
     if (!CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
       $fields[] = 'campaign_id';
     }
@@ -513,7 +571,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @throws \API_Exception
    */
   public function getPrefetchFields(TokenValueEvent $e): array {
-    $allTokens = array_keys($this->getAllTokens());
+    $allTokens = array_keys($this->getTokenMetadata());
     $requiredFields = array_intersect($this->getActiveTokens($e), $allTokens);
     if (empty($requiredFields)) {
       return [];
@@ -567,6 +625,33 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($value !== NULL) {
       return CRM_Core_BAO_CustomField::displayValue($value, $id);
     }
+  }
+
+  /**
+   * Get any overrides for token metadata.
+   *
+   * This is most obviously used for setting the audience, which
+   * will affect widget-presence.
+   *
+   * @return \string[][]
+   */
+  protected function getTokenMetadataOverrides(): array {
+    return [];
+  }
+
+  /**
+   * To handle variable tokens, override this function and return the active tokens.
+   *
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
+   * @return mixed
+   */
+  public function getActiveTokens(TokenValueEvent $e) {
+    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
+    if (!isset($messageTokens[$this->entity])) {
+      return FALSE;
+    }
+    return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata()));
   }
 
 }

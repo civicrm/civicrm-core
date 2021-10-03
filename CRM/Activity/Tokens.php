@@ -37,6 +37,19 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   use CRM_Core_TokenTrait;
 
   /**
+   * Class constructor.
+   *
+   * Overriding because the trait needs this to happen & trying to
+   * leave any changes that affect the trait out of scope here.
+   */
+  public function __construct() {
+    $this->entity = 'activity';
+    $this->tokenNames = array_merge(
+      $this->getBasicTokens(),
+      $this->getCustomFieldTokens());
+  }
+
+  /**
    * Get the entity name for api v4 calls.
    *
    * @return string
@@ -172,6 +185,32 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
+   * Get fields Fieldshistorically not advertised for tokens.
+   *
+   * @return string[]
+   */
+  protected function getSkippedFields(): array {
+    return array_merge(parent::getSkippedFields(), [
+      'source_record_id',
+      'phone_id',
+      'phone_number',
+      'priority_id',
+      'parent_id',
+      'is_test',
+      'medium_id',
+      'is_auto',
+      'relationship_id',
+      'is_current_revision',
+      'original_id',
+      'result',
+      'is_deleted',
+      'engagement_level',
+      'weight',
+      'is_star',
+    ]);
+  }
+
+  /**
    * @inheritDoc
    */
   public function getActiveTokens(TokenValueEvent $e) {
@@ -183,7 +222,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
     $activeTokens = [];
     // if message token contains '_\d+_', then treat as '_N_'
     foreach ($messageTokens[$this->entity] as $msgToken) {
-      if (array_key_exists($msgToken, $this->tokenNames)) {
+      if (array_key_exists($msgToken, $this->tokensMetadata)) {
         $activeTokens[] = $msgToken;
       }
       elseif (in_array($msgToken, ['campaign', 'activity_id', 'status', 'activity_type', 'case_id'])) {

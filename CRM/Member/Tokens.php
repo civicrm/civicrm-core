@@ -50,6 +50,8 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
       'end_date',
       'status_id',
       'membership_type_id',
+      'source',
+      'status_override_end_date',
     ];
   }
 
@@ -65,6 +67,30 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
     }
+  }
+
+  /**
+   * Get any overrides for token metadata.
+   *
+   * This is most obviously used for setting the audience, which
+   * will affect widget-presence.
+   *
+   * Changing the audience is done in order to simplify the
+   * UI for more general users.
+   *
+   * @return \string[][]
+   */
+  protected function getTokenMetadataOverrides(): array {
+    return [
+      'owner_membership_id' => ['audience' => 'sysadmin'],
+      'max_related' => ['audience' => 'sysadmin'],
+      'contribution_recur_id' => ['audience' => 'sysadmin'],
+      'is_override' => ['audience' => 'sysadmin'],
+      'is_test' => ['audience' => 'sysadmin'],
+      // Pay later is considered to be unreliable in the schema
+      // and will eventually be removed.
+      'is_pay_later' => ['audience' => 'deprecated'],
+    ];
   }
 
   /**

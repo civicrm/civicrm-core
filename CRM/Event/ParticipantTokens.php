@@ -111,7 +111,7 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
    *
    * @return string[]
    */
-  public function getSkippedFields(): array {
+  protected function getSkippedFields(): array {
     $fields = parent::getSkippedFields();
     // Never add these 2 fields - may not be a stable part of the schema.
     // This field is on it's way out of core.
