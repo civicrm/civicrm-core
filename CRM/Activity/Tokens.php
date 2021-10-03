@@ -34,8 +34,6 @@ use Civi\Token\TokenRow;
  */
 class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
 
-  use CRM_Core_TokenTrait;
-
   /**
    * Get the entity name for api v4 calls.
    *
@@ -50,13 +48,6 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    */
   private function getEntityTableName(): string {
     return 'civicrm_activity';
-  }
-
-  /**
-   * @return string
-   */
-  private function getEntityContextSchema(): string {
-    return 'activityId';
   }
 
   /**
@@ -85,7 +76,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
     // Multiple revisions of the activity.
     // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
-    $e->query->select('e.id AS tokenContext_' . $this->getEntityContextSchema());
+    $e->query->select('e.id AS tokenContext_' . $this->getEntityAlias());
   }
 
   /**
@@ -103,7 +94,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $activityId = $row->context[$this->getEntityContextSchema()];
+    $activityId = $row->context[$this->getEntityAlias()];
 
     if (!empty($this->getDeprecatedTokens()[$field])) {
       $realField = $this->getDeprecatedTokens()[$field];
