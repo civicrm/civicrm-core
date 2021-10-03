@@ -57,7 +57,6 @@ class MailingPreview {
 
     };
     $job->mailing_id = $mailing->id ?: NULL;
-    $job->is_test = 1;
     $job->status = 'Complete';
 
     $flexMailer = new FlexMailer(array(
