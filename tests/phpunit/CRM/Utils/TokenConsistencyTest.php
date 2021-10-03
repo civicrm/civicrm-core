@@ -215,6 +215,20 @@ case.custom_1 :' . '
   }
 
   /**
+   * Get tokens that are not advertised via listTokens.
+   *
+   * @return string[]
+   */
+  public function getUnadvertisedTokens(): array {
+    return [
+      '{membership.status_id}' => 'Status ID',
+      '{membership.membership_type_id}' => 'Membership Type ID',
+      '{membership.status_id:name}' => 'Machine name: Status',
+      '{membership.membership_type_id:name}' => 'Machine name: Membership Type',
+    ];
+  }
+
+  /**
    * Get the contribution recur tokens keyed by the token.
    *
    * e.g {contribution_recur.id}
@@ -411,6 +425,8 @@ contribution_recur.payment_instrument_id:name :Check
     $tokens = $tokenProcessor->listTokens();
     // Add in custom tokens as token processor supports these.
     $expectedTokens['{membership.custom_1}'] = 'Enter text here :: Group with field text';
+    // Add in unadvertised tokens - for now they are included.
+    $expectedTokens = array_merge($expectedTokens, $this->getUnadvertisedTokens());
     $this->assertEquals(array_merge($expectedTokens, $this->getDomainTokens()), $tokens);
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['membershipId' => $this->getMembershipID()]);
@@ -665,7 +681,11 @@ December 21st, 2007
     $this->setupParticipantScheduledReminder();
 
     $tokens = CRM_Core_SelectValues::eventTokens();
-    $this->assertEquals($this->getEventTokens(), $tokens);
+    $unadvertisedTokens = [
+      '{event.event_type_id}' => 'Event Type',
+      '{event.event_type_id:name}' => 'Machine name: Event Type',
+    ];
+    $this->assertEquals(array_merge($this->getEventTokens(), $unadvertisedTokens), $tokens);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,

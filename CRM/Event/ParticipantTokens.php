@@ -45,8 +45,17 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
   /**
    * Get any tokens with custom calculation.
    */
-  public function getBespokeTokens(): array {
-    return ['balance' => ts('Event Balance')];
+  protected function getBespokeTokens(): array {
+    return [
+      'balance' => [
+        'title' => ts('Event Balance'),
+        'name' => 'balance',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'Money',
+        'audience' => 'user',
+      ],
+    ];
   }
 
   /**
