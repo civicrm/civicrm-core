@@ -1876,6 +1876,7 @@ function _civicrm_api3_generic_replace_base_params($params) {
   unset($baseParams['values']);
   unset($baseParams['sequential']);
   unset($baseParams['options']);
+  $baseParams['options']['limit'] = 0;
   return $baseParams;
 }
 
