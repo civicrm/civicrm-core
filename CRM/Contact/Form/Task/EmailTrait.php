@@ -148,6 +148,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if ($cid) {
       $this->_contactIds = explode(',', $cid);
     }
+    // The default in CRM_Core_Form_Task is null, but changing it there gives
+    // errors later.
+    if (is_null($this->_contactIds)) {
+      $this->_contactIds = [];
+    }
     if (count($this->_contactIds) > 1) {
       $this->_single = FALSE;
     }
