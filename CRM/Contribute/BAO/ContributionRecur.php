@@ -554,7 +554,11 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
         unset($overrides['financial_type_id']);
       }
       $result = array_merge($templateContribution, $overrides);
-      $result['line_item'][$order->getPriceSetID()] = $lineItems;
+      // Line items aren't always written to a contribution, for mystery reasons.
+      // Checking for their existence prevents $order->getPriceSetID returning NULL.
+      if ($lineItems) {
+        $result['line_item'][$order->getPriceSetID()] = $lineItems;
+      }
       // If the template contribution was made on-behalf then add the
       // relevant values to ensure the activity reflects that.
       $relatedContact = CRM_Contribute_BAO_Contribution::getOnbehalfIds($result['id']);
