@@ -17,6 +17,7 @@ use CRM_Authx_ExtensionUtil as E;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 $_authx_settings = function() {
+  $weight = 10;
   $flows = ['param', 'header', 'xheader', 'login', 'auto', 'script', 'pipe', 'legacyrest'];
   $basic = [
     'group_name' => 'CiviCRM Preferences',
@@ -42,8 +43,10 @@ $_authx_settings = function() {
     'pseudoconstant' => [
       'callback' => ['\Civi\Authx\Meta', 'getGuardTypes'],
     ],
+    'settings_pages' => ['authx' => ['weight' => $weight]],
   ];
   foreach ($flows as $flow) {
+    $weight = $weight+10;
     $s["authx_{$flow}_cred"] = $basic + [
       'name' => "authx_{$flow}_cred",
       'type' => 'Array',
@@ -59,6 +62,7 @@ $_authx_settings = function() {
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getCredentialTypes'],
       ],
+      'settings_pages' => ['authx' => ['weight' => $weight]],
     ];
     $s["authx_{$flow}_user"] = $basic + [
       'name' => "authx_{$flow}_user",
@@ -74,6 +78,7 @@ $_authx_settings = function() {
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getUserModes'],
       ],
+      'settings_pages' => ['authx' => ['weight' => $weight+5]],
     ];
   }
 
