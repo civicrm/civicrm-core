@@ -28,6 +28,10 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       $_REQUEST[$param] = $value;
     }
 
+    require_once 'HTML/QuickForm.php';
+    $form = new HTML_QuickForm();
+    $form->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
+
     $item = CRM_Core_Invoke::getItem([$_GET['q']]);
     ob_start();
     CRM_Core_Invoke::runItem($item);
@@ -58,6 +62,9 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       ],
       'Fulltext search' => [
         'civicrm/contact/search/custom?csid=15&reset=1',
+      ],
+      'New Email' => [
+        'civicrm/activity/email/add?atype=3&action=add&reset=1&context=standalone',
       ],
     ];
   }
