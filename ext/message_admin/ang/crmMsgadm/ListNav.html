@@ -1,19 +1,17 @@
-<div class="panel panel-info">
-
-  <ul class="panel-heading nav nav-tabs">
+<nav class="bg-info">
+  <ul class="nav nav-tabs">
     <li role="presentation"
         ng-class="{active: location.path() === '/user'}"
         ng-if="checkPerm('edit message templates') || checkPerm('edit user-driven message templates')">
-      <a ng-href="#/user">{{ts('User-Driven Messages')}}</a>
+      <a ng-href="#/user">{{:: ts('User-Driven Messages') }}</a>
     </li>
     <li role="presentation"
         ng-class="{active: location.path() === '/workflow'}"
         ng-if="checkPerm('edit message templates') || checkPerm('edit system workflow message templates')">
-      <a ng-href="#/workflow">{{ts('System Workflow Messages')}}</a>
+      <a ng-href="#/workflow">{{:: ts('System Workflow Messages' )}}</a>
     </li>
   </ul>
-
-</div>
+</nav>
 
 <div class="help">
 

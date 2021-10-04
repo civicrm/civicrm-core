@@ -368,6 +368,9 @@ if (!CRM.vars) CRM.vars = {};
         settings.width = '' + parseInt(percentage+gap-((screenWidth - 700)/7*(gap)/100), 10) + '%';
       }
     }
+    if (settings.dialogClass && !_.includes(settings.dialogClass, 'crm-container')) {
+      settings.dialogClass += ' crm-container';
+    }
     return settings;
   };
 

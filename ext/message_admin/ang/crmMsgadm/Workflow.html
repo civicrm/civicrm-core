@@ -8,10 +8,10 @@
     <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
   </div>
 
-  <table>
+  <table class="table table-striped">
     <thead>
     <tr>
-      <th>{{ts('Title')}}</th>
+      <th>{{:: ts('Title') }}</th>
       <th></th>
     </tr>
     </thead>
@@ -19,7 +19,7 @@
     <tr ng-repeat="record in $ctrl.records | filter:filters.text | orderBy:['msg_title','_is_translation','tx_language_label']">
       <td>{{record.msg_title}}</td>
       <td class="text-right">
-        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Edit')}}</a>
+        <a class="btn btn-xs btn-default" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Edit') }}</a>
       </td>
     </tr>
     </tbody>

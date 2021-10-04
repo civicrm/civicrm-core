@@ -8,11 +8,11 @@
     <input class="form-control" type="search" id="msgtpl-filter-text" ng-model="filters.text">
   </div>
 
-  <table>
+  <table class="table table-striped">
     <thead>
     <tr>
-      <th>{{ts('Title')}}</th>
-      <th>{{ts('Locale')}}</th>
+      <th>{{:: ts('Title') }}</th>
+      <th>{{:: ts('Locale') }}</th>
       <th></th>
       <th></th>
       <th></th>
@@ -24,23 +24,23 @@
       <td>{{record.tx_language_label || ts('Standard')}}</td>
       <td>
         <span ng-if="!record.tx_language || !!record.tx_statuses.active">
-          <a class="text-success" crm-icon="fa-file-text" title="{{ts('Edit current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record)}}">{{ts('Current')}}</a>
+          <a class="text-success" crm-icon="fa-file-text" title="{{ts('Edit current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record)}}">{{:: ts('Current') }}</a>
         </span>
         <span ng-if="!(!record.tx_language || !!record.tx_statuses.active)">
-          <span class="text-danger" crm-icon="fa-file-text" title="{{ts('No current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}">{{ts('Current')}}</span>
+          <span class="text-danger" crm-icon="fa-file-text" title="{{ts('No current revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}">{{:: ts('Current') }}</span>
         </span>
       </td>
       <td>
         <span ng-if="!!record.tx_statuses.draft">
-          <a class="text-warning" crm-icon="fa-file-text-o" title="{{ts('Edit draft revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{ts('Draft')}}</a>
+          <a class="text-warning" crm-icon="fa-file-text-o" title="{{ts('Edit draft revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}" ng-href="{{$ctrl.editUrl(record, 'draft')}}">{{:: ts('Draft') }}</a>
         </span>
         <span ng-if="!record.tx_statuses.draft">
-          <span class="text-muted" crm-icon="fa-file-text-o" title="{{ts('No draft revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}">{{ts('Draft')}}</span>
+          <span class="text-muted" crm-icon="fa-file-text-o" title="{{ts('No draft revision, &quot;%1&quot;, &quot;%2&quot;', {1: record.msg_title, 2: record.tx_language_label || ts('Standard')})}}">{{:: ts('Draft') }}</span>
         </span>
       </td>
       <td>
         <span ng-if="!record.tx_language">
-          <a class="" crm-icon="fa-plus" ng-click="$ctrl.addTranslation(record)" title="{{ts('Add translation, &quot;%1&quot;', {1: record.msg_title})}}">{{ts('Translate')}}</a>
+          <a href crm-icon="fa-plus" ng-click="$ctrl.addTranslation(record)" title="{{ts('Add translation, &quot;%1&quot;', {1: record.msg_title})}}">{{:: ts('Translate') }}</a>
         </span>
       </td>
     </tr>
