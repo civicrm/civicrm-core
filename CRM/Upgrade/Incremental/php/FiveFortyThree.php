@@ -151,6 +151,8 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Update individual_suffix token in greetings (use {contact.suffix_id:label})',
       'updateGreetingOptions', 'contact.individual_suffix', 'contact.suffix_id:label', $rev
     );
+
+    $this->addTask('Set note_date field to NOT NULL', 'setNoteDateFieldNotNull');
   }
 
   /**
@@ -181,6 +183,21 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     if ($contactTableCollation !== $relationshipCacheCollation) {
       CRM_Core_BAO_SchemaHandler::migrateUtf8mb4(($characterSet === 'utf8mb4' ? FALSE : TRUE), ['%civicrm_relationship_cache%']);
     }
+    return TRUE;
+  }
+
+  /**
+   * Ensure note_date is NOT NULL
+   *
+   * Since note_date is exposed in the UI, we want to ensure an empty value
+   * results in CURRENT_TIME, not a NULL date.
+   */
+  public static function setNoteDateFieldNotNull(): bool {
+    $i18nRewrite = FALSE;
+    $query = "UPDATE civicrm_note SET note_date = created_date WHERE note_date IS NULL";
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, $i18nRewrite);
+    $query = "ALTER TABLE civicrm_note CHANGE COLUMN `note_date` `note_date` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Date attached to the note'";
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, $i18nRewrite);
     return TRUE;
   }
 
