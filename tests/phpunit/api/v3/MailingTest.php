@@ -592,7 +592,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       ['body_html' => '', 'body_text' => ''],
       ['scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'],
       // expectedFailure
-      "/Mailing cannot be sent. There are missing or invalid fields \\(body\\)./",
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body.*\\)./",
       // expectedJobCount
       0,
     ];
