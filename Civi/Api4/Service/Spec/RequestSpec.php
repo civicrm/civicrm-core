@@ -37,15 +37,29 @@ class RequestSpec implements \Iterator {
   protected $fields = [];
 
   /**
+   * @var array
+   */
+  protected $values = [];
+
+  /**
    * @param string $entity
    * @param string $action
+   * @param array $values
    */
-  public function __construct($entity, $action) {
+  public function __construct($entity, $action, $values = []) {
     $this->entity = $entity;
     $this->action = $action;
     $this->entityTableName = CoreUtil::getTableName($entity);
+    // Set contact_type from id if possible
+    if ($entity === 'Contact' && empty($values['contact_type']) && !empty($values['id'])) {
+      $values['contact_type'] = \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $values['id'], 'contact_id');
+    }
+    $this->values = $values;
   }
 
+  /**
+   * @param FieldSpec $field
+   */
   public function addFieldSpec(FieldSpec $field) {
     if (!$field->getEntity()) {
       $field->setEntity($this->entity);
@@ -124,6 +138,21 @@ class RequestSpec implements \Iterator {
    */
   public function getEntity() {
     return $this->entity;
+  }
+
+  /**
+   * @return array
+   */
+  public function getValues() {
+    return $this->values;
+  }
+
+  /**
+   * @param string $key
+   * @return mixed
+   */
+  public function getValue(string $key) {
+    return $this->values[$key] ?? NULL;
   }
 
   /**
