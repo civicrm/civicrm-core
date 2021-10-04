@@ -322,4 +322,27 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       ->execute();
   }
 
+  public function testAge(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 1 year - 1 month'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 21 year - 6 month'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addSelect('first_name', 'age_years')
+      ->execute()->indexBy('first_name');
+    $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertEquals(21, $result['def']['age_years']);
+
+    Contact::get(FALSE)
+      ->addWhere('age_years', '=', 21)
+      ->addWhere('last_name', '=', $lastName)
+      ->execute()->single();
+  }
+
 }

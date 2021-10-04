@@ -40,7 +40,7 @@ class SpecGatherer {
    * @return \Civi\Api4\Service\Spec\RequestSpec
    */
   public function getSpec($entity, $action, $includeCustom, $values = []) {
-    $specification = new RequestSpec($entity, $action);
+    $specification = new RequestSpec($entity, $action, $values);
 
     // Real entities
     if (strpos($entity, 'Custom_') !== 0) {
@@ -80,17 +80,16 @@ class SpecGatherer {
   /**
    * @param string $entity
    * @param string $action
-   * @param \Civi\Api4\Service\Spec\RequestSpec $specification
-   * @param array $values
+   * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
-  private function addDAOFields($entity, $action, RequestSpec $specification, $values = []) {
+  private function addDAOFields($entity, $action, RequestSpec $spec) {
     $DAOFields = $this->getDAOFields($entity);
 
     foreach ($DAOFields as $DAOField) {
       if ($DAOField['name'] == 'id' && $action == 'create') {
         continue;
       }
-      if (array_key_exists('contactType', $DAOField) && !empty($values['contact_type']) && $DAOField['contactType'] != $values['contact_type']) {
+      if (array_key_exists('contactType', $DAOField) && $spec->getValue('contact_type') && $DAOField['contactType'] != $spec->getValue('contact_type')) {
         continue;
       }
       if (!empty($DAOField['component']) &&
@@ -105,28 +104,26 @@ class SpecGatherer {
         $DAOField['default'] = '1';
       }
       $field = SpecFormatter::arrayToField($DAOField, $entity);
-      $specification->addFieldSpec($field);
+      $spec->addFieldSpec($field);
     }
   }
 
   /**
    * Get custom fields that extend this entity
    *
-   * @see \CRM_Core_SelectValues::customGroupExtends
-   *
    * @param string $entity
-   * @param \Civi\Api4\Service\Spec\RequestSpec $specification
-   * @param array $values
+   * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    * @throws \API_Exception
+   * @see \CRM_Core_SelectValues::customGroupExtends
    */
-  private function addCustomFields($entity, RequestSpec $specification, $values = []) {
+  private function addCustomFields($entity, RequestSpec $spec) {
     $customInfo = \Civi\Api4\Utils\CoreUtil::getCustomGroupExtends($entity);
     if (!$customInfo) {
       return;
     }
     // If a contact_type was passed in, exclude custom groups for other contact types
-    if ($entity === 'Contact' && !empty($values['contact_type'])) {
-      $extends = ['Contact', $values['contact_type']];
+    if ($entity === 'Contact' && $spec->getValue('contact_type')) {
+      $extends = ['Contact', $spec->getValue('contact_type')];
     }
     else {
       $extends = $customInfo['extends'];
@@ -139,7 +136,7 @@ class SpecGatherer {
 
     foreach ($customFields as $fieldArray) {
       $field = SpecFormatter::arrayToField($fieldArray, $entity);
-      $specification->addFieldSpec($field);
+      $spec->addFieldSpec($field);
     }
   }
 
