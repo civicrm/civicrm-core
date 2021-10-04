@@ -2307,6 +2307,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
         'HTML/QuickForm/Rule/Compare.php',
       ],
     ];
+    // add the maxfilesize rule needed for File form fields
+    (new CRM_Core_Form())->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
     // FIXME: …ditto for $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES']
     $GLOBALS['HTML_QUICKFORM_ELEMENT_TYPES'] = [
       'group' => [
