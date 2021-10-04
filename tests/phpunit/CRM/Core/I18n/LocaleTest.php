@@ -101,10 +101,6 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
 
   /**
    * Quirk in strtolower does not handle "I" as expected, compared to mb_strtolower.
-   * I think setting locale messes up something that I don't know how to reset,
-   * so see if these help:
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
    */
   public function testInsertTurkish() {
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS foo");

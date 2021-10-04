@@ -104,11 +104,6 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
 
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
     $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
-    // This rule somehow disappears if there's a form-related test before us,
-    // so register it again. See packages/HTML/QuickForm/file.php.
-    // update - actually - it's never registered. Even in form made
-    // I can see it missing - It's really weird.
-    $form->registerRule('maxfilesize', 'callback', '_ruleCheckMaxFileSize', 'HTML_QuickForm_file');
     $form->isSearchContext = FALSE;
     $form->buildForm();
     $form->submit(array_merge($form->_defaultValues, [

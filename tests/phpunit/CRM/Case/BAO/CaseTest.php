@@ -389,12 +389,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   /**
    * Test various things after a case is closed.
-   *
-   * This annotation is not ideal, but without it there is some kind of
-   * messup that happens to quickform that persists between tests, e.g.
-   * it can't add maxfilesize validation rules.
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
    */
   public function testCaseClosure() {
     $loggedInUser = $this->createLoggedInUser();

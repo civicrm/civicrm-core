@@ -151,8 +151,6 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     $session = CRM_Core_Session::singleton();
     $session->set('dateTypes', 1);
-    $this->_sethtmlGlobals();
-
   }
 
   /**
