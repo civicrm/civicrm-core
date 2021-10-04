@@ -192,6 +192,13 @@
         return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
+      this.canBeSortable = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr),
+          arg = (_.findWhere(info.args, {type: 'field'}) || {});
+        return arg.field && arg.field.type !== 'Pseudo';
+      };
+
       // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT
       // which gets special treatment in APIv4 to convert it to an array.
       this.canBeLink = function(col) {

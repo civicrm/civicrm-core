@@ -277,7 +277,7 @@
       }
       function fieldToColumn(fieldExpr, defaults) {
         var info = parseExpr(fieldExpr),
-          field = _.findWhere(info.args, {type: 'field'}) || {},
+          field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {},
           values = _.merge({
             type: 'field',
             key: info.alias,
@@ -287,7 +287,7 @@
           values.label = getDefaultLabel(fieldExpr);
         }
         if (defaults.sortable) {
-          values.sortable = field.type === 'Field';
+          values.sortable = field.type && field.type !== 'Pseudo';
         }
         return values;
       }
