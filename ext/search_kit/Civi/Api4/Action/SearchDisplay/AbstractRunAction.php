@@ -42,6 +42,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   protected $filters = [];
 
   /**
+   * Integer used as a seed when ordering by RAND().
+   * This keeps the order stable enough to use a pager with random sorting.
+   *
+   * @var int
+   */
+  protected $seed;
+
+  /**
    * Name of Afform, if this display is embedded (used for permissioning)
    * @var string
    */
