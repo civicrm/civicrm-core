@@ -228,7 +228,7 @@
           </td>
         </tr>
         {/if}
-        {if $form.payment_processor_id}
+        {if !empty($form.payment_processor_id)}
           <tr class="crm-contribution-form-block-payment_processor_id"><td class="label nowrap">{$form.payment_processor_id.label}<span class="crm-marker"> * </span></td><td>{$form.payment_processor_id.html}</td></tr>
         {/if}
       </table>

@@ -19,7 +19,7 @@
                 <td class="label">{$form.lcMessages.label}</td>
                 <td>{$form.lcMessages.html}</td>
             </tr>
-           {if $form.languageLimit}
+           {if !empty($form.languageLimit)}
              <tr class="crm-localization-form-block-languageLimit">
                  <td class="label">{$form.languageLimit.label}</td>
                  <td>{$form.languageLimit.html}<br />
@@ -37,7 +37,7 @@
                 <span class="description">{$settings_fields.inheritLocale.description}</span>
               </td>
             </tr>
-          {if !$form.languageLimit}
+          {if empty($form.languageLimit)}
             <tr class="crm-localization-form-block-uiLanguages">
                 <td class="label">{$form.uiLanguages.label}</td>
                 <td>{$form.uiLanguages.html}</td>
@@ -104,7 +104,7 @@
         </table>
     <h3>{ts}Multiple Languages Support{/ts}</h3>
       <table class="form-layout-compressed">
-        {if $form.makeSinglelingual}
+        {if !empty($form.makeSinglelingual)}
           <tr class="crm-localization-form-block-makeSinglelingual_description">
               <td></td>
               <td><span class="description">{ts 1="http://documentation.civicrm.org"}This is a multilingual installation. It contains certain schema differences compared to regular installations of CiviCRM. Please <a href="%1">refer to the documentation</a> for details.{/ts}</span></td>

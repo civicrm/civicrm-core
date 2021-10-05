@@ -2,11 +2,11 @@
   <table>
     <tr>
       <td>
-        {if $form.component_mode}
+        {if !empty($form.component_mode)}
           {$form.component_mode.label} {help id="id-display-results"}
           <br />
           {$form.component_mode.html}
-          {if $form.display_relationship_type}
+          {if !empty($form.display_relationship_type)}
             <div id="crm-display_relationship_type">{$form.display_relationship_type.html}</div>
           {/if}
         {else}

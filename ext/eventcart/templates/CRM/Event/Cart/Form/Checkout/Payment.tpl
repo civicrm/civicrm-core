@@ -94,7 +94,7 @@
   </tfoot>
 </table>
 {if $payment_required == true}
-  {if $form.is_pay_later.label}
+  {if !empty($form.is_pay_later.label)}
     <div class="crm-section {$form.is_pay_later.name}-section">
       <div class="label">{$form.is_pay_later.label}</div>
       <div class="content">{$form.is_pay_later.html}
@@ -117,14 +117,14 @@
 {/if}
 
 <script type="text/javascript">
-{if $form.is_pay_later.name}
+{if !empty($form.is_pay_later.name)}
 var pay_later_sel = "input#{$form.is_pay_later.name}";
 {/if}
 {literal}
 CRM.$(function($) {
 
   function refresh() {
-    {/literal}{if $form.is_pay_later.name}{literal}
+    {/literal}{if !empty($form.is_pay_later.name)}{literal}
     var is_pay_later = $(pay_later_sel).prop("checked");
     {/literal}{else}
     var is_pay_later = false;
@@ -133,7 +133,7 @@ CRM.$(function($) {
     $(".pay-later-instructions").toggle(is_pay_later);
     $("div.billingNameInfo-section .description").html(is_pay_later ? "Enter the billing address at which you can be invoiced." : "Enter the name as shown on your credit or debit card, and the billing address for this card.");
   }
-  {/literal}{if $form.is_pay_later.name}{literal}
+  {/literal}{if !empty($form.is_pay_later.name)}{literal}
   $(pay_later_sel).change(function() {
     refresh();
   });

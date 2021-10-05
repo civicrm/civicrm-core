@@ -233,7 +233,7 @@
         </td>
       </tr>
     {/if}
-    {if $form.tag.html}
+    {if !empty($form.tag.html)}
     <tr class="crm-case-activity-form-block-tag">
       <td class="label">{$form.tag.label}</td>
       <td class="view-value">

@@ -135,7 +135,7 @@
       {/if}
       {/crmRegion}
 
-      {if $form.is_recur}
+      {if !empty($form.is_recur)}
         <div class="crm-public-form-item crm-section {$form.is_recur.name}-section">
           <div class="label">&nbsp;</div>
           <div class="content">
@@ -199,7 +199,7 @@
             <div class="crm-public-form-item crm-section honor_block_text-section">
               {$honor_block_text}
             </div>
-          {if $form.soft_credit_type_id.html}
+          {if !empty($form.soft_credit_type_id.html)}
             <div class="crm-public-form-item crm-section {$form.soft_credit_type_id.name}-section">
               <div class="content" >
                 {$form.soft_credit_type_id.html}
@@ -256,7 +256,7 @@
       {* end of ccid loop *}
     {/if}
 
-    {if $form.payment_processor_id.label}
+    {if !empty($form.payment_processor_id.label)}
       {* PP selection only works with JS enabled, so we hide it initially *}
       <fieldset class="crm-public-form-item crm-group payment_options-group" style="display:none;">
         <legend>{ts}Payment Options{/ts}</legend>

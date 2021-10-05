@@ -22,7 +22,7 @@
       <td class="label">{$form.icon.label} {help id="id-menu_icon" file="CRM/Admin/Form/Navigation.hlp"}</td>
       <td>{$form.icon.html} </td>
     </tr>
-    {if $form.parent_id.html}
+    {if !empty($form.parent_id.html)}
       <tr class="crm-navigation-form-block-parent_id">
         <td class="label">{$form.parent_id.label} {help id="id-parent" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.parent_id.html}</td>

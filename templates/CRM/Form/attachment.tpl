@@ -41,7 +41,7 @@
      {/if}
     <div id="attachments">
       <table class="form-layout-compressed">
-      {if $form.attachFile_1}
+      {if !empty($form.attachFile_1)}
         {if !empty($context) && $context EQ 'pcpCampaign'}
             <div class="description">{ts}You can upload a picture or image to include on your page. Your file should be in .jpg, .gif, or .png format. Recommended image size is 250 x 250 pixels. Images over 360 pixels wide will be automatically resized to fit.{/ts}</div>
         {/if}

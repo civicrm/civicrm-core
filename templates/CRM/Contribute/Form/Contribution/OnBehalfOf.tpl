@@ -13,7 +13,7 @@
  * FIXME: This is way more complex than it needs to be
  * FIXME: Why are we not just using the dynamic form tpl to display this profile?
  *}
-{if $form.is_for_organization}
+{if !empty($form.is_for_organization)}
   <div class="crm-public-form-item crm-section {$form.is_for_organization.name}-section">
     <div class="label">&nbsp;</div>
     <div class="content">
@@ -28,7 +28,7 @@
   {if $onBehalfOfFields && $onBehalfOfFields|@count}
     <fieldset>
       <legend>{$fieldSetTitle}</legend>
-      {if $form.org_option}
+      {if !empty($form.org_option)}
         <div id='orgOptions' class="section crm-public-form-item crm-section">
           <div class="content">
             {$form.org_option.html}

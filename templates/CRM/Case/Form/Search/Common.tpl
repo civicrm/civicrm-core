@@ -41,7 +41,7 @@
         <br />
         {$form.case_owner.html}
       {/if}
-      {if $form.case_deleted}
+      {if !empty($form.case_deleted)}
         <br />
         {$form.case_deleted.html}
         {$form.case_deleted.label}

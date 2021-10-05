@@ -15,13 +15,13 @@
     {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
   <table class="form-layout-compressed">
-    {if $form.template_id}
+    {if !empty($form.template_id)}
       <tr class="crm-event-manage-eventinfo-form-block-template_id">
         <td class="label">{$form.template_id.label} {help id="id-select-template" isTemplate=$isTemplate}</td>
         <td>{$form.template_id.html}</td>
       </tr>
     {/if}
-    {if $form.template_title}
+    {if !empty($form.template_title)}
       <tr class="crm-event-manage-eventinfo-form-block-template_title">
         <td class="label">{$form.template_title.label} {help id="id-template-title"}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='template_title' id=$eventID}{/if}</td>
         <td>{$form.template_title.html}</td>
@@ -90,7 +90,7 @@
       <td>{$form.event_full_text.html}</td>
     </tr>
     <tr id="id-waitlist-text" class="crm-event-manage-eventinfo-form-block-waitlist_text">
-      {if $form.waitlist_text}
+      {if !empty($form.waitlist_text)}
         <td class="label">{$form.waitlist_text.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='waitlist_text' id=$eventID}{/if}<br />{help id="id-help-waitlist_text"}</td>
         <td>{$form.waitlist_text.html}</td>
       {/if}

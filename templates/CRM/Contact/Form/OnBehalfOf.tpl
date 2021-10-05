@@ -182,7 +182,7 @@
 
 </fieldset>
 
-{if $form.is_for_organization}
+{if !empty($form.is_for_organization)}
     {include file="CRM/common/showHideByFieldValue.tpl"
          trigger_field_id    ="is_for_organization"
          trigger_value       ="true"
