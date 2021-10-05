@@ -97,9 +97,13 @@
             var index = ctrl.getEntityIndex();
             uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
           }
-          // Set default value based on url
+          // Set default value from url with uniquePrefix + fieldName
           if (urlArgs && urlArgs[uniquePrefix + ctrl.fieldName]) {
             setValue(urlArgs[uniquePrefix + ctrl.fieldName]);
+          }
+          // Set default value from url with fieldName only
+          else if (urlArgs && urlArgs[ctrl.fieldName]) {
+            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[ctrl.fieldName];
           }
           // Set default value based on field defn
           else if (ctrl.defn.afform_default) {
