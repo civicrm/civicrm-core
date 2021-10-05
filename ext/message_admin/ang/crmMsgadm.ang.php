@@ -24,6 +24,7 @@ return [
     'crmDialog',
     'crmMailing',
     'crmMonaco',
+    'jsonFormatter',
     'ngRoute',
     'ngSanitize',
     'api4',

@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q) {
+  angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService) {
     var ts = $scope.ts = CRM.ts('crmMsgadm');
     var hs = $scope.hs = crmUiHelp({file: 'CRM/MessageAdmin/crmMsgadm'}); // See: templates/CRM/MessageAdmin/crmMsgadm.hlp
 
@@ -18,6 +18,35 @@
     $ctrl.toggleAdhoc = function(value){
       $ctrl.isAdhocExample = !$ctrl.isAdhocExample;
       $ctrl.adhocExampleJson = angular.toJson(model.examples[$ctrl.exampleId], 2);
+    };
+
+    $ctrl.inspectExample = function() {
+      var dlgModel = {
+        title: '',
+        data: {}
+      };
+      var dlgOptions = CRM.utils.adjustDialogDefaults({
+        dialogClass: 'crm-msgadm-dialog',
+        autoOpen: false,
+        height: '80%',
+        width: '80%'
+      });
+
+      dlgModel.refresh = function(){
+        return crmApi4('ExampleData', 'get', {
+          where: [["name", "=", model.examples[$ctrl.exampleId].name]],
+          select: ['name', 'file', 'title', 'data']
+        }).then(function(response){
+          dlgModel.title = ts('Example: %1', {1: response[0].title || response[0].name});
+          dlgModel.data = response[0];
+        });
+      };
+
+      dlgModel.refresh().then(function(){
+        return dialogService.open('inspectExampleDlg', '~/crmMsgadm/InspectExample.html', dlgModel, dlgOptions)
+          // Nothing to do but hide warnings.
+          .then(forceUpdate, forceUpdate);
+      });
     };
 
     function requestAdhocExample() {
@@ -41,7 +70,7 @@
       // For a dev working on example, it's easier if the example is always loaded fresh.
       return crmApi4('ExampleData', 'get', {
         where: [["name", "=", model.examples[$ctrl.exampleId].name]],
-        select: ['data'],
+        select: ['name', 'file', 'title', 'data'],
         chain: {
           "render": ["WorkflowMessage", "render", {
             "workflow": "$data.workflow",
@@ -71,6 +100,10 @@
       });
       return crmStatus({start: ts('Rendering...'), success: ''}, rendering);
     };
+    function forceUpdate() {
+      lastId = null;
+      return update();
+    }
 
     $scope.$watch('$ctrl.revisionId', update);
     $scope.$watch('$ctrl.formatId', update);

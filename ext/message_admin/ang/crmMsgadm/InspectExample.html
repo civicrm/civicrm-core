@@ -1,0 +1,24 @@
+<div id="bootstrap-theme" crm-dialog="inspectExampleDlg">
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <div class="navbar-brand">
+          {{::model.title}}
+        </div>
+      </div>
+      <div class="navbar-form navbar-right">
+        <div class="form-group">
+          <button crm-icon="fa-refresh" type="button" class="btn btn-default" ng-click="model.refresh()"></button>
+          <button crm-icon="fa-times" type="button" class="btn btn-default" ng-click="inspectExampleDlg.close()">
+            {{::ts('Close')}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+
+  <json-formatter json="model.data" open="1"></json-formatter>
+
+</div>
