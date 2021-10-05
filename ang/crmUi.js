@@ -945,7 +945,8 @@
           else {
             $(element).prepend('<span class="icon ui-icon-' + attrs.crmIcon + '"></span> ');
           }
-          if ($(element).is('button')) {
+          // Add crm-* class to non-bootstrap buttons
+          if ($(element).is('button:not(.btn)')) {
             $(element).addClass('crm-button');
           }
         }
