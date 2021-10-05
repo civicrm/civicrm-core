@@ -184,7 +184,7 @@ class FormatTest extends CiviUnitTestCase {
         'money_number_long' => '1 234,560',
       ],
     ];
-    $cases['en_US_KWD_long'] = [
+    $cases['fr_FR_KWD_long'] = [
       [
         'amount' => '1234.5678000',
         'locale' => 'fr_FR',
