@@ -260,13 +260,14 @@ body.af-gui-dragging {
   opacity: 1;
   transition: opacity 0s;
 }
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button > span,
+/* Fix button colors when bar is highlighted */
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > span {
   color: white;
 }
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button:hover > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .open > button > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > button:focus > span {
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
   color: #0071bd;
 }
 

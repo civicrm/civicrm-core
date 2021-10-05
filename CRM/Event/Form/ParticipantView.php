@@ -192,8 +192,6 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     $displayName = CRM_Contact_BAO_Contact::displayName($values[$participantID]['contact_id']);
 
     $participantCount = [];
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = $invoiceSettings['invoicing'] ?? NULL;
     $totalTaxAmount = 0;
     foreach ($lineItem as $k => $v) {
       if (CRM_Utils_Array::value('participant_count', $lineItem[$k]) > 0) {
@@ -201,7 +199,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
       }
       $totalTaxAmount = $v['tax_amount'] + $totalTaxAmount;
     }
-    if ($invoicing) {
+    if (Civi::settings()->get('invoicing')) {
       $this->assign('totalTaxAmount', $totalTaxAmount);
     }
     if ($participantCount) {
@@ -209,7 +207,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
     $this->assign('displayName', $displayName);
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-    CRM_Utils_System::setTitle(ts('View Event Registration for') . ' ' . $displayName);
+    $this->setTitle(ts('View Event Registration for') . ' ' . $displayName);
 
     $roleId = $values[$participantID]['role_id'] ?? NULL;
     $title = $displayName . ' (' . CRM_Utils_Array::value($roleId, $participantRoles) . ' - ' . $eventTitle . ')';

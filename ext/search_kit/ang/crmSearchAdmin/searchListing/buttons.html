@@ -1,0 +1,9 @@
+<a class="btn btn-xs btn-default" href="#/edit/{{:: row.id.raw }}" ng-if="row.permissionToEdit">
+  {{:: ts('Edit') }}
+</a>
+<a class="btn btn-xs btn-default" href="#/create/{{:: row.api_entity.raw + '?params=' + $ctrl.encode(row.api_params.raw) }}">
+  {{:: ts('Clone') }}
+</a>
+<a href class="btn btn-xs btn-danger" ng-click="$ctrl.confirmDelete(row)">
+  {{:: ts('Delete') }}
+</a>

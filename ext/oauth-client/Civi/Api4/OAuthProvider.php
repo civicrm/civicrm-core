@@ -59,6 +59,9 @@ class OAuthProvider extends Generic\AbstractEntity {
         [
           'name' => 'options',
         ],
+        [
+          'name' => 'contactTemplate',
+        ],
       ];
     });
     return $action->setCheckPermissions($checkPermissions);

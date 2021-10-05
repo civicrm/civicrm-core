@@ -335,7 +335,7 @@ class CRM_Contact_Form_Search_Criteria {
       'tag_types_text' => ['name' => 'tag_types_text'],
       'tag_search' => [
         'name' => 'tag_search',
-        'help' => ['id' => 'id-all-tags'],
+        'help' => ['id' => 'id-all-tags', 'file' => NULL],
       ],
       'tag_set' => [
         'name' => 'tag_set',
@@ -345,7 +345,7 @@ class CRM_Contact_Form_Search_Criteria {
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
-        'help' => ['id' => 'id-all-tag-types'],
+        'help' => ['id' => 'id-all-tag-types', 'file' => NULL],
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',

@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -201,6 +202,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $submitOnce = TRUE;
 
   /**
+   * Status of contribution prior to edit.
+   *
+   * @var string
+   */
+  protected $previousContributionStatus;
+
+  /**
    * Explicitly declare the form context.
    */
   public function getDefaultContext() {
@@ -301,7 +309,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     if ($this->_mode && $this->_id) {
       $this->_payNow = TRUE;
       $this->assign('payNow', $this->_payNow);
-      CRM_Utils_System::setTitle(ts('Pay with Credit Card'));
+      $this->setTitle(ts('Pay with Credit Card'));
     }
     elseif (!empty($this->_values['is_template'])) {
       $this->setPageTitle(ts('Template Contribution'));
@@ -459,6 +467,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \CRM_Core_Exception
+   * @throws \API_Exception
    */
   public function buildQuickForm() {
     if ($this->_id) {
@@ -572,24 +581,23 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
-    if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id) == TRUE) {
-      if (!empty($this->_recurPaymentProcessors)) {
-        $buildRecurBlock = TRUE;
-        if ($this->_ppID) {
-          // ppID denotes a pledge payment.
-          foreach ($this->_paymentProcessors as $processor) {
-            if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
-              $buildRecurBlock = TRUE;
-              break;
-            }
-            $buildRecurBlock = FALSE;
+    CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id);
+    if (!empty($this->_recurPaymentProcessors)) {
+      $buildRecurBlock = TRUE;
+      if ($this->_ppID) {
+        // ppID denotes a pledge payment.
+        foreach ($this->_paymentProcessors as $processor) {
+          if (!empty($processor['is_recur']) && !empty($processor['object']) && $processor['object']->supports('recurContributionsForPledges')) {
+            $buildRecurBlock = TRUE;
+            break;
           }
+          $buildRecurBlock = FALSE;
         }
-        if ($buildRecurBlock) {
-          CRM_Contribute_Form_Contribution_Main::buildRecur($this);
-          $this->setDefaults(['is_recur' => 0]);
-          $this->assign('buildRecurBlock', TRUE);
-        }
+      }
+      if ($buildRecurBlock) {
+        CRM_Contribute_Form_Contribution_Main::buildRecur($this);
+        $this->setDefaults(['is_recur' => 0]);
+        $this->assign('buildRecurBlock', TRUE);
       }
     }
     $this->addPaymentProcessorSelect(FALSE, $buildRecurBlock);
@@ -654,21 +662,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $this->add('select', 'from_email_address', ts('Receipt From'), $this->_fromEmails);
 
-    $component = 'contribution';
     $componentDetails = [];
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-      if (!empty($componentDetails['membership'])) {
-        $component = 'membership';
-      }
-      elseif (!empty($componentDetails['participant'])) {
-        $component = 'participant';
-      }
     }
-    if ($this->_ppID) {
-      $component = 'pledge';
-    }
-    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses($component, $this->_id);
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('contribution', $this->getPreviousContributionStatus());
 
     // define the status IDs that show the cancellation info, see CRM-17589
     $cancelInfo_show_ids = [];
@@ -1095,8 +1093,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $this->set('params', $this->_params);
-
-    $this->assign('receive_date', $this->_params['receive_date']);
+    // It actually makes no sense that we would set receive_date in params
+    // for credit card payments....
+    $this->assign('receive_date', $this->_params['receive_date'] ?? date('Y-m-d H:i:s'));
 
     // Result has all the stuff we need
     // lets archive it to a financial transaction
@@ -1166,6 +1165,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           }
           catch (CiviCRM_API3_Exception $e) {
             if ($e->getErrorCode() != 'contribution_completed') {
+              \Civi::log()->error('CRM_Contribute_Form_Contribution::processCreditCard CiviCRM_API3_Exception: ' . $e->getMessage());
               throw new CRM_Core_Exception('Failed to update contribution in database');
             }
           }
@@ -1493,7 +1493,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);
 
-    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id']));
+    $isEmpty = array_keys(array_flip($submittedValues['soft_credit_contact_id'] ?? []));
     if ($this->_id && count($isEmpty) == 1 && key($isEmpty) == NULL) {
       civicrm_api3('ContributionSoft', 'get', ['contribution_id' => $this->_id, 'pcp_id' => ['IS NULL' => 1], 'api.ContributionSoft.delete' => 1]);
     }
@@ -1826,6 +1826,36 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         "reset=1&action=add&context={$this->_context}&cid={$this->_contactID}"
       ));
     }
+  }
+
+  /**
+   * Get the contribution ID.
+   *
+   * @return int|null
+   */
+  protected function getContributionID(): ?int {
+    return $this->_id;
+  }
+
+  /**
+   * Get the selected contribution status.
+   *
+   * @return string|null
+   *
+   * @throws \API_Exception
+   */
+  protected function getPreviousContributionStatus(): ?string {
+    if (!$this->getContributionID()) {
+      return NULL;
+    }
+    if (!$this->previousContributionStatus) {
+      $this->previousContributionStatus = Contribution::get(FALSE)
+        ->addWhere('id', '=', $this->getContributionID())
+        ->addSelect('contribution_status_id:name')
+        ->execute()
+        ->first()['contribution_status_id:name'];
+    }
+    return $this->previousContributionStatus;
   }
 
 }

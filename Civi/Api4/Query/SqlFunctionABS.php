@@ -31,7 +31,14 @@ class SqlFunctionABS extends SqlFunction {
    * @return string
    */
   public static function getTitle(): string {
-    return ts('Absolute');
+    return ts('Absolute value');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The positive value of a number.');
   }
 
 }

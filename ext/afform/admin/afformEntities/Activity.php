@@ -1,5 +1,6 @@
 <?php
 return [
+  'type' => 'primary',
   'defaults' => "{
     data: {
       source_contact_id: 'user_contact_id',

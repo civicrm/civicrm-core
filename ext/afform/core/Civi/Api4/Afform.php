@@ -86,6 +86,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\SubmitFile
+   */
+  public static function submitFile($checkPermissions = TRUE) {
+    return (new Action\Afform\SubmitFile('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicBatchAction
    */
   public static function revert($checkPermissions = TRUE) {
@@ -128,16 +137,19 @@ class Afform extends Generic\AbstractEntity {
         [
           'name' => 'type',
           'options' => $self->pseudoconstantOptions('afform_type'),
+          'suffixes' => ['id', 'name', 'label', 'icon'],
         ],
         [
           'name' => 'requires',
           'data_type' => 'Array',
         ],
         [
-          'name' => 'block',
+          'name' => 'entity_type',
+          'description' => 'Block used for this entity type',
         ],
         [
-          'name' => 'join',
+          'name' => 'join_entity',
+          'description' => 'Used for blocks that join a sub-entity (e.g. Emails for a Contact)',
         ],
         [
           'name' => 'title',
@@ -167,10 +179,6 @@ class Afform extends Generic\AbstractEntity {
           ],
         ],
         [
-          'name' => 'repeat',
-          'data_type' => 'Mixed',
-        ],
-        [
           'name' => 'server_route',
         ],
         [
@@ -180,29 +188,45 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'redirect',
         ],
         [
+          'name' => 'create_submission',
+          'data_type' => 'Boolean',
+        ],
+        [
           'name' => 'layout',
           'data_type' => 'Array',
+          'description' => 'HTML form layout; format is controlled by layoutFormat param',
         ],
       ];
       // Calculated fields returned by get action
       if ($self->getAction() === 'get') {
         $fields[] = [
           'name' => 'module_name',
+          'type' => 'Extra',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'directive_name',
+          'type' => 'Extra',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_local',
+          'type' => 'Extra',
           'data_type' => 'Boolean',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_base',
+          'type' => 'Extra',
           'data_type' => 'Boolean',
           'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'search_displays',
+          'type' => 'Extra',
+          'data_type' => 'Array',
+          'readonly' => TRUE,
+          'description' => 'Embedded search displays, formatted like ["search-name.display-name"]',
         ];
       }
 
@@ -221,6 +245,7 @@ class Afform extends Generic\AbstractEntity {
       'get' => [],
       'prefill' => [],
       'submit' => [],
+      'submitFile' => [],
     ];
   }
 

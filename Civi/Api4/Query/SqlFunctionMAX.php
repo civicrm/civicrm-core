@@ -36,4 +36,11 @@ class SqlFunctionMAX extends SqlFunction {
     return ts('Max');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The largest value in the grouping.');
+  }
+
 }

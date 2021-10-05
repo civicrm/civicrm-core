@@ -189,18 +189,6 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
   }
 
   /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
-  }
-
-  /**
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {

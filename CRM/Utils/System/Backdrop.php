@@ -1056,4 +1056,16 @@ AND    u.status = 1
     return ['ufAccessURL' => url('admin/config/people/permissions')];
   }
 
+  /**
+   * Get the CRM database as a 'prefix'.
+   *
+   * This returns a string that can be prepended to a query to include a CRM table.
+   *
+   * However, this string should contain backticks, or not, in accordance with the
+   * CMS's drupal views expectations, if any.
+   */
+  public function getCRMDatabasePrefix(): string {
+    return str_replace(parent::getCRMDatabasePrefix(), '`', '');
+  }
+
 }

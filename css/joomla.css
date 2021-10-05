@@ -402,14 +402,37 @@ body.ui-dialog-open #status {
 
 /* Joomla 4 */
 
-body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
+body.admin.com_civicrm.layout-default #content {
 	padding: 0;
 }
 
-body.admin.com_civicrm.layout-default #subhead {
+body.admin.com_civicrm.layout-default #subhead-container {
 	display: none;
 }
 
 body.admin.com_civicrm.layout-default .crm-container .crm-dashlet {
 	max-width: 50vw; /* fixes over-wide news dashlet */ 
 }
+
+body.admin.com_civicrm.layout-default .crm-container .content {
+	padding: inherit; /* overrides J4 duplicated padding */
+}
+
+/* J4 Modals */
+
+body.admin.com_civicrm.layout-default .crm-container.ui-dialog.ui-resizable {
+	z-index: 1021;
+}
+
+body.admin.com_civicrm.layout-default .ui-widget-overlay {
+	z-index: 1;
+}
+
+body.admin.com_civicrm.layout-default .crm-container .modal-dialog {
+	max-width: inherit;
+	padding: 0;
+	margin: 0;
+	overflow: scroll;
+	pointer-events: all;
+}
+

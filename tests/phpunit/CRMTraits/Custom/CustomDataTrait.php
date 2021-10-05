@@ -24,11 +24,8 @@ trait CRMTraits_Custom_CustomDataTrait {
    * Create a custom group with fields of multiple types.
    *
    * @param array $groupParams
-   *
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function createCustomGroupWithFieldsOfAllTypes($groupParams = []) {
+  public function createCustomGroupWithFieldsOfAllTypes(array $groupParams = []): void {
     $this->createCustomGroup($groupParams);
     $this->ids['CustomField'] = $this->createCustomFieldsOfAllTypes();
   }
@@ -39,11 +36,8 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $params
    *
    * @return int
-   *
-   * @throws \API_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function createCustomGroup($params = []) {
+  public function createCustomGroup(array $params = []): int {
     $params = array_merge([
       'title' => 'Custom Group',
       'extends' => $this->entity ?? 'Contact',
@@ -52,7 +46,15 @@ trait CRMTraits_Custom_CustomDataTrait {
       'max_multiple' => 0,
     ], $params);
     $identifier = $params['name'] ?? $params['title'];
-    $this->ids['CustomGroup'][$identifier] = CustomGroup::create(FALSE)->setValues($params)->execute()->first()['id'];
+    try {
+      $this->ids['CustomGroup'][$identifier] = CustomGroup::create(FALSE)
+        ->setValues($params)
+        ->execute()
+        ->first()['id'];
+    }
+    catch (API_Exception $e) {
+      $this->fail('Could not create group ' . $e->getMessage());
+    }
     return $this->ids['CustomGroup'][$identifier];
   }
 
@@ -63,7 +65,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return string
    */
-  public function getCustomGroupTable($identifier = 'Custom Group') {
+  public function getCustomGroupTable(string $identifier = 'Custom Group'): string {
     return $this->callAPISuccessGetValue('CustomGroup', ['id' => $this->ids['CustomGroup'][$identifier], 'return' => 'table_name']);
   }
 
@@ -75,7 +77,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return string
    */
-  protected function getCustomFieldColumnName($key) {
+  protected function getCustomFieldColumnName(string $key): string {
     return $this->callAPISuccessGetValue('CustomField', ['id' => $this->getCustomFieldID($key), 'return' => 'column_name']);
   }
 
@@ -90,7 +92,6 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @param array $fieldParams
    *
-   * @throws \API_Exception
    */
   public function createCustomGroupWithFieldOfType(array $groupParams = [], string $customFieldType = 'text', ?string $identifier = NULL, array $fieldParams = []): void {
     $supported = ['text', 'select', 'date', 'checkbox', 'int', 'contact_reference', 'radio', 'multi_country'];
@@ -141,7 +142,7 @@ trait CRMTraits_Custom_CustomDataTrait {
   /**
    * @return array
    */
-  public function createCustomFieldsOfAllTypes() {
+  public function createCustomFieldsOfAllTypes(): array {
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $ids = [];
     $ids['text'] = (int) $this->createTextCustomField(['custom_group_id' => $customGroupID])['id'];
@@ -171,7 +172,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return string
    */
-  protected function getCustomFieldName($key) {
+  protected function getCustomFieldName(string $key): string {
     return 'custom_' . $this->getCustomFieldID($key);
   }
 
@@ -184,7 +185,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return int
    * @throws \API_Exception
    */
-  protected function addOptionToCustomField($key, $values) {
+  protected function addOptionToCustomField(string $key, array $values): int {
     $optionGroupID = CustomField::get(FALSE)
       ->addWhere('id', '=', $this->getCustomFieldID($key))
       ->addSelect('option_group_id')
@@ -205,7 +206,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return string
    */
-  protected function getCustomFieldID($key) {
+  protected function getCustomFieldID(string $key): string {
     return $this->ids['CustomField'][$key];
   }
 
@@ -245,7 +246,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createIntCustomField($params = []) {
+  protected function createIntCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Int'), $params);
     return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
   }
@@ -258,7 +259,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createBooleanCustomField($params = []) {
+  protected function createBooleanCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Boolean'), $params);
     return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
   }
@@ -271,7 +272,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createContactReferenceCustomField($params = []) {
+  protected function createContactReferenceCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('ContactReference'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -284,7 +285,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createTextCustomField($params = []) {
+  protected function createTextCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('String'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -297,7 +298,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createLinkCustomField($params = []) {
+  protected function createLinkCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Link'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -310,7 +311,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createCountryCustomField($params = []) {
+  protected function createCountryCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Country'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -323,7 +324,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createMultiCountryCustomField($params = []) {
+  protected function createMultiCountryCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('Country', 'Multi-Select Country'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -336,7 +337,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createStateCustomField($params = []) {
+  protected function createStateCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('StateProvince'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -349,7 +350,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createMultiStateCustomField($params = []) {
+  protected function createMultiStateCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('StateProvince', 'Multi-Select State/Province'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -362,7 +363,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createFileCustomField($params = []) {
+  protected function createFileCustomField(array $params = []): array {
     $params = array_merge($this->getFieldsValuesByType('File'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -400,7 +401,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createDateCustomField($params): array {
+  protected function createDateCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Date'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -424,7 +425,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function createIntegerRadioCustomField($params): array {
+  protected function createIntegerRadioCustomField(array $params): array {
     $params = array_merge($this->getFieldsValuesByType('Int', 'Radio'), $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
@@ -432,12 +433,12 @@ trait CRMTraits_Custom_CustomDataTrait {
   /**
    * Get default field values for the type of field.
    *
-   * @param $dataType
+   * @param string $dataType
    * @param string $htmlType
    *
-   * @return mixed
+   * @return array
    */
-  public function getFieldsValuesByType($dataType, $htmlType = 'default') {
+  public function getFieldsValuesByType(string $dataType, string $htmlType = 'default'): array {
     $values = $this->getAvailableFieldCombinations()[$dataType];
     return array_merge([
       'is_searchable' => 1,
@@ -458,7 +459,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return array
    */
-  protected function getAvailableFieldCombinations() {
+  protected function getAvailableFieldCombinations(): array {
     return [
       'String' => [
         'default' => [
@@ -816,7 +817,7 @@ trait CRMTraits_Custom_CustomDataTrait {
           'label' => 'test_link',
           'html_type' => 'Link',
           'data_type' => 'Link',
-          'default_value' => 'http://civicrm.org',
+          'default_value' => 'https://civicrm.org',
         ],
       ],
       'ContactReference' => [

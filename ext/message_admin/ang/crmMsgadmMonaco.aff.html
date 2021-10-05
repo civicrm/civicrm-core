@@ -1,0 +1,9 @@
+<!-- (1) Encapsulate some common options. (2) Work-around issues with propagating updates to 'readOnly'/'disabled' property. -->
+<div ng-if="options.disabled"
+   crm-monaco="{crmHeightPct: options.crmHeightPct, language: options.language, wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent', readOnly: true}"
+   ng-model="options.record[options.field]">
+</div>
+<div ng-if="!options.disabled"
+   crm-monaco="{crmHeightPct: options.crmHeightPct, language: options.language, wordWrap: 'wordWrapColumn', wordWrapColumn: 100, wordWrapMinified: false, wrappingIndent: 'indent'}"
+   ng-model="options.record[options.field]">
+</div>

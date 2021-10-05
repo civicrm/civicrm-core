@@ -11,6 +11,10 @@
 
 namespace Civi\Search;
 
+use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
+use Civi\Api4\Query\SqlEquation;
+use Civi\Api4\Query\SqlFunction;
+use Civi\Api4\Tag;
 use CRM_Search_ExtensionUtil as E;
 
 /**
@@ -28,13 +32,18 @@ class Admin {
     return [
       'schema' => self::addImplicitFKFields($schema),
       'joins' => self::getJoins($schema),
+      'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
-      'functions' => \CRM_Api4_Page_Api4Explorer::getSqlFunctions(),
+      'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
       'afformEnabled' => $extensions->isActiveModule('afform'),
       'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
+      'tags' => Tag::get()
+        ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
+        ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
+        ->execute(),
     ];
   }
 
@@ -53,7 +62,9 @@ class Admin {
       'IN' => E::ts('Is One Of'),
       'NOT IN' => E::ts('Not One Of'),
       'LIKE' => E::ts('Is Like'),
+      'REGEXP' => E::ts('Matches Regexp'),
       'NOT LIKE' => E::ts('Not Like'),
+      'NOT REGEXP' => E::ts('Not Regexp'),
       'BETWEEN' => E::ts('Is Between'),
       'NOT BETWEEN' => E::ts('Not Between'),
       'IS EMPTY' => E::ts('Is Empty'),
@@ -68,6 +79,7 @@ class Admin {
     return [
       'default' => E::ts('Default'),
       'primary' => E::ts('Primary'),
+      'secondary' => E::ts('Secondary'),
       'success' => E::ts('Success'),
       'info' => E::ts('Info'),
       'warning' => E::ts('Warning'),
@@ -108,6 +120,13 @@ class Admin {
         ]);
         foreach ($getFields as $field) {
           $field['fieldName'] = $field['name'];
+          // Hack for RelationshipCache to make Relationship fields editable
+          if ($entity['name'] === 'RelationshipCache') {
+            $entity['primary_key'] = ['relationship_id'];
+            if (in_array($field['name'], ['is_active', 'start_date', 'end_date'])) {
+              $field['readonly'] = FALSE;
+            }
+          }
           $entity['fields'][] = $field;
         }
         $params = $entity['get'][0];
@@ -338,19 +357,63 @@ class Admin {
     foreach ($entities as $entity) {
       foreach ($entity['ui_join_filters'] ?? [] as $fieldName) {
         $field = civicrm_api4($entity['name'], 'getFields', [
-          'select' => ['options'],
+          'select' => ['options', 'data_type'],
           'where' => [['name', '=', $fieldName]],
           'loadOptions' => ['name'],
         ])->first();
-        $value = isset($field['options'][0]) ? json_encode($field['options'][0]['name']) : '';
+        $value = '';
+        if ($field['data_type'] === 'Boolean') {
+          $value = TRUE;
+        }
+        elseif (isset($field['options'][0])) {
+          $fieldName .= ':name';
+          $value = json_encode($field['options'][0]['name']);
+        }
         $conditions[] = [
-          $alias . '.' . $fieldName . ($value ? ':name' : ''),
+          $alias . '.' . $fieldName,
           '=',
           $value,
         ];
       }
     }
     return $conditions;
+  }
+
+  private static function getSqlFunctions() {
+    $functions = \CRM_Api4_Page_Api4Explorer::getSqlFunctions();
+    // Add faux function "e" for SqlEquations
+    $functions[] = [
+      'name' => 'e',
+      'title' => ts('Arithmetic'),
+      'description' => ts('Add, subtract, multiply, divide'),
+      'category' => SqlFunction::CATEGORY_MATH,
+      'dataType' => 'Number',
+      'params' => [
+        [
+          'label' => ts('Value'),
+          'min_expr' => 1,
+          'max_expr' => 1,
+          'must_be' => ['SqlField', 'SqlNumber'],
+        ],
+        [
+          'label' => ts('Value'),
+          'min_expr' => 1,
+          'max_expr' => 99,
+          'flag_before' => array_combine(SqlEquation::$arithmeticOperators, SqlEquation::$arithmeticOperators),
+          'must_be' => ['SqlField', 'SqlNumber'],
+        ],
+      ],
+    ];
+    // Filter out empty param properties (simplifies the javascript which treats empty arrays/objects as != null)
+    foreach ($functions as &$function) {
+      foreach ($function['params'] as $i => $param) {
+        $function['params'][$i] = array_filter($param);
+      }
+    }
+    usort($functions, function($a, $b) {
+      return $a['title'] <=> $b['title'];
+    });
+    return $functions;
   }
 
 }

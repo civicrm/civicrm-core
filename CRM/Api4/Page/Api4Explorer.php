@@ -59,6 +59,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
           $fns[] = [
             'name' => $className::getName(),
             'title' => $className::getTitle(),
+            'description' => $className::getDescription(),
             'params' => $className::getParams(),
             'category' => $className::getCategory(),
             'dataType' => $className::getDataType(),

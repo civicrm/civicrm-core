@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Product;
+
 /**
  * This class generates form components for Premiums.
  */
@@ -35,8 +37,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $params = ['id' => $this->_id];
-      CRM_Contribute_BAO_Product::retrieve($params, $tempDefaults);
+      $tempDefaults = Product::get()->addWhere('id', '=', $this->_id)->execute()->first();
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -291,10 +292,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $this->_processImages($params);
 
     // Save the premium product to database
-    $premium = CRM_Contribute_BAO_Product::create($params);
+    $premium = Product::save()->addRecord($params)->execute()->first();
 
     CRM_Core_Session::setStatus(
-      ts("The Premium '%1' has been saved.", [1 => $premium->name]),
+      ts("The Premium '%1' has been saved.", [1 => $premium['name']]),
       ts('Saved'), 'success');
   }
 

@@ -68,15 +68,15 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     $emailAdd = civicrm_api3('Email', 'get', [
       'sequential' => 1,
-      'return' => "email",
+      'return' => 'email',
       'contact_id' => $contactID,
     ]);
 
     $mesTemplate = civicrm_api3('MessageTemplate', 'get', $params + [
       'sequential' => 1,
       'is_active' => 1,
-      'return' => ["id", "msg_title"],
-      'workflow_id' => ['IS NULL' => ""],
+      'return' => ['id', 'msg_title'],
+      'workflow_name' => ['IS NULL' => ''],
     ]);
     $mailTokens = civicrm_api3('Mailing', 'gettokens', [
       'entity' => ['contact', 'mailing'],

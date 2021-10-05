@@ -424,6 +424,46 @@ class AllFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
   }
 
   /**
+   * Civi's test suite includes middleware that will add JWT tokens to outgoing requests.
+   *
+   * This test tries a few permutations with different principals ("demo", "Lebowski"),
+   * different identifier fields (authx_user, authx_contact_id), and different
+   * flows (param/header/xheader).
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function testJwtMiddleware() {
+    // HTTP GET with a specific user. Choose flow automatically.
+    $response = $this->createGuzzle()->get('civicrm/authx/id', [
+      'authx_user' => $GLOBALS['_CV']['DEMO_USER'],
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', 'param', $response);
+
+    // HTTP GET with a specific contact. Choose flow automatically.
+    $response = $this->createGuzzle()->get('civicrm/authx/id', [
+      'authx_contact_id' => $this->getDemoCID(),
+    ]);
+    $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', 'param', $response);
+
+    // HTTP POST with a specific contact. Per-client default.
+    $response = $this->createGuzzle([
+      'authx_contact_id' => $this->getLebowskiCID(),
+    ])->post('civicrm/authx/id');
+    $this->assertMyContact($this->getLebowskiCID(), NULL, 'jwt', 'param', $response);
+
+    // Using explicit flow options...
+    foreach (['param', 'xheader', 'header'] as $flowType) {
+      \Civi::settings()->set("authx_{$flowType}_cred", ['jwt']);
+      $response = $this->createGuzzle()->get('civicrm/authx/id', [
+        'authx_contact_id' => $this->getDemoCID(),
+        'authx_flow' => $flowType,
+      ]);
+      $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), 'jwt', $flowType, $response);
+    }
+  }
+
+  /**
    * Filter a request, applying the given authentication options
    *
    * @param \Psr\Http\Message\RequestInterface $request

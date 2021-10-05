@@ -84,7 +84,7 @@ class CustomValueTest extends BaseCustomValueTest {
     $expectedResult = [
       [
         'custom_group' => $group,
-        'type' => 'Custom',
+        'type' => 'Field',
         'name' => $colorFieldName,
         'title' => $colorFieldName,
         'entity' => "Custom_$group",
@@ -97,7 +97,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'custom_group' => $group,
-        'type' => 'Custom',
+        'type' => 'Field',
         'name' => $multiFieldName,
         'title' => $multiFieldName,
         'entity' => "Custom_$group",
@@ -110,7 +110,7 @@ class CustomValueTest extends BaseCustomValueTest {
       ],
       [
         'custom_group' => $group,
-        'type' => 'Custom',
+        'type' => 'Field',
         'name' => $textFieldName,
         'title' => $textFieldName,
         'entity' => "Custom_$group",

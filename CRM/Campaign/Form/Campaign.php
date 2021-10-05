@@ -75,7 +75,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $title = ts('Delete Campaign');
     }
     if ($title) {
-      CRM_Utils_System::setTitle($title);
+      $this->setTitle($title);
     }
 
     $session = CRM_Core_Session::singleton();

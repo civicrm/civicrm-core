@@ -473,4 +473,17 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     return CRM_Utils_System::url($path, ['reset' => 1, 'ssID' => $id]);
   }
 
+  /**
+   * Retrieve pseudoconstant options for $this->api_entity field
+   * @return array
+   */
+  public static function getApiEntityOptions() {
+    return Civi\Api4\Entity::get(FALSE)
+      ->addSelect('name', 'title_plural')
+      ->addOrderBy('title_plural')
+      ->execute()
+      ->indexBy('name')
+      ->column('title_plural');
+  }
+
 }

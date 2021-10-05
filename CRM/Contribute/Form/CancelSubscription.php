@@ -97,7 +97,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
 
-    CRM_Utils_System::setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
+    $this->setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
 
     if ($this->isSelfService()) {
@@ -222,7 +222,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         'id' => $this->getSubscriptionDetails()->recur_id,
         'membership_id' => $this->_mid,
         'processor_message' => $message,
-        'cancel_reason' => $params['cancel_reason'],
+        'cancel_reason' => $this->getSubmittedValue('cancel_reason'),
       ]);
 
       $tplParams = [];
@@ -255,25 +255,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       }
 
       if (CRM_Utils_Array::value('is_notify', $params) == 1) {
-        if ($this->getSubscriptionDetails()->contribution_page_id) {
-          CRM_Core_DAO::commonRetrieveAll(
-            'CRM_Contribute_DAO_ContributionPage',
-            'id',
-            $this->getSubscriptionDetails()->contribution_page_id,
-            $value,
-            ['title', 'receipt_from_name', 'receipt_from_email']
-          );
-          $receiptFrom
-            = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->getSubscriptionDetails()->contribution_page_id]) .
-            '" <' .
-            $value[$this->getSubscriptionDetails()->contribution_page_id]['receipt_from_email'] .
-            '>';
-        }
-        else {
-          $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-          $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-        }
-
         // send notification
         $sendTemplateParams
           = [
@@ -283,7 +264,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
             'tplParams' => $tplParams,
             //'isTest'    => $isTest, set this from _objects
             'PDFFilename' => 'receipt.pdf',
-            'from' => $receiptFrom,
+            'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
             'toName' => $this->_donorDisplayName,
             'toEmail' => $this->_donorEmail,
           ];

@@ -25,6 +25,7 @@ class SqlFunctionCOALESCE extends SqlFunction {
       [
         'max_expr' => 99,
         'optional' => FALSE,
+        'label' => ts('Value?'),
       ],
     ];
   }
@@ -34,6 +35,13 @@ class SqlFunctionCOALESCE extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Coalesce');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The first value that is not null.');
   }
 
 }

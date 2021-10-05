@@ -34,8 +34,8 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     parent::preProcess();
     if ($this->_crid) {
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
-      if ($this->_subscriptionDetails->membership_id) {
-        $this->_mid = $this->_subscriptionDetails->membership_id;
+      if ($this->getSubscriptionDetails()->membership_id) {
+        $this->_mid = $this->getSubscriptionDetails()->membership_id;
       }
     }
 
@@ -47,14 +47,13 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     if ($this->_mid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'info');
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
       $this->_mode = 'auto_renew';
     }
 
-    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
+    if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->getSubscriptionDetails())) {
       throw new CRM_Core_Exception('Required information missing.');
     }
 
@@ -67,10 +66,10 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     $this->assignBillingType();
 
-    $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
-    $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
-    $this->assign('amount', $this->_subscriptionDetails->amount);
-    $this->assign('installments', $this->_subscriptionDetails->installments);
+    $this->assign('recur_frequency_unit', $this->getSubscriptionDetails()->frequency_unit);
+    $this->assign('recur_frequency_interval', $this->getSubscriptionDetails()->frequency_interval);
+    $this->assign('amount', $this->getSubscriptionDetails()->amount);
+    $this->assign('installments', $this->getSubscriptionDetails()->installments);
     $this->assign('mode', $this->_mode);
 
     // handle context redirection
@@ -86,7 +85,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
   public function setDefaultValues() {
     $this->_defaults = [];
 
-    if ($this->_subscriptionDetails->contact_id) {
+    if ($this->getSubscriptionDetails()->contact_id) {
       $fields = [];
       $names = array(
         'first_name',
@@ -106,7 +105,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       $fields["email-{$this->_bltID}"] = 1;
       $fields['email-Primary'] = 1;
 
-      CRM_Core_BAO_UFGroup::setProfileDefaults($this->_subscriptionDetails->contact_id, $fields, $this->_defaults);
+      CRM_Core_BAO_UFGroup::setProfileDefaults($this->getSubscriptionDetails()->contact_id, $fields, $this->_defaults);
 
       // use primary email address if billing email address is empty
       if (empty($this->_defaults["email-{$this->_bltID}"]) &&
@@ -198,36 +197,37 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       list($key) = explode('-', $key);
       $processorParams[$key] = $val;
     }
-    $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
-    $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
+    $processorParams['billingStateProvince'] = $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$this->_bltID}"], FALSE);
+    $processorParams['billingCountry'] = $processorParams['country'] = CRM_Core_PseudoConstant::country($params["billing_country_id-{$this->_bltID}"], FALSE);
     $processorParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($processorParams);
     $processorParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($processorParams);
-    $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
-    $processorParams['amount'] = $this->_subscriptionDetails->amount;
+    $processorParams['recurProcessorID'] = $processorParams['subscriptionId'] = $this->getSubscriptionDetails()->processor_id;
+    $processorParams['amount'] = $this->getSubscriptionDetails()->amount;
+    $processorParams['contributionRecurID'] = $this->getContributionRecurID();
     $message = '';
     $updateSubscription = $this->_paymentProcessor['object']->updateSubscriptionBillingInfo($message, $processorParams);
     if (is_a($updateSubscription, 'CRM_Core_Error')) {
       CRM_Core_Error::displaySessionError($updateSubscription);
     }
     elseif ($updateSubscription) {
-      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_subscriptionDetails->contact_id, 'contact_type');
-      $contact = &CRM_Contact_BAO_Contact::createProfileContact($params,
+      $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->getSubscriptionDetails()->contact_id, 'contact_type');
+      CRM_Contact_BAO_Contact::createProfileContact($params,
         $fields,
-        $this->_subscriptionDetails->contact_id,
+        $this->getSubscriptionDetails()->contact_id,
         NULL,
         NULL,
         $ctype
       );
 
       // build tpl params
-      if ($this->_subscriptionDetails->membership_id) {
-        $inputParams = array('id' => $this->_subscriptionDetails->membership_id);
+      if ($this->getSubscriptionDetails()->membership_id) {
+        $inputParams = array('id' => $this->getSubscriptionDetails()->membership_id);
         CRM_Member_BAO_Membership::getValues($inputParams, $tplParams);
-        $tplParams = $tplParams[$this->_subscriptionDetails->membership_id];
+        $tplParams = $tplParams[$this->getSubscriptionDetails()->membership_id];
         $tplParams['membership_status'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
         $tplParams['membershipType'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $tplParams['membership_type_id']);
         $status = ts('Billing details for your automatically renewed %1 membership have been updated.',
-          array(1 => $tplParams['membershipType'])
+          [1 => $tplParams['membershipType']]
         );
         $msgTitle = ts('Details Updated');
         $msgType = 'success';
@@ -235,18 +235,18 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       else {
         $status = ts('Billing details for the recurring contribution of %1, every %2 %3 have been updated.',
           array(
-            1 => $this->_subscriptionDetails->amount,
-            2 => $this->_subscriptionDetails->frequency_interval,
-            3 => $this->_subscriptionDetails->frequency_unit,
+            1 => $this->getSubscriptionDetails()->amount,
+            2 => $this->getSubscriptionDetails()->frequency_interval,
+            3 => $this->getSubscriptionDetails()->frequency_unit,
           )
         );
         $msgTitle = ts('Details Updated');
         $msgType = 'success';
 
         $tplParams = array(
-          'recur_frequency_interval' => $this->_subscriptionDetails->frequency_interval,
-          'recur_frequency_unit' => $this->_subscriptionDetails->frequency_unit,
-          'amount' => $this->_subscriptionDetails->amount,
+          'recur_frequency_interval' => $this->getSubscriptionDetails()->frequency_interval,
+          'recur_frequency_unit' => $this->getSubscriptionDetails()->frequency_unit,
+          'amount' => $this->getSubscriptionDetails()->amount,
         );
       }
 
@@ -297,7 +297,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 <br/>{$this->_defaults['address']}";
 
       $activityParams = array(
-        'source_contact_id' => $this->_subscriptionDetails->contact_id,
+        'source_contact_id' => $this->getSubscriptionDetails()->contact_id,
         'activity_type_id' => CRM_Core_PseudoConstant::getKey(
           'CRM_Activity_BAO_Activity',
           'activity_type_id',
@@ -316,34 +316,19 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
       CRM_Activity_BAO_Activity::create($activityParams);
 
-      // send notification
-      if ($this->_subscriptionDetails->contribution_page_id) {
-        CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',
-          $this->_subscriptionDetails->contribution_page_id, $value, array(
-            'title',
-            'receipt_from_name',
-            'receipt_from_email',
-          )
-        );
-        $receiptFrom = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) . '" <' . $value[$this->_subscriptionDetails->contribution_page_id]['receipt_from_email'] . '>';
-      }
-      else {
-        $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
-        $receiptFrom = "$domainValues[0] <$domainValues[1]>";
-      }
-      list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_subscriptionDetails->contact_id);
+      list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->getSubscriptionDetails()->contact_id);
       $tplParams['contact'] = array('display_name' => $donorDisplayName);
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
 
       $sendTemplateParams = array(
-        'groupName' => $this->_subscriptionDetails->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
-        'valueName' => $this->_subscriptionDetails->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
-        'contactId' => $this->_subscriptionDetails->contact_id,
+        'groupName' => $this->getSubscriptionDetails()->membership_id ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
+        'valueName' => $this->getSubscriptionDetails()->membership_id ? 'membership_autorenew_billing' : 'contribution_recurring_billing',
+        'contactId' => $this->getSubscriptionDetails()->contact_id,
         'tplParams' => $tplParams,
-        'isTest' => $this->_subscriptionDetails->is_test,
+        'isTest' => $this->getSubscriptionDetails()->is_test,
         'PDFFilename' => 'receipt.pdf',
-        'from' => $receiptFrom,
+        'from' => CRM_Contribute_BAO_ContributionRecur::getRecurFromAddress($this->getContributionRecurID()),
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       );

@@ -818,8 +818,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *   List of membershipType details keyed by membershipTypeID
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getAllMembershipTypes() {
-    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID();
+  public static function getAllMembershipTypes(): array {
+    $cacheString = __CLASS__ . __FUNCTION__ . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheString)) {
       $types = civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values'];
       $taxRates = CRM_Core_PseudoConstant::getTaxRates();

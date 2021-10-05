@@ -23,7 +23,7 @@
         // Select all
         ctrl.allRowsSelected = true;
         if (ctrl.page === 1 && ctrl.results.length < ctrl.limit) {
-          ctrl.selectedRows = _.pluck(ctrl.results, 'id');
+          ctrl.selectedRows = _.pluck(_.pluck(ctrl.results, 'id'), 'raw');
           return;
         }
         // If more than one page of results, use ajax to fetch all ids
@@ -37,9 +37,9 @@
 
       // Toggle row selection
       selectRow: function(row) {
-        var index = this.selectedRows.indexOf(row.id);
+        var index = this.selectedRows.indexOf(row.id.raw);
         if (index < 0) {
-          this.selectedRows.push(row.id);
+          this.selectedRows.push(row.id.raw);
           this.allRowsSelected = (this.rowCount === this.selectedRows.length);
         } else {
           this.allRowsSelected = false;
@@ -49,7 +49,7 @@
 
       // @return bool
       isRowSelected: function(row) {
-        return this.allRowsSelected || _.includes(this.selectedRows, row.id);
+        return this.allRowsSelected || _.includes(this.selectedRows, row.id.raw);
       },
 
       refreshAfterTask: function() {
@@ -69,8 +69,8 @@
       onPostRun: [function(results, status, editedRow) {
         if (editedRow && status === 'success') {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
-          var index = this.selectedRows.indexOf(editedRow.id);
-          if (index > -1 && !_.findWhere(results, {id: editedRow.id})) {
+          var index = this.selectedRows.indexOf(editedRow.id.raw);
+          if (index > -1 && !_.findWhere(results, {id: editedRow.id.raw})) {
             this.selectedRows.splice(index, 1);
           }
         }

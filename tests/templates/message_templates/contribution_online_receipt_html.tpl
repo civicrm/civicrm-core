@@ -9,7 +9,6 @@
   receipt_text:::{$receipt_text}
   {/if}
   is_pay_later:::{$is_pay_later}
-  displayName:::{$displayName}
   financialTypeId:::{$financialTypeId}
   financialTypeName:::{$financialTypeName}
   contactID:::{$contactID}
@@ -51,9 +50,6 @@
   {/if}
   {if isset($is_recur)}
   is_recur:::{$is_recur}
-  {/if}
-  {if isset($contributeMode)}
-  contributeMode:::{$contributeMode}
   {/if}
   {if isset($trxn_id)}
   trxn_id:::{$trxn_id}

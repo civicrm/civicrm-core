@@ -217,12 +217,6 @@ WHERE civicrm_case.id = %1";
 
       CRM_Utils_Hook::post('delete', 'Case', $caseId, $case);
 
-      // remove case from recent items.
-      $caseRecent = [
-        'id' => $caseId,
-        'type' => 'Case',
-      ];
-      CRM_Utils_Recent::del($caseRecent);
       return TRUE;
     }
 

@@ -29,10 +29,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
    * @throws \Exception
    */
   public function run() {
-    // lets get around the time limit issue if possible for upgrades
-    if (!ini_get('safe_mode')) {
-      set_time_limit(0);
-    }
+    set_time_limit(0);
 
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');
 
@@ -77,7 +74,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $upgrade = new CRM_Upgrade_Form();
     $template = CRM_Core_Smarty::singleton();
     list($currentVer, $latestVer) = $upgrade->getUpgradeVersions();
-
+    CRM_Core_Smarty::singleton()->assign('sid', CRM_Utils_System::getSiteID());
     // Show success msg if db already upgraded
     if (version_compare($currentVer, $latestVer) == 0) {
       $template->assign('upgraded', TRUE);
@@ -191,7 +188,6 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
 
     $template->assign('message', $postUpgradeMessage);
     $template->assign('upgraded', TRUE);
-    $template->assign('sid', CRM_Utils_System::getSiteID());
     $template->assign('newVersion', $latestVer);
 
     // Render page header

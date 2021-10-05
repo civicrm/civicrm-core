@@ -60,7 +60,7 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
     }
     $this->assign('title', $this->_title);
 
-    CRM_Utils_System::setTitle(ts('Confirm Custom Group Delete'));
+    $this->setTitle(ts('Confirm Custom Group Delete'));
   }
 
   /**

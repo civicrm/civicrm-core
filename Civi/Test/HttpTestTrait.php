@@ -34,11 +34,20 @@ trait HttpTestTrait {
   /**
    * Create an HTTP client suitable for simulating AJAX requests.
    *
+   * The client may include some mix of these middlewares:
+   *
+   * @see \CRM_Utils_GuzzleMiddleware::authx()
+   * @see \CRM_Utils_GuzzleMiddleware::url()
+   * @see \CRM_Utils_GuzzleMiddleware::curlLog()
+   * @see Middleware::history()
+   * @see Middleware::log()
+   *
    * @param array $options
    * @return \GuzzleHttp\Client
    */
   protected function createGuzzle($options = []) {
     $handler = HandlerStack::create();
+    $handler->unshift(\CRM_Utils_GuzzleMiddleware::authx(), 'civi_authx');
     $handler->unshift(\CRM_Utils_GuzzleMiddleware::url(), 'civi_url');
     $handler->push(Middleware::history($this->httpHistory), 'history');
 

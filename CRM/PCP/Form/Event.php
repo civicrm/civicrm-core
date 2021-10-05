@@ -42,7 +42,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $defaults = [];
     if (isset($this->_id)) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Personal Campaign Page Settings (%1)', [1 => $title]));
+      $this->setTitle(ts('Personal Campaign Page Settings (%1)', [1 => $title]));
 
       $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_event'];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);

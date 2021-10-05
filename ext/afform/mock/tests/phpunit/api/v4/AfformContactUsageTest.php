@@ -39,7 +39,7 @@ EOHTML;
     <legend class="af-text">Individual 1</legend>
     <afblock-name-individual></afblock-name-individual>
     <div af-join="Email" min="1" af-repeat="Add">
-      <afjoin-email-default></afjoin-email-default>
+      <afblock-contact-email></afblock-contact-email>
     </div>
     <af-field name="employer_id" defn="{input_type: 'Select', input_attrs: {}}" />
   </fieldset>
@@ -49,7 +49,7 @@ EOHTML;
       <af-field name="organization_name" />
     </div>
     <div af-join="Email">
-      <afjoin-email-default></afjoin-email-default>
+      <afblock-contact-email></afblock-contact-email>
     </div>
   </fieldset>
   <button class="af-button btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
@@ -91,6 +91,7 @@ EOHTML;
     $this->useValues([
       'layout' => self::$layouts['registerSite'],
       'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
     ]);
 
     $firstName = uniqid(__FUNCTION__);
@@ -120,10 +121,24 @@ EOHTML;
       ->setName($this->formName)
       ->setValues($values)
       ->execute();
+
+    $submission = Civi\Api4\AfformSubmission::get(FALSE)
+      ->addOrderBy('id', 'DESC')
+      ->execute()->first();
+
+    $this->assertEquals($this->formName, $submission['afform_name']);
+    $this->assertIsInt($submission['data']['Activity1'][0]['id']);
+    $this->assertIsInt($submission['data']['Individual1'][0]['id']);
+
     // Check that Activity was submitted correctly.
-    $activity = \Civi\Api4\Activity::get(FALSE)->execute()->first();
+    $activity = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $submission['data']['Activity1'][0]['id'])
+      ->execute()->first();
     $this->assertEquals('Individual1', $activity['subject']);
-    $contact = \Civi\Api4\Contact::get()->addWhere('first_name', '=', $firstName)->execute()->first();
+    $contact = \Civi\Api4\Contact::get()
+      ->addWhere('id', '=', $submission['data']['Individual1'][0]['id'])
+      ->execute()->first();
+    $this->assertEquals($firstName, $contact['first_name']);
     $this->assertEquals('site', $contact['last_name']);
     // Check that the data overrides form submsision
     $this->assertEquals('Register A site', $contact['source']);

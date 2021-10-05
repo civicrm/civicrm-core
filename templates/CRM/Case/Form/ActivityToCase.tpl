@@ -44,7 +44,7 @@
     }
 
     var dataUrl = {/literal}"{crmURL p='civicrm/case/addToCase' q='reset=1' h=0}"{literal};
-    dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{$contactID}"{literal} + '&fileOnCaseAction=' + action;
+    dataUrl += '&activityId=' + activityID + '&caseId=' + currentCaseId + '&cid=' + {/literal}"{if !empty($contactID)}{$contactID}{/if}"{literal} + '&fileOnCaseAction=' + action;
 
     function save() {
       if (!$("#file_on_case_unclosed_case_id").val()) {

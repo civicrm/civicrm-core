@@ -744,13 +744,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     CRM_Utils_Hook::post('delete', 'Relationship', $id, $relationship);
 
-    // delete the recently created Relationship
-    $relationshipRecent = [
-      'id' => $id,
-      'type' => 'Relationship',
-    ];
-    CRM_Utils_Recent::del($relationshipRecent);
-
     return $relationship;
   }
 

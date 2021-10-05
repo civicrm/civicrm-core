@@ -99,7 +99,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
 
     //set the title.
-    CRM_Utils_System::setTitle(ts('Reserve Respondents'));
+    $this->setTitle(ts('Reserve Respondents'));
   }
 
   public function validateSurvey() {

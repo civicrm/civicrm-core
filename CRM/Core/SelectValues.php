@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  * One place to store frequently used values in Select Elements. Note that
  * some of the below elements will be dynamic, so we'll probably have a
@@ -492,14 +494,12 @@ class CRM_Core_SelectValues {
    * Domain tokens
    *
    * @return array
+   *
+   * @deprecated
    */
   public static function domainTokens() {
-    return [
-      '{domain.name}' => ts('Domain name'),
-      '{domain.address}' => ts('Domain (organization) address'),
-      '{domain.phone}' => ts('Domain (organization) phone'),
-      '{domain.email}' => ts('Domain (organization) email'),
-    ];
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
+    return $tokenProcessor->listTokens();
   }
 
   /**
@@ -521,14 +521,14 @@ class CRM_Core_SelectValues {
    *
    * @return array
    */
-  public static function membershipTokens() {
+  public static function membershipTokens(): array {
     return [
       '{membership.id}' => ts('Membership ID'),
-      '{membership.status}' => ts('Membership Status'),
-      '{membership.type}' => ts('Membership Type'),
+      '{membership.status_id:label}' => ts('Status'),
+      '{membership.membership_type_id:label}' => ts('Membership Type'),
       '{membership.start_date}' => ts('Membership Start Date'),
-      '{membership.join_date}' => ts('Membership Join Date'),
-      '{membership.end_date}' => ts('Membership End Date'),
+      '{membership.join_date}' => ts('Member Since'),
+      '{membership.end_date}' => ts('Membership Expiration Date'),
       '{membership.fee}' => ts('Membership Fee'),
     ];
   }
@@ -536,160 +536,73 @@ class CRM_Core_SelectValues {
   /**
    * Different type of Event Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function eventTokens() {
-    return [
-      '{event.event_id}' => ts('Event ID'),
-      '{event.title}' => ts('Event Title'),
-      '{event.start_date}' => ts('Event Start Date'),
-      '{event.end_date}' => ts('Event End Date'),
-      '{event.event_type}' => ts('Event Type'),
-      '{event.summary}' => ts('Event Summary'),
-      '{event.contact_email}' => ts('Event Contact Email'),
-      '{event.contact_phone}' => ts('Event Contact Phone'),
-      '{event.description}' => ts('Event Description'),
-      '{event.location}' => ts('Event Location'),
-      '{event.fee_amount}' => ts('Event Fees'),
-      '{event.info_url}' => ts('Event Info URL'),
-      '{event.registration_url}' => ts('Event Registration URL'),
-      '{event.balance}' => ts('Event Balance'),
-    ];
+  public static function eventTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['eventId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
+    }
+    return $allTokens;
   }
 
   /**
-   * Different type of Event Tokens.
+   * Different type of Contribution Tokens.
+   *
+   * @deprecated
    *
    * @return array
    */
   public static function contributionTokens(): array {
-    $tokens = [];
-    $processor = new CRM_Contribute_Tokens();
-    foreach ($processor->getAllTokens() as $token => $title) {
-      $tokens['{contribution.' . $token . '}'] = $title;
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contributionId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
+      }
     }
-    return $tokens;
+    return $allTokens;
   }
 
   /**
    * Different type of Contact Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function contactTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $additionalFields = [
-        'checksum' => ['title' => ts('Checksum')],
-        'contact_id' => ['title' => ts('Internal Contact ID')],
-      ];
-      $exportFields = array_merge(CRM_Contact_BAO_Contact::exportableFields(), $additionalFields);
-
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      //FIXME:skipping some tokens for time being.
-      $skipTokens = [
-        'is_bulkmail',
-        'group',
-        'tag',
-        'contact_sub_type',
-        'note',
-        'is_deceased',
-        'deceased_date',
-        'legal_identifier',
-        'contact_sub_type',
-        'user_unique_id',
-        'addressee_id',
-        'email_greeting_id',
-        'postal_greeting_id',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields(['Individual', 'Address']);
-      $legacyTokenNames = array_flip(CRM_Utils_Token::legacyContactTokens());
-
-      foreach ($values as $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($val);
-        if ($customFieldId) {
-          // CRM-15191 - if key is not in $customFields then the field is disabled and should be ignored
-          if (!empty($customFields[$customFieldId])) {
-            $tokens["{contact.$val}"] = $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'];
-          }
-        }
-        else {
-          // Support legacy token names
-          $tokenName = CRM_Utils_Array::value($val, $legacyTokenNames, $val);
-          $tokens["{contact.$tokenName}"] = $exportFields[$val]['title'];
-        }
-      }
-
-      // Get all the hook tokens too
-      $hookTokens = [];
-      CRM_Utils_Hook::tokens($hookTokens);
-      foreach ($hookTokens as $tokenValues) {
-        foreach ($tokenValues as $key => $value) {
-          if (is_numeric($key)) {
-            $key = $value;
-          }
-          if (!preg_match('/^\{[^\}]+\}$/', $key)) {
-            $key = '{' . $key . '}';
-          }
-          if (preg_match('/^\{([^\}]+)\}$/', $value, $matches)) {
-            $value = $matches[1];
-          }
-          $tokens[$key] = $value;
-        }
+  public static function contactTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
       }
     }
-
-    return $tokens;
+    return $allTokens;
   }
 
   /**
    * Different type of Participant Tokens.
    *
+   * @deprecated
+   *
    * @return array
    */
-  public static function participantTokens() {
-    static $tokens = NULL;
-    if (!$tokens) {
-      $exportFields = CRM_Event_BAO_Participant::exportableFields();
-
-      $values = array_merge(array_keys($exportFields));
-      unset($values[0]);
-
-      // skipping some tokens for time being.
-      $skipTokens = [
-        'event_id',
-        'participant_is_pay_later',
-        'participant_is_test',
-        'participant_contact_id',
-        'participant_fee_currency',
-        'participant_campaign_id',
-        'participant_status',
-        'participant_discount_name',
-      ];
-
-      $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
-
-      foreach ($values as $key => $val) {
-        if (in_array($val, $skipTokens)) {
-          continue;
-        }
-        //keys for $tokens should be constant. $token Values are changed for Custom Fields. CRM-3734
-        if ($customFieldId = CRM_Core_BAO_CustomField::getKeyID($val)) {
-          $tokens["{participant.$val}"] = !empty($customFields[$customFieldId]) ? $customFields[$customFieldId]['label'] . " :: " . $customFields[$customFieldId]['groupTitle'] : '';
-        }
-        else {
-          $tokens["{participant.$val}"] = $exportFields[$val]['title'];
-        }
+  public static function participantTokens(): array {
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
+    $allTokens = $tokenProcessor->listTokens();
+    foreach (array_keys($allTokens) as $token) {
+      if (strpos($token, '{domain.') === 0) {
+        unset($allTokens[$token]);
       }
     }
-    return $tokens;
+    return $allTokens;
   }
 
   /**
@@ -699,9 +612,18 @@ class CRM_Core_SelectValues {
   public static function caseTokens($caseTypeId = NULL) {
     static $tokens = NULL;
     if (!$tokens) {
-      foreach (CRM_Case_BAO_Case::fields() as $field) {
-        $tokens["{case.{$field['name']}}"] = $field['title'];
-      }
+      $tokens = [
+        '{case.id}' => ts('Case ID'),
+        '{case.case_type_id:label}' => ts('Case Type'),
+        '{case.subject}' => ts('Case Subject'),
+        '{case.start_date}' => ts('Case Start Date'),
+        '{case.end_date}' => ts('Case End Date'),
+        '{case.details}' => ts('Details'),
+        '{case.status_id:label}' => ts('Case Status'),
+        '{case.is_deleted:label}' => ts('Case is in the Trash'),
+        '{case.created_date}' => ts('Created Date'),
+        '{case.modified_date}' => ts('Modified Date'),
+      ];
 
       $customFields = CRM_Core_BAO_CustomField::getFields('Case', FALSE, FALSE, $caseTypeId);
       foreach ($customFields as $id => $field) {

@@ -1,0 +1,14 @@
+<div id="bootstrap-theme" class="crm-search">
+  <h1 crm-page-title>{{:: ts('Saved Searches') }}</h1>
+  <div class="form-inline">
+    <input class="form-control" type="search" ng-model="$ctrl.filters.label" placeholder="{{:: ts('Filter by label...') }}">
+    <input class="form-control" type="search" ng-model="$ctrl.filters['created_id.display_name,modified_id.display_name']" placeholder="{{:: ts('Filter by author...') }}">
+    <input class="form-control collapsible-optgroups" ng-model="$ctrl.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
+    <input class="form-control" ng-model="$ctrl.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
+    <a class="btn btn-primary pull-right" href="#/create/Contact/">
+      <i class="crm-i fa-plus"></i>
+      {{:: ts('New Search') }}
+    </a>
+  </div>
+  <div ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTable.html'"></div>
+</div>

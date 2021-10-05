@@ -22,9 +22,9 @@
   {else}
     <td>&nbsp;</td>
   {/if}
-  {if $form.activity_survey_id || $buildEngagementLevel}
+  {if !empty($form.activity_survey_id) || $buildEngagementLevel}
     <td>
-      {if $form.activity_survey_id}
+      {if !empty($form.activity_survey_id)}
         <label>{$form.activity_survey_id.label}</label>
         <br/>
         {$form.activity_survey_id.html}
@@ -60,7 +60,7 @@
   </td>
 </tr>
 
-{if $form.activity_tags}
+{if !empty($form.activity_tags)}
   <tr>
     <td><label>{$form.activity_tags.label}</label>
       <br/>

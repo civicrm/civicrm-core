@@ -94,19 +94,22 @@
         $scope.blockTitles.length = 0;
         _.each(afGui.meta.blocks, function(block, directive) {
           if ((!search || _.contains(directive, search) || _.contains(block.name.toLowerCase(), search) || _.contains(block.title.toLowerCase(), search)) &&
-            (block.block === '*' || block.block === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.block === ctrl.entity.data.contact_type)) &&
+            (block.entity_type === '*' || block.entity_type === ctrl.entity.type || (ctrl.entity.type === 'Contact' && block.entity_type === ctrl.entity.data.contact_type)) &&
             block.name !== ctrl.editor.getAfform().name
           ) {
-            var item = {"#tag": block.join ? "div" : directive};
-            if (block.join) {
-              item['af-join'] = block.join;
+            var item = {"#tag": block.join_entity ? "div" : directive};
+            if (block.join_entity) {
+              var joinEntity = afGui.getEntity(block.join_entity);
+              // Skip adding block if entity does not exist
+              if (!joinEntity) {
+                return;
+              }
+              item['af-join'] = block.join_entity;
               item['#children'] = [{"#tag": directive}];
-            }
-            if (block.repeat) {
               item['af-repeat'] = ts('Add');
               item.min = '1';
-              if (typeof block.repeat === 'number') {
-                item.max = '' + block.repeat;
+              if (typeof joinEntity.repeat_max === 'number') {
+                item.max = '' + joinEntity.repeat_max;
               }
             }
             $scope.blockList.push(item);

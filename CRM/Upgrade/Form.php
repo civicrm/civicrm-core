@@ -25,7 +25,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum previous CiviCRM version we can directly upgrade from
    */
-  const MINIMUM_UPGRADABLE_VERSION = '4.4.7';
+  const MINIMUM_UPGRADABLE_VERSION = '4.5.9';
 
   /**
    * @var \CRM_Core_Config
@@ -187,7 +187,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   }
 
   public function preProcess() {
-    CRM_Utils_System::setTitle($this->getTitle());
+    $this->setTitle($this->getTitle());
     if (!$this->verifyPreDBState($errorMessage)) {
       if (!isset($errorMessage)) {
         $errorMessage = 'pre-condition failed for current upgrade step';

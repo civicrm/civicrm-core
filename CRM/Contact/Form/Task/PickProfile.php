@@ -80,7 +80,7 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    CRM_Utils_System::setTitle(ts('Update multiple contacts'));
+    $this->setTitle(ts('Update multiple contacts'));
 
     foreach ($this->_contactIds as $id) {
       $this->_contactTypes = CRM_Contact_BAO_Contact::getContactTypes($id);

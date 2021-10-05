@@ -16,6 +16,8 @@ namespace Civi\Api4\Query;
  */
 class SqlFunctionLOWER extends SqlFunction {
 
+  protected static $dataType = 'String';
+
   protected static $category = self::CATEGORY_STRING;
 
   protected static function params(): array {
@@ -32,6 +34,13 @@ class SqlFunctionLOWER extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Lowercase');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Lowercase version of text.');
   }
 
 }

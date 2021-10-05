@@ -841,6 +841,10 @@ class CRM_Core_Permission {
         $prefix . ts('administer payment processors'),
         ts('Add, Update, or Disable Payment Processors'),
       ],
+      'render templates' => [
+        $prefix . ts('render templates'),
+        ts('Render open-ended template content. (Additional constraints may apply to autoloaded records and specific notations.)'),
+      ],
       'edit message templates' => [
         $prefix . ts('edit message templates'),
       ],
@@ -1135,6 +1139,7 @@ class CRM_Core_Permission {
       ],
     ];
     $permissions['line_item'] = $permissions['contribution'];
+    $permissions['product'] = $permissions['contribution'];
 
     $permissions['financial_item'] = $permissions['contribution'];
 

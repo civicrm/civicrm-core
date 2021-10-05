@@ -492,7 +492,7 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
  */
 function afform_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
   if ($entity == 'Afform') {
-    if ($action == 'prefill' || $action == 'submit') {
+    if ($action == 'prefill' || $action == 'submit' || $action == 'submitFile') {
       $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
     }
   }
@@ -516,6 +516,22 @@ function afform_civicrm_preProcess($formName, &$form) {
         ],
       ],
     ];
+  }
+}
+
+/**
+ * Implements hook_civicrm_pre().
+ */
+function afform_civicrm_pre($op, $entity, $id, &$params) {
+  // When deleting a searchDisplay, also delete any Afforms the display is embedded within
+  if ($entity === 'SearchDisplay' && $op === 'delete') {
+    $display = \Civi\Api4\SearchDisplay::get(FALSE)
+      ->addSelect('saved_search_id.name', 'name')
+      ->addWhere('id', '=', $id)
+      ->execute()->first();
+    \Civi\Api4\Afform::revert(FALSE)
+      ->addWhere('search_displays', 'CONTAINS', $display['saved_search_id.name'] . ".{$display['name']}")
+      ->execute();
   }
 }
 

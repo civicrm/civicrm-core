@@ -249,6 +249,16 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'pledge_reminder', 'type' => 'text'],
         ],
       ],
+      [
+        'version' => '5.43.alpha1',
+        'upgrade_descriptor' => ts('Missed templates from earlier versions'),
+        'templates' => [
+          ['name' => 'contribution_online_receipt', 'type' => 'text'],
+          ['name' => 'case_activity', 'type' => 'html'],
+          ['name' => 'case_activity', 'type' => 'text'],
+          ['name' => 'case_activity', 'type' => 'subject'],
+        ],
+      ],
     ];
   }
 
@@ -290,6 +300,24 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option in non-workflow templates.
+   *
+   * @param string $old
+   * @param string $new
+   */
+  public function replaceTokenInMessageTemplates(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_msg_template
+      SET
+        msg_text = REPLACE(msg_text, '$oldToken', '$newToken'),
+        msg_subject = REPLACE(msg_subject, '$oldToken', '$newToken'),
+        msg_html = REPLACE(msg_html, '$oldToken', '$newToken')
+      WHERE workflow_name IS NULL
+    ");
+  }
+
+  /**
    * Replace a token with the new preferred option.
    *
    * @param string $old
@@ -307,35 +335,18 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
-   * Get warnings for users if the replaced string is still present.
+   * Replace a token with the new preferred option in a print label.
    *
-   * This might be the case when used in an IF and for now we will recommend
-   * manual intervention.
-   *
-   * @param string $workflowName
    * @param string $old
    * @param string $new
-   *
-   * @return string
    */
-  public function getMessageTemplateWarning(string $workflowName, string $old, string $new) {
-    if (CRM_Core_DAO::singleValueQuery("
-      SELECT COUNT(*)
-      FROM civicrm_msg_template
-      WHERE workflow_name = '$workflowName'
-      AND (
-        msg_html LIKE '%$old%'
-        OR msg_subject LIKE '%$old%'
-        OR civicrm_msg_template.msg_text LIKE '%$old%'
-      )
-    ")) {
-      return ts('Please review your %1 message template and remove references to the token %2 as it has been replaced by %3', [
-        1 => $workflowName,
-        2 => '{' . $old . '}',
-        3 => '{' . $new . '}',
-      ]);
-    }
-    return '';
+  public function replaceTokenInPrintLabel(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_print_label
+      SET
+        data = REPLACE(data, '$oldToken', '$newToken')
+    ");
   }
 
   /**

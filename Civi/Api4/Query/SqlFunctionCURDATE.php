@@ -29,4 +29,11 @@ class SqlFunctionCURDATE extends SqlFunction {
     return ts('Now');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The current date.');
+  }
+
 }

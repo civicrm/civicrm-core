@@ -4,6 +4,10 @@
   border: 1px solid lightgrey;
 }
 
+#bootstrap-theme .crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+  vertical-align: middle;
+}
+
 .crm-search-display.crm-search-display-table td > crm-search-display-editable,
 .crm-search-display.crm-search-display-table td > .crm-editable-enabled {
   display: block !important;

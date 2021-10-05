@@ -53,7 +53,7 @@ class EventScanner {
    * @param string|null $self
    *   If the target $class is focused on a specific entity/form/etc, use the `$self` parameter to specify it.
    *   This will activate support for `self_{$event}` methods.
-   *   Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'hook_civicrm_pre::Contact'.
+   *   Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'on_hook_civicrm_pre::Contact'.
    * @return array
    *   List of events/listeners. Format is compatible with 'getSubscribedEvents()'.
    *   Ex: ['some.event' => [['firstFunc'], ['secondFunc']]

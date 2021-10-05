@@ -12,7 +12,7 @@
       fieldName: '@name',
       defn: '='
     },
-    controller: function($scope, $element, crmApi4, $timeout) {
+    controller: function($scope, $element, crmApi4, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
         boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
@@ -86,14 +86,72 @@
           });
         }
 
-        // Set default value
-        if (ctrl.defn.afform_default) {
-          // Wait for parent controllers to initialize
-          $timeout(function() {
-            $scope.dataProvider.getFieldData()[ctrl.fieldName] = ctrl.defn.afform_default;
-          });
+        // Wait for parent controllers to initialize
+        $timeout(function() {
+          // Unique field name = entity_name index . join . field_name
+          var entityName = ctrl.afFieldset.getName(),
+            joinEntity = ctrl.afJoin ? ctrl.afJoin.entity : null,
+            uniquePrefix = '',
+            urlArgs = $location.search();
+          if (entityName) {
+            var index = ctrl.getEntityIndex();
+            uniquePrefix = entityName + (index ? index + 1 : '') + (joinEntity ? '.' + joinEntity : '') + '.';
+          }
+          // Set default value from url with uniquePrefix + fieldName
+          if (urlArgs && urlArgs[uniquePrefix + ctrl.fieldName]) {
+            setValue(urlArgs[uniquePrefix + ctrl.fieldName]);
+          }
+          // Set default value from url with fieldName only
+          else if (urlArgs && urlArgs[ctrl.fieldName]) {
+            $scope.dataProvider.getFieldData()[ctrl.fieldName] = urlArgs[ctrl.fieldName];
+          }
+          // Set default value based on field defn
+          else if (ctrl.defn.afform_default) {
+            setValue(ctrl.defn.afform_default);
+          }
+        });
+      };
+
+      // Set default value; ensure data type matches input type
+      function setValue(value) {
+        if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
+          if (!_.isPlainObject(value)) {
+            value = {
+              '>=': +(('' + value).split('-')[0] || 0),
+              '<=': +(('' + value).split('-')[1] || 0),
+            };
+          }
+        } else if (ctrl.defn.input_type === 'Number') {
+          value = +value;
+        } else if (ctrl.defn.search_range && !_.isPlainObject(value)) {
+          value = {
+            '>=': ('' + value).split('-')[0],
+            '<=': ('' + value).split('-')[1] || '',
+          };
         }
 
+        $scope.dataProvider.getFieldData()[ctrl.fieldName] = value;
+      }
+
+      // Get the repeat index of the entity fieldset (not the join)
+      ctrl.getEntityIndex = function() {
+        // If already in a join repeat, look up the outer repeat
+        if ('repeatIndex' in $scope.dataProvider && $scope.dataProvider.afRepeat.getRepeatType() === 'join') {
+          return $scope.dataProvider.outerRepeatItem ? $scope.dataProvider.outerRepeatItem.repeatIndex : 0;
+        } else {
+          return ctrl.afRepeatItem ? ctrl.afRepeatItem.repeatIndex : 0;
+        }
+      };
+
+      // Params for the Afform.submitFile API when uploading a file field
+      ctrl.getFileUploadParams = function() {
+        return {
+          entityName: ctrl.afFieldset.modelName,
+          fieldName: ctrl.fieldName,
+          joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
+          entityIndex: ctrl.getEntityIndex(),
+          joinIndex: ctrl.afJoin && $scope.dataProvider.repeatIndex || null
+        };
       };
 
       $scope.getOptions = function () {

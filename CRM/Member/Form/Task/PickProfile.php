@@ -50,7 +50,7 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     $session = CRM_Core_Session::singleton();
     $this->_userContext = $session->readUserContext();
 
-    CRM_Utils_System::setTitle(ts('Update multiple memberships'));
+    $this->setTitle(ts('Update multiple memberships'));
 
     $validate = FALSE;
     //validations

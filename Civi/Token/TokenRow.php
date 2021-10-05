@@ -174,8 +174,8 @@ class TokenRow {
    * @return TokenRow
    */
   public function customToken($entity, $customFieldID, $entityID) {
-    $customFieldName = "custom_" . $customFieldID;
-    $record = civicrm_api3($entity, "getSingle", [
+    $customFieldName = 'custom_' . $customFieldID;
+    $record = civicrm_api3($entity, 'getSingle', [
       'return' => $customFieldName,
       'id' => $entityID,
     ]);
@@ -183,10 +183,10 @@ class TokenRow {
 
     // format the raw custom field value into proper display value
     if (isset($fieldValue)) {
-      $fieldValue = \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
+      $fieldValue = (string) \CRM_Core_BAO_CustomField::displayValue($fieldValue, $customFieldID);
     }
 
-    return $this->tokens($entity, $customFieldName, $fieldValue);
+    return $this->format('text/html')->tokens($entity, $customFieldName, $fieldValue);
   }
 
   /**
@@ -272,7 +272,7 @@ class TokenRow {
                 $htmlTokens[$entity][$field] = \CRM_Utils_String::purifyHTML($value);
               }
               else {
-                $htmlTokens[$entity][$field] = htmlentities($value);
+                $htmlTokens[$entity][$field] = is_object($value) ? $value : htmlentities($value);
               }
             }
           }
@@ -283,15 +283,18 @@ class TokenRow {
         // HTML => Plain.
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
+            if (!$value instanceof \DateTime) {
+              $value = html_entity_decode(strip_tags($value));
+            }
             if (!isset($textTokens[$entity][$field])) {
-              $textTokens[$entity][$field] = html_entity_decode(strip_tags($value));
+              $textTokens[$entity][$field] = $value;
             }
           }
         }
         break;
 
       default:
-        throw new \RuntimeException("Invalid format");
+        throw new \RuntimeException('Invalid format');
     }
 
     return $this;

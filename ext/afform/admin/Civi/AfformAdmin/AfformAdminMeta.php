@@ -2,6 +2,7 @@
 
 namespace Civi\AfformAdmin;
 
+use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_AfformAdmin_ExtensionUtil as E;
 
@@ -67,17 +68,32 @@ class AfformAdminMeta {
     }
     $info = \Civi\Api4\Entity::get(FALSE)
       ->addWhere('name', '=', $entityName)
-      ->addSelect('title', 'icon')
       ->execute()->first();
     if (!$info) {
       // Disabled contact type or nonexistent api entity
       return NULL;
     }
-    return [
-      'entity' => $entityName,
+    return self::entityToAfformMeta($info);
+  }
+
+  /**
+   * Converts info from API.Entity.get to an array of afform entity metadata
+   * @param array $info
+   * @return array
+   */
+  private static function entityToAfformMeta(array $info): array {
+    $meta = [
+      'entity' => $info['name'],
       'label' => $info['title'],
       'icon' => $info['icon'],
     ];
+    // Custom entities are always type 'join'
+    if (in_array('CustomValue', $info['type'], TRUE)) {
+      $meta['type'] = 'join';
+      $max = (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', substr($info['name'], 7), 'max_multiple', 'name');
+      $meta['repeat_max'] = $max ?: NULL;
+    }
+    return $meta;
   }
 
   /**
@@ -140,9 +156,16 @@ class AfformAdminMeta {
           'icon' => 'fa-pencil-square-o',
           'fields' => [],
         ],
-        'Contact' => self::getApiEntity('Contact'),
       ],
     ];
+
+    // Explicitly load Contact and Custom entities because they do not have afformEntity files
+    $entities = Entity::get(TRUE)
+      ->addClause('OR', ['name', '=', 'Contact'], ['type', 'CONTAINS', 'CustomValue'])
+      ->execute()->indexBy('name');
+    foreach ($entities as $name => $entity) {
+      $data['entities'][$name] = self::entityToAfformMeta($entity);
+    }
 
     $contactTypes = \CRM_Contact_BAO_ContactType::basicTypeInfo();
 
@@ -213,7 +236,7 @@ class AfformAdminMeta {
         'title' => E::ts('Submit Button'),
         'element' => [
           '#tag' => 'button',
-          'class' => 'af-button btn-primary',
+          'class' => 'af-button btn btn-primary',
           'crm-icon' => 'fa-check',
           'ng-click' => 'afform.submit()',
           '#children' => [

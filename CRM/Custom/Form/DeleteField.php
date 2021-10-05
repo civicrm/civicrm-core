@@ -49,7 +49,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
 
     $this->_title = $defaults['label'] ?? NULL;
     $this->assign('title', $this->_title);
-    CRM_Utils_System::setTitle(ts('Delete %1', [1 => $this->_title]));
+    $this->setTitle(ts('Delete %1', [1 => $this->_title]));
   }
 
   /**

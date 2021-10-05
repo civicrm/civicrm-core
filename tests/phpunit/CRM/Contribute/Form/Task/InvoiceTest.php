@@ -27,6 +27,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
     $this->revertTemplateToReservedTemplate('contribution_invoice_receipt');
     CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
   }
 
   /**

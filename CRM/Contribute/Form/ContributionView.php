@@ -25,6 +25,9 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    */
   public function preProcess() {
     $id = $this->get('id');
+    if (empty($id)) {
+      throw new CRM_Core_Exception('Contribution ID is required');
+    }
     $params = ['id' => $id];
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
@@ -96,13 +99,11 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     CRM_Core_BAO_CustomGroup::buildCustomDataView($this, $groupTree, FALSE, NULL, NULL, NULL, $id);
 
     $premiumId = NULL;
-    if ($id) {
-      $dao = new CRM_Contribute_DAO_ContributionProduct();
-      $dao->contribution_id = $id;
-      if ($dao->find(TRUE)) {
-        $premiumId = $dao->id;
-        $productID = $dao->product_id;
-      }
+    $dao = new CRM_Contribute_DAO_ContributionProduct();
+    $dao->contribution_id = $id;
+    if ($dao->find(TRUE)) {
+      $premiumId = $dao->id;
+      $productID = $dao->product_id;
     }
 
     if ($premiumId) {
@@ -139,31 +140,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign($name, $value);
     }
 
-    $lineItems = [];
-    $displayLineItems = FALSE;
-    if ($id) {
-      $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
-      $firstLineItem = reset($lineItems[0]);
-      if (empty($firstLineItem['price_set_id'])) {
-        // CRM-20297 All we care is that it's not QuickConfig, so no price set
-        // is no problem.
-        $displayLineItems = TRUE;
-      }
-      else {
-        try {
-          $priceSet = civicrm_api3('PriceSet', 'getsingle', [
-            'id' => $firstLineItem['price_set_id'],
-            'return' => 'is_quick_config, id',
-          ]);
-          $displayLineItems = !$priceSet['is_quick_config'];
-        }
-        catch (CiviCRM_API3_Exception $e) {
-          throw new CRM_Core_Exception('Cannot find price set by ID');
-        }
-      }
-    }
+    $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
     $this->assign('lineItem', $lineItems);
-    $this->assign('displayLineItems', $displayLineItems);
     $values['totalAmount'] = $values['total_amount'];
     $this->assign('displayLineItemFinancialType', TRUE);
 
@@ -177,7 +155,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     // assign values to the template
-    $this->assign($values);
+    $this->assignVariables($values, array_keys($values));
     $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
     $this->assign('invoicing', $invoicing);
     $this->assign('isDeferred', Civi::settings()->get('deferred_revenue_enabled'));
@@ -194,10 +172,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     }
 
     if (empty($values['is_template'])) {
-      CRM_Utils_System::setTitle(ts('View Contribution from') . ' ' . $displayName);
+      $this->setTitle(ts('View Contribution from') . ' ' . $displayName);
     }
     else {
-      CRM_Utils_System::setTitle(ts('View Template Contribution from') . ' ' . $displayName);
+      $this->setTitle(ts('View Template Contribution from') . ' ' . $displayName);
     }
 
     // add viewed contribution to recent items list

@@ -39,38 +39,39 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   /**
    * Build all the data structures needed to build the form.
    *
+   * @deprecated
+   *
    * @param CRM_Core_Form $form
    */
   public static function preProcess(&$form) {
-    if (!isset($form->_single)) {
-      // @todo ensure this is already set.
-      $form->_single = FALSE;
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    $defaults = [];
+    $form->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
+    if (is_numeric(key($form->_fromEmails))) {
+      $emailID = (int) key($form->_fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
-    $messageText = [];
-    $messageSubject = [];
-    $dao = new CRM_Core_BAO_MessageTemplate();
-    $dao->is_active = 1;
-    $dao->find();
-    while ($dao->fetch()) {
-      $messageText[$dao->id] = $dao->msg_text;
-      $messageSubject[$dao->id] = $dao->msg_subject;
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
     }
-
-    $form->assign('message', $messageText);
-    $form->assign('messageSubject', $messageSubject);
-    parent::preProcess($form);
+    $form->setDefaults($defaults);
+    $form->setTitle('Print/Merge Document');
   }
 
   /**
+   * @deprecated
    * @param CRM_Core_Form $form
    * @param int $cid
    */
   public static function preProcessSingle(&$form, $cid) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
     if (count($form->_contactIds) === 1) {
-      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')]));
+      $form->setTitle(
+        ts('Print/Merge Document for %1',
+        [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')])
+      );
     }
   }
 
@@ -82,8 +83,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    *
    * @return array
    *   [$categories, $html_message, $messageToken, $returnProperties]
+   *
+   * @deprecated
    */
   public static function processMessageTemplate($formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     $html_message = self::processTemplate($formValues);
 
     $categories = self::getTokenCategories();
@@ -108,14 +113,17 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * Process the form after the input has been submitted and validated.
    *
    * @param CRM_Core_Form $form
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
+   *
+   * @deprecated
    */
-  public static function postProcess(&$form) {
+  public static function postProcess(&$form): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $formValues = $form->controller->exportValues($form->getName());
-    list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
-    $skipOnHold = $form->skipOnHold ?? FALSE;
-    $skipDeceased = $form->skipDeceased ?? TRUE;
+    [$formValues, $categories, $html_message, $messageToken, $returnProperties] = self::processMessageTemplate($formValues);
     $html = $activityIds = [];
 
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
@@ -124,48 +132,21 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     }
 
     if (!empty($formValues['document_file_path'])) {
-      list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
+      [$html_message, $zip] = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
     }
 
     foreach ($form->_contactIds as $item => $contactId) {
-      $caseId = NULL;
-      $params = ['contact_id' => $contactId];
-
       $caseId = $form->getVar('_caseId');
       if (empty($caseId) && !empty($form->_caseIds[$item])) {
         $caseId = $form->_caseIds[$item];
       }
-      if ($caseId) {
-        $params['case_id'] = $caseId;
-      }
 
-      list($contact) = CRM_Utils_Token::getTokenDetails($params,
-        $returnProperties,
-        $skipOnHold,
-        $skipDeceased,
-        NULL,
-        $messageToken,
-        'CRM_Contact_Form_Task_PDFLetterCommon'
-      );
-
-      if (civicrm_error($contact)) {
-        $notSent[] = $contactId;
-        continue;
-      }
-
-      $tokenHtml = CRM_Utils_Token::replaceContactTokens($html_message, $contact[$contactId], TRUE, $messageToken);
-
-      if ($caseId) {
-        $tokenHtml = CRM_Utils_Token::replaceCaseTokens($caseId, $tokenHtml, $messageToken);
-      }
-      $tokenHtml = CRM_Utils_Token::replaceHookTokens($tokenHtml, $contact[$contactId], $categories, TRUE);
-
-      if (defined('CIVICRM_MAIL_SMARTY') && CIVICRM_MAIL_SMARTY) {
-        $smarty = CRM_Core_Smarty::singleton();
-        // also add the contact tokens to the template
-        $smarty->assign_by_ref('contact', $contact);
-        $tokenHtml = $smarty->fetch("string:$tokenHtml");
-      }
+      $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'contactId' => $contactId,
+        'messageTemplate' => ['msg_html' => $html_message],
+        'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
+        'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
+      ])['html'];
 
       $html[] = $tokenHtml;
     }
@@ -182,8 +163,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $mimeType = self::getMimeType($type);
     // ^^ Useful side-effect: consistently throws error for unrecognized types.
 
-    if ($type == 'pdf') {
-      $fileName = "CiviLetter.$type";
+    $fileName = method_exists($form, 'getFileName') ? ($form->getFileName() . '.' . $type) : 'CiviLetter.' . $type;
+
+    if ($type === 'pdf') {
       CRM_Utils_PDF_Utils::html2pdf($html, $fileName, FALSE, $formValues);
     }
     elseif (!empty($formValues['document_file_path'])) {
@@ -191,7 +173,6 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
-      $fileName = "CiviLetter.$type";
       CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
     }
 
@@ -233,8 +214,11 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    *   and use-case.
    *
    * @throws CRM_Core_Exception
+   *
+   * @deprecated
    */
   public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
 
     $activityParams = [
       'subject' => $subject,
@@ -304,6 +288,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @param string $type
    * @return string
    * @throws \CRM_Core_Exception
+   *
+   * @deprecated
    */
   private static function getMimeType($type) {
     $mimeTypes = [
@@ -322,6 +308,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
 
   /**
    * Get the categories required for rendering tokens.
+   *
+   * @deprecated
    *
    * @return array
    */
@@ -346,6 +334,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @return bool
    *   TRUE if the Download Document button was clicked (also defaults to TRUE
    *     if the form controller does not exist), else FALSE
+   *
+   * @deprecated
    */
   protected static function isLiveMode($form) {
     // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...

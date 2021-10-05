@@ -71,6 +71,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public $_action;
 
   /**
+   * Monetary fields that may be submitted.
+   *
+   * Any fields in this list will be converted to non-localised format
+   * if retrieved by `getSubmittedValue`
+   *
+   * @var array
+   */
+  protected $submittableMoneyFields = [];
+
+  /**
    * Available payment processors.
    *
    * As part of trying to consolidate various payment pages we store processors here & have functions
@@ -131,9 +141,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * e.g on a form declare $_dateFields = array(
    *  'receive_date' => array('default' => 'now'),
    *  );
-   *  then in postProcess call $this->convertDateFieldsToMySQL($formValues)
-   *  to have the time field re-incorporated into the field & 'now' set if
-   *  no value has been passed in
    */
   protected $_dateFields = [];
 
@@ -347,6 +354,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'settingPath',
       'autocomplete',
       'validContact',
+      'email',
     ];
 
     foreach ($rules as $rule) {
@@ -2139,35 +2147,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Convert all date fields within the params to mysql date ready for the
-   * BAO layer. In this case fields are checked against the $_datefields defined for the form
-   * and if time is defined it is incorporated
-   *
-   * @param array $params
-   *   Input params from the form.
-   *
-   * @todo it would probably be better to work on $this->_params than a passed array
-   * @todo standardise the format which dates are passed to the BAO layer in & remove date
-   * handling from BAO
-   */
-  public function convertDateFieldsToMySQL(&$params) {
-    foreach ($this->_dateFields as $fieldName => $specs) {
-      if (!empty($params[$fieldName])) {
-        $params[$fieldName] = CRM_Utils_Date::isoToMysql(
-          CRM_Utils_Date::processDate(
-            $params[$fieldName],
-            CRM_Utils_Array::value("{$fieldName}_time", $params), TRUE)
-        );
-      }
-      else {
-        if (isset($specs['default'])) {
-          $params[$fieldName] = date('YmdHis', strtotime($specs['default']));
-        }
-      }
-    }
-  }
-
-  /**
    * @param $elementName
    */
   public function removeFileRequiredRules($elementName) {
@@ -2418,20 +2397,20 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function setPageTitle($entityLabel) {
     switch ($this->_action) {
       case CRM_Core_Action::ADD:
-        CRM_Utils_System::setTitle(ts('New %1', [1 => $entityLabel]));
+        $this->setTitle(ts('New %1', [1 => $entityLabel]));
         break;
 
       case CRM_Core_Action::UPDATE:
-        CRM_Utils_System::setTitle(ts('Edit %1', [1 => $entityLabel]));
+        $this->setTitle(ts('Edit %1', [1 => $entityLabel]));
         break;
 
       case CRM_Core_Action::VIEW:
       case CRM_Core_Action::PREVIEW:
-        CRM_Utils_System::setTitle(ts('View %1', [1 => $entityLabel]));
+        $this->setTitle(ts('View %1', [1 => $entityLabel]));
         break;
 
       case CRM_Core_Action::DELETE:
-        CRM_Utils_System::setTitle(ts('Delete %1', [1 => $entityLabel]));
+        $this->setTitle(ts('Delete %1', [1 => $entityLabel]));
         break;
     }
   }
@@ -2741,11 +2720,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return mixed|null
    */
-  protected function getSubmittedValue(string $fieldName) {
+  public function getSubmittedValue(string $fieldName) {
     if (empty($this->exportedValues)) {
       $this->exportedValues = $this->controller->exportValues($this->_name);
     }
-    return $this->exportedValues[$fieldName] ?? NULL;
+    $value = $this->exportedValues[$fieldName] ?? NULL;
+    if (in_array($fieldName, $this->submittableMoneyFields, TRUE)) {
+      return CRM_Utils_Rule::cleanMoney($value);
+    }
+    return $value;
   }
 
   /**

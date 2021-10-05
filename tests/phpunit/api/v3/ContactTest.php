@@ -90,6 +90,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_website',
       'civicrm_relationship',
       'civicrm_uf_match',
+      'civicrm_file',
+      'civicrm_entity_file',
       'civicrm_phone',
       'civicrm_address',
       'civicrm_acl_contact_cache',
@@ -146,9 +148,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateIndividualNoCacheClear(): void {
-
     $contact = $this->callAPISuccess('contact', 'create', $this->_params);
-    $groupID = $this->groupCreate();
+
+    $smartGroupParams = ['form_values' => ['contact_type' => ['IN' => ['Household']]]];
+    $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
+    $groupID = $this->groupCreate(['saved_search_id' => $savedSearch->id]);
 
     $this->putGroupContactCacheInClearableState($groupID, $contact);
 

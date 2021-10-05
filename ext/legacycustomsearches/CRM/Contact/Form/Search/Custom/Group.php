@@ -653,20 +653,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
   }
 
   /**
-   * Set title on search.
-   *
-   * @param string $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
-  }
-
-  /**
    * Build ACL clause.
    *
    * @param string $tableAlias

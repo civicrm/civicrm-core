@@ -34,4 +34,11 @@ class SqlFunctionAVG extends SqlFunction {
     return ts('Average');
   }
 
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('The mean of all values in the grouping.');
+  }
+
 }

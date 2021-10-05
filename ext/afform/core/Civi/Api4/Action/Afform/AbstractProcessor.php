@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Generic\Result;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Shared functionality for form submission pre & post processing.
@@ -64,7 +65,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   /**
    * Load all entities
    */
-  private function loadEntities() {
+  protected function loadEntities() {
     foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
       $this->_entityIds[$entityName] = [];
       if (!empty($entity['actions']['update'])) {
@@ -149,7 +150,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if (self::getEntityField($joinEntityName, 'entity_id')) {
       $params[] = ['entity_id', '=', $mainEntityId];
       if (self::getEntityField($joinEntityName, 'entity_table')) {
-        $params[] = ['entity_table', '=', 'civicrm_' . \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($mainEntityName)];
+        $params[] = ['entity_table', '=', CoreUtil::getTableName($mainEntityName)];
       }
     }
     else {

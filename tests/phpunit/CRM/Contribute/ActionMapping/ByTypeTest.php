@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Contribution;
+use Civi\Token\TokenProcessor;
 
 /**
  * Class CRM_Contribute_ActionMapping_ByTypeTest
@@ -255,6 +256,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
    * legacy processor function. Once this is true we can expose the listener on the
    * token processor for contribution and call it internally from the legacy code.
    *
+   * @throws \API_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function testTokenRendering(): void {
@@ -295,13 +297,13 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = [
       'first name = Alice',
-      'receive_date = February 1st, 2015 12:00 AM',
+      'receive_date = February 1st, 2015',
       'contribution status id = 1',
       'new style status = Completed',
       'new style label = Completed Label**',
       'id ' . $this->ids['Contribution']['alice'],
       'id  - not valid for action schedule',
-      'cancel date August 9th, 2021 12:00 AM',
+      'cancel date August 9th, 2021',
       'source SSF',
       'financial type id = 1',
       'financial type name = Donation',
@@ -319,6 +321,22 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     ];
     $this->mut->checkMailLog($expected);
 
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => get_class(),
+      'smarty' => FALSE,
+      'schema' => ['contributionId'],
+      'contributionId' => $this->ids['Contribution']['alice'],
+      'contactId' => $this->contacts['alice']['id'],
+    ]);
+    $tokenProcessor->addRow([]);
+    $tokenProcessor->addMessage('html', $this->schedule->body_text, 'text/plain');
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      foreach ($expected as $value) {
+        $this->assertStringContainsString($value, $row->render('html'));
+      }
+    }
+
     $messageToken = CRM_Utils_Token::getTokens($this->schedule->body_text);
 
     $contributionDetails = CRM_Contribute_BAO_Contribution::replaceContributionTokens(
@@ -331,7 +349,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
       TRUE
     );
     $expected = [
-      'receive_date = February 1st, 2015 12:00 AM',
+      'receive_date = February 1st, 2015',
       'new style status = Completed',
       'contribution status id = 1',
       'id ' . $this->ids['Contribution']['alice'],
@@ -379,9 +397,13 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends \Civi\ActionSchedule\Abstr
     $fields = (array) Contribution::getFields()->addSelect('name', 'title')->execute()->indexBy('name');
     $allFields = [];
     foreach ($fields as $field) {
-      $allFields[$field['name']] = $field['title'];
+      if (!in_array($field['name'], ['is_test', 'is_pay_later', 'is_template'], TRUE)) {
+        $allFields[$field['name']] = $field['title'];
+      }
     }
-    // $this->assertEquals($realLegacyTokens, $allFields);
+    // contact ID is skipped.
+    unset($allFields['contact_id']);
+    $this->assertEquals($allFields, $realLegacyTokens);
     $this->assertEquals($legacyTokens, $processor->tokenNames);
     foreach ($tokens as $token) {
       $this->assertEquals(CRM_Core_SelectValues::contributionTokens()['{contribution.' . $token . '}'], $processor->tokenNames[$token]);

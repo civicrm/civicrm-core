@@ -210,33 +210,20 @@ WHERE  id IN ( $groupIDs )
   }
 
   /**
-   * Function to clear group contact cache and reset the corresponding
-   *  group's cache and refresh date
+   * Function to clear group contact cache
    *
-   * @param int $groupID
+   * @param array $groupIDs
    *
    */
-  protected static function clearGroupContactCache($groupID): void {
-    $transaction = new CRM_Core_Transaction();
-    $query = "
+  protected static function clearGroupContactCache($groupIDs): void {
+    $clearCacheQuery = '
     DELETE  g
       FROM  civicrm_group_contact_cache g
-      WHERE  g.group_id = %1 ";
-
-    $update = "
-  UPDATE civicrm_group g
-    SET    cache_date = null
-    WHERE  id = %1 ";
-
+      WHERE  g.group_id IN (%1) ';
     $params = [
-      1 => [$groupID, 'Integer'],
+      1 => [implode(',', $groupIDs), 'CommaSeparatedIntegers'],
     ];
-
-    CRM_Core_DAO::executeQuery($query, $params);
-    // also update the cache_date for these groups
-    CRM_Core_DAO::executeQuery($update, $params);
-
-    $transaction->commit();
+    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
   }
 
   /**
@@ -248,6 +235,10 @@ WHERE  id IN ( $groupIDs )
    * clear.
    */
   protected static function flushCaches() {
+    if (!CRM_Core_Config::isPermitCacheFlushMode()) {
+      return;
+    }
+
     try {
       $lock = self::getLockForRefresh();
     }
@@ -255,19 +246,32 @@ WHERE  id IN ( $groupIDs )
       // Someone else is kindly doing the refresh for us right now.
       return;
     }
+
+    // Get the list of expired smart groups that may need flushing
     $params = [1 => [self::getCacheInvalidDateTime(), 'String']];
-    $groupsDAO = CRM_Core_DAO::executeQuery("SELECT id FROM civicrm_group WHERE cache_date <= %1", $params);
+    $groupsThatMayNeedToBeFlushedSQL = "SELECT id FROM civicrm_group WHERE (saved_search_id IS NOT NULL OR children <> '') AND (cache_date <= %1 OR cache_date IS NULL)";
+    $groupsDAO = CRM_Core_DAO::executeQuery($groupsThatMayNeedToBeFlushedSQL, $params);
     $expiredGroups = [];
     while ($groupsDAO->fetch()) {
       $expiredGroups[] = $groupsDAO->id;
     }
-    if (!empty($expiredGroups)) {
-      $expiredGroups = implode(',', $expiredGroups);
-      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN ({$expiredGroups})");
+    if (empty($expiredGroups)) {
+      // There are no expired smart groups to flush
+      return;
+    }
+
+    $expiredGroupsCSV = implode(',', $expiredGroups);
+    $flushSQLParams = [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']];
+    // Now check if we actually have any entries in the smart groups to flush
+    $groupsHaveEntriesToFlushSQL = 'SELECT group_id FROM civicrm_group_contact_cache gc WHERE group_id IN (%1) LIMIT 1';
+    $groupsHaveEntriesToFlush = (bool) CRM_Core_DAO::singleValueQuery($groupsHaveEntriesToFlushSQL, $flushSQLParams);
+
+    if ($groupsHaveEntriesToFlush) {
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_group_contact_cache WHERE group_id IN (%1)", [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']]);
 
       // Clear these out without resetting them because we are not building caches here, only clearing them,
       // so the state is 'as if they had never been built'.
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL WHERE id IN ({$expiredGroups})");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_group SET cache_date = NULL WHERE id IN (%1)", [1 => [$expiredGroupsCSV, 'CommaSeparatedIntegers']]);
     }
     $lock->release();
   }
@@ -381,6 +385,7 @@ WHERE  id IN ( $groupIDs )
         ->setCategory('gccache')
         ->setMemory();
       self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
+      self::clearGroupContactCache([$groupID]);
       self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
       self::releaseGroupLocks([$groupID]);
     }
@@ -724,6 +729,7 @@ ORDER BY   gc.contact_id, g.children
         // Also - if we switched to the 'triple union' approach described above
         // we could throw a try-catch around this line since best-effort would
         // be good enough & potentially improve user experience.
+        self::clearGroupContactCache($lockedGroups);
         self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
         self::releaseGroupLocks($lockedGroups);
       }
@@ -786,18 +792,6 @@ ORDER BY   gc.contact_id, g.children
   private static function updateCacheFromTempTable(CRM_Utils_SQL_TempTable $groupContactsTempTable, array $groupIDs): void {
     $tempTable = $groupContactsTempTable->getName();
 
-    // Don't call clearGroupContactCache as we don't want to clear the cache dates
-    // The will get updated by updateCacheTime() below and not clearing the dates reduces
-    // the chance that loadAll() will try and rebuild at the same time.
-    $clearCacheQuery = '
-    DELETE  g
-      FROM  civicrm_group_contact_cache g
-      WHERE  g.group_id IN (%1) ';
-    $params = [
-      1 => [implode(',', $groupIDs), 'CommaSeparatedIntegers'],
-    ];
-    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
-
     CRM_Core_DAO::executeQuery(
       "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT contact_id, group_id FROM $tempTable
@@ -835,7 +829,7 @@ ORDER BY   gc.contact_id, g.children
       if ($savedSearch['api_entity']) {
         $sql = self::getApiSQL($savedSearch, $groupID);
       }
-      elseif (!empty($savedSearch['form_values']['customSearchID'])) {
+      elseif (!empty($savedSearch['search_custom_id'])) {
         $sql = self::getCustomSearchSQL($savedSearch, $groupID);
       }
       else {
@@ -852,8 +846,6 @@ ORDER BY   gc.contact_id, g.children
       "SELECT $groupID as group_id, contact_id as contact_id
        FROM   civicrm_group_contact
        WHERE  civicrm_group_contact.status = 'Added' AND civicrm_group_contact.group_id = $groupID ";
-
-    self::clearGroupContactCache($groupID);
 
     foreach ($contactQueries as $contactQuery) {
       CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTableName (group_id, contact_id) {$contactQuery}");

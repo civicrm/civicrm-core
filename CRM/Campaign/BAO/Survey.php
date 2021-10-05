@@ -18,7 +18,7 @@
 /**
  * Class CRM_Campaign_BAO_Survey.
  */
-class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey {
+class CRM_Campaign_BAO_Survey extends CRM_Campaign_DAO_Survey implements Civi\Test\HookInterface {
 
   /**
    * Retrieve DB object based on input parameters.
@@ -366,24 +366,31 @@ SELECT  survey.id    as id,
   }
 
   /**
-   * Delete the survey.
+   * Delete a survey.
    *
    * @param int $id
-   *   Survey id.
-   *
+   * @deprecated
    * @return mixed|null
    */
   public static function del($id) {
     if (!$id) {
       return NULL;
     }
-    $reportId = CRM_Campaign_BAO_Survey::getReportID($id);
-    if ($reportId) {
-      CRM_Report_BAO_ReportInstance::del($reportId);
+    self::deleteRecord(['id' => $id]);
+    return 1;
+  }
+
+  /**
+   * Event fired prior to modifying a Survey.
+   * @param \Civi\Core\Event\PreEvent $event
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if ($event->action === 'delete' && $event->id) {
+      $reportId = self::getReportID($event->id);
+      if ($reportId) {
+        CRM_Report_BAO_ReportInstance::deleteRecord(['id' => $reportId]);
+      }
     }
-    $dao = new CRM_Campaign_DAO_Survey();
-    $dao->id = $id;
-    return $dao->delete();
   }
 
   /**

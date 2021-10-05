@@ -15,7 +15,7 @@
       {$fieldSpec.help}
     {else}''{/if}
     {/capture}{help id=$help.id file=$help.file}{/if}
-    {if $action == 2 && $fieldSpec.is_add_translate_dialog}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
+    {if $action == 2 && !empty($fieldSpec.is_add_translate_dialog)}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
   </td>
   <td>{if !empty($fieldSpec.pre_html_text)}{$fieldSpec.pre_html_text}{/if}{if $form.$fieldName.html}{$form.$fieldName.html}{else}{$fieldSpec.place_holder}{/if}{if !empty($fieldSpec.post_html_text)}{$fieldSpec.post_html_text}{/if}<br />
     {if !empty($fieldSpec.description)}<span class="description">{$fieldSpec.description}</span>{/if}

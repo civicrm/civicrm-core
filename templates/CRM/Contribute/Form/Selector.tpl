@@ -22,10 +22,10 @@
       {/if}
       {foreach from=$columnHeaders item=header}
         <th scope="col">
-          {if $header.sort}
+          {if isset($header.sort)}
             {assign var='key' value=$header.sort}
             {$sort->_response.$key.link}
-          {else}
+          {elseif (!empty($header.name))}
             {$header.name}
           {/if}
         </th>
@@ -48,7 +48,7 @@
              <a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$row.contact_id`&id=`$row.contribution_id`&selector=1"}">
                &nbsp; {$row.total_amount|crmMoney:$row.currency}
             </a>
-          {if $row.amount_level }<br/>({$row.amount_level}){/if}
+          {if !empty($row.amount_level) }<br/>({$row.amount_level}){/if}
           {if $row.contribution_recur_id && $row.is_template}
             <br/>{ts}(Recurring Template){/ts}
           {elseif $row.contribution_recur_id }
@@ -56,10 +56,13 @@
           {/if}
         </td>
       {foreach from=$columnHeaders item=column}
-        {assign var='columnName' value=$column.field_name}
+          {assign var='columnName' value=''}
+          {if isset($column.field_name)}
+            {assign var='columnName' value=$column.field_name}
+          {/if}
         {if !$columnName}{* if field_name has not been set skip, this helps with not changing anything not specifically edited *}
         {elseif $columnName === 'total_amount'}{* rendered above as soft credit columns = confusing *}
-        {elseif $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
+        {elseif isset($column.type) && $column.type === 'actions'}{* rendered below as soft credit column handling = not fixed *}
         {elseif $columnName == 'contribution_status'}
           <td class="crm-contribution-status">
             {$row.contribution_status}<br/>
@@ -68,13 +71,13 @@
             {/if}
           </td>
         {else}
-          {if $column.type == 'date'}
+          {if isset($column.type) && $column.type == 'date'}
             <td class="crm-contribution-{$columnName}">
               {$row.$columnName|crmDate}
             </td>
           {else}
-          <td class="crm-{$columnName} crm-{$columnName}_{$row.columnName}">
-            {$row.$columnName}
+          <td class="crm-{$columnName} crm-{$columnName}_{if isset($row.columnName)}{$row.columnName}{/if}">
+            {if isset($row.$columnName)}{$row.$columnName}{/if}
           </td>
           {/if}
         {/if}

@@ -72,6 +72,9 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
       $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
       $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
+      if (!empty($field['custom_group_id'])) {
+        $field['title'] = $field["groupTitle"] . ' :: ' . $field["title"];
+      }
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 

@@ -143,8 +143,8 @@
   <field>
     <name>modified_date</name>
     <title>Modified Date</title>
-    <type>datetime</type>
-    <default>CURRENT_TIMESTAMP</default>
+    <type>timestamp</type>
+    <default>CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP</default>
     <comment>Last updated date for this record. mostly the last time a payment was received</comment>
     <add>1.6</add>
     <html>
@@ -428,6 +428,12 @@
       <type>EntityRef</type>
       <label>Campaign</label>
     </html>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <prefetch>FALSE</prefetch>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>campaign_id</name>

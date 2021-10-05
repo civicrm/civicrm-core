@@ -157,17 +157,11 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * Delete the profile Field.
    *
    * @param int $id
-   *   Field Id.
-   *
+   * @deprecated
    * @return bool
-   *
    */
   public static function del($id) {
-    //delete  field field
-    $field = new CRM_Core_DAO_UFField();
-    $field->id = $id;
-    $field->delete();
-    return TRUE;
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**

@@ -1117,20 +1117,11 @@ AND    record_type_id = $targetRecordID
    * Delete the mailing job.
    *
    * @param int $id
-   *   Mailing Job id.
-   *
-   * @return mixed
+   * @deprecated
+   * @return bool
    */
   public static function del($id) {
-    CRM_Utils_Hook::pre('delete', 'MailingJob', $id);
-
-    $jobDAO = new CRM_Mailing_BAO_MailingJob();
-    $jobDAO->id = $id;
-    $result = $jobDAO->delete();
-
-    CRM_Utils_Hook::post('delete', 'MailingJob', $jobDAO->id, $jobDAO);
-
-    return $result;
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
 }

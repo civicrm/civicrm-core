@@ -408,4 +408,37 @@ class FkJoinTest extends UnitTestCase {
     $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
   }
 
+  public function testDeprecatedJoins() {
+    $message = '';
+    try {
+      \Civi\Api4\Email::get(FALSE)
+        ->addWhere('contact.first_name', '=', 'Peter')
+        ->addWhere('contact.last_name', '=', '')
+        ->addWhere('contact.is_deleted', '=', 0)
+        ->addWhere('contact.is_deceased', '=', 0)
+        ->addWhere('email', '=', '')
+        ->addWhere('is_primary', '=', TRUE)
+        ->setSelect(['contact_id'])->execute();
+    }
+    catch (\Exception $e) {
+      $message = $e->getMessage();
+    }
+    $this->assertStringContainsString("Deprecated join alias 'contact' used in APIv4 get. Should be changed to 'contact_id'", $message);
+  }
+
+  public function testJoinWithExpression() {
+    Phone::create(FALSE)
+      ->setValues(['contact_id' => $this->getReference('test_contact_1')['id'], 'phone' => '654321'])
+      ->execute();
+    $contacts = Contact::get(FALSE)
+      ->addSelect('id', 'phone.phone')
+      ->addJoin('Phone', 'INNER', ['LOWER(phone.phone)', '=', "CONCAT('6', '5', '4', '3', '2', '1')"])
+      ->addWhere('id', 'IN', [$this->getReference('test_contact_1')['id'], $this->getReference('test_contact_2')['id']])
+      ->addOrderBy('phone.id')
+      ->execute();
+    $this->assertCount(1, $contacts);
+    $this->assertEquals($this->getReference('test_contact_1')['id'], $contacts[0]['id']);
+    $this->assertEquals('654321', $contacts[0]['phone.phone']);
+  }
+
 }

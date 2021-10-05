@@ -3,6 +3,8 @@
 namespace Civi\Api4\Action\Afform;
 
 use Civi\Afform\Event\AfformSubmitEvent;
+use Civi\Api4\AfformSubmission;
+use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Class Submit
@@ -36,9 +38,11 @@ class Submit extends AbstractProcessor {
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
-          // Only accept values from join fields on the form
           foreach ($joinValues as $index => $vals) {
-            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields']);
+            // Only accept values from join fields on the form
+            $joinValues[$index] = array_intersect_key($vals, $entity['joins'][$joinEntity]['fields'] ?? []);
+            // Merge in pre-set data
+            $joinValues[$index] = array_merge($joinValues[$index], $entity['joins'][$joinEntity]['data'] ?? []);
           }
         }
         $entityValues[$entityName][] = $values;
@@ -59,8 +63,21 @@ class Submit extends AbstractProcessor {
       \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
     }
 
-    // What should I return?
-    return [];
+    // Save submission record
+    if (!empty($this->_afform['create_submission'])) {
+      $submission = AfformSubmission::create(FALSE)
+        ->addValue('contact_id', \CRM_Core_Session::getLoggedInContactID())
+        ->addValue('afform_name', $this->name)
+        ->addValue('data', $this->_entityIds)
+        ->execute()->first();
+    }
+
+    // Return ids and a token for uploading files
+    return [
+      [
+        'token' => $this->generatePostSubmitToken(),
+      ],
+    ];
   }
 
   /**
@@ -136,7 +153,7 @@ class Submit extends AbstractProcessor {
       try {
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
         $event->setEntityId($index, $saved['id']);
-        self::saveJoins($event->getEntityType(), $saved['id'], $record['joins'] ?? []);
+        self::saveJoins($event, $index, $saved['id'], $record['joins'] ?? []);
       }
       catch (\API_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity
@@ -148,25 +165,27 @@ class Submit extends AbstractProcessor {
   /**
    * This saves joins (sub-entities) such as Email, Address, Phone, etc.
    *
-   * @param $mainEntityName
-   * @param $entityId
-   * @param $joins
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   * @param int $index
+   * @param int|string $entityId
+   * @param array $joins
    * @throws \API_Exception
-   * @throws \Civi\API\Exception\NotImplementedException
    */
-  protected static function saveJoins($mainEntityName, $entityId, $joins) {
+  protected static function saveJoins(AfformSubmitEvent $event, $index, $entityId, $joins) {
     foreach ($joins as $joinEntityName => $join) {
       $values = self::filterEmptyJoins($joinEntityName, $join);
       // TODO: REPLACE works for creating or updating contacts, but different logic would be needed if
       // the contact was being auto-updated via a dedupe rule; in that case we would not want to
       // delete any existing records.
       if ($values) {
-        civicrm_api4($joinEntityName, 'replace', [
+        $result = civicrm_api4($joinEntityName, 'replace', [
           // Disable permission checks because the main entity has already been vetted
           'checkPermissions' => FALSE,
-          'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
+          'where' => self::getJoinWhereClause($event->getEntityType(), $joinEntityName, $entityId),
           'records' => $values,
-        ]);
+        ], ['id']);
+        $indexedResult = array_combine(array_keys($values), (array) $result);
+        $event->setJoinIds($index, $joinEntityName, $indexedResult);
       }
       // REPLACE doesn't work if there are no records, have to use DELETE
       else {
@@ -174,25 +193,41 @@ class Submit extends AbstractProcessor {
           civicrm_api4($joinEntityName, 'delete', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,
-            'where' => self::getJoinWhereClause($mainEntityName, $joinEntityName, $entityId),
+            'where' => self::getJoinWhereClause($event->getEntityType(), $joinEntityName, $entityId),
           ]);
         }
         catch (\API_Exception $e) {
           // No records to delete
         }
+        $event->setJoinIds($index, $joinEntityName, []);
       }
     }
   }
 
   /**
-   * Filter out joins that have been left blank on the form
+   * Filter out join entities that have been left blank on the form
    *
    * @param $entity
    * @param $join
    * @return array
    */
   private static function filterEmptyJoins($entity, $join) {
-    return array_filter($join, function($item) use($entity) {
+    $idField = CoreUtil::getIdFieldName($entity);
+    $fileFields = (array) civicrm_api4($entity, 'getFields', [
+      'checkPermissions' => FALSE,
+      'where' => [['fk_entity', '=', 'File']],
+    ], ['name']);
+    // Files will be uploaded later, fill with empty values for now
+    // TODO: Somehow check if a file has actually been selected for upload
+    foreach ($join as &$item) {
+      if (empty($item[$idField]) && $fileFields) {
+        $item += array_fill_keys($fileFields, '');
+      }
+    }
+    return array_filter($join, function($item) use($entity, $idField, $fileFields) {
+      if (!empty($item[$idField]) || $fileFields) {
+        return TRUE;
+      }
       switch ($entity) {
         case 'Email':
           return !empty($item['email']);
@@ -207,7 +242,7 @@ class Submit extends AbstractProcessor {
           return !empty($item['url']);
 
         default:
-          \CRM_Utils_Array::remove($item, 'id', 'is_primary', 'location_type_id', 'entity_id', 'contact_id', 'entity_table');
+          \CRM_Utils_Array::remove($item, 'is_primary', 'location_type_id', 'entity_id', 'contact_id', 'entity_table');
           return (bool) array_filter($item);
       }
     });
@@ -239,6 +274,27 @@ class Submit extends AbstractProcessor {
         $record['fields']['id'] = $this->_entityIds[$entityName][$index]['id'];
       }
     }
+  }
+
+  /**
+   * Generates token returned from submit action
+   *
+   * @return string
+   * @throws \Civi\Crypto\Exception\CryptoException
+   */
+  private function generatePostSubmitToken(): string {
+    // 1 hour should be more than sufficient to upload files
+    $expires = \CRM_Utils_Time::time() + (60 * 60);
+
+    /** @var \Civi\Crypto\CryptoJwt $jwt */
+    $jwt = \Civi::service('crypto.jwt');
+
+    return $jwt->encode([
+      'exp' => $expires,
+      // Note: Scope is not the same as "authx" scope. "Authx" tokens are user-login tokens. This one is a more limited access token.
+      'scope' => 'afformPostSubmit',
+      'civiAfformSubmission' => ['name' => $this->name, 'data' => $this->_entityIds],
+    ]);
   }
 
 }

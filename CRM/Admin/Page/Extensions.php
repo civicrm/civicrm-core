@@ -248,6 +248,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       }
       $row = (array) $info;
       $row['id'] = $info->key;
+      $row['upgradelink'] = '';
       $action = CRM_Core_Action::UPDATE;
       $row['action'] = CRM_Core_Action::formLink(self::links(),
         $action,

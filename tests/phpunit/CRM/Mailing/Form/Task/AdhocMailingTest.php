@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 /**
- * Test class for CRM_Contact_Form_Task_EmailCommon.
+ * Test class for CRM_Mailing_Form_Task_AdhocMailing.
  * @group headless
  */
 class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {

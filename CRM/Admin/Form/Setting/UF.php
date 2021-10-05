@@ -36,7 +36,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $this->_settings['wpBasePage'] = CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME;
     }
 
-    CRM_Utils_System::setTitle(
+    $this->setTitle(
       ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
@@ -67,8 +67,8 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
         $config->dsn != $config->userFrameworkDSN || !empty($drupal_prefix)
       )
     ) {
-      $dsn = CRM_Utils_SQL::autoSwitchDSN($config->dsn);
-      $dsnArray = DB::parseDSN($dsn);
+
+      $dsnArray = DB::parseDSN(CRM_Utils_SQL::autoSwitchDSN($config->dsn));
       $tableNames = CRM_Core_DAO::getTableNames();
       asort($tableNames);
       $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= [';
@@ -77,13 +77,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       }
       // add default prefix: the drupal database prefix
       $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
-      $prefix = "";
-      if ($config->dsn != $config->userFrameworkDSN) {
-        $prefix = "`{$dsnArray['database']}`.";
-        if ($config->userFramework === 'Backdrop') {
-          $prefix = "{$dsnArray['database']}.";
-        }
-      }
+      $prefix = $config->userSystem->getCRMDatabasePrefix();
       foreach ($tableNames as $tableName) {
         $tablePrefixes .= "\n  '" . str_pad($tableName . "'", 41) . " => '{$prefix}',";
       }

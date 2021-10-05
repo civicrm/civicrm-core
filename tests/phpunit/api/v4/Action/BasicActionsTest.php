@@ -158,7 +158,7 @@ class BasicActionsTest extends UnitTestCase {
   public function testGetFields() {
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
-    $this->assertCount(7, $getFields);
+    $this->assertCount(8, $getFields);
     $this->assertEquals('Identifier', $getFields['identifier']['title']);
     // Ensure default data type is "String" when not specified
     $this->assertEquals('String', $getFields['color']['data_type']);
@@ -167,6 +167,10 @@ class BasicActionsTest extends UnitTestCase {
     $this->assertTrue($getFields['group']['options']);
     $this->assertTrue($getFields['fruit']['options']);
     $this->assertFalse($getFields['identifier']['options']);
+
+    // Getfields should figure out what suffixes are available based on option keys
+    $this->assertEquals(['name', 'label'], $getFields['group']['suffixes']);
+    $this->assertEquals(['name', 'label', 'color'], $getFields['fruit']['suffixes']);
 
     // Load simple options
     $getFields = MockBasicEntity::getFields()
@@ -350,6 +354,28 @@ class BasicActionsTest extends UnitTestCase {
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals('two', $result->first()['group']);
+  }
+
+  public function testRegexpOperators() {
+    $records = [
+      ['color' => 'red'],
+      ['color' => 'blue'],
+      ['color' => 'brown'],
+    ];
+    $this->replaceRecords($records);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'REGEXP', '^b')
+      ->execute();
+    $this->assertCount(2, $result);
+    $this->assertEquals('blue', $result[0]['color']);
+    $this->assertEquals('brown', $result[1]['color']);
+
+    $result = MockBasicEntity::get()
+      ->addWhere('color', 'NOT REGEXP', '^b')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals('red', $result[0]['color']);
   }
 
   public function testPseudoconstantMatch() {

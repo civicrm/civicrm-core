@@ -149,7 +149,7 @@ class CRM_Contact_Import_ImportJob {
           $header[] = $locationTypes[$selOne];
           $parserParameters['mapperLocType'][$key] = $selOne;
           if ($selTwo && is_numeric($selTwo)) {
-            if ($fldName === 'phone') {
+            if ($fldName === 'phone' || $fldName === 'phone_ext') {
               $header[] = $phoneTypes[$selTwo];
               $parserParameters['mapperPhoneType'][$key] = $selTwo;
             }
@@ -188,7 +188,7 @@ class CRM_Contact_Import_ImportJob {
               $header[] = $locationTypes[$selTwo];
               $parserParameters['relatedContactLocType'][$key] = $selTwo;
               if ($selThree) {
-                if ($selOne == 'phone') {
+                if ($selOne == 'phone' || $selOne == 'phone_ext') {
                   $header[] = $phoneTypes[$selThree];
                   $parserParameters['relatedContactPhoneType'][$key] = $selThree;
                 }

@@ -932,7 +932,7 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return static[]
    * @throws CRM_Core_Exception
    */
-  public static function writeRecords(array $records) {
+  public static function writeRecords(array $records): array {
     $results = [];
     foreach ($records as $record) {
       $results[] = static::writeRecord($record);
@@ -957,13 +957,19 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($record['id'])) {
       throw new CRM_Core_Exception("Cannot delete {$entityName} with no id.");
     }
+    CRM_Utils_Type::validate($record['id'], 'Positive');
 
     CRM_Utils_Hook::pre('delete', $entityName, $record['id'], $record);
     $instance = new $className();
     $instance->id = $record['id'];
-    if (!$instance->delete()) {
+    // Load complete object for the sake of hook_civicrm_post, below
+    $instance->find(TRUE);
+    if (!$instance || !$instance->delete()) {
       throw new CRM_Core_Exception("Could not delete {$entityName} id {$record['id']}");
     }
+    // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
+    // But that's not possible with delete because it's gone from the database by the time this hook is called.
+    // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
     CRM_Utils_Hook::post('delete', $entityName, $record['id'], $instance);
 
     return $instance;
@@ -1971,11 +1977,12 @@ LIKE %1
    *
    * @param int $entityID
    * @param int $newEntityID
+   * @param string $parentOperation
    */
-  public function copyCustomFields($entityID, $newEntityID) {
+  public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
-    // Obtain custom values for old event
+    // Obtain custom values for the old entity.
     $customParams = $htmlType = [];
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($entityID, $entity);
 
@@ -2009,8 +2016,8 @@ LIKE %1
         }
       }
 
-      // Save Custom Fields for new Event
-      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity);
+      // Save Custom Fields for new Entity.
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, $parentOperation ?? 'create');
     }
 
     // copy activity attachments ( if any )

@@ -9,13 +9,13 @@
     <email>info@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">http://FIXME</url>
-    <url desc="Documentation">http://FIXME</url>
-    <url desc="Support">http://FIXME</url>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/oauth-client</url>
+    <url desc="Documentation">https://docs.civicrm.org/sysadmin/en/latest/setup/oauth/</url>
+    <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate>2020-10-23</releaseDate>
-  <version>5.42.alpha1</version>
+  <version>5.43.alpha1</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.38</ver>
@@ -23,7 +23,7 @@
   <requires>
     <ext version="~4.5">org.civicrm.afform</ext>
   </requires>
-  <comments>This extension provides a framework for oauth support</comments>
+  <comments>This extension provides a framework for OAuth support</comments>
   <classloader>
     <psr0 prefix="CRM_" path=""/>
     <psr4 prefix="Civi\" path="Civi"/>

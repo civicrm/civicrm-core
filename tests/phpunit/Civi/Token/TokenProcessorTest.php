@@ -31,6 +31,40 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   /**
+   * The visitTokens() method is internal - but it is important basis for other methods.
+   * Specifically, it parses all token expressions and invokes a callback for each.
+   *
+   * Ensure these callbacks get the expected data (with various quirky notations).
+   */
+  public function testVisitTokens() {
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+    ]);
+    $examples = [
+      '{foo.bar}' => ['foo', 'bar', NULL],
+      '{foo.bar|whiz}' => ['foo', 'bar', ['whiz']],
+      '{foo.bar|whiz:"bang"}' => ['foo', 'bar', ['whiz', 'bang']],
+      '{FoO.bAr|whiz:"bang"}' => ['FoO', 'bAr', ['whiz', 'bang']],
+      '{oo_f.ra_b|b_52:"bang":"b@ng, on +he/([do0r])?!"}' => ['oo_f', 'ra_b', ['b_52', 'bang', 'b@ng, on +he/([do0r])?!']],
+      '{foo.bar.whiz}' => ['foo', 'bar.whiz', NULL],
+      '{foo.bar.whiz|bang}' => ['foo', 'bar.whiz', ['bang']],
+      '{foo.bar:label}' => ['foo', 'bar:label', NULL],
+      '{foo.bar:label|truncate:"10"}' => ['foo', 'bar:label', ['truncate', '10']],
+    ];
+    foreach ($examples as $input => $expected) {
+      array_unshift($expected, $input);
+      $log = [];
+      $filtered = $p->visitTokens($input, function (?string $fullToken, ?string $entity, ?string $field, ?array $modifier) use (&$log) {
+        $log[] = [$fullToken, $entity, $field, $modifier];
+        return 'Replaced!';
+      });
+      $this->assertEquals(1, count($log), "Should receive one callback on expression: $input");
+      $this->assertEquals($expected, $log[0]);
+      $this->assertEquals('Replaced!', $filtered);
+    }
+  }
+
+  /**
    * Test that a row can be added via "addRow(array $context)".
    */
   public function testAddRow() {
@@ -140,20 +174,24 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   public function testRenderLocalizedSmarty() {
+    \CRM_Utils_Time::setTime('2022-04-08 16:32:04');
+    $resetTime = \CRM_Utils_AutoClean::with(['CRM_Utils_Time', 'resetTime']);
+    $this->dispatcher->addSubscriber(new \CRM_Core_DomainTokens());
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'smarty' => TRUE,
     ]);
-    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts}', 'text/plain');
+    $p->addMessage('text', '{ts}Yes{/ts} {ts}No{/ts} {domain.now|crmDate:"%B"}', 'text/plain');
     $p->addRow([]);
     $p->addRow(['locale' => 'fr_FR']);
     $p->addRow(['locale' => 'es_MX']);
 
     $expectText = [
-      'Yes No',
-      'Oui Non',
-      'Sí No',
+      'Yes No April',
+      'Oui Non Avril',
+      'Sí No Abril',
     ];
 
     $rowCount = 0;
@@ -166,10 +204,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(3, $rowCount);
   }
 
-  public function testRenderLocalizedHookToken() {
+  public function testRenderLocalizedHookToken(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
       $e->tokens['trans'] = [
         'trans.affirm' => ts('Translated affirmation'),
@@ -281,6 +320,35 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 
+  public function testFilter() {
+    $exampleTokens['foo_bar']['whiz_bang'] = 'Some Text';
+    $exampleMessages = [
+      'This is {foo_bar.whiz_bang}.' => 'This is Some Text.',
+      'This is {foo_bar.whiz_bang|lower}...' => 'This is some text...',
+      'This is {foo_bar.whiz_bang|upper}!' => 'This is SOME TEXT!',
+    ];
+    $expectExampleCount = /* {#msgs} x {smarty:on,off} */ 6;
+    $actualExampleCount = 0;
+
+    foreach ($exampleMessages as $inputMessage => $expectOutput) {
+      foreach ([TRUE, FALSE] as $useSmarty) {
+        $p = new TokenProcessor($this->dispatcher, [
+          'controller' => __CLASS__,
+          'smarty' => $useSmarty,
+        ]);
+        $p->addMessage('example', $inputMessage, 'text/plain');
+        $p->addRow()
+          ->format('text/plain')->tokens($exampleTokens);
+        foreach ($p->evaluate()->getRows() as $key => $row) {
+          $this->assertEquals($expectOutput, $row->render('example'));
+          $actualExampleCount++;
+        }
+      }
+    }
+
+    $this->assertEquals($expectExampleCount, $actualExampleCount);
+  }
+
   public function onListTokens(TokenRegisterEvent $e) {
     $this->counts[__FUNCTION__]++;
     $e->register('custom', [
@@ -314,6 +382,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function($e) {
       $e->tokens['fruit'] = [
         'fruit.apple' => ts('Apple'),
@@ -354,10 +424,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Define extended tokens with funny symbols
    */
-  public function testHookTokenExtraChar() {
+  public function testHookTokenExtraChar(): void {
     $cid = $this->individualCreate();
 
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
     \Civi::dispatcher()->addListener('hook_civicrm_tokens', function ($e) {
       $e->tokens['food'] = [
         'food.fruit.apple' => ts('Apple'),
@@ -414,5 +485,164 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     }
     $this->assertEquals(2, $loops);
   }
+
+  /**
+   * Process a message using mocked data.
+   */
+  public function testMockData_ContactContribution() {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId', 'contactId'],
+    ]);
+    $p->addMessage('example', 'Invoice #{contribution.invoice_id} for {contact.display_name}!', 'text/plain');
+    $p->addRow([
+      'contactId' => 11,
+      'contact' => [
+        'display_name' => 'The Override',
+      ],
+      'contributionId' => 111,
+      'contribution' => [
+        'id' => 111,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 11111,
+      ],
+    ]);
+    $p->addRow([
+      'contactId' => 22,
+      'contact' => [
+        'display_name' => 'Another Override',
+      ],
+      'contributionId' => 222,
+      'contribution' => [
+        'id' => 111,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 22222,
+      ],
+    ]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #11111 for The Override!', $outputs[0]);
+    $this->assertEquals('Invoice #22222 for Another Override!', $outputs[1]);
+  }
+
+  /**
+   * Process a message using mocked data, accessed through a Smarty alias.
+   */
+  public function testMockData_SmartyAlias_Contribution(): void {
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId'],
+      'smarty' => TRUE,
+      'smartyTokenAlias' => [
+        'theInvoiceId' => 'contribution.invoice_id',
+      ],
+    ]);
+    $p->addMessage('example', 'Invoice #{$theInvoiceId}!', 'text/plain');
+    $p->addRow([
+      'contributionId' => 333,
+      'contribution' => [
+        'id' => 333,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 33333,
+      ],
+    ]);
+    $p->addRow([
+      'contributionId' => 444,
+      'contribution' => [
+        'id' => 444,
+        'receive_date' => '2012-01-02',
+        'invoice_id' => 44444,
+      ],
+    ]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #33333!', $outputs[0]);
+    $this->assertEquals('Invoice #44444!', $outputs[1]);
+
+  }
+
+  /**
+   * This defines a compatibility mechanism wherein an old Smarty expression can
+   * be evaluated based on a newer token expression.
+   *
+   * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
+   */
+  public function testSmartyTokenAlias_Contribution(): void {
+    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => 100, 'trxn_id' => 1000]);
+    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => 200, 'trxn_id' => 1]);
+    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+    $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
+    $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
+
+    $p = new TokenProcessor($this->dispatcher, [
+      'controller' => __CLASS__,
+      'schema' => ['contributionId'],
+      'smarty' => TRUE,
+      'smartyTokenAlias' => [
+        'theInvoiceId' => 'contribution.invoice_id',
+      ],
+    ]);
+    $p->addMessage('example', 'Invoice #{$theInvoiceId}!', 'text/plain');
+    $p->addRow(['contributionId' => $first]);
+    $p->addRow(['contributionId' => $second]);
+    $p->evaluate();
+
+    $outputs = [];
+    foreach ($p->getRows() as $row) {
+      $outputs[] = $row->render('example');
+    }
+    $this->assertEquals('Invoice #100!', $outputs[0]);
+    $this->assertEquals('Invoice #200!', $outputs[1]);
+  }
+
+  ///**
+  // * This defines a compatibility mechanism wherein an old Smarty expression can
+  // * be evaluated based on a newer token expression.
+  // *
+  // * The following example doesn't work because the handling of greeting+contact
+  // * tokens still use a special override (TokenCompatSubscriber::onRender).
+  // *
+  // * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
+  // */
+  //  public function testSmartyTokenAlias_Contact() {
+  //    $alice = $this->individualCreate(['first_name' => 'Alice']);
+  //    $bob = $this->individualCreate(['first_name' => 'Bob']);
+  //    $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
+  //
+  //    $p = new TokenProcessor($this->dispatcher, [
+  //      'controller' => __CLASS__,
+  //      'schema' => ['contactId'],
+  //      'smarty' => TRUE,
+  //      'smartyTokenAlias' => [
+  //        'myFirstName' => 'contact.first_name',
+  //      ],
+  //    ]);
+  //    $p->addMessage('example', 'Hello {$myFirstName}!', 'text/plain');
+  //    $p->addRow(['contactId' => $alice]);
+  //    $p->addRow(['contactId' => $bob]);
+  //    $p->evaluate();
+  //
+  //    $outputs = [];
+  //    foreach ($p->getRows() as $row) {
+  //      $outputs[] = $row->render('example');
+  //    }
+  //    $this->assertEquals('Hello Alice!', $outputs[0]);
+  //    $this->assertEquals('Hello Bob!', $outputs[1]);
+  //  }
 
 }

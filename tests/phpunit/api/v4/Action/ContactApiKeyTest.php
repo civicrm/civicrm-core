@@ -50,17 +50,21 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     $result = Contact::get()
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
+      ->addSelect('IF((api_key IS NULL), "yes", "no") AS is_api_key_null')
       ->execute()
       ->first();
     $this->assertEquals($key, $result['api_key']);
+    $this->assertEquals('no', $result['is_api_key_null']);
     $this->assertFalse($isSafe($result), "Should reveal secret details ($key): " . var_export($result, 1));
 
     // Can also be fetched via join
     $email = Email::get()
       ->addSelect('contact_id.api_key')
+      ->addSelect('IF((contact_id.api_key IS NULL), "yes", "no") AS is_api_key_null')
       ->addWhere('id', '=', $contact['email']['id'])
       ->execute()->first();
     $this->assertEquals($key, $email['contact_id.api_key']);
+    $this->assertEquals('no', $result['is_api_key_null']);
     $this->assertFalse($isSafe($email), "Should reveal secret details ($key): " . var_export($email, 1));
 
     // Remove permission and we should not see the key
@@ -68,20 +72,24 @@ class ContactApiKeyTest extends \api\v4\UnitTestCase {
     $result = Contact::get()
       ->addWhere('id', '=', $contact['id'])
       ->addSelect('api_key')
+      ->addSelect('IF((api_key IS NULL), "yes", "no") AS is_api_key_null')
       ->setDebug(TRUE)
       ->execute();
     $this->assertContains('api_key', $result->debug['unauthorized_fields']);
     $this->assertArrayNotHasKey('api_key', $result[0]);
+    $this->assertArrayNotHasKey('is_api_key_null', $result[0]);
     $this->assertTrue($isSafe($result[0]), "Should NOT reveal secret details ($key): " . var_export($result[0], 1));
 
     // Also not available via join
     $email = Email::get()
       ->addSelect('contact_id.api_key')
+      ->addSelect('IF((contact_id.api_key IS NULL), "yes", "no") AS is_api_key_null')
       ->addWhere('id', '=', $contact['email']['id'])
       ->setDebug(TRUE)
       ->execute();
     $this->assertContains('contact_id.api_key', $email->debug['unauthorized_fields']);
     $this->assertArrayNotHasKey('contact_id.api_key', $email[0]);
+    $this->assertArrayNotHasKey('is_api_key_null', $result[0]);
     $this->assertTrue($isSafe($email[0]), "Should NOT reveal secret details ($key): " . var_export($email[0], 1));
 
     $result = Contact::get()

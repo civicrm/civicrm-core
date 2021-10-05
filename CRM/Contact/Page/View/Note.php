@@ -21,20 +21,6 @@
 class CRM_Contact_Page_View_Note extends CRM_Core_Page {
 
   /**
-   * The action links for notes that we need to display for the browse screen
-   *
-   * @var array
-   */
-  public static $_links = NULL;
-
-  /**
-   * The action links for comments that we need to display for the browse screen
-   *
-   * @var array
-   */
-  public static $_commentLinks = NULL;
-
-  /**
    * Notes found running the browse function
    * @var array
    */
@@ -158,7 +144,7 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
-      CRM_Core_BAO_Note::del($this->_id);
+      $this->delete();
       CRM_Utils_System::redirect($url);
     }
 
@@ -233,82 +219,74 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
   }
 
   /**
-   * Delete the note object from the db.
+   * Delete the note object from the db and set a status msg.
    */
   public function delete() {
-    CRM_Core_BAO_Note::del($this->_id);
+    CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
+    $status = ts('Selected Note has been deleted successfully.');
+    CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
   }
 
   /**
    * Get action links.
    *
-   * @return array
-   *   (reference) of action links
+   * @return array[]
    */
-  public static function &links() {
-    if (!(self::$_links)) {
-      $deleteExtra = ts('Are you sure you want to delete this note?');
-
-      self::$_links = [
-        CRM_Core_Action::VIEW => [
-          'name' => ts('View'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
-          'title' => ts('View Note'),
-        ],
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
-          'title' => ts('Edit Note'),
-        ],
-        CRM_Core_Action::ADD => [
-          'name' => ts('Comment'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=add&reset=1&cid=%%cid%%&parentId=%%id%%&selectedChild=note',
-          'title' => ts('Add Comment'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
-          'title' => ts('Delete Note'),
-        ],
-      ];
-    }
-    return self::$_links;
+  public static function links() {
+    return [
+      CRM_Core_Action::VIEW => [
+        'name' => ts('View'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
+        'title' => ts('View Note'),
+      ],
+      CRM_Core_Action::UPDATE => [
+        'name' => ts('Edit'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
+        'title' => ts('Edit Note'),
+      ],
+      CRM_Core_Action::ADD => [
+        'name' => ts('Comment'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=add&reset=1&cid=%%cid%%&parentId=%%id%%&selectedChild=note',
+        'title' => ts('Add Comment'),
+      ],
+      CRM_Core_Action::DELETE => [
+        'name' => ts('Delete'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=note',
+        'title' => ts('Delete Note'),
+      ],
+    ];
   }
 
   /**
    * Get action links for comments.
    *
-   * @return array
-   *   (reference) of action links
+   * @return array[]
    */
-  public static function &commentLinks() {
-    if (!(self::$_commentLinks)) {
-      self::$_commentLinks = [
-        CRM_Core_Action::VIEW => [
-          'name' => ts('View'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=view&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
-          'title' => ts('View Comment'),
-        ],
-        CRM_Core_Action::UPDATE => [
-          'name' => ts('Edit'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=update&reset=1&cid=%%cid%%&id={id}&parentId=%%pid%%&selectedChild=note',
-          'title' => ts('Edit Comment'),
-        ],
-        CRM_Core_Action::DELETE => [
-          'name' => ts('Delete'),
-          'url' => 'civicrm/contact/view/note',
-          'qs' => 'action=delete&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
-          'title' => ts('Delete Comment'),
-        ],
-      ];
-    }
-    return self::$_commentLinks;
+  public static function commentLinks() {
+    return [
+      CRM_Core_Action::VIEW => [
+        'name' => ts('View'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=view&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
+        'title' => ts('View Comment'),
+      ],
+      CRM_Core_Action::UPDATE => [
+        'name' => ts('Edit'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=update&reset=1&cid=%%cid%%&id={id}&parentId=%%pid%%&selectedChild=note',
+        'title' => ts('Edit Comment'),
+      ],
+      CRM_Core_Action::DELETE => [
+        'name' => ts('Delete'),
+        'url' => 'civicrm/contact/view/note',
+        'qs' => 'action=delete&reset=1&cid=%%cid%%&id={id}&selectedChild=note',
+        'title' => ts('Delete Comment'),
+      ],
+    ];
   }
 
 }

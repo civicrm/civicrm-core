@@ -12,7 +12,7 @@
 {if !empty($searchtype) && $searchtype eq 'ts_sel'}
 <div id="popupContainer">
   <div class="crm-block crm-form-block crm-search-form-block">
-    <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
+    <table id="selectedRecords-{if !empty($group)}{$group.id}{/if}" class="display crm-copy-fields crm-sortable">
       <thead>
       <tr class="columnheader">
         <th class="contact_details">{ts}Name{/ts}</th>

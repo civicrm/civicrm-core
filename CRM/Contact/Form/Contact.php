@@ -180,7 +180,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       );
       $typeLabel = implode(' / ', $typeLabel);
 
-      CRM_Utils_System::setTitle(ts('New %1', [1 => $typeLabel]));
+      $this->setTitle(ts('New %1', [1 => $typeLabel]));
       $session->pushUserContext(CRM_Utils_System::url('civicrm/dashboard', 'reset=1'));
       $this->_contactId = NULL;
     }
@@ -221,7 +221,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         }
 
         // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
-        CRM_Utils_System::setTitle($displayName);
+        $this->setTitle($displayName);
         $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
         $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 

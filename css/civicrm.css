@@ -2087,6 +2087,11 @@ a.crm-i:hover {
   opacity: .8;
 }
 
+.crm-submit-buttons .helpicon {
+    float: left;
+    padding-right: 6px;
+}
+
 .crm-container  a.helpicon:hover,
 .crm-container  a.helpicon:focus {
   opacity: 1;
@@ -3898,4 +3903,28 @@ span.crm-status-icon {
   padding: 1px 5px;
   border-radius: 3px;
   border: 1px solid grey;
+}
+
+/* search kit grid layout styling */
+.crm-search-display-grid-container {
+  display: grid;
+  grid-gap: 1em;
+  align-items: center;
+  justify-items: center;
+}
+
+.crm-search-display-grid-layout-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.crm-search-display-grid-layout-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.crm-search-display-grid-layout-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.crm-search-display-grid-layout-5 {
+  grid-template-columns: repeat(5, 1fr);
 }

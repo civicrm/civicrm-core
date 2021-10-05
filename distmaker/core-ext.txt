@@ -13,6 +13,7 @@ ewaysingle
 financialacls
 flexmailer
 greenwich
+message_admin
 oauth-client
 payflowpro
 recaptcha

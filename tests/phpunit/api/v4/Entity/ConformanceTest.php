@@ -19,7 +19,12 @@
 
 namespace api\v4\Entity;
 
+use api\v4\Traits\CheckAccessTrait;
+use api\v4\Traits\OptionCleanupTrait;
+use api\v4\Traits\TableDropperTrait;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\Entity;
 use api\v4\UnitTestCase;
 use Civi\Api4\Event\ValidateValuesEvent;
@@ -33,9 +38,9 @@ use Civi\Test\HookInterface;
  */
 class ConformanceTest extends UnitTestCase implements HookInterface {
 
-  use \api\v4\Traits\CheckAccessTrait;
-  use \api\v4\Traits\TableDropperTrait;
-  use \api\v4\Traits\OptionCleanupTrait {
+  use CheckAccessTrait;
+  use TableDropperTrait;
+  use OptionCleanupTrait {
     setUp as setUpOptionCleanup;
   }
 
@@ -48,24 +53,31 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    * Set up baseline for testing
    */
   public function setUp(): void {
-    $tablesToTruncate = [
-      'civicrm_case_type',
-      'civicrm_custom_group',
-      'civicrm_custom_field',
-      'civicrm_group',
-      'civicrm_event',
-      'civicrm_participant',
-      'civicrm_batch',
-      'civicrm_product',
-    ];
-    $this->dropByPrefix('civicrm_value_myfavorite');
-    $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
     $this->setUpOptionCleanup();
     $this->loadDataSet('CaseType');
     $this->loadDataSet('ConformanceTest');
     $this->creationParamProvider = \Civi::container()->get('test.param_provider');
     parent::setUp();
     $this->resetCheckAccess();
+  }
+
+  /**
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function tearDown(): void {
+    CustomField::delete()->addWhere('id', '>', 0)->execute();
+    CustomGroup::delete()->addWhere('id', '>', 0)->execute();
+    $tablesToTruncate = [
+      'civicrm_case_type',
+      'civicrm_group',
+      'civicrm_event',
+      'civicrm_participant',
+      'civicrm_batch',
+      'civicrm_product',
+    ];
+    $this->cleanup(['tablesToTruncate' => $tablesToTruncate]);
+    parent::tearDown();
   }
 
   /**
@@ -133,7 +145,7 @@ class ConformanceTest extends UnitTestCase implements HookInterface {
    *
    * @throws \API_Exception
    */
-  public function testConformance($entity): void {
+  public function testConformance(string $entity): void {
     $entityClass = CoreUtil::getApiClass($entity);
 
     $this->checkEntityInfo($entityClass);

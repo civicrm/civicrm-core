@@ -42,16 +42,10 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
    * @param string $rev
    *   an intermediate version; note that setPostUpgradeMessage is called repeatedly with different $revs.
    */
-  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
-    $templateUpgrader = new CRM_Upgrade_Incremental_MessageTemplates($rev);
-    $upgradeMessage = $templateUpgrader->getMessageTemplateWarning('contribution_invoice_receipt', '$display_name', 'contact.display_name');
-    if (!empty($upgradeMessage)) {
-      $postUpgradeMessage .= '<ul><li>' . htmlspecialchars($upgradeMessage) . '</li></ul>';
+  public function setPostUpgradeMessage(&$postUpgradeMessage, $rev): void {
+    if ($rev === '5.41.alpha1') {
+      $postUpgradeMessage .= '<br /><br />' . ts('A token has been updated in the %1 template. Check the system checks page to see if any action is required.', [1 => 'invoice']);
     }
-    // Example: Generate a post-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $postUpgradeMessage .= '<br /><br />' . ts("By default, CiviCRM now disables the ability to import directly from SQL. To use this feature, you must explicitly grant permission 'import SQL datasource'.");
-    // }
   }
 
   /*
@@ -89,6 +83,42 @@ class CRM_Upgrade_Incremental_php_FiveFortyOne extends CRM_Upgrade_Incremental_B
     $this->addTask('Replace contribution page id token in action schedule',
       'updateActionScheduleToken', 'contribution.contribution_page_id', 'contribution.contribution_page_id:label', $rev
     );
+  }
+
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_41_beta1($rev) {
+    $this->addTask('Ensure non-English installs have a default financial type for the membership price set.',
+      'ensureDefaultMembershipFinancialType');
+  }
+
+  public static function ensureDefaultMembershipFinancialType(): bool {
+    $membershipPriceSet = CRM_Core_DAO::executeQuery(
+      'SELECT id, financial_type_id FROM civicrm_price_set WHERE name = "default_membership_type_amount"'
+    );
+    $membershipPriceSet->fetch();
+    if (!is_numeric($membershipPriceSet->financial_type_id)) {
+      $membershipFinancialTypeID = CRM_Core_DAO::singleValueQuery('
+        SELECT id FROM civicrm_financial_type
+        WHERE name = "Member Dues"
+        OR name = %1', [1 => [ts('Member Dues'), 'String']]
+      );
+      if (!$membershipFinancialTypeID) {
+        // This should be unreachable - but something is better than nothing
+        // if we get to this point & 2 will be correct on 99.9% of installs.
+        $membershipFinancialTypeID = 2;
+      }
+      CRM_Core_DAO::executeQuery("
+        UPDATE civicrm_price_set
+        SET financial_type_id = $membershipFinancialTypeID
+        WHERE name = 'default_membership_type_amount'"
+      );
+
+    }
+    return TRUE;
   }
 
   /**

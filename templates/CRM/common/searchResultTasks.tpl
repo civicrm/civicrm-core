@@ -13,8 +13,8 @@
   <table class="form-layout-compressed">
   <tr>
     <td class="font-size12pt" style="width: 40%;">
-    {if $savedSearch.name}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
-    {ts count=$pager->_totalItems plural='%count Results'}%count Result{/ts}{if $selectorLabel}&nbsp;-&nbsp;{$selectorLabel}{/if}
+    {if !empty($savedSearch.name)}{$savedSearch.name} ({ts}smart group{/ts}) - {/if}
+    {ts count=$pager->_totalItems plural='%count Results'}%count Result{/ts}{if !empty($selectorLabel)}&nbsp;-&nbsp;{$selectorLabel}{/if}
     {if $context == 'Event' && $participantCount && ( $pager->_totalItems ne $participantCount ) }
         <br />{ts}Actual participant count{/ts} : {$participantCount} {help id="id-actual_participant_count" file="CRM/Event/Form/Search/Results.hlp"} &nbsp;
     {/if}

@@ -538,6 +538,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Logging',
       // Skip message template because workflow_id/workflow_name are sync'd.
       'MessageTemplate',
+      // Skip survey because the pseudoconstant will have no options.
+      'Survey',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithout;
@@ -650,6 +652,11 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'CaseType' => [
         'cant_update' => [
           'definition',
+        ],
+      ],
+      'ContributionRecur' => [
+        'break_return' => [
+          'contribution_recur_modified_date',
         ],
       ],
       'Domain' => ['cant_update' => ['domain_version']],

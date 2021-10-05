@@ -15,6 +15,17 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+## CiviCRM 5.42.0
+
+Released October 6, 2021
+
+- **[Synopsis](release-notes/5.42.0.md#synopsis)**
+- **[Features](release-notes/5.42.0.md#features)**
+- **[Bugs resolved](release-notes/5.42.0.md#bugs)**
+- **[Miscellany](release-notes/5.42.0.md#misc)**
+- **[Credits](release-notes/5.42.0.md#credits)**
+- **[Feedback](release-notes/5.42.0.md#feedback)**
+
 ## CiviCRM 5.41.0
 
 Released September 1, 2021
@@ -25,6 +36,24 @@ Released September 1, 2021
 - **[Miscellany](release-notes/5.41.0.md#misc)**
 - **[Credits](release-notes/5.41.0.md#credits)**
 - **[Feedback](release-notes/5.41.0.md#feedback)**
+
+## CiviCRM 5.40.4
+
+Released August 26, 2021
+
+- **[Synopsis](release-notes/5.40.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.40.4.md#bugs)**
+- **[Credits](release-notes/5.40.4.md#credits)**
+- **[Feedback](release-notes/5.40.4.md#feedback)**
+
+## CiviCRM 5.40.3
+
+Released August 23, 2021
+
+- **[Synopsis](release-notes/5.40.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.40.3.md#bugs)**
+- **[Credits](release-notes/5.40.3.md#credits)**
+- **[Feedback](release-notes/5.40.3.md#feedback)**
 
 ## CiviCRM 5.40.2
 

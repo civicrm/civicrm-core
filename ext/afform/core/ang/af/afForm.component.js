@@ -4,9 +4,10 @@
     bindings: {
       ctrl: '@'
     },
-    controller: function($scope, $timeout, crmApi4, crmStatus, $window, $location) {
+    controller: function($scope, $element, $timeout, crmApi4, crmStatus, $window, $location, FileUploader) {
       var schema = {},
         data = {},
+        status,
         ctrl = this;
 
       this.$onInit = function() {
@@ -53,21 +54,57 @@
         }
       };
 
-      this.submit = function submit() {
-        var submission = crmApi4('Afform', 'submit', {name: ctrl.getFormMeta().name, args: $scope.$parent.routeParams || {}, values: data});
-        var metaData = ctrl.getFormMeta();
-        if (metaData.redirect) {
-          submission.then(function() {
-            var url = metaData.redirect;
-            if (url.indexOf('civicrm/') === 0) {
-              url = CRM.url(url);
-            } else if (url.indexOf('/') === 0) {
-              url = $location.protocol() + '://' + $location.host() + url;
-            }
-            $window.location.href = url;
-          });
+      // Used when submitting file fields
+      this.fileUploader = new FileUploader({
+        url: CRM.url('civicrm/ajax/api4/Afform/submitFile'),
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+        onCompleteAll: postProcess,
+        onBeforeUploadItem: function(item) {
+          status.resolve();
+          status = CRM.status({start: ts('Uploading %1', {1: item.file.name})});
         }
-        return crmStatus({start: ts('Saving'), success: ts('Saved')}, submission);
+      });
+
+      // Called after form is submitted and files are uploaded
+      function postProcess() {
+        var metaData = ctrl.getFormMeta();
+
+        if (metaData.redirect) {
+          var url = metaData.redirect;
+          if (url.indexOf('civicrm/') === 0) {
+            url = CRM.url(url);
+          } else if (url.indexOf('/') === 0) {
+            url = $location.protocol() + '://' + $location.host() + url;
+          }
+          $window.location.href = url;
+        }
+        status.resolve();
+        $element.unblock();
+      }
+
+      this.submit = function() {
+        status = CRM.status({});
+        $element.block();
+
+        crmApi4('Afform', 'submit', {
+          name: ctrl.getFormMeta().name,
+          args: $scope.$parent.routeParams || {},
+          values: data}
+        ).then(function(response) {
+          if (ctrl.fileUploader.getNotUploadedItems().length) {
+            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+              file.formData.push({
+                params: JSON.stringify(_.extend({
+                  token: response[0].token,
+                  name: ctrl.getFormMeta().name
+                }, file.crmApiParams()))
+              });
+            });
+            ctrl.fileUploader.uploadAll();
+          } else {
+            postProcess();
+          }
+        });
       };
     }
   });

@@ -83,6 +83,12 @@ class CurrentFilterTest extends UnitTestCase {
     $this->assertArrayNotHasKey($expiring['id'], $notCurrent);
     $this->assertArrayHasKey($past['id'], $notCurrent);
     $this->assertArrayHasKey($inactive['id'], $notCurrent);
+
+    // Assert that "Extra" fields like is_current are not returned with select *
+    $defaultGet = Relationship::get()->setLimit(1)->execute()->single();
+    $this->assertArrayNotHasKey('is_current', $defaultGet);
+    $starGet = Relationship::get()->addSelect('*')->setLimit(1)->execute()->single();
+    $this->assertArrayNotHasKey('is_current', $starGet);
   }
 
 }

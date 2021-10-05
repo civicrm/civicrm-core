@@ -161,4 +161,103 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     unlink($file);
   }
 
+  /**
+   * dataprovider for testMakeFilenameWithUnicode
+   * @return array
+   */
+  public function makeFilenameWithUnicodeProvider(): array {
+    return [
+      // explicit indices to make it easier to see which one failed
+      0 => [
+        'string' => '',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => '',
+      ],
+      1 => [
+        'string' => 'a',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'a',
+      ],
+      2 => [
+        'string' => 'a b',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'a_b',
+      ],
+      3 => [
+        'string' => 'a4b',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'a4b',
+      ],
+      4 => [
+        'string' => '_a!@#$%^&*()[]+-=."\'{}<>?/\\|;:b',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => '_a____________________________b',
+      ],
+      5 => [
+        'string' => '_a!@#$%^&*()[]+-=."\'{}<>?/\\|;:b',
+        'replacementCharacter' => '',
+        'cutoffLength' => NULL,
+        'expected' => '_ab',
+      ],
+      // emojis get replaced, but alphabetic letters in non-english are kept
+      6 => [
+        'string' => 'açbяc😀d',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'açbяc_d',
+      ],
+      7 => [
+        'string' => 'çя😀',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'çя_',
+      ],
+      // test default cutoff
+      8 => [
+        'string' => 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        'replacementCharacter' => NULL,
+        'cutoffLength' => NULL,
+        'expected' => 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456',
+      ],
+      9 => [
+        'string' => 'abcdefghijklmnopqrstuvwxyz0123456789012345678901234567890123456789',
+        'replacementCharacter' => '_',
+        'cutoffLength' => 30,
+        'expected' => 'abcdefghijklmnopqrstuvwxyz0123',
+      ],
+      // test cutoff truncates multibyte properly
+      10 => [
+        'string' => 'ДДДДДДДДДДДДДДД',
+        'replacementCharacter' => '',
+        'cutoffLength' => 10,
+        'expected' => 'ДДДДДДДДДД',
+      ],
+    ];
+  }
+
+  /**
+   * test makeFilenameWithUnicode
+   * @dataProvider makeFilenameWithUnicodeProvider
+   * @param string $input
+   * @param ?string $replacementCharacter
+   * @param ?int $cutoffLength
+   * @param string $expected
+   */
+  public function testMakeFilenameWithUnicode(string $input, ?string $replacementCharacter, ?int $cutoffLength, string $expected) {
+    if (is_null($replacementCharacter) && is_null($cutoffLength)) {
+      $this->assertSame($expected, CRM_Utils_File::makeFilenameWithUnicode($input));
+    }
+    elseif (is_null($cutoffLength)) {
+      $this->assertSame($expected, CRM_Utils_File::makeFilenameWithUnicode($input, $replacementCharacter));
+    }
+    else {
+      $this->assertSame($expected, CRM_Utils_File::makeFilenameWithUnicode($input, $replacementCharacter, $cutoffLength));
+    }
+  }
+
 }

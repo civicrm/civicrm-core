@@ -160,8 +160,10 @@ class CRM_Utils_Date {
    *
    */
   public static function getAbbrWeekdayNames() {
-    static $days = [];
+    $key = 'abbrDays_' . \CRM_Core_I18n::getLocale();
+    $days = &\Civi::$statics[__CLASS__][$key];
     if (!$days) {
+      $days = [];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
 
@@ -189,8 +191,10 @@ class CRM_Utils_Date {
    *
    */
   public static function getFullWeekdayNames() {
-    static $days = [];
+    $key = 'fullDays_' . \CRM_Core_I18n::getLocale();
+    $days = &\Civi::$statics[__CLASS__][$key];
     if (!$days) {
+      $days = [];
       // First day of the week
       $firstDay = Civi::settings()->get('weekBegins');
 
@@ -214,7 +218,8 @@ class CRM_Utils_Date {
    *
    */
   public static function &getAbbrMonthNames($month = FALSE) {
-    static $abbrMonthNames;
+    $key = 'abbrMonthNames_' . \CRM_Core_I18n::getLocale();
+    $abbrMonthNames = &\Civi::$statics[__CLASS__][$key];
     if (!isset($abbrMonthNames)) {
 
       // set LC_TIME and build the arrays from locale-provided names
@@ -237,16 +242,28 @@ class CRM_Utils_Date {
    *
    */
   public static function &getFullMonthNames() {
-    static $fullMonthNames;
-    if (!isset($fullMonthNames)) {
-
-      // set LC_TIME and build the arrays from locale-provided names
-      CRM_Core_I18n::setLcTime();
-      for ($i = 1; $i <= 12; $i++) {
-        $fullMonthNames[$i] = strftime('%B', mktime(0, 0, 0, $i, 10, 1970));
-      }
+    $key = 'fullMonthNames_' . \CRM_Core_I18n::getLocale();
+    if (empty(\Civi::$statics[__CLASS__][$key])) {
+      // Not relying on strftime because it depends on the operating system
+      // and most people will not have a non-US locale configured out of the box
+      // Ignoring other date names for now, since less visible by default
+      \Civi::$statics[__CLASS__][$key] = [
+        1 => ts('January'),
+        2 => ts('February'),
+        3 => ts('March'),
+        4 => ts('April'),
+        5 => ts('May'),
+        6 => ts('June'),
+        7 => ts('July'),
+        8 => ts('August'),
+        9 => ts('September'),
+        10 => ts('October'),
+        11 => ts('November'),
+        12 => ts('December'),
+      ];
     }
-    return $fullMonthNames;
+
+    return \Civi::$statics[__CLASS__][$key];
   }
 
   /**

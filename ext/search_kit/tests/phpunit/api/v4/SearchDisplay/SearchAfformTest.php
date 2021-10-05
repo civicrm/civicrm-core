@@ -1,6 +1,8 @@
 <?php
 namespace api\v4\SearchDisplay;
 
+use Civi\Api4\Action\Afform\Save;
+use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\SavedSearch;
@@ -35,7 +37,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
           'select' => [
             'id',
             'display_name',
-            'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_DISTINCT_Contact_Email_contact_id_01_email',
+            'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
           ],
           'orderBy' => [],
           'where' => [
@@ -77,7 +79,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
               'type' => 'field',
             ],
             [
-              'key' => 'GROUP_CONCAT_DISTINCT_Contact_Email_contact_id_01_email',
+              'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
               'label' => 'Emails',
               'dataType' => 'String',
               'type' => 'field',
@@ -149,6 +151,55 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['filters'] = ['Contact_Email_contact_id_01.email' => $email];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
+  }
+
+  public function testDeleteSearchWillDeleteAfform() {
+    $search = SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestSearchToDelete',
+        'label' => 'TestSearchToDelete',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+        ],
+      ])
+      ->execute()->first();
+
+    $display = SearchDisplay::create(FALSE)
+      ->setValues([
+        'name' => 'TestDisplayToDelete',
+        'label' => 'TestDisplayToDelete',
+        'saved_search_id.name' => 'TestSearchToDelete',
+        'type' => 'table',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'dataType' => 'Integer',
+              'type' => 'field',
+            ],
+          ],
+        ],
+        'acl_bypass' => FALSE,
+      ])
+      ->execute()->first();
+
+    Afform::create(FALSE)
+      ->addValue('name', 'TestAfformToDelete')
+      ->addValue('title', 'TestAfformToDelete')
+      ->setLayoutFormat('html')
+      ->addValue('layout', '<div><crm-search-display-table search-name="TestSearchToDelete" display-name="TestDisplayToDelete"></crm-search-display-table></div>')
+      ->execute();
+
+    $this->assertCount(1, Afform::get(FALSE)->addWhere('name', '=', 'TestAfformToDelete')->execute());
+
+    SavedSearch::delete(FALSE)
+      ->addWhere('name', '=', 'TestSearchToDelete')
+      ->execute();
+
+    $this->assertCount(0, Afform::get(FALSE)->addWhere('name', '=', 'TestAfformToDelete')->execute());
   }
 
 }

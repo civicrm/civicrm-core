@@ -393,6 +393,16 @@ function financialacls_is_acl_limiting_enabled(): bool {
   return (bool) Civi::settings()->get('acl_financial_type');
 }
 
+/**
+ * Clear the statics cache when the setting is enabled or disabled.
+ *
+ * Note the setting will eventually disappear in favour of whether
+ * the extension is enabled or disabled.
+ */
+function financialacls_toggle() {
+  unset(\Civi::$statics['CRM_Financial_BAO_FinancialType']);
+}
+
 // --- Functions below this ship commented out. Uncomment as required. ---
 
 /**

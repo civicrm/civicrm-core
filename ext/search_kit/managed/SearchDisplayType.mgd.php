@@ -32,4 +32,15 @@ return [
       'icon' => 'fa-list',
     ],
   ],
+  [
+    'name' => 'SearchDisplayType:grid',
+    'entity' => 'OptionValue',
+    'params' => [
+      'option_group_id' => 'search_display_type',
+      'value' => 'grid',
+      'name' => 'crm-search-display-grid',
+      'label' => 'Grid',
+      'icon' => 'fa-th',
+    ],
+  ],
 ];

@@ -11,6 +11,7 @@
 !/ext/greenwich
 /ext/greenwich/dist
 /ext/greenwich/extern
+!/ext/message_admin
 !/ext/oauth-client
 !/ext/search_kit
 !/ext/financialacls

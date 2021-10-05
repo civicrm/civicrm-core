@@ -35,10 +35,10 @@
       <thead class="sticky">
       {foreach from=$columnHeaders item=header}
         <th>
-          {if $header.sort}
+          {if !empty($header.sort)}
             {assign var='key' value=$header.sort}
             {$sort->_response.$key.link}
-          {else}
+          {elseif !empty($header.name)}
             {$header.name}
           {/if}
         </th>

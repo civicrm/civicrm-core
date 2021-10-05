@@ -863,7 +863,10 @@ WHERE ($subtypeClause)";
    * @throws \API_Exception
    */
   protected static function getAllContactTypes() {
-    if (!Civi::cache('contactTypes')->has('all')) {
+    $cache = Civi::cache('contactTypes');
+    $cacheKey = 'all_' . $GLOBALS['tsLocale'];
+    $contactTypes = $cache->get($cacheKey);
+    if ($contactTypes === NULL) {
       $contactTypes = (array) ContactType::get(FALSE)
         ->setSelect(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id', 'parent_id:name', 'parent_id:label'])
         ->execute()->indexBy('name');
@@ -873,9 +876,8 @@ WHERE ($subtypeClause)";
         $contactTypes[$id]['parent_label'] = $contactType['parent_id:label'];
         unset($contactTypes[$id]['parent_id:name'], $contactTypes[$id]['parent_id:label']);
       }
-      Civi::cache('contactTypes')->set('all', $contactTypes);
+      $cache->set($cacheKey, $contactTypes);
     }
-    $contactTypes = Civi::cache('contactTypes')->get('all');
     return $contactTypes;
   }
 

@@ -183,6 +183,46 @@ class Test {
   }
 
   /**
+   * @return \Civi\Test\ExampleDataLoader
+   */
+  public static function examples(): \Civi\Test\ExampleDataLoader {
+    if (!isset(self::$singletons['examples'])) {
+      self::$singletons['examples'] = new \Civi\Test\ExampleDataLoader();
+    }
+    return self::$singletons['examples'];
+  }
+
+  /**
+   * Lookup the content of an example data-set.
+   *
+   * This helper is for the common case of looking up the data for a specific example.
+   * If you need more detailed information (eg the list of examples or other metadata),
+   * then use `\Civi\Test::examples(): ExampleDataLoader`. It  provides more methods.
+   *
+   * @param string $name
+   *   Symbolic name of the data-set.
+   * @return array
+   *   The example data.
+   */
+  public static function example(string $name): array {
+    $result = static::examples()->getFull($name);
+    if (!isset($result['data'])) {
+      throw new \CRM_Core_Exception("Failed to load example data-set: $name");
+    }
+    return $result['data'];
+  }
+
+  /**
+   * @return \Civi\Test\EventChecker
+   */
+  public static function eventChecker() {
+    if (!isset(self::$singletons['eventChecker'])) {
+      self::$singletons['eventChecker'] = new \Civi\Test\EventChecker();
+    }
+    return self::$singletons['eventChecker'];
+  }
+
+  /**
    * Prepare and execute a batch of SQL statements.
    *
    * @param string $query

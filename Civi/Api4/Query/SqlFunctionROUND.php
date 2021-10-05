@@ -23,10 +23,12 @@ class SqlFunctionROUND extends SqlFunction {
       [
         'optional' => FALSE,
         'must_be' => ['SqlField', 'SqlNumber'],
+        'label' => ts('Number'),
       ],
       [
         'optional' => TRUE,
         'must_be' => ['SqlNumber'],
+        'label' => ts('Decimal places'),
       ],
     ];
   }
@@ -36,6 +38,13 @@ class SqlFunctionROUND extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('Round');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('Number rounded to specified number of decimal places.');
   }
 
 }

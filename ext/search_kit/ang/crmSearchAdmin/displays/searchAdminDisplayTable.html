@@ -9,6 +9,15 @@
     </div>
     <div class="form-group" ng-include="'~/crmSearchAdmin/displays/common/searchButtonConfig.html'"></div>
   </div>
+  <div class="form-inline">
+    <label>{{:: ts('Table Style') }}</label>
+    <div class="checkbox-inline form-control" ng-repeat="style in $ctrl.tableClasses">
+      <label>
+        <input type="checkbox" ng-checked="$ctrl.includes($ctrl.display.settings.classes, style.name)" ng-click="$ctrl.toggle($ctrl.display.settings.classes, style.name)">
+        <span>{{:: style.label }}</span>
+      </label>
+    </div>
+  </div>
   <search-admin-pager-config display="$ctrl.display"></search-admin-pager-config>
 </fieldset>
 <fieldset class="crm-search-admin-edit-columns-wrapper">
@@ -33,6 +42,12 @@
           <option value="text-center">{{:: ts('Center') }}</option>
           <option value="text-right">{{:: ts('Right') }}</option>
         </select>
+      </div>
+      <div class="form-inline" ng-if=":: $ctrl.parent.canBeSortable(col)">
+        <label title="{{:: ts('Allow user to click on header to sort table by this column') }}">
+          <input type="checkbox" ng-checked="col.sortable !== false" ng-click="col.sortable = col.sortable === false" >
+          {{:: ts('Sortable Header') }}
+        </label>
       </div>
       <div ng-include="'~/crmSearchAdmin/displays/colType/' + col.type + '.html'"></div>
     </fieldset>

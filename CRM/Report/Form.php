@@ -626,6 +626,10 @@ class CRM_Report_Form extends CRM_Core_Form {
 
       // set qfkey so that pager picks it up and use it in the "Next > Last >>" links.
       // FIXME: Note setting it in $_GET doesn't work, since pager generates link based on QUERY_STRING
+      if (!isset($_SERVER['QUERY_STRING'])) {
+        // in php 7.4 can do this with less lines with ??=
+        $_SERVER['QUERY_STRING'] = '';
+      }
       $_SERVER['QUERY_STRING'] .= "&qfKey={$this->controller->_key}";
     }
 
@@ -1361,20 +1365,8 @@ class CRM_Report_Form extends CRM_Core_Form {
               !is_array($field['options']) || empty($field['options'])
             ) {
               // If there's no option list for this filter, define one.
-              $field['options'] = [
-                1 => ts('January'),
-                2 => ts('February'),
-                3 => ts('March'),
-                4 => ts('April'),
-                5 => ts('May'),
-                6 => ts('June'),
-                7 => ts('July'),
-                8 => ts('August'),
-                9 => ts('September'),
-                10 => ts('October'),
-                11 => ts('November'),
-                12 => ts('December'),
-              ];
+              $field['options'] = CRM_Utils_Date::getFullMonthNames();
+
               // Add this option list to this column _columns. This is
               // required so that filter statistics show properly.
               $this->_columns[$table]['filters'][$fieldName]['options'] = $field['options'];

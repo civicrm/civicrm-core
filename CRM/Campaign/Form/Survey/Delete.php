@@ -47,7 +47,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
     CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
     $this->_surveyTitle = $surveyInfo['title'];
     $this->assign('surveyTitle', $this->_surveyTitle);
-    CRM_Utils_System::setTitle(ts('Delete Survey') . ' - ' . $this->_surveyTitle);
+    $this->setTitle(ts('Delete Survey') . ' - ' . $this->_surveyTitle);
   }
 
   /**

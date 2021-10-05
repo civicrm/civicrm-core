@@ -20,7 +20,9 @@
 namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 
 /**
  * @group headless
@@ -66,8 +68,7 @@ class GetFieldsTest extends UnitTestCase {
   public function testInternalPropsAreHidden() {
     // Public getFields should not contain @internal props
     $fields = Contact::getFields(FALSE)
-      ->execute()
-      ->getArrayCopy();
+      ->execute();
     foreach ($fields as $field) {
       $this->assertArrayNotHasKey('output_formatters', $field);
     }
@@ -77,6 +78,19 @@ class GetFieldsTest extends UnitTestCase {
     foreach ($fields as $field) {
       $this->assertArrayHasKey('output_formatters', $field);
     }
+  }
+
+  public function testPreloadFalse() {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    Campaign::create()->setValues(['name' => 'Big Campaign', 'title' => 'Biggie'])->execute();
+    // The campaign_id field has preload = false in the schema,
+    // Which means the options will NOT load but suffixes are still available
+    $fields = Contribution::getFields(FALSE)
+      ->setLoadOptions(['name', 'label'])
+      ->execute()->indexBy('name');
+    $this->assertFalse($fields['campaign_id']['options']);
+    $this->assertEquals(['name', 'label'], $fields['campaign_id']['suffixes']);
   }
 
 }

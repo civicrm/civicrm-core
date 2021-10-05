@@ -1513,8 +1513,8 @@ WHERE  id = %1
     }
 
     // Use abbrColum if context is abbreviate
-    if ($context === 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
-      $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
+    if ($context === 'abbreviate' && !empty($pseudoconstant['abbrColumn'])) {
+      $params['labelColumn'] = $pseudoconstant['abbrColumn'];
     }
 
     // Condition param can be passed as an sql clause string or an array of clauses

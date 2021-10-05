@@ -16,6 +16,7 @@
  */
 
 use Civi\Api4\Email;
+use Civi\Api4\Contribution;
 
 /**
  * This class provides the common functionality for tasks that send emails.
@@ -38,6 +39,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_templates;
 
   /**
+   * Email addresses to send to.
+   *
+   * @var array
+   */
+  protected $emails = [];
+
+  /**
    * Store "to" contact details.
    * @var array
    */
@@ -54,19 +62,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @var array
    */
   public $_toContactIds = [];
-
-  /**
-   * Store only "cc" contact ids.
-   * @var array
-   */
-  public $_ccContactIds = [];
-
-  /**
-   * Store only "bcc" contact ids.
-   *
-   * @var array
-   */
-  public $_bccContactIds = [];
 
   /**
    * Is the form being loaded from a search action.
@@ -125,7 +120,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \API_Exception
    */
   protected function traitPreProcess() {
-    CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($this);
     if ($this->isSearchContext()) {
       // Currently only the contact email form is callable outside search context.
       parent::preProcess();
@@ -153,6 +147,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $cid = $this->get('cid');
     if ($cid) {
       $this->_contactIds = explode(',', $cid);
+    }
+    // The default in CRM_Core_Form_Task is null, but changing it there gives
+    // errors later.
+    if (is_null($this->_contactIds)) {
+      $this->_contactIds = [];
     }
     if (count($this->_contactIds) > 1) {
       $this->_single = FALSE;
@@ -187,10 +186,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     if ($to->getValue()) {
       foreach ($this->getEmails($to) as $value) {
         $contactId = $value['contact_id'];
-        $email = $value['email'];
         if ($contactId) {
           $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-          $this->_toContactEmails[] = $email;
           $this->_allContactIds[] = $contactId;
         }
       }
@@ -248,7 +245,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $this->add('text', 'subject', ts('Subject'), ['size' => 50, 'maxlength' => 254], TRUE);
 
-    $this->add('select', 'from_email_address', ts('From'), $this->_fromEmails, TRUE);
+    $this->add('select', 'from_email_address', ts('From'), $this->getFromEmails(), TRUE);
 
     CRM_Mailing_BAO_Mailing::commonCompose($this);
 
@@ -256,31 +253,9 @@ trait CRM_Contact_Form_Task_EmailTrait {
     CRM_Core_BAO_File::buildAttachment($this, NULL);
 
     if ($this->_single) {
-      // also fix the user context stack
-      if ($this->getCaseID()) {
-        $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $this->_caseId,
-          'contact_id', 'case_id'
-        );
-        $url = CRM_Utils_System::url('civicrm/contact/view/case',
-          "&reset=1&action=view&cid={$ccid}&id=" . $this->getCaseID()
-        );
-      }
-      elseif ($this->_context) {
-        $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-      }
-      else {
-        $url = CRM_Utils_System::url('civicrm/contact/view',
-          "&show=1&action=browse&cid={$this->_contactIds[0]}&selectedChild=activity"
-        );
-      }
-
-      $session = CRM_Core_Session::singleton();
-      $session->replaceUserContext($url);
-      $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
+      CRM_Core_Session::singleton()->replaceUserContext($this->getRedirectUrl());
     }
-    else {
-      $this->addDefaultButtons(ts('Send Email'), 'upload');
-    }
+    $this->addDefaultButtons(ts('Send Email'), 'upload', 'cancel');
 
     $fields = [
       'followup_assignee_contact_id' => [
@@ -331,7 +306,29 @@ trait CRM_Contact_Form_Task_EmailTrait {
     CRM_Campaign_BAO_Campaign::addCampaign($this);
 
     $this->addFormRule([__CLASS__, 'saveTemplateFormRule'], $this);
+    $this->addFormRule([__CLASS__, 'deprecatedTokensFormRule'], $this);
     CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'templates/CRM/Contact/Form/Task/EmailCommon.js', 0, 'html-header');
+  }
+
+  /**
+   * Set relevant default values.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function setDefaultValues(): array {
+    $defaults = parent::setDefaultValues();
+    $fromEmails = $this->getFromEmails();
+    if (is_numeric(key($fromEmails))) {
+      $emailID = (int) key($fromEmails);
+      $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
+    }
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+    }
+    return $defaults;
   }
 
   /**
@@ -344,8 +341,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   public function postProcess() {
     $this->bounceIfSimpleMailLimitExceeded(count($this->_contactIds));
-
-    // check and ensure that
     $formValues = $this->controller->exportValues($this->getName());
     $this->submit($formValues);
   }
@@ -356,7 +351,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @param int $count
    *  The number of emails the user is attempting to send
    */
-  protected function bounceIfSimpleMailLimitExceeded($count) {
+  protected function bounceIfSimpleMailLimitExceeded($count): void {
     $limit = Civi::settings()->get('simple_mail_limit');
     if ($count > $limit) {
       CRM_Core_Error::statusBounce(ts('Please do not use this task to send a lot of emails (greater than %1). Many countries have legal requirements when sending bulk emails and the CiviMail framework has opt out functionality and domain tokens to help meet these.',
@@ -377,10 +372,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    * @throws \API_Exception
    */
-  public function submit($formValues) {
+  public function submit($formValues): void {
     $this->saveMessageTemplate($formValues);
 
-    $from = $formValues['from_email_address'] ?? NULL;
+    $from = $formValues['from_email_address'];
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
@@ -402,7 +397,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       if (!isset($this->_contactDetails[$contactId])) {
         continue;
       }
-      $email = $this->_toContactEmails[$key];
+      $email = $this->getEmail($key);
       // prevent duplicate emails if same email address is selected CRM-4067
       // we should allow same emails for different contacts
       $details = $this->_contactDetails[$contactId];
@@ -412,18 +407,15 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // send the mail
-    [$sent, $activityIds] = CRM_Activity_BAO_Activity::sendEmail(
+    [$sent, $activityIds] = $this->sendEmail(
       $formattedContactDetails,
       $this->getSubject($formValues['subject']),
       $formValues['text_message'],
       $formValues['html_message'],
-      NULL,
-      NULL,
       $from,
       $this->getAttachments($formValues),
       $cc,
       $bcc,
-      array_keys($this->_toContactDetails),
       $additionalDetails,
       $this->getContributionIDs(),
       CRM_Utils_Array::value('campaign_id', $formValues),
@@ -488,7 +480,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @return array
    */
-  public function listTokens() {
+  public function listTokens(): array {
     return CRM_Core_SelectValues::contactTokens();
   }
 
@@ -663,6 +655,40 @@ trait CRM_Contact_Form_Task_EmailTrait {
   }
 
   /**
+   * Prevent submission of deprecated tokens.
+   *
+   * Note this rule can be removed after a transition period.
+   * It's mostly to help to ensure users don't get missing tokens
+   * or unexpected output after the 5.43 upgrade until any
+   * old templates have aged out.
+   *
+   * @param array $fields
+   *
+   * @return bool|string[]
+   */
+  public static function deprecatedTokensFormRule(array $fields) {
+    $deprecatedTokens = [
+      '{case.status_id}' => '{case.status_id:label}',
+      '{case.case_type_id}' => '{case.case_type_id:label}',
+      '{contribution.campaign}' => '{contribution.campaign_id:label}',
+      '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
+      '{contribution.contribution_id}' => '{contribution.id}',
+      '{contribution.contribution_source}' => '{contribution.source}',
+      '{contribution.contribution_status}' => '{contribution.contribution_status_id:label}',
+      '{contribution.contribution_cancel_date}' => '{contribution.cancel_date}',
+      '{contribution.type}' => '{contribution.financial_type_id:label}',
+      '{contribution.contribution_page_id}' => '{contribution.contribution_page_id:label}',
+    ];
+    $tokenErrors = [];
+    foreach ($deprecatedTokens as $token => $replacement) {
+      if (strpos($fields['html_message'], $token) !== FALSE) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      }
+    }
+    return empty($tokenErrors) ? TRUE : ['html_message' => implode('<br>', $tokenErrors)];
+  }
+
+  /**
    * Get selected contribution IDs.
    *
    * @return array
@@ -684,6 +710,330 @@ trait CRM_Contact_Form_Task_EmailTrait {
       return (int) $caseID;
     }
     return NULL;
+  }
+
+  /**
+   * @return array
+   */
+  protected function getFromEmails(): array {
+    $fromEmailValues = CRM_Core_BAO_Email::getFromEmail();
+
+    if (empty($fromEmailValues)) {
+      CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
+    }
+    return $fromEmailValues;
+  }
+
+  /**
+   * Get the relevant emails.
+   *
+   * @param int $index
+   *
+   * @return string
+   */
+  protected function getEmail(int $index): string {
+    if (empty($this->emails)) {
+      $toEmails = explode(',', $this->getSubmittedValue('to'));
+      foreach ($toEmails as $value) {
+        $parts = explode('::', $value);
+        $this->emails[] = $parts[1];
+      }
+    }
+    return $this->emails[$index];
+  }
+
+  /**
+   * Send the message to all the contacts.
+   *
+   * Do not use this function outside of core tested code. It will change.
+   *
+   * It will also become protected once tests no longer call it.
+   *
+   * @internal
+   *
+   * Also insert a contact activity in each contacts record.
+   *
+   * @param array $contactDetails
+   *   The array of contact details to send the email.
+   * @param string $subject
+   *   The subject of the message.
+   * @param $text
+   * @param $html
+   * @param string $from
+   * @param array|null $attachments
+   *   The array of attachments if any.
+   * @param string|null $cc
+   *   Cc recipient.
+   * @param string|null $bcc
+   *   Bcc recipient.
+   * @param string|null $additionalDetails
+   *   The additional information of CC and BCC appended to the activity Details.
+   * @param array|null $contributionIds
+   * @param int|null $campaignId
+   * @param int|null $caseId
+   *
+   * @return array
+   *   bool $sent FIXME: this only indicates the status of the last email sent.
+   *   array $activityIds The activity ids created, one per "To" recipient.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   * @internal
+   *
+   * Also insert a contact activity in each contacts record.
+   *
+   */
+  public function sendEmail(
+    $contactDetails,
+    $subject,
+    $text,
+    $html,
+    $from,
+    $attachments = NULL,
+    $cc = NULL,
+    $bcc = NULL,
+    $additionalDetails = NULL,
+    $contributionIds = NULL,
+    $campaignId = NULL,
+    $caseId = NULL
+  ) {
+
+    $userID = CRM_Core_Session::getLoggedInContactID();
+
+    $contributionDetails = [];
+    if (!empty($contributionIds)) {
+      $contributionDetails = Contribution::get(FALSE)
+        ->setSelect(['contact_id'])
+        ->addWhere('id', 'IN', $contributionIds)
+        ->execute()
+        // Note that this indexing means that only the last
+        // contribution per contact is resolved to tokens.
+        // this is long-standing functionality, albeit possibly
+        // not thought through.
+        ->indexBy('contact_id');
+    }
+
+    $sent = $notSent = [];
+    $attachmentFileIds = [];
+    $activityIds = [];
+    $firstActivityCreated = FALSE;
+    foreach ($contactDetails as $values) {
+      $tokenContext = $caseId ? ['caseId' => $caseId] : [];
+      $contactId = $values['contact_id'];
+      $emailAddress = $values['email'];
+
+      if (!empty($contributionDetails)) {
+        $tokenContext['contributionId'] = $contributionDetails[$contactId]['id'];
+      }
+
+      $tokenSubject = $subject;
+      $tokenText = in_array($values['preferred_mail_format'], ['Both', 'Text'], TRUE) ? $text : '';
+      $tokenHtml = in_array($values['preferred_mail_format'], ['Both', 'HTML'], TRUE) ? $html : '';
+
+      $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
+        'messageTemplate' => [
+          'msg_text' => $tokenText,
+          'msg_html' => $tokenHtml,
+          'msg_subject' => $tokenSubject,
+        ],
+        'tokenContext' => $tokenContext,
+        'contactId' => $contactId,
+        'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
+      ]);
+
+      $sent = FALSE;
+      // To minimize storage requirements, only one copy of any file attachments uploaded to CiviCRM is kept,
+      // even when multiple contacts will receive separate emails from CiviCRM.
+      if (!empty($attachmentFileIds)) {
+        $attachments = array_replace_recursive($attachments, $attachmentFileIds);
+      }
+
+      // Create email activity.
+      $activityID = $this->createEmailActivity($userID, $renderedTemplate['subject'], $renderedTemplate['html'], $renderedTemplate['text'], $additionalDetails, $campaignId, $attachments, $caseId);
+      $activityIds[] = $activityID;
+
+      if ($firstActivityCreated == FALSE && !empty($attachments)) {
+        $attachmentFileIds = CRM_Activity_BAO_Activity::getAttachmentFileIds($activityID, $attachments);
+        $firstActivityCreated = TRUE;
+      }
+
+      if ($this->sendMessage(
+        $from,
+        $contactId,
+        $renderedTemplate['subject'],
+        $renderedTemplate['text'],
+        $renderedTemplate['html'],
+        $emailAddress,
+        $activityID,
+        // get the set of attachments from where they are stored
+        CRM_Core_BAO_File::getEntityFile('civicrm_activity', $activityID),
+        $cc,
+        $bcc
+      )
+      ) {
+        $sent = TRUE;
+      }
+    }
+
+    return [$sent, $activityIds];
+  }
+
+  /**
+   * @param int $sourceContactID
+   *   The contact ID of the email "from".
+   * @param string $subject
+   * @param string $html
+   * @param string $text
+   * @param string $additionalDetails
+   *   The additional information of CC and BCC appended to the activity details.
+   * @param int $campaignID
+   * @param array $attachments
+   * @param int $caseID
+   *
+   * @return int
+   *   The created activity ID
+   * @throws \CRM_Core_Exception
+   */
+  protected function createEmailActivity($sourceContactID, $subject, $html, $text, $additionalDetails, $campaignID, $attachments, $caseID) {
+    $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
+
+    // CRM-6265: save both text and HTML parts in details (if present)
+    if ($html and $text) {
+      $details = "-ALTERNATIVE ITEM 0-\n{$html}{$additionalDetails}\n-ALTERNATIVE ITEM 1-\n{$text}{$additionalDetails}\n-ALTERNATIVE END-\n";
+    }
+    else {
+      $details = $html ? $html : $text;
+      $details .= $additionalDetails;
+    }
+
+    $activityParams = [
+      'source_contact_id' => $sourceContactID,
+      'activity_type_id' => $activityTypeID,
+      'activity_date_time' => date('YmdHis'),
+      'subject' => $subject,
+      'details' => $details,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
+      'campaign_id' => $campaignID,
+    ];
+    if (!empty($caseID)) {
+      $activityParams['case_id'] = $caseID;
+    }
+
+    // CRM-5916: strip [case #…] before saving the activity (if present in subject)
+    $activityParams['subject'] = preg_replace('/\[case #([0-9a-h]{7})\] /', '', $activityParams['subject']);
+
+    // add the attachments to activity params here
+    if ($attachments) {
+      // first process them
+      $activityParams = array_merge($activityParams, $attachments);
+    }
+
+    $activity = civicrm_api3('Activity', 'create', $activityParams);
+
+    return $activity['id'];
+  }
+
+  /**
+   * Send message - under refactor.
+   *
+   * @param $from
+   * @param $toID
+   * @param $subject
+   * @param $text_message
+   * @param $html_message
+   * @param $emailAddress
+   * @param $activityID
+   * @param null $attachments
+   * @param null $cc
+   * @param null $bcc
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   * @throws \PEAR_Exception
+   */
+  protected function sendMessage(
+    $from,
+    $toID,
+    $subject,
+    $text_message,
+    $html_message,
+    $emailAddress,
+    $activityID,
+    $attachments = NULL,
+    $cc = NULL,
+    $bcc = NULL
+  ) {
+    [$toDisplayName, $toEmail, $toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($toID);
+    if ($emailAddress) {
+      $toEmail = trim($emailAddress);
+    }
+
+    // make sure both email addresses are valid
+    // and that the recipient wants to receive email
+    if (empty($toEmail) or $toDoNotEmail) {
+      return FALSE;
+    }
+    if (!trim($toDisplayName)) {
+      $toDisplayName = $toEmail;
+    }
+
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+
+    // create the params array
+    $mailParams = [
+      'groupName' => 'Activity Email Sender',
+      'from' => $from,
+      'toName' => $toDisplayName,
+      'toEmail' => $toEmail,
+      'subject' => $subject,
+      'cc' => $cc,
+      'bcc' => $bcc,
+      'text' => $text_message,
+      'html' => $html_message,
+      'attachments' => $attachments,
+    ];
+
+    if (!CRM_Utils_Mail::send($mailParams)) {
+      return FALSE;
+    }
+
+    // add activity target record for every mail that is send
+    $activityTargetParams = [
+      'activity_id' => $activityID,
+      'contact_id' => $toID,
+      'record_type_id' => $targetID,
+    ];
+    CRM_Activity_BAO_ActivityContact::create($activityTargetParams);
+    return TRUE;
+  }
+
+  /**
+   * Get the url to redirect the user's browser to.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRedirectUrl(): string {
+    // also fix the user context stack
+    if ($this->getCaseID()) {
+      $ccid = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $this->_caseId,
+        'contact_id', 'case_id'
+      );
+      $url = CRM_Utils_System::url('civicrm/contact/view/case',
+        "&reset=1&action=view&cid={$ccid}&id=" . $this->getCaseID()
+      );
+    }
+    elseif ($this->_context) {
+      $url = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
+    }
+    else {
+      $url = CRM_Utils_System::url('civicrm/contact/view',
+        "&show=1&action=browse&cid={$this->_contactIds[0]}&selectedChild=activity"
+      );
+    }
+    return $url;
   }
 
 }

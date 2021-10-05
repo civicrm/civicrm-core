@@ -42,13 +42,6 @@ class CRM_Core_Session {
   protected $_session = NULL;
 
   /**
-   * Current php Session ID : needed to detect if the session is changed
-   *
-   * @var string
-   */
-  protected $sessionID;
-
-  /**
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
@@ -128,10 +121,9 @@ class CRM_Core_Session {
    *   Is this a read operation, in this case, the session will not be touched.
    */
   public function initialize($isRead = FALSE) {
-    // remove $_SESSION reference if session is changed
-    if (($sid = session_id()) !== $this->sessionID) {
-      $this->_session = NULL;
-      $this->sessionID = $sid;
+    // reset $this->_session in case if it is no longer a reference to $_SESSION;
+    if (isset($_SESSION) && isset($this->_session) && $_SESSION !== $this->_session) {
+      unset($this->_session);
     }
     // lets initialize the _session variable just before we need it
     // hopefully any bootstrapping code will actually load the session from the CMS
@@ -171,9 +163,9 @@ class CRM_Core_Session {
       unset($this->_session[$this->_key]);
     }
     else {
-      $this->_session = [];
+      $this->_session[$this->_key] = [];
+      unset($this->_session);
     }
-
   }
 
   /**

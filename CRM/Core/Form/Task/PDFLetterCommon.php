@@ -23,23 +23,32 @@
  * The intention is that common functionality can be moved here and the other
  * classes cleaned up.
  * Keep old-style token handling out of this class.
+ *
+ * @deprecated
  */
 class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * @var CRM_Core_Form $form
+   *
+   * @deprecated
    */
   public static function preProcess(&$form) {
-    CRM_Utils_System::setTitle('Print/Merge Document');
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
+    $form->setTitle('Print/Merge Document');
   }
 
   /**
    * Build the form object.
    *
+   * @deprecated
+   *
    * @var CRM_Core_Form $form
    * @throws \CRM_Core_Exception
    */
   public static function buildQuickForm(&$form) {
+    CRM_Core_Error::deprecatedFunctionWarning('no supported alternative for non-core code');
     // This form outputs a file so should never be submitted via ajax
     $form->preventAjaxSubmit();
 
@@ -52,6 +61,10 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       ['size' => 45, 'maxlength' => 255],
       FALSE
     );
+
+    // Added for core#2121,
+    // To support sending a custom pdf filename before downloading.
+    $form->addElement('hidden', 'pdf_file_name');
 
     $form->addSelect('format_id', [
       'label' => ts('Select Format'),
@@ -167,8 +180,11 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * Set default values.
+   *
+   * @deprecated
    */
   public static function setDefaultValues() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
     return $defaultFormat;
@@ -188,7 +204,25 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    */
   public static function formRule($fields, $files, $self) {
     $errors = [];
-    $template = CRM_Core_Smarty::singleton();
+    $deprecatedTokens = [
+      '{case.status_id}' => '{case.status_id:label}',
+      '{case.case_type_id}' => '{case.case_type_id:label}',
+      '{membership.status}' => '{membership.status_id:label}',
+      '{membership.type}' => '{membership.membership_type_id:label}',
+      '{contribution.campaign}' => '{contribution.campaign_id:label}',
+      '{contribution.payment_instrument}' => '{contribution.payment_instrument_id:label}',
+      '{contribution.contribution_id}' => '{contribution.id}',
+      '{contribution.contribution_source}' => '{contribution.source}',
+    ];
+    $tokenErrors = [];
+    foreach ($deprecatedTokens as $token => $replacement) {
+      if (strpos($fields['html_message'], $token) !== FALSE) {
+        $tokenErrors[] = ts('Token %1 is no longer supported - use %2 instead', [$token, $replacement]);
+      }
+    }
+    if (!empty($tokenErrors)) {
+      $errors['html_message'] = implode('<br>', $tokenErrors);
+    }
 
     // If user uploads non-document file other than odt/docx
     if (empty($fields['template']) &&
@@ -223,11 +257,15 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    *
    * @return string $html_message
    *
+   * @deprecated
+   *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function processTemplate(&$formValues) {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+
     $html_message = $formValues['html_message'] ?? NULL;
 
     // process message template
@@ -285,6 +323,8 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   }
 
   /**
+   * @deprecated
+   *
    * @param $message
    */
   public static function formatMessage(&$message) {
@@ -336,17 +376,13 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param array $formValues
    *   The values submitted through the form
    *
-   * @return array
-   *   If formValues['is_unit_test'] is true, otherwise outputs document to browser
+   * @deprecated
    */
-  public static function renderFromRows($rows, $msgPart, $formValues) {
+  public static function renderFromRows($rows, $msgPart, $formValues): void {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $html = [];
     foreach ($rows as $row) {
       $html[] = $row->render($msgPart);
-    }
-
-    if (!empty($formValues['is_unit_test'])) {
-      return $html;
     }
 
     if (!empty($html)) {
@@ -357,8 +393,11 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   /**
    * List the available tokens
    * @return array of token name => label
+   *
+   * @deprecated
    */
   public static function listTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
     $class = get_called_class();
     if (method_exists($class, 'createTokenProcessor')) {
       return $class::createTokenProcessor()->listTokens();
@@ -368,15 +407,25 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   /**
    * Output the pdf or word document from the generated html.
    *
+   * @deprecated
+   *
    * @param array $formValues
    * @param array $html
    */
   protected static function outputFromHtml($formValues, array $html) {
-    if ($formValues['document_type'] === 'pdf') {
-      CRM_Utils_PDF_Utils::html2pdf($html, 'CiviLetter.pdf', FALSE, $formValues);
+    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    // Set the filename for the PDF using the Activity Subject, if defined. Remove unwanted characters and limit the length to 200 characters.
+    if (!empty($formValues['subject'])) {
+      $fileName = CRM_Utils_File::makeFilenameWithUnicode($formValues['subject'], '_', 200);
     }
     else {
-      CRM_Utils_PDF_Document::html2doc($html, 'CiviLetter.' . $formValues['document_type'], $formValues);
+      $fileName = 'CiviLetter';
+    }
+    if ($formValues['document_type'] === 'pdf') {
+      CRM_Utils_PDF_Utils::html2pdf($html, $fileName . '.pdf', FALSE, $formValues);
+    }
+    else {
+      CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $formValues['document_type'], $formValues);
     }
   }
 

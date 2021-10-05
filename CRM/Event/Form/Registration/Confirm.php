@@ -87,7 +87,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     if (isset($this->_values['event']['confirm_title'])) {
-      CRM_Utils_System::setTitle($this->_values['event']['confirm_title']);
+      $this->setTitle($this->_values['event']['confirm_title']);
     }
 
     // Personal campaign page

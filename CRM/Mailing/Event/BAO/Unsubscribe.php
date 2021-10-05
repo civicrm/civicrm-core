@@ -132,10 +132,10 @@ WHERE  email = %2
     $relevant_mailing_id = $mailing_id;
 
     // Special case for AB Tests:
-    if (in_array($mailing_type, ['experiement', 'winner'])) {
+    if (in_array($mailing_type, ['experiment', 'winner'])) {
       // The mailing belongs to an AB test.
       // See if we can find an AB test where this is variant B.
-      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', mailing_id, 'mailing_id_a', 'mailing_id_b');
+      $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
       if (!empty($mailing_id_a)) {
         // OK, we were given mailing B and we looked up variant A which is the relevant one.
         $relevant_mailing_id = $mailing_id_a;
@@ -384,7 +384,7 @@ WHERE  email = %2
 
     $params = [
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
+      'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
       'toEmail' => $eq->email,
       'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),

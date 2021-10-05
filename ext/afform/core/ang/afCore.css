@@ -17,6 +17,9 @@ a.af-api4-action-idle {
     margin-right: .5em;
     vertical-align: top;
 }
+af-form {
+  display: block;
+}
 
 [af-repeat-item] {
   position: relative;

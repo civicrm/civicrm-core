@@ -85,6 +85,23 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
         ],
+        'order_bys' => [
+          'event_start_date' => [
+            'title' => ts('Event Start Date'),
+            'default' => '1',
+            'default_weight' => '0',
+            'default_order' => 'DESC',
+          ],
+          'event_end_date' => [
+            'title' => ts('Event End Date'),
+          ],
+          'max_participants' => [
+            'title' => ts('Capacity'),
+          ],
+          'title' => [
+            'title' => ts('Event Title'),
+          ],
+        ],
       ],
     ];
     $this->_currencyColumn = 'civicrm_participant_fee_currency';

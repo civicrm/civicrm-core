@@ -72,7 +72,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
       CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
       $this->_surveyTitle = $surveyInfo['title'];
       $this->assign('surveyTitle', $this->_surveyTitle);
-      CRM_Utils_System::setTitle(ts('Configure Survey - %1', [1 => $this->_surveyTitle]));
+      $this->setTitle(ts('Configure Survey - %1', [1 => $this->_surveyTitle]));
     }
 
     $this->assign('action', $this->_action);

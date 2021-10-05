@@ -1,0 +1,96 @@
+<div crm-ui-debug="options"></div>
+
+<ng-form name="contentForm" crm-ui-id-scope ng-init="accordions={msg_subject: true, msg_html: true, msg_text: false}">
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href ng-click="accordions.msg_subject = !accordions.msg_subject">
+        <i class="crm-i fa-caret-{{ accordions.msg_subject ? 'down' : 'right' }}"></i>
+        {{:: ts('Subject') }}
+      </a>
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_subject', selection)"
+             ng-show="accordions.msg_subject && !$ctrl.isDisabled()"
+      />
+      <div class="clearfix"></div>
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_subject">
+      <div ng-model="$ctrl.msgtpl.msg_subject"
+           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
+           crm-monaco-insert-rx="insert:msg_subject"
+           ng-disabled="$ctrl.isDisabled()"
+      ></div>
+      <p class="help-block">{{::ts('The email subject is a single line. However, template codes may use multiple lines.')}}</p>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href ng-click="accordions.msg_html = !accordions.msg_html">
+        <i class="crm-i fa-caret-{{ accordions.msg_html ? 'down' : 'right' }}"></i>
+        {{:: ts('HTML Content') }}
+      </a>
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('HTML Content: Toolbar')}}" ng-show="accordions.msg_html">
+        <button type="button" class="btn btn-secondary" title="{{::ts('Open large editor')}}" ng-click="$ctrl.openFull(ts('HTML Content'), 'msg_html', {language: 'html'})">
+          <i class="crm-i fa-expand"></i>
+        </button>
+        <button type="button" class="btn btn-secondary" title="{{::ts('Open preview')}}" ng-click="$ctrl.openPreview({formatName: 'msg_html'})">
+          <i class="crm-i fa-eye"></i>
+        </button>
+      </div>
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_html', selection)"
+             ng-show="accordions.msg_html && !$ctrl.isDisabled()"
+      />
+      <div class="clearfix"></div>
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_html">
+      <div ng-model="$ctrl.msgtpl.msg_html"
+           crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"
+           crm-monaco-insert-rx="insert:msg_html"
+           ng-disabled="$ctrl.isDisabled()"
+      ></div>
+    </div>
+  </div>
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <a href ng-click="accordions.msg_text = !accordions.msg_text">
+        <i class="crm-i fa-caret-{{ accordions.msg_text ? 'down' : 'right' }}"></i>
+        {{:: ts('Text Content') }}
+      </a>
+      <div class="btn-group btn-group-xs pull-right" role="toolbar" aria-label="{{::ts('Text Content: Toolbar')}}" ng-show="accordions.msg_text">
+        <button type="button" class="btn btn-secondary" title="{{ ::ts('Open large editor') }}" ng-click="$ctrl.openFull(ts('Text Content'), 'msg_text', {language: 'smarty'})">
+          <i class="crm-i fa-expand"></i>
+        </button>
+        <button type="button" class="btn btn-secondary" title="{{ ::ts('Open preview') }}" ng-click="$ctrl.openPreview({formatName: 'msg_text'})">
+          <i class="crm-i fa-eye"></i>
+        </button>
+      </div>
+      &nbsp;
+      <input class="form-control pull-right crm-action-menu fa-code"
+             tabindex="-1"
+             style="z-index:1"
+             crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
+             on-crm-ui-select="$broadcast('insert:msg_text', selection)"
+             ng-show="accordions.msg_text && !$ctrl.isDisabled()"
+      />
+      <div class="clearfix"></div>
+    </div>
+    <div class="panel-body" uib-collapse="!accordions.msg_text">
+      <div ng-model="$ctrl.msgtpl.msg_text"
+           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.5})"
+           crm-monaco-insert-rx="insert:msg_text"
+           ng-disabled="$ctrl.isDisabled()"
+      ></div>
+    </div>
+  </div>
+
+
+</ng-form>

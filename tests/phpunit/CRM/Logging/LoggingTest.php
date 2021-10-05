@@ -39,6 +39,28 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that hooks removing tables from logging are respected during custom field add.
+   *
+   * During custom field save logging is only handled for the affected table.
+   * We need to make sure this respects hooks to remove from the logging set.
+   */
+  public function testLoggingHookIgnore(): void {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'ignoreSillyName']);
+    Civi::settings()->set('logging', TRUE);
+    $this->createCustomGroupWithFieldOfType(['table_name' => 'silly_name']);
+    $this->assertEmpty(CRM_Core_DAO::singleValueQuery("SHOW tables LIKE 'log_silly_name'"));
+  }
+
+  /**
+   * Implement hook to cause our log table to be ignored.
+   *
+   * @param array $logTableSpec
+   */
+  public function ignoreSillyName(array &$logTableSpec): void {
+    unset($logTableSpec['silly_name']);
+  }
+
+  /**
    * Test creating logging schema when database is in multilingual mode.
    */
   public function testMultilingualLogging(): void {

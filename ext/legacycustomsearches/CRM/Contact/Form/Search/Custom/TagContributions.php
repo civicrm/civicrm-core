@@ -237,18 +237,6 @@ WHERE  $where
   }
 
   /**
-   * @param $title
-   */
-  public function setTitle($title) {
-    if ($title) {
-      CRM_Utils_System::setTitle($title);
-    }
-    else {
-      CRM_Utils_System::setTitle(ts('Search'));
-    }
-  }
-
-  /**
    * @return null
    */
   public function summary() {

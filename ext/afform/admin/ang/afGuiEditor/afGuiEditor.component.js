@@ -69,13 +69,14 @@
 
           if (editor.mode === 'create') {
             editor.addEntity(editor.entity);
+            editor.afform.create_submission = true;
             editor.layout['#children'].push(afGui.meta.elements.submit.element);
           }
         }
 
         else if (editor.getFormType() === 'block') {
           editor.layout['#children'] = editor.afform.layout;
-          editor.blockEntity = editor.afform.join || editor.afform.block;
+          editor.blockEntity = editor.afform.join_entity || editor.afform.entity_type;
           $scope.entities[editor.blockEntity] = backfillEntityDefaults({
             type: editor.blockEntity,
             name: editor.blockEntity,
@@ -120,7 +121,7 @@
         while (!!$scope.entities[type + num]) {
           num++;
         }
-        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)($scope), {
+        $scope.entities[type + num] = backfillEntityDefaults(_.assign($parse(meta.defaults)(editor), {
           '#tag': 'af-entity',
           type: meta.entity,
           name: type + num,
@@ -331,7 +332,7 @@
       $scope.$watch('editor.afform.title', function(newTitle, oldTitle) {
         if (typeof oldTitle === 'string') {
           _.each($scope.entities, function(entity) {
-            if (entity.data && entity.data.source === oldTitle) {
+            if (entity.data && 'source' in entity.data && (entity.data.source || '') === oldTitle) {
               entity.data.source = newTitle;
             }
           });

@@ -41,11 +41,23 @@ class MailingPreview {
     $contactID = \CRM_Utils_Array::value('contact_id', $params,
       \CRM_Core_Session::singleton()->get('userID'));
 
-    $job = new \CRM_Mailing_BAO_MailingJob();
+    $job = new class extends \CRM_Mailing_BAO_MailingJob {
+
+      public function insert() {
+        throw new \RuntimeException('MailingJob is just a preview. It cannot be saved.');
+      }
+
+      public function update($dataObject = FALSE) {
+        throw new \RuntimeException('MailingJob is just a preview. It cannot be saved.');
+      }
+
+      public function save($hook = TRUE) {
+        throw new \RuntimeException('MailingJob is just a preview. It cannot be saved.');
+      }
+
+    };
     $job->mailing_id = $mailing->id ?: NULL;
-    $job->is_test = 1;
     $job->status = 'Complete';
-    // $job->save();
 
     $flexMailer = new FlexMailer(array(
       'is_preview' => TRUE,

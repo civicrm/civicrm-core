@@ -116,13 +116,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     $transaction->commit();
 
     CRM_Utils_Hook::post('delete', 'Group', $id, $group);
-
-    // delete the recently created Group
-    $groupRecent = [
-      'id' => $id,
-      'type' => 'Group',
-    ];
-    CRM_Utils_Recent::del($groupRecent);
   }
 
   /**
@@ -912,7 +905,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
       if ($object->saved_search_id) {
-        $values[$object->id]['title'] .= ' (' . ts('Smart Group') . ')';
+        $values[$object->id]['class'][] = "crm-smart-group";
         // check if custom search, if so fix view link
         $customSearchID = CRM_Core_DAO::getFieldValue(
           'CRM_Contact_DAO_SavedSearch',

@@ -131,6 +131,20 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(100, $result[0]['MIN:total_amount']);
     $this->assertEquals(2, $result[0]['count']);
     $this->assertEquals(1, $result[1]['count']);
+
+    $result = Contribution::get(FALSE)
+      ->addGroupBy('contact_id')
+      ->addGroupBy('receive_date')
+      ->addSelect('contact_id')
+      ->addSelect('receive_date')
+      ->addSelect('SUM(total_amount)')
+      ->addOrderBy('receive_date')
+      ->addWhere('contact_id', '=', $cid)
+      ->addHaving('SUM(total_amount)', '>', 300)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertStringStartsWith('2020-04-04', $result[0]['receive_date']);
+    $this->assertEquals(400, $result[0]['SUM:total_amount']);
   }
 
   public function testComparisonFunctions() {
@@ -177,6 +191,28 @@ class SqlFunctionTest extends UnitTestCase {
     $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
   }
 
+  public function testStringFunctions() {
+    $sampleData = [
+      ['first_name' => 'abc', 'middle_name' => 'Q', 'last_name' => 'tester1', 'source' => '123'],
+    ];
+    $cid = Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute()->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addSelect('CONCAT_WS("|", first_name, middle_name, last_name) AS concat_ws')
+      ->addSelect('REPLACE(first_name, "c", "cdef") AS new_first')
+      ->addSelect('UPPER(first_name)')
+      ->addSelect('LOWER(middle_name)')
+      ->execute()->first();
+
+    $this->assertEquals('abc|Q|tester1', $result['concat_ws']);
+    $this->assertEquals('abcdef', $result['new_first']);
+    $this->assertEquals('ABC', $result['UPPER:first_name']);
+    $this->assertEquals('q', $result['LOWER:middle_name']);
+  }
+
   public function testIncorrectNumberOfArguments() {
     try {
       Activity::get(FALSE)
@@ -185,7 +221,7 @@ class SqlFunctionTest extends UnitTestCase {
       $this->fail('Api should have thrown exception');
     }
     catch (\API_Exception $e) {
-      $this->assertEquals('Incorrect number of arguments for SQL function IF', $e->getMessage());
+      $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
     }
 
     try {
@@ -195,8 +231,35 @@ class SqlFunctionTest extends UnitTestCase {
       $this->fail('Api should have thrown exception');
     }
     catch (\API_Exception $e) {
-      $this->assertEquals('Incorrect number of arguments for SQL function NULLIF', $e->getMessage());
+      $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
     }
+
+    try {
+      Activity::get(FALSE)
+        ->addSelect('CONCAT_WS(",", ) AS whoops')
+        ->execute();
+      $this->fail('Api should have thrown exception');
+    }
+    catch (\API_Exception $e) {
+      $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
+    }
+  }
+
+  public function testRandFunction() {
+    $cid = Contact::create(FALSE)
+      ->addValue('first_name', 'hello')
+      ->execute()->first()['id'];
+
+    $result = Contact::get(FALSE)
+      ->addSelect('RAND() AS rand')
+      ->addOrderBy('RAND()')
+      ->setDebug(TRUE)
+      ->setLimit(1)
+      ->execute();
+
+    $this->assertStringContainsString('ORDER BY RAND()', $result->debug['sql'][0]);
+    $this->assertGreaterThanOrEqual(0, $result[0]['rand']);
+    $this->assertLessThan(1, $result[0]['rand']);
   }
 
 }

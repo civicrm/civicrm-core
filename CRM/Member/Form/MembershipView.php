@@ -341,7 +341,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       }
 
       // omitting contactImage from title for now since the summary overlay css doesn't work outside crm-container
-      CRM_Utils_System::setTitle(ts('View Membership for') . ' ' . $displayName);
+      $this->setTitle(ts('View Membership for') . ' ' . $displayName);
 
       // add viewed membership to recent items list
       $recentTitle = $displayName . ' - ' . ts('Membership Type:') . ' ' . $values['membership_type'];

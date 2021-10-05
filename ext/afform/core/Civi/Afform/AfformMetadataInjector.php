@@ -28,12 +28,12 @@ class AfformMetadataInjector {
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         try {
           $module = \Civi::service('angular')->getModule(basename($path, '.aff.html'));
-          $meta = \Civi\Api4\Afform::get(FALSE)->addWhere('name', '=', $module['_afform'])->setSelect(['join', 'block'])->execute()->first();
+          $meta = \Civi\Api4\Afform::get(FALSE)->addWhere('name', '=', $module['_afform'])->setSelect(['join_entity', 'entity_type'])->execute()->first();
         }
         catch (\Exception $e) {
         }
 
-        $blockEntity = $meta['join'] ?? $meta['block'] ?? NULL;
+        $blockEntity = $meta['join_entity'] ?? $meta['entity_type'] ?? NULL;
         if (!$blockEntity) {
           $entities = self::getFormEntities($doc);
         }

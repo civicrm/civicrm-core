@@ -113,6 +113,11 @@ class Entity extends Generic\AbstractEntity {
           'description' => 'Version this API entity was added',
         ],
         [
+          'name' => 'class',
+          'data_type' => 'String',
+          'description' => 'PHP class name',
+        ],
+        [
           'name' => 'bridge',
           'data_type' => 'Array',
           'description' => 'Connecting fields for EntityBridge types',

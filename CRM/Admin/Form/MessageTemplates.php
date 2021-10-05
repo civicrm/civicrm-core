@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\MessageTemplate;
+use Civi\Token\TokenProcessor;
 
 /**
  *
@@ -109,7 +110,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
     else {
       $this->_workflow_id = $this->_values['workflow_id'] ?? NULL;
       $this->checkUserPermission($this->_workflow_id);
-      $this->assign('workflow_id', $this->_workflow_id);
+      $this->assign('isWorkflow', (bool) ($this->_values['workflow_id'] ?? NULL));
 
       if ($this->_workflow_id) {
         $selectedChild = 'workflow';
@@ -170,9 +171,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_subject')
     );
 
-    //get the tokens.
-    $tokens = CRM_Core_SelectValues::contactTokens();
-    $tokens = array_merge($tokens, CRM_Core_SelectValues::domainTokens());
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $tokens = $tokenProcessor->listTokens();
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
 
@@ -213,7 +213,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      CRM_Utils_System::setTitle(ts('View System Default Message Template'));
+      $this->setTitle(ts('View System Default Message Template'));
     }
   }
 

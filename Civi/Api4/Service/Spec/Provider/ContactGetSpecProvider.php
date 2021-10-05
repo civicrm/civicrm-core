@@ -22,6 +22,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
+    // Groups field
     $field = new FieldSpec('groups', 'Contact', 'Array');
     $field->setLabel(ts('In Groups'))
       ->setTitle(ts('Groups'))
@@ -30,8 +31,22 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       ->setType('Filter')
       ->setOperators(['IN', 'NOT IN'])
       ->addSqlFilter([__CLASS__, 'getContactGroupSql'])
+      ->setSuffixes(['id', 'name', 'label'])
       ->setOptionsCallback([__CLASS__, 'getGroupList']);
     $spec->addFieldSpec($field);
+
+    // Age field
+    if (!$spec->getValue('contact_type') || $spec->getValue('contact_type') === 'Individual') {
+      $field = new FieldSpec('age_years', 'Contact', 'Integer');
+      $field->setLabel(ts('Age (years)'))
+        ->setTitle(ts('Age (years)'))
+        ->setColumnName('birth_date')
+        ->setDescription(ts('Age of individual (in years)'))
+        ->setType('Extra')
+        ->setReadonly(TRUE)
+        ->setSqlRenderer([__CLASS__, 'calculateAge']);
+      $spec->addFieldSpec($field);
+    }
   }
 
   /**
@@ -57,7 +72,7 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
     $tempTable = \CRM_Utils_SQL_TempTable::build();
     $tempTable->createWithColumns('contact_id INT');
     $tableName = $tempTable->getName();
-    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups($value, $tableName);
+    \CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups((array) $value, $tableName);
     // SQL optimization - use INNER JOIN if the base table is Contact & this clause is not nested
     if ($fieldAlias === '`a`.`id`' && $operator === "IN" && !$depth) {
       $query->getQuery()->join($tableName, "INNER JOIN `$tableName` ON $fieldAlias = `$tableName`.contact_id");
@@ -91,6 +106,15 @@ class ContactGetSpecProvider implements Generic\SpecProviderInterface {
       }
     }
     return $options;
+  }
+
+  /**
+   * Generate SQL for age field
+   * @param array $field
+   * @return string
+   */
+  public static function calculateAge(array $field) {
+    return "TIMESTAMPDIFF(YEAR, {$field['sql_name']}, CURDATE())";
   }
 
 }

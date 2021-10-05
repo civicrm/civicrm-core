@@ -76,7 +76,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
       'label'
     );
 
-    CRM_Utils_System::setTitle(ts('Custom Field Move: %1',
+    $this->setTitle(ts('Custom Field Move: %1',
       [1 => $this->_srcFieldLabel]
     ));
 

@@ -12,12 +12,13 @@
     {{:: ts('Style') }}
   </label>
   <select id="crm-search-admin-col-style-{{$index}}" class="form-control" ng-model="col.style">
-    <option ng-repeat="opt in $ctrl.parent.styles" value="{{ opt.key }}">{{ opt.value }}</option>
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key }}">{{:: opt.value }}</option>
+    <option ng-repeat="opt in $ctrl.parent.styles" value="{{:: opt.key + '-outline' }}">{{:: opt.value + ' ' + ts('Outline') }}</option>
   </select>
 </div>
 <div class="form-inline">
   <label>
-    {{:: ts('Menu Text/Icon') }}
+    {{:: ts('Menu Icon/Text') }}
   </label>
   <div class="btn-group">
     <button type="button" class="btn btn-{{ col.style + ' ' + col.size }}">
@@ -27,6 +28,7 @@
       <span crm-ui-editable ng-model="col.text">{{ col.text }}</span>
     </button>
   </div>
+  <crm-search-admin-token-select model="col" field="text" suffix=":label"></crm-search-admin-token-select>
 </div>
 <hr>
 <crm-search-admin-link-group links="$ctrl.parent.getLinks()" group="col.links" api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams"></crm-search-admin-link-group>

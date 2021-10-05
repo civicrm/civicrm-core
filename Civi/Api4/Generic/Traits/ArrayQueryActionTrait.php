@@ -149,6 +149,11 @@ trait ArrayQueryActionTrait {
         $pattern = '/^' . str_replace('%', '.*', preg_quote($expected, '/')) . '$/i';
         return !preg_match($pattern, $value) == ($operator != 'LIKE');
 
+      case 'REGEXP':
+      case 'NOT REGEXP':
+        $pattern = '/' . str_replace('/', '\\/', $expected) . '/';
+        return !preg_match($pattern, $value) == ($operator != 'REGEXP');
+
       case 'IN':
         return in_array($value, $expected);
 

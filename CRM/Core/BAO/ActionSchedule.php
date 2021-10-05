@@ -213,20 +213,11 @@ FROM civicrm_action_schedule cas
    * Delete a Reminder.
    *
    * @param int $id
-   *   ID of the Reminder to be deleted.
-   *
+   * @deprecated
    * @throws CRM_Core_Exception
    */
   public static function del($id) {
-    if ($id) {
-      $dao = new CRM_Core_DAO_ActionSchedule();
-      $dao->id = $id;
-      if ($dao->find(TRUE)) {
-        $dao->delete();
-        return;
-      }
-    }
-    throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
+    self::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -624,15 +615,15 @@ FROM civicrm_action_schedule cas
     $mailParams = [
       'groupName' => 'Scheduled Reminder Sender',
       'from' => self::pickFromEmail($schedule),
-      'toName' => $tokenRow->context['contact']['display_name'],
+      'toName' => $tokenRow->render('toName'),
       'toEmail' => $toEmail,
       'subject' => $tokenRow->render('subject'),
       'entity' => 'action_schedule',
       'entity_id' => $schedule->id,
     ];
 
-    if (!$body_html || $tokenRow->context['contact']['preferred_mail_format'] === 'Text' ||
-      $tokenRow->context['contact']['preferred_mail_format'] === 'Both'
+    $preferredMailFormat = $tokenRow->render('preferred_mail_format');
+    if (!$body_html ||  $preferredMailFormat === 'Text' || $preferredMailFormat === 'Both'
     ) {
       // render the &amp; entities in text mode, so that the links work
       $mailParams['text'] = str_replace('&amp;', '&', $body_text);
@@ -667,6 +658,10 @@ FROM civicrm_action_schedule cas
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
     $tp->addMessage('sms_body_text', $schedule->sms_body_text, 'text/plain');
     $tp->addMessage('subject', $schedule->subject, 'text/plain');
+    // These 2 are not 'real' tokens - but it tells the processor to load them.
+    $tp->addMessage('toName', '{contact.display_name}', 'text/plain');
+    $tp->addMessage('preferred_mail_format', '{contact.preferred_mail_format}', 'text/plain');
+
     return $tp;
   }
 

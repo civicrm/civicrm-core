@@ -197,6 +197,37 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertArrayHasKey($jan['id'], (array) $result);
   }
 
+  public function testRegexpOperators() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $alex = Contact::create()
+      ->setValues(['first_name' => 'Alex', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $jane = Contact::create()
+      ->setValues(['first_name' => 'Jane', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(2, $result);
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+    $this->assertArrayHasKey($alex['id'], (array) $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('first_name', 'NOT REGEXP', '^A')
+      ->execute()->indexBy('id');
+    $this->assertCount(1, $result);
+    $this->assertArrayHasKey($jane['id'], (array) $result);
+  }
+
   public function testGetRelatedWithSubType() {
     $org = Contact::create(FALSE)
       ->addValue('contact_type', 'Organization')
@@ -261,6 +292,26 @@ class ContactGetTest extends \api\v4\UnitTestCase {
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
+  public function testGetWithWhereExpression() {
+    $last_name = uniqid(__FUNCTION__);
+
+    $alice = Contact::create()
+      ->setValues(['first_name' => 'Alice', 'last_name' => $last_name])
+      ->execute()->first();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('ALICE')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertCount(0, $result);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $last_name)
+      ->addWhere('LOWER(first_name)', '=', "BINARY('alice')", TRUE)
+      ->execute()->indexBy('id');
+    $this->assertArrayHasKey($alice['id'], (array) $result);
+  }
+
   /**
    * @throws \API_Exception
    */
@@ -269,6 +320,29 @@ class ContactGetTest extends \api\v4\UnitTestCase {
       ->addClause('OR', ['first_name', '=', '🚂'], ['last_name', '=', '🚂'])
       ->setCheckPermissions(FALSE)
       ->execute();
+  }
+
+  public function testAge(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'abc', 'last_name' => $lastName, 'birth_date' => 'now - 1 year - 1 month'],
+      ['first_name' => 'def', 'last_name' => $lastName, 'birth_date' => 'now - 21 year - 6 month'],
+    ];
+    Contact::save(FALSE)
+      ->setRecords($sampleData)
+      ->execute();
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addSelect('first_name', 'age_years')
+      ->execute()->indexBy('first_name');
+    $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertEquals(21, $result['def']['age_years']);
+
+    Contact::get(FALSE)
+      ->addWhere('age_years', '=', 21)
+      ->addWhere('last_name', '=', $lastName)
+      ->execute()->single();
   }
 
 }

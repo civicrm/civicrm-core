@@ -97,7 +97,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
     if ($this->processor && $this->processor->getTemporaryTable()) {
       // delete the export temp table
-      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS " . $this->processor->getTemporaryTable());
+      CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS ' . $this->processor->getTemporaryTable());
     }
     parent::tearDown();
   }
@@ -2553,7 +2553,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'image_url' => '`image_url` longtext',
       'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
-      'preferred_mail_format' => '`preferred_mail_format` varchar(16)',
+      'preferred_mail_format' => '`preferred_mail_format` text(16)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
       'first_name' => '`first_name` varchar(64)',
@@ -2741,7 +2741,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'image_url' => '`image_url` longtext',
       'preferred_communication_method' => '`preferred_communication_method` varchar(255)',
       'preferred_language' => '`preferred_language` varchar(5)',
-      'preferred_mail_format' => '`preferred_mail_format` varchar(16)',
+      'preferred_mail_format' => '`preferred_mail_format` text(16)',
       'hash' => '`hash` varchar(32)',
       'contact_source' => '`contact_source` varchar(255)',
       'first_name' => '`first_name` varchar(64)',

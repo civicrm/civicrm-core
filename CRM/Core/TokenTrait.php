@@ -58,17 +58,15 @@ trait CRM_Core_TokenTrait {
 
   /**
    * Find the fields that we need to get to construct the tokens requested.
-   * @param  array $activeTokens list of active tokens
+   *
    * @return array         list of fields needed to generate those tokens
    */
-  public function getReturnFields($activeTokens) {
+  public function getReturnFields(): array {
     // Make sure we always return something
     $fields = ['id'];
 
-    $tokensInUse = array_intersect(
-      $activeTokens,
-      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()))
-    );
+    $tokensInUse =
+      array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()));
     foreach ($tokensInUse as $token) {
       if (isset(self::$fieldMapping[$token])) {
         $fields = array_merge($fields, self::$fieldMapping[$token]);

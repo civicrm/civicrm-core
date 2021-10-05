@@ -29,14 +29,15 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
         'optional' => FALSE,
       ],
       [
-        'prefix' => 'ORDER BY',
+        'name' => 'ORDER BY',
+        'label' => ts('Order by'),
         'max_expr' => 1,
         'flag_after' => ['ASC' => ts('Ascending'), 'DESC' => ts('Descending')],
         'must_be' => ['SqlField'],
         'optional' => TRUE,
       ],
       [
-        'prefix' => 'SEPARATOR',
+        'name' => 'SEPARATOR',
         'max_expr' => 1,
         'must_be' => ['SqlString'],
         'optional' => TRUE,
@@ -78,6 +79,13 @@ class SqlFunctionGROUP_CONCAT extends SqlFunction {
    */
   public static function getTitle(): string {
     return ts('List');
+  }
+
+  /**
+   * @return string
+   */
+  public static function getDescription(): string {
+    return ts('All values in the grouping.');
   }
 
 }

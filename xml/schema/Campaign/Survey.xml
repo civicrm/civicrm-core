@@ -47,6 +47,12 @@
       <label>Campaign</label>
     </html>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_campaign</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <prefetch>FALSE</prefetch>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>campaign_id</name>
@@ -208,6 +214,13 @@
     <default>NULL</default>
     <comment>Used to store option group id.</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+      <nameColumn>name</nameColumn>
+      <condition>name LIKE "civicrm_survey_%"</condition>
+    </pseudoconstant>
   </field>
   <field>
     <name>bypass_confirm</name>

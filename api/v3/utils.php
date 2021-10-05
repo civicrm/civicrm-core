@@ -1876,6 +1876,7 @@ function _civicrm_api3_generic_replace_base_params($params) {
   unset($baseParams['values']);
   unset($baseParams['sequential']);
   unset($baseParams['options']);
+  $baseParams['options']['limit'] = 0;
   return $baseParams;
 }
 
@@ -2059,6 +2060,10 @@ function _civicrm_api3_swap_out_aliases(&$apiRequest, $fields) {
  */
 function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $entity) {
   list($fieldValue, $op) = _civicrm_api3_field_value_check($params, $fieldName);
+  if ($fieldName === 'auto_renew' && $fieldValue === TRUE) {
+    // https://lab.civicrm.org/dev/rc/-/issues/14
+    $fieldValue = 1;
+  }
   if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
     return;
   }

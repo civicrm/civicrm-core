@@ -157,7 +157,7 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // set this for debugging -look for output in apache error log
     //curl_setopt ($ch,CURLOPT_VERBOSE,1 );
     // ensures any Location headers are followed
-    if (ini_get('open_basedir') == '' && ini_get('safe_mode') == 'Off') {
+    if (ini_get('open_basedir') == '') {
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
     }
 

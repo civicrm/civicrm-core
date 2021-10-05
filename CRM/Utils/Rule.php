@@ -639,12 +639,46 @@ class CRM_Utils_Rule {
    *
    * @return bool
    */
-  public static function email($value) {
+  public static function email($value): bool {
+    if (function_exists('idn_to_ascii')) {
+      $parts = explode('@', $value);
+      foreach ($parts as &$part) {
+        // if the function returns FALSE then let filter_var have at it.
+        $part = self::idnToAsci($part) ?: $part;
+        if ($part === 'localhost') {
+          // if we are in a dev environment add .com to trick it into accepting localhost.
+          // this is a bit best-effort - ie we don't really care that it's in a bigger if.
+          $part .= '.com';
+        }
+      }
+      $value = implode('@', $parts);
+    }
     return (bool) filter_var($value, FILTER_VALIDATE_EMAIL);
   }
 
   /**
-   * @param $list
+   * Convert domain string to ascii.
+   *
+   * See https://lab.civicrm.org/dev/core/-/issues/2769
+   * and also discussion over in guzzle land
+   * https://github.com/guzzle/guzzle/pull/2454
+   *
+   * @param string $string
+   *
+   * @return string|false
+   */
+  private static function idnToAsci(string $string) {
+    if (!\extension_loaded('intl')) {
+      return $string;
+    }
+    if (defined('INTL_IDNA_VARIANT_UTS46')) {
+      return idn_to_ascii($string, 0, INTL_IDNA_VARIANT_UTS46);
+    }
+    return idn_to_ascii($string);
+  }
+
+  /**
+   * @param string $list
    *
    * @return bool
    */

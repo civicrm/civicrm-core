@@ -34,8 +34,10 @@
     },
     controller: function($scope, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        afforms;
 
+      this.afformPath = CRM.url('civicrm/admin/afform');
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
 
@@ -68,6 +70,13 @@
             links: []
           }
         },
+        include: {
+          label: ts('Custom Code'),
+          icon: 'fa-code',
+          defaults: {
+            path: ''
+          }
+        }
       };
 
       // Drag-n-drop settings for reordering columns
@@ -133,6 +142,17 @@
         }
       };
 
+      this.toggleImage = function(col) {
+        if (col.image) {
+          delete col.image;
+        } else {
+          col.image = {
+            alt: this.getColLabel(col)
+          };
+          delete col.editable;
+        }
+      };
+
       this.toggleEditable = function(col) {
         if (col.editable) {
           delete col.editable;
@@ -140,19 +160,28 @@
         }
 
         var info = searchMeta.parseExpr(col.key),
+          arg = _.findWhere(info.args, {type: 'field'}) || {},
           value = col.key.split(':')[0];
+        if (!arg.field || info.fn) {
+          delete col.editable;
+          return;
+        }
         // If field is an implicit join, use the original fk field
-        if (info.field.name !== info.field.fieldName) {
+        if (arg.field.name !== arg.field.fieldName) {
           value = value.substr(0, value.lastIndexOf('.'));
           info = searchMeta.parseExpr(value);
+          arg = info.args[0];
         }
         col.editable = {
-          entity: info.field.baseEntity,
-          options: !!info.field.options,
-          serialize: !!info.field.serialize,
-          fk_entity: info.field.fk_entity,
-          id: info.prefix + 'id',
-          name: info.field.name,
+          // Hack to support editing relationships
+          entity: arg.field.entity.replace('RelationshipCache', 'Relationship'),
+          input_type: arg.field.input_type,
+          data_type: arg.field.data_type,
+          options: !!arg.field.options,
+          serialize: !!arg.field.serialize,
+          fk_entity: arg.field.fk_entity,
+          id: arg.prefix + searchMeta.getEntity(arg.field.entity).primary_key[0],
+          name: arg.field.name,
           value: value
         };
       };
@@ -160,7 +189,22 @@
       this.isEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.rewrite && !col.link && !info.fn && info.field && !info.field.readonly;
+        return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
+      };
+
+      this.canBeSortable = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr),
+          arg = (_.findWhere(info.args, {type: 'field'}) || {});
+        return arg.field && arg.field.type !== 'Pseudo';
+      };
+
+      // Aggregate functions (COUNT, AVG, MAX) cannot display as links, except for GROUP_CONCAT
+      // which gets special treatment in APIv4 to convert it to an array.
+      this.canBeLink = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       };
 
       this.toggleLink = function(column) {
@@ -251,10 +295,18 @@
           return _.findIndex(ctrl.display.settings.sort, [key]) >= 0;
         }
         return {
-          results: [{
-            text: ts('Columns'),
-            children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
-          }].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
+          results: [
+            {
+              text: ts('Random'),
+              icon: 'crm-i fa-random',
+              id: 'RAND()',
+              disabled: disabledIf('RAND()')
+            },
+            {
+              text: ts('Columns'),
+              children: ctrl.crmSearchAdmin.getSelectFields(disabledIf)
+            }
+          ].concat(ctrl.crmSearchAdmin.getAllFields('', ['Field', 'Custom'], disabledIf))
         };
       };
 
@@ -264,6 +316,16 @@
         if (_.findIndex(ctrl.display.settings[name], value) < 0) {
           ctrl.display.settings[name].push(value);
         }
+      };
+
+      // @return {Array}
+      this.getAfforms = function() {
+        if (ctrl.display.name && ctrl.crmSearchAdmin.afforms) {
+          if (!afforms || (ctrl.crmSearchAdmin.afforms[ctrl.display.name] && afforms !== ctrl.crmSearchAdmin.afforms[ctrl.display.name])) {
+            afforms = ctrl.crmSearchAdmin.afforms[ctrl.display.name] || [];
+          }
+        }
+        return afforms;
       };
 
       $scope.$watch('$ctrl.display.settings', function() {

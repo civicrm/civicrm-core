@@ -162,7 +162,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
-    CRM_Utils_System::setTitle(ts('Renew Membership'));
+    $this->setTitle(ts('Renew Membership'));
 
     parent::preProcess();
   }

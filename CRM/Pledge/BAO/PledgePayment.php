@@ -203,27 +203,11 @@ WHERE     pledge_id = %1
    * Delete pledge payment.
    *
    * @param int $id
-   *
-   * @return int
-   *   pledge payment id
+   * @deprecated
+   * @return bool
    */
   public static function del($id) {
-    $payment = new CRM_Pledge_DAO_PledgePayment();
-    $payment->id = $id;
-    if ($payment->find()) {
-      $payment->fetch();
-
-      CRM_Utils_Hook::pre('delete', 'PledgePayment', $id, $payment);
-
-      $result = $payment->delete();
-
-      CRM_Utils_Hook::post('delete', 'PledgePayment', $id, $payment);
-
-      return $result;
-    }
-    else {
-      return FALSE;
-    }
+    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**

@@ -58,10 +58,10 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);
       }
 
-      CRM_Utils_System::setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
+      $this->setTitle(implode(',', $displayName) . ' - ' . ts('Email'));
     }
     else {
-      CRM_Utils_System::setTitle(ts('New Email'));
+      $this->setTitle(ts('New Email'));
     }
     if ($this->_context === 'search') {
       $this->_single = TRUE;

@@ -134,11 +134,13 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function setDeleteMessage() {
     $this->deleteMessage = '<span class="font-red bold">'
-      . ts('WARNING: Deleting this membership will also delete any related payment (contribution) records.' . ts('This action cannot be undone.')
-        . '</span><p>'
-        . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
-          . '</p><p>'
-        . ts("Click 'Delete' if you want to continue.") . '</p>');
+      . ts('WARNING: Deleting this membership will also delete any related payment (contribution) records.')
+      . ' '
+      . ts('This action cannot be undone.')
+      . '</span><p>'
+      . ts('Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.')
+      . '</p><p>'
+      . ts("Click 'Delete' if you want to continue.") . '</p>';
   }
 
   /**

@@ -32,23 +32,23 @@
           <i class="crm-i fa-trash" aria-hidden="true"></i> {ts}Delete{/ts}</span>
       </a>
     {/if}
-    {include file="CRM/common/formButtons.tpl" location="top"}
     {assign var='pdfUrlParams' value="reset=1&id=$id&cid=$contact_id"}
     {assign var='emailUrlParams' value="reset=1&id=$id&cid=$contact_id&select=email"}
     {if $invoicing && empty($is_template)}
       <div class="css_right">
         <a class="button no-popup" href="{crmURL p='civicrm/contribute/invoice' q=$pdfUrlParams}">
-          <i class="crm-i fa-print" aria-hidden="true"></i>
+          <i class="crm-i fa-download" aria-hidden="true"></i>
         {if $contribution_status != 'Refunded' && $contribution_status != 'Cancelled' }
-          {ts}Print Invoice{/ts}</a>
+          {ts}Download Invoice{/ts}</a>
         {else}
-          {ts}Print Invoice and Credit Note{/ts}</a>
+          {ts}Download Invoice and Credit Note{/ts}</a>
         {/if}
         <a class="button" href="{crmURL p='civicrm/contribute/invoice/email' q=$emailUrlParams}">
           <i class="crm-i fa-paper-plane" aria-hidden="true"></i>
           {ts}Email Invoice{/ts}</a>
       </div>
     {/if}
+    {include file="CRM/common/formButtons.tpl" location="top"}
   </div>
 </div>
 <table class="crm-info-panel">
@@ -75,33 +75,18 @@
     <td>{if $receive_date}{$receive_date|crmDate}{else}({ts}not available{/ts}){/if}</td>
   </tr>
   {/if}
-  {if $displayLineItems}
-    <tr>
-      <td class="label">{ts}Contribution Amount{/ts}</td>
-      <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
+  <tr>
+    <td class="label">{ts}Contribution Amount{/ts}</td>
+    <td>{include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
         {if $contribution_recur_id}
           <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-            {ts}View Recurring Contribution{/ts}
+              {ts}View Recurring Contribution{/ts}
           </a>
           <br/>
-          {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
+            {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
-      </td>
-    </tr>
-  {else}
-    <tr>
-      <td class="label">{ts}Total Amount{/ts}</td>
-      <td><strong>{$total_amount|crmMoney:$currency}</strong>
-        {if $contribution_recur_id}
-          <a class="open-inline action-item crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
-            {ts}View Recurring Contribution{/ts}
-          </a>
-          <br/>
-          {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
-        {/if}
-      </td>
-    </tr>
-  {/if}
+    </td>
+  </tr>
   {if $invoicing && $tax_amount}
     <tr>
       <td class="label">{ts 1=$taxTerm}Total %1 Amount{/ts}</td>

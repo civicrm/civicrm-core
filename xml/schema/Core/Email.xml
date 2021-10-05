@@ -143,6 +143,8 @@
     <comment>When the address went on bounce hold</comment>
     <html>
       <label>Hold Date</label>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.1</add>
   </field>
@@ -152,6 +154,8 @@
     <comment>When the address bounce status was last reset</comment>
     <html>
       <label>Reset Date</label>
+      <type>Select Date</type>
+      <formatType>activityDateTime</formatType>
     </html>
     <add>1.1</add>
   </field>

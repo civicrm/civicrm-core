@@ -42,8 +42,8 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
   }
 
   body.crm-menubar-below-cms-menu.layout-default > #civicrm-menu-nav #civicrm-menu {
-    top: 70px;
-    z-index: 1000;
+    top: calc($menubarHeight + 26px);
+    z-index: 10000;
     position: absolute;
 	  border-top: 1px solid #aaa;
   }
@@ -60,23 +60,14 @@ body.admin.com_civicrm.layout-default #crm-qsearch label {
 @media (max-width: $breakMin) {
 
   body.com_civicrm.layout-default #header {
-    min-height: 45px;
-    padding: 10px 0;
     margin-bottom: $menubarHeight;
   }
 
   body.admin.com_civicrm.layout-default #civicrm-menu-nav {
-    margin-top: 45px;
+    margin-top: calc($menubarHeight + 14px);
     background: #1b1b1b;
     z-index: 1000;
     height: $menubarHeight;
     border-top: 1px solid #aaa;
   }
 }
-
-@media (max-width: 575px) {
-
-  body.admin.com_civicrm.layout-default #civicrm-menu-nav {
-  	margin-top: 77px;
-  }
-}	

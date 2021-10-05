@@ -57,7 +57,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
 
     // Fetch custom entities unless we've already fetched everything requested
     if (!$namesRequested || array_diff($namesRequested, array_keys($entities))) {
-      $this->addCustomEntities($entities);
+      $entities = array_merge($entities, $this->getCustomEntities());
     }
 
     ksort($entities);
@@ -81,59 +81,69 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    * @return \Civi\Api4\Generic\AbstractEntity[]
    */
   private function getAllApiClasses() {
-    $classNames = [];
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
-    );
-    foreach ($locations as $location) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
-      if (is_dir($dir)) {
-        foreach (glob("$dir/*.php") as $file) {
-          $className = 'Civi\Api4\\' . basename($file, '.php');
-          if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
-            $classNames[] = $className;
+    $cache = \Civi::cache('metadata');
+    $classNames = $cache->get('api4.entities.classNames', []);
+    if (!$classNames) {
+      $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
+        array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
+      );
+      foreach ($locations as $location) {
+        $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
+        if (is_dir($dir)) {
+          foreach (glob("$dir/*.php") as $file) {
+            $className = 'Civi\Api4\\' . basename($file, '.php');
+            if (is_a($className, 'Civi\Api4\Generic\AbstractEntity', TRUE)) {
+              $classNames[] = $className;
+            }
           }
         }
       }
+      $cache->set('api4.entities.classNames', $classNames);
     }
     return $classNames;
   }
 
   /**
-   * Add custom-field pseudo-entities
+   * Get custom-field pseudo-entities
    *
-   * @param $entities
-   * @throws \API_Exception
+   * @return array[]
    */
-  private function addCustomEntities(&$entities) {
-    $customEntities = CustomGroup::get()
-      ->addWhere('is_multiple', '=', 1)
-      ->addWhere('is_active', '=', 1)
-      ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
-      ->setCheckPermissions(FALSE)
-      ->execute();
-    $baseInfo = CustomValue::getInfo();
-    foreach ($customEntities as $customEntity) {
-      $fieldName = 'Custom_' . $customEntity['name'];
-      $baseEntity = CoreUtil::getApiClass(CustomGroupJoinable::getEntityFromExtends($customEntity['extends']));
-      $entities[$fieldName] = [
-        'name' => $fieldName,
-        'title' => $customEntity['title'],
-        'title_plural' => $customEntity['title'],
-        'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
-        'paths' => [
-          'view' => "civicrm/contact/view/cd?reset=1&gid={$customEntity['id']}&recId=[id]&multiRecordDisplay=single",
-        ],
-        'icon' => $customEntity['icon'] ?: NULL,
-      ] + $baseInfo;
-      if (!empty($customEntity['help_pre'])) {
-        $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);
+  private function getCustomEntities() {
+    $cache = \Civi::cache('metadata');
+    $entities = $cache->get('api4.entities.custom');
+    if (!isset($entities)) {
+      $entities = [];
+      $customEntities = CustomGroup::get()
+        ->addWhere('is_multiple', '=', 1)
+        ->addWhere('is_active', '=', 1)
+        ->setSelect(['name', 'title', 'help_pre', 'help_post', 'extends', 'icon'])
+        ->setCheckPermissions(FALSE)
+        ->execute();
+      $baseInfo = CustomValue::getInfo();
+      foreach ($customEntities as $customEntity) {
+        $fieldName = 'Custom_' . $customEntity['name'];
+        $baseEntity = CoreUtil::getApiClass(CustomGroupJoinable::getEntityFromExtends($customEntity['extends']));
+        $entities[$fieldName] = [
+          'name' => $fieldName,
+          'title' => $customEntity['title'],
+          'title_plural' => $customEntity['title'],
+          'description' => ts('Custom group for %1', [1 => $baseEntity::getInfo()['title_plural']]),
+          'paths' => [
+            'view' => "civicrm/contact/view/cd?reset=1&gid={$customEntity['id']}&recId=[id]&multiRecordDisplay=single",
+          ],
+          'icon' => $customEntity['icon'] ?: NULL,
+        ] + $baseInfo;
+        if (!empty($customEntity['help_pre'])) {
+          $entities[$fieldName]['comment'] = $this->plainTextify($customEntity['help_pre']);
+        }
+        if (!empty($customEntity['help_post'])) {
+          $pre = empty($entities[$fieldName]['comment']) ? '' : $entities[$fieldName]['comment'] . "\n\n";
+          $entities[$fieldName]['comment'] = $pre . $this->plainTextify($customEntity['help_post']);
+        }
       }
-      if (!empty($customEntity['help_post'])) {
-        $pre = empty($entities[$fieldName]['comment']) ? '' : $entities[$fieldName]['comment'] . "\n\n";
-        $entities[$fieldName]['comment'] = $pre . $this->plainTextify($customEntity['help_post']);
-      }
+      $cache->set('api4.entities.custom', $entities);
     }
+    return $entities;
   }
 
   /**

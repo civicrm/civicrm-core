@@ -35,17 +35,6 @@
                crm-ui-select="{placeholder: ts('Group By'), data: fieldsForGroupBy, dropdownCss: {width: '300px'}}"
                on-crm-ui-select="$ctrl.addParam('groupBy', selection)" >
       </div>
-      <fieldset id="crm-search-build-functions">
-        <legend ng-click="controls.showFunctions = !controls.showFunctions">
-          <i class="crm-i fa-caret-{{ !controls.showFunctions ? 'right' : 'down' }}"></i>
-          {{:: ts('Field Transformations') }}
-        </legend>
-        <div ng-if="!!controls.showFunctions">
-          <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select">
-            <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]"></crm-search-function>
-          </fieldset>
-        </div>
-      </fieldset>
     </fieldset>
   </div>
   <div class="crm-search-criteria-column">
@@ -57,3 +46,15 @@
     </fieldset>
   </div>
 </div>
+<fieldset id="crm-search-build-functions">
+  <legend ng-click="controls.showFunctions = !controls.showFunctions">
+    <i class="crm-i fa-caret-{{ !controls.showFunctions ? 'right' : 'down' }}"></i>
+    {{:: ts('Field Transformations') }}
+  </legend>
+  <div ng-if="!!controls.showFunctions">
+    <!-- Must use track by $index with an array of primitives, and manually refresh this loop when indexes change -->
+    <fieldset ng-repeat="col in $ctrl.savedSearch.api_params.select track by $index" ng-if="!$ctrl.isPseudoField(col)">
+      <crm-search-function expr="$ctrl.savedSearch.api_params.select[$index]"></crm-search-function>
+    </fieldset>
+  </div>
+</fieldset>

@@ -28,7 +28,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           </td>
           <td class="crm-extensions-status">{$row.statusLabel} </td>
           <td class="crm-extensions-version">{$row.version|escape}
-            {if ($row.develStage and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
+            {if (!empty($row.develStage) and $row.develStage != 'stable') or preg_match(";(alpha|beta|dev);", $row.version)}
               {icon icon="fa-flask crm-extensions-stage"}{ts}This is a pre-release version. For more details, see the expanded description.{/ts}{/icon}
             {else}
               {icon icon="fa-check-circle crm-extensions-stage"}{ts}This is a stable release version.{/ts}{/icon}

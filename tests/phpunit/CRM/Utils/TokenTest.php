@@ -152,10 +152,8 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
    *   and makes sure that greeting + contact tokens are replaced.
    * This is a good example to copy/expand when creating additional tests for token processor
    *   in "real" situations.
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function testTokenProcessor() {
+  public function testTokenProcessor(): void {
     $params['contact_id'] = $this->individualCreate();
 
     // Prepare the processor and general context.

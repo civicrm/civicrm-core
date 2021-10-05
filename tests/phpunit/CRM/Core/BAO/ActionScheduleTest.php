@@ -880,8 +880,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       '{contact.display_name}',
       // funny legacy contact token
       '{contact.gender}',
-      // funny legacy contact token
-      '{contact.gender_id}',
       // domain token
       '{domain.name}',
       // action-scheduler token
@@ -896,7 +894,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ]);
     // Note: The behavior of domain-tokens on a scheduled reminder is undefined. All we
     // can really do is check that it has something.
-    $someTokensExpected = 'Churmondleia Ōtākou;;Female;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
+    $someTokensExpected = 'Churmondleia Ōtākou;;Female;;[a-zA-Z0-9 ]+;;Phone Call';
     $manyTokensExpected = sprintf('%s;;Dear Churmondleia;;%s', $someTokensExpected, '{contactCustomTokenValue}');
 
     // In this example, we use a lot of tokens cutting across multiple components.
@@ -961,7 +959,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // In this example, we test activity tokens
     $activityTokens = '{activity.subject};;{activity.details};;{activity.activity_date_time}';
-    $activity = $this->fixtures['phonecall'];
+    $activity = [
+      'status_id' => 1,
+      'activity_type_id' => 2,
+      'activity_date_time' => '20120615100000',
+      'is_current_revision' => 1,
+      'is_deleted' => 0,
+      'subject' => 'Phone call',
+      'details' => 'A phone call about a bear',
+    ];
     $activityTokensExpected = "Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM";
     $cases[4] = [
       // Schedule definition.

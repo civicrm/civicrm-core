@@ -124,7 +124,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
     $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
       'sequential' => 1,
-      'financial_type_id' => "Member Dues",
+      'financial_type_id' => 'Member Dues',
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
@@ -183,7 +183,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test Multiple Membership Status for same contribution id.
    */
-  public function testMultipleMembershipsContribution() {
+  public function testMultipleMembershipsContribution(): void {
     // Main contact
     $memStatus = CRM_Member_PseudoConstant::membershipStatus();
     // Pending Membership Status
@@ -205,7 +205,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membershipID1 = $this->contactMembershipCreate($membershipParam);
 
     // Pending Payment Status
-    $ContributionCreate = $this->callAPISuccess('Contribution', 'create', [
+    $contribution = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => '1',
       'total_amount' => 100,
       'contact_id' => $contactId1,
@@ -216,7 +216,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
-      'contribution_id' => $ContributionCreate['id'],
+      'contribution_id' => $contribution['id'],
       'membership_id' => $membershipID1,
     ]);
 
@@ -226,7 +226,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membershipID2 = $this->contactMembershipCreate($membershipParam);
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
-      'contribution_id' => $ContributionCreate['id'],
+      'contribution_id' => $contribution['id'],
       'membership_id' => $membershipID2,
     ]);
 
@@ -236,25 +236,22 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $membershipID3 = $this->contactMembershipCreate($membershipParam);
     $this->callAPISuccess('MembershipPayment', 'create', [
       'sequential' => 1,
-      'contribution_id' => $ContributionCreate['id'],
+      'contribution_id' => $contribution['id'],
       'membership_id' => $membershipID3,
     ]);
-
+    $_REQUEST['action'] = 'update';
+    $_REQUEST['id'] = $contribution['id'];
     // Change Payment Status to Completed
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_id = $ContributionCreate['id'];
-    $params = ['id' => $ContributionCreate['id']];
-    $values = $ids = [];
-    CRM_Contribute_BAO_Contribution::getValues($params, $values, $ids);
-    $form->_values = $values;
-    $form->testSubmit([
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 100,
       'financial_type_id' => '1',
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
-    ],
-      CRM_Core_Action::UPDATE);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
 
     // check for Membership 1
     $params = ['id' => $membershipID1, 'return' => ['contact_id', 'status_id']];
@@ -965,9 +962,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test civicrm_contact_memberships_create with membership id (edit
    * membership).
-   * success expected.
+   *
+   * @dataProvider versionThreeAndFour
    */
-  public function testMembershipCreateWithId() {
+  public function testMembershipCreateWithId($version): void {
+    $this->_apiversion = $version;
     $membershipID = $this->contactMembershipCreate($this->_params);
     $params = [
       'id' => $membershipID,
@@ -1256,7 +1255,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     unset($this->_params['join_date'], $this->_params['is_override']);
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals(date('Y-m-d', strtotime('now')), $result['join_date']);
+    $this->assertEquals(date('Y-m-d'), $result['join_date']);
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2009-12-21', $result['end_date']);
   }

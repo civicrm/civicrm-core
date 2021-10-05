@@ -149,6 +149,7 @@ trait DAOActionTrait {
       }
 
       $result[] = $this->baoToArray($createResult, $item);
+      \CRM_Utils_API_HTMLInputCoder::singleton()->decodeRows($result);
     }
 
     // Use bulk `writeRecords` method if the BAO doesn't have a create or add method
@@ -194,6 +195,9 @@ trait DAOActionTrait {
   }
 
   /**
+   * Converts params from flat array e.g. ['GroupName.Fieldname' => value] to the
+   * hierarchy expected by the BAO, nested within $params['custom'].
+   *
    * @param array $params
    * @param int $entityId
    *
@@ -203,8 +207,6 @@ trait DAOActionTrait {
   protected function formatCustomParams(&$params, $entityId) {
     $customParams = [];
 
-    // $customValueID is the ID of the custom value in the custom table for this
-    // entity (i guess this assumes it's not a multi value entity)
     foreach ($params as $name => $value) {
       $field = $this->getCustomFieldInfo($name);
       if (!$field) {
@@ -258,7 +260,7 @@ trait DAOActionTrait {
    *
    * @param string $fieldExpr
    *   Field identifier with possible suffix, e.g. MyCustomGroup.MyField1:label
-   * @return array|NULL
+   * @return array{id: int, name: string, entity: string, suffix: string, html_type: string, data_type: string}|NULL
    */
   protected function getCustomFieldInfo(string $fieldExpr) {
     if (strpos($fieldExpr, '.') === FALSE) {

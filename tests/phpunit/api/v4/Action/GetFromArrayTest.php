@@ -112,6 +112,16 @@ class GetFromArrayTest extends UnitTestCase {
     $this->assertEquals([1, 3], array_column((array) $result, 'field1'));
 
     $result = MockArrayEntity::get()
+      ->addWhere('field2', 'REGEXP', '(zebra|yac[a-z]|something/else)')
+      ->execute();
+    $this->assertEquals([1, 2], array_column((array) $result, 'field1'));
+
+    $result = MockArrayEntity::get()
+      ->addWhere('field2', 'NOT REGEXP', '^[x|y|z]')
+      ->execute();
+    $this->assertEquals([4, 5], array_column((array) $result, 'field1'));
+
+    $result = MockArrayEntity::get()
       ->addWhere('field3', 'IS NULL')
       ->execute();
     $this->assertEquals([1, 3], array_column((array) $result, 'field1'));

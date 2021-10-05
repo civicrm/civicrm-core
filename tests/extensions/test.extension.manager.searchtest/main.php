@@ -22,7 +22,7 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    * @return void
    */
   public function buildForm(&$form) {
-    CRM_Utils_System::setTitle(ts('My Search Title'));
+    $form->setTitle(ts('My Search Title'));
 
     $form->add('text',
       'household_name',

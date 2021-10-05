@@ -121,39 +121,23 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     global $civicrm_setting;
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
     Civi::service('settings_manager')->useMandatory();
-    $value = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME, 'imageUploadDir');
+    $value = Civi::settings()->get('imageUploadDir');
     $this->assertEquals('/test/override', $value);
+
+    $civicrm_setting['domain']['customCSSURL'] = 'http://test.test/overridedomain';
+    Civi::service('settings_manager')->useMandatory();
+    $value = Civi::settings()->get('customCSSURL');
+    $this->assertEquals('http://test.test/overridedomain', $value);
 
     // CRM-14974 test suite
     $civicrm_setting['Test Preferences']['overrideSetting'] = '/test/override';
     Civi::service('settings_manager')->useMandatory();
-    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
-    $this->assertEquals('/test/override', $values['overrideSetting']);
-    Civi::settings()->set('databaseSetting', '/test/database');
-    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
-    $this->assertEquals('/test/override', $values['overrideSetting']);
-    $this->assertEquals('/test/database', $values['databaseSetting']);
-    $civicrm_setting['Test Preferences']['databaseSetting'] = '/test/dataride';
-    Civi::service('settings_manager')->useMandatory();
-    $values = CRM_Core_BAO_Setting::getItem('Test Preferences');
-    $this->assertEquals('/test/override', $values['overrideSetting']);
-    $this->assertEquals('/test/dataride', $values['databaseSetting']);
+    $value = Civi::settings()->get('overrideSetting');
+    $this->assertEquals('/test/override', $value);
     // CRM-14974 tear down
     unset($civicrm_setting['Test Preferences']);
-    $query = "DELETE FROM civicrm_setting WHERE name IN ('overrideSetting', 'databaseSetting');";
+    $query = "DELETE FROM civicrm_setting WHERE name = 'overrideSetting'";
     CRM_Core_DAO::executeQuery($query);
-  }
-
-  /**
-   * Ensure that overrides in $civicrm_setting apply when
-   * using getItem($group).
-   */
-  public function testGetItemGroup_Override() {
-    global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
-    Civi::service('settings_manager')->useMandatory();
-    $values = CRM_Core_BAO_Setting::getItem(CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME);
-    $this->assertEquals('/test/override', $values['imageUploadDir']);
   }
 
   public function testDefaults() {

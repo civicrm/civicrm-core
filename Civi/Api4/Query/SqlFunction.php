@@ -30,13 +30,6 @@ abstract class SqlFunction extends SqlExpression {
    */
   protected static $category;
 
-  /**
-   * Data type output by this function
-   *
-   * @var string
-   */
-  protected static $dataType;
-
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',
@@ -50,19 +43,23 @@ abstract class SqlFunction extends SqlExpression {
     $arg = trim(substr($this->expr, strpos($this->expr, '(') + 1, -1));
     foreach ($this->getParams() as $idx => $param) {
       $prefix = NULL;
-      if ($param['prefix']) {
-        $prefix = $this->captureKeyword([$param['prefix']], $arg);
+      $name = $param['name'] ?: ($idx + 1);
+      // If this isn't the first param it needs to start with something;
+      // either the name (e.g. "ORDER BY") if it has one, or a comma separating it from the previous param.
+      $start = $param['name'] ?: ($idx ? ',' : NULL);
+      if ($start) {
+        $prefix = $this->captureKeyword([$start], $arg);
         // Supply api_default
         if (!$prefix && isset($param['api_default'])) {
           $this->args[$idx] = [
-            'prefix' => $param['api_default']['prefix'] ?? [$param['prefix']],
+            'prefix' => [$start],
             'expr' => array_map([parent::class, 'convert'], $param['api_default']['expr']),
-            'suffix' => $param['api_default']['suffix'] ?? [],
+            'suffix' => [],
           ];
           continue;
         }
         if (!$prefix && !$param['optional']) {
-          throw new \API_Exception("Missing {$param['prefix']} for SQL function " . static::getName());
+          throw new \API_Exception("Missing param $name for SQL function " . static::getName());
         }
       }
       elseif ($param['flag_before']) {
@@ -73,15 +70,21 @@ abstract class SqlFunction extends SqlExpression {
         'expr' => [],
         'suffix' => [],
       ];
-      if ($param['max_expr'] && (!$param['prefix'] || $param['prefix'] === $prefix)) {
-        $exprs = $this->captureExpressions($arg, $param['must_be'], $param['cant_be']);
-        if (count($exprs) < $param['min_expr'] || count($exprs) > $param['max_expr']) {
-          throw new \API_Exception('Incorrect number of arguments for SQL function ' . static::getName());
+      if ($param['max_expr'] && (!$param['name'] || $param['name'] === $prefix)) {
+        $exprs = $this->captureExpressions($arg, $param['must_be'], $param['max_expr']);
+        if (
+          count($exprs) < $param['min_expr'] &&
+          !(!$exprs && $param['optional'])
+        ) {
+          throw new \API_Exception("Too few arguments to param $name for SQL function " . static::getName());
         }
         $this->args[$idx]['expr'] = $exprs;
 
         $this->args[$idx]['suffix'] = (array) $this->captureKeyword(array_keys($param['flag_after']), $arg);
       }
+    }
+    if (trim($arg)) {
+      throw new \API_Exception("Too many arguments given for SQL function " . static::getName());
     }
   }
 
@@ -101,100 +104,6 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
-   * Shift a keyword off the beginning of the argument string and return it.
-   *
-   * @param array $keywords
-   *   Whitelist of keywords
-   * @param string $arg
-   * @return mixed|null
-   */
-  private function captureKeyword($keywords, &$arg) {
-    foreach ($keywords as $key) {
-      if (strpos($arg, $key . ' ') === 0) {
-        $arg = ltrim(substr($arg, strlen($key)));
-        return $key;
-      }
-    }
-    return NULL;
-  }
-
-  /**
-   * Shifts 0 or more expressions off the argument string and returns them
-   *
-   * @param string $arg
-   * @param array $mustBe
-   * @param array $cantBe
-   * @return array
-   * @throws \API_Exception
-   */
-  private function captureExpressions(&$arg, $mustBe, $cantBe) {
-    $captured = [];
-    $arg = ltrim($arg);
-    while ($arg) {
-      $item = $this->captureExpression($arg);
-      $arg = ltrim(substr($arg, strlen($item)));
-      $expr = SqlExpression::convert($item, FALSE, $mustBe, $cantBe);
-      $this->fields = array_merge($this->fields, $expr->getFields());
-      $captured[] = $expr;
-      // Keep going if we have a comma indicating another expression follows
-      if (substr($arg, 0, 1) === ',') {
-        $arg = ltrim(substr($arg, 1));
-      }
-      else {
-        break;
-      }
-    }
-    return $captured;
-  }
-
-  /**
-   * Scans the beginning of a string for an expression; stops when it hits delimiter
-   *
-   * @param $arg
-   * @return string
-   */
-  private function captureExpression($arg) {
-    $chars = str_split($arg);
-    $isEscaped = $quote = NULL;
-    $item = '';
-    $quotes = ['"', "'"];
-    $brackets = [
-      ')' => '(',
-    ];
-    $enclosures = array_fill_keys($brackets, 0);
-    foreach ($chars as $index => $char) {
-      if (!$isEscaped && in_array($char, $quotes, TRUE)) {
-        // Open quotes - we'll ignore everything inside
-        if (!$quote) {
-          $quote = $char;
-        }
-        // Close quotes
-        elseif ($char === $quote) {
-          $quote = NULL;
-        }
-      }
-      if (!$quote) {
-        // Delineates end of expression
-        if (($char == ',' || $char == ' ') && !array_filter($enclosures)) {
-          return $item;
-        }
-        // Open brackets - we'll ignore delineators inside
-        if (isset($enclosures[$char])) {
-          $enclosures[$char]++;
-        }
-        // Close brackets
-        if (isset($brackets[$char]) && $enclosures[$brackets[$char]]) {
-          $enclosures[$brackets[$char]]--;
-        }
-      }
-      $item .= $char;
-      // We are escaping the next char if this is a backslash not preceded by an odd number of backslashes
-      $isEscaped = $char === '\\' && ((strlen($item) - strlen(rtrim($item, '\\'))) % 2);
-    }
-    return $item;
-  }
-
-  /**
    * Render the expression for insertion into the sql query
    *
    * @param array $fieldList
@@ -202,9 +111,8 @@ abstract class SqlFunction extends SqlExpression {
    */
   public function render(array $fieldList): string {
     $output = '';
-    $params = $this->getParams();
-    foreach ($this->args as $index => $arg) {
-      $rendered = $this->renderArg($arg, $params[$index], $fieldList);
+    foreach ($this->args as $arg) {
+      $rendered = $this->renderArg($arg, $fieldList);
       if (strlen($rendered)) {
         $output .= (strlen($output) ? ' ' : '') . $rendered;
       }
@@ -214,11 +122,10 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * @param array $arg
-   * @param array $param
    * @param array $fieldList
    * @return string
    */
-  private function renderArg($arg, $param, $fieldList): string {
+  private function renderArg($arg, $fieldList): string {
     $rendered = implode(' ', $arg['prefix']);
     foreach ($arg['expr'] ?? [] as $idx => $expr) {
       if (strlen($rendered) || $idx) {
@@ -257,14 +164,14 @@ abstract class SqlFunction extends SqlExpression {
     foreach (static::params() as $param) {
       // Merge in defaults to ensure each param has these properties
       $params[] = $param + [
-        'prefix' => NULL,
+        'name' => NULL,
+        'label' => ts('Select'),
         'min_expr' => 1,
         'max_expr' => 1,
         'flag_before' => [],
         'flag_after' => [],
         'optional' => FALSE,
-        'must_be' => [],
-        'cant_be' => ['SqlWild'],
+        'must_be' => ['SqlField', 'SqlFunction', 'SqlString', 'SqlNumber', 'SqlNull'],
         'api_default' => NULL,
       ];
     }
@@ -289,15 +196,8 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
-   * @return string|NULL
-   */
-  public static function getDataType():? string {
-    return static::$dataType;
-  }
-
-  /**
    * @return string
    */
-  abstract public static function getTitle(): string;
+  abstract public static function getDescription(): string;
 
 }

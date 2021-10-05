@@ -624,13 +624,12 @@ AND    domain_id    = %4
       return [];
     }
 
-    static $ufValues;
-    if ($ufID && !isset($ufValues[$ufID])) {
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$ufID])) {
       $ufmatch = new CRM_Core_DAO_UFMatch();
       $ufmatch->uf_id = $ufID;
       $ufmatch->domain_id = CRM_Core_Config::domainID();
       if ($ufmatch->find(TRUE)) {
-        $ufValues[$ufID] = [
+        Civi::$statics[__CLASS__][__FUNCTION__][$ufID] = [
           'uf_id' => $ufmatch->uf_id,
           'uf_name' => $ufmatch->uf_name,
           'contact_id' => $ufmatch->contact_id,
@@ -638,7 +637,7 @@ AND    domain_id    = %4
         ];
       }
     }
-    return $ufValues[$ufID];
+    return Civi::$statics[__CLASS__][__FUNCTION__][$ufID] ?? NULL;
   }
 
   /**

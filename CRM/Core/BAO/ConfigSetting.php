@@ -360,11 +360,8 @@ class CRM_Core_BAO_ConfigSetting {
    * @param array $enabledComponents
    */
   public static function setEnabledComponents($enabledComponents) {
-    // fix the config object. update db.
+    // The on_change trigger on this setting will trigger a cache flush
     Civi::settings()->set('enable_components', $enabledComponents);
-
-    // also force reset of component array
-    CRM_Core_Component::getEnabledComponents(TRUE);
   }
 
   /**

@@ -349,31 +349,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    * Delete the tag.
    *
    * @param int $id
-   *   Tag id.
-   *
+   * @deprecated
    * @return bool
    */
   public static function del($id) {
-    // since this is a destructive operation, lets make sure
-    // id is a positive number
-    CRM_Utils_Type::validate($id, 'Positive');
-
-    // delete all crm_entity_tag records with the selected tag id
-    $entityTag = new CRM_Core_DAO_EntityTag();
-    $entityTag->tag_id = $id;
-    $entityTag->delete();
-
-    // delete from tag table
-    $tag = new CRM_Core_DAO_Tag();
-    $tag->id = $id;
-
-    CRM_Utils_Hook::pre('delete', 'Tag', $id, $tag);
-
-    if ($tag->delete()) {
-      CRM_Utils_Hook::post('delete', 'Tag', $id, $tag);
-      return TRUE;
-    }
-    return FALSE;
+    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

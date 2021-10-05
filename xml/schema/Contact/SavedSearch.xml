@@ -49,6 +49,7 @@
     <default>NULL</default>
     <comment>Administrative label for search</comment>
     <html>
+      <label>Label</label>
       <type>Text</type>
     </html>
     <add>5.32</add>
@@ -126,6 +127,9 @@
     <length>255</length>
     <comment>Entity name for API based search</comment>
     <add>5.24</add>
+    <pseudoconstant>
+      <callback>CRM_Contact_BAO_SavedSearch::getApiEntityOptions</callback>
+    </pseudoconstant>
   </field>
 
   <field>

@@ -22,7 +22,7 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
    * This is a 'no error' test to support refactoring. It ensures no fatal is hit & lays
    * the basis for more tests later.
    */
-  public function testMembershipTokenReplacementInPDF() {
+  public function testMembershipTokenReplacementInPDF(): void {
     // First check tasks are there is some weird static caching that could mess us up.
     $tasks = CRM_Member_Task::tasks();
     $this->assertArrayHasKey(201, $tasks, print_r($tasks, TRUE));

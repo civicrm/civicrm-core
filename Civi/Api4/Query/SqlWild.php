@@ -23,4 +23,8 @@ class SqlWild extends SqlExpression {
     return '*';
   }
 
+  public static function getTitle(): string {
+    return ts('Wild');
+  }
+
 }
