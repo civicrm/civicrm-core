@@ -2304,11 +2304,8 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
     $options = CRM_Utils_Array::value('values', $options, []);
   }
 
-  // If passed a value-separated string, explode to an array, then re-implode after matching values.
-  $implode = FALSE;
   if (is_string($fieldValue) && strpos($fieldValue, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
     $fieldValue = CRM_Utils_Array::explodePadded($fieldValue);
-    $implode = TRUE;
   }
   // If passed multiple options, validate each.
   if (is_array($fieldValue)) {
@@ -2316,12 +2313,6 @@ function _civicrm_api3_api_match_pseudoconstant(&$fieldValue, $entity, $fieldNam
       if (!is_array($value)) {
         _civicrm_api3_api_match_pseudoconstant_value($value, $options, $fieldName, CRM_Utils_Array::value('api.required', $fieldInfo));
       }
-    }
-    // TODO: unwrap the call to implodePadded from the conditional and do it always
-    // need to verify that this is safe and doesn't break anything though.
-    // Better yet would be to leave it as an array and ensure that every dao/bao can handle array input
-    if ($implode) {
-      CRM_Utils_Array::implodePadded($fieldValue);
     }
   }
   else {
