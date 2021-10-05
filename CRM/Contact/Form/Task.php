@@ -137,7 +137,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       // since we don't store all contacts in prevnextcache, when user selects "all" use query to retrieve contacts
       // rather than prevnext cache table for most of the task actions except export where we rebuild query to fetch
       // final result set
-      $allCids[$cacheKey] = self::getContactIds($form);
+      $allCids[$cacheKey] = self::legacyGetContactIds($form);
 
       $form->_contactIds = [];
       if (empty($form->_contactIds)) {
@@ -222,11 +222,16 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    *   - custom search (FIXME: does this still apply to custom search?).
    * When we call this function we are not using the prev/next cache
    *
+   * We've started to try to move away from these functions
+   * being static. Probably we need to convert the export forms
+   * to use a trait based approach. For now this is renamed to
+   * permit the use of a non-static function with this name
+   *
    * @param $form CRM_Core_Form
    *
    * @return array $contactIds
    */
-  public static function getContactIds($form) {
+  protected static function legacyGetContactIds($form) {
     // need to perform action on all contacts
     // fire the query again and get the contact id's + display name
     $sortID = NULL;

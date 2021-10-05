@@ -110,4 +110,26 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     return $tokens;
   }
 
+  /**
+   * Get the rows from the results to be pdf-d.
+   *
+   * @todo the case handling should be in the case pdf task.
+   * It needs fixing to support standalone & some url fixes
+   *
+   * similar to https://github.com/civicrm/civicrm-core/pull/21688
+   *
+   * @return array
+   */
+  protected function getRows(): array {
+    $rows = [];
+    foreach ($this->_contactIds as $index => $contactID) {
+      $caseID = $this->getVar('_caseId');
+      if (empty($caseID) && !empty($this->_caseIds[$index])) {
+        $caseID = $this->_caseIds[$index];
+      }
+      $rows[] = ['contactId' => $contactID, 'caseId' => $caseID];
+    }
+    return $rows;
+  }
+
 }

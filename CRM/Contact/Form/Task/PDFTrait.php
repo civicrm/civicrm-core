@@ -237,16 +237,11 @@ trait CRM_Contact_Form_Task_PDFTrait {
       [$html_message, $zip] = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
     }
 
-    foreach ($this->_contactIds as $item => $contactId) {
-      $caseId = $this->getVar('_caseId');
-      if (empty($caseId) && !empty($this->_caseIds[$item])) {
-        $caseId = $this->_caseIds[$item];
-      }
-
+    foreach ($this->getRows() as $row) {
       $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
-        'contactId' => $contactId,
+        'contactId' => $row['contactId'],
         'messageTemplate' => ['msg_html' => $html_message],
-        'tokenContext' => $caseId ? ['caseId' => $caseId] : [],
+        'tokenContext' => array_merge($row, ['schema' => $this->getTokenSchema()]),
         'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
       ])['html'];
 

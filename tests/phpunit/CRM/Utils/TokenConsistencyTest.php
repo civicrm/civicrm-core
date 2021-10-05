@@ -570,6 +570,24 @@ December 21st, 2007
   }
 
   /**
+   * Test that membership tokens are consistently rendered.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testParticipantCustomDateToken(): void {
+    $this->createEventAndParticipant();
+    $dateFieldID = $this->createDateCustomField(['custom_group_id' => $this->ids['CustomGroup']['participant_'], 'default_value' => ''])['id'];
+    $input = '{participant.custom_' . $dateFieldID . '}';
+    $input .= '{participant.' . $this->getCustomFieldName('participant_int') . '}';
+    $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => ['msg_html' => $input],
+      'tokenContext' => array_merge(['participantId' => $this->ids['participant'][0]], ['schema' => ['participantId', 'eventId']]),
+    ])['html'];
+    $this->assertEquals(99999, $tokenHtml);
+  }
+
+  /**
    * Get declared participant tokens.
    *
    * @return string[]
@@ -745,45 +763,12 @@ December 21st, 2007
    * @throws \API_Exception
    */
   public function setupParticipantScheduledReminder($includeParticipant = TRUE): void {
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
-    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'int', 'participant_');
-    $html = '';
+    $this->createEventAndParticipant();
     $tokens = array_keys($this->getEventTokens());
     if ($includeParticipant) {
       $tokens = array_keys(array_merge($this->getEventTokens(), $this->getParticipantTokens()));
     }
     $html = $this->getTokenString($tokens);
-    $emailID = Email::create()->setValues(['email' => 'event@example.com'])->execute()->first()['id'];
-    $addressID = Address::create()->setValues([
-      'street_address' => '15 Walton St',
-      'supplemental_address_1' => 'up the road',
-      'city' => 'Emerald City',
-      'state_province_id:label' => 'Maine',
-      'postal_code' => 90210,
-    ])->execute()->first()['id'];
-    $phoneID = Phone::create()->setValues(['phone' => '456 789'])->execute()->first()['id'];
-
-    $locationBlockID = LocBlock::save(FALSE)->setRecords([
-      [
-        'email_id' => $emailID,
-        'address_id' => $addressID,
-        'phone_id' => $phoneID,
-      ],
-    ])->execute()->first()['id'];
-    $this->ids['event'][0] = $this->eventCreate([
-      'description' => 'event description',
-      $this->getCustomFieldName('text') => 'my field',
-      'loc_block_id' => $locationBlockID,
-    ])['id'];
-    // Create an unrelated participant record so that the ids don't match.
-    // this prevents things working just because the id 'happens to be valid'
-    $this->participantCreate(['register_date' => '2020-01-01', 'event_id' => $this->ids['event'][0]]);
-    $this->ids['participant'][0] = $this->participantCreate([
-      'event_id' => $this->ids['event'][0],
-      'fee_amount' => 50,
-      'fee_level' => 'steep',
-      $this->getCustomFieldName('participant_int') => '99999',
-    ]);
     CRM_Utils_Time::setTime('2007-02-20 15:00:00');
     $this->callAPISuccess('action_schedule', 'create', [
       'title' => 'job',
@@ -832,6 +817,56 @@ December 21st, 2007
       $html .= substr($token, 1, -1) . ' :' . $token . "\n";
     }
     return $html;
+  }
+
+  /**
+   * Create an event with a participant.
+   *
+   * @throws \API_Exception
+   */
+  protected function createEventAndParticipant(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Event']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'int', 'participant_');
+    $emailID = Email::create()
+      ->setValues(['email' => 'event@example.com'])
+      ->execute()
+      ->first()['id'];
+    $addressID = Address::create()->setValues([
+      'street_address' => '15 Walton St',
+      'supplemental_address_1' => 'up the road',
+      'city' => 'Emerald City',
+      'state_province_id:label' => 'Maine',
+      'postal_code' => 90210,
+    ])->execute()->first()['id'];
+    $phoneID = Phone::create()
+      ->setValues(['phone' => '456 789'])
+      ->execute()
+      ->first()['id'];
+
+    $locationBlockID = LocBlock::save(FALSE)->setRecords([
+      [
+        'email_id' => $emailID,
+        'address_id' => $addressID,
+        'phone_id' => $phoneID,
+      ],
+    ])->execute()->first()['id'];
+    $this->ids['event'][0] = $this->eventCreate([
+      'description' => 'event description',
+      $this->getCustomFieldName('text') => 'my field',
+      'loc_block_id' => $locationBlockID,
+    ])['id'];
+    // Create an unrelated participant record so that the ids don't match.
+    // this prevents things working just because the id 'happens to be valid'
+    $this->participantCreate([
+      'register_date' => '2020-01-01',
+      'event_id' => $this->ids['event'][0],
+    ]);
+    $this->ids['participant'][0] = $this->participantCreate([
+      'event_id' => $this->ids['event'][0],
+      'fee_amount' => 50,
+      'fee_level' => 'steep',
+      $this->getCustomFieldName('participant_int') => '99999',
+    ]);
   }
 
 }

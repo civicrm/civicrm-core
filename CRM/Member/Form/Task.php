@@ -95,4 +95,13 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     );
   }
 
+  /**
+   * Get the token processor schema required to list any tokens for this task.
+   *
+   * @return array
+   */
+  public function getTokenSchema(): array {
+    return ['membershipId', 'contactId'];
+  }
+
 }
