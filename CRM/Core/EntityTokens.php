@@ -174,7 +174,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         unset($basicTokens[$fieldName]);
       }
     }
-    return array_merge($basicTokens, $this->getPseudoTokens(), $this->getBespokeTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
+    foreach ($this->getBespokeTokens() as $token) {
+      $basicTokens[$token['name']] = $token['title'];
+    }
+    return array_merge($basicTokens, $this->getPseudoTokens(), CRM_Utils_Token::getCustomFieldTokens($this->getApiEntityName()));
   }
 
   /**
@@ -275,7 +278,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   /**
    * Get any tokens with custom calculation.
    */
-  public function getBespokeTokens(): array {
+  protected function getBespokeTokens(): array {
     return [];
   }
 
@@ -431,7 +434,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return string[]
    *
    */
-  public function getExposedFields(): array {
+  protected function getExposedFields(): array {
     $return = [];
     foreach ($this->getFieldMetadata() as $field) {
       if (!in_array($field['name'], $this->getSkippedFields(), TRUE)) {

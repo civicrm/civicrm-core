@@ -34,23 +34,23 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get all tokens.
+   * List out the fields that are exposed.
    *
-   * This function will be removed once the parent class can determine it.
+   * For historical reasons these are the only exposed fields.
+   *
+   * It is also possible to list 'skippedFields'
+   *
+   * @return string[]
    */
-  public function getAllTokens(): array {
-    return array_merge(
-      [
-        'fee' => ts('Membership Fee'),
-        'id' => ts('Membership ID'),
-        'join_date' => ts('Member Since'),
-        'start_date' => ts('Membership Start Date'),
-        'end_date' => ts('Membership Expiration Date'),
-        'status_id:label' => ts('Status'),
-        'membership_type_id:label' => ts('Membership Type'),
-      ],
-      CRM_Utils_Token::getCustomFieldTokens('Membership')
-    );
+  protected function getExposedFields(): array {
+    return [
+      'id',
+      'join_date',
+      'start_date',
+      'end_date',
+      'status_id',
+      'membership_type_id',
+    ];
   }
 
   /**
@@ -74,6 +74,26 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
    */
   public function getDependencies(): array {
     return ['fee' => 'membership_type_id'];
+  }
+
+  /**
+   * Get any tokens with custom calculation.
+   *
+   * In this case 'fee' should be converted to{membership.membership_type_id.fee}
+   * but we don't have the formatting support to do that with no
+   * custom intervention yet.
+   */
+  protected function getBespokeTokens(): array {
+    return [
+      'fee' => [
+        'title' => ts('Membership Fee'),
+        'name' => 'fee',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'integer',
+        'audience' => 'user',
+      ],
+    ];
   }
 
 }

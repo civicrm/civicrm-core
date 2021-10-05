@@ -41,24 +41,44 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    *
    * This function will be removed once the parent class can determine it.
    */
-  public function getAllTokens(): array {
-    return array_merge(
-      [
-        'event_type_id:label' => ts('Event Type'),
-        'title' => ts('Event Title'),
-        'id' => ts('Event ID'),
-        'start_date' => ts('Event Start Date'),
-        'end_date' => ts('Event End Date'),
-        'summary' => ts('Event Summary'),
-        'description' => ts('Event Description'),
-        'location' => ts('Event Location'),
-        'info_url' => ts('Event Info URL'),
-        'registration_url' => ts('Event Registration URL'),
-        'contact_email' => ts('Event Contact Email'),
-        'contact_phone' => ts('Event Contact Phone'),
+  protected function getBespokeTokens(): array {
+    return [
+      'location' => [
+        'title' => ts('Event Location'),
+        'name' => 'location',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
       ],
-      CRM_Utils_Token::getCustomFieldTokens('Event')
-    );
+      'info_url' => [
+        'title' => ts('Event Info URL'),
+        'name' => 'info_url',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+      ],
+      'registration_url' => [
+        'title' => ts('Event Registration URL'),
+        'name' => 'registration_url',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+      ],
+      'contact_email' => [
+        'title' => ts('Event Contact Email'),
+        'name' => 'contact_email',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+      ],
+      'contact_phone' => [
+        'title' => ts('Event Contact Phone'),
+        'name' => 'contact_phone',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => '',
+      ],
+    ];
   }
 
   /**
@@ -94,15 +114,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
     $cacheKey = __CLASS__ . 'event_tokens' . $eventID . '_' . CRM_Core_I18n::getLocale();
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $event = Event::get(FALSE)->addWhere('id', '=', $eventID)
-        ->setSelect([
-          'event_type_id',
-          'title',
-          'id',
-          'start_date',
-          'end_date',
-          'summary',
-          'description',
-          'loc_block_id',
+        ->setSelect(array_merge([
           'loc_block_id.address_id.street_address',
           'loc_block_id.address_id.city',
           'loc_block_id.address_id.state_province_id:label',
@@ -110,7 +122,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'loc_block_id.email_id.email',
           'loc_block_id.phone_id.phone',
           'custom.*',
-        ])
+        ], $this->getExposedFields()))
         ->execute()->first();
       $tokens['location']['text/plain'] = \CRM_Utils_Address::format([
         'street_address' => $event['loc_block_id.address_id.street_address'],
@@ -124,6 +136,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';
       $tokens['end_date']['text/html'] = !empty($event['end_date']) ? new DateTime($event['end_date']) : '';
       $tokens['event_type_id:label']['text/html'] = CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
+      $tokens['event_type_id:name']['text/html'] = CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Event', 'event_type_id', $event['event_type_id']);
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
 
@@ -141,6 +154,27 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       Civi::cache('metadata')->set($cacheKey, $tokens);
     }
     return Civi::cache('metadata')->get($cacheKey);
+  }
+
+  /**
+   * Get entity fields that should be exposed as tokens.
+   *
+   * Event has traditionally exposed very few fields. This is probably because
+   * a) there are a tonne of weird fields so an opt out approach doesn't work and
+   * b) so people just added what they needed at the time...
+   *
+   * @return string[]
+   *
+   */
+  protected function getExposedFields(): array {
+    return ['event_type_id',
+      'title',
+      'id',
+      'start_date',
+      'end_date',
+      'summary',
+      'description',
+    ];
   }
 
 }

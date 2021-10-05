@@ -123,20 +123,6 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Get all the tokens supported by this processor.
-   *
-   * @return array|string[]
-   * @throws \API_Exception
-   */
-  protected function getAllTokens(): array {
-    $tokens = parent::getAllTokens();
-    if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
-      $tokens['case_id'] = ts('Activity Case ID');
-    }
-    return $tokens;
-  }
-
-  /**
    * Get the basic tokens provided.
    *
    * @return array token name => token label
@@ -160,6 +146,29 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
       }
     }
     return $this->basicTokens;
+  }
+
+  /**
+   * Get tokens that are special or calculated for this enitty.
+   *
+   * @return array|array[]
+   */
+  protected function getBespokeTokens(): array {
+    $tokens = [];
+    if (array_key_exists('CiviCase', CRM_Core_Component::getEnabledComponents())) {
+      $tokens['case_id'] = ts('Activity Case ID');
+      return [
+        'case_id' => [
+          'title' => ts('Activity Case ID'),
+          'name' => 'case_id',
+          'type' => 'calculated',
+          'options' => NULL,
+          'data_type' => 'Integer',
+          'audience' => 'user',
+        ],
+      ];
+    }
+    return $tokens;
   }
 
   /**
