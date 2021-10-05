@@ -4,7 +4,7 @@
 <li role="presentation" ng-class="{active: controls.tab === 'compose'}">
   <a href ng-click="selectTab('compose')">
     <i class="crm-i fa-gears"></i>
-    {{ ts('Compose Search') }}
+    {{:: ts('Compose Search') }}
   </a>
 </li>
 <li role="presentation" ng-class="{active: controls.tab === 'group'}" ng-if="$ctrl.savedSearch.groups.length" title="{{ !$ctrl.groupExists ? ts('Group will be deleted.') : '' }}">
@@ -36,7 +36,7 @@
         {{:: ts('Smart Group') }}
       </a>
     </li>
-    <li class="dropdown-header">{{ ts('Display') }}</li>
+    <li class="dropdown-header">{{:: ts('Display') }}</li>
     <li ng-repeat="type in ::$ctrl.displayTypes">
       <a href ng-click="$ctrl.addDisplay(type.id)">
         <i class="crm-i {{:: type.icon }}"></i>
