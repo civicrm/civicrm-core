@@ -24,7 +24,7 @@
   <div class="crm-search-admin-edit-columns" ng-model="$ctrl.display.settings.columns" ui-sortable="$ctrl.parent.sortableOptions">
     <fieldset ng-repeat="col in $ctrl.display.settings.columns" class="crm-draggable">
       <legend><i class="crm-i fa-arrows crm-search-move-icon"></i> {{ $ctrl.parent.getColLabel(col) }}</legend>
-      <div class="form-inline" title="{{ ts('Should this item display on its own line or inline with other items?') }}">
+      <div class="form-inline" title="{{:: ts('Should this item display on its own line or inline with other items?') }}">
         <label><input type="checkbox" ng-model="col.break"> {{:: ts('New Line') }}</label>
         <button type="button" class="btn-xs pull-right" ng-click="$ctrl.parent.removeCol($index)" title="{{:: ts('Remove') }}">
           <i class="crm-i fa-ban"></i>
