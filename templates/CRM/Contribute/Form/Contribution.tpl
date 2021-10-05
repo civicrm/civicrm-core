@@ -126,7 +126,7 @@
         {if $contributionMode && $processorSupportsFutureStartDate}
           <tr id='start_date' class="crm-contribution-form-block-receive_date">
             <td class="label">{ts}Start Date{/ts}</td>
-            <td {$valueStyle}>{if $hideCalender neq true}{$form.receive_date.html}{/if}<br />
+            <td {$valueStyle}>{$form.receive_date.html}<br />
               <span class="description">{ts}You can set a start date for recurring contributions and the first payment will be on that date. For a single post-dated contribution you must select recurring and choose one installment{/ts}</span>
             </td>
           </tr>
@@ -165,11 +165,7 @@
                   <tr id="cancelDate" class="crm-contribution-form-block-cancel_date">
                     <td class="label">{$form.cancel_date.label}</td>
                     <td>
-                      {if $hideCalendar neq true}
-                        {$form.cancel_date.html}
-                      {else}
-                        {$form.cancel_date.value|crmDate}
-                      {/if}
+                      {$form.cancel_date.html}
                     </td>
                   </tr>
                   <tr id="cancelDescription" class="crm-contribution-form-block-cancel_reason">
