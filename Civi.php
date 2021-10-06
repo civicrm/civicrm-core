@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Core\Format;
+
 /**
  * Class Civi
  *
@@ -101,6 +103,15 @@ class Civi {
    */
   public static function paths() {
     return \Civi\Core\Container::getBootService('paths');
+  }
+
+  /**
+   * Obtain the formatting object.
+   *
+   * @return \Civi\Core\Format
+   */
+  public static function format(): Format {
+    return new Civi\Core\Format();
   }
 
   /**
