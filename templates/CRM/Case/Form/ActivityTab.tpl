@@ -45,7 +45,7 @@
             {$form.activity_type_filter_id.html}
           </td>
         </tr>
-        {if $form.activity_deleted}
+        {if !empty($form.activity_deleted)}
           <tr class="crm-case-caseview-form-block-activity_deleted">
             <td>
               {$form.activity_deleted.html}{$form.activity_deleted.label}

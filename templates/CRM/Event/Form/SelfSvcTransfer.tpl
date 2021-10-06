@@ -28,7 +28,7 @@
       <td class="crm-participant-participant_role">{$details.role}</td>
     </tr>
   </table>
-  {if $form.contact_id}
+  {if !empty($form.contact_id)}
     <div class="crm-public-form-item crm-section selfsvctransfer-section">
       <div class="crm-public-form-item crm-section selfsvctransfer-contact_id-section">
         <div class="label">{$form.contact_id.label}</div>

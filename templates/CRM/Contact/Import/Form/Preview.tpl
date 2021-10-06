@@ -102,7 +102,7 @@
 
       {* Existing Group *}
 
-<div id="existing-groups" class="crm-accordion-wrapper crm-existing_group-accordion {if $form.groups} {else}collapsed{/if}">
+<div id="existing-groups" class="crm-accordion-wrapper crm-existing_group-accordion {if !empty($form.groups)} {else}collapsed{/if}">
  <div class="crm-accordion-header">
   {$form.groups.label}
  </div><!-- /.crm-accordion-header -->

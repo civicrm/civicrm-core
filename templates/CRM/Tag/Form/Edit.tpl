@@ -20,13 +20,13 @@
           <td class="label">{$form.description.label}</td>
           <td>{$form.description.html}</td>
        </tr>
-         {if $form.parent_id.html}
+         {if !empty($form.parent_id.html)}
        <tr class="crm-tag-form-block-parent_id">
          <td class="label">{$form.parent_id.label}</td>
          <td>{$form.parent_id.html}</td>
        </tr>
    {/if}
-      {if $form.used_for}
+      {if !empty($form.used_for)}
        <tr class="crm-tag-form-block-used_for">
           <td class="label">{$form.used_for.label}</td>
           <td>{$form.used_for.html} <br />
@@ -39,7 +39,7 @@
           </td>
         </tr>
       {/if}
-      {if $form.color.html}
+      {if !empty($form.color.html)}
         <tr class="crm-tag-form-block-color">
           <td class="label">{$form.color.label}</td>
           <td>{$form.color.html}</td>

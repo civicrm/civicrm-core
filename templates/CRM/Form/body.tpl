@@ -7,11 +7,11 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $form.javascript}
+{if !empty($form.javascript)}
   {$form.javascript}
 {/if}
 
-{if $form.hidden}
+{if !empty($form.hidden)}
   <div>{$form.hidden}</div>
 {/if}
 

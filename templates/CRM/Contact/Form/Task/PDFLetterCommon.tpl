@@ -8,7 +8,7 @@
  +--------------------------------------------------------------------+
 *}
 {*common template for compose PDF letters*}
-{if $form.template.html}
+{if !empty($form.template.html)}
 <table class="form-layout-compressed">
     <tr>
       <td class="label-left">
@@ -23,7 +23,7 @@
       <td class="label-left">{$form.subject.label}</td>
       <td>{$form.subject.html}</td>
     </tr>
-    {if $form.campaign_id}
+    {if !empty($form.campaign_id)}
     <tr>
       <td class="label-left">{$form.campaign_id.label}</td>
       <td>{$form.campaign_id.html}</td>

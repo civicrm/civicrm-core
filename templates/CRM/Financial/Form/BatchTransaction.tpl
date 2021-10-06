@@ -25,7 +25,7 @@
             </td>
           </tr>
           <tr>
-          {if $form.contact_tags}
+          {if !empty($form.contact_tags)}
             <td>
               <label>{ts}Contributor Tag(s){/ts}</label><br>
               {$form.contact_tags.html}
@@ -33,7 +33,7 @@
             {else}
             <td>&nbsp;</td>
           {/if}
-          {if $form.group}
+          {if !empty($form.group)}
             <td><label>{ts}Contributor Group(s){/ts}</label><br>
               {$form.group.html}
             </td>
@@ -242,7 +242,7 @@ function buildTransactionSelectorAssign(filterSearch) {
     });
   }
 });
-	
+
 }
 
 function buildTransactionSelectorRemove( ) {

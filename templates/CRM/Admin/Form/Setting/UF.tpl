@@ -17,7 +17,7 @@
             <td class="label">{$form.userFrameworkUsersTableName.label}</td>
             <td>{$form.userFrameworkUsersTableName.html}</td>
         </tr>
-        {if $form.wpBasePage}
+        {if !empty($form.wpBasePage)}
          <tr class="crm-uf-form-block-wpBasePage">
             <td class="label">{$form.wpBasePage.label}</td>
             <td>{$config->userFrameworkBaseURL}{$form.wpBasePage.html}

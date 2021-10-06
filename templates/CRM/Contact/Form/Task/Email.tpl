@@ -26,14 +26,14 @@
          {$form.to.html} {help id="id-to_email" file="CRM/Contact/Form/Task/Email.hlp"}
        </td>
     </tr>
-    <tr class="crm-contactEmail-form-block-cc_id" {if !$form.cc_id.value}style="display:none;"{/if}>
+    <tr class="crm-contactEmail-form-block-cc_id" {if empty($form.cc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.cc_id.label}</td>
       <td>
         {$form.cc_id.html}
         <a class="crm-hover-button clear-cc-link" rel="cc_id" title="{ts}Clear{/ts}" href="#"><i class="crm-i fa-times" aria-hidden="true"></i></a>
       </td>
     </tr>
-    <tr class="crm-contactEmail-form-block-bcc_id" {if !$form.bcc_id.value}style="display:none;"{/if}>
+    <tr class="crm-contactEmail-form-block-bcc_id" {if empty($form.bcc_id.value)}style="display:none;"{/if}>
       <td class="label">{$form.bcc_id.label}</td>
       <td>
         {$form.bcc_id.html}
@@ -44,8 +44,8 @@
       <td></td>
       <td>
         <div>
-          <a href="#" rel="cc_id" class="add-cc-link crm-hover-button" {if $form.cc_id.value}style="display:none;"{/if}>{ts}Add CC{/ts}</a>&nbsp;&nbsp;
-          <a href="#" rel="bcc_id" class="add-cc-link crm-hover-button" {if $form.bcc_id.value}style="display:none;"{/if}>{ts}Add BCC{/ts}</a>
+          <a href="#" rel="cc_id" class="add-cc-link crm-hover-button" {if !empty($form.cc_id.value)}style="display:none;"{/if}>{ts}Add CC{/ts}</a>&nbsp;&nbsp;
+          <a href="#" rel="bcc_id" class="add-cc-link crm-hover-button" {if !empty($form.bcc_id.value)}style="display:none;"{/if}>{ts}Add BCC{/ts}</a>
         </div>
       </td>
     </tr>

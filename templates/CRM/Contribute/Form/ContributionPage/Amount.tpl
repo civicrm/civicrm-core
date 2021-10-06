@@ -420,7 +420,7 @@
 
 </script>
 {/literal}
-{if $form.is_recur}
+{if !empty($form.is_recur)}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_recur"
     trigger_value       ="true"
@@ -430,7 +430,7 @@
     invert              = "false"
 }
 {/if}
-{if $form.adjust_recur_start_date}
+{if !empty($form.adjust_recur_start_date)}
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="adjust_recur_start_date"
     trigger_value       ="true"

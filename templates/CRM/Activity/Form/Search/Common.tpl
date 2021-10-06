@@ -14,7 +14,7 @@
   </td>
 </tr>
 <tr>
-  {if $form.activity_type_id}
+  {if !empty($form.activity_type_id)}
     <td><label>{$form.activity_type_id.label}</label>
        <br />
        {$form.activity_type_id.html}
@@ -43,14 +43,14 @@
   <td>
     <table>
       <tr><td>
-        {if $form.parent_id}
+        {if !empty($form.parent_id)}
           <label>{ts}Has a Followup Activity?{/ts}</label>
           <br/>
           {$form.parent_id.html}
         {/if}
       </td></tr>
       <tr><td>
-      {if $form.followup_parent_id}
+      {if !empty($form.followup_parent_id)}
           <label>{ts}Is a Followup Activity?{/ts}</label>
           <br/>
           {$form.followup_parent_id.html}

@@ -11,7 +11,7 @@
    <fieldset class="crm-group crm_user-group">
       <div class="messages help cms_user_help-section">
    {if !$isCMS}
-      {ts}If you would like to create an account on this site, check the box below and enter a Username{/ts}{if $form.cms_pass} {ts}and a password{/ts}.{/if}
+      {ts}If you would like to create an account on this site, check the box below and enter a Username{/ts}{if !empty($form.cms_pass)} {ts}and a password{/ts}.{/if}
    {else}
       {ts}Please enter a Username to create an account.{/ts}
    {/if}
@@ -32,7 +32,7 @@
              </div>
            </div>
 
-           {if $form.cms_pass}
+           {if !empty($form.cms_pass)}
            <div class="crm-section cms_pass-section">
              <div class="label">
                <label for="cms_pass">{$form.cms_pass.label}</label>

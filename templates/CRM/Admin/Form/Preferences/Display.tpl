@@ -212,7 +212,7 @@
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
-{if $form.contact_edit_options.html}
+{if !empty($form.contact_edit_options.html)}
   {literal}
     <script type="text/javascript">
       CRM.$(function($) {

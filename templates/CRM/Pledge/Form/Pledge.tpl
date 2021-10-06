@@ -81,7 +81,7 @@
           </tr>
 
         {if $email and $outBound_option != 2}
-            {if $form.is_acknowledge }
+            {if !empty($form.is_acknowledge)}
           <tr class="crm-pledge-form-block-is_acknowledge">
             <td class="label">{$form.is_acknowledge.label}</td>
             <td>{$form.is_acknowledge.html}<br />

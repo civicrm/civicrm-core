@@ -14,37 +14,37 @@
     {include file="CRM/common/formButtons.tpl"}
   </div>
   {if $contactType eq 'Individual'}
-    {if $form.prefix_id}
+    {if !empty($form.prefix_id)}
       <div class="crm-inline-edit-field">
         {$form.prefix_id.label}<br/>
         {$form.prefix_id.html}
       </div>
     {/if}
-    {if $form.formal_title}
+    {if !empty($form.formal_title)}
       <div class="crm-inline-edit-field">
         {$form.formal_title.label}<br/>
         {$form.formal_title.html}
       </div>
     {/if}
-    {if $form.first_name}
+    {if !empty($form.first_name)}
       <div class="crm-inline-edit-field">
         {$form.first_name.label}<br />
         {$form.first_name.html}
       </div>
     {/if}
-    {if $form.middle_name}
+    {if !empty($form.middle_name)}
       <div class="crm-inline-edit-field">
         {$form.middle_name.label}<br />
         {$form.middle_name.html}
       </div>
     {/if}
-    {if $form.last_name}
+    {if !empty($form.last_name)}
       <div class="crm-inline-edit-field">
         {$form.last_name.label}<br />
         {$form.last_name.html}
       </div>
     {/if}
-    {if $form.suffix_id}
+    {if !empty($form.suffix_id)}
       <div class="crm-inline-edit-field">
         {$form.suffix_id.label}<br/>
         {$form.suffix_id.html}

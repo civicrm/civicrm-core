@@ -20,7 +20,7 @@
             <tr class="crm-preferences-date-form-block-date_format">
                 <td class="label">{$form.date_format.label}</td><td>{$form.date_format.html}</td>
             </tr>
-            {if $form.time_format.label}
+            {if !empty($form.time_format.label)}
             <tr class="crm-preferences-date-form-block-time_format">
                 <td class="label">{$form.time_format.label}</td><td>{$form.time_format.html}</td>
             </tr>
