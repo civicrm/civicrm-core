@@ -84,7 +84,7 @@
               {if !empty($freezeFinancialType)}
                 {help id="id-total_amount"}
               {/if}
-              {if !empty($payNow)}
+              {if !$payNow}
                 {if $hasPriceSets}
                   <span id='totalAmountORPriceSet'> {ts}OR{/ts}</span>
                   <span id='selectPriceSet'>{$form.price_set_id.html}</span>
@@ -100,7 +100,7 @@
             </td>
           </tr>
 
-          {if $buildRecurBlock && !empty($payNow)}
+          {if $buildRecurBlock && !$payNow}
             <tr id='recurringPaymentBlock'>
               <td></td>
               <td>
@@ -148,7 +148,7 @@
               {if $contribution_status_id eq 2}{if $is_pay_later }: {ts}Pay Later{/ts} {else}: {ts}Incomplete Transaction{/ts}{/if}{/if}
             </td>
             <td>
-              {if !empty($isUsePaymentBlock) && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
+              {if !$isUsePaymentBlock && $contactId && $contribID && $contributionMode EQ null && $contribution_status_id eq 2}
                 {capture assign=payNowLink}{crmURL p='civicrm/contact/view/contribution' q="reset=1&action=update&id=`$contribID`&cid=`$contactId`&context=`$context`&mode=live"}{/capture}
                 <a class="open-inline action-item crm-hover-button" href="{$payNowLink}"><i class="crm-i fa-credit-card" aria-hidden="true"></i> {ts}Pay with Credit Card{/ts}</a>
               {/if}
