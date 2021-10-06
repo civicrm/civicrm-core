@@ -78,7 +78,7 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
       'updateActionScheduleToken', 'event.fee_amount', 'participant.fee_amount', $rev
     );
     $this->addTask('Replace event type token in action schedule',
-      'updateActionScheduleToken', 'event.event_type_id', 'participant.event_type_id:label', $rev
+      'updateActionScheduleToken', 'event.event_type_id', 'event.event_type_id:label', $rev
     );
     $this->addTask('Replace event balance in action schedule',
       'updateActionScheduleToken', 'event.balance', 'participant.balance', $rev
