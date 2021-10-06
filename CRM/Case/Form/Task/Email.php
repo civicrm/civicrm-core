@@ -53,12 +53,11 @@ class CRM_Case_Form_Task_Email extends CRM_Case_Form_Task {
    *
    * The case handling should possibly be on the case form.....
    *
-   * @param string $subject
-   *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  protected function getSubject(string $subject):string {
+  protected function getSubject():string {
+    $subject = $this->getSubmittedValue('subject');
     // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
     if ($this->getCaseID()) {
       $hash = substr(sha1(CIVICRM_SITE_KEY . $this->getCaseID()), 0, 7);

@@ -1261,11 +1261,14 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $text = __FUNCTION__ . ' text {contact.display_name} {case.case_type_id:label}';
 
     /* @var CRM_Contact_Form_Task_Email $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+    ]);
     $mut = new CiviMailUtils($this, TRUE);
     [$sent, $activity_ids] = $form->sendEmail(
       $contactDetails,
-      $subject,
       $text,
       $html,
       __FUNCTION__ . '@example.com',
@@ -1374,11 +1377,14 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
     /* @var CRM_Contact_Form_Task_Email $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+    ]);
     $mut = new CiviMailUtils($this, TRUE);
     [$sent, $activity_ids] = $form->sendEmail(
       $contactDetails,
-      $subject,
       $text,
       $html,
       $from = __FUNCTION__ . '@example.com'
@@ -1434,16 +1440,15 @@ $text
     ]);
     $campaign_id = $result['id'];
 
-    $subject = __FUNCTION__ . ' subject';
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
-    $userID = $loggedInUser;
-    /* @var CRM_Contact_Form_Task_Email $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    /* @var CRM_Activity_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Activity_Form_Task_Email', [
+      'subject' => __FUNCTION__ . ' subject',
+    ]);
 
     [$sent, $activity_ids] = $email_result = $form->sendEmail(
       $contactDetails,
-      $subject,
       $text,
       $html,
       __FUNCTION__ . '@example.com',
@@ -1698,10 +1703,13 @@ $text
 
     $mut = new CiviMailUtils($this, TRUE);
     /* @var CRM_Contact_Form_Task_Email $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+    ]);
     [$sent, $activity_ids] = $form->sendEmail(
       $contact['values'],
-      $subject,
       $text,
       $html,
       $from = __FUNCTION__ . '@example.com',
@@ -1745,10 +1753,13 @@ $text
     $text = __FUNCTION__ . ' text' . '{contact.display_name}';
 
     /* @var CRM_Contact_Form_Task_Email $form */
-    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'subject' => $subject,
+      'html_message' => $html,
+      'text_message' => $text,
+    ]);
     $form->sendEmail(
       $contact['values'],
-      $subject,
       $text,
       $html,
     __FUNCTION__ . '@example.com',

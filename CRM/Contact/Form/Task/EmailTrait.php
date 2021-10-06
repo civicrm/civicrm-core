@@ -409,7 +409,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // send the mail
     [$sent, $activityIds] = $this->sendEmail(
       $formattedContactDetails,
-      $this->getSubject($formValues['subject']),
       $formValues['text_message'],
       $formValues['html_message'],
       $from,
@@ -578,15 +577,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
   /**
    * Get the subject for the message.
    *
-   * The case handling should possibly be on the case form.....
-   *
-   * @param string $subject
-   *
    * @return string
-   * @throws \CRM_Core_Exception
    */
-  protected function getSubject(string $subject):string {
-    return $subject;
+  protected function getSubject():string {
+    return (string) $this->getSubmittedValue('subject');
   }
 
   /**
@@ -750,8 +744,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @param array $contactDetails
    *   The array of contact details to send the email.
-   * @param string $subject
-   *   The subject of the message.
    * @param $text
    * @param $html
    * @param string $from
@@ -781,7 +773,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   public function sendEmail(
     $contactDetails,
-    $subject,
     $text,
     $html,
     $from,
@@ -822,13 +813,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
         $tokenContext['contributionId'] = $contributionDetails[$contactId]['id'];
       }
 
-      $tokenSubject = $subject;
-
       $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => [
           'msg_text' => $text,
           'msg_html' => $html,
-          'msg_subject' => $tokenSubject,
+          'msg_subject' => $this->getSubject(),
         ],
         'tokenContext' => $tokenContext,
         'contactId' => $contactId,
