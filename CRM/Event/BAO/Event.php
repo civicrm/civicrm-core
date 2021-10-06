@@ -154,7 +154,10 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
     }
 
     $transaction->commit();
-
+    if (!empty($params['id'])) {
+      // Note that this will specifically clear cached event tokens.
+      Civi::cache('metadata')->clear();
+    }
     return $event;
   }
 
@@ -1093,7 +1096,7 @@ WHERE civicrm_event.is_active = 1
                 TRUE,
                 $participantParams
               );
-              list($profileValues) = $profileValues;
+              [$profileValues] = $profileValues;
               $val = [
                 'id' => $gId,
                 'values' => $profileValues,
