@@ -34,11 +34,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
    * @inheritDoc
    */
   public function setContactIDs() {
-    // @todo Parameters shouldn't be needed and should be class member
-    // variables instead, set appropriately by each subclass.
-    $this->_contactIds = $this->getContactIDsFromComponent($this->_entityIds,
-      'civicrm_case_contact', 'case_id'
-    );
+    $this->_contactIds = $this->getContactIDs();
   }
 
   /**
@@ -101,6 +97,21 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
    */
   public function getEntityAliasField() {
     return 'case_id';
+  }
+
+  protected function getContactIDs(): array {
+    if (isset($this->_contactIds)) {
+      return $this->_contactIds;
+    }
+    $contactIDSFromUrl = CRM_Utils_Request::retrieve('cid', 'CommaSeparatedIntegers', $this);
+    if (!empty($contactIDSFromUrl)) {
+      return explode(',', $contactIDSFromUrl);
+    }
+    // @todo Parameters shouldn't be needed and should be class member
+    // variables instead, set appropriately by each subclass.
+    return $this->getContactIDsFromComponent($this->_entityIds,
+      'civicrm_case_contact', 'case_id'
+    );
   }
 
 }

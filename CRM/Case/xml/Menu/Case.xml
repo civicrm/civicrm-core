@@ -135,4 +135,10 @@
     <path>civicrm/ajax/get-cases</path>
     <page_callback>CRM_Case_Page_AJAX::getCases</page_callback>
   </item>
+  <item>
+    <path>civicrm/case/email/add</path>
+    <path_arguments>action=add,task=email</path_arguments>
+    <title>Email</title>
+    <page_callback>CRM_Case_Form_Task_Email</page_callback>
+  </item>
 </menu>

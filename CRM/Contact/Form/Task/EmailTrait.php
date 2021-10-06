@@ -586,11 +586,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    */
   protected function getSubject(string $subject):string {
-    // CRM-5916: prepend case id hash to CiviCase-originating emails’ subjects
-    if ($this->getCaseID()) {
-      $hash = substr(sha1(CIVICRM_SITE_KEY . $this->getCaseID()), 0, 7);
-      $subject = "[case #$hash] $subject";
-    }
     return $subject;
   }
 

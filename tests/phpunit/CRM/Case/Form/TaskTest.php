@@ -17,9 +17,9 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
    *
    * @dataProvider contactIDProvider
    */
-  public function testSetContactIDs($input, $selected_search_results, $expected) {
+  public function testSetContactIDs($input, $selected_search_results, $expected): void {
     $this->createCaseContacts($input);
-    $task = new CRM_Case_Form_Task();
+    $task = $this->getFormObject('CRM_Case_Form_Task');
 
     // This simulates the selection from the search results list. What we're
     // testing is that no matter what order the cases were created or what
