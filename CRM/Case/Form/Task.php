@@ -76,7 +76,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
       if (empty($caseID) && !empty($this->_caseIds[$index])) {
         $caseID = $this->_caseIds[$index];
       }
-      $rows[] = ['contactId' => $contactID, 'caseId' => $caseID];
+      $rows[] = ['contact_id' => $contactID, 'schema' => ['caseId' => $caseID, 'contactId' => $contactID]];
     }
     return $rows;
   }

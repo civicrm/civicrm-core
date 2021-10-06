@@ -367,7 +367,7 @@ SELECT contact_id
   protected function getRows(): array {
     $rows = [];
     foreach ($this->getContactIDs() as $contactID) {
-      $rows[] = ['contactId' => $contactID];
+      $rows[] = ['schema' => ['contactId' => $contactID]];
     }
     return $rows;
   }

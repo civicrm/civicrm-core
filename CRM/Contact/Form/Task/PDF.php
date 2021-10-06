@@ -127,7 +127,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
       if (empty($caseID) && !empty($this->_caseIds[$index])) {
         $caseID = $this->_caseIds[$index];
       }
-      $rows[] = ['contactId' => $contactID, 'caseId' => $caseID];
+      $rows[] = ['contact_id' => $contactID, 'schema' => ['caseId' => $caseID, 'contactId' => $contactID]];
     }
     return $rows;
   }
