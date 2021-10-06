@@ -201,7 +201,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
 
     // check if we need to setdefaults and check for valid contact emails / communication preferences
-    if (is_array($this->_allContactIds) && $setDefaults) {
+    if (!empty($this->_allContactIds) && $setDefaults) {
       // get the details for all selected contacts ( to, cc and bcc contacts )
       $allContactDetails = civicrm_api3('Contact', 'get', [
         'id' => ['IN' => $this->_allContactIds],
