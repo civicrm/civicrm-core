@@ -172,7 +172,7 @@
       // Params for the Afform.submitFile API when uploading a file field
       ctrl.getFileUploadParams = function() {
         return {
-          entityName: ctrl.afFieldset.modelName,
+          modelName: ctrl.afFieldset.getName(),
           fieldName: ctrl.fieldName,
           joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
           entityIndex: ctrl.getEntityIndex(),
