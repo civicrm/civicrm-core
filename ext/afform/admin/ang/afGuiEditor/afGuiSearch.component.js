@@ -86,7 +86,7 @@
             "#tag": "af-field",
             name: (prefix ? prefix + '.' : '') + field.name
           };
-          if (field.input_type === 'Select') {
+          if (field.input_type === 'Select' || field.input_type === 'ChainSelect') {
             tag.defn = {input_attrs: {multiple: true}};
           } else if (field.input_type === 'Date') {
             tag.defn = {input_type: 'Select', search_range: true};

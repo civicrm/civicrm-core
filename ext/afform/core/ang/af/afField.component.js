@@ -15,7 +15,11 @@
     controller: function($scope, $element, crmApi4, $timeout, $location) {
       var ts = $scope.ts = CRM.ts('org.civicrm.afform'),
         ctrl = this,
+        // Prefix used for SearchKit explicit joins
+        namePrefix = '',
         boolOptions = [{id: true, label: ts('Yes')}, {id: false, label: ts('No')}],
+        // Used to store chain select options loaded on-the-fly
+        chainSelectOptions = null,
         // Only used for is_primary radio button
         noOptions = [{id: true, label: ''}];
 
@@ -29,6 +33,9 @@
 
         $element.addClass('af-field-type-' + _.kebabCase(ctrl.defn.input_type));
 
+        if (this.defn.name !== this.fieldName) {
+          namePrefix = this.fieldName.substr(0, this.fieldName.length - this.defn.name.length);
+        }
 
         if (ctrl.defn.search_range) {
           // Initialize value as object unless using relative date select
@@ -69,21 +76,40 @@
 
         // ChainSelect - watch control field & reload options as needed
         if (ctrl.defn.input_type === 'ChainSelect') {
-          $scope.$watch('dataProvider.getFieldData()[defn.input_attrs.control_field]', function(val) {
+          var controlField = namePrefix + ctrl.defn.input_attrs.control_field;
+          $scope.$watch('dataProvider.getFieldData()["' + controlField + '"]', function(val) {
+            // After switching option list, remove invalid options
+            function validateValue() {
+              var options = $scope.getOptions(),
+                value = $scope.dataProvider.getFieldData()[ctrl.fieldName];
+              if (_.isArray(value)) {
+                _.remove(value, function(item) {
+                  return !_.find(options, function(option) {return option.id == item;});
+                });
+              } else if (value && !_.find(options, function(option) {return option.id == value;})) {
+                $scope.dataProvider.getFieldData()[ctrl.fieldName] = '';
+              }
+            }
             if (val) {
+              $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
               var params = {
-                where: [['name', '=', ctrl.fieldName]],
+                where: [['name', '=', ctrl.defn.name]],
                 select: ['options'],
                 loadOptions: ['id', 'label'],
                 values: {}
               };
               params.values[ctrl.defn.input_attrs.control_field] = val;
-              crmApi4($scope.dataProvider.getEntityType(), 'getFields', params, 0)
+              crmApi4(ctrl.defn.entity, 'getFields', params, 0)
                 .then(function(data) {
-                  ctrl.defn.options = data.options;
+                  $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', false);
+                  chainSelectOptions = data.options;
+                  validateValue();
                 });
+            } else {
+              chainSelectOptions = null;
+              validateValue();
             }
-          });
+          }, true);
         }
 
         // Wait for parent controllers to initialize
@@ -155,7 +181,7 @@
       };
 
       $scope.getOptions = function () {
-        return ctrl.defn.options || (ctrl.fieldName === 'is_primary' && ctrl.defn.input_type === 'Radio' ? noOptions : boolOptions);
+        return chainSelectOptions || ctrl.defn.options || (ctrl.fieldName === 'is_primary' && ctrl.defn.input_type === 'Radio' ? noOptions : boolOptions);
       };
 
       $scope.select2Options = function() {

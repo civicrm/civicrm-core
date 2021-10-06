@@ -76,7 +76,7 @@
       this.canBeMultiple = function() {
         return this.isSearch() &&
           !_.includes(['Date', 'Timestamp'], ctrl.getDefn().data_type) &&
-          _.includes(['Select', 'EntityRef'], $scope.getProp('input_type'));
+          _.includes(['Select', 'EntityRef', 'ChainSelect'], $scope.getProp('input_type'));
       };
 
       this.getRangeElements = function(type) {

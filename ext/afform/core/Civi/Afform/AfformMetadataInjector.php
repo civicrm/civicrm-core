@@ -104,7 +104,7 @@ class AfformMetadataInjector {
       $isSearchRange = !empty($fieldDefn['search_range']) && \CRM_Utils_JS::decode($fieldDefn['search_range']);
 
       // Default placeholder for select inputs
-      if ($inputType === 'Select') {
+      if ($inputType === 'Select' || $inputType === 'ChainSelect') {
         $fieldInfo['input_attrs']['placeholder'] = E::ts('Select');
       }
       elseif ($inputType === 'EntityRef') {
@@ -163,7 +163,7 @@ class AfformMetadataInjector {
     $params = [
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'entity', 'fk_entity'],
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
