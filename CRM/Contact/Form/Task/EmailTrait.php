@@ -16,7 +16,6 @@
  */
 
 use Civi\Api4\Email;
-use Civi\Api4\Contribution;
 
 /**
  * This class provides the common functionality for tasks that send emails.
@@ -374,15 +373,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $bcc = $this->getEmailString($bccArray);
     $additionalDetails .= empty($bccArray) ? '' : "\nbcc : " . $this->getEmailUrlString($bccArray);
 
-    // format contact details array to handle multiple emails from same contact
-    $formattedContactDetails = [];
-    foreach ($this->getEmails() as $details) {
-      $formattedContactDetails[$details['contact_id'] . '::' . $details['email']] = $details;
-    }
-
     // send the mail
     [$sent, $activityIds] = $this->sendEmail(
-      $formattedContactDetails,
       $formValues['text_message'],
       $formValues['html_message'],
       $from,
@@ -390,7 +382,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $cc,
       $bcc,
       $additionalDetails,
-      $this->getContributionIDs(),
       CRM_Utils_Array::value('campaign_id', $formValues),
       $this->getCaseID()
     );
@@ -446,15 +437,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
         CRM_Core_BAO_MessageTemplate::add($messageTemplate);
       }
     }
-  }
-
-  /**
-   * List available tokens for this form.
-   *
-   * @return array
-   */
-  public function listTokens(): array {
-    return CRM_Core_SelectValues::contactTokens();
   }
 
   /**
@@ -714,8 +696,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * Also insert a contact activity in each contacts record.
    *
-   * @param array $contactDetails
-   *   The array of contact details to send the email.
    * @param $text
    * @param $html
    * @param string $from
@@ -727,7 +707,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *   Bcc recipient.
    * @param string|null $additionalDetails
    *   The additional information of CC and BCC appended to the activity Details.
-   * @param array|null $contributionIds
    * @param int|null $campaignId
    * @param int|null $caseId
    *
@@ -737,14 +716,16 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
+   * @throws \PEAR_Exception
    * @internal
    *
    * Also insert a contact activity in each contacts record.
    *
+   * @internal
+   *
+   * Also insert a contact activity in each contacts record.
    */
   public function sendEmail(
-    $contactDetails,
     $text,
     $html,
     $from,
@@ -752,46 +733,26 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $cc = NULL,
     $bcc = NULL,
     $additionalDetails = NULL,
-    $contributionIds = NULL,
     $campaignId = NULL,
     $caseId = NULL
   ) {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
 
-    $contributionDetails = [];
-    if (!empty($contributionIds)) {
-      $contributionDetails = Contribution::get(FALSE)
-        ->setSelect(['contact_id'])
-        ->addWhere('id', 'IN', $contributionIds)
-        ->execute()
-        // Note that this indexing means that only the last
-        // contribution per contact is resolved to tokens.
-        // this is long-standing functionality, albeit possibly
-        // not thought through.
-        ->indexBy('contact_id');
-    }
-
     $sent = $notSent = [];
     $attachmentFileIds = [];
     $activityIds = [];
     $firstActivityCreated = FALSE;
-    foreach ($contactDetails as $values) {
-      $tokenContext = $caseId ? ['caseId' => $caseId] : [];
+    foreach ($this->getRowsForEmails() as $values) {
       $contactId = $values['contact_id'];
       $emailAddress = $values['email'];
-
-      if (!empty($contributionDetails)) {
-        $tokenContext['contributionId'] = $contributionDetails[$contactId]['id'];
-      }
-
       $renderedTemplate = CRM_Core_BAO_MessageTemplate::renderTemplate([
         'messageTemplate' => [
           'msg_text' => $text,
           'msg_html' => $html,
           'msg_subject' => $this->getSubject(),
         ],
-        'tokenContext' => $tokenContext,
+        'tokenContext' => array_merge(['schema' => $this->getTokenSchema()], ($values['schema'] ?? [])),
         'contactId' => $contactId,
         'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
       ]);
@@ -988,6 +949,68 @@ trait CRM_Contact_Form_Task_EmailTrait {
       );
     }
     return $url;
+  }
+
+  /**
+   * Get the result rows to email.
+   *
+   * @return array
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRowsForEmails(): array {
+    $rows = [];
+    foreach ($this->getRows() as $row) {
+      $rows[$row['contact_id']][] = $row;
+    }
+    // format contact details array to handle multiple emails from same contact
+    $formattedContactDetails = [];
+    foreach ($this->getEmails() as $details) {
+      $contactID = $details['contact_id'];
+      $index = $contactID . '::' . $details['email'];
+      if (!isset($rows[$contactID])) {
+        $formattedContactDetails[$index] = $details;
+        continue;
+      }
+      if ($this->isGroupByContact()) {
+        foreach ($rows[$contactID] as $rowDetail) {
+          $details['schema'] = $rowDetail['schema'] ?? [];
+        }
+        $formattedContactDetails[$index] = $details;
+      }
+      else {
+        foreach ($rows[$contactID] as $key => $rowDetail) {
+          $index .= '_' . $key;
+          $formattedContactDetails[$index] = $details;
+          $formattedContactDetails[$index]['schema'] = $rowDetail['schema'] ?? [];
+        }
+      }
+
+    }
+    return $formattedContactDetails;
+  }
+
+  /**
+   * Only send one email per contact.
+   *
+   * This has historically been done for contributions & makes sense if
+   * no entity specific tokens are in use.
+   *
+   * @return bool
+   */
+  protected function isGroupByContact(): bool {
+    return TRUE;
+  }
+
+  /**
+   * Get the tokens in the submitted message.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getMessageTokens(): array {
+    return CRM_Utils_Token::getTokens($this->getSubject() . $this->getSubmittedValue('html_message') . $this->getSubmittedValue('text_message'));
   }
 
 }

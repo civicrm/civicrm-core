@@ -66,4 +66,18 @@ class CRM_Case_Form_Task_Email extends CRM_Case_Form_Task {
     return $subject;
   }
 
+  /**
+   * Get the result rows to email.
+   *
+   * @return array
+   */
+  protected function getRows(): array {
+    // format contact details array to handle multiple emails from same contact
+    $rows = parent::getRows();
+    foreach ($rows as $index => $row) {
+      $rows[$index]['schema']['caseId'] = $this->getCaseID();
+    }
+    return $rows;
+  }
+
 }

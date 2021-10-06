@@ -75,6 +75,18 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public static $entityShortname = NULL;
 
+
+  /**
+   * Rows to act on.
+   *
+   * e.g
+   *  [
+   *    ['contact_id' => 4, 'participant_id' => 6, 'schema' => ['contactId' => 5, 'participantId' => 6],
+   *  ]
+   * @var array
+   */
+  protected $rows = [];
+
   /**
    * Set where the browser should be directed to next.
    *
@@ -367,7 +379,7 @@ SELECT contact_id
   protected function getRows(): array {
     $rows = [];
     foreach ($this->getContactIDs() as $contactID) {
-      $rows[] = ['schema' => ['contactId' => $contactID]];
+      $rows[] = ['contact_id' => $contactID, 'schema' => ['contactId' => $contactID]];
     }
     return $rows;
   }
