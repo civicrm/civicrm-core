@@ -10,7 +10,7 @@
     $ctrl.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
     $ctrl.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
     $ctrl.cycle = function(idFld, listFld, delta){
-      $ctrl[idFld] = ($ctrl[idFld] + delta) % model[listFld].length;
+      $ctrl[idFld] = ($ctrl[idFld] + delta + model[listFld].length) % model[listFld].length;
     };
 
     $ctrl.adhocExample = {};
