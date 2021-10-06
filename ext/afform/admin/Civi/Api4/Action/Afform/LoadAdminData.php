@@ -216,6 +216,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
    */
   private function loadForm($name) {
     return Afform::get($this->checkPermissions)
+      ->addSelect('*', 'directive_name')
       ->setFormatWhitespace(TRUE)
       ->setLayoutFormat('shallow')
       ->addWhere('name', '=', $name)
