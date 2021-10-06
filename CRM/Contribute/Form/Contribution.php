@@ -243,10 +243,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // Get the contribution id if update
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
+    $this->assign('isUsePaymentBlock', !empty($this->_id));
     if (!empty($this->_id)) {
       $this->assignPaymentInfoBlock();
       $this->assign('contribID', $this->_id);
-      $this->assign('isUsePaymentBlock', TRUE);
     }
 
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
@@ -510,8 +510,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // build price set form.
     $buildPriceSet = FALSE;
     $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
-    $this->assign('invoicing', $invoicing);
-
+    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
+    // This is a probably-deprecated approach to partial payments - assign here
+    // & if true it will be overwritten.
+    $this->assign('payNow', FALSE);
     $buildRecurBlock = FALSE;
 
     // display tax amount on edit contribution page
