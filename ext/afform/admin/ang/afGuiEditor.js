@@ -180,19 +180,24 @@
     CRM.loadScript(CRM.config.resourceBase + 'js/jquery/jquery.crmIconPicker.js').done(function() {
       $('#af-gui-icon-picker').crmIconPicker();
     });
-    // Add css class while dragging
+    // Add css classes while dragging
     $(document)
+      // When dragging an item over a container, add a class to highlight the target
       .on('sortover', function(e) {
         $('.af-gui-container').removeClass('af-gui-dragtarget');
         $(e.target).closest('.af-gui-container').addClass('af-gui-dragtarget');
       })
+      // Un-highlight when dragging out of a container
       .on('sortout', '.af-gui-container', function() {
         $(this).removeClass('af-gui-dragtarget');
       })
+      // Add body class which puts the entire UI into a "dragging" state
       .on('sortstart', '#afGuiEditor', function() {
         $('body').addClass('af-gui-dragging');
       })
-      .on('sortstop', function() {
+      // Ensure dragging classes are removed when not sorting
+      // Listening to multiple event types because sort* events are not 100% reliable
+      .on('sortbeforestop mouseenter', function() {
         $('body').removeClass('af-gui-dragging');
         $('.af-gui-dragtarget').removeClass('af-gui-dragtarget');
       });
