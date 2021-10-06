@@ -24,6 +24,21 @@ function search_kit_civicrm_container($container) {
 }
 
 /**
+ * Implements hook_civicrm_alterApiRoutePermissions().
+ *
+ * Allow anonymous users to run a search display. Permissions are checked internally.
+ *
+ * @see CRM_Utils_Hook::alterApiRoutePermissions
+ */
+function search_kit_civicrm_alterApiRoutePermissions(&$permissions, $entity, $action) {
+  if ($entity === 'SearchDisplay') {
+    if ($action === 'run' || $action === 'download' || $action === 'getSearchTasks') {
+      $permissions = CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION;
+    }
+  }
+}
+
+/**
  * Implements hook_civicrm_xmlMenu().
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
