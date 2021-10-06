@@ -1,12 +1,12 @@
 <?php
 
-class CRM_Contribute_WorkflowMessage_RecurringEdit_BasicEditExample extends \Civi\WorkflowMessage\WorkflowMessageExample {
+class CRM_Contribute_WorkflowMessage_RecurringEdit_AlexCancelled extends \Civi\WorkflowMessage\WorkflowMessageExample {
 
   public function getExamples(): iterable {
     yield [
       'name' => "workflow/{$this->wfName}/{$this->exName}",
       // This title is not very clear. When we have some more examples to compare against, feel free to change/clarify.
-      'title' => ts('Recurring Edit: Basic Example'),
+      'title' => ts('Recurring Edit: Alex, Cancelled'),
       'tags' => ['preview', 'phpunit'],
     ];
   }
