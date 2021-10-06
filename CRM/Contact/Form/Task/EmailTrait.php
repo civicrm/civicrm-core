@@ -161,7 +161,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $emailAttributes = [
       'class' => 'huge',
     ];
-    $to = $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
+    $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
 
     $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
@@ -173,26 +173,12 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'multiple' => TRUE,
     ]);
 
-    if ($to->getValue()) {
-      $this->_toContactIds = $this->_contactIds = [];
-    }
     $setDefaults = TRUE;
     if (property_exists($this, '_context') && $this->_context === 'standalone') {
       $setDefaults = FALSE;
     }
 
     $this->_allContactIds = $this->_toContactIds = $this->_contactIds;
-
-    if ($to->getValue()) {
-      foreach ($this->getEmails($to) as $value) {
-        $contactId = $value['contact_id'];
-        if ($contactId) {
-          $this->_contactIds[] = $this->_toContactIds[] = $contactId;
-          $this->_allContactIds[] = $contactId;
-        }
-      }
-      $setDefaults = TRUE;
-    }
 
     //get the group of contacts as per selected by user in case of Find Activities
     if (!empty($this->_activityHolderIds)) {
@@ -374,7 +360,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   public function submit($formValues): void {
     $this->saveMessageTemplate($formValues);
-
     $from = $formValues['from_email_address'];
     // dev/core#357 User Emails are keyed by their id so that the Signature is able to be added
     // If we have had a contact email used here the value returned from the line above will be the
@@ -391,19 +376,8 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     // format contact details array to handle multiple emails from same contact
     $formattedContactDetails = [];
-    foreach ($this->_contactIds as $key => $contactId) {
-      // if we dont have details on this contactID, we should ignore
-      // potentially this is due to the contact not wanting to receive email
-      if (!isset($this->_contactDetails[$contactId])) {
-        continue;
-      }
-      $email = $this->getEmail($key);
-      // prevent duplicate emails if same email address is selected CRM-4067
-      // we should allow same emails for different contacts
-      $details = $this->_contactDetails[$contactId];
-      $details['email'] = $email;
-      unset($details['email_id']);
-      $formattedContactDetails["{$contactId}::{$email}"] = $details;
+    foreach ($this->getEmails() as $details) {
+      $formattedContactDetails[$details['contact_id'] . '::' . $details['email']] = $details;
     }
 
     // send the mail
@@ -487,12 +461,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
   /**
    * Get the emails from the added element.
    *
-   * @param HTML_QuickForm_Element $element
-   *
    * @return array
    */
-  protected function getEmails($element): array {
-    $allEmails = explode(',', $element->getValue());
+  protected function getEmails(): array {
+    $allEmails = explode(',', $this->getSubmittedValue('to'));
     $return = [];
     foreach ($allEmails as $value) {
       $values = explode('::', $value);
