@@ -384,7 +384,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $final = $base . $separator . implode($separator, $queryParts) . $fragment;
       }
       else {
-        $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+        $final = untrailingslashit($base) . '?' . implode($separator, $queryParts) . $fragment;
       }
 
     }
@@ -400,7 +400,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
 
       if (!empty($queryParts)) {
-        $final = $base . '?' . implode($separator, $queryParts) . $fragment;
+        $final = untrailingslashit($base) . '?' . implode($separator, $queryParts) . $fragment;
       }
       else {
         $final = $base . $fragment;
