@@ -49,6 +49,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'audience' => 'user',
       ],
       'info_url' => [
         'title' => ts('Event Info URL'),
@@ -56,6 +57,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'audience' => 'user',
       ],
       'registration_url' => [
         'title' => ts('Event Registration URL'),
@@ -63,6 +65,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'audience' => 'user',
       ],
       'contact_email' => [
         'title' => ts('Event Contact Email'),
@@ -70,6 +73,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => 'String',
+        'audience' => 'user',
       ],
       'contact_phone' => [
         'title' => ts('Event Contact Phone'),
@@ -77,6 +81,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         'type' => 'calculated',
         'options' => NULL,
         'data_type' => '',
+        'audience' => 'user',
       ],
     ];
   }
@@ -92,7 +97,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
     }
     if (array_key_exists($field, $this->getEventTokenValues($eventID))) {
       foreach ($this->getEventTokenValues($eventID)[$field] as $format => $value) {
-        $row->format($format)->tokens($entity, $field, $value);
+        $row->format($format)->tokens($entity, $field, $value ?? '');
       }
     }
   }
@@ -143,14 +148,15 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
 
-      foreach (array_keys($this->getTokenMetadata()) as $field) {
-        if (!isset($tokens[$field])) {
-          if ($this->isCustomField($field)) {
+      foreach ($this->getTokenMetadata() as $fieldName => $fieldSpec) {
+        if (!isset($tokens[$fieldName])) {
+          if ($fieldSpec['type'] === 'Custom') {
             $this->prefetch[$eventID] = $event;
-            $tokens[$field]['text/html'] = $this->getCustomFieldValue($eventID, $field);
+            $value = $event[$fieldSpec['name']];
+            $tokens[$fieldName]['text/html'] = CRM_Core_BAO_CustomField::displayValue($value, $fieldSpec['custom_field_id']);
           }
           else {
-            $tokens[$field]['text/html'] = $event[$field];
+            $tokens[$fieldName]['text/html'] = $event[$fieldName];
           }
         }
       }
