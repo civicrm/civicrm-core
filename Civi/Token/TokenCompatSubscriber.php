@@ -60,6 +60,12 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
       return '';
     });
 
+    // This removes the pattern used in greetings of having bits of text that
+    // depend on the tokens around them - ie '{first_name}{ }{last_name}
+    // has an extra construct '{ }' which will resolve as a space if the
+    // tokens on either side are resolved to 'something'
+    $e->string = preg_replace('/\\\\|\{(\s*)?\}/', ' ', $e->string);
+
     if ($useSmarty) {
       $smartyVars = [];
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {

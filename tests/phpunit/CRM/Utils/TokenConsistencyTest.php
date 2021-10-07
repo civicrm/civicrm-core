@@ -235,6 +235,45 @@ case.custom_1 :' . '
   }
 
   /**
+   * Test tokens in 2 ways to ensure consistent handling.
+   *
+   * 1) as part of the greeting processing
+   * 2) via the token processor.
+   *
+   */
+  public function testOddTokens(): void {
+
+    $variants = [
+      [
+        'string' => '{contact.individual_prefix}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.individual_suffix}',
+        'expected' => 'Mr. Anthony  Anderson II',
+      ],
+      [
+        'string' => '{contact.prefix_id:label}{ }{contact.first_name}{ }{contact.middle_name}{ }{contact.last_name}{ }{contact.suffix_id:label}',
+        'expected' => 'Mr. Anthony  Anderson II',
+      ],
+    ];
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'smarty' => FALSE,
+      'schema' => ['contactId'],
+    ]);
+    $contactID = $this->individualCreate(['middle_name' => '']);
+    $tokenProcessor->addRow(['contactId' => $contactID]);
+    $tokenProcessor->evaluate();
+    foreach ($variants as $index => $variant) {
+      $tokenProcessor->addMessage($index, $variant['string'], 'text/plain');
+    }
+    $tokenProcessor->evaluate();
+    $result = $tokenProcessor->getRow(0);
+    foreach ($variants as $index => $variant) {
+      $greetingString = $variant['string'];
+      CRM_Utils_Token::replaceGreetingTokens($greetingString, $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]), $contactID);
+      $this->assertEquals($variant['expected'], $greetingString);
+      $this->assertEquals($variant['expected'], $result->render($index));
+    }
+  }
+
+  /**
    * Get the contribution recur tokens keyed by the token.
    *
    * e.g {contribution_recur.id}
