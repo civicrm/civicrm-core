@@ -227,29 +227,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Interpret the variable `$context['smartyTokenAlias']` (e.g. `mySmartyField' => `tkn_entity.tkn_field`).
-   *
-   * We need to ensure that any tokens like `{tkn_entity.tkn_field}` are hydrated, so
-   * we pretend that they are in use.
-   *
-   * @param \Civi\Token\Event\TokenValueEvent $e
-   */
-  public function setupSmartyAliases(TokenValueEvent $e) {
-    $aliasedTokens = [];
-    foreach ($e->getRows() as $row) {
-      $aliasedTokens = array_unique(array_merge($aliasedTokens,
-        array_values($row->context['smartyTokenAlias'] ?? [])));
-    }
-
-    $fakeMessage = implode('', array_map(function ($f) {
-      return '{' . $f . '}';
-    }, $aliasedTokens));
-
-    $proc = $e->getTokenProcessor();
-    $proc->addMessage('TokenCompatSubscriber.aliases', $fakeMessage, 'text/plain');
-  }
-
-  /**
    * Load token data from legacy hooks.
    *
    * While our goal is for people to move towards implementing
