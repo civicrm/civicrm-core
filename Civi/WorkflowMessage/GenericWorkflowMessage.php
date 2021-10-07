@@ -15,6 +15,7 @@ namespace Civi\WorkflowMessage;
 use Civi\Schema\Traits\MagicGetterSetterTrait;
 use Civi\WorkflowMessage\Traits\AddressingTrait;
 use Civi\WorkflowMessage\Traits\FinalHelperTrait;
+use Civi\WorkflowMessage\Traits\LocalizationTrait;
 use Civi\WorkflowMessage\Traits\ReflectiveWorkflowTrait;
 
 /**
@@ -43,6 +44,9 @@ class GenericWorkflowMessage implements WorkflowMessageInterface {
 
   // Implement setTo(), setReplyTo(), etc
   use AddressingTrait;
+
+  // Implement setLocale(), etc
+  use LocalizationTrait;
 
   /**
    * WorkflowMessage constructor.
