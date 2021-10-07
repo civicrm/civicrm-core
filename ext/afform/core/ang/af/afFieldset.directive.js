@@ -35,7 +35,7 @@
           return data[0].fields;
         };
         this.getFormName = function() {
-          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getMeta().name : $scope.meta.name;
+          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
         };
       }
     };

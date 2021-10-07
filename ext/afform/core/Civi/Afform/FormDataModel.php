@@ -28,6 +28,11 @@ class FormDataModel {
 
   /**
    * @var array
+   */
+  protected $searchDisplays = [];
+
+  /**
+   * @var array
    *   Ex: $secureApi4s['spouse'] = function($entity, $action, $params){...};
    */
   protected $secureApi4s = [];
@@ -124,14 +129,19 @@ class FormDataModel {
    * @param array $nodes
    * @param string $entity
    * @param string $join
+   * @param string $searchDisplay
    */
-  protected function parseFields($nodes, $entity = NULL, $join = NULL) {
+  protected function parseFields($nodes, $entity = NULL, $join = NULL, $searchDisplay = NULL) {
     foreach ($nodes as $node) {
       if (!is_array($node) || !isset($node['#tag'])) {
         continue;
       }
-      elseif (!empty($node['af-fieldset']) && !empty($node['#children'])) {
-        $this->parseFields($node['#children'], $node['af-fieldset'], $join);
+      elseif (isset($node['af-fieldset']) && !empty($node['#children'])) {
+        $searchDisplay = $node['af-fieldset'] ? NULL : $this->findSearchDisplay($node);
+        $this->parseFields($node['#children'], $node['af-fieldset'], $join, $searchDisplay);
+      }
+      elseif ($searchDisplay && $node['#tag'] === 'af-field') {
+        $this->searchDisplays[$searchDisplay]['fields'][$node['name']] = AHQ::getProps($node);
       }
       elseif ($entity && $node['#tag'] === 'af-field') {
         if ($join) {
@@ -146,7 +156,7 @@ class FormDataModel {
         $this->parseFields($node['#children'] ?? [], $entity, $node['af-join']);
       }
       elseif (!empty($node['#children'])) {
-        $this->parseFields($node['#children'], $entity, $join);
+        $this->parseFields($node['#children'], $entity, $join, $searchDisplay);
       }
       // Recurse into embedded blocks
       if (isset($this->blocks[$node['#tag']])) {
@@ -154,8 +164,22 @@ class FormDataModel {
           $this->blocks[$node['#tag']] = Afform::get()->setCheckPermissions(FALSE)->setSelect(['name', 'layout'])->addWhere('name', '=', $this->blocks[$node['#tag']]['name'])->execute()->first();
         }
         if (!empty($this->blocks[$node['#tag']]['layout'])) {
-          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join);
+          $this->parseFields($this->blocks[$node['#tag']]['layout'], $entity, $join, $searchDisplay);
         }
+      }
+    }
+  }
+
+  /**
+   * Finds a search display within a fieldset
+   *
+   * @param array $node
+   */
+  public function findSearchDisplay($node) {
+    foreach (\Civi\Search\Display::getDisplayTypes(['name']) as $displayType) {
+      foreach (AHQ::getTags($node, $displayType['name']) as $display) {
+        $this->searchDisplays[$display['display-name']]['searchName'] = $display['search-name'];
+        return $display['display-name'];
       }
     }
   }
@@ -173,6 +197,13 @@ class FormDataModel {
    */
   public function getEntity($entityName) {
     return $this->entities[$entityName] ?? NULL;
+  }
+
+  /**
+   * @return array
+   */
+  public function getSearchDisplay($displayName) {
+    return $this->searchDisplays[$displayName] ?? NULL;
   }
 
 }

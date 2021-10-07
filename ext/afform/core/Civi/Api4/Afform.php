@@ -95,6 +95,15 @@ class Afform extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Afform\GetOptions
+   */
+  public static function getOptions($checkPermissions = TRUE) {
+    return (new Action\Afform\GetOptions('Afform', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicBatchAction
    */
   public static function revert($checkPermissions = TRUE) {
@@ -243,6 +252,7 @@ class Afform extends Generic\AbstractEntity {
       "default" => ["administer CiviCRM"],
       // These all check form-level permissions
       'get' => [],
+      'getOptions' => [],
       'prefill' => [],
       'submit' => [],
       'submitFile' => [],
