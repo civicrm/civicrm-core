@@ -73,7 +73,10 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
     $primaryContactId = $this->get('primaryContactId');
     if ($primaryContactId) {
-      list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($primaryContactId);
+      $email = CRM_Utils_Array::valueByRegexKey('/^email-/', current($this->_params));
+      if (!$email) {
+        $email = CRM_Contact_BAO_Contact::getPrimaryEmail($primaryContactId);
+      }
       $this->assign('email', $email);
     }
     $this->assignToTemplate();

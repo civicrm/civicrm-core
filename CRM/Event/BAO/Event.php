@@ -1111,9 +1111,9 @@ WHERE civicrm_event.is_active = 1
 
     if ($values['event']['is_email_confirm'] || $returnMessageText) {
       list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactID);
-
+      $notifyEmail = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantParams) ?? $email;
       //send email only when email is present
-      if (isset($email) || $returnMessageText) {
+      if (isset($notifyEmail) || $returnMessageText) {
         $preProfileID = $values['custom_pre_id'] ?? NULL;
         $postProfileID = $values['custom_post_id'] ?? NULL;
 
@@ -1156,7 +1156,7 @@ WHERE civicrm_event.is_active = 1
           $customPostTitles = NULL;
         }
         $tplParams = array_merge($values, $participantParams, [
-          'email' => $email,
+          'email' => $notifyEmail,
           'confirm_email_text' => $values['event']['confirm_email_text'] ?? NULL,
           'isShowLocation' => $values['event']['is_show_location'] ?? NULL,
           // The concept of contributeMode is deprecated.
@@ -1236,7 +1236,7 @@ WHERE civicrm_event.is_active = 1
         else {
           $sendTemplateParams['from'] = CRM_Utils_Array::value('confirm_from_name', $values['event']) . " <" . CRM_Utils_Array::value('confirm_from_email', $values['event']) . ">";
           $sendTemplateParams['toName'] = $displayName;
-          $sendTemplateParams['toEmail'] = $email;
+          $sendTemplateParams['toEmail'] = $notifyEmail;
           $sendTemplateParams['autoSubmitted'] = TRUE;
           $sendTemplateParams['cc'] = CRM_Utils_Array::value('cc_confirm',
             $values['event']
