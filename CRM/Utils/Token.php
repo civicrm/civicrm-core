@@ -1523,15 +1523,32 @@ class CRM_Utils_Token {
     return $value;
   }
 
+  /**
+   * @deprecated
+   *
+   * Do not use this function - it still needs full removal from active code
+   * in CRM_Contribute_Form_Task_PDFLetter.
+   */
   protected static function _buildContributionTokens() {
     $key = 'contribution';
 
     if (!isset(Civi::$statics[__CLASS__][__FUNCTION__][$key])) {
-      $processor = new CRM_Contribute_Tokens();
       $tokens = array_merge(CRM_Contribute_BAO_Contribution::exportableFields('All'),
         ['campaign' => [], 'financial_type' => [], 'payment_instrument' => []],
         self::getCustomFieldTokens('Contribution'),
-        $processor->getPseudoTokens()
+        [
+          'financial_type_id:label',
+          'financial_type_id:name',
+          'contribution_page_id:label',
+          'contribution_page_id:name',
+          'payment_instrument_id:label',
+          'payment_instrument_id:name',
+          'is_test:label',
+          'is_pay_later:label',
+          'contribution_status_id:label',
+          'contribution_status_id:name',
+          'is_template:label',
+        ]
       );
       foreach ($tokens as $token) {
         if (!empty($token['name'])) {

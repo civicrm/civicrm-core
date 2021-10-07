@@ -313,61 +313,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * Get pseudoTokens - it tokens that reflect the name or label of a pseudoconstant.
-   *
-   * @internal - this function will likely be made protected soon.
-   *
-   * @return array
-   */
-  public function getPseudoTokens(): array {
-    $return = [];
-    foreach (array_keys($this->getBasicTokens()) as $fieldName) {
-      if ($this->isAddPseudoTokens($fieldName)) {
-        $fieldLabel = $this->fieldMetadata[$fieldName]['input_attrs']['label'] ?? $this->fieldMetadata[$fieldName]['label'];
-        $return[$fieldName . ':label'] = $fieldLabel;
-        $return[$fieldName . ':name'] = ts('Machine name') . ': ' . $fieldLabel;
-      }
-      if ($this->isBooleanField($fieldName)) {
-        $return[$fieldName . ':label'] = $this->getFieldMetadata()[$fieldName]['title'];
-      }
-    }
-    return $return;
-  }
-
-  /**
    * Get any tokens with custom calculation.
    */
   protected function getBespokeTokens(): array {
     return [];
-  }
-
-  /**
-   * Is this a field we should add pseudo-tokens to?
-   *
-   * Pseudo-tokens allow access to name and label fields - e.g
-   *
-   * {contribution.contribution_status_id:name} might resolve to 'Completed'
-   *
-   * @param string $fieldName
-   */
-  public function isAddPseudoTokens($fieldName): bool {
-    if (in_array($fieldName, $this->getCurrencyFieldName())) {
-      // 'currency' is manually added to the skip list as an anomaly.
-      // name & label aren't that suitable for 'currency' (symbol, which
-      // possibly maps to 'abbr' would be) and we can't gather that
-      // from the metadata as yet.
-      return FALSE;
-    }
-    if ($this->getFieldMetadata()[$fieldName]['type'] === 'Custom') {
-      // If we remove this early return then we get that extra nuanced goodness
-      // and support for the more portable v4 style field names
-      // on custom fields - where labels or names can be returned.
-      // At present the gap is that the metadata for the label is not accessed
-      // and tests failed on the enotice and we don't have a clear plan about
-      // v4 style custom tokens - but medium term this IF will probably go.
-      return FALSE;
-    }
-    return (bool) ($this->getFieldMetadata()[$fieldName]['options'] || !empty($this->getFieldMetadata()[$fieldName]['suffixes']));
   }
 
   /**
@@ -382,7 +331,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @internal function will likely be protected soon.
    */
-  public function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+  protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
     if ($pseudoKey === 'name') {
       $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
     }

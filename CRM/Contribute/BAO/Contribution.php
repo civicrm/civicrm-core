@@ -4904,8 +4904,14 @@ LIMIT 1;";
   }
 
   /**
+   * Do not use - still called from CRM_Contribute_Form_Task_PDFLetter
+   *
+   * This needs to be refactored out of use & deprecated out of existence.
+   *
    * Get the contribution fields for $id and display labels where
    * appropriate (if the token is present).
+   *
+   * @deprecated
    *
    * @param int $id
    * @param array $messageToken
@@ -4925,11 +4931,34 @@ LIMIT 1;";
           $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
         }
       }
-      $processor = new CRM_Contribute_Tokens();
-      $pseudoFields = array_keys($processor->getPseudoTokens());
+
+      $pseudoFields = [
+        'financial_type_id:label',
+        'financial_type_id:name',
+        'contribution_page_id:label',
+        'contribution_page_id:name',
+        'payment_instrument_id:label',
+        'payment_instrument_id:name',
+        'is_test:label',
+        'is_pay_later:label',
+        'contribution_status_id:label',
+        'contribution_status_id:name',
+        'is_template:label',
+        'campaign_id:label',
+        'campaign_id:name',
+      ];
       foreach ($pseudoFields as $pseudoField) {
         $split = explode(':', $pseudoField);
-        $result['values'][$id][$pseudoField] = $processor->getPseudoValue($split[0], $split[1], $result['values'][$id][$split[0]] ?? '');
+        $pseudoKey = $split[1];
+        $realField = $split[0];
+        $fieldValue = $result['values'][$id][$realField] ?? '';
+        if ($pseudoKey === 'name') {
+          $fieldValue = (string) CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
+        }
+        if ($pseudoKey === 'label') {
+          $fieldValue = (string) CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', $realField, $fieldValue);
+        }
+        $result['values'][$id][$pseudoField] = $fieldValue;
       }
     }
     return $result;
