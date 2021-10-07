@@ -114,35 +114,6 @@ class CRM_Activity_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   }
 
   /**
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function testCreateDocumentSpecialTokens(): void {
-    $this->markTestIncomplete('special tokens not yet merged - see https://github.com/civicrm/civicrm-core/pull/12012');
-    $activity = $this->activityCreate();
-    $data = [
-      ['Source First Name: {activity.source_first_name}', 'Source First Name: Anthony'],
-      ['Target N First Name: {activity.target_N_first_name}', 'Target N First Name: Julia'],
-      ['Target 0 First Name: {activity.target_0_first_name}', 'Target 0 First Name: Julia'],
-      ['Target 1 First Name: {activity.target_1_first_name}', 'Target 1 First Name: Julia'],
-      ['Target 2 First Name: {activity.target_2_first_name}', 'Target 2 First Name: '],
-      ['Assignee N First Name: {activity.target_N_first_name}', 'Assignee N First Name: Julia'],
-      ['Assignee 0 First Name: {activity.target_0_first_name}', 'Assignee 0 First Name: Julia'],
-      ['Assignee 1 First Name: {activity.target_1_first_name}', 'Assignee 1 First Name: Julia'],
-      ['Assignee 2 First Name: {activity.target_2_first_name}', 'Assignee 2 First Name: '],
-      ['Assignee Count: {activity.assignees_count}', 'Assignee Count: 1'],
-      ['Target Count: {activity.targets_count}', 'Target Count: 1'],
-    ];
-    $html_message = "\n" . implode("\n", CRM_Utils_Array::collect('0', $data)) . "\n";
-    $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
-    $output = $form->createDocument([$activity['id']], $html_message, []);
-
-    foreach ($data as $line) {
-      $this->assertContains("\n" . $line[1] . "\n", $output[0]);
-    }
-  }
-
-  /**
    * Unknown tokens are removed at the very end.
    *
    * @throws \CRM_Core_Exception
