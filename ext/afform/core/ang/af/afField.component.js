@@ -90,19 +90,19 @@
                 $scope.dataProvider.getFieldData()[ctrl.fieldName] = '';
               }
             }
-            if (val) {
+            if (val && (typeof val === 'number' || val.length)) {
               $('input[crm-ui-select]', $element).addClass('loading').prop('disabled', true);
               var params = {
-                where: [['name', '=', ctrl.defn.name]],
-                select: ['options'],
-                loadOptions: ['id', 'label'],
-                values: {}
+                name: ctrl.afFieldset.getFormName(),
+                modelName: ctrl.afFieldset.getName(),
+                fieldName: ctrl.fieldName,
+                joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
+                values: $scope.dataProvider.getFieldData()
               };
-              params.values[ctrl.defn.input_attrs.control_field] = val;
-              crmApi4(ctrl.defn.entity, 'getFields', params, 0)
+              crmApi4('Afform', 'getOptions', params)
                 .then(function(data) {
-                  $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', false);
-                  chainSelectOptions = data.options;
+                  $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', !data.length);
+                  chainSelectOptions = data;
                   validateValue();
                 });
             } else {
@@ -172,7 +172,7 @@
       // Params for the Afform.submitFile API when uploading a file field
       ctrl.getFileUploadParams = function() {
         return {
-          entityName: ctrl.afFieldset.modelName,
+          modelName: ctrl.afFieldset.getName(),
           fieldName: ctrl.fieldName,
           joinEntity: ctrl.afJoin ? ctrl.afJoin.entity : null,
           entityIndex: ctrl.getEntityIndex(),

@@ -163,7 +163,7 @@ class AfformMetadataInjector {
     $params = [
       'action' => $action,
       'where' => [['name', 'IN', $namesToMatch]],
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'entity', 'fk_entity'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'help_pre', 'help_post', 'options', 'fk_entity'],
       'loadOptions' => ['id', 'label'],
       // If the admin included this field on the form, then it's OK to get metadata about the field regardless of user permissions.
       'checkPermissions' => FALSE,
@@ -172,11 +172,16 @@ class AfformMetadataInjector {
       $params['values'] = ['contact_type' => $entityName];
       $entityName = 'Contact';
     }
-    $fields = civicrm_api4($entityName, 'getFields', $params);
-    $field = $originalField = $fields->first();
+    foreach (civicrm_api4($entityName, 'getFields', $params) as $field) {
+      // In the highly unlikely event of 2 fields returned, prefer the exact match
+      if ($field['name'] === $fieldName) {
+        break;
+      }
+    }
     // If this is an implicit join, get new field from fk entity
     if ($field['name'] !== $fieldName && $field['fk_entity']) {
       $params['where'] = [['name', '=', substr($fieldName, 1 + strrpos($fieldName, '.'))]];
+      $originalField = $field;
       $field = civicrm_api4($field['fk_entity'], 'getFields', $params)->first();
       if ($field) {
         $field['label'] = $originalField['label'] . ' ' . $field['label'];

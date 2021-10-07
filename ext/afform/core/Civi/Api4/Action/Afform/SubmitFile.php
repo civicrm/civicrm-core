@@ -12,10 +12,16 @@ use Civi\Api4\Utils\CoreUtil;
  *
  * @method $this setToken(string $token)
  * @method $this setFieldName(string $fieldName)
- * @method $this setEntityName(string $entityName)
+ * @method $this setModelName(string $modelName)
  * @method $this setJoinEntity(string $joinEntity)
  * @method $this setEntityIndex(int $entityIndex)
  * @method $this setJoinIndex(int $joinIndex)
+ * @method string getToken()
+ * @method string getFieldName()
+ * @method string getModelName()
+ * @method string getJoinEntity()
+ * @method int getEntityIndex()
+ * @method int getJoinIndex()
  * @package Civi\Api4\Action\Afform
  */
 class SubmitFile extends AbstractProcessor {
@@ -31,7 +37,7 @@ class SubmitFile extends AbstractProcessor {
    * @var string
    * @required
    */
-  protected $entityName;
+  protected $modelName;
 
   /**
    * @var string
@@ -58,15 +64,15 @@ class SubmitFile extends AbstractProcessor {
     if (empty($_FILES['file'])) {
       throw new \API_Exception('File upload required');
     }
-    $afformEntity = $this->_formDataModel->getEntity($this->entityName);
+    $afformEntity = $this->_formDataModel->getEntity($this->modelName);
     $apiEntity = $this->joinEntity ?: $afformEntity['type'];
     $entityIndex = (int) $this->entityIndex;
     $joinIndex = (int) $this->joinIndex;
     if ($this->joinEntity) {
-      $entityId = $this->_entityIds[$this->entityName][$entityIndex]['joins'][$this->joinEntity][$joinIndex] ?? NULL;
+      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['joins'][$this->joinEntity][$joinIndex] ?? NULL;
     }
     else {
-      $entityId = $this->_entityIds[$this->entityName][$entityIndex]['id'] ?? NULL;
+      $entityId = $this->_entityIds[$this->modelName][$entityIndex]['id'] ?? NULL;
     }
 
     if (!$entityId) {

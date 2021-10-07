@@ -15,6 +15,9 @@ class api_v4_AfformContactUsageTest extends api_v4_AfformUsageTestCase {
   <fieldset af-fieldset="me">
       <af-field name="first_name" />
       <af-field name="last_name" />
+      <div af-join="Address" min="1" af-repeat="Add">
+        <afblock-contact-address></afblock-contact-address>
+      </div>
   </fieldset>
 </af-form>
 EOHTML;
@@ -85,6 +88,33 @@ EOHTML;
     $contact = Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $cid)->execute()->first();
     $this->assertEquals('Firsty', $contact['first_name']);
     $this->assertEquals('Lasty', $contact['last_name']);
+  }
+
+  public function testChainSelect(): void {
+    $this->useValues([
+      'layout' => self::$layouts['aboutMe'],
+      'permission' => CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Get states for USA
+    $result = Civi\Api4\Afform::getOptions()
+      ->setName($this->formName)
+      ->setModelName('me')
+      ->setFieldName('state_province_id')
+      ->setJoinEntity('Address')
+      ->setValues(['country_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United States', 'id', 'name')])
+      ->execute();
+    $this->assertEquals('Alabama', $result[0]['label']);
+
+    // Get states for UK
+    $result = Civi\Api4\Afform::getOptions()
+      ->setName($this->formName)
+      ->setModelName('me')
+      ->setFieldName('state_province_id')
+      ->setJoinEntity('Address')
+      ->setValues(['country_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Country', 'United Kingdom', 'id', 'name')])
+      ->execute();
+    $this->assertEquals('Aberdeen City', $result[0]['label']);
   }
 
   public function testCheckEntityReferenceFieldsReplacement(): void {

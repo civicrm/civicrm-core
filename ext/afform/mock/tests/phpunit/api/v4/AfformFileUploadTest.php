@@ -110,7 +110,7 @@ EOHTML;
       Civi\Api4\Afform::submitFile()
         ->setName($this->formName)
         ->setToken($submission['token'])
-        ->setEntityName('Individual1')
+        ->setModelName('Individual1')
         ->setFieldName('MyInfo.single_file_field')
         ->setEntityIndex($entityIndex)
         ->execute();
@@ -120,7 +120,7 @@ EOHTML;
         Civi\Api4\Afform::submitFile()
           ->setName($this->formName)
           ->setToken($submission['token'])
-          ->setEntityName('Individual1')
+          ->setModelName('Individual1')
           ->setFieldName('my_file')
           ->setEntityIndex($entityIndex)
           ->setJoinEntity('Custom_MyFiles')
