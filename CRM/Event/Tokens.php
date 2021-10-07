@@ -112,8 +112,11 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getEventTokenValues(int $eventID = NULL): array {
     $cacheKey = __CLASS__ . 'event_tokens' . $eventID . '_' . CRM_Core_I18n::getLocale();
+    if ($this->checkPermissions) {
+      $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
+    }
     if (!Civi::cache('metadata')->has($cacheKey)) {
-      $event = Event::get(FALSE)->addWhere('id', '=', $eventID)
+      $event = Event::get($this->checkPermissions)->addWhere('id', '=', $eventID)
         ->setSelect(array_merge([
           'loc_block_id.address_id.street_address',
           'loc_block_id.address_id.city',
@@ -140,7 +143,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
       $tokens['contact_phone']['text/html'] = $event['loc_block_id.phone_id.phone'];
       $tokens['contact_email']['text/html'] = $event['loc_block_id.email_id.email'];
 
-      foreach (array_keys($this->getAllTokens()) as $field) {
+      foreach (array_keys($this->getTokenMetadata()) as $field) {
         if (!isset($tokens[$field])) {
           if ($this->isCustomField($field)) {
             $this->prefetch[$eventID] = $event;
