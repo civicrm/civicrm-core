@@ -16,7 +16,7 @@ class FormDataModel {
   protected $defaults = ['security' => 'RBAC', 'actions' => ['create' => TRUE, 'update' => TRUE]];
 
   /**
-   * @var array
+   * @var array[]
    *   Ex: $entities['spouse']['type'] = 'Contact';
    */
   protected $entities;
@@ -27,7 +27,7 @@ class FormDataModel {
   protected $blocks = [];
 
   /**
-   * @var array
+   * @var array[]
    */
   protected $searchDisplays = [];
 
@@ -193,14 +193,14 @@ class FormDataModel {
   }
 
   /**
-   * @return array
+   * @return array{type: string, fields: array, joins: array, security: string, actions: array}
    */
   public function getEntity($entityName) {
     return $this->entities[$entityName] ?? NULL;
   }
 
   /**
-   * @return array
+   * @return array{fields: array, searchName: string}
    */
   public function getSearchDisplay($displayName) {
     return $this->searchDisplays[$displayName] ?? NULL;
