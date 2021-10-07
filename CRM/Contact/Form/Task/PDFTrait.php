@@ -239,9 +239,9 @@ trait CRM_Contact_Form_Task_PDFTrait {
 
     foreach ($this->getRows() as $row) {
       $tokenHtml = CRM_Core_BAO_MessageTemplate::renderTemplate([
-        'contactId' => $row['contactId'],
+        'contactId' => $row['contact_id'],
         'messageTemplate' => ['msg_html' => $html_message],
-        'tokenContext' => array_merge($row, ['schema' => $this->getTokenSchema()]),
+        'tokenContext' => array_merge(['schema' => $this->getTokenSchema()], ($row['schema'] ?? [])),
         'disableSmarty' => (!defined('CIVICRM_MAIL_SMARTY') || !CIVICRM_MAIL_SMARTY),
       ])['html'];
 

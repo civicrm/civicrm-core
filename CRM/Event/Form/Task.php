@@ -122,7 +122,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
       return $this->_contactIds;
     }
     foreach ($this->getRows() as $row) {
-      $this->_contactIds[] = $row['contactId'];
+      $this->_contactIds[] = $row['contact_id'];
     }
     return $this->_contactIds;
   }
@@ -158,7 +158,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
    *
    * @throws \API_Exception
    */
-  public function getRows(): array {
+  protected function getRows(): array {
     if (empty($this->rows)) {
       // checkPermissions set to false - in case form is bypassing in some way.
       $participants = Participant::get(FALSE)
@@ -166,9 +166,12 @@ class CRM_Event_Form_Task extends CRM_Core_Form_Task {
         ->setSelect(['id', 'contact_id'])->execute();
       foreach ($participants as $participant) {
         $this->rows[] = [
-          // We map to this funky format for the token processor :-(
-          'contactId' => $participant['contact_id'],
-          'participantId' => $participant['id'],
+          'contact_id' => $participant['contact_id'],
+          'participant_id' => $participant['id'],
+          'schema' => [
+            'contactId' => $participant['contact_id'],
+            'participantId' => $participant['id'],
+          ],
         ];
       }
     }
