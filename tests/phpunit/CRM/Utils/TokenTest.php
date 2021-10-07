@@ -60,8 +60,8 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
    * Test for replaceGreetingTokens.
    *
    */
-  public function testReplaceGreetingTokens() {
-    $tokenString = 'First Name: {contact.first_name} Last Name: {contact.last_name} Birth Date: {contact.birth_date} Prefix: {contact.prefix_id} Suffix: {contact.individual_suffix}';
+  public function testReplaceGreetingTokens(): void {
+    $tokenString = 'First Name: {contact.first_name} Last Name: {contact.last_name} Birth Date: {contact.birth_date} Prefix: {contact.prefix_id:label} Suffix: {contact.individual_suffix}';
     $contactDetails = [
       [
         2811 => [

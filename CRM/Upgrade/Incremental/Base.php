@@ -290,7 +290,7 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
-   * Updated a message token within a template.
+   * Updated a message token within a label.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @param string $old
@@ -302,6 +302,22 @@ class CRM_Upgrade_Incremental_Base {
   public static function updatePrintLabelToken($ctx, string $old, string $new, $version):bool {
     $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
     $messageObj->replaceTokenInPrintLabel($old, $new);
+    return TRUE;
+  }
+
+  /**
+   * Updated a message token within greeting options.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old
+   * @param string $new
+   * @param $version
+   *
+   * @return bool
+   */
+  public static function updateGreetingOptions($ctx, string $old, string $new, $version):bool {
+    $messageObj = new CRM_Upgrade_Incremental_MessageTemplates($version);
+    $messageObj->replaceTokenInGreetingOptions($old, $new);
     return TRUE;
   }
 

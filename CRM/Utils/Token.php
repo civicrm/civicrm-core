@@ -671,7 +671,7 @@ class CRM_Utils_Token {
     // we have to do this because this function is
     // called only when we find a token in the string
 
-    if (!in_array($token, self::$_tokens['contact'])) {
+    if (!in_array(str_replace(':label', '', $token), self::$_tokens['contact'])) {
       $noReplace = TRUE;
     }
     elseif ($token == 'checksum') {
@@ -685,10 +685,10 @@ class CRM_Utils_Token {
       $value = "cs={$cs}";
     }
     else {
-      $value = (array) CRM_Utils_Array::retrieveValueRecursive($contact, $token);
+      $value = (array) CRM_Utils_Array::retrieveValueRecursive($contact, str_replace(':label', '', $token));
 
       foreach ($value as $index => $item) {
-        $value[$index] = self::convertPseudoConstantsUsingMetadata($value[$index], $token);
+        $value[$index] = self::convertPseudoConstantsUsingMetadata($value[$index], str_replace(':label', '', $token));
       }
       $value = implode(', ', $value);
     }

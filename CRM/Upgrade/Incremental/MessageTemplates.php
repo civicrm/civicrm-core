@@ -350,6 +350,28 @@ class CRM_Upgrade_Incremental_MessageTemplates {
   }
 
   /**
+   * Replace a token with the new preferred option in a print label.
+   *
+   * @param string $old
+   * @param string $new
+   *
+   * @throws \API_Exception
+   */
+  public function replaceTokenInGreetingOptions(string $old, string $new): void {
+    $oldToken = '{' . $old . '}';
+    $newToken = '{' . $new . '}';
+    $options = (array) Civi\Api4\OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', 'IN', ['email_greeting', 'postal_greeting', 'addressee'])
+      ->setSelect(['id'])->execute()->indexBy('id');
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value
+      SET
+        label = REPLACE(label, '$oldToken', '$newToken'),
+        name = REPLACE(name, '$oldToken', '$newToken')
+      WHERE id IN (" . implode(',', array_keys($options)) . ')'
+    );
+  }
+
+  /**
    * Get the upgrade messages.
    */
   public function getUpgradeMessages() {
