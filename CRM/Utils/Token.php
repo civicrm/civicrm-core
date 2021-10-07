@@ -1561,6 +1561,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use.
+   *
+   * @deprecated
+   *
    * Replace tokens for an entity.
    * @param string $entity
    * @param array $entityArray
@@ -1872,6 +1876,8 @@ class CRM_Utils_Token {
 
   /**
    * Get all custom field tokens of $entity
+   *
+   * @deprecated
    *
    * @param string $entity
    * @return array
