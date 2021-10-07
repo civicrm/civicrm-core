@@ -53,7 +53,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = [
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      // 'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"{action.forward}\">Forward this email</a></p><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -287,13 +288,44 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
     // 'Preview should not create any mailing_recipient records'
     $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients');
-    $baseurl = CRM_Utils_System::baseCMSURL();
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
-    $this->assertStringContainsString('<a href="' . $baseurl . 'index.php?q=civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=">Forward this email with no protocol</a>', $previewResult['values']['body_html']);
+    $this->assertRegexp('!>Forward this email</a>!', $previewResult['values']['body_html']);
+    $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
     $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
+  }
+
+  /**
+   *
+   */
+  public function testMailerPreviewExtraScheme() {
+    try {
+      \Civi::settings()->set('flexmailer_traditional', 'bao');
+
+      $contactID = $this->individualCreate();
+      $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
+      $displayName = $displayName['values'][$contactID]['display_name'];
+      $this->assertNotEmpty($displayName);
+
+      $params = $this->_params;
+      $params['body_html'] = '<a href="http://{action.forward}">Forward this email written in ckeditor</a>';
+      $params['api.Mailing.preview'] = [
+        'id' => '$value.id',
+        'contact_id' => $contactID,
+      ];
+      $params['options']['force_rollback'] = 1;
+
+      $result = $this->callAPISuccess('mailing', 'create', $params);
+      $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+      $this->assertRegexp('!>Forward this email written in ckeditor</a>!', $previewResult['values']['body_html']);
+      $this->assertRegexp('!<a href="([^"]+)civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+      $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
+
+    } finally {
+      \Civi::settings()->revert('flexmailer_traditional');
+    }
   }
 
   public function testMailerPreviewUnknownContact(): void {
