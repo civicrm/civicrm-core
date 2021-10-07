@@ -98,6 +98,12 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     /* @var CRM_Contact_Form_Task_Email $form*/
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'to' => implode(',', $to),
+      'subject' => 'Really interesting stuff',
+      'bcc_id' => $bcc,
+      'cc_id' => '',
+      'from_email_address' => $loggedInEmail['id'],
+      'html_message' => 'blah',
+      'text_message' => 'blah',
     ]);
     $form->_contactIds = $form_contactIds;
     $form->_contactIds[$deceasedContactID] = $deceasedContactID;
@@ -106,18 +112,14 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     $form->isSearchContext = FALSE;
     $form->buildForm();
-    $form->submit(array_merge($form->_defaultValues, [
-      // @todo - it's better to pass these into getForm
-      // and access them on the form using $this->getSubmittedValue().
-      'from_email_address' => $loggedInEmail['id'],
-      'subject' => 'Really interesting stuff',
-      'bcc_id' => $bcc,
-      'cc_id' => '',
-    ]));
-    $mut->checkMailLog([
-      'This is a test Signature',
-    ]);
-    $mut->stop();
+    $this->assertEquals([
+      'html_message' => '<br/><br/>--<p>This is a test Signature</p>',
+      'text_message' => '
+
+--
+This is a test Signature',
+    ], $form->_defaultValues);
+    $form->postProcess();
     $activity = Activity::get(FALSE)->setSelect(['details'])->execute()->first();
     $bccUrl1 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $bcc1], TRUE);
     $bccUrl2 = CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $bcc2], TRUE);

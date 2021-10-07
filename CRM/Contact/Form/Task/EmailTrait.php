@@ -304,7 +304,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    */
   public function setDefaultValues(): array {
-    $defaults = parent::setDefaultValues();
+    $defaults = parent::setDefaultValues() ?: [];
     $fromEmails = $this->getFromEmails();
     if (is_numeric(key($fromEmails))) {
       $emailID = (int) key($fromEmails);
@@ -365,18 +365,16 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // numerical key where as $from for use in the sendEmail in Activity needs to be of format of "To Name" <toemailaddress>
     $from = CRM_Utils_Mail::formatFromAddress($from);
 
-    $ccArray = $formValues['cc_id'] ? explode(',', $formValues['cc_id']) : [];
-    $cc = $this->getEmailString($ccArray);
-    $additionalDetails = empty($ccArray) ? '' : "\ncc : " . $this->getEmailUrlString($ccArray);
+    $cc = $this->getCc();
+    $additionalDetails = empty($cc) ? '' : "\ncc : " . $this->getEmailUrlString($this->getCcArray());
 
-    $bccArray = $formValues['bcc_id'] ? explode(',', $formValues['bcc_id']) : [];
-    $bcc = $this->getEmailString($bccArray);
-    $additionalDetails .= empty($bccArray) ? '' : "\nbcc : " . $this->getEmailUrlString($bccArray);
+    $bcc = $this->getBcc();
+    $additionalDetails .= empty($bcc) ? '' : "\nbcc : " . $this->getEmailUrlString($this->getBccArray());
 
     // send the mail
     [$sent, $activityIds] = $this->sendEmail(
-      $formValues['text_message'],
-      $formValues['html_message'],
+      $this->getSubmittedValue('text_message'),
+      $this->getSubmittedValue('html_message'),
       $from,
       $this->getAttachments($formValues),
       $cc,
@@ -725,7 +723,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
    *
    * Also insert a contact activity in each contacts record.
    */
-  public function sendEmail(
+  protected function sendEmail(
     $text,
     $html,
     $from,
@@ -829,7 +827,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       'subject' => $subject,
       'details' => $details,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Completed'),
-      'campaign_id' => $campaignID,
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
     ];
     if (!empty($caseID)) {
       $activityParams['case_id'] = $caseID;
@@ -1011,6 +1009,45 @@ trait CRM_Contact_Form_Task_EmailTrait {
    */
   protected function getMessageTokens(): array {
     return CRM_Utils_Token::getTokens($this->getSubject() . $this->getSubmittedValue('html_message') . $this->getSubmittedValue('text_message'));
+  }
+
+  /**
+   * @return string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getBcc(): string {
+    return $this->getEmailString($this->getBccArray());
+  }
+
+  /**
+   * @return string
+   * @throws \API_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getCc(): string {
+    return $this->getEmailString($this->getCcArray());
+  }
+
+  /**
+   * @return array
+   */
+  protected function getCcArray() {
+    if ($this->getSubmittedValue('cc_id')) {
+      return explode(',', $this->getSubmittedValue('cc_id'));
+    }
+    return [];
+  }
+
+  /**
+   * @return array
+   */
+  protected function getBccArray() {
+    $bccArray = [];
+    if ($this->getSubmittedValue('bcc_id')) {
+      $bccArray = explode(',', $this->getSubmittedValue('bcc_id'));
+    }
+    return $bccArray;
   }
 
 }
