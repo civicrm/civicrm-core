@@ -328,6 +328,14 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
 
     $this->assertEquals(2, $totalEntityFiles, 'Two files should be attached with new case.');
+
+    // delete original files
+    unlink($fileA['values']['uri']);
+    unlink($fileB['values']['uri']);
+    // find out the hashed name of the attached file
+    foreach (CRM_Core_BAO_File::getEntityFile($customGroup['table_name'], $newCase[0]) as $file) {
+      unlink($file['fullPath']);
+    }
   }
 
   /**
