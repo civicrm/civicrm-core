@@ -57,11 +57,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    foreach ($this->getTokenMetadata() as $field) {
+    foreach ($this->getTokenMetadata() as $tokenName => $field) {
       if ($field['audience'] === 'user') {
         $e->register([
           'entity' => $this->entity,
-          'field' => $field['name'],
+          'field' => $tokenName,
           'label' => $field['title'],
         ]);
       }
@@ -83,31 +83,30 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $this->tokensMetadata = Civi::cache('metadata')->get($cacheKey);
       }
       else {
-        foreach (array_merge($this->getFieldMetadata(), $this->getBespokeTokens()) as $field) {
-          if (
-            $field['type'] === 'Custom'
-            || !empty($this->getBespokeTokens()[$field['name']])
-            || in_array($field['name'], $this->getExposedFields(), TRUE)
-          ) {
-            $field['audience'] = 'user';
-            if ($field['name'] === 'contact_id') {
-              // Since {contact.id} is almost always present don't confuse users
-              // by also adding (e.g {participant.contact_id)
-              $field['audience'] = 'sysadmin';
-            }
-            if (!empty($this->getTokenMetadataOverrides()[$field['name']])) {
-              $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
-            }
-            if ($field['type'] === 'Custom') {
-              // Convert to apiv3 style for now. Later we can add v4 with
-              // portable naming & support for labels/ dates etc so let's leave
-              // the space open for that.
-              // Not the existing quickform widget has handling for the custom field
-              // format based on the title using this syntax.
-              $field['name'] = 'custom_' . $field['custom_field_id'];
-              $parts = explode(': ', $field['label']);
-              $field['title'] = "{$parts[1]} :: {$parts[0]}";
-            }
+        $this->tokensMetadata = $this->getBespokeTokens();
+        foreach ($this->getFieldMetadata() as $field) {
+          $field['audience'] = 'user';
+          if ($field['name'] === 'contact_id') {
+            // Since {contact.id} is almost always present don't confuse users
+            // by also adding (e.g {participant.contact_id)
+            $field['audience'] = 'sysadmin';
+          }
+          if (!empty($this->getTokenMetadataOverrides()[$field['name']])) {
+            $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
+          }
+          if ($field['type'] === 'Custom') {
+            // Convert to apiv3 style for now. Later we can add v4 with
+            // portable naming & support for labels/ dates etc so let's leave
+            // the space open for that.
+            // Not the existing quickform widget has handling for the custom field
+            // format based on the title using this syntax.
+            $parts = explode(': ', $field['label']);
+            $field['title'] = "{$parts[1]} :: {$parts[0]}";
+            $tokenName = 'custom_' . $field['custom_field_id'];
+            $this->tokensMetadata[$tokenName] = $field;
+            continue;
+          }
+          if (in_array($field['name'], $this->getExposedFields(), TRUE)) {
             if (
               ($field['options'] || !empty($field['suffixes']))
               // At the time of writing currency didn't have a label option - this may have changed.
@@ -247,7 +246,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isBooleanField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
+    return $this->getMetadataForField($fieldName)['data_type'] === 'Boolean';
   }
 
   /**
@@ -258,7 +257,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isDateField(string $fieldName): bool {
-    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
+    return in_array($this->getMetadataForField($fieldName)['data_type'], ['Timestamp', 'Date'], TRUE);
   }
 
   /**
@@ -291,7 +290,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return bool
    */
   public function isMoneyField(string $fieldName): bool {
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Money';
+    return $this->getMetadataForField($fieldName)['data_type'] === 'Money';
   }
 
   /**
@@ -553,7 +552,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return string
    */
   protected function getCustomFieldName(int $id): string {
-    foreach ($this->getFieldMetadata() as $key => $field) {
+    foreach ($this->getTokenMetadata() as $key => $field) {
       if (($field['custom_field_id'] ?? NULL) === $id) {
         return $key;
       }
@@ -570,10 +569,33 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getCustomFieldValue($entityID, string $field) {
     $id = str_replace('custom_', '', $field);
-    $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? NULL;
+    $value = $this->prefetch[$entityID][$this->getCustomFieldName($id)] ?? '';
     if ($value !== NULL) {
       return CRM_Core_BAO_CustomField::displayValue($value, $id);
     }
+  }
+
+  /**
+   * Get the metadata for the field.
+   *
+   * @param string $fieldName
+   *
+   * @return array
+   */
+  protected function getMetadataForField($fieldName): array {
+    if (isset($this->getTokenMetadata()[$fieldName])) {
+      return $this->getTokenMetadata()[$fieldName];
+    }
+    return $this->getTokenMetadata()[$this->getDeprecatedTokens()[$fieldName]];
+  }
+
+  /**
+   * Get array of deprecated tokens and the new token they map to.
+   *
+   * @return array
+   */
+  protected function getDeprecatedTokens(): array {
+    return [];
   }
 
   /**
