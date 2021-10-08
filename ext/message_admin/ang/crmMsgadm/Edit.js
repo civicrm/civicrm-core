@@ -257,7 +257,11 @@
           }
           return acc;
         }, []),
-        title: ts('Preview')
+        filterData: function(data) {
+          data.modelProps.locale = $ctrl.lang;
+          return data;
+        },
+        title: $ctrl.lang ? ts('Preview - %1', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang}) : ts('Preview')
       };
 
       crmApi4({

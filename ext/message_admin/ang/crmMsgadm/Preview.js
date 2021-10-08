@@ -39,6 +39,9 @@
         }).then(function(response){
           dlgModel.title = ts('Example: %1', {1: response[0].title || response[0].name});
           dlgModel.data = response[0];
+          if (model.filterData && dlgModel.data.data) {
+            dlgModel.data['data(filtered)'] = model.filterData(angular.copy(dlgModel.data.data));
+          }
         });
       };
 
@@ -76,10 +79,11 @@
       //   $ctrl.preview = model.revisions[$ctrl.revisionId].rec;
       $ctrl.preview = {loading: true};
       var rendering = $ctrl.isAdhocExample ? requestAdhocExample() : requestStoredExample();
-      rendering.then(function(exampleData){
+      rendering.then(function(exampleData) {
+        var filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
-          workflow: exampleData.workflow,
-          values: exampleData.modelProps,
+          workflow: filteredData.workflow,
+          values: filteredData.modelProps,
           messageTemplate: model.revisions[$ctrl.revisionId].rec
         });
       }).then(function(response) {
