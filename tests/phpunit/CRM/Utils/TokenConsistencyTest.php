@@ -259,7 +259,6 @@ case.custom_1 :' . '
     ]);
     $contactID = $this->individualCreate(['middle_name' => '']);
     $tokenProcessor->addRow(['contactId' => $contactID]);
-    $tokenProcessor->evaluate();
     foreach ($variants as $index => $variant) {
       $tokenProcessor->addMessage($index, $variant['string'], 'text/plain');
     }
@@ -268,8 +267,8 @@ case.custom_1 :' . '
     foreach ($variants as $index => $variant) {
       $greetingString = $variant['string'];
       CRM_Utils_Token::replaceGreetingTokens($greetingString, $this->callAPISuccessGetSingle('Contact', ['id' => $contactID]), $contactID);
-      $this->assertEquals($variant['expected'], $greetingString);
-      $this->assertEquals($variant['expected'], $result->render($index));
+      $this->assertEquals($variant['expected'], $greetingString, 'replaceGreetingTokens() should render expected output');
+      $this->assertEquals($variant['expected'], $result->render($index), 'TokenProcessor should render expected output');
     }
   }
 
