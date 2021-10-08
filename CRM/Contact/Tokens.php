@@ -57,12 +57,18 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    foreach (array_merge($this->getContactTokens(), $this->getCustomFieldTokens()) as $name => $label) {
-      $e->register([
-        'entity' => $this->entity,
-        'field' => $name,
-        'label' => $label,
-      ]);
+    $relatedTokens = array_flip($this->getTokenMappingsForRelatedEntities());
+    foreach ($this->getTokenMetadata() as $tokenName => $field) {
+      if ($field['audience'] === 'user') {
+        $e->register([
+          'entity' => $this->entity,
+          // Preserve legacy token names. It generally feels like
+          // it would be good to switch to the more specific token names
+          // but other code paths are still in use which can't handle them.
+          'field' => $relatedTokens[$tokenName] ?? $tokenName,
+          'label' => $field['title'],
+        ]);
+      }
     }
     foreach ($this->getLegacyHookTokens() as $legacyHookToken) {
       $e->register([
@@ -90,7 +96,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   /**
    * @return string
    */
-  public function getEntityIDField(): string {
+  protected function getEntityIDField(): string {
     return 'contactId';
   }
 
@@ -104,7 +110,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    *
    * @return array
    */
-  public function getLegacyHookTokens(): array {
+  protected function getLegacyHookTokens(): array {
     $tokens = [];
     $hookTokens = [];
     \CRM_Utils_Hook::tokens($hookTokens);
@@ -134,105 +140,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getCustomFieldTokens(): array {
-    $tokens = [];
-    $customFields = \CRM_Core_BAO_CustomField::getFields(['Individual', 'Address', 'Contact']);
-    foreach ($customFields as $customField) {
-      $tokens['custom_' . $customField['id']] = $customField['label'] . " :: " . $customField['groupTitle'];
-    }
-    return $tokens;
-  }
-
-  /**
    * Get all tokens advertised as contact tokens.
    *
    * @return string[]
    */
-  public function getContactTokens(): array {
-    return [
-      'contact_type' => 'Contact Type',
-      'do_not_email' => 'Do Not Email',
-      'do_not_phone' => 'Do Not Phone',
-      'do_not_mail' => 'Do Not Mail',
-      'do_not_sms' => 'Do Not Sms',
-      'do_not_trade' => 'Do Not Trade',
-      'is_opt_out' => 'No Bulk Emails (User Opt Out)',
-      'external_identifier' => 'External Identifier',
-      'sort_name' => 'Sort Name',
-      'display_name' => 'Display Name',
-      'nick_name' => 'Nickname',
-      'image_URL' => 'Image Url',
-      'preferred_communication_method:label' => 'Preferred Communication Method',
-      'preferred_language:label' => 'Preferred Language',
-      'preferred_mail_format:label' => 'Preferred Mail Format',
-      'hash' => 'Contact Hash',
-      'source' => 'Contact Source',
-      'first_name' => 'First Name',
-      'middle_name' => 'Middle Name',
-      'last_name' => 'Last Name',
-      'prefix_id:label' => 'Individual Prefix',
-      'suffix_id:label' => 'Individual Suffix',
-      'formal_title' => 'Formal Title',
-      'communication_style_id:label' => 'Communication Style',
-      'job_title' => 'Job Title',
-      'gender_id:label' => 'Gender ID',
-      'birth_date' => 'Birth Date',
-      'current_employer_id' => 'Current Employer ID',
-      'is_deleted:label' => 'Contact is in Trash',
-      'created_date' => 'Created Date',
-      'modified_date' => 'Modified Date',
-      'addressee_display' => 'Addressee',
-      'email_greeting_display' => 'Email Greeting',
-      'postal_greeting_display' => 'Postal Greeting',
-      'current_employer' => 'Current Employer',
-      'location_type' => 'Location Type',
-      'address_id' => 'Address ID',
-      'street_address' => 'Street Address',
-      'street_number' => 'Street Number',
-      'street_number_suffix' => 'Street Number Suffix',
-      'street_name' => 'Street Name',
-      'street_unit' => 'Street Unit',
-      'supplemental_address_1' => 'Supplemental Address 1',
-      'supplemental_address_2' => 'Supplemental Address 2',
-      'supplemental_address_3' => 'Supplemental Address 3',
-      'city' => 'City',
-      'postal_code_suffix' => 'Postal Code Suffix',
-      'postal_code' => 'Postal Code',
-      'geo_code_1' => 'Latitude',
-      'geo_code_2' => 'Longitude',
-      'manual_geo_code' => 'Is Manually Geocoded',
-      'address_name' => 'Address Name',
-      'master_id' => 'Master Address ID',
-      'county' => 'County',
-      'state_province' => 'State',
-      'country' => 'Country',
-      'phone' => 'Phone',
-      'phone_ext' => 'Phone Extension',
-      'phone_type_id' => 'Phone Type ID',
-      'phone_type' => 'Phone Type',
-      'email' => 'Email',
-      'on_hold' => 'On Hold',
-      'signature_text' => 'Signature Text',
-      'signature_html' => 'Signature Html',
-      'im_provider' => 'IM Provider',
-      'im' => 'IM Screen Name',
-      'openid' => 'OpenID',
-      'world_region' => 'World Region',
-      'url' => 'Website',
-      'checksum' => 'Checksum',
-      'id' => 'Internal Contact ID',
-    ];
-  }
-
-  /**
-   * Get all tokens advertised as contact tokens.
-   *
-   * @return string[]
-   */
-  public function getExposedFields(): array {
+  protected function getExposedFields(): array {
     return [
       'contact_type',
       'do_not_email',
@@ -375,7 +287,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     if (empty($messageTokens)) {
       return;
     }
-    $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId']) && empty($row->context['contact'])) {
@@ -399,28 +310,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $row->format('text/html')
             ->tokens('contact', $token, "cs={$cs}");
         }
-        elseif (!empty($row->context['contact'][$token]) &&
-          $this->isDateField($token)
-        ) {
-          // Handle dates here, for now. Standardise with other token entities next round
-          $row->format('text/plain')->tokens('contact', $token, \CRM_Utils_Date::customFormat($row->context['contact'][$token]));
-        }
-        elseif (
-          ($row->context['contact'][$token] ?? '') == 0
-          && $this->isBooleanField($token)) {
-          // Note this will be the default behaviour once we fetch with apiv4.
-          $row->format('text/plain')->tokens('contact', $token, '');
-        }
         elseif ($token === 'signature_html') {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
         }
         else {
-          $value = $this->getFieldValue($row, $token);
-          if (is_array($value)) {
-            $value = implode(',', $value);
-          }
-          $row->format('text/html')
-            ->tokens('contact', $token, $value);
+          parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);
         }
       }
     }
@@ -456,41 +350,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Is the given field a boolean field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isBooleanField(string $fieldName): bool {
-    // no metadata for these 2 non-standard fields
-    // @todo - fix to api v4 & have metadata for all fields. Migrate contact_is_deleted
-    // to {contact.is_deleted}. on hold feels like a token that exists by
-    // accident & could go.... since it's not from the main entity.
-    if (in_array($fieldName, ['contact_is_deleted', 'on_hold'])) {
-      return TRUE;
-    }
-    if (empty($this->getFieldMetadata()[$fieldName])) {
-      return FALSE;
-    }
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
-  }
-
-  /**
-   * Is the given field a date field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isDateField(string $fieldName): bool {
-    if (empty($this->getFieldMetadata()[$fieldName])) {
-      return FALSE;
-    }
-    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
-  }
-
-  /**
    * Get the metadata for the available fields.
    *
    * @return array
@@ -516,10 +375,17 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       foreach ($metadata as $field) {
         $this->addFieldToTokenMetadata($field, $exposedFields, 'primary_' . $entity);
       }
-      // Manually add in the abbreviated state province as that maps to
-      // what has traditionally been delivered.
-      $this->tokensMetadata['primary_address.state_province_id:abbr'] = $this->tokensMetadata['primary_address.state_province_id:label'];
     }
+    // Manually add in the abbreviated state province as that maps to
+    // what has traditionally been delivered.
+    $this->tokensMetadata['primary_address.state_province_id:abbr'] = $this->tokensMetadata['primary_address.state_province_id:label'];
+    $this->tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $this->tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
+    // Hide the label for now because we are not sure if there are paths
+    // where legacy token resolution is in play where this could not be resolved.
+    $this->tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
+    // Hide this really obscure one. Just cos it annoys me.
+    $this->tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
     Civi::cache('metadata')->set($this->getCacheKey(), $this->tokensMetadata);
     return $this->tokensMetadata;
   }
@@ -686,6 +552,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     return [
       'individual_prefix' => 'prefix_id:label',
       'individual_suffix' => 'suffix_id:label',
+      'contact_type' => 'contact_type:label',
       'gender' => 'gender_id:label',
       'communication_style' => 'communication_style_id:label',
       'preferred_communication_method' => 'preferred_communication_method:label',
@@ -694,7 +561,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'addressee' => 'addressee_display',
       'contact_id' => 'id',
       'contact_source' => 'source',
-      'contact_is_deleted' => 'is_deleted:label',
+      'contact_is_deleted' => 'is_deleted',
       'current_employer_id' => 'employer_id',
     ];
   }
@@ -716,7 +583,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getTokenMappingsForRelatedEntities(): array {
     return [
-      'on_hold' => 'primary_email.on_hold:label',
+      'on_hold' => 'primary_email.on_hold',
       'on_hold:label' => 'primary_email.on_hold:label',
       'phone_type_id' => 'primary_phone.phone_type_id',
       'phone_type_id:label' => 'primary_phone.phone_type_id:label',
@@ -743,12 +610,10 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'master_id' => 'primary_address.master_id',
       'county' => 'primary_address.county_id:label',
       'county_id' => 'primary_address.county_id',
-      'county_id:label' => 'primary_address.county_id:label',
       'state_province' => 'primary_address.state_province_id:abbr',
       'state_province_id' => 'primary_address.state_province_id',
       'country' => 'primary_address.country_id:label',
       'country_id' => 'primary_address.country_id',
-      'country_id:label' => 'primary_address.country_id:label',
       'world_region' => 'primary_address.country_id.region_id:name',
       'phone_type' => 'primary_phone.phone_type_id:label',
       'phone' => 'primary_phone.phone',
