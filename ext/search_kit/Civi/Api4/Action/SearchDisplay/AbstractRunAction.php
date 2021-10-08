@@ -339,6 +339,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       // Select value fields for in-place editing
       if (isset($column['editable']['value'])) {
         $additions[] = $column['editable']['value'];
+        $additions[] = $column['editable']['id'];
       }
     }
     // Add fields referenced via token
