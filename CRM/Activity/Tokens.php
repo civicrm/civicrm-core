@@ -15,6 +15,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
@@ -34,21 +35,6 @@ use Civi\Token\TokenRow;
  */
 class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
 
-  use CRM_Core_TokenTrait;
-
-  /**
-   * Class constructor.
-   *
-   * Overriding because the trait needs this to happen & trying to
-   * leave any changes that affect the trait out of scope here.
-   */
-  public function __construct() {
-    $this->entity = 'activity';
-    $this->tokenNames = array_merge(
-      $this->getBasicTokens(),
-      $this->getCustomFieldTokens());
-  }
-
   /**
    * Get the entity name for api v4 calls.
    *
@@ -59,38 +45,10 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @return string
-   */
-  private function getEntityTableName(): string {
-    return 'civicrm_activity';
-  }
-
-  /**
-   * @return string
-   */
-  private function getEntityContextSchema(): string {
-    return 'activityId';
-  }
-
-  /**
-   * Mapping from tokenName to api return field
-   * Using arrays allows more complex tokens to be handled that require more than one API field.
-   * For example, an address token might want ['street_address', 'city', 'postal_code']
-   *
-   * @var array
-   */
-  private static $fieldMapping = [
-    'activity_id' => ['id'],
-    'activity_type' => ['activity_type_id'],
-    'status' => ['status_id'],
-    'campaign' => ['campaign_id'],
-  ];
-
-  /**
    * @inheritDoc
    */
-  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
-    if ($e->mapping->getEntity() !== $this->getEntityTableName()) {
+  public function alterActionScheduleQuery(MailingQueryEvent $e): void {
+    if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
       return;
     }
 
@@ -98,7 +56,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
     // Multiple revisions of the activity.
     // Q: Could we simplify & move the extra AND clauses into `where(...)`?
     $e->query->param('casEntityJoinExpr', 'e.id = reminder.entity_id AND e.is_current_revision = 1 AND e.is_deleted = 0');
-    $e->query->select('e.id AS tokenContext_' . $this->getEntityContextSchema());
+    parent::alterActionScheduleQuery($e);
   }
 
   /**
@@ -116,14 +74,14 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $activityId = $row->context[$this->getEntityContextSchema()];
+    $activityId = $this->getFieldValue($row, 'id');
 
     if (!empty($this->getDeprecatedTokens()[$field])) {
       $realField = $this->getDeprecatedTokens()[$field];
       parent::evaluateToken($row, $entity, $realField, $prefetch);
       $row->format('text/plain')->tokens($entity, $field, $row->tokens['activity'][$realField]);
     }
-    elseif (in_array($field, ['case_id'])) {
+    elseif ($field === 'case_id') {
       // An activity can be linked to multiple cases so case_id is always an array.
       // We just return the first case ID for the token.
       // this weird hack might exist because apiv3 is weird &
@@ -133,32 +91,6 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
     else {
       parent::evaluateToken($row, $entity, $field, $prefetch);
     }
-  }
-
-  /**
-   * Get the basic tokens provided.
-   *
-   * @return array token name => token label
-   */
-  public function getBasicTokens(): array {
-    if (!isset($this->basicTokens)) {
-      $this->basicTokens = [
-        'id' => ts('Activity ID'),
-        'subject' => ts('Activity Subject'),
-        'details' => ts('Activity Details'),
-        'activity_date_time' => ts('Activity Date-Time'),
-        'created_date' => ts('Activity Created Date'),
-        'modified_date' => ts('Activity Modified Date'),
-        'activity_type_id' => ts('Activity Type ID'),
-        'status_id' => ts('Activity Status ID'),
-        'location' => ts('Activity Location'),
-        'duration' => ts('Activity Duration'),
-      ];
-      if (CRM_Campaign_BAO_Campaign::isCampaignEnable()) {
-        $this->basicTokens['campaign_id'] = ts('Campaign ID');
-      }
-    }
-    return $this->basicTokens;
   }
 
   /**
@@ -220,19 +152,13 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
     }
 
     $activeTokens = [];
-    // if message token contains '_\d+_', then treat as '_N_'
     foreach ($messageTokens[$this->entity] as $msgToken) {
-      if (array_key_exists($msgToken, $this->tokensMetadata)) {
+      if (array_key_exists($msgToken, $this->getTokenMetadata())) {
         $activeTokens[] = $msgToken;
       }
-      elseif (in_array($msgToken, ['campaign', 'activity_id', 'status', 'activity_type', 'case_id'])) {
+      // case_id is probably set in metadata anyway.
+      elseif ($msgToken === 'case_id' || isset($this->getDeprecatedTokens()[$msgToken])) {
         $activeTokens[] = $msgToken;
-      }
-      else {
-        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
-        if (array_key_exists($altToken, $this->tokenNames)) {
-          $activeTokens[] = $msgToken;
-        }
       }
     }
     return array_unique($activeTokens);

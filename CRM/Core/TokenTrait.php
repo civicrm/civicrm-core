@@ -46,12 +46,6 @@ trait CRM_Core_TokenTrait {
       if (array_key_exists($msgToken, $this->tokenNames)) {
         $activeTokens[] = $msgToken;
       }
-      else {
-        $altToken = preg_replace('/_\d+_/', '_N_', $msgToken);
-        if (array_key_exists($altToken, $this->tokenNames)) {
-          $activeTokens[] = $msgToken;
-        }
-      }
     }
     return array_unique($activeTokens);
   }
