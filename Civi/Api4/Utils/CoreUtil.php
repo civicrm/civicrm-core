@@ -13,6 +13,7 @@
 namespace Civi\Api4\Utils;
 
 use Civi\API\Request;
+use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
 class CoreUtil {
@@ -43,13 +44,9 @@ class CoreUtil {
    * @return string|\Civi\Api4\Generic\AbstractEntity
    */
   public static function getApiClass($entityName) {
-    if (strpos($entityName, 'Custom_') === 0) {
-      $groupName = substr($entityName, 7);
-      return self::isCustomEntity($groupName) ? 'Civi\Api4\CustomValue' : NULL;
-    }
-    // Because "Case" is a reserved php keyword
-    $className = 'Civi\Api4\\' . ($entityName === 'Case' ? 'CiviCase' : $entityName);
-    return class_exists($className) ? $className : NULL;
+    $e = new CreateApi4RequestEvent($entityName);
+    \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
+    return $e->className;
   }
 
   /**
@@ -164,7 +161,7 @@ class CoreUtil {
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  private static function isCustomEntity($customGroupName) {
+  public static function isCustomEntity($customGroupName) {
     return $customGroupName && \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'is_multiple', 'name');
   }
 

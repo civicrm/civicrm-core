@@ -10,7 +10,7 @@
  */
 namespace Civi\API;
 
-use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Event\CreateApi4RequestEvent;
 
 /**
  * Class Request
@@ -45,17 +45,13 @@ class Request {
         ];
 
       case 4:
-        // For custom pseudo-entities
-        if (strpos($entity, 'Custom_') === 0) {
-          $apiRequest = \Civi\Api4\CustomValue::$action(substr($entity, 7));
+        $e = new CreateApi4RequestEvent($entity);
+        \Civi::dispatcher()->dispatch('civi.api4.createRequest', $e);
+        $callable = [$e->className, $action];
+        if (!$e->className || !is_callable($callable)) {
+          throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
         }
-        else {
-          $callable = [CoreUtil::getApiClass($entity), $action];
-          if (!is_callable($callable)) {
-            throw new \Civi\API\Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
-          }
-          $apiRequest = call_user_func($callable);
-        }
+        $apiRequest = call_user_func_array($callable, $e->args);
         foreach ($params as $name => $param) {
           $setter = 'set' . ucfirst($name);
           $apiRequest->$setter($param);
