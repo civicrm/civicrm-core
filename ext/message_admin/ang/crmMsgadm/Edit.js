@@ -245,11 +245,6 @@
     // Ex: $rootScope.$emit('previewMsgTpl', {revisionName: 'txDraft', formatName: 'msg_text'})
     function onPreview(event, args) {
       var defaults = {
-        // exampleName: 'fix-this-example',
-        // examples: [
-        //   {id: 0, name: 'fix-this-example', title: ts('Fix this example')},
-        //   {id: 1, name: 'another-example', title: ts('Another example')}
-        // ],
         formatName: 'msg_html',
         formats: [
           {id: 0, name: 'msg_html', label: ts('HTML')},
