@@ -56,13 +56,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     if (!$this->checkActive($e->getTokenProcessor())) {
       return;
     }
-    foreach (array_merge($this->getContactTokens(), $this->getCustomFieldTokens()) as $name => $label) {
-      $e->register([
-        'entity' => $this->entity,
-        'field' => $name,
-        'label' => $label,
-      ]);
-    }
+    parent::registerTokens($e);
     foreach ($this->getLegacyHookTokens() as $legacyHookToken) {
       $e->register([
         'entity' => $legacyHookToken['category'],
@@ -133,96 +127,85 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  public function getCustomFieldTokens(): array {
-    $tokens = [];
-    $customFields = \CRM_Core_BAO_CustomField::getFields(['Individual', 'Address', 'Contact']);
-    foreach ($customFields as $customField) {
-      $tokens['custom_' . $customField['id']] = $customField['label'] . " :: " . $customField['groupTitle'];
-    }
-    return $tokens;
-  }
-
-  /**
    * Get all tokens advertised as contact tokens.
    *
    * @return string[]
    */
-  public function getContactTokens(): array {
+  public function getExposedFields(): array {
     return [
-      'contact_type' => 'Contact Type',
-      'do_not_email' => 'Do Not Email',
-      'do_not_phone' => 'Do Not Phone',
-      'do_not_mail' => 'Do Not Mail',
-      'do_not_sms' => 'Do Not Sms',
-      'do_not_trade' => 'Do Not Trade',
-      'is_opt_out' => 'No Bulk Emails (User Opt Out)',
-      'external_identifier' => 'External Identifier',
-      'sort_name' => 'Sort Name',
-      'display_name' => 'Display Name',
-      'nick_name' => 'Nickname',
-      'image_URL' => 'Image Url',
-      'preferred_communication_method:label' => 'Preferred Communication Method',
-      'preferred_language:label' => 'Preferred Language',
-      'preferred_mail_format:label' => 'Preferred Mail Format',
-      'hash' => 'Contact Hash',
-      'source' => 'Contact Source',
-      'first_name' => 'First Name',
-      'middle_name' => 'Middle Name',
-      'last_name' => 'Last Name',
-      'prefix_id:label' => 'Individual Prefix',
-      'suffix_id:label' => 'Individual Suffix',
-      'formal_title' => 'Formal Title',
-      'communication_style_id:label' => 'Communication Style',
-      'job_title' => 'Job Title',
-      'gender_id:label' => 'Gender ID',
-      'birth_date' => 'Birth Date',
-      'current_employer_id' => 'Current Employer ID',
-      'is_deleted:label' => 'Contact is in Trash',
-      'created_date' => 'Created Date',
-      'modified_date' => 'Modified Date',
-      'addressee_display' => 'Addressee',
-      'email_greeting_display' => 'Email Greeting',
-      'postal_greeting_display' => 'Postal Greeting',
-      'current_employer' => 'Current Employer',
-      'location_type' => 'Location Type',
-      'address_id' => 'Address ID',
-      'street_address' => 'Street Address',
-      'street_number' => 'Street Number',
-      'street_number_suffix' => 'Street Number Suffix',
-      'street_name' => 'Street Name',
-      'street_unit' => 'Street Unit',
-      'supplemental_address_1' => 'Supplemental Address 1',
-      'supplemental_address_2' => 'Supplemental Address 2',
-      'supplemental_address_3' => 'Supplemental Address 3',
-      'city' => 'City',
-      'postal_code_suffix' => 'Postal Code Suffix',
-      'postal_code' => 'Postal Code',
-      'geo_code_1' => 'Latitude',
-      'geo_code_2' => 'Longitude',
-      'manual_geo_code' => 'Is Manually Geocoded',
-      'address_name' => 'Address Name',
-      'master_id' => 'Master Address ID',
-      'county' => 'County',
-      'state_province' => 'State',
-      'country' => 'Country',
-      'phone' => 'Phone',
-      'phone_ext' => 'Phone Extension',
-      'phone_type_id' => 'Phone Type ID',
-      'phone_type' => 'Phone Type',
-      'email' => 'Email',
-      'on_hold' => 'On Hold',
-      'signature_text' => 'Signature Text',
-      'signature_html' => 'Signature Html',
-      'im_provider' => 'IM Provider',
-      'im' => 'IM Screen Name',
-      'openid' => 'OpenID',
-      'world_region' => 'World Region',
-      'url' => 'Website',
-      'checksum' => 'Checksum',
-      'id' => 'Internal Contact ID',
+      'contact_type',
+      'do_not_email',
+      'do_not_phone',
+      'do_not_mail',
+      'do_not_sms',
+      'do_not_trade',
+      'is_opt_out',
+      'external_identifier',
+      'sort_name',
+      'display_name',
+      'nick_name',
+      'image_URL',
+      'preferred_communication_method',
+      'preferred_language',
+      'preferred_mail_format',
+      'hash',
+      'source',
+      'first_name',
+      'middle_name',
+      'last_name',
+      'prefix_id',
+      'suffix_id',
+      'formal_title',
+      'communication_style_id',
+      'job_title',
+      'gender_id',
+      'birth_date',
+      'employer_id',
+      'is_deleted',
+      'created_date',
+      'modified_date',
+      'addressee_display',
+      'email_greeting_display',
+      'postal_greeting_display',
+      'checksum',
+      'id',
+    ];
+  }
+
+  /**
+   * Get the fields exposed from related entities.
+   *
+   * @return \string[][]
+   */
+  protected function getRelatedEntityTokenMetadata(): array {
+    return [
+      'address' => [
+        'location_type_id',
+        'id',
+        'street_address',
+        'street_number',
+        'street_number_suffix',
+        'street_name',
+        'street_unit',
+        'supplemental_address_1',
+        'supplemental_address_2',
+        'supplemental_address_3',
+        'city',
+        'postal_code_suffix',
+        'postal_code',
+        'geo_code_1',
+        'geo_code_2',
+        'name',
+        'master_id',
+        'county_id',
+        'state_province_id',
+        'country_id',
+      ],
+      'phone' => ['phone', 'phone_ext', 'phone_type_id'],
+      'email' => ['email', 'signature_html', 'signature_text', 'on_hold'],
+      'website' => ['url'],
+      'OpenID' => ['openid'],
+      'im' => ['name', 'provider_id'],
     ];
   }
 
@@ -290,7 +273,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     if (empty($messageTokens)) {
       return;
     }
-    $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
 
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId']) && empty($row->context['contact'])) {
@@ -314,24 +296,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $row->format('text/html')
             ->tokens('contact', $token, "cs={$cs}");
         }
-        elseif (!empty($row->context['contact'][$token]) &&
-          $this->isDateField($token)
-        ) {
-          // Handle dates here, for now. Standardise with other token entities next round
-          $row->format('text/plain')->tokens('contact', $token, \CRM_Utils_Date::customFormat($row->context['contact'][$token]));
-        }
-        elseif (
-          ($row->context['contact'][$token] ?? '') == 0
-          && $this->isBooleanField($token)) {
-          // Note this will be the default behaviour once we fetch with apiv4.
-          $row->format('text/plain')->tokens('contact', $token, '');
-        }
         elseif ($token === 'signature_html') {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
         }
         else {
-          $row->format('text/html')
-            ->tokens('contact', $token, $this->getFieldValue($row, $token));
+          parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);
         }
       }
     }
@@ -367,56 +336,42 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Is the given field a boolean field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isBooleanField(string $fieldName): bool {
-    // no metadata for these 2 non-standard fields
-    // @todo - fix to api v4 & have metadata for all fields. Migrate contact_is_deleted
-    // to {contact.is_deleted}. on hold feels like a token that exists by
-    // accident & could go.... since it's not from the main entity.
-    if (in_array($fieldName, ['contact_is_deleted', 'on_hold'])) {
-      return TRUE;
-    }
-    if (empty($this->getFieldMetadata()[$fieldName])) {
-      return FALSE;
-    }
-    return $this->getFieldMetadata()[$fieldName]['data_type'] === 'Boolean';
-  }
-
-  /**
-   * Is the given field a date field.
-   *
-   * @param string $fieldName
-   *
-   * @return bool
-   */
-  public function isDateField(string $fieldName): bool {
-    if (empty($this->getFieldMetadata()[$fieldName])) {
-      return FALSE;
-    }
-    return in_array($this->getFieldMetadata()[$fieldName]['data_type'], ['Timestamp', 'Date'], TRUE);
-  }
-
-  /**
    * Get the metadata for the available fields.
    *
    * @return array
+   * @noinspection PhpDocMissingThrowsInspection
+   * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getFieldMetadata(): array {
-    if (empty($this->fieldMetadata)) {
-      try {
-        // Tests fail without checkPermissions = FALSE
-        $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
-      }
-      catch (\API_Exception $e) {
-        $this->fieldMetadata = [];
+  protected function getTokenMetadata(): array {
+    if ($this->tokensMetadata) {
+      return $this->tokensMetadata;
+    }
+    if (Civi::cache('metadata')->has($this->getCacheKey())) {
+      return Civi::cache('metadata')->get($this->getCacheKey());
+    }
+    $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
+    $this->tokensMetadata = $this->getBespokeTokens();
+    foreach ($this->fieldMetadata as $field) {
+      $this->addFieldToTokenMetadata($field, $this->getExposedFields());
+    }
+
+    foreach ($this->getRelatedEntityTokenMetadata() as $entity => $exposedFields) {
+      $metadata = (array) civicrm_api4($entity, 'getfields', ['checkPermissions' => FALSE], 'name');
+      foreach ($metadata as $field) {
+        if (!in_array($field['name'], ['name', 'id'])) {
+          // The original thought was to support apiv4 join prefixes for
+          // tokens across the board - advertising {contact.primary_address.street_name}
+          // and providing less visible support for {contact.billing_address.street_name}
+          // for workflow templates. That change seems a bit too ambitious for now
+          // so only the field that does not map to the real db name is being prefixed
+          // for now.
+          $field['advertised_name'] = $field['name'];
+        }
+        $this->addFieldToTokenMetadata($field, $exposedFields, 'primary_' . $entity);
       }
     }
-    return $this->fieldMetadata;
+    Civi::cache('metadata')->set($this->getCacheKey(), $this->tokensMetadata);
+    return $this->tokensMetadata;
   }
 
   /**
@@ -556,7 +511,10 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     return [
       'individual_prefix' => 'prefix_id:label',
       'individual_suffix' => 'suffix_id:label',
+      'contact_type' => 'contact_type:label',
       'gender' => 'gender_id:label',
+      'address_name' => 'primary_address.name',
+      'address_id' => 'primary_address.id',
       'communication_style' => 'communication_style_id:label',
       'preferred_communication_method' => 'preferred_communication_method:label',
       'email_greeting' => 'email_greeting_display',
@@ -565,6 +523,112 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'contact_id' => 'id',
       'contact_source' => 'source',
       'contact_is_deleted' => 'is_deleted:label',
+      'current_employer_id' => 'employer_id',
+      'current_employer' => 'employer_id.display_name',
+    ];
+  }
+
+  /**
+   * Get the tokens that are accessed by joining onto a related entity.
+   *
+   * Note the original thinking was to migrate to advertising the tokens
+   * that more accurately reflect the schema & also add support for e.g
+   * billing_address.street_address - which would be hugely useful for workflow
+   * message templates.
+   *
+   * However that feels like a bridge too far for this round
+   * since we haven't quite hit the goal of all token processing going through
+   * the token processor & we risk advertising tokens that don't work if we get
+   * ahead of that process.
+   *
+   * @return string[]
+   */
+  protected function getTokenMappingsForRelatedEntities(): array {
+    return [
+      'on_hold' => 'primary_email.on_hold:label',
+      'phone_type_id' => 'primary_phone.phone_type_id',
+      'current_employer' => 'employer_id.display_name',
+      'location_type_id' => 'primary_address.location_type_id',
+      'location_type' => 'primary_address.location_type_id:label',
+      'street_address' => 'primary_address.street_address',
+      'address_id' => 'primary_address.id',
+      'street_number' => 'primary_address.street_number',
+      'street_number_suffix' => 'primary_address.street_number_suffix',
+      'street_name' => 'primary_address.street_name',
+      'street_unit' => 'primary_address.street_unit',
+      'supplemental_address_1' => 'primary_address.supplemental_address_1',
+      'supplemental_address_2' => 'primary_address.supplemental_address_2',
+      'supplemental_address_3' => 'primary_address.supplemental_address_3',
+      'city' => 'primary_address.city',
+      'postal_code' => 'primary_address.postal_code',
+      'postal_code_suffix' => 'primary_address.postal_code_suffix',
+      'geo_code_1' => 'primary_address.geo_code_1',
+      'geo_code_2' => 'primary_address.geo_code_2',
+      'master_id' => 'primary_address.master_id',
+      'county' => 'primary_address.county_id:label',
+      'county_id' => 'primary_address.county_id',
+      'state_province' => 'primary_address.state_province_id:abbr',
+      'state_province_id' => 'primary_address.state_province_id',
+      'country' => 'primary_address.country_id:label',
+      'country_id' => 'primary_address.country_id',
+      'world_region' => 'primary_address.country_id.region_id:name',
+      'phone_type' => 'primary_phone.phone_type_id:label',
+      'phone' => 'primary_phone.phone',
+      'phone_ext' => 'primary_phone.phone_ext',
+      'email' => 'primary_email.email',
+      'signature_text' => 'primary_email.signature_text',
+      'signature_html' => 'primary_email.signature_html',
+      'im' => 'primary_im.name',
+      'im_provider' => 'primary_im.provider_id:label',
+      'provider_id' => 'primary_im.provider_id',
+      'openid' => 'primary_OpenID.openid',
+      'url' => 'primary_website.url',
+    ];
+  }
+
+  /**
+   * Get calculated or otherwise 'special', tokens.
+   *
+   * @return array[]
+   */
+  protected function getBespokeTokens(): array {
+    return [
+      'checksum' => [
+        'title' => ts('Checksum'),
+        'name' => 'checksum',
+        'type' => 'calculated',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'employer_id.display_name' => [
+        'title' => ts('Current Employer'),
+        'name' => 'employer_id.display_name',
+        'type' => 'mapped',
+        'api_v3' => 'current_employer',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'user',
+      ],
+      'primary_address.country_id.region_id:name' => [
+        'title' => ts('World Region'),
+        'name' => 'country_id.region_id.name',
+        'type' => 'mapped',
+        'api_v3' => 'world_region',
+        'options' => NULL,
+        'data_type' => 'String',
+        'advertised_name' => 'world_region',
+        'audience' => 'user',
+      ],
+      // this gets forced out if we specify individual fields
+      'organization_name' => [
+        'title' => ts('Organization name'),
+        'name' => 'organization_name',
+        'type' => 'Field',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
     ];
   }
 

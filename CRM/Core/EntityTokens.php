@@ -61,7 +61,11 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       if ($field['audience'] === 'user') {
         $e->register([
           'entity' => $this->entity,
-          'field' => $tokenName,
+          // Advertised name allows us a longer transition for contact tokens
+          // where the 'real' name is {contact.primary_address.street_name}
+          // but we don't want to advertise that until we are confident the
+          // list is being used in the context of the token processor.
+          'field' => $field['advertised_name'] ?? $tokenName,
           'label' => $field['title'],
         ]);
       }
@@ -110,6 +114,14 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         // If it's set here it has already been loaded in pre-fetch.
         return $row->format('text/plain')->tokens($entity, $field, (string) $fieldValue);
       }
+      if ($field === 'state_province_id:abbr') {
+        // Hack handle this one for now.
+        $apiv3Value = $this->getFieldValue($row, 'state_province');
+        if ($apiv3Value) {
+          return $row->tokens($entity, $field, $apiv3Value);
+        }
+      }
+
       // Once prefetch is fully standardised we can remove this - as long
       // as tests pass we should be fine as tests cover this.
       $split = explode(':', $field);
@@ -175,13 +187,6 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   public function getExtendableTableName(): string {
     return CRM_Core_DAO_AllCoreTables::getTableForEntityName($this->getApiEntityName());
-  }
-
-  /**
-   * Get the relevant bao name.
-   */
-  public function getBAOName(): string {
-    return CRM_Core_DAO_AllCoreTables::getFullName($this->getApiEntityName());
   }
 
   /**
@@ -286,11 +291,16 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @internal function will likely be protected soon.
    */
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
+      $fieldValue = (string) CRM_Core_PseudoConstant::getName($bao, $realField, $fieldValue);
     }
     if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
+      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($bao, $realField, $fieldValue);
+    }
+    if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
+      // hack alert - currently only supported for state.
+      $fieldValue = (string) CRM_Core_PseudoConstant::stateProvinceAbbreviation($fieldValue);
     }
     return (string) $fieldValue;
   }
@@ -541,7 +551,25 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (isset($this->getTokenMetadata()[$fieldName])) {
       return $this->getTokenMetadata()[$fieldName];
     }
+    if (isset($this->getTokenMappingsForRelatedEntities()[$fieldName])) {
+      return $this->getTokenMetadata()[$this->getTokenMappingsForRelatedEntities()[$fieldName]];
+    }
     return $this->getTokenMetadata()[$this->getDeprecatedTokens()[$fieldName]];
+  }
+
+  /**
+   * Get token mappings for related entities - specifically the contact entity.
+   *
+   * This function exists to help manage the way contact tokens is structured
+   * of an query-object style result set that needs to be mapped to apiv4.
+   *
+   * The end goal is likely to be to advertised tokens that better map to api
+   * v4 and deprecate the existing ones but that is a long-term migration.
+   *
+   * @return array
+   */
+  protected function getTokenMappingsForRelatedEntities(): array {
+    return [];
   }
 
   /**
@@ -587,7 +615,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param array $exposedFields
    * @param string $prefix
    */
-  protected function addFieldToTokenMetadata(array $field, array $exposedFields, $prefix = ''): void {
+  protected function addFieldToTokenMetadata(array $field, array $exposedFields, string $prefix = ''): void {
+    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+      return;
+    }
     $field['audience'] = 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users
@@ -606,6 +637,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $parts = explode(': ', $field['label']);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
       $tokenName = 'custom_' . $field['custom_field_id'];
+      if ($prefix) {
+        $tokenName = $prefix . '.' . $tokenName;
+      }
       $this->tokensMetadata[$tokenName] = $field;
       return;
     }
@@ -614,15 +648,26 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       if (
         ($field['options'] || !empty($field['suffixes']))
         // At the time of writing currency didn't have a label option - this may have changed.
-        && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
-      ) {
-        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$field['name'] . ':name'] = $field;
+        && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)) {
+        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$tokenName . ':name'] = $field;
         $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
         $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
         $this->tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';
         $this->tokensMetadata[$tokenName . ':name']['audience'] = 'sysadmin';
         $this->tokensMetadata[$tokenName . ':label']['title'] = $fieldLabel;
         $this->tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
+        if (isset($field['advertised_name'])) {
+          $this->tokensMetadata[$tokenName . ':name']['advertised_name'] .= ':name';
+          $this->tokensMetadata[$tokenName . ':label']['advertised_name'] .= ':label';
+        }
+        if ($field['name'] === 'state_province_id') {
+          // This is pretty hacky. Goal is to not change much for now but eventually
+          // expose both label & abbr with their 'real' names.
+          $this->tokensMetadata[$tokenName . ':abbr'] = $this->tokensMetadata[$tokenName . ':label'];
+          $this->tokensMetadata[$tokenName . ':abbr']['title'] .= (' ' . ts('Abbreviated'));
+          $this->tokensMetadata[$tokenName . ':abbr']['advertised_name'] = 'state_province';
+          $this->tokensMetadata[$tokenName . ':label']['audience'] = 'sysadmin';
+        }
         $field['audience'] = 'sysadmin';
       }
       if ($field['data_type'] === 'Boolean') {
