@@ -176,6 +176,21 @@
       {name: 'txDraft', label: ts('%1 - Draft translation', {1: $ctrl.locales[$ctrl.lang] || $ctrl.lang})}
     ];
 
+    function doSave() {
+      var requests = {};
+      if ($ctrl.lang) {
+        requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', $ctrl.records.txActive);
+        requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', $ctrl.records.txDraft);
+      }
+      else {
+        requests.main = ['MessageTemplate', 'update', {
+          where: [['id', '=', $ctrl.records.main.id]],
+          values: $ctrl.records.main
+        }];
+      }
+      return crmApi4(requests);
+    }
+
     $ctrl.switchTab = function switchTab(tgt) {
       $ctrl.tab = tgt;
       // Experimenting with action buttons in the tab-bar. This makes the scroll unnecessary.
@@ -198,33 +213,21 @@
     $ctrl.createDraft = function createDraft(src) {
       copyTranslations(src, $ctrl.records.txDraft);
       $ctrl.switchTab('txDraft');
-      crmStatus({success: ts('Beginning draft...')}, $q.resolve());
+      crmStatus({start: ts('Saving...'), success: ts('Created draft.')}, doSave());
     };
     $ctrl.deleteDraft = function deleteDraft() {
       copyTranslations({}, $ctrl.records.txDraft);
       $ctrl.switchTab('txActive');
-      crmStatus({error: ts('Abandoned draft.')}, $q.reject()).then(function(){},function(){});
+      crmStatus({start: ts('Saving...'), success: ts('Abandoned draft.')}, doSave());
     };
     $ctrl.activateDraft = function activateDraft() {
       copyTranslations($ctrl.records.txDraft, $ctrl.records.txActive);
       copyTranslations({}, $ctrl.records.txDraft);
       $ctrl.switchTab('txActive');
-      crmStatus({success: ts('Activated draft.')}, $q.resolve());
+      crmStatus({start: ts('Saving...'), success: ts('Activated draft.')}, doSave());
     };
-
     $ctrl.save = function save() {
-      var requests = {};
-      if ($ctrl.lang) {
-        requests.txActive = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'active', $ctrl.records.txActive);
-        requests.txDraft = reqReplaceTranslations($ctrl.records.main.id, $ctrl.lang, 'draft', $ctrl.records.txDraft);
-      }
-      else {
-        requests.main = ['MessageTemplate', 'update', {
-          where: [['id', '=', $ctrl.records.main.id]],
-          values: $ctrl.records.main
-        }];
-      }
-      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, crmApi4(requests)));
+      return block(crmStatus({start: ts('Saving...'), success: ts('Saved')}, doSave()));
     };
     $ctrl.cancel = function() {
       window.location = '#/workflow';
