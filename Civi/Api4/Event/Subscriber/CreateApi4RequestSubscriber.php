@@ -17,6 +17,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Resolve class for core and custom entities
+ *
+ * This runs while getting the class name for an entity / action.
  */
 class CreateApi4RequestSubscriber implements EventSubscriberInterface {
 
@@ -35,6 +37,7 @@ class CreateApi4RequestSubscriber implements EventSubscriberInterface {
    * @param \Civi\Api4\Event\CreateApi4RequestEvent $event
    */
   public function onApiRequestCreate(\Civi\Api4\Event\CreateApi4RequestEvent $event) {
+    // Multi-record custom data entities
     if (strpos($event->entityName, 'Custom_') === 0) {
       $groupName = substr($event->entityName, 7);
       if (CoreUtil::isCustomEntity($groupName)) {
@@ -42,10 +45,12 @@ class CreateApi4RequestSubscriber implements EventSubscriberInterface {
         $event->args = [$groupName];
       }
     }
-    // Because "Case" is a reserved php keyword
-    $className = 'Civi\Api4\\' . ($event->entityName === 'Case' ? 'CiviCase' : $event->entityName);
-    if (class_exists($className)) {
-      $event->className = $className;
+    else {
+      // Because "Case" is a reserved php keyword
+      $className = 'Civi\Api4\\' . ($event->entityName === 'Case' ? 'CiviCase' : $event->entityName);
+      if (class_exists($className)) {
+        $event->className = $className;
+      }
     }
   }
 
