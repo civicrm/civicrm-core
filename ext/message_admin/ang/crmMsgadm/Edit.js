@@ -310,9 +310,9 @@
       });
 
     }
-    $rootScope.$on('previewMsgTpl', onPreview);
-    $rootScope.$on('$destroy', function (){
-      $rootScope.$off('previewMsgTpl', onPreview);
+    var unreg = $rootScope.$on('previewMsgTpl', onPreview);
+    $scope.$on('$destroy', function (){
+      unreg();
     });
   });
 
