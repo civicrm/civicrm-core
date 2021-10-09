@@ -85,49 +85,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       else {
         $this->tokensMetadata = $this->getBespokeTokens();
         foreach ($this->getFieldMetadata() as $field) {
-          $field['audience'] = 'user';
-          if ($field['name'] === 'contact_id') {
-            // Since {contact.id} is almost always present don't confuse users
-            // by also adding (e.g {participant.contact_id)
-            $field['audience'] = 'sysadmin';
-          }
-          if (!empty($this->getTokenMetadataOverrides()[$field['name']])) {
-            $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
-          }
-          if ($field['type'] === 'Custom') {
-            // Convert to apiv3 style for now. Later we can add v4 with
-            // portable naming & support for labels/ dates etc so let's leave
-            // the space open for that.
-            // Not the existing quickform widget has handling for the custom field
-            // format based on the title using this syntax.
-            $parts = explode(': ', $field['label']);
-            $field['title'] = "{$parts[1]} :: {$parts[0]}";
-            $tokenName = 'custom_' . $field['custom_field_id'];
-            $this->tokensMetadata[$tokenName] = $field;
-            continue;
-          }
-          if (in_array($field['name'], $this->getExposedFields(), TRUE)) {
-            if (
-              ($field['options'] || !empty($field['suffixes']))
-              // At the time of writing currency didn't have a label option - this may have changed.
-              && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
-            ) {
-              $this->tokensMetadata[$field['name'] . ':label'] = $this->tokensMetadata[$field['name'] . ':name'] = $field;
-              $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
-              $this->tokensMetadata[$field['name'] . ':label']['name'] = $field['name'] . ':label';
-              $this->tokensMetadata[$field['name'] . ':name']['name'] = $field['name'] . ':name';
-              $this->tokensMetadata[$field['name'] . ':name']['audience'] = 'sysadmin';
-              $this->tokensMetadata[$field['name'] . ':label']['title'] = $fieldLabel;
-              $this->tokensMetadata[$field['name'] . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
-              $field['audience'] = 'sysadmin';
-            }
-            if ($field['data_type'] === 'Boolean') {
-              $this->tokensMetadata[$field['name'] . ':label'] = $field;
-              $this->tokensMetadata[$field['name'] . ':label']['name'] = $field['name'] . ':label';
-              $field['audience'] = 'sysadmin';
-            }
-            $this->tokensMetadata[$field['name']] = $field;
-          }
+          $this->addFieldToTokenMetadata($field, $this->getExposedFields());
         }
         foreach ($this->getHiddenTokens() as $name) {
           $this->tokensMetadata[$name]['audience'] = 'hidden';
@@ -623,6 +581,60 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return FALSE;
     }
     return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata()));
+  }
+
+  /**
+   * Add the token to the metadata based on the field spec.
+   *
+   * @param array $field
+   * @param array $exposedFields
+   * @param string $prefix
+   */
+  protected function addFieldToTokenMetadata(array $field, array $exposedFields, $prefix = ''): void {
+    $field['audience'] = 'user';
+    if ($field['name'] === 'contact_id') {
+      // Since {contact.id} is almost always present don't confuse users
+      // by also adding (e.g {participant.contact_id)
+      $field['audience'] = 'sysadmin';
+    }
+    if (!empty($this->getTokenMetadataOverrides()[$field['name']])) {
+      $field = array_merge($field, $this->getTokenMetadataOverrides()[$field['name']]);
+    }
+    if ($field['type'] === 'Custom') {
+      // Convert to apiv3 style for now. Later we can add v4 with
+      // portable naming & support for labels/ dates etc so let's leave
+      // the space open for that.
+      // Not the existing quickform widget has handling for the custom field
+      // format based on the title using this syntax.
+      $parts = explode(': ', $field['label']);
+      $field['title'] = "{$parts[1]} :: {$parts[0]}";
+      $tokenName = 'custom_' . $field['custom_field_id'];
+      $this->tokensMetadata[$tokenName] = $field;
+      return;
+    }
+    $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
+    if (in_array($field['name'], $exposedFields, TRUE)) {
+      if (
+        ($field['options'] || !empty($field['suffixes']))
+        // At the time of writing currency didn't have a label option - this may have changed.
+        && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
+      ) {
+        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$field['name'] . ':name'] = $field;
+        $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
+        $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
+        $this->tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';
+        $this->tokensMetadata[$tokenName . ':name']['audience'] = 'sysadmin';
+        $this->tokensMetadata[$tokenName . ':label']['title'] = $fieldLabel;
+        $this->tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
+        $field['audience'] = 'sysadmin';
+      }
+      if ($field['data_type'] === 'Boolean') {
+        $this->tokensMetadata[$tokenName . ':label'] = $field;
+        $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
+        $field['audience'] = 'sysadmin';
+      }
+      $this->tokensMetadata[$tokenName] = $field;
+    }
   }
 
 }
