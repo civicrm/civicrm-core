@@ -303,6 +303,9 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       if (empty($row->context['contact'])) {
         $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
       }
+      if (empty($row->context['contactId'])) {
+        $row->context['contactId'] = $row->context['contact']['id'];
+      }
 
       foreach ($messageTokens as $token) {
         if ($token === 'checksum') {
@@ -330,8 +333,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
         }
         else {
-          $row->format('text/html')
-            ->tokens('contact', $token, $this->getFieldValue($row, $token));
+          parent::evaluateToken($row, 'contact', $token, [$row->context['contactId'] => $row->context['contact']]);
         }
       }
     }

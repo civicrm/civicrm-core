@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -592,6 +594,8 @@ class CRM_Utils_Token {
    * @param bool $returnBlankToken
    *   Return unevaluated token if value is null.
    *
+   * @deprecated
+   *
    * @param bool $escapeSmarty
    *
    * @return string
@@ -634,6 +638,13 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do Not use.
+   *
+   * Only core usage is from a deprecated unused function and
+   * from deprecated BAO_Mailing code (to be replaced by flexmailer).
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param bool $html
@@ -718,8 +729,12 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use - unused in core.
+   *
    * Replace all the hook tokens in $str with information from
    * $contact.
+   *
+   * @deprecated
    *
    * @param string $str
    *   The string with tokens to be replaced.
@@ -790,6 +805,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use, unused in core.
+   *
+   * @deprecated
+   *
    * @param $token
    * @param $contact
    * @param $category
@@ -1303,9 +1322,6 @@ class CRM_Utils_Token {
    *
    * @TODO Remove that inconsistency in usage.
    *
-   * ::replaceContactTokens() may need to be called after this method, to
-   * replace tokens supplied from this method.
-   *
    * @param string $tokenString
    * @param array $contactDetails
    * @param int $contactId
@@ -1317,72 +1333,24 @@ class CRM_Utils_Token {
     if (!$contactDetails && !$contactId) {
       return;
     }
-
     // check if there are any tokens
     $greetingTokens = self::getTokens($tokenString);
-
-    if (!empty($greetingTokens)) {
-      // first use the existing contact object for token replacement
-      if (!empty($contactDetails)) {
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString, $contactDetails, TRUE, $greetingTokens, TRUE, $escapeSmarty);
+    $context = $contactId ? ['contactId' => $contactId] : [];
+    if ($contactDetails) {
+      foreach ($contactDetails[0] as $contact) {
+        // Only 1 - the loop is because we may not know the id.
+        $context['contact'] = $contact;
       }
-
-      self::removeNullContactTokens($tokenString, $contactDetails, $greetingTokens);
-      // check if there are any unevaluated tokens
-      $greetingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, means there are few tokens which are not
-      // evaluated, like custom data etc
-      // so retrieve it from database
-      if (!empty($greetingTokens) && array_key_exists('contact', $greetingTokens)) {
-        $greetingsReturnProperties = array_flip(CRM_Utils_Array::value('contact', $greetingTokens));
-        $greetingsReturnProperties = array_fill_keys(array_keys($greetingsReturnProperties), 1);
-        $contactParams = ['contact_id' => $contactId];
-
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-
-        // again replace tokens
-        $tokenString = CRM_Utils_Token::replaceContactTokens($tokenString,
-          $greetingDetails,
-          TRUE,
-          $greetingTokens,
-          TRUE,
-          $escapeSmarty
-        );
-      }
-
-      // check if there are still any unevaluated tokens
-      $remainingTokens = self::getTokens($tokenString);
-
-      // $greetingTokens not empty, there are customized or hook tokens to replace
-      if (!empty($remainingTokens)) {
-        // Fill the return properties array
-        $greetingTokens = $remainingTokens;
-        reset($greetingTokens);
-        $greetingsReturnProperties = [];
-        foreach ($greetingTokens as $value) {
-          $props = array_flip($value);
-          $props = array_fill_keys(array_keys($props), 1);
-          $greetingsReturnProperties = $greetingsReturnProperties + $props;
-        }
-        $contactParams = ['contact_id' => $contactId];
-        $greetingDetails = self::getTokenDetails($contactParams,
-          $greetingsReturnProperties,
-          FALSE, FALSE, NULL,
-          $greetingTokens,
-          $className
-        );
-        // Prepare variables for calling replaceHookTokens
-        $categories = array_keys($greetingTokens);
-        [$contact] = $greetingDetails;
-        // Replace tokens defined in Hooks.
-        $tokenString = CRM_Utils_Token::replaceHookTokens($tokenString, $contact[$contactId], $categories);
-      }
+    }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'smarty' => FALSE,
+      'class' => $className,
+    ]);
+    $tokenProcessor->addRow($context);
+    $tokenProcessor->addMessage('greeting', $tokenString, 'text/plain');
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      $tokenString = $row->render('greeting');
     }
   }
 
@@ -1390,6 +1358,8 @@ class CRM_Utils_Token {
    * At this point, $contactDetails has loaded the contact from the DAO. Any
    * (non-custom) missing fields are null.  By removing them, we can avoid
    * expensive calls to CRM_Contact_BAO_Query.
+   *
+   * @deprecated unused in core
    *
    * @param string $tokenString
    * @param array $contactDetails
@@ -1862,6 +1832,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
+   * Only used from deprecated functions not called by core.
+   *
    * @return array
    *   [legacy_token => new_token]
    */
