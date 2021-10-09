@@ -541,7 +541,25 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (isset($this->getTokenMetadata()[$fieldName])) {
       return $this->getTokenMetadata()[$fieldName];
     }
+    if (isset($this->getTokenMappingsForRelatedEntities()[$fieldName])) {
+      return $this->getTokenMetadata()[$this->getTokenMappingsForRelatedEntities()[$fieldName]];
+    }
     return $this->getTokenMetadata()[$this->getDeprecatedTokens()[$fieldName]];
+  }
+
+  /**
+   * Get token mappings for related entities - specifically the contact entity.
+   *
+   * This function exists to help manage the way contact tokens is structured
+   * of an query-object style result set that needs to be mapped to apiv4.
+   *
+   * The end goal is likely to be to advertised tokens that better map to api
+   * v4 and deprecate the existing ones but that is a long-term migration.
+   *
+   * @return array
+   */
+  protected function getTokenMappingsForRelatedEntities(): array {
+    return [];
   }
 
   /**
@@ -616,7 +634,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         // At the time of writing currency didn't have a label option - this may have changed.
         && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
       ) {
-        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$field['name'] . ':name'] = $field;
+        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$tokenName . ':name'] = $field;
         $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
         $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
         $this->tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';

@@ -391,7 +391,6 @@ emo
       ['old' => '{contact.individual_suffix}', 'new' => '{contact.suffix_id:label}', 'output' => 'II'],
       ['old' => '{contact.gender}', 'new' => '{contact.gender_id:label}', 'output' => 'Female'],
       ['old' => '{contact.communication_style}', 'new' => '{contact.communication_style_id:label}', 'output' => 'Formal'],
-      ['old' => '{contact.preferred_communication_method}', 'new' => '{contact.preferred_communication_method:label}', 'output' => 'Phone'],
       ['old' => '{contact.contact_id}', 'new' => '{contact.id}', 'output' => $contactID],
       ['old' => '{contact.email_greeting}', 'new' => '{contact.email_greeting_display}', 'output' => 'Dear Anthony'],
       ['old' => '{contact.postal_greeting}', 'new' => '{contact.postal_greeting_display}', 'output' => 'Dear Anthony'],
@@ -473,9 +472,8 @@ emo
       $rendered = (string) $row->render('html');
     }
     $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
-    // @todo - this works better in token processor than in CRM_Core_Token.
-    // once synced we can fix $this->getExpectedContactOutput to return the right thing.
-    $expected = str_replace("preferred_communication_method:\n", "preferred_communication_method:Phone\n", $expected);
+    // the right thing to use is the (advertised) label now.
+    $expected = str_replace("preferred_communication_method:Phone\n", "preferred_communication_method:1\n", $expected);
     $this->assertEquals($expected, $rendered);
   }
 
