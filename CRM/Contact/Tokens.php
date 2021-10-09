@@ -10,6 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenProcessor;
@@ -297,7 +298,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
             ->tokens('contact', $token, "cs={$cs}");
         }
         elseif ($token === 'signature_html') {
-          $row->format('text/html')->tokens('contact', $token, html_entity_decode($row->context['contact'][$token]));
+          $row->format('text/html')->tokens('contact', $token, html_entity_decode($this->getFieldValue($row, $token)));
         }
         else {
           parent::evaluateToken($row, $this->entity, $token, $row->context['contact']);
@@ -385,44 +386,69 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   protected function getContact(int $contactId, array $requiredFields, bool $getAll = FALSE): array {
-    $returnProperties = array_fill_keys($requiredFields, 1);
-    $mappedFields = array_flip($this->getDeprecatedTokens());
 
-    if (!empty($returnProperties['checksum'])) {
-      $returnProperties['hash'] = 1;
+    if (in_array('checksum', $requiredFields, TRUE)) {
+      $returnProperties[] = 'hash';
     }
-
-    foreach ($mappedFields as $tokenName => $api3Name) {
-      if (in_array($tokenName, $requiredFields, TRUE)) {
-        $returnProperties[$api3Name] = 1;
+    foreach ($this->getTokenMappingsForRelatedEntities() as $oldName => $newName) {
+      if (in_array($oldName, $requiredFields, TRUE)) {
+        $returnProperties[] = $newName;
       }
     }
-    if ($getAll) {
-      $returnProperties = array_merge($this->getAllContactReturnFields(), $returnProperties);
+    $joins = [];
+    $customFields = [];
+    foreach ($requiredFields as $field) {
+      $fieldSpec = $this->getMetadataForField($field);
+      $prefix = '';
+      if (isset($fieldSpec['table_name']) && $fieldSpec['table_name'] !== 'civicrm_contact') {
+        $tableAlias = str_replace('civicrm_', 'primary_', $fieldSpec['table_name']);
+        $joins[$tableAlias] = $fieldSpec['entity'];
+
+        $prefix = $tableAlias . '.';
+      }
+      if ($fieldSpec['type'] === 'Custom') {
+        $customFields['custom_' . $fieldSpec['custom_field_id']] = $fieldSpec['name'];
+      }
+      $returnProperties[] = $prefix . $this->getMetadataForField($field)['name'];
     }
 
-    $params = [
-      ['contact_id', '=', $contactId, 0, 0],
-    ];
-    // @todo - map the parameters to apiv4 instead....
-    [$contact] = \CRM_Contact_BAO_Query::apiQuery($params, $returnProperties ?? NULL);
-    //CRM-4524
-    $contact = reset($contact);
-    foreach ($mappedFields as $tokenName => $apiv3Name) {
+    if ($getAll) {
+      $returnProperties = array_merge(['*', 'custom.*', 'primary_address.*', 'primary_phone.*', 'primary_im.*', 'primary_email.*', 'primary_website.*', 'primary_openid.*'], $this->getDeprecatedTokens(), $this->getTokenMappingsForRelatedEntities());
+    }
+
+    $contactApi = Contact::get($this->checkPermissions)
+      ->setSelect($returnProperties)->addWhere('id', '=', $contactId);
+    foreach ($joins as $alias => $joinEntity) {
+      $contactApi->addJoin($joinEntity . ' AS ' . $alias,
+        'LEFT',
+        ['id', '=', $alias . '.contact_id'],
+        // For website the fact we use 'first' is the deduplication.
+        ($joinEntity !== 'Website' ? [$alias . '.is_primary', '=', 1] : []));
+    }
+    $contact = $contactApi->execute()->first();
+
+    foreach ($this->getDeprecatedTokens() as $apiv3Name => $fieldName) {
       // it would be set already with the right value for a greeting token
       // the query object returns the db value for email_greeting_display
       // and a numeric value for email_greeting if you put email_greeting
       // in the return properties.
-      if (!isset($contact[$tokenName])) {
-        $contact[$tokenName] = $contact[$apiv3Name] ?? '';
+      if (!isset($contact[$apiv3Name])) {
+        $contact[$apiv3Name] = $contact[$fieldName];
+      }
+    }
+    foreach ($this->getTokenMappingsForRelatedEntities() as $oldName => $newName) {
+      if (isset($contact[$newName])) {
+        $contact[$oldName] = $contact[$newName];
       }
     }
 
     //update value of custom field token
-    foreach ($requiredFields as $token) {
-      if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-        $contact[$token] = \CRM_Core_BAO_CustomField::displayValue($contact[$token], \CRM_Core_BAO_CustomField::getKeyID($token));
+    foreach ($customFields as $apiv3Name => $fieldName) {
+      $value = $contact[$fieldName];
+      if ($this->getMetadataForField($apiv3Name)['data_type'] === 'Boolean') {
+        $value = (int) $value;
       }
+      $contact[$apiv3Name] = \CRM_Core_BAO_CustomField::displayValue($value, \CRM_Core_BAO_CustomField::getKeyID($apiv3Name));
     }
 
     return $contact;
@@ -546,10 +572,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   protected function getTokenMappingsForRelatedEntities(): array {
     return [
       'on_hold' => 'primary_email.on_hold:label',
+      'on_hold:label' => 'primary_email.on_hold:label',
       'phone_type_id' => 'primary_phone.phone_type_id',
+      'phone_type_id:label' => 'primary_phone.phone_type_id:label',
       'current_employer' => 'employer_id.display_name',
       'location_type_id' => 'primary_address.location_type_id',
       'location_type' => 'primary_address.location_type_id:label',
+      'location_type_id:label' => 'primary_address.location_type_id:label',
       'street_address' => 'primary_address.street_address',
       'address_id' => 'primary_address.id',
       'street_number' => 'primary_address.street_number',
@@ -567,10 +596,12 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'master_id' => 'primary_address.master_id',
       'county' => 'primary_address.county_id:label',
       'county_id' => 'primary_address.county_id',
+      'county_id:label' => 'primary_address.county_id:label',
       'state_province' => 'primary_address.state_province_id:abbr',
       'state_province_id' => 'primary_address.state_province_id',
       'country' => 'primary_address.country_id:label',
       'country_id' => 'primary_address.country_id',
+      'country_id:label' => 'primary_address.country_id:label',
       'world_region' => 'primary_address.country_id.region_id:name',
       'phone_type' => 'primary_phone.phone_type_id:label',
       'phone' => 'primary_phone.phone',
@@ -580,6 +611,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'signature_html' => 'primary_email.signature_html',
       'im' => 'primary_im.name',
       'im_provider' => 'primary_im.provider_id:label',
+      'provider_id:label' => 'primary_im.provider_id:label',
       'provider_id' => 'primary_im.provider_id',
       'openid' => 'primary_OpenID.openid',
       'url' => 'primary_website.url',

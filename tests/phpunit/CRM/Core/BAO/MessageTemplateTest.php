@@ -767,7 +767,7 @@ emo
     $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
     $expected = 'contact_type:Individual
 do_not_email:1
-do_not_phone:0
+do_not_phone:
 do_not_mail:1
 do_not_sms:1
 do_not_trade:1
@@ -793,7 +793,7 @@ job_title:Busy person
 gender:Female
 birth_date:December 31st, 1998
 current_employer_id:' . $contact['employer_id'] . '
-contact_is_deleted:0
+contact_is_deleted:No
 created_date:January 1st, 2020
 modified_date:' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
 addressee:Mr. Robert Frank Smith II
@@ -825,12 +825,12 @@ phone_ext:77
 phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
-on_hold:0
+on_hold:No
 signature_text:Yours sincerely
 signature_html:<p>Yours</p>
-im_provider:1
+im_provider:Yahoo
 im:IM Screen Name
-openid:OpenID
+openid:
 world_region:America South, Central, North and Caribbean
 url:http://civicrm.org
 custom_1:Bobsled
@@ -893,7 +893,7 @@ job_title |Busy person
 gender_id:label |Female
 birth_date |December 31st, 1998
 employer_id |' . $contact['employer_id'] . '
-is_deleted:label |
+is_deleted:label |No
 created_date |January 1st, 2020
 modified_date |' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
 addressee_display |Mr. Robert Frank Smith II
@@ -918,7 +918,7 @@ geo_code_2 |2.294694
 primary_address.name |The white house
 master_id |' . $tokenData['master_id'] . '
 county_id:label |
-state_province_id:abbr |TX
+state_province |TX
 country_id:label |United States
 phone |123-456
 phone_ext |77
@@ -928,8 +928,8 @@ on_hold:label |No
 signature_text |Yours sincerely
 signature_html |<p>Yours</p>
 provider_id:label |Yahoo
-im |IM Screen Name
-openid |OpenID
+primary_im.name |IM Screen Name
+openid |
 world_region |America South, Central, North and Caribbean
 url |http://civicrm.org
 custom_9 |Mr. Spider Man II

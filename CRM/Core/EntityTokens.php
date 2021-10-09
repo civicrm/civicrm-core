@@ -128,6 +128,9 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->tokens($entity, $field, $this->getPseudoValue($split[0], $split[1], $this->getFieldValue($row, $split[0])));
     }
     if ($this->isCustomField($field)) {
+      if ($fieldValue) {
+        return $row->format('text/html')->tokens($entity, $field, $fieldValue);
+      }
       $prefetchedValue = $this->getCustomFieldValue($this->getFieldValue($row, 'id'), $field);
       if ($prefetchedValue) {
         return $row->format('text/html')->tokens($entity, $field, $prefetchedValue);
