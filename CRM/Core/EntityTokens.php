@@ -75,10 +75,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    */
   protected function getTokenMetadata(): array {
     if (empty($this->tokensMetadata)) {
-      $cacheKey = __CLASS__ . 'token_metadata' . $this->getApiEntityName() . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
-      if ($this->checkPermissions) {
-        $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
-      }
+      $cacheKey = $this->getCacheKey();
       if (Civi::cache('metadata')->has($cacheKey)) {
         $this->tokensMetadata = Civi::cache('metadata')->get($cacheKey);
       }
@@ -623,6 +620,19 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return FALSE;
     }
     return array_intersect($messageTokens[$this->entity], array_keys($this->getTokenMetadata()));
+  }
+
+  /**
+   * Get a cache key appropriate to the current usage.
+   *
+   * @return string
+   */
+  protected function getCacheKey(): string {
+    $cacheKey = __CLASS__ . 'token_metadata' . $this->getApiEntityName() . CRM_Core_Config::domainID() . '_' . CRM_Core_I18n::getLocale();
+    if ($this->checkPermissions) {
+      $cacheKey .= '__' . CRM_Core_Session::getLoggedInContactID();
+    }
+    return $cacheKey;
   }
 
 }
