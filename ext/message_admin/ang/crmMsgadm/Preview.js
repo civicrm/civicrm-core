@@ -39,6 +39,9 @@
         }).then(function(response){
           dlgModel.title = ts('Example: %1', {1: response[0].title || response[0].name});
           dlgModel.data = response[0];
+          if (model.filterData && dlgModel.data.data) {
+            dlgModel.data['data(filtered)'] = model.filterData(angular.copy(dlgModel.data.data));
+          }
         });
       };
 
@@ -50,36 +53,20 @@
     };
 
     function requestAdhocExample() {
-      var adhocExample;
       try {
-        adhocExample = JSON.parse($ctrl.adhocExampleJson);
+        return $q.resolve(JSON.parse($ctrl.adhocExampleJson.data));
       }
       catch (err) {
         return $q.reject(ts('Malformed JSON example'));
       }
-      return crmApi4('WorkflowMessage', 'render', {
-        workflow: adhocExample.data.workflow,
-        values: adhocExample.data.modelProps,
-        messageTemplate: model.revisions[$ctrl.revisionId].rec
-      }).then(function(response) {
-        return response[0];
-      });
     }
 
     function requestStoredExample() {
-      // For a dev working on example, it's easier if the example is always loaded fresh.
       return crmApi4('ExampleData', 'get', {
         where: [["name", "=", model.examples[$ctrl.exampleId].name]],
-        select: ['name', 'file', 'title', 'data'],
-        chain: {
-          "render": ["WorkflowMessage", "render", {
-            "workflow": "$data.workflow",
-            "values": "$data.modelProps",
-            "messageTemplate": model.revisions[$ctrl.revisionId].rec
-          }]
-        }
+        select: ['data']
       }).then(function(response) {
-        return response[0].render[0];
+        return response[0].data;
       });
     }
 
@@ -92,8 +79,15 @@
       //   $ctrl.preview = model.revisions[$ctrl.revisionId].rec;
       $ctrl.preview = {loading: true};
       var rendering = $ctrl.isAdhocExample ? requestAdhocExample() : requestStoredExample();
-      rendering.then(function(response) {
-        $ctrl.preview = response;
+      rendering.then(function(exampleData) {
+        var filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
+        return crmApi4('WorkflowMessage', 'render', {
+          workflow: filteredData.workflow,
+          values: filteredData.modelProps,
+          messageTemplate: model.revisions[$ctrl.revisionId].rec
+        });
+      }).then(function(response) {
+        $ctrl.preview = response[0];
       }, function(failure) {
         $ctrl.preview = {};
         crmUiAlert({title: ts('Render failed'), text: failure.error_message, type: 'error'});
