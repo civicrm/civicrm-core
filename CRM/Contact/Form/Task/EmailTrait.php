@@ -182,7 +182,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
     //get the group of contacts as per selected by user in case of Find Activities
     if (!empty($this->_activityHolderIds)) {
       $contact = $this->get('contacts');
-      $this->_allContactIds = $this->_contactIds = $contact;
+      $this->_allContactIds = $this->_toContactIds = $this->_contactIds = $contact;
     }
 
     // check if we need to setdefaults and check for valid contact emails / communication preferences
