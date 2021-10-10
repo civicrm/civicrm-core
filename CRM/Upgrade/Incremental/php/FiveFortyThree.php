@@ -83,6 +83,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     $this->addTask('Replace event fee amount in action schedule',
       'updateActionScheduleToken', 'event.fee_amount', 'participant.fee_amount', $rev
     );
+    $this->addTask('Replace contact.preferred_communication_method in action schedule',
+      'updateActionScheduleToken', 'contact.preferred_communication_method', 'contact.preferred_communication_method:label', $rev
+    );
     $this->addTask('Replace event event_id in action schedule',
       'updateActionScheduleToken', 'event.event_id', 'event.id', $rev
     );
@@ -118,6 +121,9 @@ class CRM_Upgrade_Incremental_php_FiveFortyThree extends CRM_Upgrade_Incremental
     );
     $this->addTask('Update participant registered by id token in event badges',
       'updatePrintLabelToken', 'participant.participant_registered_by_id', 'participant.registered_by_id', $rev
+    );
+    $this->addTask('Update preferred_communication_method token in saved message templates',
+      'updateMessageToken', '', 'contact.preferred_communication_method', 'contact.preferred_communication_method:label', $rev
     );
     $this->addTask('Update contribution status token in saved message templates',
       'updateMessageToken', '', 'contribution.contribution_status', 'contribution.contribution_status_id:label', $rev
