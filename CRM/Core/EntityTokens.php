@@ -178,18 +178,14 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * Get the relevant bao name.
-   */
-  public function getBAOName(): string {
-    return CRM_Core_DAO_AllCoreTables::getFullName($this->getApiEntityName());
-  }
-
-  /**
    * Get an array of fields to be requested.
+   *
+   * @todo this function should look up tokenMetadata that
+   * is already loaded.
    *
    * @return string[]
    */
-  public function getReturnFields(): array {
+  protected function getReturnFields(): array {
     return array_keys($this->getBasicTokens());
   }
 
@@ -200,7 +196,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isBooleanField(string $fieldName): bool {
+  protected function isBooleanField(string $fieldName): bool {
     return $this->getMetadataForField($fieldName)['data_type'] === 'Boolean';
   }
 
@@ -211,7 +207,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isDateField(string $fieldName): bool {
+  protected function isDateField(string $fieldName): bool {
     return in_array($this->getMetadataForField($fieldName)['data_type'], ['Timestamp', 'Date'], TRUE);
   }
 
@@ -222,7 +218,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isPseudoField(string $fieldName): bool {
+  protected function isPseudoField(string $fieldName): bool {
     return strpos($fieldName, ':') !== FALSE;
   }
 
@@ -233,7 +229,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isCustomField(string $fieldName) : bool {
+  protected function isCustomField(string $fieldName) : bool {
     return (bool) \CRM_Core_BAO_CustomField::getKeyID($fieldName);
   }
 
@@ -244,7 +240,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return bool
    */
-  public function isMoneyField(string $fieldName): bool {
+  protected function isMoneyField(string $fieldName): bool {
     return $this->getMetadataForField($fieldName)['data_type'] === 'Money';
   }
 
@@ -286,11 +282,16 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @internal function will likely be protected soon.
    */
   protected function getPseudoValue(string $realField, string $pseudoKey, $fieldValue): string {
+    $bao = CRM_Core_DAO_AllCoreTables::getFullName($this->getMetadataForField($realField)['entity']);
     if ($pseudoKey === 'name') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getName($this->getBAOName(), $realField, $fieldValue);
+      $fieldValue = (string) CRM_Core_PseudoConstant::getName($bao, $realField, $fieldValue);
     }
     if ($pseudoKey === 'label') {
-      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($this->getBAOName(), $realField, $fieldValue);
+      $fieldValue = (string) CRM_Core_PseudoConstant::getLabel($bao, $realField, $fieldValue);
+    }
+    if ($pseudoKey === 'abbr' && $realField === 'state_province_id') {
+      // hack alert - currently only supported for state.
+      $fieldValue = (string) CRM_Core_PseudoConstant::stateProvinceAbbreviation($fieldValue);
     }
     return (string) $fieldValue;
   }
@@ -365,18 +366,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * Get tokens supporting the syntax we are migrating to.
-   *
-   * In general these are tokens that were not previously supported
-   * so we can add them in the preferred way or that we have
-   * undertaken some, as yet to be written, db update.
-   *
-   * See https://lab.civicrm.org/dev/core/-/issues/2650
+   * @todo remove this function & use the metadata that is loaded.
    *
    * @return string[]
    * @throws \API_Exception
    */
-  public function getBasicTokens(): array {
+  protected function getBasicTokens(): array {
     $return = [];
     foreach ($this->getExposedFields() as $fieldName) {
       // Custom fields are still added v3 style - we want to keep v4 naming 'unpoluted'
@@ -428,7 +423,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($this->getApiEntityName());
   }
 
-  public function getEntityIDField(): string {
+  protected function getEntityIDField(): string {
     return $this->getEntityName() . 'Id';
   }
 
@@ -448,7 +443,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     return $result;
   }
 
-  public function getCurrencyFieldName() {
+  protected function getCurrencyFieldName() {
     return [];
   }
 
@@ -458,7 +453,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return string
    */
-  public function getCurrency($row): string {
+  protected function getCurrency($row): string {
     if (!empty($this->getCurrencyFieldName())) {
       return $this->getFieldValue($row, $this->getCurrencyFieldName()[0]);
     }
@@ -495,7 +490,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    *
    * @return array
    */
-  public function getDependencies(): array {
+  protected function getDependencies(): array {
     return [];
   }
 
@@ -605,7 +600,10 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @param array $exposedFields
    * @param string $prefix
    */
-  protected function addFieldToTokenMetadata(array $field, array $exposedFields, $prefix = ''): void {
+  protected function addFieldToTokenMetadata(array $field, array $exposedFields, string $prefix = ''): void {
+    if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
+      return;
+    }
     $field['audience'] = 'user';
     if ($field['name'] === 'contact_id') {
       // Since {contact.id} is almost always present don't confuse users

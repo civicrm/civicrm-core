@@ -323,7 +323,7 @@ London, 90210
     $this->hookClass->setHook('civicrm_tokens', [$this, 'hookTokens']);
 
     $this->createCustomGroupWithFieldsOfAllTypes([]);
-    $tokenData = $this->getAllContactTokens();
+    $tokenData = $this->getOldContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
     $advertisedTokens = CRM_Core_SelectValues::contactTokens();
     $this->assertEquals($this->getAdvertisedTokens(), $advertisedTokens);
@@ -457,24 +457,31 @@ emo
    */
   public function testContactTokensRenderedByTokenProcessor(): void {
     $this->createCustomGroupWithFieldsOfAllTypes([]);
-    $tokenData = $this->getAllContactTokens();
+    $tokenData = $this->getOldContactTokens();
     $address = $this->setupContactFromTokeData($tokenData);
     $tokenString = '';
     foreach (array_keys($tokenData) as $key) {
       $tokenString .= "{$key}:{contact.{$key}}\n";
     }
+    $newStyleTokenString = '';
+    foreach (array_keys($this->getAdvertisedTokens()) as $key) {
+      $newStyleTokenString .= substr($key, 9, -1) . ' |' . $key . "\n";
+    }
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), []);
     $tokenProcessor->addMessage('html', $tokenString, 'text/html');
+    $tokenProcessor->addMessage('new', $newStyleTokenString, 'text/html');
+
     $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
     $tokenProcessor->evaluate();
     $rendered = '';
     foreach ($tokenProcessor->getRows() as $row) {
       $rendered = (string) $row->render('html');
+      $newStyleRendered = $row->render('new');
     }
     $expected = $this->getExpectedContactOutput($address['id'], $tokenData, $rendered);
-    // the right thing to use is the (advertised) label now.
-    $expected = str_replace("preferred_communication_method:Phone\n", "preferred_communication_method:1\n", $expected);
     $this->assertEquals($expected, $rendered);
+    $this->assertEquals($this->getExpectedContactOutputNewStyle($address['id'], $tokenData, $newStyleRendered), $newStyleRendered);
+
   }
 
   /**
@@ -510,13 +517,13 @@ emo
    */
   public function getAdvertisedTokens(): array {
     return [
-      '{contact.contact_type}' => 'Contact Type',
-      '{contact.do_not_email}' => 'Do Not Email',
-      '{contact.do_not_phone}' => 'Do Not Phone',
-      '{contact.do_not_mail}' => 'Do Not Mail',
-      '{contact.do_not_sms}' => 'Do Not Sms',
-      '{contact.do_not_trade}' => 'Do Not Trade',
-      '{contact.is_opt_out}' => 'No Bulk Emails (User Opt Out)',
+      '{contact.contact_type:label}' => 'Contact Type',
+      '{contact.do_not_email:label}' => 'Do Not Email',
+      '{contact.do_not_phone:label}' => 'Do Not Phone',
+      '{contact.do_not_mail:label}' => 'Do Not Mail',
+      '{contact.do_not_sms:label}' => 'Do Not Sms',
+      '{contact.do_not_trade:label}' => 'Do Not Trade',
+      '{contact.is_opt_out:label}' => 'No Bulk Emails (User Opt Out)',
       '{contact.external_identifier}' => 'External Identifier',
       '{contact.sort_name}' => 'Sort Name',
       '{contact.display_name}' => 'Display Name',
@@ -535,9 +542,9 @@ emo
       '{contact.formal_title}' => 'Formal Title',
       '{contact.communication_style_id:label}' => 'Communication Style',
       '{contact.job_title}' => 'Job Title',
-      '{contact.gender_id:label}' => 'Gender ID',
+      '{contact.gender_id:label}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
-      '{contact.current_employer_id}' => 'Current Employer ID',
+      '{contact.employer_id}' => 'Current Employer ID',
       '{contact.is_deleted:label}' => 'Contact is in Trash',
       '{contact.created_date}' => 'Created Date',
       '{contact.modified_date}' => 'Modified Date',
@@ -545,7 +552,7 @@ emo
       '{contact.email_greeting_display}' => 'Email Greeting',
       '{contact.postal_greeting_display}' => 'Postal Greeting',
       '{contact.current_employer}' => 'Current Employer',
-      '{contact.location_type}' => 'Location Type',
+      '{contact.location_type_id:label}' => 'Address Location Type',
       '{contact.address_id}' => 'Address ID',
       '{contact.street_address}' => 'Street Address',
       '{contact.street_number}' => 'Street Number',
@@ -560,21 +567,19 @@ emo
       '{contact.postal_code}' => 'Postal Code',
       '{contact.geo_code_1}' => 'Latitude',
       '{contact.geo_code_2}' => 'Longitude',
-      '{contact.manual_geo_code}' => 'Is Manually Geocoded',
       '{contact.address_name}' => 'Address Name',
       '{contact.master_id}' => 'Master Address ID',
       '{contact.county}' => 'County',
-      '{contact.state_province}' => 'State',
+      '{contact.state_province}' => 'State/Province',
       '{contact.country}' => 'Country',
       '{contact.phone}' => 'Phone',
       '{contact.phone_ext}' => 'Phone Extension',
-      '{contact.phone_type_id}' => 'Phone Type ID',
       '{contact.phone_type}' => 'Phone Type',
       '{contact.email}' => 'Email',
-      '{contact.on_hold}' => 'On Hold',
+      '{contact.on_hold:label}' => 'On Hold',
       '{contact.signature_text}' => 'Signature Text',
       '{contact.signature_html}' => 'Signature Html',
-      '{contact.im_provider}' => 'IM Provider',
+      '{contact.provider_id:label}' => 'IM Provider',
       '{contact.im}' => 'IM Screen Name',
       '{contact.openid}' => 'OpenID',
       '{contact.world_region}' => 'World Region',
@@ -593,7 +598,7 @@ emo
       '{contact.custom_12}' => 'Yes No :: Custom Group',
       '{contact.custom_3}' => 'Test Date :: Custom Group',
       '{contact.checksum}' => 'Checksum',
-      '{contact.id}' => 'Internal Contact ID',
+      '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
     ];
   }
@@ -614,7 +619,7 @@ emo
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function getAllContactTokens(): array {
+  public function getOldContactTokens(): array {
     return [
       'contact_type' => 'Individual',
       'do_not_email' => 1,
@@ -786,7 +791,7 @@ gender:Female
 birth_date:December 31st, 1998
 current_employer_id:' . $contact['employer_id'] . '
 contact_is_deleted:
-created_date:January 1st, 2020 12:00 AM
+created_date:January 1st, 2020
 modified_date:' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
 addressee:Mr. Robert Frank Smith II
 email_greeting:Dear Robert
@@ -818,7 +823,7 @@ phone_ext:77
 phone_type_id:2
 phone_type:Mobile
 email:anthony_anderson@civicrm.org
-on_hold:
+on_hold:0
 signature_text:Yours sincerely
 signature_html:<p>Yours</p>
 im_provider:1
@@ -841,6 +846,106 @@ custom_12:Yes
 custom_13:Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
+';
+    return $expected;
+  }
+
+  /**
+   * Get the expected rendered string.
+   *
+   * @param int $id
+   * @param array $tokenData
+   * @param string $actualOutput
+   *
+   * @return string
+   * @throws \API_Exception
+   */
+  protected function getExpectedContactOutputNewStyle($id, array $tokenData, string $actualOutput): string {
+    $checksum = substr($actualOutput, (strpos($actualOutput, 'cs=') + 3), 47);
+    $contact = Contact::get(FALSE)->addWhere('id', '=', $tokenData['contact_id'])->setSelect(['modified_date', 'employer_id'])->execute()->first();
+    $expected = 'contact_type:label |Individual
+do_not_email:label |Yes
+do_not_phone:label |No
+do_not_mail:label |Yes
+do_not_sms:label |Yes
+do_not_trade:label |Yes
+is_opt_out:label |Yes
+external_identifier |blah
+sort_name |Smith, Robert
+display_name |Mr. Robert Smith II
+nick_name |Bob
+image_URL |https://example.com
+preferred_communication_method:label |Phone
+preferred_language:label |French (Canada)
+preferred_mail_format:label |Both
+hash |xyz
+source |Contact Source
+first_name |Robert
+middle_name |Frank
+last_name |Smith
+prefix_id:label |Mr.
+suffix_id:label |II
+formal_title |Dogsbody
+communication_style_id:label |Formal
+job_title |Busy person
+gender_id:label |Female
+birth_date |December 31st, 1998
+employer_id |' . $contact['employer_id'] . '
+is_deleted:label |No
+created_date |January 1st, 2020
+modified_date |' . CRM_Utils_Date::customFormat($contact['modified_date']) . '
+addressee_display |Mr. Robert Frank Smith II
+email_greeting_display |Dear Robert
+postal_greeting_display |Dear Robert
+current_employer |Unit Test Organization
+location_type_id:label |Home
+address_id |' . $id . '
+street_address |Street Address
+street_number |123
+street_number_suffix |S
+street_name |Main St
+street_unit |45B
+supplemental_address_1 |Round the corner
+supplemental_address_2 |Up the road
+supplemental_address_3 |By the big tree
+city |New York
+postal_code_suffix |4578
+postal_code |90210
+geo_code_1 |48.858093
+geo_code_2 |2.294694
+address_name |The white house
+master_id |' . $tokenData['master_id'] . '
+county |
+state_province |TX
+country |United States
+phone |123-456
+phone_ext |77
+phone_type |Mobile
+email |anthony_anderson@civicrm.org
+on_hold:label |No
+signature_text |Yours sincerely
+signature_html |<p>Yours</p>
+provider_id:label |Yahoo
+im |IM Screen Name
+openid |OpenID
+world_region |America South, Central, North and Caribbean
+url |http://civicrm.org
+custom_9 |Mr. Spider Man II
+custom_7 |New Zealand
+custom_8 |France, Canada
+custom_4 |999
+custom_1 |Bobsled
+custom_6 |
+custom_2 |Red
+custom_13 |Purple
+custom_10 |Queensland
+custom_11 |Victoria, New South Wales
+custom_5 |<a href="http://civicrm.org" target="_blank">http://civicrm.org</a>
+custom_12 |Yes
+custom_3 |01/20/2021 12:00AM
+checksum |cs=' . $checksum . '
+id |' . $tokenData['contact_id'] . '
+t_stuff.favourite_emoticon |
 ';
     return $expected;
   }
