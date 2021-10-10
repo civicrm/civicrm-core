@@ -50,7 +50,7 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CRM_Contribute_Form_Rec
       'Return-Path: bob@example.org',
       'Dear Anthony,',
       'Your recurring contribution has been updated as requested:',
-      'Recurring contribution is for $ 10.00, every 1 month(s) for 12 installments.',
+      'Recurring contribution is for $10.00, every 1 month(s) for 12 installments.',
       'If you have questions please contact us at "Bob" <bob@example.org>.',
     ];
   }

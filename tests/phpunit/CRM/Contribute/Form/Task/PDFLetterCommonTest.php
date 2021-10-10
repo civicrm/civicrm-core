@@ -105,7 +105,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
       $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertStringContainsString('USD, USD * $ 60.00, $ 70.00 * January 1st, 2021  1:21 PM, February 1st, 2021  2:21 AM', $e->errorData['html']);
+      $this->assertStringContainsString('USD, USD * $60.00, $70.00 * January 1st, 2021  1:21 PM, February 1st, 2021  2:21 AM', $e->errorData['html']);
     }
   }
 
@@ -198,7 +198,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $this->createLoggedInUser();;
     foreach (['docx', 'odt'] as $docType) {
       $formValues = [
-        'is_unit_test' => TRUE,
         'group_by' => NULL,
         'document_file' => [
           'name' => __DIR__ . "/sample_documents/Template.$docType",
@@ -297,10 +296,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   <body>
     <div id="crm-container">
 id : 1
-total_amount : &euro; 9,999.99
-fee_amount : &euro; 1,111.11
-net_amount : &euro; 7,777.78
-non_deductible_amount : &euro; 2,222.22
+total_amount : €9,999.99
+fee_amount : €1,111.11
+net_amount : €7,777.78
+non_deductible_amount : €2,222.22
 receive_date : July 20th, 2018
 payment_instrument_id:label : Check
 trxn_id : 1234
