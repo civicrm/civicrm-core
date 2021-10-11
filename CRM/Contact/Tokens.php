@@ -288,8 +288,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
-    if (empty($messageTokens)) {
+    $this->activeTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
+    if (empty($this->activeTokens)) {
       return;
     }
 
@@ -302,10 +302,10 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
       if (empty($row->context['contact'])) {
-        $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
+        $row->context['contact'] = $this->getContact($row->context['contactId'], $this->activeTokens);
       }
 
-      foreach ($messageTokens as $token) {
+      foreach ($this->activeTokens as $token) {
         if ($token === 'checksum') {
           $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
             NULL,
@@ -349,6 +349,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     foreach ($possibilities as $possibility) {
       if (isset($row->context[$entityName][$possibility])) {
         return $row->context[$entityName][$possibility];
+      }
+    }
+    $contactID = $this->getFieldValue($row, 'id');
+    if ($contactID) {
+      $row->context['contact'] = array_merge($this->getContact($contactID, $this->activeTokens), $row->context['contact']);
+      if (isset($row->context[$entityName][$field])) {
+        return $row->context[$entityName][$field];
       }
     }
     return '';
@@ -446,6 +453,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         ($joinEntity !== 'Website' ? [$alias . '.is_primary', '=', 1] : []));
     }
     $contact = $contactApi->execute()->first();
+    if (!$contact) {
+      // This is probably a test-only situation where tokens are retrieved for a
+      // fake contact id - check `testReplaceGreetingTokens`
+      return [];
+    }
 
     foreach ($this->getDeprecatedTokens() as $apiv3Name => $fieldName) {
       // it would be set already with the right value for a greeting token
@@ -673,6 +685,15 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'organization_name' => [
         'title' => ts('Organization name'),
         'name' => 'organization_name',
+        'type' => 'Field',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      // this gets forced out if we specify individual fields
+      'household_name' => [
+        'title' => ts('Household name'),
+        'name' => 'household_name',
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',
