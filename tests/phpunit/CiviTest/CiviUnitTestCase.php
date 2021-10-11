@@ -2708,6 +2708,22 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    * Replace the template with a test-oriented template designed to show all the variables.
    *
    * @param string $templateName
+   * @param string $input
+   * @param string $type
+   */
+  protected function swapMessageTemplateForInput(string $templateName, string $input, string $type = 'html'): void {
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_msg_template
+      SET msg_{$type} = %1
+      WHERE workflow_name = '{$templateName}'
+      AND is_default = 1", [1 => [$input, 'String']]
+    );
+  }
+
+  /**
+   * Replace the template with a test-oriented template designed to show all the variables.
+   *
+   * @param string $templateName
    * @param string $type
    */
   protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
