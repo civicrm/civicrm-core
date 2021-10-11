@@ -304,6 +304,8 @@ function _civicrm_api3_order_delete_spec(array &$params) {
  */
 function _order_create_wrangle_membership_params(array &$membershipParams) {
   $fields = Membership::getFields(FALSE)->execute()->indexBy('name');
+  // Ensure this legacy parameter is not true.
+  $membershipParams['skipStatusCal'] = FALSE;
   foreach ($fields as $fieldName => $field) {
     $customFieldName = 'custom_' . ($field['custom_field_id'] ?? NULL);
     if ($field['type'] === ['Custom'] && isset($membershipParams[$customFieldName])) {
