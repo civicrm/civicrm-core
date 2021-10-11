@@ -124,7 +124,7 @@ class AfformAdminMeta {
     $fields = (array) civicrm_api4($entityName, 'getFields', $params);
 
     // Add implicit joins to search fields
-    if ($params['action'] === 'search') {
+    if ($params['action'] === 'get') {
       foreach (array_reverse($fields, TRUE) as $index => $field) {
         if (!empty($field['fk_entity']) && !$field['options']) {
           $fkLabelField = CoreUtil::getInfoItem($field['fk_entity'], 'label_field');
