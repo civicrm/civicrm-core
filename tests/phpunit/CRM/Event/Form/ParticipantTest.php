@@ -830,7 +830,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     /* @var CRM_Event_Form_SelfSvcTransfer $form */
     $form = $this->getFormObject('CRM_Event_Form_SelfSvcTransfer');
     $toContactId = $this->individualCreate();
+    $mut = new CiviMailUtils($this);
+    $this->swapMessageTemplateForInput('event_online_receipt', '{domain.name} {contact.first_name}');
     $form->transferParticipantRegistration($toContactId, $participantId);
+    $mut->checkAllMailLog(['Default Domain Name Anthony']);
+    $mut->clearMessages();
+    $this->revertTemplateToReservedTemplate('event_online_receipt', 'html');
 
     //Assert participant is transferred to $toContactId.
     $participant = $this->callAPISuccess('Participant', 'getsingle', [
