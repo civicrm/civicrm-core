@@ -846,12 +846,33 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   ///////////////// civicrm_membership_create methods
 
   /**
-   * Test civicrm_contact_memberships_create with empty params.
-   * Error expected.
+   * Test dates are calculated for pending membership.
    */
-  public function testCreateWithEmptyParams() {
-    $params = [];
-    $this->callAPIFailure('membership', 'create', $params);
+  public function testCreatePending(): void {
+    $membership = $this->callAPISuccess('Membership', 'create', [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => 'General',
+      'status_id' => 'Pending',
+      'sequential' => 1,
+    ])['values'][0];
+    $this->assertEquals(date('Ymd'), $membership['start_date']);
+    $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
+  }
+
+  /**
+   * Test dates are calculated for pending membership.
+   */
+  public function testCreatePendingWithSkipStatusCalc(): void {
+    $membership = $this->callAPISuccess('Membership', 'create', [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => 'General',
+      'status_id' => 'Pending',
+      'sequential' => 1,
+      'skipStatusCal' => TRUE,
+    ])['values'][0];
+    $this->assertEquals(date('Ymd'), $membership['start_date']);
+    $this->assertEquals(date('Ymd'), $membership['join_date']);
+    $this->assertEquals(date('Ymd', strtotime('+1 year -1 day')), $membership['end_date']);
   }
 
   /**
