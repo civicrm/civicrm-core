@@ -1246,43 +1246,10 @@ WHERE entity_id =%1 AND entity_table = %2";
     $activity = self::create($activityParams);
     $activityID = $activity->id;
 
-    // Process Tokens
-    // token replacement of addressee/email/postal greetings
-    // get the tokens added in subject and message
-    $messageToken = CRM_Utils_Token::getTokens($text);
-    $returnProperties = [];
-    if (isset($messageToken['contact'])) {
-      foreach ($messageToken['contact'] as $key => $value) {
-        $returnProperties[$value] = 1;
-      }
-    }
-    // Call tokens hook
-    $tokens = [];
-    CRM_Utils_Hook::tokens($tokens);
-    $categories = array_keys($tokens);
-    // get token details for contacts, call only if tokens are used
-    $tokenDetails = [];
-    if (!empty($returnProperties) || !empty($tokens)) {
-      [$tokenDetails] = CRM_Utils_Token::getTokenDetails($contactIds,
-        $returnProperties,
-        NULL, NULL, FALSE,
-        $messageToken,
-        'CRM_Activity_BAO_Activity'
-      );
-    }
-
     $success = 0;
     $errMsgs = [];
     foreach ($contactDetails as $contact) {
       $contactId = $contact['contact_id'];
-
-      // Replace tokens
-      if (!empty($tokenDetails) && is_array($tokenDetails["{$contactId}"])) {
-        // unset phone from details since it always returns primary number
-        unset($tokenDetails["{$contactId}"]['phone']);
-        unset($tokenDetails["{$contactId}"]['phone_type_id']);
-        $contact = array_merge($contact, $tokenDetails["{$contactId}"]);
-      }
       $tokenText = CRM_Core_BAO_MessageTemplate::renderTemplate(['messageTemplate' => ['msg_text' => $text], 'contactId' => $contactId, 'disableSmarty' => TRUE])['text'];
 
       // Only send if the phone is of type mobile
