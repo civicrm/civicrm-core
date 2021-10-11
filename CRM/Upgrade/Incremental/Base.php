@@ -322,6 +322,61 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Updated a currency in civicrm_currency and related configurations
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   * @param string $old_name
+   * @param string $new_name
+   *
+   * @return bool
+   */
+  public static function updateCurrencyName($ctx, string $old_name, string $new_name): bool {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_currency SET name = %1 WHERE name = %2', [
+      1 => [$new_name, 'String'],
+      2 => [$old_name, 'String'],
+    ]);
+
+    $oid = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_option_group WHERE name = 'currencies_enabled'");
+    if ($oid) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_option_value SET value = %1 WHERE value = %2 AND option_group_id = %3', [
+        1 => [$new_name, 'String'],
+        2 => [$old_name, 'String'],
+        3 => [$oid, 'String'],
+      ]);
+    }
+
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET fee_currency = %1 WHERE fee_currency = %2', [
+      1 => [$new_name, 'String'],
+      2 => [$old_name, 'String'],
+    ]);
+
+    $tables = [
+      'civicrm_contribution',
+      'civicrm_contribution_page',
+      'civicrm_contribution_recur',
+      'civicrm_contribution_soft',
+      'civicrm_event',
+      'civicrm_financial_item',
+      'civicrm_financial_trxn',
+      'civicrm_grant',
+      'civicrm_pcp',
+      'civicrm_pledge_payment',
+      'civicrm_pledge',
+      'civicrm_product',
+    ];
+
+    foreach ($tables as $table) {
+      CRM_Core_DAO::executeQuery('UPDATE %3 SET currency = %1 WHERE currency = %2', [
+        1 => [$new_name, 'String'],
+        2 => [$old_name, 'String'],
+        3 => [$table, 'MysqlColumnNameOrAlias'],
+      ]);
+    }
+
+    return TRUE;
+  }
+
+  /**
    * Re-save any valid values from contribute settings into the normal setting
    * format.
    *
