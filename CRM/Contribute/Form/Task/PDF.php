@@ -228,6 +228,7 @@ AND    {$this->_componentClause}";
    * @return array
    *   array of common elements
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getElements($contribIds, $params, $contactIds) {
     $pdfElements = [];
@@ -242,21 +243,17 @@ AND    {$this->_componentClause}";
 
     $pdfElements['createPdf'] = FALSE;
     if (!empty($pdfElements['params']['output']) &&
-      ($pdfElements['params']['output'] == "pdf_invoice" || $pdfElements['params']['output'] == "pdf_receipt")
+      ($pdfElements['params']['output'] === 'pdf_invoice' || $pdfElements['params']['output'] === 'pdf_receipt')
     ) {
       $pdfElements['createPdf'] = TRUE;
     }
 
     $excludeContactIds = [];
     if (!$pdfElements['createPdf']) {
-      $returnProperties = [
-        'email' => 1,
-        'do_not_email' => 1,
-        'is_deceased' => 1,
-        'on_hold' => 1,
-      ];
-
-      list($contactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, $returnProperties, FALSE, FALSE);
+      $contactDetails = civicrm_api3('Contact', 'get', [
+        'return' => ['email', 'do_not_email', 'is_deceased', 'on_hold'],
+        'id' => ['IN' => $contactIds],
+      ])['values'];
       $pdfElements['suppressedEmails'] = 0;
       $suppressedEmails = 0;
       foreach ($contactDetails as $id => $values) {
