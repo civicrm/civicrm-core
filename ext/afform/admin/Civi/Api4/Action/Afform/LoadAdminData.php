@@ -161,7 +161,7 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if ($info['definition']['type'] === 'search') {
-      $getFieldsMode = 'search';
+      $getFieldsMode = 'get';
       $displayTags = [];
       if ($newForm) {
         [$searchName, $displayName] = array_pad(explode('.', $this->entity ?? ''), 2, '');
