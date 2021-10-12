@@ -315,11 +315,6 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->context[$entityName][$field];
     }
 
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $aliasedField = $this->getEntityAlias() . $field;
-    if (isset($actionSearchResult->{$aliasedField})) {
-      return $actionSearchResult->{$aliasedField};
-    }
     $entityID = $row->context[$this->getEntityIDField()];
     if ($field === 'id') {
       return $entityID;
@@ -357,9 +352,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
       return;
     }
-    foreach ($this->getReturnFields() as $token) {
-      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
-    }
+    $e->query->select('e.id AS tokenContext_' . $this->getEntityIDField());
   }
 
   /**
