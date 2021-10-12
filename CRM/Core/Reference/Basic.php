@@ -112,21 +112,26 @@ EOS;
    */
   public function getReferenceCount($targetDao) {
     $targetColumn = $this->getTargetKey();
-    $params = [
-      1 => [$targetDao->$targetColumn, 'String'],
-    ];
-    $sql = <<<EOS
+    $count = 0;
+    if ($targetDao->{$targetColumn} !== '' && $targetDao->{$targetColumn} !== NULL) {
+
+      $params = [
+        1 => [$targetDao->{$targetColumn} ?? '', 'String'],
+      ];
+      $sql = <<<EOS
 SELECT count(*)
 FROM {$this->getReferenceTable()}
 WHERE {$this->getReferenceKey()} = %1
 EOS;
+      $count = CRM_Core_DAO::singleValueQuery($sql, $params);
+    }
 
     return [
       'name' => implode(':', ['sql', $this->getReferenceTable(), $this->getReferenceKey()]),
       'type' => get_class($this),
       'table' => $this->getReferenceTable(),
       'key' => $this->getReferenceKey(),
-      'count' => CRM_Core_DAO::singleValueQuery($sql, $params),
+      'count' => $count,
     ];
   }
 
