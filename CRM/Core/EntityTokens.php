@@ -349,9 +349,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if ($e->mapping->getEntity() !== $this->getExtendableTableName()) {
       return;
     }
-    foreach ($this->getReturnFields() as $token) {
-      $e->query->select('e.' . $token . ' AS ' . $this->getEntityAlias() . $token);
-    }
+    $e->query->select('e.id AS tokenContext_' . $this->getEntityIDField());
   }
 
   /**
