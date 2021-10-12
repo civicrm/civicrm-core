@@ -21,7 +21,7 @@
     {* display current relationships *}
     <h3>{ts}Current Relationships{/ts}</h3>
     <div id="permission-legend" class="help">
-      <span class="crm-label">Permissioned Relationships: </span>
+      <span class="crm-label">{ts}Permissioned Relationships: {/ts}</span>
       {include file="CRM/Contact/Page/View/RelationshipPerm.tpl" permType=1 afterText=true}
     </div>
     {include file="CRM/Contact/Page/View/RelationshipSelector.tpl" context="current"}

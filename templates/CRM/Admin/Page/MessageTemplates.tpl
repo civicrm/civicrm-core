@@ -28,7 +28,7 @@
       <textarea name="msg-subject" id="msg_subject" style="height: 6em; width: 45em;">{$form.msg_subject.value}</textarea>
       <div class='spacer'></div>
       <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_subject.select(); return false;' class='button'><span>Select Subject</span></a>
+        <a href='#' onclick='MessageTemplates.msg_subject.select(); return false;' class='button'><span>{ts}Select Subject{/ts}</span></a>
         <div class='spacer'></div>
       </div>
     </div>
@@ -40,7 +40,7 @@
       <textarea class="huge" name='msg_text' id='msg_text'>{$form.msg_text.value|htmlentities}</textarea>
       <div class='spacer'></div>
       <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_text.select(); return false;' class='button'><span>Select Text Message</span></a>
+        <a href='#' onclick='MessageTemplates.msg_text.select(); return false;' class='button'><span>{ts}Select Text Message{/ts}</span></a>
         <div class='spacer'></div>
       </div>
     </div>
@@ -52,7 +52,7 @@
       <textarea class="huge" name='msg_html' id='msg_html'>{$form.msg_html.value|htmlentities}</textarea>
       <div class='spacer'></div>
       <div class="section">
-        <a href='#' onclick='MessageTemplates.msg_html.select(); return false;' class='button'><span>Select HTML Message</span></a>
+        <a href='#' onclick='MessageTemplates.msg_html.select(); return false;' class='button'><span>{ts}Select HTML Message{/ts}</span></a>
         <div class='spacer'></div>
       </div>
     </div>

@@ -9,7 +9,7 @@
 *}
 <div class="crm-block crm-form-block">
 
-<h3>Mapper - 4 Selectors</h3>
+<h3>{ts}Mapper - 4 Selectors{/ts}</h3>
 
 <div class="form-item">
    <dl>

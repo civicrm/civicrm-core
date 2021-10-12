@@ -58,7 +58,7 @@ CRM.$(function($) {
 
 {* Import Progress Bar and Info *}
 <div id="id-processing" class="hiddenElement">
-  <h3>Importing records...</h3><br />
+  <h3>{ts}Importing records...{/ts}</h3><br />
        <div id="status" style="margin-left:6px;"></div>
   <div class="progressBar" id="importProgressBar" style="margin-left:6px;display:none;"></div>
   <div id="intermediate"></div>
