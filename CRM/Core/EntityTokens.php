@@ -307,11 +307,6 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->context[$entityName][$field];
     }
 
-    $actionSearchResult = $row->context['actionSearchResult'];
-    $aliasedField = $this->getEntityAlias() . $field;
-    if (isset($actionSearchResult->{$aliasedField})) {
-      return $actionSearchResult->{$aliasedField};
-    }
     $entityID = $row->context[$this->getEntityIDField()];
     if ($field === 'id') {
       return $entityID;
