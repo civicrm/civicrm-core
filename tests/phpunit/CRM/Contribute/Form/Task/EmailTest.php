@@ -70,10 +70,10 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
     $form->buildForm();
     $this->assertEquals('<br/><br/>--Benny, Benny', $form->_defaultValues['html_message']);
     $form->postProcess();
-    $mut->assertSubjects(['Mr. Anthony Anderson II $ 999.00', 'Mr. Elton Anderson II $ 100.00']);
+    $mut->assertSubjects(['Mr. Anthony Anderson II $999.00', 'Mr. Elton Anderson II $100.00']);
     $mut->checkAllMailLog([
       'Subject: Mr. Anthony Anderson II',
-      '$ 999.0',
+      '$999.0',
       'Default Domain Name',
       'Donation soy',
       'Donation ranch',

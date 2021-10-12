@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Token;
 
+use Brick\Money\Money;
 use Civi\Token\Event\TokenRegisterEvent;
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
@@ -429,7 +430,7 @@ class TokenProcessor {
           '/:"([^"]+)"/' => $enqueue,
         ], $m[3]);
         if ($unmatched) {
-          throw new \CRM_Core_Exception("Malformed token parameters (" . $m[0] . ")");
+          throw new \CRM_Core_Exception('Malformed token parameters (' . $m[0] . ')');
         }
       }
       return $callback($m[0] ?? NULL, $m[1] ?? NULL, $m[2] ?? NULL, $filterParts);
@@ -458,6 +459,10 @@ class TokenProcessor {
       }
     }
 
+    if ($value instanceof Money && $filter === NULL) {
+      $filter = ['crmMoney'];
+    }
+
     switch ($filter[0] ?? NULL) {
       case NULL:
         return $value;
@@ -467,6 +472,11 @@ class TokenProcessor {
 
       case 'lower':
         return mb_strtolower($value);
+
+      case 'crmMoney':
+        if ($value instanceof Money) {
+          return \Civi::format()->money($value->getAmount(), $value->getCurrency());
+        }
 
       case 'crmDate':
         if ($value instanceof \DateTime) {

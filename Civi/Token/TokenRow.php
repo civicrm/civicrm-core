@@ -1,8 +1,11 @@
 <?php
 namespace Civi\Token;
 
+use Brick\Money\Money;
+
 /**
  * Class TokenRow
+ *
  * @package Civi\Token
  *
  * A TokenRow is a helper/stub providing simplified access to the TokenProcessor.
@@ -283,7 +286,7 @@ class TokenRow {
         // HTML => Plain.
         foreach ($htmlTokens as $entity => $values) {
           foreach ($values as $field => $value) {
-            if (!$value instanceof \DateTime) {
+            if (!$value instanceof \DateTime && !$value instanceof Money) {
               $value = html_entity_decode(strip_tags($value));
             }
             if (!isset($textTokens[$entity][$field])) {

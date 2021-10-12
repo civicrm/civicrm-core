@@ -16,6 +16,7 @@ use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 use Civi\ActionSchedule\Event\MailingQueryEvent;
 use Civi\Token\TokenProcessor;
+use Brick\Money\Money;
 
 /**
  * Class CRM_Core_EntityTokens
@@ -123,8 +124,15 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       return $row->customToken($entity, \CRM_Core_BAO_CustomField::getKeyID($field), $this->getFieldValue($row, 'id'));
     }
     if ($this->isMoneyField($field)) {
+      $currency = $this->getCurrency($row);
+      if (!$currency) {
+        // too hard basket for now - just do what we always did.
+        return $row->format('text/plain')->tokens($entity, $field,
+          \CRM_Utils_Money::format($fieldValue, $currency));
+      }
       return $row->format('text/plain')->tokens($entity, $field,
-        \CRM_Utils_Money::format($fieldValue, $this->getCurrency($row)));
+        Money::of($fieldValue, $currency));
+
     }
     if ($this->isDateField($field)) {
       try {
