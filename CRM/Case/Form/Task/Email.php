@@ -33,6 +33,11 @@ class CRM_Case_Form_Task_Email extends CRM_Case_Form_Task {
   /**
    * List available tokens for this form.
    *
+   * @todo - this is not standard behaviour. We should either stop filtering
+   * case tokens by type and just remove this function (which would allow
+   * domain tokens to show up too) or
+   * resolve https://lab.civicrm.org/dev/core/-/issues/2788
+   *
    * @return array
    * @throws \CRM_Core_Exception
    */
@@ -70,14 +75,18 @@ class CRM_Case_Form_Task_Email extends CRM_Case_Form_Task {
    * Get the result rows to email.
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected function getRows(): array {
-    // format contact details array to handle multiple emails from same contact
-    $rows = parent::getRows();
-    foreach ($rows as $index => $row) {
-      $rows[$index]['schema']['caseId'] = $this->getCaseID();
+  protected function getRowsForEmails(): array {
+    $formattedContactDetails = [];
+    foreach ($this->getEmails() as $details) {
+      $contactID = $details['contact_id'];
+      $index = $contactID . '::' . $details['email'];
+      $formattedContactDetails[$index] = $details;
+      $formattedContactDetails[$index]['schema'] = ['contactId' => $contactID, 'caseId' => $this->getCaseID()];
     }
-    return $rows;
+    return $formattedContactDetails;
   }
 
 }
