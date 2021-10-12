@@ -547,7 +547,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
     if (isset($this->getTokenMappingsForRelatedEntities()[$fieldName])) {
       return $this->getTokenMetadata()[$this->getTokenMappingsForRelatedEntities()[$fieldName]];
     }
-    return $this->getTokenMetadata()[$this->getDeprecatedTokens()[$fieldName]];
+    return $this->getTokenMetadata()[$this->getDeprecatedTokens()[$fieldName]] ?? [];
   }
 
   /**
