@@ -1853,6 +1853,7 @@ input.crm-form-entityref {
   width: 10px;
   padding-top: 4px;
   padding-right: 4px;
+  display: inline-block;
 }
 
 /* crm button style */
