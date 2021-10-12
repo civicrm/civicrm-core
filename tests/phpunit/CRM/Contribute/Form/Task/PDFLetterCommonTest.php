@@ -161,7 +161,6 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, TRUE, TRUE, $messageToken, 'test', '**', FALSE);
 
     $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
-    $this->assertEquals('emo', $contacts[$this->_individualId]['favourite_emoticon']);
     $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
     $this->assertEquals($campaignTitle, $contributions[$result['id']]['campaign']);
     $this->assertEquals('Check', $contributions[$result['id']]['payment_instrument']);
@@ -261,14 +260,16 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   /**
    * Test all contribution tokens.
    *
-   * @throws \API_Exception
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function testAllContributionTokens(): void {
+    $this->hookClass->setHook('civicrm_tokenValues', [$this, 'hookTokenValues']);
+    $this->hookClass->setHook('civicrm_tokens', [$this, 'hook_tokens']);
+
     $this->createLoggedInUser();
     $this->createCustomGroupWithFieldsOfAllTypes(['extends' => 'Contribution']);
-    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one']);
+    $this->campaignCreate(['name' => 'Big one', 'title' => 'Big one'], FALSE);
     $tokens = $this->getAllContributionTokens();
     $formValues = [
       'document_type' => 'pdf',
@@ -277,6 +278,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     foreach (array_keys($this->getAllContributionTokens()) as $token) {
       $formValues['html_message'] .= "$token : {contribution.$token}\n";
     }
+    $formValues['html_message'] .= '{emoji.favourite_emoticon}';
     /* @var $form CRM_Contribute_Form_Task_PDFLetter */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
     $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
@@ -326,6 +328,7 @@ campaign_id:label : Big one
 ' . $this->getCustomFieldName('multi_state') . ' : Victoria, New South Wales
 ' . $this->getCustomFieldName('boolean') . ' : Yes
 ' . $this->getCustomFieldName('checkbox') . ' : Purple
+emo
     </div>
   </body>
 </html>', $html);
@@ -513,6 +516,7 @@ campaign_id:label : Big one
   public function hook_tokens(&$tokens): void {
     $this->hookTokensCalled++;
     $tokens['aggregate'] = ['rendered_token' => 'rendered_token'];
+    $tokens['emoji'] = ['favourite_emoticon' => 'favourite_emoticon'];
   }
 
   /**
