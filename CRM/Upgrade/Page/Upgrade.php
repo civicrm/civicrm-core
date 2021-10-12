@@ -77,6 +77,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     CRM_Core_Smarty::singleton()->assign('sid', CRM_Utils_System::getSiteID());
     // Show success msg if db already upgraded
     if (version_compare($currentVer, $latestVer) == 0) {
+      $template->assign('message', '');
       $template->assign('upgraded', TRUE);
       $template->assign('newVersion', $latestVer);
       CRM_Utils_System::setTitle(ts('Your database has already been upgraded to CiviCRM %1',
@@ -189,6 +190,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
     $template->assign('message', $postUpgradeMessage);
     $template->assign('upgraded', TRUE);
     $template->assign('newVersion', $latestVer);
+    $template->assign('sid', CRM_Utils_System::getSiteID());
 
     // Render page header
     if (!defined('CIVICRM_UF_HEAD') && $region = CRM_Core_Region::instance('html-header', FALSE)) {
