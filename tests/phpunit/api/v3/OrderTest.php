@@ -317,6 +317,141 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test create order api for membership, allowing BAO to calculate dates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAddOrderForMembershipAutoDates(): void {
+    $membershipType = $this->membershipTypeCreate();
+    $p = [
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Pending',
+    ];
+    $priceFields = $this->createPriceSet();
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = [
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => $membershipType,
+      ];
+    }
+    $p['line_items'][] = [
+      'line_item' => [array_pop($lineItems)],
+      'params' => [
+        'contact_id' => $this->_individualId,
+        'membership_type_id' => $membershipType,
+        'source' => 'Payment',
+      ],
+    ];
+
+    // Create expected dates immediately before order creation to minimise chance of day changing over.
+    $expectedStart = date('Y-m-d');
+    $expectedEnd = date('Y-m-d', strtotime('+ 1 year - 1 day'));
+
+    $order = $this->callAPISuccess('Order', 'create', $p, __FUNCTION__, __FILE__);
+
+    $params = [
+      'id' => $order['id'],
+    ];
+    $order = $this->callAPISuccess('Order', 'get', $params);
+    $expectedResult = [
+      $order['id'] => [
+        'total_amount' => 200,
+        'contribution_id' => $order['id'],
+        'contribution_status' => 'Pending Label**',
+        'net_amount' => 200,
+      ],
+    ];
+    $this->checkPaymentResult($order, $expectedResult);
+
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
+
+    // Check membership dates automatically added for legacy skipStatusCal
+    $this->assertEquals($expectedStart, $membership['join_date'] ?? NULL, 'join_date is calculated');
+    $this->assertEquals($expectedStart, $membership['start_date'] ?? NULL, 'start_date is calculated');
+    $this->assertEquals($expectedEnd, $membership['end_date'] ?? NULL, 'end_date is calculated');
+
+    $this->callAPISuccess('Contribution', 'Delete', ['id' => $order['id']]);
+  }
+
+  /**
+   * Test create order api for membership, allowing BAO to calculate dates; skipStatusCal is set but should be ignored.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testAddOrderForMembershipAutoDatesSkipStatusCal(): void {
+    $membershipType = $this->membershipTypeCreate();
+    $p = [
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 'Member Dues',
+      'contribution_status_id' => 'Pending',
+    ];
+    $priceFields = $this->createPriceSet();
+    foreach ($priceFields['values'] as $key => $priceField) {
+      $lineItems[$key] = [
+        'price_field_id' => $priceField['price_field_id'],
+        'price_field_value_id' => $priceField['id'],
+        'label' => $priceField['label'],
+        'field_title' => $priceField['label'],
+        'qty' => 1,
+        'unit_price' => $priceField['amount'],
+        'line_total' => $priceField['amount'],
+        'financial_type_id' => $priceField['financial_type_id'],
+        'entity_table' => 'civicrm_membership',
+        'membership_type_id' => $membershipType,
+      ];
+    }
+    $p['line_items'][] = [
+      'line_item' => [array_pop($lineItems)],
+      'params' => [
+        'contact_id' => $this->_individualId,
+        'membership_type_id' => $membershipType,
+        'source' => 'Payment',
+        'skipStatusCal' => 1,
+      ],
+    ];
+
+    // Create expected dates immediately before order creation to minimise chance of day changing over.
+    $expectedStart = date('Y-m-d');
+    $expectedEnd = date('Y-m-d', strtotime('+ 1 year - 1 day'));
+
+    $order = $this->callAPISuccess('Order', 'create', $p, __FUNCTION__, __FILE__);
+
+    $params = [
+      'id' => $order['id'],
+    ];
+    $order = $this->callAPISuccess('Order', 'get', $params);
+    $expectedResult = [
+      $order['id'] => [
+        'total_amount' => 200,
+        'contribution_id' => $order['id'],
+        'contribution_status' => 'Pending Label**',
+        'net_amount' => 200,
+      ],
+    ];
+    $this->checkPaymentResult($order, $expectedResult);
+
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
+
+    // Check membership dates automatically added for legacy skipStatusCal
+    $this->assertEquals($expectedStart, $membership['join_date'] ?? NULL, 'join_date is calculated');
+    $this->assertEquals($expectedStart, $membership['start_date'] ?? NULL, 'start_date is calculated');
+    $this->assertEquals($expectedEnd, $membership['end_date'] ?? NULL, 'end_date is calculated');
+
+    $this->callAPISuccess('Contribution', 'Delete', ['id' => $order['id']]);
+  }
+
+  /**
    * Test create order api for participant
    *
    * @throws \CRM_Core_Exception

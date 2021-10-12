@@ -47,6 +47,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
+    $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
 
@@ -204,6 +205,28 @@ case.custom_1 :' . '
     $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
     $tokenProcessor->evaluate();
     $this->assertEquals($this->getExpectedContributionRecurTokenOutPut(), $tokenProcessor->getRow(0)->render('html'));
+  }
+
+  /**
+   * Test money format tokens can respect passed in locale.
+   */
+  public function testMoneyFormat(): void {
+    // Our 'migration' off configured thousand separators at the moment is a define.
+    putenv('IGNORE_SEPARATOR_CONFIG=1');
+    $this->createLoggedInUser();
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['contribution_recurId'],
+    ]);
+    $tokenString = '{contribution_recur.amount}';
+    $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
+    $tokenProcessor->addRow([
+      'contribution_recurId' => $this->getContributionRecurID(),
+      'locale' => 'nb_NO',
+    ]);
+    $tokenProcessor->evaluate();
+    $this->assertEquals('€ 5 990,99', $tokenProcessor->getRow(0)->render('html'));
   }
 
   /**
@@ -379,7 +402,7 @@ case.custom_1 :' . '
    */
   protected function getExpectedContributionRecurTokenOutPut(): string {
     return 'contribution_recur.id :' . $this->getContributionRecurID() . '
-contribution_recur.amount :€ 5,990.99
+contribution_recur.amount :€5,990.99
 contribution_recur.currency :EUR
 contribution_recur.frequency_unit :year
 contribution_recur.frequency_interval :2
@@ -533,7 +556,7 @@ participant.role_id :1
 participant.register_date :February 19th, 2007
 participant.source :Wimbeldon
 participant.fee_level :steep
-participant.fee_amount :$ 50.00
+participant.fee_amount :$50.00
 participant.registered_by_id :
 participant.transferred_to_contact_id :
 participant.role_id:label :Attendee

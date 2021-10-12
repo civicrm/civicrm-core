@@ -584,9 +584,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
         foreach ($tokenProcessor->getRows() as $row) {
           $resolvedTokens[$token][$row->context['contributionId']] = $row->render($token);
         }
-        // We've resolved the value for each row - resorting to swapping them out
-        // with the old function.
-        $html_message = CRM_Utils_Token::token_replace('contribution', $token, implode($separator, $resolvedTokens[$token]), $html_message);
+        $html_message = str_replace('{contribution.' . $token . '}', implode($separator, $resolvedTokens[$token]), $html_message);
       }
     }
     $tokenContext['contributionId'] = $contributionID;

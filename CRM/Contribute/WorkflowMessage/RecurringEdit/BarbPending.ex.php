@@ -21,7 +21,7 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit_BarbPending extends \Civi\Wor
     $example['asserts'] = [
       'default' => [
         ['for' => 'subject', 'regex' => '/Recurring Contribution Update.*Barb/'],
-        ['for' => 'text', 'regex' => '/Recurring contribution is for € 5,990.99, every 2 year.s. for 24 installments/'],
+        ['for' => 'text', 'regex' => '/Recurring contribution is for €5,990.99, every 2 year.s. for 24 installments/'],
       ],
     ];
   }

@@ -3,6 +3,7 @@ namespace Civi\Token;
 
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
+use Money\Money;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -69,7 +70,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     if ($useSmarty) {
       $smartyVars = [];
       foreach ($e->context['smartyTokenAlias'] ?? [] as $smartyName => $tokenName) {
-        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName));
+        $smartyVars[$smartyName] = \CRM_Utils_Array::pathGet($e->row->tokens, explode('.', $tokenName), $e->context['locale'] ?? NULL);
+        if ($smartyVars[$smartyName] instanceof \Brick\Money\Money) {
+          $smartyVars[$smartyName] = \Civi::format()->money($smartyVars[$smartyName]->getAmount(), $smartyVars[$smartyName]->getCurrency());
+        }
       }
       \CRM_Core_Smarty::singleton()->pushScope($smartyVars);
       try {
