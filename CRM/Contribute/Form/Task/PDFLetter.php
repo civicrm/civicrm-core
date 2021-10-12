@@ -316,6 +316,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @param bool $isIncludeSoftCredits
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
@@ -356,16 +357,12 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     // CiviMail, with a big performance impact.
     // Hooks allow more nuanced smarty usage here.
     CRM_Core_Smarty::singleton()->assign('contributions', $contributions);
+    $resolvedContacts = civicrm_api3('Contact', 'get', [
+      'return' => array_keys($returnProperties),
+      'id' => ['IN' => array_keys($contacts)],
+    ])['values'];
     foreach ($contacts as $contactID => $contact) {
-      [$tokenResolvedContacts] = CRM_Utils_Token::getTokenDetails(['contact_id' => $contactID],
-        $returnProperties,
-        $skipOnHold,
-        $skipDeceased,
-        NULL,
-        $messageToken,
-        $task
-      );
-      $contacts[$contactID] = array_merge($tokenResolvedContacts[$contactID], $contact);
+      $contacts[$contactID] = array_merge($resolvedContacts[$contactID], $contact);
     }
     return [$contributions, $contacts];
   }
