@@ -33,7 +33,7 @@
                     <td class="crm-report-instanceList-description">{$row.description}</td>
                     <td>
                     <a href="{$row.viewUrl}" class="action-item crm-hover-button">{ts}View Results{/ts}</a>
-                    <span class="btn-slide crm-hover-button">more
+                    <span class="btn-slide crm-hover-button">{ts}more{/ts}
                       <ul class="panel">
                         {foreach from=$row.actions item=action key=action_name}
                           <li><a href="{$action.url}" class="{$action_name} action-item crm-hover-button small-popup"

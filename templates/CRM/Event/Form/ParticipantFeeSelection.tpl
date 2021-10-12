@@ -81,7 +81,7 @@ CRM.$(function($) {
 
 {/literal}
 </script>
-<h3>Change Registration Selections</h3>
+<h3>{ts}Change Registration Selections{/ts}</h3>
 
 <div class="crm-block crm-form-block crm-payment-form-block">
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

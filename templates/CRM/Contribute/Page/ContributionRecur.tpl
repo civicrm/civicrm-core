@@ -25,7 +25,7 @@
       {else}
         <tr><td class="label">{ts}Amount{/ts}</td><td>{$recur.amount|crmMoney:$recur.currency}{if $is_test} ({ts}test{/ts}){/if}</td></tr>
       {/if}
-      <tr><td class="label">{ts}Frequency{/ts}</td><td>every {$recur.frequency_interval} {$recur.frequency_unit}</td></tr>
+      <tr><td class="label">{ts}Frequency{/ts}</td><td>{ts 1=$recur.frequency_interval 2=$recur.frequency_unit}every %1 %2{/ts}</td></tr>
       {if !empty($recur.installments)}<tr><td class="label">{ts}Installments{/ts}</td><td>{$recur.installments}</td></tr>{/if}
       <tr><td class="label">{ts}Status{/ts}</td><td>{$recur.contribution_status}</td></tr>
       <tr><td class="label">{ts}Start Date{/ts}</td><td>{$recur.start_date|crmDate}</td></tr>
