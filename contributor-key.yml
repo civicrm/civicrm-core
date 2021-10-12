@@ -150,6 +150,10 @@
   name        : Andrew Wasson
   organization: Luna Design
 
+- github      : awestuk
+  organization: Humanists UK
+  name        : Andrew West;
+
 - github      : awzilkie
   name        : Adam Zilkie
 
@@ -1154,6 +1158,9 @@
 
 - github      : ray-wright
   name        : Ray Wright
+
+- github      : rbaugh
+  name        : Richard Baugh
 
 - github      : reecebenson
   name        : Reece Benson
