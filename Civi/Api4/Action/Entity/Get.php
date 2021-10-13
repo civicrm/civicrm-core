@@ -40,15 +40,15 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     $entities = $cache->get('api4.entities.info', []);
 
     if (!$entities) {
+      // Load entities declared in API files
       foreach ($this->getAllApiClasses() as $className) {
-        // Load entities declared in API files
         $this->loadEntity($className, $entities);
-        // Load entities based on custom data
-        $entities = array_merge($entities, $this->getCustomEntities());
-        // Allow extensions to modify the list of entities
-        $event = GenericHookEvent::create(['entities' => &$entities]);
-        \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
       }
+      // Load entities based on custom data
+      $entities = array_merge($entities, $this->getCustomEntities());
+      // Allow extensions to modify the list of entities
+      $event = GenericHookEvent::create(['entities' => &$entities]);
+      \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
       ksort($entities);
       $cache->set('api4.entities.info', $entities);
     }

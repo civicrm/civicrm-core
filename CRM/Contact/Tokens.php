@@ -33,6 +33,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
+   * Tokens defined by the legacy hook.
+   *
+   * @var array
+   */
+  protected $hookTokens;
+
+  /**
    * @inheritDoc
    */
   public static function getSubscribedEvents(): array {
@@ -112,9 +119,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getLegacyHookTokens(): array {
     $tokens = [];
-    $hookTokens = [];
-    \CRM_Utils_Hook::tokens($hookTokens);
-    foreach ($hookTokens as $tokenValues) {
+
+    foreach ($this->getHookTokens() as $tokenValues) {
       foreach ($tokenValues as $key => $value) {
         if (is_numeric($key)) {
           // This appears to be an attempt to compensate for
@@ -243,10 +249,10 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    */
   public function evaluateLegacyHookTokens(TokenValueEvent $e): void {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    $hookTokens = array_intersect(\CRM_Utils_Token::getTokenCategories(), array_keys($messageTokens));
-    if (empty($hookTokens)) {
+    if (!array_intersect(array_keys($this->getHookTokens()), array_keys($messageTokens))) {
       return;
     }
+
     foreach ($e->getRows() as $row) {
       if (empty($row->context['contactId'])) {
         continue;
@@ -266,9 +272,15 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         $messageTokens,
         $row->context['controller']
       );
-      foreach ($hookTokens as $hookToken) {
-        foreach ($messageTokens[$hookToken] as $tokenName) {
-          $row->format('text/html')->tokens($hookToken, $tokenName, $contactArray[$row->context['contactId']]["{$hookToken}.{$tokenName}"] ?? '');
+      foreach ($this->getHookTokens() as $category => $hookToken) {
+        if (!empty($messageTokens[$category])) {
+          foreach (array_keys($hookToken) as $tokenName) {
+            $tokenPartOnly = str_replace($category . '.', '', $tokenName);
+            if (in_array($tokenPartOnly, $messageTokens[$category], TRUE)) {
+              $row->format('text/html')
+                ->tokens($category, str_replace($category . '.', '', $tokenName), $contactArray[$row->context['contactId']][$tokenName] ?? ($contactArray[$row->context['contactId']][$category . '.' . $tokenName] ?? ''));
+            }
+          }
         }
       }
     }
@@ -674,6 +686,25 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         'audience' => 'sysadmin',
       ],
     ];
+  }
+
+  /**
+   * Get the tokens defined by the legacy hook.
+   *
+   * @return array
+   */
+  protected function getHookTokens(): array {
+    if ($this->hookTokens === NULL) {
+      if (isset(Civi::$statics[__CLASS__]['hook_tokens'])) {
+        $this->hookTokens = Civi::$statics[__CLASS__]['hook_tokens'];
+      }
+      else {
+        $this->hookTokens = [];
+        \CRM_Utils_Hook::tokens($this->hookTokens);
+        Civi::$statics[__CLASS__]['hook_tokens'] = $this->hookTokens;
+      }
+    }
+    return $this->hookTokens;
   }
 
 }
