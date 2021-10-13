@@ -382,7 +382,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
     }
 
     foreach ($this->getRelatedEntityTokenMetadata() as $entity => $exposedFields) {
-      $apiEntity = ($entity === 'openid') ? 'OpenID' : $entity;
+      $apiEntity = ($entity === 'openid') ? 'OpenID' : ucfirst($entity);
       $metadata = (array) civicrm_api4($apiEntity, 'getfields', ['checkPermissions' => FALSE], 'name');
       foreach ($metadata as $field) {
         $this->addFieldToTokenMetadata($field, $exposedFields, 'primary_' . $entity);
