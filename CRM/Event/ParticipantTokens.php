@@ -10,7 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
 /**
@@ -19,13 +18,6 @@ use Civi\Token\TokenRow;
  * Generate "participant.*" tokens.
  */
 class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
-
-  public static function getSubscribedEvents() {
-    $events = parent::getSubscribedEvents();
-    // Set the weight so it runs before event tokens.
-    $events['civi.token.eval'] = ['evaluateTokens', 400];
-    return $events;
-  }
 
   /**
    * Get the entity name for api v4 calls.
@@ -44,21 +36,6 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * To handle variable tokens, override this function and return the active tokens.
-   *
-   * @param \Civi\Token\Event\TokenValueEvent $e
-   *
-   * @return mixed
-   */
-  public function getActiveTokens(TokenValueEvent $e) {
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!isset($messageTokens[$this->entity])) {
-      return isset($messageTokens['event']) ? ['event_id'] : FALSE;
-    }
-    return parent::getActiveTokens($e);
-  }
-
-  /**
    * Get any tokens with custom calculation.
    */
   protected function getBespokeTokens(): array {
@@ -74,15 +51,20 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
     ];
   }
 
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
+    // When targeting `civicrm_participant` records, we enable both `{participant.*}` (per usual) and the related `{event.*}`.
+    parent::alterActionScheduleQuery($e);
+    if ($e->mapping->getEntity() === $this->getExtendableTableName()) {
+      $e->query->select('e.event_id AS tokenContext_eventId');
+    }
+  }
+
   /**
    * @inheritDoc
    * @throws \CiviCRM_API3_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $this->prefetch = (array) $prefetch;
-    if (empty($row->context['eventId'])) {
-      $row->context['eventId'] = $this->getFieldValue($row, 'event_id');
-    }
     if ($field === 'balance') {
       // @todo - is this really a good idea to call this & potentially get the
       // balance of the contribution attached to 'registered_by_id'
