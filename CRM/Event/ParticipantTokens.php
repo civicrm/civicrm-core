@@ -74,15 +74,20 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
     ];
   }
 
+  public function alterActionScheduleQuery(\Civi\ActionSchedule\Event\MailingQueryEvent $e): void {
+    // When targeting `civicrm_participant` records, we enable both `{participant.*}` (per usual) and the related `{event.*}`.
+    parent::alterActionScheduleQuery($e);
+    if ($e->mapping->getEntity() === $this->getExtendableTableName()) {
+      $e->query->select('e.event_id AS tokenContext_eventId');
+    }
+  }
+
   /**
    * @inheritDoc
    * @throws \CiviCRM_API3_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {
     $this->prefetch = (array) $prefetch;
-    if (empty($row->context['eventId'])) {
-      $row->context['eventId'] = $this->getFieldValue($row, 'event_id');
-    }
     if ($field === 'balance') {
       // @todo - is this really a good idea to call this & potentially get the
       // balance of the contribution attached to 'registered_by_id'
