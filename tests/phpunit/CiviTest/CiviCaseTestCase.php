@@ -111,8 +111,8 @@ class CiviCaseTestCase extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
-    $this->quickCleanup($this->tablesToTruncate, TRUE);
     $this->customDirectories(array('template_path' => FALSE));
+    $this->quickCleanup($this->tablesToTruncate, TRUE);
     CRM_Case_XMLRepository::singleton(TRUE);
   }
 

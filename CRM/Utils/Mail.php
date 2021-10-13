@@ -572,7 +572,7 @@ class CRM_Utils_Mail {
    * contact ID in RFC822 format.
    *
    * @param string $from
-   *   contact ID or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
+   *   civicrm_email.id or formatted "From address", eg. 12 or "Fred Bloggs" <fred@example.org>
    * @return string
    *   The RFC822-formatted email header (display name + address)
    */
