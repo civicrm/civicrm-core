@@ -10,7 +10,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Token\Event\TokenValueEvent;
 use Civi\Token\TokenRow;
 
 /**
@@ -19,13 +18,6 @@ use Civi\Token\TokenRow;
  * Generate "participant.*" tokens.
  */
 class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
-
-  public static function getSubscribedEvents() {
-    $events = parent::getSubscribedEvents();
-    // Set the weight so it runs before event tokens.
-    $events['civi.token.eval'] = ['evaluateTokens', 400];
-    return $events;
-  }
 
   /**
    * Get the entity name for api v4 calls.
@@ -41,21 +33,6 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
    */
   public function getCurrencyFieldName(): array {
     return ['fee_currency'];
-  }
-
-  /**
-   * To handle variable tokens, override this function and return the active tokens.
-   *
-   * @param \Civi\Token\Event\TokenValueEvent $e
-   *
-   * @return mixed
-   */
-  public function getActiveTokens(TokenValueEvent $e) {
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!isset($messageTokens[$this->entity])) {
-      return isset($messageTokens['event']) ? ['event_id'] : FALSE;
-    }
-    return parent::getActiveTokens($e);
   }
 
   /**
