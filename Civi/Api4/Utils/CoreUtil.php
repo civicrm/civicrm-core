@@ -13,6 +13,7 @@
 namespace Civi\Api4\Utils;
 
 use Civi\API\Request;
+use Civi\Api4\Entity;
 use Civi\Api4\Event\CreateApi4RequestEvent;
 use CRM_Core_DAO_AllCoreTables as AllCoreTables;
 
@@ -29,14 +30,8 @@ class CoreUtil {
     if ($entityName === 'CustomValue' || strpos($entityName, 'Custom_') === 0) {
       return 'CRM_Core_BAO_CustomValue';
     }
-    $dao = self::getInfoItem($entityName, 'dao');
-    if (!$dao) {
-      return NULL;
-    }
-    $bao = str_replace("DAO", "BAO", $dao);
-    // Check if this entity actually has a BAO. Fall back on the DAO if not.
-    $file = strtr($bao, '_', '/') . '.php';
-    return stream_resolve_include_path($file) ? $bao : $dao;
+    $dao = AllCoreTables::getFullName($entityName);
+    return $dao ? AllCoreTables::getBAOClassName($dao) : NULL;
   }
 
   /**
@@ -57,8 +52,11 @@ class CoreUtil {
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    $className = self::getApiClass($entityName);
-    return $className ? $className::getInfo()[$keyToReturn] ?? NULL : NULL;
+    $info = Entity::get(FALSE)
+      ->addWhere('name', '=', $entityName)
+      ->addSelect($keyToReturn)
+      ->execute()->first();
+    return $info ? $info[$keyToReturn] ?? NULL : NULL;
   }
 
   /**

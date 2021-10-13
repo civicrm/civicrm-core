@@ -21,11 +21,29 @@ namespace api\v4\Action;
 
 use api\v4\UnitTestCase;
 use Civi\Api4\MockBasicEntity;
+use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\GenericHookEvent;
+use Civi\Test\HookInterface;
 
 /**
  * @group headless
  */
-class BasicActionsTest extends UnitTestCase {
+class BasicActionsTest extends UnitTestCase implements HookInterface {
+
+  /**
+   * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function on_civi_api4_entityTypes(GenericHookEvent $e): void {
+    $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
+  }
+
+  public function setUpHeadless() {
+    // Ensure MockBasicEntity gets added via above listener
+    \Civi::cache('metadata')->clear();
+    return parent::setUpHeadless();
+  }
 
   private function replaceRecords(&$records) {
     MockBasicEntity::delete()->addWhere('identifier', '>', 0)->execute();
@@ -38,6 +56,7 @@ class BasicActionsTest extends UnitTestCase {
     $info = MockBasicEntity::getInfo();
     $this->assertEquals('MockBasicEntity', $info['name']);
     $this->assertEquals(['identifier'], $info['primary_key']);
+    $this->assertEquals('identifier', CoreUtil::getIdFieldName('MockBasicEntity'));
   }
 
   public function testCrud() {
