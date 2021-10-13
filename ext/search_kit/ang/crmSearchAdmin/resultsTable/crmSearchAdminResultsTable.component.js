@@ -77,6 +77,9 @@
         };
         ctrl.settings = ctrl.display.settings;
         setLabel();
+        ctrl.results = null;
+        ctrl.rowCount = null;
+        ctrl.page = 1;
       }
 
       function setLabel() {
@@ -86,7 +89,6 @@
       this.$onInit = function() {
         buildSettings();
         this.initializeDisplay($scope, $element);
-        $scope.$watch('$ctrl.search.api_entity', buildSettings);
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
         $scope.$watch('$ctrl.search.label', setLabel);
       };

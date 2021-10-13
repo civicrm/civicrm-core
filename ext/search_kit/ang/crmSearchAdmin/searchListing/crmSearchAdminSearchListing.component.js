@@ -60,9 +60,9 @@
 
       this.onPostRun.push(function(result) {
         _.each(result, function(row) {
-          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.display_acl_bypass.raw, true);
+          row.permissionToEdit = CRM.checkPerm('all CiviCRM permissions and ACLs') || !_.includes(row.data.display_acl_bypass, true);
           // Saves rendering cycles to not show an empty menu of search displays
-          if (!row.display_name.raw) {
+          if (!row.data.display_name) {
             row.openDisplayMenu = false;
           }
         });
@@ -77,16 +77,16 @@
         function getConfirmationMsg() {
           var msg = '<h4>' + _.escape(ts('Permanently delete this saved search?')) + '</h4>' +
             '<ul>';
-          if (search.display_label.view && search.display_label.view.length === 1) {
+          if (search.data.display_label && search.data.display_label.length === 1) {
             msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
-          } else if (search.display_label.view && search.display_label.view.length > 1) {
-            msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.view.length})) + '</li>';
+          } else if (search.data.display_label && search.data.display_label.length > 1) {
+            msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.data.display_label.length})) + '</li>';
           }
-          _.each(search.groups.view, function(smartGroup) {
+          _.each(search.data.groups, function(smartGroup) {
             msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
           });
           if (search.afform_count) {
-            _.each(ctrl.afforms[search.name.raw], function(afform) {
+            _.each(ctrl.afforms[search.data.name], function(afform) {
               msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
             });
           }
@@ -94,7 +94,7 @@
         }
 
         var dialog = CRM.confirm({
-          title: ts('Delete %1', {1: search.label.view}),
+          title: ts('Delete %1', {1: search.data.label}),
           message: getConfirmationMsg(),
         }).on('crmConfirm:yes', function() {
           $scope.$apply(function() {
@@ -109,7 +109,7 @@
 
       this.deleteSearch = function(search) {
         crmStatus({start: ts('Deleting...'), success: ts('Search Deleted')},
-          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.id.raw]]}).then(function() {
+          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.data.id]]}).then(function() {
             ctrl.rowCount = null;
             ctrl.runSearch();
           })
@@ -219,7 +219,7 @@
 
       function updateAfformCounts() {
         _.each(ctrl.results, function(row) {
-          row.afform_count = ctrl.afforms && ctrl.afforms[row.name.raw] && ctrl.afforms[row.name.raw].length || 0;
+          row.afform_count = ctrl.afforms && ctrl.afforms[row.data.name] && ctrl.afforms[row.data.name].length || 0;
         });
       }
 

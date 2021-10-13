@@ -87,6 +87,12 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
               'dataType' => 'String',
               'type' => 'field',
             ],
+            [
+              'key' => 'is_deceased',
+              'label' => 'Deceased',
+              'dataType' => 'Boolean',
+              'type' => 'field',
+            ],
           ],
           'sort' => [
             ['id', 'ASC'],
@@ -103,19 +109,19 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $params['filters']['first_name'] = ['One', 'Two'];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('One', $result[0]['first_name']['raw']);
-    $this->assertEquals('Two', $result[1]['first_name']['raw']);
+    $this->assertEquals('One', $result[0]['data']['first_name']);
+    $this->assertEquals('Two', $result[1]['data']['first_name']);
 
     // Raw value should be boolean, view value should be string
-    $this->assertEquals(FALSE, $result[0]['is_deceased']['raw']);
-    $this->assertEquals(ts('No'), $result[0]['is_deceased']['view']);
+    $this->assertEquals(FALSE, $result[0]['data']['is_deceased']);
+    $this->assertEquals(ts('No'), $result[0]['columns'][4]['val']);
 
-    $params['filters'] = ['last_name' => $lastName, 'id' => ['>' => $result[0]['id']['raw'], '<=' => $result[1]['id']['raw'] + 1]];
+    $params['filters'] = ['last_name' => $lastName, 'id' => ['>' => $result[0]['data']['id'], '<=' => $result[1]['data']['id'] + 1]];
     $params['sort'] = [['first_name', 'ASC']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('Three', $result[0]['first_name']['raw']);
-    $this->assertEquals('Two', $result[1]['first_name']['raw']);
+    $this->assertEquals('Three', $result[0]['data']['first_name']);
+    $this->assertEquals('Two', $result[1]['data']['first_name']);
 
     $params['filters'] = ['last_name' => $lastName, 'contact_sub_type:label' => ['Tester', 'Bot']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
@@ -186,9 +192,9 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertNotEmpty($result->first()['display_name']['raw']);
+    $this->assertNotEmpty($result->first()['data']['display_name']);
     // Assert that display name was added to the search due to the link token
-    $this->assertNotEmpty($result->first()['sort_name']['raw']);
+    $this->assertNotEmpty($result->first()['data']['sort_name']);
 
     // These items are not part of the search, but will be added via links
     $this->assertArrayNotHasKey('contact_type', $result->first());
@@ -205,9 +211,9 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('Individual', $result->first()['contact_type']['raw']);
-    $this->assertEquals('Unit test', $result->first()['source']['raw']);
-    $this->assertEquals($lastName, $result->first()['last_name']['raw']);
+    $this->assertEquals('Individual', $result->first()['data']['contact_type']);
+    $this->assertEquals('Unit test', $result->first()['data']['source']);
+    $this->assertEquals($lastName, $result->first()['data']['last_name']);
   }
 
   /**
@@ -304,14 +310,14 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->cleanupCachedPermissions();
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
-    $this->assertEquals($sampleData['Two'], $result[0]['id']['raw']);
+    $this->assertEquals($sampleData['Two'], $result[0]['data']['id']);
 
     $hooks->setHook('civicrm_aclWhereClause', [$this, 'aclWhereGreaterThan']);
     $this->cleanupCachedPermissions();
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals($sampleData['Three'], $result[0]['id']['raw']);
-    $this->assertEquals($sampleData['Four'], $result[1]['id']['raw']);
+    $this->assertEquals($sampleData['Three'], $result[0]['data']['id']);
+    $this->assertEquals($sampleData['Four'], $result[1]['data']['id']);
   }
 
   public function testWithACLBypass() {
