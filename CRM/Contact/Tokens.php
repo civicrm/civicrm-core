@@ -369,37 +369,34 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getTokenMetadata(): array {
-    if ($this->tokensMetadata) {
-      return $this->tokensMetadata;
-    }
     if (Civi::cache('metadata')->has($this->getCacheKey())) {
       return Civi::cache('metadata')->get($this->getCacheKey());
     }
     $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
-    $this->tokensMetadata = $this->getBespokeTokens();
+    $tokensMetadata = $this->getBespokeTokens();
     foreach ($this->fieldMetadata as $field) {
-      $this->addFieldToTokenMetadata($field, $this->getExposedFields());
+      $this->addFieldToTokenMetadata($tokensMetadata, $field, $this->getExposedFields());
     }
 
     foreach ($this->getRelatedEntityTokenMetadata() as $entity => $exposedFields) {
       $apiEntity = ($entity === 'openid') ? 'OpenID' : ucfirst($entity);
       $metadata = (array) civicrm_api4($apiEntity, 'getfields', ['checkPermissions' => FALSE], 'name');
       foreach ($metadata as $field) {
-        $this->addFieldToTokenMetadata($field, $exposedFields, 'primary_' . $entity);
+        $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'primary_' . $entity);
       }
     }
     // Manually add in the abbreviated state province as that maps to
     // what has traditionally been delivered.
-    $this->tokensMetadata['primary_address.state_province_id:abbr'] = $this->tokensMetadata['primary_address.state_province_id:label'];
-    $this->tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
-    $this->tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
+    $tokensMetadata['primary_address.state_province_id:abbr'] = $tokensMetadata['primary_address.state_province_id:label'];
+    $tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
-    $this->tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
+    $tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
     // Hide this really obscure one. Just cos it annoys me.
-    $this->tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
-    Civi::cache('metadata')->set($this->getCacheKey(), $this->tokensMetadata);
-    return $this->tokensMetadata;
+    $tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
+    Civi::cache('metadata')->set($this->getCacheKey(), $tokensMetadata);
+    return $tokensMetadata;
   }
 
   /**

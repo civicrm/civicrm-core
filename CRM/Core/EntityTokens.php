@@ -75,23 +75,18 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
    * @return array
    */
   protected function getTokenMetadata(): array {
-    if (empty($this->tokensMetadata)) {
-      $cacheKey = $this->getCacheKey();
-      if (Civi::cache('metadata')->has($cacheKey)) {
-        $this->tokensMetadata = Civi::cache('metadata')->get($cacheKey);
+    $cacheKey = $this->getCacheKey();
+    if (!Civi::cache('metadata')->has($cacheKey)) {
+      $tokensMetadata = $this->getBespokeTokens();
+      foreach ($this->getFieldMetadata() as $field) {
+        $this->addFieldToTokenMetadata($tokensMetadata, $field, $this->getExposedFields());
       }
-      else {
-        $this->tokensMetadata = $this->getBespokeTokens();
-        foreach ($this->getFieldMetadata() as $field) {
-          $this->addFieldToTokenMetadata($field, $this->getExposedFields());
-        }
-        foreach ($this->getHiddenTokens() as $name) {
-          $this->tokensMetadata[$name]['audience'] = 'hidden';
-        }
-        Civi::cache('metadata')->set($cacheKey, $this->tokensMetadata);
+      foreach ($this->getHiddenTokens() as $name) {
+        $tokensMetadata[$name]['audience'] = 'hidden';
       }
+      Civi::cache('metadata')->set($cacheKey, $tokensMetadata);
     }
-    return $this->tokensMetadata;
+    return Civi::cache('metadata')->get($cacheKey);
   }
 
   /**
@@ -597,11 +592,12 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   /**
    * Add the token to the metadata based on the field spec.
    *
+   * @param array $tokensMetadata
    * @param array $field
    * @param array $exposedFields
    * @param string $prefix
    */
-  protected function addFieldToTokenMetadata(array $field, array $exposedFields, string $prefix = ''): void {
+  protected function addFieldToTokenMetadata(array &$tokensMetadata, array $field, array $exposedFields, string $prefix = ''): void {
     if ($field['type'] !== 'Custom' && !in_array($field['name'], $exposedFields, TRUE)) {
       return;
     }
@@ -623,7 +619,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
       $parts = explode(': ', $field['label']);
       $field['title'] = "{$parts[1]} :: {$parts[0]}";
       $tokenName = 'custom_' . $field['custom_field_id'];
-      $this->tokensMetadata[$tokenName] = $field;
+      $tokensMetadata[$tokenName] = $field;
       return;
     }
     $tokenName = $prefix ? ($prefix . '.' . $field['name']) : $field['name'];
@@ -633,21 +629,21 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         // At the time of writing currency didn't have a label option - this may have changed.
         && !in_array($field['name'], $this->getCurrencyFieldName(), TRUE)
       ) {
-        $this->tokensMetadata[$tokenName . ':label'] = $this->tokensMetadata[$tokenName . ':name'] = $field;
+        $tokensMetadata[$tokenName . ':label'] = $tokensMetadata[$tokenName . ':name'] = $field;
         $fieldLabel = $field['input_attrs']['label'] ?? $field['label'];
-        $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
-        $this->tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';
-        $this->tokensMetadata[$tokenName . ':name']['audience'] = 'sysadmin';
-        $this->tokensMetadata[$tokenName . ':label']['title'] = $fieldLabel;
-        $this->tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
+        $tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
+        $tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';
+        $tokensMetadata[$tokenName . ':name']['audience'] = 'sysadmin';
+        $tokensMetadata[$tokenName . ':label']['title'] = $fieldLabel;
+        $tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
         $field['audience'] = 'sysadmin';
       }
       if ($field['data_type'] === 'Boolean') {
-        $this->tokensMetadata[$tokenName . ':label'] = $field;
-        $this->tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
+        $tokensMetadata[$tokenName . ':label'] = $field;
+        $tokensMetadata[$tokenName . ':label']['name'] = $field['name'] . ':label';
         $field['audience'] = 'sysadmin';
       }
-      $this->tokensMetadata[$tokenName] = $field;
+      $tokensMetadata[$tokenName] = $field;
     }
   }
 
