@@ -68,14 +68,18 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    */
   public static function basicTypeInfo($includeInactive = FALSE) {
     $cacheKey = 'CRM_CT_BTI_' . (int) $includeInactive;
-    if (!Civi::cache('contactTypes')->has($cacheKey)) {
-      $contactType = ContactType::get(FALSE)->setSelect(['*'])->addWhere('parent_id', 'IS NULL');
+    $contactTypes = Civi::cache('contactTypes')->get($cacheKey, []);
+    if (!$contactTypes) {
+      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type')
+        ->where('parent_id IS NULL');
       if ($includeInactive === FALSE) {
-        $contactType->addWhere('is_active', '=', 1);
+        $query->where('is_active = 1');
       }
-      Civi::cache('contactTypes')->set($cacheKey, (array) $contactType->execute()->indexBy('name'));
+      $dao = CRM_Core_DAO::executeQuery($query->toSQL());
+      $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
+      Civi::cache('contactTypes')->set($cacheKey, $contactTypes);
     }
-    return Civi::cache('contactTypes')->get($cacheKey);
+    return $contactTypes;
   }
 
   /**
