@@ -59,7 +59,7 @@ class CRM_Contribute_WorkflowMessage_RecurringEdit extends Civi\WorkflowMessage\
   protected function exportExtraTokenContext(array &$export): void {
     $export['smartyTokenAlias']['installments'] = 'contribution_recur.installments';
     $export['smartyTokenAlias']['amount'] = 'contribution_recur.amount';
-    $export['smartyTokenAlias']['recur_frequency_unit'] = 'contribution_recur.frequency_unit';
+    $export['smartyTokenAlias']['recur_frequency_unit'] = 'contribution_recur.frequency_unit:label';
     $export['smartyTokenAlias']['recur_frequency_interval'] = 'contribution_recur.frequency_interval';
   }
 
