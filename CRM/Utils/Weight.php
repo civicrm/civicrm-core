@@ -400,8 +400,8 @@ class CRM_Utils_Weight {
         $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$prevID}&amp;dir=swap\"><img src=\"{$imageURL}/up.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
+        $links[] = "<span class=\"order-icon\"></span>";
+        $links[] = "<span class=\"order-icon\"></span>";
       }
 
       if ($nextID != 0) {
@@ -412,8 +412,8 @@ class CRM_Utils_Weight {
         $links[] = "<a class=\"crm-weight-arrow\" href=\"{$url}&amp;dst={$lastID}&amp;dir=last\"><img src=\"{$imageURL}/last.gif\" title=\"$alt\" alt=\"$alt\" class=\"order-icon\"></a>";
       }
       else {
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
-        $links[] = "<img src=\"{$imageURL}/spacer.gif\" class=\"order-icon\">";
+        $links[] = "<span class=\"order-icon\"></span>";
+        $links[] = "<span class=\"order-icon\"></span>";
       }
       $rows[$id]['weight'] = implode('&nbsp;', $links);
     }
