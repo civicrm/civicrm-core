@@ -943,4 +943,41 @@ December 21st, 2007
     ]);
   }
 
+  public function testEscaping() {
+    $create = function(string $entity, array $record): CRM_Core_DAO {
+      // It's most convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
+      CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($record);
+      return CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
+    };
+
+    $context = [];
+    $context['contactId'] = $create('Contact', [
+      'first_name' => '<b>ig</b>illy brackets',
+    ])->id;
+    $context['eventId'] = $create('Event', [
+      'title' => 'The Webinar',
+      'description' => '<p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
+    ])->id;
+
+    $messages = $expected = [];
+
+    // The `first_name` does not allow HTML. Any funny characters are presented like literal text.
+    $messages['contact_text'] = 'Hello {contact.first_name}!';
+    $expected['contact_text'] = "Hello <b>ig</b>illy brackets!";
+
+    $messages['contact_html'] = "<p>Hello {contact.first_name}!</p>";
+    $expected['contact_html'] = "<p>Hello &lt;b&gt;ig&lt;/b&gt;illy brackets!</p>";
+
+    // The `description` does allow HTML. Any funny characters are filtered out of text.
+    $messages['event_text'] = 'You signed up for this event: {event.title}: {event.description}';
+    $expected['event_text'] = 'You signed up for this event: The Webinar: Some online webinar thingy. Attendees will need to install the TeleFoo app.';
+
+    $messages['event_html'] = "<p>You signed up for this event:</p> <h3>{event.title}</h3> {event.description}";
+    $expected['event_html'] = '<p>You signed up for this event:</p> <h3>The Webinar</h3> <p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>';
+
+    $rendered = CRM_Core_TokenSmarty::render($messages, $context);
+
+    $this->assertEquals($expected, $rendered);
+  }
+
 }
