@@ -9,8 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\ContactType;
-
 /**
  *
  * @package CRM
@@ -871,14 +869,21 @@ WHERE ($subtypeClause)";
     $cacheKey = 'all_' . $GLOBALS['tsLocale'];
     $contactTypes = $cache->get($cacheKey);
     if ($contactTypes === NULL) {
-      $contactTypes = (array) ContactType::get(FALSE)
-        ->setSelect(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id', 'parent_id:name', 'parent_id:label'])
-        ->execute()->indexBy('name');
-
+      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type');
+      $dao = CRM_Core_DAO::executeQuery($query->toSQL());
+      $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
+      $name_options = self::buildOptions('parent_id', 'validate');
+      $label_options = self::buildOptions('parent_id', 'get');
       foreach ($contactTypes as $id => $contactType) {
-        $contactTypes[$id]['parent'] = $contactType['parent_id:name'];
-        $contactTypes[$id]['parent_label'] = $contactType['parent_id:label'];
-        unset($contactTypes[$id]['parent_id:name'], $contactTypes[$id]['parent_id:label']);
+        $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']] : NULL;
+        $contactTypes[$id]['parent_label'] = $contactType['parent_id'] ? $label_options[$contactType['parent_id']] : NULL;
+        // Fix types.
+        $contactTypes[$id]['id'] = (int) $contactType['id'];
+        $contactTypes[$id]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
+        $contactTypes[$id]['is_active'] = (bool) $contactType['is_active'];
+        $contactTypes[$id]['is_reserved'] = (bool) $contactType['is_reserved'];
+        $contactTypes[$id]['description'] = $contactType['description'] ?: NULL;
+        $contactTypes[$id]['image_URL'] = $contactType['image_URL'] ?: NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }
