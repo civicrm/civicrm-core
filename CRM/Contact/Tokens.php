@@ -33,13 +33,6 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * Tokens defined by the legacy hook.
-   *
-   * @var array
-   */
-  protected $hookTokens;
-
-  /**
    * @inheritDoc
    */
   public static function getSubscribedEvents(): array {
@@ -249,7 +242,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    */
   public function evaluateLegacyHookTokens(TokenValueEvent $e): void {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
-    if (!array_intersect(array_keys($this->getHookTokens()), array_keys($messageTokens))) {
+    if (empty($messageTokens) || !array_intersect(array_keys($this->getHookTokens()), array_keys($messageTokens))) {
       return;
     }
 
@@ -694,17 +687,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @return array
    */
   protected function getHookTokens(): array {
-    if ($this->hookTokens === NULL) {
-      if (isset(Civi::$statics[__CLASS__]['hook_tokens'])) {
-        $this->hookTokens = Civi::$statics[__CLASS__]['hook_tokens'];
-      }
-      else {
-        $this->hookTokens = [];
-        \CRM_Utils_Hook::tokens($this->hookTokens);
-        Civi::$statics[__CLASS__]['hook_tokens'] = $this->hookTokens;
-      }
+    if (isset(Civi::$statics[__CLASS__]['hook_tokens'])) {
+      return Civi::$statics[__CLASS__]['hook_tokens'];
     }
-    return $this->hookTokens;
+    $tokens = [];
+    \CRM_Utils_Hook::tokens($tokens);
+    Civi::$statics[__CLASS__]['hook_tokens'] = $tokens;
+    return $tokens;
   }
 
 }
