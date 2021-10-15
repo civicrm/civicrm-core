@@ -1337,10 +1337,7 @@ class CRM_Utils_Token {
     $greetingTokens = self::getTokens($tokenString);
     $context = $contactId ? ['contactId' => $contactId] : [];
     if ($contactDetails) {
-      foreach ($contactDetails[0] as $contact) {
-        // Only 1 - the loop is because we may not know the id.
-        $context['contact'] = $contact;
-      }
+      $context['contact'] = isset($contactDetails[0]) ? reset($contactDetails[0]) : $contactDetails;
     }
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'smarty' => FALSE,
