@@ -722,6 +722,7 @@ input.crm-form-entityref {
 
 .crm-container div.empowered-by-logo {
   background: url('../i/civi99.png') no-repeat;
+  background-image: url('../i/civi99.svg'), none;
   display: block;
   line-height: 34px;
   position: absolute;
