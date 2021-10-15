@@ -871,14 +871,15 @@ WHERE ($subtypeClause)";
     $cacheKey = 'all_' . $GLOBALS['tsLocale'];
     $contactTypes = $cache->get($cacheKey);
     if ($contactTypes === NULL) {
-      $contactTypes = (array) ContactType::get(FALSE)
-        ->setSelect(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id', 'parent_id:name', 'parent_id:label'])
-        ->execute()->indexBy('name');
-
+      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type')
+        ->select(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id']);
+      $dao = CRM_Core_DAO::executeQuery($query->toSQL());
+      $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
+      $name_options = self::buildOptions('parent_id', 'validate');
+      $label_options = self::buildOptions('parent_id', 'get');
       foreach ($contactTypes as $id => $contactType) {
-        $contactTypes[$id]['parent'] = $contactType['parent_id:name'];
-        $contactTypes[$id]['parent_label'] = $contactType['parent_id:label'];
-        unset($contactTypes[$id]['parent_id:name'], $contactTypes[$id]['parent_id:label']);
+        $contactTypes[$id]['parent'] = $name_options[$contactType['parent_id']];
+        $contactTypes[$id]['parent_label'] = $label_options[$contactType['parent_id']];
       }
       $cache->set($cacheKey, $contactTypes);
     }
