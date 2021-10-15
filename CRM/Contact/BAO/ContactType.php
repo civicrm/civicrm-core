@@ -876,8 +876,10 @@ WHERE ($subtypeClause)";
       $name_options = self::buildOptions('parent_id', 'validate');
       $label_options = self::buildOptions('parent_id', 'get');
       foreach ($contactTypes as $id => $contactType) {
-        $contactTypes[$id]['parent'] = $name_options[$contactType['parent_id']];
-        $contactTypes[$id]['parent_label'] = $label_options[$contactType['parent_id']];
+        if ($contactType['parent_id']) {
+          $contactTypes[$id]['parent'] = $name_options[$contactType['parent_id']];
+          $contactTypes[$id]['parent_label'] = $label_options[$contactType['parent_id']];
+        }
       }
       $cache->set($cacheKey, $contactTypes);
     }
