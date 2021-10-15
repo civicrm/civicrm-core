@@ -1778,18 +1778,9 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   /**
    * Enable CiviCampaign Component.
-   *
-   * @param bool $reloadConfig
-   *    Force relaod config or not
    */
-  public function enableCiviCampaign($reloadConfig = TRUE) {
+  public function enableCiviCampaign(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    if ($reloadConfig) {
-      // force reload of config object
-      $config = CRM_Core_Config::singleton(TRUE, TRUE);
-    }
-    //flush cache by calling with reset
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
   }
 
   /**
