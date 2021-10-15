@@ -48,6 +48,11 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
     $this->quickCleanUpFinancialEntities();
+
+    // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
+    // `clear()` works around it. This should be removed if that's updated, but it will be safe either way.
+    Civi::cache('metadata')->clear();
+
     parent::tearDown();
   }
 
@@ -944,10 +949,18 @@ December 21st, 2007
   }
 
   public function testEscaping() {
-    $create = function(string $entity, array $record): CRM_Core_DAO {
-      // It's most convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
+    $autoClean = [];
+    $create = function(string $entity, array $record = []) use (&$autoClean) {
+      // It's convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
       CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($record);
-      return CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
+      $dao = CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
+
+      // We're not using transactions, and truncating 'contact' seems problematic, so we roll up our sleeves and cleanup each record...
+      $autoClean[] = CRM_Utils_AutoClean::with(function() use ($entity, $dao) {
+        CRM_Core_DAO::deleteTestObjects(CRM_Core_DAO_AllCoreTables::getFullName($entity), ['id' => $dao->id]);
+      });
+
+      return $dao;
     };
 
     $context = [];
