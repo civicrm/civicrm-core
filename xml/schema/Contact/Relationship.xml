@@ -169,6 +169,7 @@
   <field>
     <name>case_id</name>
     <type>int unsigned</type>
+    <component>CiviCase</component>
     <title>Case ID</title>
     <default>NULL</default>
     <comment>FK to civicrm_case</comment>
