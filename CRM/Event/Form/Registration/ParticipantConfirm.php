@@ -101,7 +101,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       $additonalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
       $requireSpace = 1 + count($additonalIds);
       if ($emptySeats !== NULL && ($requireSpace > $emptySeats)) {
-        $statusMsg = ts("Oops, it looks like there are currently no available spaces for the %1 event.", [1 => $values['title']]);
+        $statusMsg = ts("Unfortunately there are currently no available spaces for the %1 event.", [1 => $values['title']]);
       }
       else {
         if ($this->_cc == 'fail') {
@@ -143,7 +143,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
       }
     }
     if (!$statusMsg) {
-      $statusMsg = ts("Oops, it looks like your registration for %1 has already been cancelled.",
+      $statusMsg = ts("Your registration for %1 has already been cancelled. No further action is needed.",
         [1 => $values['title']]
       );
     }
