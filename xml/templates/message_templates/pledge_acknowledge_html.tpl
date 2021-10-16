@@ -20,7 +20,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}Thank you for your generous pledge.{/ts}</p>
    </td>
   </tr>
@@ -80,7 +80,7 @@
 
      <tr>
       <td colspan="2" {$valueStyle}>
-       <p>{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions
+       <p>{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions
 or need to modify your payment schedule.{/ts}</p>
       </td>
      </tr>

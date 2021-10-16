@@ -26,6 +26,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
@@ -33,6 +34,7 @@ use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OptionGroup;
+use Civi\Api4\Phone;
 use Civi\Api4\RelationshipType;
 use Civi\Payment\System;
 use Civi\Api4\OptionValue;
@@ -731,7 +733,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function membershipStatusDelete(int $membershipStatusID) {
+  public function membershipStatusDelete(int $membershipStatusID): void {
     $this->callAPISuccess('Membership', 'get', ['status_id' => $membershipStatusID, 'api.Membership.delete' => 1]);
     $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatusID]);
   }
@@ -1010,10 +1012,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return int
    *   id of created pledge
-   *
-   * @throws \CRM_Core_Exception
    */
-  public function pledgeCreate($params) {
+  public function pledgeCreate($params): int {
     $params = array_merge([
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
@@ -3612,8 +3612,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'status_id'        => 1,
       'case_type'        => 'housing_support',
       'subject'          => 'Case Subject',
-      'start_date'       => date("Y-m-d"),
-      'start_date_time'  => date("YmdHis"),
+      'start_date'       => date('Y-m-d'),
+      'start_date_time'  => date('YmdHis'),
       'medium_id'        => 2,
       'activity_details' => '',
     ], $extra);
@@ -3797,6 +3797,24 @@ WHERE a1.is_primary = 0
       VALUES (2, 1, 2, 'Membership Amount', 'Radio')
       ON DUPLICATE KEY UPDATE `name` = '1', price_set_id = 1, label =  'Membership Amount', html_type = 'Radio'
     ");
+  }
+
+  /**
+   * Add an address block to the current domain.
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function addLocationBlockToDomain(): void {
+    $contactID = CRM_Core_BAO_Domain::getDomain()->contact_id;
+    Phone::create()
+      ->setValues(['phone' => 123, 'contact_id' => $contactID])
+      ->execute()
+      ->first()['id'];
+    Address::create()->setValues([
+      'street_address' => '10 Downing Street',
+      'city' => 'London',
+      'contact_id' => $contactID,
+    ])->execute()->first();
   }
 
 }
