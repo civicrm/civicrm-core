@@ -115,7 +115,7 @@ class CRM_Contact_Form_Edit_TagsAndGroups {
 
         if ($groupElementType == 'select' && !empty($groupsOptions)) {
           $form->add('select2', $fName, $groupName, $groupsOptions, FALSE,
-            ['placeholder' => '- select -', 'multiple' => TRUE, 'class' => 'twenty']
+            ['placeholder' => ts('- select -'), 'multiple' => TRUE, 'class' => 'twenty']
           );
           $form->assign('groupCount', count($groupsOptions));
         }

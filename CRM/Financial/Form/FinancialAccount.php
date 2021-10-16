@@ -90,7 +90,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
     if (!empty($financialAccountType)) {
       $element = $this->add('select', 'financial_account_type_id', ts('Financial Account Type'),
-        ['' => '- select -'] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
+        ['' => ts('- select -')] + $financialAccountType, TRUE, ['class' => 'crm-select2 huge']);
       if ($this->_isARFlag) {
         $element->freeze();
         $elementAccounting->freeze();

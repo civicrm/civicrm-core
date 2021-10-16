@@ -258,7 +258,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->assign('ruleFields', json_encode($ruleFields));
 
     $dedupeRules = [
-      '' => '- Unsupervised rule -',
+      '' => ts('- Unsupervised rule -'),
     ];
     $dedupeRules += CRM_Dedupe_BAO_DedupeRuleGroup::getByType('Individual');
     $this->add('select', 'dedupe_rule_group_id', ts('Duplicate matching rule'), $dedupeRules);

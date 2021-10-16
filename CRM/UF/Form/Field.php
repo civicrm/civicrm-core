@@ -287,7 +287,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     unset($contactTypes['']);
 
     $contactTypes = !empty($contactTypes) ? ['Contact' => 'Contacts'] + $contactTypes : [];
-    $sel1 = ['' => '- select -'] + $contactTypes;
+    $sel1 = ['' => ts('- select -')] + $contactTypes;
 
     if (!empty($fields['Activity'])) {
       $sel1['Activity'] = 'Activity';
