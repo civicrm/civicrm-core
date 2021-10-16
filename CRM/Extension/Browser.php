@@ -243,7 +243,7 @@ class CRM_Extension_Browser {
     restore_error_handler();
 
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
-      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests. Contact your site administrator for assistance.'), 'connection_error');
+      throw new CRM_Extension_Exception(ts('The CiviCRM public extensions directory at %1 could not be contacted - please check your webserver can make external HTTP requests. Contact your site administrator for assistance.', [1 => $this->getRepositoryUrl()]), 'connection_error');
     }
 
     // Don't call grabCachedJson here, that would risk infinite recursion
