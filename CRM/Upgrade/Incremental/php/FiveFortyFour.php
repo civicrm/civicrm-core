@@ -49,27 +49,33 @@ class CRM_Upgrade_Incremental_php_FiveFortyFour extends CRM_Upgrade_Incremental_
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   * @param string $rev
    */
+  public function upgrade_5_44_alpha1($rev) {
+    // The runSql task populates the new column, so this addColumn task runs first
+    $this->addTask('Add case_id column to civicrm_relationship_cache', 'addColumn',
+      'civicrm_relationship_cache', 'case_id', "int unsigned DEFAULT NULL COMMENT 'FK to civicrm_case'"
+    );
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add FK to civicrm_relationship_cache.case_id', 'addRelationshipCacheCaseFK');
+  }
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev): void {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...): bool {
-  //   return TRUE;
-  // }
+  /**
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function addRelationshipCacheCaseFK(CRM_Queue_TaskContext $ctx): bool {
+    if (!self::checkFKExists('civicrm_relationship_cache', 'FK_civicrm_relationship_cache_case_id')) {
+      CRM_Core_DAO::executeQuery("
+        ALTER TABLE `civicrm_relationship_cache`
+          ADD CONSTRAINT `FK_civicrm_relationship_cache_case_id`
+            FOREIGN KEY (`case_id`) REFERENCES `civicrm_case` (`id`)
+            ON DELETE CASCADE;
+      ", [], TRUE, NULL, FALSE, FALSE);
+    }
+    return TRUE;
+  }
 
 }
