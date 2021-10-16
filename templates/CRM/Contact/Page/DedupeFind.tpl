@@ -18,37 +18,37 @@
         <tr>
           <td class="crm-contact-form-block-contact1">
             <label for="contact1">{ts}Contact 1{/ts}</label><br />
-            <input type="text" placeholder="Search Contact1" search-column="2" />
+            <input type="text" placeholder="{ts}Search Contact1{/ts}" search-column="2" />
           </td>
           <td class="crm-contact-form-block-contact2">
             <label for="contact2">{ts}Contact 2{/ts}</label><br />
-            <input type="text" placeholder="Search Contact2" search-column="4" />
+            <input type="text" placeholder="{ts}Search Contact2{/ts}" search-column="4" />
           </td>
           <td class="crm-contact-form-block-email1">
             <label for="email1">{ts}Email 1{/ts}</label><br />
-            <input type="text" placeholder="Search Email1" search-column="5" />
+            <input type="text" placeholder="{ts}Search Email1{/ts}" search-column="5" />
           </td>
           <td class="crm-contact-form-block-email2">
             <label for="email2">{ts}Email 2{/ts}</label><br />
-            <input type="text" placeholder="Search Email2" search-column="6" />
+            <input type="text" placeholder="{ts}Search Email2{/ts}" search-column="6" />
           </td>
         </tr>
         <tr>
           <td class="crm-contact-form-block-street-address1">
             <label for="street-adddress1">{ts}Street Address 1{/ts}</label><br />
-            <input type="text" placeholder="Search Street Address1" search-column="7" />
+            <input type="text" placeholder="{ts}Search Street Address1{/ts}" search-column="7" />
           </td>
           <td class="crm-contact-form-block-street-address2">
             <label for="street-adddress2">{ts}Street Address 2{/ts}</label><br />
-            <input type="text" placeholder="Search Street Address2" search-column="8" />
+            <input type="text" placeholder="{ts}Search Street Address2{/ts}" search-column="8" />
           </td>
           <td class="crm-contact-form-block-postcode1">
             <label for="postcode1">{ts}Postcode 1{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode1" search-column="9" />
+            <input type="text" placeholder="{ts}Search Postcode1{/ts}" search-column="9" />
           </td>
           <td class="crm-contact-form-block-postcode2">
             <label for="postcode2">{ts}Postcode 2{/ts}</label><br />
-            <input type="text" placeholder="Search Postcode2" search-column="10" />
+            <input type="text" placeholder="{ts}Search Postcode2{/ts}" search-column="10" />
           </td>
         </tr>
       </table>
