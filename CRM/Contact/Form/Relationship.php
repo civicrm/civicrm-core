@@ -297,7 +297,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       [
         'options' => ['' => ts('- select -')] + $relationshipList,
         'class' => 'huge',
-        'placeholder' => '- select -',
+        'placeholder' => ts('- select -'),
         'option_url' => 'civicrm/admin/reltype',
         'option_context' => [
           'contact_id' => $this->_contactId,

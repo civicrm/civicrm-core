@@ -49,7 +49,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
    */
   public function __construct() {
     //filter options for survey activity status.
-    $responseStatus = array('' => '- Any -');
+    $responseStatus = array('' => ts('- Any -'));
     self::$_surveyRespondentStatus = [];
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     if ($statusId = array_search('Scheduled', $activityStatus)) {
