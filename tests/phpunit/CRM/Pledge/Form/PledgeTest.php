@@ -3,7 +3,8 @@
 use Civi\Api4\Email;
 
 /**
- *  Include dataProvider for tests
+ * CRM_Pledge_Form_PledgeTest
+ *
  * @group headless
  */
 class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
@@ -35,9 +36,10 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
     $form->postProcess();
     $mut->checkAllMailLog([
       'Default Domain Name Anthony',
+      // These strings that are in the text template, since we swapped out the html one.
       123,
       'fixme.domainemail@example.org',
-      '<p>Dear Anthony,</p>',
+      'Dear Anthony,',
     ]);
     $mut->clearMessages();
     $this->revertTemplateToReservedTemplate('pledge_acknowledge');

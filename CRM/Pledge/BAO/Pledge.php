@@ -800,8 +800,11 @@ GROUP BY  currency
    * @param array $params
    *
    * @return array
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function updatePledgeStatus($params) {
+  public static function updatePledgeStatus($params): array {
 
     $returnMessages = [];
 
@@ -905,36 +908,26 @@ SELECT  pledge.contact_id              as contact_id,
 
     if ($sendReminders) {
       // retrieve domain tokens
-      $domain = CRM_Core_BAO_Domain::getDomain();
       $tokens = [
         'domain' => ['name', 'phone', 'address', 'email'],
         'contact' => CRM_Core_SelectValues::contactTokens(),
       ];
 
-      $domainValues = [];
-      foreach ($tokens['domain'] as $token) {
-        $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
-      }
-
-      // get the domain email address, since we don't carry w/ object.
-      $domainValue = CRM_Core_BAO_Domain::getNameAndEmail();
-      $domainValues['email'] = $domainValue[1];
-
       // retrieve contact tokens
 
       // this function does NOT return Deceased contacts since we don't want to send them email
-      [$contactDetails] = CRM_Utils_Token::getTokenDetails($contactIds,
-        NULL,
-        FALSE, FALSE, NULL,
-        $tokens, 'CRM_UpdatePledgeRecord'
-      );
+      $contactDetails = civicrm_api3('Contact', 'get', [
+        'is_deceased' => 0,
+        'id' => ['IN' => $contactIds],
+        'return' => ['id', 'display_name', 'email', 'do_not_email', 'email', 'on_hold'],
+      ])['values'];
 
       // assign domain values to template
       $template = CRM_Core_Smarty::singleton();
-      $template->assign('domain', $domainValues);
 
       // set receipt from
-      $receiptFrom = '"' . $domainValues['name'] . '" <' . $domainValues['email'] . '>';
+      $receiptFrom = CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE);
+      $receiptFrom = reset($receiptFrom);
 
       foreach ($pledgeDetails as $paymentId => $details) {
         if (array_key_exists($details['contact_id'], $contactDetails)) {
@@ -979,7 +972,6 @@ SELECT  pledge.contact_id              as contact_id,
           if ($toEmail && !($doNotEmail || $onHold)) {
             // assign value to template
             $template->assign('amount_paid', $details['amount_paid'] ? $details['amount_paid'] : 0);
-            $template->assign('contact', $contactDetails[$contactId]);
             $template->assign('next_payment', $details['scheduled_date']);
             $template->assign('amount_due', $details['amount_due']);
             $template->assign('checksumValue', $details['checksumValue']);

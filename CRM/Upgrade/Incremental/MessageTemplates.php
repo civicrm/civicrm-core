@@ -268,6 +268,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'pledge_acknowledge', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.44.alpha1',
+        'upgrade_descriptor' => ts('Use domain and contact tokens instead of smarty values'),
+        'label' => ts('Pledge reminder'),
+        'templates' => [
+          ['name' => 'pledge_reminder', 'type' => 'text'],
+          ['name' => 'pledge_reminder', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 

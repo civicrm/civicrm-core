@@ -25,8 +25,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   /**
    * Setup for tests.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function setUp(): void {
     parent::setUp();

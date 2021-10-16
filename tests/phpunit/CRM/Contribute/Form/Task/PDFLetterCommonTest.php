@@ -194,7 +194,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPostProcess(): void {
-    $this->createLoggedInUser();;
+    $this->createLoggedInUser();
     foreach (['docx', 'odt'] as $docType) {
       $formValues = [
         'group_by' => NULL,

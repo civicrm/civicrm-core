@@ -1973,6 +1973,10 @@ class CRM_Utils_Token {
           '$domain' => 'no longer available / relevant',
           '$contact' => 'no longer available / relevant',
         ],
+        'pledge_reminder' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
       ],
     ];
   }
