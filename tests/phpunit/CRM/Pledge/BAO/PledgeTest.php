@@ -18,10 +18,7 @@
 class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
   /**
-   * Sets up the fixture, for example, opens a network connection.
-   * This method is called before a test is executed.
-   *
-   * @throws \CiviCRM_API3_Exception
+   * Sets up the test data.
    */
   protected function setUp(): void {
     parent::setUp();
@@ -45,8 +42,6 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
   /**
    *  Test for Add/Update Pledge.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testAdd(): void {
     //do test for normal add.
@@ -63,11 +58,9 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
   /**
    * Test Pledge Payment Status with 1 installment
    * and not passing status id.
-   *
-   * @throws \CRM_Core_Exception
    */
   public function testPledgePaymentStatus(): void {
-    $scheduledDate = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
+    $scheduledDate = date('Ymd', mktime(0, 0, 0, date('m'), date('d') + 2, date('y')));
     $this->_params['installments'] = 1;
     $this->_params['scheduled_date'] = $scheduledDate;
 
@@ -78,15 +71,13 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $this->assertCount(1, $pledgePayment);
     $payment = array_pop($pledgePayment);
     // Assert that we actually have no pledge Payments
-    $this->assertEquals(0, CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))));
+    $this->assertEquals(0, CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'), TRUE)));
     $this->assertEquals('Pending', $payment['status']);
     $this->assertEquals($payment['scheduled_date'], date('Y-m-d 00:00:00', strtotime($scheduledDate)));
   }
 
   /**
-   *  Test that payment retrieve wrks based on known pledge id.
-   *
-   * @throws \CRM_Core_Exception
+   *  Test that payment retrieve works based on known pledge id.
    */
   public function testRetrieveKnownPledgeID(): void {
     $params = [
@@ -112,13 +103,13 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($pledgeParams, $defaults);
 
-    $this->assertEquals(1, $pledgeId->N, "Pledge was retrieved");
+    $this->assertEquals(1, $pledgeId->N, 'Pledge was retrieved');
   }
 
   /**
    *  Test build recur params.
    */
-  public function testGetPledgeStartDate() {
+  public function testGetPledgeStartDate(): void {
     $startDate = json_encode(['calendar_month' => 6]);
 
     $params = [
@@ -131,7 +122,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate(6, $params);
     $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate(6);
 
-    $this->assertEquals(date('m/d/Y', strtotime($date)), $paymentDate, "The two dates do not match");
+    $this->assertEquals(date('m/d/Y', strtotime($date)), $paymentDate, 'The two dates do not match');
 
     // Try with fixed date
     $date = NULL;
@@ -141,7 +132,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate($date, $params);
-    $this->assertEquals(date('m/d/Y', strtotime($date)), '06/10/2016', "The two dates do not match");
+    $this->assertEquals('06/10/2016', date('m/d/Y', strtotime($date)), 'The two dates do not match');
   }
 
 }
