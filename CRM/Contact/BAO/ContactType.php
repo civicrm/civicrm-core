@@ -875,10 +875,15 @@ WHERE ($subtypeClause)";
       $name_options = self::buildOptions('parent_id', 'validate');
       $label_options = self::buildOptions('parent_id', 'get');
       foreach ($contactTypes as $id => $contactType) {
-        if ($contactType['parent_id']) {
-          $contactTypes[$id]['parent'] = $name_options[$contactType['parent_id']];
-          $contactTypes[$id]['parent_label'] = $label_options[$contactType['parent_id']];
-        }
+        $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']]: NULL;
+        $contactTypes[$id]['parent_label'] = $contactType['parent_id'] ? $label_options[$contactType['parent_id']] : NULL;
+        // Fix types.
+        $contactTypes[$id]['id'] = (int) $contactType['id'];
+        $contactTypes[$id]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
+        $contactTypes[$id]['is_active'] = (bool) $contactType['is_active'];
+        $contactTypes[$id]['is_reserved'] = (bool) $contactType['is_reserved'];
+        $contactTypes[$id]['description'] = $contactType['description'] ?: NULL;
+        $contactTypes[$id]['image_URL'] = $contactType['image_URL'] ?: NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }
