@@ -58,9 +58,9 @@ class SchemaMapBuilder {
    */
   private function loadTables(SchemaMap $map) {
     /** @var \CRM_Core_DAO $daoName */
-    foreach (AllCoreTables::get() as $daoName => $data) {
+    foreach (AllCoreTables::get() as $data) {
       $table = new Table($data['table']);
-      foreach ($daoName::fields() as $fieldData) {
+      foreach ($data['class']::fields() as $fieldData) {
         $this->addJoins($table, $fieldData['name'], $fieldData);
       }
       $map->addTable($table);
