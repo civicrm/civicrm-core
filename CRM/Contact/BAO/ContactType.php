@@ -869,8 +869,7 @@ WHERE ($subtypeClause)";
     $cacheKey = 'all_' . $GLOBALS['tsLocale'];
     $contactTypes = $cache->get($cacheKey);
     if ($contactTypes === NULL) {
-      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type')
-        ->select(['id', 'name', 'label', 'description', 'is_active', 'is_reserved', 'image_URL', 'parent_id']);
+      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type');
       $dao = CRM_Core_DAO::executeQuery($query->toSQL());
       $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
       $name_options = self::buildOptions('parent_id', 'validate');
