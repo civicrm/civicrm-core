@@ -875,7 +875,7 @@ WHERE ($subtypeClause)";
       $name_options = self::buildOptions('parent_id', 'validate');
       $label_options = self::buildOptions('parent_id', 'get');
       foreach ($contactTypes as $id => $contactType) {
-        $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']]: NULL;
+        $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']] : NULL;
         $contactTypes[$id]['parent_label'] = $contactType['parent_id'] ? $label_options[$contactType['parent_id']] : NULL;
         // Fix types.
         $contactTypes[$id]['id'] = (int) $contactType['id'];
