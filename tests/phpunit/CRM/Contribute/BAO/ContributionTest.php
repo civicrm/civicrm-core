@@ -1198,7 +1198,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Function to create contribution with tax.
    */
-  public function createContributionWithTax($params = [], $isCompleted = TRUE) {
+  public function createContributionWithTax($params = [], $isCompleted = TRUE): array {
     if (!isset($params['total_amount'])) {
       $params['total_amount'] = 100;
     }
@@ -1206,15 +1206,16 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->enableTaxAndInvoicing();
     $financialType = $this->createFinancialType();
     $financialAccount = $this->addTaxAccountToFinancialType($financialType['id']);
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->testSubmit([
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => $params['total_amount'],
       'financial_type_id' => $financialType['id'],
       'contact_id' => $contactId,
       'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
-    ], CRM_Core_Action::ADD);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
         'contact_id' => $contactId,
