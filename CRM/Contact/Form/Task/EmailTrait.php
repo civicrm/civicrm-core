@@ -391,11 +391,11 @@ trait CRM_Contact_Form_Task_EmailTrait {
       // has no meaning for followup activities, and this doesn't prevent
       // creating more manually if desired.
       $followupStatus = $this->createFollowUpActivities($formValues, $activityIds[0]);
-      $count_success = count($this->_toContactDetails);
+
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', [
         'plural' => '%count messages were sent successfully. ',
-        'count' => $count_success,
-      ]) . $followupStatus, ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $count_success]), 'success');
+        'count' => $sent,
+      ]) . $followupStatus, ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $sent]), 'success');
     }
 
     if (!empty($this->suppressedEmails)) {
@@ -441,13 +441,33 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * Get the emails from the added element.
    *
    * @return array
+   * @throws \API_Exception
    */
   protected function getEmails(): array {
     $allEmails = explode(',', $this->getSubmittedValue('to'));
     $return = [];
+    $contactIDs = [];
     foreach ($allEmails as $value) {
       $values = explode('::', $value);
-      $return[] = ['contact_id' => $values[0], 'email' => $values[1]];
+      $return[$values[0]] = ['contact_id' => $values[0], 'email' => $values[1]];
+      $contactIDs[] = $values[0];
+    }
+    $this->suppressedEmails = [];
+    $suppressionDetails = Email::get(FALSE)
+      ->addWhere('contact_id', 'IN', $contactIDs)
+      ->addWhere('is_primary', '=', TRUE)
+      ->addSelect('email', 'contact_id', 'contact_id.is_deceased', 'on_hold', 'contact_id.do_not_email', 'contact_id.display_name')
+      ->execute();
+    foreach ($suppressionDetails as $details) {
+      if (empty($details['email']) || $details['contact_id.is_deceased'] || $details['contact_id.do_not_email'] || $details['on_hold']) {
+        $this->setSuppressedEmail($details['contact_id'], [
+          'on_hold' => $details['on_hold'],
+          'is_deceased' => $details['contact_id.is_deceased'],
+          'email' => $details['email'],
+          'display_name' => $details['contact_id.display_name'],
+        ]);
+        unset($return[$details['contact_id']]);
+      }
     }
     return $return;
   }
@@ -737,7 +757,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
 
-    $sent = $notSent = [];
+    $sent = 0;
     $attachmentFileIds = [];
     $activityIds = [];
     $firstActivityCreated = FALSE;
@@ -755,7 +775,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
         'disableSmarty' => !CRM_Utils_Constant::value('CIVICRM_MAIL_SMARTY'),
       ]);
 
-      $sent = FALSE;
       // To minimize storage requirements, only one copy of any file attachments uploaded to CiviCRM is kept,
       // even when multiple contacts will receive separate emails from CiviCRM.
       if (!empty($attachmentFileIds)) {
@@ -785,7 +804,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
         $bcc
       )
       ) {
-        $sent = TRUE;
+        $sent++;
       }
     }
 
