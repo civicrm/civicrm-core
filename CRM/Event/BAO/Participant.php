@@ -1406,12 +1406,18 @@ UPDATE  civicrm_participant
     $participantValues,
     $eventDetails,
     $contactDetails,
-    &$domainValues,
+    $domainValues,
     $mailType
   ) {
     //send emails.
     $mailSent = FALSE;
 
+    if (!$contactDetails) {
+      $contactDetails = civicrm_api3('Contact', 'getsingle', [
+        'id' => $participantValues['contact_id'],
+        'return' => ['email', 'display_name'],
+      ]);
+    }
     //don't send confirmation mail to additional
     //since only primary able to confirm registration.
     if (!empty($participantValues['registered_by_id']) &&

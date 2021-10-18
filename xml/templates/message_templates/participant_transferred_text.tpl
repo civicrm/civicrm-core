@@ -29,17 +29,17 @@
 {ts}Email{/ts}: {$eventEmail.email}{/if}{/foreach}
 {/if}
 
-{if $contact.email}
+{if '{contact.email}'}
 
 ===========================================================
 {ts}Registered Email{/ts}
 
 ===========================================================
-{$contact.email}
+{contact.email}
 {/if}
 
 {if $register_date}
 {ts}Registration Date{/ts}: {$participant.register_date|crmDate}
 {/if}
 
-{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}
+{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}

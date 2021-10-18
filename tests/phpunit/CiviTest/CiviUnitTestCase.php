@@ -858,7 +858,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   public function participantCreate(array $params = []) {
     if (empty($params['contact_id'])) {
-      $params['contact_id'] = $this->individualCreate();
+      $this->ids['Contact']['participant'] = $params['contact_id'] = $this->individualCreate();
     }
     if (empty($params['event_id'])) {
       $event = $this->eventCreate();
