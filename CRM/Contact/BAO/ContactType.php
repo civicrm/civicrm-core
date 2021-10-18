@@ -54,8 +54,6 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   /**
    * Retrieve basic contact type information.
    *
-   * @todo - call getAllContactTypes & return filtered results.
-   *
    * @param bool $includeInactive
    *
    * @return array
@@ -65,19 +63,9 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypeInfo($includeInactive = FALSE) {
-    $cacheKey = 'CRM_CT_BTI_' . (int) $includeInactive;
-    $contactTypes = Civi::cache('contactTypes')->get($cacheKey, []);
-    if (!$contactTypes) {
-      $query = CRM_Utils_SQL_Select::from('civicrm_contact_type')
-        ->where('parent_id IS NULL');
-      if ($includeInactive === FALSE) {
-        $query->where('is_active = 1');
-      }
-      $dao = CRM_Core_DAO::executeQuery($query->toSQL());
-      $contactTypes = array_column($dao->fetchAll(), NULL, 'name');
-      Civi::cache('contactTypes')->set($cacheKey, $contactTypes);
-    }
-    return $contactTypes;
+    return array_filter(self::getAllContactTypes(), function($type) use ($includeInactive) {
+      return empty($type['parent']) && ($includeInactive || $type['is_active']);
+    });
   }
 
   /**
@@ -185,8 +173,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
   }
 
   /**
-   *
-   * retrieve list of all types i.e basic + subtypes.
+   * Retrieve list of all types i.e basic + subtypes.
    *
    * @param bool $all
    *
@@ -208,7 +195,6 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    *
    * @return array
    *   Array of basic types + all subtypes.
-   * @throws \API_Exception
    */
   public static function contactTypeInfo($all = FALSE) {
     $contactTypes = self::getAllContactTypes();
@@ -229,7 +215,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType {
    * @param null $typeName
    * @param null $delimiter
    *
-   * @return array
+   * @return array|string
    *   Array of basictypes with name as 'built-in name' and 'label' as value
    * @throws \API_Exception
    */
@@ -362,7 +348,6 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *
    * @param array|string $subType contact subType.
    * @return array|string
-   *   basicTypes.
    */
   public static function getBasicType($subType) {
     // @todo - use Cache class - ie like Civi::cache('contactTypes')
@@ -703,7 +688,6 @@ WHERE name = %1';
    * @return bool
    */
   public static function hasRelationships($contactId, $contactType) {
-    $subTypeClause = NULL;
     if (self::isaSubType($contactType)) {
       $subType = $contactType;
       $contactType = self::getBasicType($subType);
@@ -860,8 +844,10 @@ WHERE ($subtypeClause)";
   /**
    * Get all contact types, leveraging caching.
    *
-   * @return array
+   * Note, this function is used within APIv4 Entity.get, so must use a
+   * SQL query instead of calling APIv4 to avoid an infinite loop.
    *
+   * @return array
    * @throws \API_Exception
    */
   protected static function getAllContactTypes() {
@@ -877,13 +863,11 @@ WHERE ($subtypeClause)";
       foreach ($contactTypes as $id => $contactType) {
         $contactTypes[$id]['parent'] = $contactType['parent_id'] ? $name_options[$contactType['parent_id']] : NULL;
         $contactTypes[$id]['parent_label'] = $contactType['parent_id'] ? $label_options[$contactType['parent_id']] : NULL;
-        // Fix types.
+        // Cast int/bool types.
         $contactTypes[$id]['id'] = (int) $contactType['id'];
         $contactTypes[$id]['parent_id'] = $contactType['parent_id'] ? (int) $contactType['parent_id'] : NULL;
         $contactTypes[$id]['is_active'] = (bool) $contactType['is_active'];
         $contactTypes[$id]['is_reserved'] = (bool) $contactType['is_reserved'];
-        $contactTypes[$id]['description'] = $contactType['description'] ?: NULL;
-        $contactTypes[$id]['image_URL'] = $contactType['image_URL'] ?: NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }
