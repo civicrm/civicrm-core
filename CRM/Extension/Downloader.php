@@ -75,9 +75,11 @@ class CRM_Extension_Downloader {
       $requiredExtensions = CRM_Extension_System::singleton()->getManager()->findInstallRequirements([$extensionInfo->key], $extensionInfo);
       foreach ($requiredExtensions as $extension) {
         if (CRM_Extension_System::singleton()->getManager()->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED && $extension !== $extensionInfo->key) {
+          $requiredExtensionInfo = CRM_Extension_System::singleton()->getBrowser()->getExtension($extension);
+          $requiredExtensionInfoName = empty($requiredExtensionInfo->name) ? $extension : $requiredExtensionInfo->name;
           $errors[] = [
             'title' => ts('Missing Requirement: %1', [1 => $extension]),
-            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->key, 2 => $extension]),
+            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->name, 2 => $requiredExtensionInfoName]),
           ];
         }
       }
