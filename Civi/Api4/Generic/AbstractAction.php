@@ -281,8 +281,13 @@ abstract class AbstractAction implements \ArrayAccess {
       foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
         $name = $property->getName();
         if ($name != 'version' && $name[0] != '_') {
-          $this->_paramInfo[$name] = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
-          $this->_paramInfo[$name]['default'] = $defaults[$name];
+          $docs = ReflectionUtils::getCodeDocs($property, 'Property', $vars);
+          $docs['default'] = $defaults[$name];
+          if (!empty($docs['optionsCallback'])) {
+            $docs['options'] = $this->{$docs['optionsCallback']}();
+            unset($docs['optionsCallback']);
+          }
+          $this->_paramInfo[$name] = $docs;
         }
       }
     }

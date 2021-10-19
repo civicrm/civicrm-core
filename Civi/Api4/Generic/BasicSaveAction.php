@@ -56,6 +56,7 @@ class BasicSaveAction extends AbstractSaveAction {
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
+      $this->matchExisting($record);
     }
     $this->validateValues();
     foreach ($this->records as $item) {

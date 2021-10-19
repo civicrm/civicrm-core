@@ -32,6 +32,8 @@ use Civi\Api4\Utils\CoreUtil;
  * @method array getDefaults()
  * @method $this setReload(bool $reload) Specify whether complete objects will be returned after saving.
  * @method bool getReload()
+ * @method $this setMatch(array $match) Specify fields to match for update.
+ * @method bool getMatch()
  *
  * @package Civi\Api4\Generic
  */
@@ -68,6 +70,20 @@ abstract class AbstractSaveAction extends AbstractAction {
    * @var bool
    */
   protected $reload = FALSE;
+
+  /**
+   * Specify fields to match for update.
+   *
+   * Normally each record is either created or updated based on the presence of an `id`.
+   * Specifying `$match` fields will also perform an update if an existing $ENTITY matches all specified fields.
+   *
+   * Note: the fields named in this param should be without any options suffix (e.g. `my_field` not `my_field:name`).
+   * Any options suffixes in the $records will be resolved by the api prior to matching.
+   *
+   * @var array
+   * @optionsCallback getMatchFields
+   */
+  protected $match = [];
 
   /**
    * @throws \API_Exception
@@ -116,7 +132,36 @@ abstract class AbstractSaveAction extends AbstractAction {
   }
 
   /**
+   * Find existing record based on $this->match param
+   *
+   * @param $record
+   */
+  protected function matchExisting(&$record) {
+    $primaryKey = CoreUtil::getIdFieldName($this->getEntityName());
+    if (empty($record[$primaryKey]) && !empty($this->match)) {
+      $where = [];
+      foreach ($record as $key => $val) {
+        if (isset($val) && in_array($key, $this->match, TRUE)) {
+          $where[] = [$key, '=', $val];
+        }
+      }
+      if (count($where) === count($this->match)) {
+        $existing = civicrm_api4($this->getEntityName(), 'get', [
+          'select' => [$primaryKey],
+          'where' => $where,
+          'checkPermissions' => $this->checkPermissions,
+          'limit' => 2,
+        ]);
+        if ($existing->count() === 1) {
+          $record[$primaryKey] = $existing->first()[$primaryKey];
+        }
+      }
+    }
+  }
+
+  /**
    * @return string
+   * @deprecated
    */
   protected function getIdField() {
     return CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')[0];
@@ -141,6 +186,21 @@ abstract class AbstractSaveAction extends AbstractAction {
   public function addDefault(string $fieldName, $defaultValue) {
     $this->defaults[$fieldName] = $defaultValue;
     return $this;
+  }
+
+  /**
+   * Options callback for $this->match
+   * @return array
+   */
+  protected function getMatchFields() {
+    return (array) civicrm_api4($this->getEntityName(), 'getFields', [
+      'checkPermissions' => FALSE,
+      'action' => 'get',
+      'where' => [
+        ['type', 'IN', ['Field', 'Custom']],
+        ['name', 'NOT IN', CoreUtil::getInfoItem($this->getEntityName(), 'primary_key')],
+      ],
+    ], ['name']);
   }
 
 }
