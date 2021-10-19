@@ -48,6 +48,11 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_case', 'civicrm_case_type', 'civicrm_participant', 'civicrm_event'], TRUE);
     $this->quickCleanUpFinancialEntities();
+
+    // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
+    // `clear()` works around it. This should be removed if that's updated, but it will be safe either way.
+    Civi::cache('metadata')->clear();
+
     parent::tearDown();
   }
 
@@ -941,6 +946,51 @@ December 21st, 2007
       'fee_level' => 'steep',
       $this->getCustomFieldName('participant_int') => '99999',
     ]);
+  }
+
+  public function testEscaping() {
+    $autoClean = [];
+    $create = function(string $entity, array $record = []) use (&$autoClean) {
+      // It's convenient to use createTestObject(), but it doesn't reproduce the normal escaping rules from QuickForm/APIv3/APIv4.
+      CRM_Utils_API_HTMLInputCoder::singleton()->encodeRow($record);
+      $dao = CRM_Core_DAO::createTestObject(CRM_Core_DAO_AllCoreTables::getFullName($entity), $record);
+
+      // We're not using transactions, and truncating 'contact' seems problematic, so we roll up our sleeves and cleanup each record...
+      $autoClean[] = CRM_Utils_AutoClean::with(function() use ($entity, $dao) {
+        CRM_Core_DAO::deleteTestObjects(CRM_Core_DAO_AllCoreTables::getFullName($entity), ['id' => $dao->id]);
+      });
+
+      return $dao;
+    };
+
+    $context = [];
+    $context['contactId'] = $create('Contact', [
+      'first_name' => '<b>ig</b>illy brackets',
+    ])->id;
+    $context['eventId'] = $create('Event', [
+      'title' => 'The Webinar',
+      'description' => '<p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>',
+    ])->id;
+
+    $messages = $expected = [];
+
+    // The `first_name` does not allow HTML. Any funny characters are presented like literal text.
+    $messages['contact_text'] = 'Hello {contact.first_name}!';
+    $expected['contact_text'] = "Hello <b>ig</b>illy brackets!";
+
+    $messages['contact_html'] = "<p>Hello {contact.first_name}!</p>";
+    $expected['contact_html'] = "<p>Hello &lt;b&gt;ig&lt;/b&gt;illy brackets!</p>";
+
+    // The `description` does allow HTML. Any funny characters are filtered out of text.
+    $messages['event_text'] = 'You signed up for this event: {event.title}: {event.description}';
+    $expected['event_text'] = 'You signed up for this event: The Webinar: Some online webinar thingy. Attendees will need to install the TeleFoo app.';
+
+    $messages['event_html'] = "<p>You signed up for this event:</p> <h3>{event.title}</h3> {event.description}";
+    $expected['event_html'] = '<p>You signed up for this event:</p> <h3>The Webinar</h3> <p>Some online webinar thingy.</p> <p>Attendees will need to install the <a href="http://telefoo.example.com">TeleFoo</a> app.</p>';
+
+    $rendered = CRM_Core_TokenSmarty::render($messages, $context);
+
+    $this->assertEquals($expected, $rendered);
   }
 
 }

@@ -94,7 +94,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
       $to[] = $contactID . '::' . $email;
     }
     $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
-    $to[] = $deceasedContactID . '::' . 'email@example.com';
+    $to[] = $deceasedContactID . '::' . 'dead@example.com';
     /* @var CRM_Contact_Form_Task_Email $form*/
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'to' => implode(',', $to),
