@@ -180,10 +180,10 @@ AND    {$this->_componentClause}";
 
       $mail = CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contribID, $elements['createPdf']);
 
-      if ($mail['html']) {
+      if (!empty($mail['html'])) {
         $message[] = $mail['html'];
       }
-      else {
+      elseif (!empty($mail['body'])) {
         $message[] = nl2br($mail['body']);
       }
 
