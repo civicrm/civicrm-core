@@ -61,6 +61,17 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
         'icon' => 'fa-save',
         'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskUpdate.html'],
       ];
+
+      $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
+      if (in_array($entity['name'], $taggable, TRUE)) {
+        $tasks[$entity['name']]['tag'] = [
+          'module' => 'crmSearchTasks',
+          'title' => E::ts('Tag - Add/Remove Tags'),
+          'icon' => 'fa-tags',
+          'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskTag.html'],
+        ];
+      }
+
     }
 
     if (array_key_exists('delete', $entity['actions'])) {
@@ -75,13 +86,14 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     if ($entity['name'] === 'Contact') {
       // Add contact tasks which support standalone mode
       $contactTasks = $this->checkPermissions ? \CRM_Contact_Task::permissionedTaskTitles(\CRM_Core_Permission::getPermission()) : NULL;
+      // These tasks are redundant with the new api-based ones in SearchKit
+      $redundant = [\CRM_Core_Task::TAG_ADD, \CRM_Core_Task::TAG_REMOVE, \CRM_Core_Task::TASK_DELETE];
       foreach (\CRM_Contact_Task::tasks() as $id => $task) {
         if (
           (!$this->checkPermissions || isset($contactTasks[$id])) &&
           // Must support standalone mode (with a 'url' property)
           !empty($task['url']) &&
-          // The delete task is redundant with the new api-based one
-          $task['url'] !== 'civicrm/task/delete-contact'
+          !in_array($id, $redundant)
         ) {
           if ($task['url'] === 'civicrm/task/pick-profile') {
             $task['title'] = E::ts('Profile Update');

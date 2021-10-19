@@ -6,6 +6,7 @@
       entity: '<',
       action: '@',
       ids: '<',
+      idField: '@',
       params: '<',
       success: '&',
       error: '&'
@@ -22,7 +23,7 @@
 
       // Number of records to process in each batch
       var BATCH_SIZE = 500,
-        // Extimated number of seconds each batch will take (for auto-incrementing the progress bar)
+        // Estimated number of seconds each batch will take (for auto-incrementing the progress bar)
         EST_BATCH_TIME = 5;
 
       this.$onInit = function() {
@@ -41,8 +42,19 @@
           ctrl.last = ctrl.ids.length;
         }
         var params = _.cloneDeep(ctrl.params);
-        params.where = params.where || [];
-        params.where.push(['id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]);
+        if (ctrl.action === 'save') {
+          // For the save action, take each record from params and copy it with each supplied id
+          params.records = _.transform(ctrl.ids.slice(ctrl.first, ctrl.last), function(records, id) {
+            _.each(_.cloneDeep(ctrl.params.records), function(record) {
+              record[ctrl.idField || 'id'] = id;
+              records.push(record);
+            });
+          });
+        } else {
+          // For other batch actions (update, delete), add supplied ids to the where clause
+          params.where = params.where || [];
+          params.where.push([ctrl.idField || 'id', 'IN', ctrl.ids.slice(ctrl.first, ctrl.last)]);
+        }
         crmApi4(ctrl.entity, ctrl.action, params).then(
           function(result) {
             stopIncrementer();
