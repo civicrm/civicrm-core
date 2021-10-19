@@ -227,4 +227,24 @@
     </html>
     <readonly>true</readonly>
   </field>
+  <field>
+    <name>case_id</name>
+    <type>int unsigned</type>
+    <component>CiviCase</component>
+    <title>Case ID</title>
+    <default>NULL</default>
+    <comment>FK to civicrm_case</comment>
+    <html>
+      <label>Case</label>
+    </html>
+    <add>5.44</add>
+    <readonly>true</readonly>
+  </field>
+  <foreignKey>
+    <name>case_id</name>
+    <table>civicrm_case</table>
+    <key>id</key>
+    <add>2.2</add>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
 </table>
