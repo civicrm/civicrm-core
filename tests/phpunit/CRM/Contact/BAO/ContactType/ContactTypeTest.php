@@ -121,8 +121,8 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'is_reserved' => FALSE,
       'parent' => 'Individual',
       'parent_label' => 'Individual',
-      'description' => NULL,
-      'image_URL' => NULL,
+      'description' => '',
+      'image_URL' => '',
     ];
     $this->assertEquals($expected, $allTypes);
   }
@@ -141,11 +141,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'label' => 'Individual',
           'is_active' => TRUE,
           'is_reserved' => TRUE,
-          'description' => NULL,
+          'description' => '',
           'parent_id' => NULL,
           'parent' => NULL,
           'parent_label' => NULL,
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Household' =>
         [
@@ -154,11 +154,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'label' => 'Household',
           'is_active' => TRUE,
           'is_reserved' => TRUE,
-          'description' => NULL,
+          'description' => '',
           'parent_id' => NULL,
           'parent' => NULL,
           'parent_label' => NULL,
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Organization' =>
         [
@@ -167,11 +167,11 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'label' => 'Organization',
           'is_active' => TRUE,
           'is_reserved' => TRUE,
-          'description' => NULL,
+          'description' => '',
           'parent_id' => NULL,
           'parent' => NULL,
           'parent_label' => NULL,
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Student' =>
         [
@@ -181,10 +181,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 1,
           'is_active' => '1',
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Individual',
           'parent_label' => 'Individual',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Parent' =>
         [
@@ -194,10 +194,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 1,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Individual',
           'parent_label' => 'Individual',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Staff' =>
         [
@@ -207,10 +207,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 1,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Individual',
           'parent_label' => 'Individual',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Team' =>
         [
@@ -220,10 +220,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 3,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Organization',
           'parent_label' => 'Organization',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'Sponsor' =>
         [
@@ -233,10 +233,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 3,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Organization',
           'parent_label' => 'Organization',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'sub1_individual' =>
         [
@@ -246,10 +246,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 1,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Individual',
           'parent_label' => 'Individual',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'sub2_individual' =>
         [
@@ -259,10 +259,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 1,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Individual',
           'parent_label' => 'Individual',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'sub_organization' =>
         [
@@ -272,10 +272,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 3,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Organization',
           'parent_label' => 'Organization',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
       'sub_household' =>
         [
@@ -285,10 +285,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
           'parent_id' => 2,
           'is_active' => TRUE,
           'is_reserved' => FALSE,
-          'description' => NULL,
+          'description' => '',
           'parent' => 'Household',
           'parent_label' => 'Household',
-          'image_URL' => NULL,
+          'image_URL' => '',
         ],
     ];
   }
