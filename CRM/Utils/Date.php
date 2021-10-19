@@ -1258,6 +1258,16 @@ class CRM_Utils_Date {
                   $from['Y'] -= ($relativeTermSuffix - 1);
                 }
                 break;
+
+              case 'earlier':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 00;
+                $to['i'] = $to['s'] = 00;
+                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                unset($from);
+                break;
             }
             break;
         }
@@ -1495,15 +1505,28 @@ class CRM_Utils_Date {
             break;
 
           default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $to['H'] = 23;
-              $to['i'] = $to['s'] = 59;
-              $from = self::intervalAdd('month', -($relativeTermSuffix * 3), $to);
-              $from = self::intervalAdd('second', 1, $from);
+            switch ($relativeTermPrefix) {
+              case 'ending':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
+                $from = self::intervalAdd('month', -($relativeTermSuffix * 3), $to);
+                $from = self::intervalAdd('second', 1, $from);
+                break;
+
+              case 'earlier':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 00;
+                $to['i'] = $to['s'] = 00;
+                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                unset($from);
+                break;
             }
+            break;
         }
         break;
 
@@ -1675,15 +1698,28 @@ class CRM_Utils_Date {
             break;
 
           default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $to['H'] = 23;
-              $to['i'] = $to['s'] = 59;
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
+            switch ($relativeTermPrefix) {
+              case 'ending':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
+                $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                $from = self::intervalAdd('second', 1, $from);
+                break;
+
+              case 'earlier':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 00;
+                $to['i'] = $to['s'] = 00;
+                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                unset($from);
+                break;
             }
+            break;
         }
         break;
 
@@ -1803,15 +1839,28 @@ class CRM_Utils_Date {
             break;
 
           default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $to['H'] = 23;
-              $to['i'] = $to['s'] = 59;
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
+            switch ($relativeTermPrefix) {
+              case 'ending':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
+                $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                $from = self::intervalAdd('second', 1, $from);
+                break;
+
+              case 'earlier':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 00;
+                $to['i'] = $to['s'] = 00;
+                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                unset($from);
+                break;
             }
+            break;
         }
         break;
 
@@ -1877,15 +1926,28 @@ class CRM_Utils_Date {
             break;
 
           default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $to['H'] = 23;
-              $to['i'] = $to['s'] = 59;
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
+            switch ($relativeTermPrefix) {
+              case 'ending':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
+                $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                $from = self::intervalAdd('second', 1, $from);
+                break;
+
+              case 'earlier':
+                $to['d'] = $now['mday'];
+                $to['M'] = $now['mon'];
+                $to['Y'] = $now['year'];
+                $to['H'] = 00;
+                $to['i'] = $to['s'] = 00;
+                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                unset($from);
+                break;
             }
+            break;
         }
         break;
     }

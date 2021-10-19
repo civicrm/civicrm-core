@@ -324,4 +324,33 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test relativeToAbsolute function for "earlier_x.<unit>" operator
+   *
+   * "from" must be empty
+   * "to" must be today - x units at 00:00:00
+   */
+  public function testRelativeEarlierX() {
+    $relativeDateValues = [
+      'earlier_2.day' => '- 2 days',
+      'earlier_15.day' => '- 15 days',
+      'earlier_1.week' => '- 1 week',
+      'earlier_6.week' => '- 6 week',
+      'earlier_3.month' => '- 3 month',
+      'earlier_6.month' => '- 6 month',
+      'earlier_4.year' => '- 4 year',
+      'earlier_10.year' => '- 10 year',
+    ];
+
+    foreach ($relativeDateValues as $key => $value) {
+      $parts = explode('.', $key);
+      $date = CRM_Utils_Date::relativeToAbsolute($parts[0], $parts[1]);
+      $this->assertEquals([
+        'from' => NULL,
+        'to' => date('Ymd000000', strtotime($value)),
+      ], $date, 'relative term is ' . $key);
+    }
+
+  }
+
 }
