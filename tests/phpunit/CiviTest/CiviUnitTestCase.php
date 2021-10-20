@@ -2655,13 +2655,13 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Create price set
+   * Create price set that includes one price field with two option values.
    *
    * @param string $component
    * @param int $componentId
    * @param array $priceFieldOptions
    *
-   * @return array
+   * @return array - the result of API3 PriceFieldValue.get for the new PriceField
    */
   protected function createPriceSet($component = 'contribution_page', $componentId = NULL, $priceFieldOptions = []) {
     $paramsSet['title'] = 'Price Set' . substr(sha1(rand()), 0, 7);
