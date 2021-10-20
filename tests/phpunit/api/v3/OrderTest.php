@@ -122,13 +122,13 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function checkPaymentResult($results, $expectedResult, $lineItems = NULL): void {
     foreach ($expectedResult[$results['id']] as $key => $value) {
-      $this->assertEquals($results['values'][$results['id']][$key], $value);
+      $this->assertEquals($value, $results['values'][$results['id']][$key], "Unexpected value for '$key'");
     }
 
     if ($lineItems) {
       foreach ($lineItems as $key => $items) {
         foreach ($items as $k => $item) {
-          $this->assertEquals($results['values'][$results['id']]['line_items'][$key][$k], $item);
+          $this->assertEquals($item, $results['values'][$results['id']]['line_items'][$key][$k], "Unexpected value for line item $key, $k");
         }
       }
     }
