@@ -21,7 +21,7 @@
  */
 class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
-   * particpant id
+   * participant id
    *
    * @var string
    *
@@ -35,7 +35,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    */
   protected $_contact_id;
   /**
-   * name of the particpant
+   * name of the participant
    *
    * @var string
    *
@@ -78,7 +78,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    */
   protected $_participant = [];
   /**
-   * particpant values
+   * participant values
    *
    * @var string
    */
