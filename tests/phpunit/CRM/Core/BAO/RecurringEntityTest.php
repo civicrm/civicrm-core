@@ -366,4 +366,40 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Testing Activity Generation through Entity Recursion with minute units.
+   */
+  public function testRecurringEntityGenerationWithMinuteUnit() {
+    // Create original activity
+    $activityDateTime = '2021-11-11 15:00:00';
+    $activityId = $this->activityCreate([
+      'activity_date_time' => $activityDateTime,
+      'subject' => 'minute unit test',
+    ])['id'];
+
+    // Create recurring activities.
+    $recursion = new CRM_Core_BAO_RecurringEntity();
+    $recursion->entity_id = $activityId;
+    $recursion->entity_table = 'civicrm_activity';
+    $recursion->dateColumns = ['activity_date_time'];
+    $recursion->schedule = [
+      'entity_value' => $activityId,
+      'start_action_date' => $activityDateTime,
+      'repetition_frequency_unit' => 'minute',
+      'repetition_frequency_interval' => 20,
+      'start_action_offset' => 4,
+    ];
+
+    $recursion->generate();
+
+    $activities = \Civi\Api4\Activity::get()
+      ->addSelect('activity_date_time')
+      ->addWhere('subject', '=', 'minute unit test')
+      ->execute()
+      ->column('activity_date_time');
+    $this->assertEquals(5, count($activities));
+    $expectedTimestamps = ['2021-11-11 15:00:00', '2021-11-11 15:20:00', '2021-11-11 15:40:00', '2021-11-11 16:00:00', '2021-11-11 16:20:00'];
+    $this->assertEquals($expectedTimestamps, $activities);
+  }
+
 }

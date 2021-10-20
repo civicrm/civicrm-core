@@ -900,6 +900,7 @@ class CRM_Core_SelectValues {
     // is for recurring payments and probably not good to re-use for recurring entities.
     // If something other than a hard-coded list is desired, add a new option_group.
     return [
+      'minute' => ts('minute', ['plural' => 'minutes', 'count' => $count]),
       'hour' => ts('hour', ['plural' => 'hours', 'count' => $count]),
       'day' => ts('day', ['plural' => 'days', 'count' => $count]),
       'week' => ts('week', ['plural' => 'weeks', 'count' => $count]),
