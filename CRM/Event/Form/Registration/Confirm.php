@@ -755,7 +755,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
               $params[$participantNum]['lineItem'] = $lineItem;
             }
 
-            //only add additional particpants and not the primary particpant as we already have that
+            //only add additional participants and not the primary participant as we already have that
             //added to $primaryParticipant so that this change doesn't break or require changes to
             //existing gateway implementations
             $primaryParticipant['participants_info'][$participantID] = $params[$participantNum];
