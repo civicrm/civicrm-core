@@ -20,13 +20,26 @@ abstract class EntityExample implements ExampleDataInterface {
   protected $entityName;
 
   /**
+   * Get the name of the example in use.
+   *
+   * @return string
+   */
+  protected function getExampleName(): string {
+    return $this->exName;
+  }
+
+  /**
+   * ExName - ex is short for 'example'.
+   *
+   * To avoid trying to remember abbreviations `getExampleName` can be used.
+   *
    * @var string
    */
   protected $exName;
 
   public function __construct() {
     if (!preg_match(';^(.*)[_\\\]([a-zA-Z0-9]+)[_\\\]([a-zA-Z0-9]+)$;', static::class, $m)) {
-      throw new \RuntimeException("Failed to parse class: " . static::class);
+      throw new \RuntimeException('Failed to parse class: ' . static::class);
     }
     $this->entityName = $m[2];
     $this->exName = $m[3];

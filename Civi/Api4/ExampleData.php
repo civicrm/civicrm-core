@@ -90,8 +90,8 @@ class ExampleData extends \Civi\Api4\Generic\AbstractEntity {
   public static function permissions() {
     return [
       // FIXME: Perhaps use 'edit message templates' or similar?
-      "meta" => ["access CiviCRM"],
-      "default" => ["administer CiviCRM"],
+      'meta' => ['access CiviCRM'],
+      'default' => ['administer CiviCRM'],
     ];
   }
 
