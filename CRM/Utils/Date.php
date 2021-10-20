@@ -1517,12 +1517,20 @@ class CRM_Utils_Date {
                 break;
 
               case 'earlier':
-                $to['d'] = $now['mday'];
-                $to['M'] = $now['mon'];
-                $to['Y'] = $now['year'];
-                $to['H'] = 00;
-                $to['i'] = $to['s'] = 00;
-                $to = self::intervalAdd($unit, -$relativeTermSuffix, $to);
+                $quarterDifference = ceil($now['mon'] / 3) - $relativeTermSuffix;
+                $subtractYear = 0;
+                if ($quarterDifference <= 0) {
+                  $subtractYear = intdiv(abs($quarterDifference), 4) + 1;
+                  $quarter = ($quarterDifference % 4) + 4;
+                }
+                else {
+                  $quarter = $quarterDifference;
+                }
+                $to['M'] = 3 * $quarter;
+                $to['Y'] = $now['year'] - $subtractYear;
+                $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+                $to['H'] = 23;
+                $to['i'] = $to['s'] = 59;
                 unset($from);
                 break;
             }
