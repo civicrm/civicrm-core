@@ -4,6 +4,7 @@ namespace Civi\AfformAdmin;
 
 use Civi\Api4\Entity;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Event\GenericHookEvent;
 use CRM_AfformAdmin_ExtensionUtil as E;
 
 class AfformAdminMeta {
@@ -203,6 +204,11 @@ class AfformAdminMeta {
         }
       }
     }
+
+    // Let extensions define their entities through an event, e.g. virtual
+    // entities that can not be registered in separate files.
+    $event = GenericHookEvent::create(['entities' => &$data['entities']]);
+    \Civi::dispatcher()->dispatch('civi.afform.entities', $event);
 
     // Todo: add method for extensions to define other elements
     $data['elements'] = [
