@@ -85,7 +85,7 @@ class AfformAdminMeta {
     $meta = [
       'entity' => $info['name'],
       'label' => $info['title'],
-      'icon' => $info['icon'],
+      'icon' => $info['icon'] ?? NULL,
     ];
     // Custom entities are always type 'join'
     if (in_array('CustomValue', $info['type'], TRUE)) {
