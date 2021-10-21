@@ -169,6 +169,36 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'effective_start_date' => '2012-06-14 00:00:00',
       'effective_end_date' => '2012-06-15 00:00:00',
     ];
+    $this->fixtures['sched_activity_5minute'] = [
+      'name' => 'Five_Minute_Phone_Call_Notice',
+      'title' => 'Five Minute Phone Call Notice',
+      'limit_to' => '1',
+      'absolute_date' => NULL,
+      'body_html' => '<p>5 minutes (for {activity.subject})</p>',
+      'body_text' => '5 minutes (non-repeating) (for {activity.subject})',
+      'end_action' => NULL,
+      'end_date' => NULL,
+      'end_frequency_interval' => NULL,
+      'end_frequency_unit' => NULL,
+      'entity_status' => '1',
+      'entity_value' => '2',
+      'group_id' => NULL,
+      'is_active' => '1',
+      'is_repeat' => '0',
+      'mapping_id' => '1',
+      'msg_template_id' => NULL,
+      'recipient' => '2',
+      'recipient_listing' => NULL,
+      'recipient_manual' => NULL,
+      'record_activity' => 1,
+      'repetition_frequency_interval' => NULL,
+      'repetition_frequency_unit' => NULL,
+      'start_action_condition' => 'before',
+      'start_action_date' => 'activity_date_time',
+      'start_action_offset' => '5',
+      'start_action_unit' => 'minute',
+      'subject' => '5 minutes (about {activity.activity_type})',
+    ];
     $this->fixtures['sched_activity_1day_r'] = [
       'name' => 'One_Day_Phone_Call_Notice_R',
       'title' => 'One Day Phone Call Notice R',
@@ -1140,6 +1170,46 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     foreach ($activities as $activityDetails) {
       $this->assertStringContainsString($activity->subject, $activityDetails['details']);
     }
+  }
+
+  /**
+   * Test "minute" as a valid unit.
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testActivityDateTimeMinuteUnit(): void {
+    $this->createScheduleFromFixtures('sched_activity_5minute');
+
+    $activity = $this->createTestObject('CRM_Activity_DAO_Activity', $this->fixtures['phone_call']);
+    $contact = $this->callAPISuccess('contact', 'create', $this->fixtures['contact']);
+    $activity->subject = 'Test subject for phone_call';
+    $activity->save();
+
+    $source['contact_id'] = $contact['id'];
+    $source['activity_id'] = $activity->id;
+    $source['record_type_id'] = 2;
+    $activityContact = $this->createTestObject('CRM_Activity_DAO_ActivityContact', $source);
+    $activityContact->save();
+
+    $this->assertCronRuns([
+      [
+        // 15 minutes before phone call time, no email
+        'time' => '2012-06-15 9:45:00',
+        'recipients' => [],
+        'subjects' => [],
+      ],
+      [
+        // 3 minutes before, an email
+        'time' => '2012-06-15 9:57:00',
+        'recipients' => [['test-member@example.com']],
+      ],
+      [
+        // Run cron again; message already sent
+        'time' => '',
+        'recipients' => [],
+      ],
+    ]);
   }
 
   /**

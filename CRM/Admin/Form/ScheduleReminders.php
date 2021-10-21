@@ -390,6 +390,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $defaults['is_active'] = 1;
       $defaults['mode'] = 'Email';
       $defaults['record_activity'] = 1;
+      $defaults['start_action_unit'] = 'hour';
     }
     else {
       $defaults = $this->_values;
