@@ -1182,7 +1182,7 @@ abstract class CRM_Utils_Hook {
    * @param CRM_Core_Payment $paymentObj
    *   Instance of payment class of the payment processor invoked (e.g., 'CRM_Core_Payment_Dummy')
    *   See discussion in CRM-16224 as to whether $paymentObj should be passed by reference.
-   * @param array &$rawParams
+   * @param array|\Civi\Payment\PropertyBag &$rawParams
    *    array of params as passed to to the processor
    * @param array|\Civi\Payment\PropertyBag &$cookedParams
    *     params after the processor code has translated them into its own key/value pairs
