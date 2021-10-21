@@ -709,4 +709,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
     return ['ufAccessURL' => url('admin/people/permissions')];
   }
 
+  /**
+   * Return the CMS-specific UF Group Types for profiles.
+   * @return array
+   */
+  public function getUfGroupTypes() {
+    return [
+      'User Registration' => ts('Drupal User Registration'),
+      'User Account' => ts('View/Edit Drupal User Account'),
+    ];
+  }
+
 }

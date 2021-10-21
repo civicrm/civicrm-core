@@ -1082,4 +1082,12 @@ abstract class CRM_Utils_System_Base {
     return TRUE;
   }
 
+  /**
+   * Return the CMS-specific UF Group Types for profiles.
+   * @return array
+   */
+  public function getUfGroupTypes() {
+    return [];
+  }
+
 }
