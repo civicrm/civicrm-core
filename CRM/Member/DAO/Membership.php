@@ -410,7 +410,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.status_override_end_date',
           'export' => TRUE,
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',

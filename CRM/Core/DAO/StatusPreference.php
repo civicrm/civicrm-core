@@ -191,7 +191,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_status_pref.hush_until',
           'export' => TRUE,
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',

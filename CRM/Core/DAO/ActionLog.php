@@ -272,7 +272,7 @@ class CRM_Core_DAO_ActionLog extends CRM_Core_DAO {
           'title' => ts('Reference Date'),
           'description' => ts('Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)'),
           'where' => 'civicrm_action_log.reference_date',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_action_log',
           'entity' => 'ActionLog',
           'bao' => 'CRM_Core_BAO_ActionLog',

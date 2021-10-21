@@ -266,7 +266,7 @@ class CRM_Contribute_DAO_ContributionProduct extends CRM_Core_DAO {
           'title' => ts('Financial Type ID'),
           'description' => ts('FK to Financial Type(for membership price sets only).'),
           'where' => 'civicrm_contribution_product.financial_type_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_contribution_product',
           'entity' => 'ContributionProduct',
           'bao' => 'CRM_Contribute_DAO_ContributionProduct',

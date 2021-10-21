@@ -327,7 +327,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'required' => FALSE,
           'where' => 'civicrm_case.created_date',
           'export' => TRUE,
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',

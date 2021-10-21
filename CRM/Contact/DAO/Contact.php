@@ -1521,7 +1521,7 @@ class CRM_Contact_DAO_Contact extends CRM_Core_DAO {
           'required' => FALSE,
           'where' => 'civicrm_contact.created_date',
           'export' => TRUE,
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_contact',
           'entity' => 'Contact',
           'bao' => 'CRM_Contact_BAO_Contact',

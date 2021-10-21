@@ -220,7 +220,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'description' => ts('When should the cache item expire'),
           'required' => FALSE,
           'where' => 'civicrm_cache.expired_date',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
