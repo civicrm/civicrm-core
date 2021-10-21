@@ -7,7 +7,10 @@
     <div class="form-inline">
       <label for="crmSearchTaskDownload-format">{{:: ts('Format') }}</label>
       <select id="crmSearchTaskDownload-format" class="form-control" ng-model="$ctrl.format">
-        <option value="csv">{{:: ts('CSV File') }}</option>
+        <option value="csv">{{:: ts('Generic Spreadsheet (.csv)') }}</option>
+        <option value="xlsx">{{:: ts('Microsoft Excel (.xlsx)') }}</option>
+        <option value="ods">{{:: ts('OpenDocument Spreadsheet (.ods)') }}</option>
+        <option value="pdf">{{:: ts('PDF Document (.pdf)') }}</option>
       </select>
     </div>
     <hr />
