@@ -192,10 +192,12 @@
         return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
+      // Checks if a column contains a sortable value
+      // Must be a real sql expression (not a pseudo-field like `result_row_num`)
       this.canBeSortable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr),
-          arg = (_.findWhere(info.args, {type: 'field'}) || {});
+          arg = (info && info.args && _.findWhere(info.args, {type: 'field'})) || {};
         return arg.field && arg.field.type !== 'Pseudo';
       };
 
