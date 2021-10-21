@@ -237,10 +237,7 @@ class CRM_Core_SelectValues {
     ];
 
     if (CRM_Core_Config::singleton()->userSystem->supports_form_extensions) {
-      $ufGroupType += [
-        'User Registration' => ts('Drupal User Registration'),
-        'User Account' => ts('View/Edit Drupal User Account'),
-      ];
+      $ufGroupType += CRM_Core_Config::singleton()->userSystem->getUfGroupTypes();
     }
     return $ufGroupType;
   }
