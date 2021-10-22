@@ -215,12 +215,7 @@ LIMIT 1
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
-    if ($usedFor === 'pledge') {
-      $statusNames = CRM_Pledge_BAO_Pledge::buildOptions('status_id', 'validate');
-    }
-    else {
-      $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-    }
+    $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
 
     $statusNamesToUnset = [
       // For records which represent a data template for a recurring
@@ -237,36 +232,19 @@ LIMIT 1
         'Refunded',
         'Chargeback',
         'Pending refund',
+        'In Progress',
+        'Overdue',
+        'Partially paid',
       ]);
 
-      if ($usedFor === 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'In Progress',
-          'Overdue',
-          'Partially paid',
-        ]);
-      }
-      elseif ($usedFor === 'participant') {
+      if ($usedFor && $usedFor !== 'contribution') {
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Cancelled',
           'Failed',
-          'In Progress',
-          'Overdue',
-          'Partially paid',
-        ]);
-      }
-      elseif ($usedFor === 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, [
-          'In Progress',
-          'Cancelled',
-          'Failed',
-          'Overdue',
-          'Partially paid',
         ]);
       }
     }
     else {
-
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
@@ -312,13 +290,8 @@ LIMIT 1
       unset($statusNames[CRM_Utils_Array::key($name, $statusNames)]);
     }
 
-    // based on filtered statuse names fetch the final list of statuses in array('id' => 'label') format
-    if ($usedFor == 'pledge') {
-      $statuses = CRM_Pledge_BAO_Pledge::buildOptions('status_id');
-    }
-    else {
-      $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
-    }
+    $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+
     foreach ($statuses as $statusID => $label) {
       if (!array_key_exists($statusID, $statusNames)) {
         unset($statuses[$statusID]);
