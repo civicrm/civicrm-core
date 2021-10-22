@@ -225,7 +225,6 @@
         </table>
       {/if}
 
-    <center>
       <table style="font-family: Arial, Verdana, sans-serif" width="100%" height="100" border="0" cellpadding="5" cellspacing="5">
         <tr>
           <td style="padding-left:15px;"><b><font size="4" align="center">{ts}CREDIT NOTE{/ts}</font></b></td>
@@ -426,7 +425,6 @@
         </tr>
       </table>
     {/if}
-    </center>
 
   </div>
   </body>
