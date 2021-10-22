@@ -133,7 +133,7 @@ VALUES
   (@option_group_id_languages, 0, 0, 'mn_MN', 'mn', {localize}'{ts escape="sql"}Mongolian{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'na_NR', 'na', {localize}'{ts escape="sql"}Nauru{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'nv_US', 'nv', {localize}'{ts escape="sql"}Navajo, Navaho{/ts}'{/localize}, @counter := @counter + 1),
-  (@option_group_id_languages, 0, 1, 'nb_NO', 'nb', {localize}'{ts escape="sql"}Norwegian BokmÃ¥l{/ts}'{/localize}, @counter := @counter + 1),
+  (@option_group_id_languages, 0, 1, 'nb_NO', 'nb', {localize}'{ts escape="sql"}Norwegian Bokmål{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'nd_ZW', 'nd', {localize}'{ts escape="sql"}North Ndebele{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ne_NP', 'ne', {localize}'{ts escape="sql"}Nepali{/ts}'{/localize}, @counter := @counter + 1),
   (@option_group_id_languages, 0, 0, 'ng_NA', 'ng', {localize}'{ts escape="sql"}Ndonga{/ts}'{/localize}, @counter := @counter + 1),
