@@ -68,7 +68,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
   public static function formRule($form, $rule) {
     $errors = [];
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
-      $errors['_qf_default'] = "Please select atleast one tag.";
+      $errors['_qf_default'] = ts('Please select at least one tag.');
     }
     return $errors;
   }
