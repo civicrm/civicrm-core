@@ -159,7 +159,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @var bool
    */
-  protected $isValidateFinancialsOnPostAssert = FALSE;
+  protected $isValidateFinancialsOnPostAssert = TRUE;
 
   /**
    * Should location types be checked to ensure primary addresses are correctly assigned after each test.
