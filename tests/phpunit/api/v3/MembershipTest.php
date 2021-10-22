@@ -151,7 +151,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test Activity creation on cancellation of membership contribution.
    *
    * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testActivityForCancelledContribution(): void {
     // @todo figure out why financial validation fails with this test.
@@ -160,16 +159,20 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $this->createContributionAndMembershipOrder();
     $membershipID = $this->callAPISuccessGetValue('MembershipPayment', ['return' => 'id']);
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->_id = $this->ids['Contribution'][0];
-    $form->testSubmit([
+
+    $_REQUEST['id'] = $this->ids['Contribution'][0];
+    $_REQUEST['action'] = 'update';
+    // change pending contribution to completed
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 100,
       'financial_type_id' => 1,
       'contact_id' => $contactId,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 3,
-    ],
-    CRM_Core_Action::UPDATE);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
 
     $this->callAPISuccessGetSingle('Activity', [
       'activity_type_id' => 'Membership Signup',
