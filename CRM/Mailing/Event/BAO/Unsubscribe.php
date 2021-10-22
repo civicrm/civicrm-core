@@ -226,23 +226,33 @@ WHERE  email = %2
     $groupIdClause = '';
     if ($groupIds || $baseGroupIds) {
       $groupIdClause = "AND grp.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
+      // Check that groupcontactcache is up to date so we can get smartgroups
+      CRM_Contact_BAO_GroupContactCache::check(array_merge($groupIds, $baseGroupIds));
     }
-    $do = CRM_Core_DAO::executeQuery("
+
+    $groupsSQL = "
             SELECT      grp.id as group_id,
                         grp.title as title,
                         grp.frontend_title as frontend_title,
                         grp.frontend_description as frontend_description,
-                        grp.description as description
+                        grp.description as description,
+                        grp.saved_search_id as saved_search_id
             FROM        civicrm_group grp
             LEFT JOIN   civicrm_group_contact gc
                 ON      gc.group_id = grp.id
+            LEFT JOIN     civicrm_group_contact_cache gcc
+                ON      gcc.group_id = grp.id
             WHERE       grp.is_hidden = 0
                         $groupIdClause
-                AND     (grp.saved_search_id is not null
-                            OR  (gc.contact_id = $contact_id
+                AND     ((grp.saved_search_id is not null AND gcc.contact_id = %1)
+                            OR  (gc.contact_id = %1
                                 AND gc.status = 'Added')
                             $baseGroupClause
-                        )");
+                        ) GROUP BY grp.id";
+    $groupsParams = [
+      1 => [$contact_id, 'Positive'],
+    ];
+    $do = CRM_Core_DAO::executeQuery($groupsSQL, $groupsParams);
 
     if ($return) {
       $returnGroups = [];
