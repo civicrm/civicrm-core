@@ -25,6 +25,7 @@ class DAOSaveAction extends AbstractSaveAction {
     foreach ($this->records as &$record) {
       $record += $this->defaults;
       $this->formatWriteValues($record);
+      $this->matchExisting($record);
       if (empty($record['id'])) {
         $this->fillDefaults($record);
       }

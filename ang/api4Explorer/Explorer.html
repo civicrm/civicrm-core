@@ -98,8 +98,11 @@
           </div>
           <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
             <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
-            <textarea class="form-control" type="{{:: param.type[0] === 'int' && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]">
+            <textarea class="form-control" ng-if="::!param.options" id="api4-param-{{:: name }}" ng-model="params[name]">
             </textarea>
+            <select multiple ng-if="::param.options" crm-ui-select class="form-control" id="api4-param-{{:: name }}" ng-model="params[name]">
+              <option ng-repeat="opt in param.options" value="{{ opt }}">{{ opt }}</option>
+            </select>
           </div>
           <fieldset ng-if="::availableParams.where" class="api4-clause-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()">
             <crm-api4-clause clauses="params.where" is-required="availableParams.where.required" op="AND" label="Where" fields="fieldsAndJoins" ></crm-api4-clause>
