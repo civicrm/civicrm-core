@@ -2810,11 +2810,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       $emailGreetingString = $emailGreeting[$contact->email_greeting_id];
       $updateQueryString[] = " email_greeting_custom = NULL ";
     }
-    else {
-      if ($contact->email_greeting_custom) {
-        $updateQueryString[] = " email_greeting_display = NULL ";
-      }
-    }
 
     if ($emailGreetingString) {
       CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
@@ -2838,11 +2833,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       $postalGreeting = CRM_Core_PseudoConstant::greeting($filter);
       $postalGreetingString = $postalGreeting[$contact->postal_greeting_id];
       $updateQueryString[] = " postal_greeting_custom = NULL ";
-    }
-    else {
-      if ($contact->postal_greeting_custom) {
-        $updateQueryString[] = " postal_greeting_display = NULL ";
-      }
     }
 
     if ($postalGreetingString) {
@@ -2868,11 +2858,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       $addressee = CRM_Core_PseudoConstant::greeting($filter);
       $addresseeString = $addressee[$contact->addressee_id];
       $updateQueryString[] = " addressee_custom = NULL ";
-    }
-    else {
-      if ($contact->addressee_custom) {
-        $updateQueryString[] = " addressee_display = NULL ";
-      }
     }
 
     if ($addresseeString) {
