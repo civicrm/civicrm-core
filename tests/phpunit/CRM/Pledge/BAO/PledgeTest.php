@@ -135,4 +135,21 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals('06/10/2016', date('m/d/Y', strtotime($date)), 'The two dates do not match');
   }
 
+  /**
+   * Test the job that updates pledge.
+   */
+  public function testPledgeUpdate(): void {
+    $this->pledgeCreate($this->_params);
+    $this->addLocationBlockToDomain();
+    $mut = new CiviMailUtils($this);
+    CRM_Pledge_BAO_Pledge::updatePledgeStatus(['send_reminders' => TRUE]);
+    $mut->checkAllMailLog([
+      'Dear Anthony,',
+      '123',
+      'fixme.domainemail@example.org',
+      '10 Downing Street
+London,',
+    ]);
+  }
+
 }

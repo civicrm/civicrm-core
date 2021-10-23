@@ -1969,6 +1969,14 @@ class CRM_Utils_Token {
           '$last_name' => 'contact.last_name',
           '$displayName' => 'contact.display_name',
         ],
+        'pledge_acknowledgement' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
+        'pledge_reminder' => [
+          '$domain' => 'no longer available / relevant',
+          '$contact' => 'no longer available / relevant',
+        ],
       ],
     ];
   }
