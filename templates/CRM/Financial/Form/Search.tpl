@@ -233,7 +233,7 @@ CRM.$(function($) {
           CRM.alert({/literal}'{ts escape="js"}An error occurred while processing your request.{/ts}', $("#batch_update option[value=" + op + "]").text() + ' {ts escape="js"}Error{/ts}'{literal}, 'error');
         }
       },
-      'json').error(serverError);
+      'json').fail(serverError);
   }
 
   function validateOp(records, op) {

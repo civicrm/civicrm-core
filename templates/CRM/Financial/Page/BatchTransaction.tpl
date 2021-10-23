@@ -141,7 +141,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
       CRM.alert(html.status);
     }
   },
-  'json').error(noServerResponse);
+  'json').fail(noServerResponse);
 }
 
 function batchSummary(entityID) {
