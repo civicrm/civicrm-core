@@ -67,7 +67,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return array
    */
-  public static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, array $inputParams, bool $isARefund, $trxnIds, $fieldId): array {
+  private static function createFinancialItemsForLine($params, $context, $fields, array $previousLineItems, array $inputParams, bool $isARefund, $trxnIds, $fieldId): array {
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
       $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
@@ -133,7 +133,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return int
    */
-  public static function getMultiplier($contribution_status_id, $context) {
+  private static function getMultiplier($contribution_status_id, $context) {
     if ($context === 'changeFinancialType' || CRM_Contribute_BAO_Contribution::isContributionStatusNegative($contribution_status_id)) {
       return -1;
     }
