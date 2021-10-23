@@ -95,7 +95,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
       );
     }
 
-    $this->setTitle('Contributions made in Year X and not Year Y');
+    $this->setTitle(ts('Contributions made in Year X and not Year Y'));
     // @TODO: Decide on better names for "Exclusion"
     // @TODO: Add rule to ensure that exclusion dates are not in the inclusion range
   }

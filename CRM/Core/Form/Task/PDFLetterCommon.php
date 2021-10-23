@@ -36,7 +36,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
   public static function preProcess(&$form) {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative');
 
-    $form->setTitle('Print/Merge Document');
+    $form->setTitle(ts('Print/Merge Document'));
   }
 
   /**

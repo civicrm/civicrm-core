@@ -60,7 +60,7 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Zip Code Range Search');
+    $this->setTitle(ts('Zip Code Range Search'));
 
     /**
      * if you are using the standard template, this array tells the template what elements

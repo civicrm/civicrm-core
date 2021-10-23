@@ -52,7 +52,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Find Totals for Events');
+    $this->setTitle(ts('Find Totals for Events'));
 
     /**
      * Define the search form fields here
