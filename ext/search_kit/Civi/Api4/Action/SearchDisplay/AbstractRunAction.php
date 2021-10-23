@@ -275,10 +275,64 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     return \CRM_Utils_System::url($path, NULL, $absolute, NULL, FALSE);
   }
 
+  /**
+   * @param $column
+   * @param $data
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, record: array, value: mixed}|null
+   */
   private function formatEditableColumn($column, $data) {
-
+    $editable = $this->getEditableInfo($column['key']);
+    if (!empty($data[$editable['id_path']])) {
+      $editable['record'] = [
+        $editable['id_key'] => $data[$editable['id_path']],
+      ];
+      $editable['value'] = $data[$editable['value_path']];
+      \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'value_path');
+      return $editable;
+    }
+    return NULL;
   }
 
+  /**
+   * @param $key
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string}|null
+   */
+  private function getEditableInfo($key) {
+    [$key] = explode(':', $key);
+    $field = $this->getField($key);
+    // If field is an implicit join, use the original fk field
+    if (!empty($field['implicit_join'])) {
+      return $this->getEditableInfo(substr($key, 0, -1 - strlen($field['name'])));
+    }
+    if ($field) {
+      $idKey = CoreUtil::getIdFieldName($field['entity']);
+      $idPath = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . $idKey;
+      // Hack to support editing relationships
+      if ($field['entity'] === 'RelationshipCache') {
+        $field['entity'] = 'Relationship';
+        $idPath = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . 'relationship_id';
+      }
+      return [
+        'entity' => $field['entity'],
+        'input_type' => $field['input_type'],
+        'data_type' => $field['data_type'],
+        'options' => !empty($field['options']),
+        'serialize' => !empty($field['serialize']),
+        'fk_entity' => $field['fk_entity'],
+        'value_key' => $field['name'],
+        'value_path' => $key,
+        'id_key' => $idKey,
+        'id_path' => $idPath,
+      ];
+    }
+    return NULL;
+  }
+
+  /**
+   * @param $column
+   * @param $data
+   * @return array{url: string, width: int, height: int}
+   */
   private function formatImage($column, $data) {
     $tokenExpr = $column['rewrite'] ?: '[' . $column['key'] . ']';
     return [
@@ -575,10 +629,13 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $possibleTokens .= implode('', array_column($column['links'], 'text'));
       }
 
-      // Select value fields for in-place editing
-      if (isset($column['editable']['value'])) {
-        $additions[] = $column['editable']['value'];
-        $additions[] = $column['editable']['id'];
+      // Select id & value for in-place editing
+      if (!empty($column['editable'])) {
+        $editable = $this->getEditableInfo($column['key']);
+        if ($editable) {
+          $additions[] = $editable['value_path'];
+          $additions[] = $editable['id_path'];
+        }
       }
     }
     // Add fields referenced via token

@@ -43,11 +43,11 @@
   <crm-search-admin-token-select ng-if="col.rewrite" model="col" field="rewrite" suffix=":label"></crm-search-admin-token-select>
 </div>
 <div class="form-inline">
-  <label ng-if="$ctrl.parent.isEditable(col)" title="{{:: ts('Users will be able to click to edit this field.') }}">
+  <label ng-if="$ctrl.parent.canBeEditable(col)" title="{{:: ts('Users will be able to click to edit this field.') }}">
     <input type="checkbox" ng-checked="col.editable" ng-click="$ctrl.parent.toggleEditable(col)">
     {{:: ts('In-Place Edit') }}
   </label>
-  <label ng-if="!$ctrl.parent.isEditable(col)" class="disabled" title="{{:: ts('Read-only or rewritten fields cannot be editable.') }}">
+  <label ng-if="!$ctrl.parent.canBeEditable(col)" class="disabled" title="{{:: ts('Read-only or rewritten fields cannot be editable.') }}">
     <input type="checkbox" disabled>
     {{:: ts('In-Place Edit') }}
   </label>
