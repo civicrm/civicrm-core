@@ -46,7 +46,7 @@ function _civicrm_api3_cxn_register_spec(&$spec) {
  *
  * @param array $params
  *   Array with keys:
- *   - app_guid: The unique identifer of the target application.
+ *   - app_guid: The unique identifier of the target application.
  *   - app_meta_url: The URL for the application's metadata.
  * @return array
  * @throws Exception

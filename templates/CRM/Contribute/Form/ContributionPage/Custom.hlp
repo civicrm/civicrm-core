@@ -19,10 +19,10 @@
   {ts}If you haven't already configured custom fields and a profile to collect data you need for this form, you can create them here using the steps below.{/ts}
 </p>
 <ol>
-  <li>{ts}Create a new profile by clicking the 'Create' button next to 'Include Profile' field below. Name your new profile (e.g. 'Contribution Information').{/ts}</li>
+  <li>{ts}Create a new profile by clicking the 'Create' button next to the 'Include Profile' field. Name your new profile (e.g. 'Contribution Information').{/ts}</li>
   <li>{ts}Add any existing fields needed by dragging them into the profile form builder.{/ts}</li>
   <li>{ts}If you need to create new custom fields, you can also do that within the profile editor. Then add the new custom field(s) to this profile by dragging them into the form builder.{/ts}</li>
-  <li>{ts}Save your profile to return to this screen. You can preview it from here by clicking the Preview (microsope) button.{/ts}</li>
+  <li>{ts}Save your profile to return to this screen. You can preview it from here by clicking the Preview button.{/ts}</li>
 </ol>
 {capture assign=docLinkCustom}{docURL page="user/organising-your-data/custom-fields" text="custom fields"}{/capture}
 {capture assign=docLinkProfile}{docURL page="user/organising-your-data/profiles" text="profiles"}{/capture}
