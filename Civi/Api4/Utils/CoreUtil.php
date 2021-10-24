@@ -45,17 +45,26 @@ class CoreUtil {
   }
 
   /**
-   * Get item from an entity's getInfo array
+   * Get a piece of metadata about an entity
    *
    * @param string $entityName
    * @param string $keyToReturn
    * @return mixed
    */
   public static function getInfoItem(string $entityName, string $keyToReturn) {
-    $info = Entity::get(FALSE)
-      ->addWhere('name', '=', $entityName)
-      ->addSelect($keyToReturn)
-      ->execute()->first();
+    // Because this function might be called thousands of times per request, read directly
+    // from the cache set by Apiv4 Entity.get to avoid the processing overhead of the API wrapper.
+    $cached = \Civi::cache('metadata')->get('api4.entities.info');
+    if ($cached) {
+      $info = $cached[$entityName] ?? NULL;
+    }
+    // If the cache is empty, calling Entity.get will populate it and we'll use it next time.
+    else {
+      $info = Entity::get(FALSE)
+        ->addWhere('name', '=', $entityName)
+        ->addSelect($keyToReturn)
+        ->execute()->first();
+    }
     return $info ? $info[$keyToReturn] ?? NULL : NULL;
   }
 
