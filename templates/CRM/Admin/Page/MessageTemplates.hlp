@@ -30,7 +30,7 @@
 {/htxt}
 {htxt id="id-system-workflow"}
 <p>
-  {ts}System workflow message templates are used to generate the emails sent to consituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts}
+  {ts}System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.{/ts}
 </p>
 <p>
   {ts}Workflow messages include text AND necessary program logic. Use caution when editing so as not to modify the program logic. Be sure to test the workflow and review the emails sent after making any changes. If you find that your changes have caused problems, errors or missing information - you can always &quot;Revert&quot; to the system default for that workflow.{/ts}
