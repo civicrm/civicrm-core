@@ -386,7 +386,7 @@ class CRM_Contact_DAO_RelationshipCache extends CRM_Core_DAO {
           'title' => ts('Case ID'),
           'description' => ts('FK to civicrm_case'),
           'where' => 'civicrm_relationship_cache.case_id',
-          'default' => 'NULL',
+          'default' => NULL,
           'table_name' => 'civicrm_relationship_cache',
           'entity' => 'RelationshipCache',
           'bao' => 'CRM_Contact_BAO_RelationshipCache',
