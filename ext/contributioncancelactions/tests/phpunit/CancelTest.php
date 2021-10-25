@@ -105,7 +105,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Create an order with more than one membership.
    *
-   * @throws \CRM_Core_Exception
    */
   protected function createMembershipOrder(): void {
     $priceFieldID = $this->callAPISuccessGetValue('price_field', [
@@ -182,9 +181,8 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * @param array $params
    *
    * @return int
-   * @throws \CRM_Core_Exception
    */
-  public function createPaymentProcessor($params = []): int {
+  public function createPaymentProcessor(array $params = []): int {
     $params = array_merge([
       'name' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
@@ -245,7 +243,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   /**
    * Test cancel order api
    * @throws API_Exception
-   * @throws CRM_Core_Exception
    */
   public function testCancelOrderWithParticipant(): void {
     $this->createContact();
@@ -261,8 +258,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    * form.
    *
    * @throws \API_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
    */
   public function testCancelFromContributionForm(): void {
     $this->createContact();
@@ -270,7 +265,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->createMembershipOrder();
     $this->createLoggedInUser();
     $formValues = [
-      'id' => $this->ids['Contribution'][0],
       'contact_id' => $this->ids['contact'][0],
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
@@ -278,7 +272,11 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
     $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $form->testSubmit($formValues, CRM_Core_Action::UPDATE);
+    $_SESSION['_' . $form->controller->_name . '_container']['values']['Contribution'] = $formValues;
+    $_REQUEST['action'] = 'update';
+    $_REQUEST['id'] = $this->ids['Contribution'][0];
+    $form->buildForm();
+    $form->postProcess();
 
     $contribution = Contribution::get()
       ->addWhere('id', '=', $this->ids['Contribution'][0])
@@ -300,7 +298,6 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
    *
    * @return int
    * @throws API_Exception
-   * @throws CRM_Core_Exception
    */
   protected function createEventOrder(): int {
     $this->ids['event'][0] = (int) Event::create()->setValues(['title' => 'Event', 'start_date' => 'tomorrow', 'event_type_id:name' => 'Workshop'])->execute()->first()['id'];

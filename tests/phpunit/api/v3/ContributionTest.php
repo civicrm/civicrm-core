@@ -3449,9 +3449,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test if renewal activity is create after changing Pending contribution to
    * Completed via offline
    *
-   * @throws \CRM_Core_Exception
-   * @throws \CRM_Core_Exception
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception|\CiviCRM_API3_Exception
    */
   public function testPendingToCompleteContribution(): void {
     $this->createPriceSetWithPage('membership');
@@ -3464,12 +3462,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Scheduled',
     ]);
     $this->assertEquals(1, $activity['count']);
-
+    $_REQUEST['id'] = $this->getContributionID();
+    $_REQUEST['action'] = 'update';
     // change pending contribution to completed
-    $form = new CRM_Contribute_Form_Contribution();
-
-    $form->_params = [
-      'id' => $this->getContributionID(),
+    /* @var CRM_Contribute_Form_Contribution $form */
+    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 20,
       'net_amount' => 20,
       'fee_amount' => 0,
@@ -3489,15 +3486,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'hidden_AdditionalDetail' => 1,
       'hidden_Premium' => 1,
       'from_email_address' => '"civi45" <civi45@civicrm.com>',
-      'receipt_date' => '',
-      'receipt_date_time' => '',
       'payment_processor_id' => $this->paymentProcessorID,
       'currency' => 'USD',
       'contribution_page_id' => $this->_ids['contribution_page'],
       'source' => 'Membership Signup and Renewal',
-    ];
-
-    $form->testSubmit($form->_params, CRM_Core_Action::UPDATE);
+    ]);
+    $form->buildForm();
+    $form->postProcess();
 
     // Case 2: After successful payment for Pending backoffice there are three activities created
     //  2.a Update status of existing Scheduled Membership Signup (created in step 1) to Completed
