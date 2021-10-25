@@ -216,6 +216,18 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   public function testGetBriefName() {
     $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_BAO_Contact'));
     $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Contact_DAO_Contact'));
+    $this->assertNull(CRM_Core_DAO_AllCoreTables::getBriefName('CRM_Core_DAO_XqZy'));
+  }
+
+  public function testGetFullName() {
+    $this->assertEquals('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getFullName('Contact'));
+    $this->assertNull(CRM_Core_DAO_AllCoreTables::getFullName('XqZy'));
+  }
+
+  public function testGetEntityNameForTable() {
+    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_contact'));
+    $this->assertEquals('RelationshipCache', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_relationship_cache'));
+    $this->assertNull(CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_invalid_table'));
   }
 
 }
