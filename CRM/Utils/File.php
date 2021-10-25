@@ -1100,4 +1100,27 @@ HTACCESS;
     return pathinfo($path, PATHINFO_EXTENSION);
   }
 
+  /**
+   * Check that filename is a directory and within open_basedir.
+   * @param string $fileName
+   * @return bool
+   */
+  public static function isDir($fileName = '') {
+    // Ensure filename is within open_basedir restrictions.
+    $openBasedir = ini_get('open_basedir');
+    if (!empty($openBasedir)) {
+      $baseDirs = explode(PATH_SEPARATOR, $openBasedir);
+      $withinBasedir = FALSE;
+      foreach ($baseDirs as $baseDir) {
+        if (strncmp($fileName, $baseDir, strlen($baseDir)) === 0) {
+          $withinBasedir = TRUE;
+        }
+      }
+      if (!$withinBasedir) {
+        return FALSE;
+      }
+    }
+    return is_dir($fileName);
+  }
+
 }

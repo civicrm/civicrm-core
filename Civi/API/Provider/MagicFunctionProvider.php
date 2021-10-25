@@ -103,7 +103,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     foreach ($include_dirs as $include_dir) {
       $api_dir = implode(DIRECTORY_SEPARATOR,
         [$include_dir, 'api', 'v' . $version]);
-      if (!is_dir($api_dir)) {
+      if (!CRM_Utils_File::isDir($api_dir)) {
         continue;
       }
       $iterator = new \DirectoryIterator($api_dir);
@@ -119,7 +119,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
 
         // Check for entities with standalone action files (eg "api/v3/MyEntity/MyAction.php").
         $action_dir = $api_dir . DIRECTORY_SEPARATOR . $file;
-        if (preg_match('/^[A-Z][A-Za-z0-9]*$/', $file) && is_dir($action_dir)) {
+        if (preg_match('/^[A-Z][A-Za-z0-9]*$/', $file) && CRM_Utils_File::isDir($action_dir)) {
           if (count(glob("$action_dir/[A-Z]*.php")) > 0) {
             $entities[] = $file;
           }
@@ -281,7 +281,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
       foreach ([$camelName, 'Generic'] as $name) {
         $action_dir = implode(DIRECTORY_SEPARATOR,
           [$include_dir, 'api', "v${version}", $name]);
-        if (!is_dir($action_dir)) {
+        if (!CRM_Utils_File::isDir($action_dir)) {
           continue;
         }
 
