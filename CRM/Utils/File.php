@@ -1112,7 +1112,7 @@ HTACCESS;
       $baseDirs = explode(PATH_SEPARATOR, $openBasedir);
       $withinBasedir = FALSE;
       foreach ($baseDirs as $baseDir) {
-        if (strncmp($fileName, $baseDir, strlen($baseDir)) === 0) {
+        if (strncasecmp($fileName, $baseDir, strlen($baseDir)) === 0) {
           $withinBasedir = TRUE;
         }
       }
