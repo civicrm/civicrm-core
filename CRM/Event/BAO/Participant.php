@@ -1437,7 +1437,8 @@ UPDATE  civicrm_participant
       }
 
       //take a receipt from as event else domain.
-      $receiptFrom = $domainValues['name'] . ' <' . $domainValues['email'] . '>';
+      $receiptFrom = CRM_Core_BAO_Domain::getFromEmail();
+
       if (!empty($eventDetails['confirm_from_name']) && !empty($eventDetails['confirm_from_email'])) {
         $receiptFrom = $eventDetails['confirm_from_name'] . ' <' . $eventDetails['confirm_from_email'] . '>';
       }

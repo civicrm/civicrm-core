@@ -311,7 +311,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
     return $defaults;
   }
