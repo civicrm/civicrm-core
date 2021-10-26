@@ -63,7 +63,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
     $paths = self::uniquePaths();
     foreach ($paths as $path) {
       $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples';
-      if (is_dir($dir)) {
+      if (\CRM_Utils_File::isDir($dir)) {
         foreach (scandir($dir) as $item) {
           if ($item && strpos($item, '.') === FALSE && array_search($item, $examples) === FALSE) {
             $examples[] = $item;
@@ -96,7 +96,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       $paths = self::uniquePaths();
       foreach ($paths as $path) {
         $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['entity'];
-        if (is_dir($dir)) {
+        if (\CRM_Utils_File::isDir($dir)) {
           foreach (scandir($dir) as $item) {
             $item = str_replace('.ex.php', '', $item);
             if ($item && strpos($item, '.') === FALSE) {
