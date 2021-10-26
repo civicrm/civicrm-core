@@ -170,18 +170,12 @@ class CRM_Financial_Page_AJAX {
         switch ($op) {
           case 'assign':
           case 'remove':
-            $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $recordID, 'payment_instrument_id');
-            $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-            $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
-            if ($op == 'remove' || ($recordPID == $batchPID && $op == 'assign') || !isset($batchPID)) {
+            if ($op == 'remove' || $op == 'assign') {
               $params = [
                 'entity_id' => $recordID,
                 'entity_table' => 'civicrm_financial_trxn',
                 'batch_id' => $entityID,
               ];
-            }
-            else {
-              $response = ['status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", [1 => $paymentInstrument])];
             }
             break;
 
@@ -204,7 +198,12 @@ class CRM_Financial_Page_AJAX {
         }
 
         if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
-          $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
+          try {
+            $updated = call_user_func_array(array($recordBAO, $methods[$op]), array(&$params));
+          }
+          catch (\CRM_Core_Exception $e) {
+            $errorMessage = $e->getMessage();
+          }
           if ($updated) {
             $redirectStatus = $updated->status_id;
             if ($batchStatus[$updated->status_id] == "Reopened") {
@@ -214,6 +213,9 @@ class CRM_Financial_Page_AJAX {
               'status' => 'record-updated-success',
               'status_id' => $redirectStatus,
             ];
+          }
+          if ($errorMessage ?? FALSE) {
+            $response = ['status' => $errorMessage];
           }
         }
       }
@@ -465,33 +467,35 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $batchPID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $entityID, 'payment_instrument_id');
-    $paymentInstrument = CRM_Core_PseudoConstant::getLabel('CRM_Batch_BAO_Batch', 'payment_instrument_id', $batchPID);
-    foreach ($cIDs as $key => $value) {
-      $recordPID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $value, 'payment_instrument_id');
-      if ($action == 'Remove' || ($recordPID == $batchPID && $action == 'Assign') || !isset($batchPID)) {
+    foreach ($cIDs as $value) {
+      if ($action == 'Remove' || $action == 'Assign') {
         $params = [
           'entity_id' => $value,
           'entity_table' => 'civicrm_financial_trxn',
           'batch_id' => $entityID,
         ];
-        if ($action == 'Assign') {
-          $updated = CRM_Batch_BAO_EntityBatch::create($params);
-        }
-        else {
-          $delete = \Civi\Api4\EntityBatch::delete(FALSE);
-          foreach ($params as $field => $val) {
-            $delete->addWhere($field, '=', $val);
+        try {
+          if ($action == 'Assign') {
+            CRM_Batch_BAO_EntityBatch::create($params);
           }
-          $updated = $delete->execute()->count();
+          else {
+            $delete = \Civi\Api4\EntityBatch::delete(FALSE);
+            foreach ($params as $field => $val) {
+              $delete->addWhere($field, '=', $val);
+            }
+            $delete->execute()->count();
+          }
+        }
+        catch (\CRM_Core_Exception $e) {
+          $errorMessage = $e->getMessage();
         }
       }
     }
-    if ($updated) {
-      $status = ['status' => 'record-updated-success'];
+    if ($errorMessage ?? FALSE) {
+      $status = ['status' => $errorMessage];
     }
     else {
-      $status = ['status' => ts("This batch is configured to include only transactions using %1 payment method. If you want to include other transactions, please edit the batch first and modify the Payment Method.", [1 => $paymentInstrument])];
+      $status = ['status' => 'record-updated-success'];
     }
     CRM_Utils_JSON::output($status);
   }
