@@ -270,7 +270,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       CRM_Utils_PDF_Document::printDocuments($html, $fileName, $type, $zip);
     }
     else {
-      CRM_Utils_PDF_Document::html2doc($html, $fileName, $formValues);
+      CRM_Utils_PDF_Document::html2doc($html, $fileName . '.' . $this->getSubmittedValue('document_type'), $formValues);
     }
 
     if ($tee) {
