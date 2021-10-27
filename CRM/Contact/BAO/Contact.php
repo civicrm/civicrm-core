@@ -541,7 +541,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Te
         //  If we are setting it to null then null out the display field.
         $params[$greetingIndex . '_display'] = 'null';
       }
-      if ((int) $params[$greetingParam] !== CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greetingParam, 'Customized')) {
+      if ((int) $params[$greetingParam] != CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $greetingParam, 'Customized')) {
         $params[$greetingIndex . '_custom'] = 'null';
       }
 

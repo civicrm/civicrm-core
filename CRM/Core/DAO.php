@@ -300,9 +300,9 @@ class CRM_Core_DAO extends DB_DataObject {
     $daoName = get_class($this);
     $handled = FALSE;
 
-    if (!$handled && $dbName == 'contact_sub_type') {
-      //coming up with a rule to set this is too complex let's not set it
-      $handled = TRUE;
+    if (in_array($dbName, ['contact_sub_type', 'email_greeting_id', 'postal_greeting_id', 'addressee_id'], TRUE)) {
+      //coming up with a rule to set these is too complex - skip
+      return;
     }
 
     // Pick an option value if needed
