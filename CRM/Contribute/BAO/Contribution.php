@@ -4646,37 +4646,6 @@ LIMIT 1;";
   }
 
   /**
-   * Calculate financial item amount when contribution is updated.
-   *
-   * @param array $params
-   *   contribution params
-   * @param array $amountParams
-   *
-   * @param string $context
-   *
-   * @return float
-   */
-  public static function calculateFinancialItemAmount($params, $amountParams, $context) {
-    if (!empty($params['is_quick_config'])) {
-      $amount = $amountParams['item_amount'];
-      if (!$amount) {
-        $amount = $params['total_amount'];
-        if ($context === NULL) {
-          $amount -= CRM_Utils_Array::value('tax_amount', $params, 0);
-        }
-      }
-    }
-    else {
-      $amount = $amountParams['line_total'];
-      if ($context == 'changedAmount') {
-        $amount -= $amountParams['previous_line_total'];
-      }
-      $amount *= $amountParams['diff'];
-    }
-    return $amount;
-  }
-
-  /**
    * Retrieve Sales Tax Financial Accounts.
    *
    *
