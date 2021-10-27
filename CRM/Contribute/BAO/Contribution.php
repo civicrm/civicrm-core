@@ -1041,7 +1041,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // This is an update so original currency if none passed in.
       $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
 
-      $transactionIDs[] = self::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $transactionIDs[] = $trxn->id;
@@ -3492,7 +3492,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       else {
         // records finanical trxn and entity financial trxn
         // also make it available as return value
-        self::recordAlwaysAccountsReceivable($trxnParams, $params);
+        CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($trxnParams, $params);
         $trxnParams['pan_truncation'] = $params['pan_truncation'] ?? NULL;
         $trxnParams['card_type_id'] = $params['card_type_id'] ?? NULL;
         $return = $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
@@ -4643,44 +4643,6 @@ LIMIT 1;";
       }
     }
     return $flag;
-  }
-
-  /**
-   * Create Accounts Receivable financial trxn entry for Completed Contribution.
-   *
-   * @param array $trxnParams
-   *   Financial trxn params
-   * @param array $contributionParams
-   *   Contribution Params
-   *
-   * @return null|int
-   */
-  public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
-    if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
-      return NULL;
-    }
-    $statusId = $contributionParams['contribution']->contribution_status_id;
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $contributionStatus = empty($statusId) ? NULL : $contributionStatuses[$statusId];
-    $previousContributionStatus = empty($contributionParams['prevContribution']) ? NULL : $contributionStatuses[$contributionParams['prevContribution']->contribution_status_id];
-    // Return if contribution status is not completed.
-    if (!($contributionStatus == 'Completed' && (empty($previousContributionStatus)
-        || (!empty($previousContributionStatus) && $previousContributionStatus == 'Pending'
-          && $contributionParams['prevContribution']->is_pay_later == 0
-        )))
-    ) {
-      return NULL;
-    }
-
-    $params = $trxnParams;
-    $financialTypeID = !empty($contributionParams['financial_type_id']) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
-    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
-    $params['to_financial_account_id'] = $arAccountId;
-    $params['status_id'] = array_search('Pending', $contributionStatuses);
-    $params['is_payment'] = FALSE;
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
-    $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
-    return $trxn->id;
   }
 
   /**
