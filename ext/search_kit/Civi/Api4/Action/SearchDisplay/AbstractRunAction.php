@@ -291,6 +291,23 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($prefix) {
         $path = str_replace('[', '[' . $prefix, $path);
       }
+      // Check access for edit/update links
+      // (presumably if a record is shown in SearchKit the user already has view access, and the check is expensive)
+      if ($path && isset($data) && $link['action'] !== 'view') {
+        $id = $data[$prefix . $idKey] ?? NULL;
+        $id = is_array($id) ? $id[$index] ?? NULL : $id;
+        if ($id) {
+          $access = civicrm_api4($link['entity'], 'checkAccess', [
+            'action' => $link['action'],
+            'values' => [
+              $idField => $id,
+            ],
+          ], 0)['access'];
+          if (!$access) {
+            return NULL;
+          }
+        }
+      }
     }
     return $path;
   }
@@ -316,6 +333,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatEditableColumn($column, $data) {
     $editable = $this->getEditableInfo($column['key']);
     if (!empty($data[$editable['id_path']])) {
+      $access = civicrm_api4($editable['entity'], 'checkAccess', [
+        'action' => 'update',
+        'values' => [
+          $editable['id_key'] => $data[$editable['id_path']],
+        ],
+      ], 0)['access'];
+      if (!$access) {
+        return NULL;
+      }
       $editable['record'] = [
         $editable['id_key'] => $data[$editable['id_path']],
       ];
