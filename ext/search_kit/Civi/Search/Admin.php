@@ -96,7 +96,7 @@ class Admin {
   public static function getSchema() {
     $schema = [];
     $entities = \Civi\Api4\Entity::get()
-      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'icon', 'paths', 'dao', 'bridge', 'ui_join_filters', 'searchable')
+      ->addSelect('name', 'title', 'title_plural', 'bridge_title', 'type', 'primary_key', 'description', 'label_field', 'icon', 'dao', 'bridge', 'ui_join_filters', 'searchable')
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
@@ -105,15 +105,10 @@ class Admin {
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
       if ($entity['get']) {
-        // Add paths (but only RUD actions) with translated titles
-        foreach ($entity['paths'] as $action => $path) {
-          unset($entity['paths'][$action]);
-          if (in_array($action, ['view', 'update', 'delete'], TRUE)) {
-            $entity['paths'][] = [
-              'path' => $path,
-              'action' => $action,
-            ];
-          }
+        // Add links with translatable titles
+        $links = Display::getEntityLinks($entity['name']);
+        if ($links) {
+          $entity['links'] = array_values($links);
         }
         $getFields = civicrm_api4($entity['name'], 'getFields', [
           'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators'],

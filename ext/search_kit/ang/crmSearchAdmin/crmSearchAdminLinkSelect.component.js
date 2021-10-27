@@ -15,20 +15,16 @@
         ctrl = this;
 
       this.setValue = function(val) {
-        ctrl.link  = ctrl.link  || {};
-        var link = ctrl.getLink(val),
-          oldVal = ctrl.link.path;
-        ctrl.link.path = val;
-        if (!link) {
+        if (val.path) {
           $timeout(function () {
             $('input[type=text]', $element).focus();
           });
         }
-        ctrl.onChange({before: oldVal, after: val});
+        ctrl.onChange({newLink: val});
       };
 
-      this.getLink = function(path) {
-        return _.findWhere(ctrl.links, {path: path});
+      this.getLink = function() {
+        return _.findWhere(ctrl.links, {action: ctrl.link.action, join: ctrl.link.join, entity: ctrl.link.entity});
       };
 
     }

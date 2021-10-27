@@ -11,7 +11,8 @@
     templateUrl: '~/crmSearchAdmin/crmSearchAdminLinkGroup.html',
     controller: function ($scope, $element, $timeout, searchMeta) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
-        ctrl = this;
+        ctrl = this,
+        linkProps = ['path', 'entity', 'action', 'join', 'target', 'icon', 'text', 'style'];
 
       this.styles = CRM.crmSearchAdmin.styles;
 
@@ -37,47 +38,45 @@
         });
       };
 
-      this.addItem = function(path) {
-        var link = ctrl.getLink(path);
-        ctrl.group.push({
-          path: path,
-          style: link && link.style || 'default',
-          text: link ? link.title : ts('Link'),
-          icon: link && link.icon || 'fa-external-link'
+      this.addItem = function(item) {
+        ctrl.group.push(_.pick(item, linkProps));
+      };
+
+      this.onChangeLink = function(item, newValue) {
+        if (newValue.path === 'civicrm/') {
+          newValue = JSON.parse(this.default);
+        }
+        _.each(linkProps, function(prop) {
+          item[prop] = newValue[prop] || '';
         });
       };
 
-      this.onChangeLink = function(item, before, after) {
-        var beforeLink = before && ctrl.getLink(before),
-          beforeTitle = beforeLink ? beforeLink.title : ts('Link'),
-          afterLink = after && ctrl.getLink(after);
-        if (afterLink && (!item.text || beforeTitle === item.text)) {
-          item.text = afterLink.title;
-        }
-      };
+      this.serialize = JSON.stringify;
 
       this.$onInit = function() {
+        this.default = this.serialize({
+          style: 'default',
+          text: ts('Link'),
+          icon: 'fa-external-link',
+          path: 'civicrm/'
+        });
         var defaultLinks = _.filter(ctrl.links, function(link) {
           return !link.join;
         });
         if (!ctrl.group.length) {
           if (defaultLinks.length) {
-            _.each(_.pluck(defaultLinks, 'path'), ctrl.addItem);
+            _.each(defaultLinks, ctrl.addItem);
           } else {
-            ctrl.addItem('civicrm/');
+            ctrl.addItem(JSON.parse(this.default));
           }
         }
         $element.on('change', 'select.crm-search-admin-add-link', function() {
           var $select = $(this);
           $scope.$apply(function() {
-            ctrl.addItem($select.val());
+            ctrl.addItem(JSON.parse($select.val()));
             $select.val('');
           });
         });
-      };
-
-      this.getLink = function(path) {
-        return _.findWhere(ctrl.links, {path: path});
       };
 
     }

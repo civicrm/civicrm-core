@@ -32,7 +32,7 @@
         <crm-search-admin-token-select model="item" field="text" suffix=":label"></crm-search-admin-token-select>
       </td>
       <td class="form-inline">
-        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, before, after)"></crm-search-admin-link-select>
+        <crm-search-admin-link-select api-entity="$ctrl.apiEntity" api-params="$ctrl.apiParams" link="item" links="$ctrl.links" on-change="$ctrl.onChangeLink(item, newLink)"></crm-search-admin-link-select>
       </td>
       <td>
         <div class="btn-group">
@@ -60,10 +60,10 @@
           <option value="">
             + {{:: ts('Add...') }}
           </option>
-          <option ng-repeat="link in $ctrl.links" value="{{ link.path }}">
-            {{ link.title }}
+          <option ng-repeat="link in $ctrl.links" value="{{:: $ctrl.serialize(link) }}">
+            {{ link.text }}
           </option>
-          <option value="civicrm/">
+          <option value="{{:: $ctrl.default }}">
             {{:: ts('Other...') }}
           </option>
         </select>

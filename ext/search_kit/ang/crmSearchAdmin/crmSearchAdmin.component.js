@@ -627,33 +627,15 @@
       }
 
       // Build a list of all possible links to main entity & join entities
+      // @return {Array}
       this.buildLinks = function() {
         function addTitle(link, entityName) {
-          switch (link.action) {
-            case 'view':
-              link.title = ts('View %1', {1: entityName});
-              link.icon = 'fa-external-link';
-              link.style = 'default';
-              break;
-
-            case 'update':
-              link.title = ts('Edit %1', {1: entityName});
-              link.icon = 'fa-pencil';
-              link.style = 'default';
-              break;
-
-            case 'delete':
-              link.title = ts('Delete %1', {1: entityName});
-              link.icon = 'fa-trash';
-              link.style = 'danger';
-              break;
-          }
+          link.text = link.text.replace('%1', entityName);
         }
 
         // Links to main entity
-        // @return {Array}
         var mainEntity = searchMeta.getEntity(ctrl.savedSearch.api_entity),
-          links = _.cloneDeep(mainEntity.paths || []);
+          links = _.cloneDeep(mainEntity.links || []);
         _.each(links, function(link) {
           link.join = '';
           addTitle(link, mainEntity.title);
@@ -662,24 +644,13 @@
         _.each(ctrl.savedSearch.api_params.join, function(joinClause) {
           var join = searchMeta.getJoin(joinClause[0]),
             joinEntity = searchMeta.getEntity(join.entity),
-            primaryKey = joinEntity.primary_key[0],
-            // Links for aggregate columns get aggregated using GROUP_CONCAT
-            isAggregate = ctrl.canAggregate(join.alias + '.' + primaryKey),
-            joinPrefix = (isAggregate ? ctrl.DEFAULT_AGGREGATE_FN + '_' : '') + join.alias + '.',
             bridgeEntity = _.isString(joinClause[2]) ? searchMeta.getEntity(joinClause[2]) : null;
-          _.each(joinEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + joinPrefix);
-            if (isAggregate) {
-              link.path = link.path.replace(/[.:]/g, '_');
-            }
+          _.each(_.cloneDeep(joinEntity.links), function(link) {
             link.join = join.alias;
             addTitle(link, join.label);
             links.push(link);
           });
-          _.each(bridgeEntity && bridgeEntity.paths, function(path) {
-            var link = _.cloneDeep(path);
-            link.path = link.path.replace(/\[/g, '[' + join.alias + '.');
+          _.each(_.cloneDeep(bridgeEntity && bridgeEntity.links), function(link) {
             link.join = join.alias;
             addTitle(link, join.label + (bridgeEntity.bridge_title ? ' ' + bridgeEntity.bridge_title : ''));
             links.push(link);
@@ -695,9 +666,7 @@
               if (!ctrl.canAggregate(idFieldName)) {
                 var joinEntity = searchMeta.getEntity(idField.fk_entity),
                   label = (idField.join ? idField.join.label + ': ' : '') + (idField.input_attrs && idField.input_attrs.label || idField.label);
-                _.each((joinEntity || {}).paths, function(path) {
-                  var link = _.cloneDeep(path);
-                  link.path = link.path.replace(/\[id/g, '[' + idFieldName);
+                _.each(_.cloneDeep(joinEntity && joinEntity.links), function(link) {
                   link.join = idFieldName;
                   addTitle(link, label);
                   links.push(link);
@@ -706,7 +675,7 @@
             }
           }
         });
-        return _.uniq(links, 'path');
+        return links;
       };
 
       function loadAfforms() {
