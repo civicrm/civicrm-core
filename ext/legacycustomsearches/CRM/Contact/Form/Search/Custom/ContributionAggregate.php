@@ -53,7 +53,7 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Find Contributors by Aggregate Totals');
+    $this->setTitle(ts('Find Contributors by Aggregate Totals'));
 
     /**
      * Define the search form fields here

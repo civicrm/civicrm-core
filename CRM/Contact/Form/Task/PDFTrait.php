@@ -179,7 +179,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
       $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
     }
     $form->setDefaults($defaults);
-    $form->setTitle('Print/Merge Document');
+    $form->setTitle(ts('Print/Merge Document'));
   }
 
   /**

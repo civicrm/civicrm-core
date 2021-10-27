@@ -108,7 +108,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Proximity Search');
+    $this->setTitle(ts('Proximity Search'));
 
     /**
      * if you are using the standard template, this array tells the template what elements

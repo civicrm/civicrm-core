@@ -55,7 +55,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
     }
     $form->setDefaults($defaults);
-    $form->setTitle('Print/Merge Document');
+    $form->setTitle(ts('Print/Merge Document'));
   }
 
   /**

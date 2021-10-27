@@ -198,7 +198,7 @@ AND    p.entity_id    = e.id
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Price Set Export');
+    $this->setTitle(ts('Price Set Export'));
 
     /**
      * if you are using the standard template, this array tells the template what elements

@@ -81,7 +81,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     /**
      * You can define a custom title for the search form
      */
-    $this->setTitle('Find Latest Activities');
+    $this->setTitle(ts('Find Latest Activities'));
 
     /**
      * Define the search form fields here

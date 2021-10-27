@@ -85,7 +85,7 @@ class CRM_Contact_Form_Search_Custom_MultipleValues extends CRM_Contact_Form_Sea
    */
   public function buildForm(&$form) {
 
-    $this->setTitle('Multiple Value Custom Group Search and Export');
+    $this->setTitle(ts('Multiple Value Custom Group Search and Export'));
 
     $form->add('text', 'sort_name', ts('Contact Name'), TRUE);
 

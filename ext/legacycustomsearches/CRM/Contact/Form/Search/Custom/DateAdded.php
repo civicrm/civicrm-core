@@ -72,7 +72,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       $select2style
     );
 
-    $this->setTitle('Search by date added to CiviCRM');
+    $this->setTitle(ts('Search by date added to CiviCRM'));
 
     //redirect if group not available for search criteria
     if (count($groups) == 0) {
