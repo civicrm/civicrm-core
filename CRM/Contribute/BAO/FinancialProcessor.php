@@ -242,6 +242,125 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Do any accounting updates required as a result of a contribution status change.
+   *
+   * Currently we have a bit of a roundabout where adding a payment results in this being called &
+   * this may attempt to add a payment. We need to resolve that....
+   *
+   * The 'right' way to add payments or refunds is through the Payment.create api. That api
+   * then updates the contribution but this process should not also record another financial trxn.
+   * Currently we have weak detection fot that scenario & where it is detected the first returned
+   * value is FALSE - meaning 'do not continue'.
+   *
+   * We should also look at the fact that the calling function - updateFinancialAccounts
+   * bunches together some disparate processes rather than having separate appropriate
+   * functions.
+   *
+   * @param array $params
+   *
+   * @return bool
+   *   Return indicates whether the updateFinancialAccounts function should continue.
+   */
+  public static function updateFinancialAccountsOnContributionStatusChange(&$params) {
+    $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
+    $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+
+    if ((($previousContributionStatus === 'Partially paid' && $currentContributionStatus === 'Completed')
+      || ($previousContributionStatus === 'Pending refund' && $currentContributionStatus === 'Completed')
+      // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
+      // why it is here or where it is handled instead.
+      || ($previousContributionStatus === 'Pending' && $params['prevContribution']->is_pay_later == TRUE
+        && $currentContributionStatus === 'Partially paid'))
+    ) {
+      return FALSE;
+    }
+
+    if (CRM_Contribute_BAO_FinancialProcessor::isContributionUpdateARefund($params['prevContribution']->contribution_status_id, $params['contribution']->contribution_status_id)) {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['trxnParams']['total_amount'] = -$params['total_amount'];
+    }
+    elseif (($previousContributionStatus === 'Pending'
+        && $params['prevContribution']->is_pay_later) || $previousContributionStatus === 'In Progress'
+    ) {
+      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
+      $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
+
+      if ($currentContributionStatus === 'Cancelled') {
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+        $params['trxnParams']['to_financial_account_id'] = $arAccountId;
+        $params['trxnParams']['total_amount'] = -$params['total_amount'];
+      }
+      else {
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+        $params['trxnParams']['from_financial_account_id'] = $arAccountId;
+      }
+    }
+
+    if (($previousContributionStatus === 'Pending'
+        || $previousContributionStatus === 'In Progress')
+      && ($currentContributionStatus === 'Completed')
+    ) {
+      if (empty($params['line_item'])) {
+        //CRM-15296
+        //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
+        // when creating recurring membership payment - there are 2 lines to comment out in contributionPageTest if fixed
+        // & this can be removed
+        return FALSE;
+      }
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      // This is an update so original currency if none passed in.
+      $params['trxnParams']['currency'] = CRM_Utils_Array::value('currency', $params, $params['prevContribution']->currency);
+
+      $transactionIDs[] = CRM_Contribute_BAO_FinancialProcessor::recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['entity_id'] = $transactionIDs[] = $trxn->id;
+
+      $sql = "SELECT id, amount FROM civicrm_financial_item WHERE entity_id = %1 and entity_table = 'civicrm_line_item'";
+
+      $entityParams = [
+        'entity_table' => 'civicrm_financial_item',
+      ];
+      foreach ($params['line_item'] as $fieldId => $fields) {
+        foreach ($fields as $fieldValueId => $lineItemDetails) {
+          self::updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
+          $fparams = [
+            1 => [$lineItemDetails['id'], 'Integer'],
+          ];
+          $financialItem = CRM_Core_DAO::executeQuery($sql, $fparams);
+          while ($financialItem->fetch()) {
+            $entityParams['entity_id'] = $financialItem->id;
+            $entityParams['amount'] = $financialItem->amount;
+            foreach ($transactionIDs as $tID) {
+              $entityParams['financial_trxn_id'] = $tID;
+              CRM_Financial_BAO_FinancialItem::createEntityTrxn($entityParams);
+            }
+          }
+        }
+      }
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Update all financial items related to the line item tto have a status of paid.
+   *
+   * @param int $lineItemID
+   */
+  private static function updateFinancialItemForLineItemToPaid($lineItemID) {
+    $fparams = [
+      1 => [
+        CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+        'Integer',
+      ],
+      2 => [$lineItemID, 'Integer'],
+    ];
+    $query = "UPDATE civicrm_financial_item SET status_id = %1 WHERE entity_id = %2 and entity_table = 'civicrm_line_item'";
+    CRM_Core_DAO::executeQuery($query, $fparams);
+  }
+
+  /**
    * Create Accounts Receivable financial trxn entry for Completed Contribution.
    *
    * @param array $trxnParams
@@ -277,6 +396,46 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
     return $trxn->id;
+  }
+
+  /**
+   * Does this transaction reflect a payment instrument change.
+   *
+   * @param array $params
+   * @param array $pendingStatuses
+   *
+   * @return bool
+   */
+  public static function isPaymentInstrumentChange(&$params, $pendingStatuses) {
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+
+    if (array_key_exists('payment_instrument_id', $params)) {
+      if (CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id) &&
+        !CRM_Utils_System::isNull($params['payment_instrument_id'])
+      ) {
+        //check if status is changed from Pending to Completed
+        // do not update payment instrument changes for Pending to Completed
+        if (!($contributionStatus == 'Completed' &&
+          in_array($params['prevContribution']->contribution_status_id, $pendingStatuses))
+        ) {
+          return TRUE;
+        }
+      }
+      elseif ((!CRM_Utils_System::isNull($params['payment_instrument_id']) &&
+          !CRM_Utils_System::isNull($params['prevContribution']->payment_instrument_id)) &&
+        $params['payment_instrument_id'] != $params['prevContribution']->payment_instrument_id
+      ) {
+        return TRUE;
+      }
+      elseif (!CRM_Utils_System::isNull($params['contribution']->check_number) &&
+        $params['contribution']->check_number != $params['prevContribution']->check_number
+      ) {
+        // another special case when check number is changed, create new financial records
+        // create financial trxn with negative amount
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
