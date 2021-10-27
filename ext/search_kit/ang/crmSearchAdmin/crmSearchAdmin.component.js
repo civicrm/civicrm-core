@@ -715,25 +715,23 @@
             if (display.id && display.name) {
               findDisplays.push(['search_displays', 'CONTAINS', ctrl.savedSearch.name + '.' + display.name]);
             }
-          }, []);
-          if (findDisplays.length) {
-            afformLoad = crmApi4('Afform', 'get', {
-              select: ['name', 'title', 'search_displays'],
-              where: [['OR', findDisplays]]
-            }).then(function(afforms) {
-              ctrl.afforms = {};
-              _.each(afforms, function(afform) {
-                _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
-                  var displayName = searchNameDisplayName.split('.')[1];
-                  ctrl.afforms[displayName] = ctrl.afforms[displayName] || [];
-                  ctrl.afforms[displayName].push({
-                    title: afform.title,
-                    link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
-                  });
+          }, [['search_displays', 'CONTAINS', ctrl.savedSearch.name]]);
+          afformLoad = crmApi4('Afform', 'get', {
+            select: ['name', 'title', 'search_displays'],
+            where: [['OR', findDisplays]]
+          }).then(function(afforms) {
+            ctrl.afforms = {};
+            _.each(afforms, function(afform) {
+              _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
+                var displayName = searchNameDisplayName.split('.')[1] || '';
+                ctrl.afforms[displayName] = ctrl.afforms[displayName] || [];
+                ctrl.afforms[displayName].push({
+                  title: afform.title,
+                  link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
                 });
               });
             });
-          }
+          });
         }
       }
 

@@ -182,7 +182,7 @@ abstract class SqlFunction extends SqlExpression {
 
   /**
    * Get the arguments passed to this sql function instance.
-   * @return array[]
+   * @return array{prefix: array, suffix: array, expr: SqlExpression}[]
    */
   public function getArgs(): array {
     return $this->args;

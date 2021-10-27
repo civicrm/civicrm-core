@@ -14,6 +14,7 @@ namespace Civi\Search;
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Query\SqlEquation;
 use Civi\Api4\Query\SqlFunction;
+use Civi\Api4\SearchDisplay;
 use Civi\Api4\Tag;
 use CRM_Search_ExtensionUtil as E;
 
@@ -38,6 +39,7 @@ class Admin {
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),
       'defaultPagerSize' => \Civi::settings()->get('default_pager_size'),
+      'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'afformEnabled' => $extensions->isActiveModule('afform'),
       'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
       'tags' => Tag::get()

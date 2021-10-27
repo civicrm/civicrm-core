@@ -1097,7 +1097,7 @@ class Api4SelectQuery {
           else {
             $fieldArray['sql_name'] = '`' . $baseTableAlias . '`.`' . $link->getBaseColumn() . '`';
           }
-          $fieldArray['implicit_join'] = $link->getBaseColumn();
+          $fieldArray['implicit_join'] = rtrim($joinTreeNode[$joinName]['#path'], '.');
           $fieldArray['explicit_join'] = $explicitJoin ? $explicitJoin['alias'] : NULL;
           // Custom fields will already have the group name prefixed
           $fieldName = $isCustom ? explode('.', $fieldArray['name'])[1] : $fieldArray['name'];
@@ -1241,10 +1241,17 @@ class Api4SelectQuery {
 
   /**
    * @param string $alias
-   * @return array|NULL
+   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}|NULL
    */
   public function getExplicitJoin($alias) {
     return $this->explicitJoins[$alias] ?? NULL;
+  }
+
+  /**
+   * @return array{entity: string, alias: string, table: string, bridge: string|NULL}[]
+   */
+  public function getExplicitJoins() {
+    return $this->explicitJoins;
   }
 
   /**

@@ -5,6 +5,10 @@ namespace Civi\Api4\Action\SearchDisplay;
 /**
  * Load the results for rendering a SearchDisplay.
  *
+ * @method $this setReturn(string $return)
+ * @method string getReturn()
+ * @method $this setLimit(int $limit)
+ * @method int getLimit()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Run extends AbstractRunAction {

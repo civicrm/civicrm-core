@@ -12,6 +12,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
  * Note: unlike other APIs this action will directly output a file
  * if 'format' is set to anything other than 'array'.
  *
+ * @method $this setFormat(string $format)
+ * @method string getFormat()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Download extends AbstractRunAction {

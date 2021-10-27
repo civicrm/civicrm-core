@@ -15,82 +15,24 @@
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait);
 
-      // Output user-facing name/label fields as a link, if possible
-      function getViewLink(fieldExpr, links) {
-        var info = searchMeta.parseExpr(fieldExpr),
-          firstField = _.findWhere(info.args, {type: 'field'}),
-          entity = firstField && searchMeta.getEntity(firstField.field.entity);
-        if (entity && firstField.field.fieldName === entity.label_field) {
-          var joinEntity = searchMeta.getJoinEntity(info);
-          return _.find(links, {join: joinEntity, action: 'view'});
-        }
-      }
-
       function buildSettings() {
-        var links = ctrl.crmSearchAdmin.buildLinks();
         ctrl.apiEntity = ctrl.search.api_entity;
-        ctrl.display = {
-          type: 'table',
-          settings: {
-            limit: CRM.crmSearchAdmin.defaultPagerSize,
-            pager: {show_count: true, expose_limit: true},
-            actions: true,
-            classes: ['table', 'table-striped'],
-            button: ts('Search'),
-            columns: _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
-              var column = {label: true, sortable: true},
-                link = getViewLink(fieldExpr, links);
-              if (link) {
-                column.title = link.title;
-                column.link = {
-                  path: link.path,
-                  target: '_blank'
-                };
-              }
-              columns.push(searchMeta.fieldToColumn(fieldExpr, column));
-            })
-          }
-        };
-        if (links.length) {
-          ctrl.display.settings.columns.push({
-            text: '',
-            icon: 'fa-bars',
-            type: 'menu',
-            size: 'btn-xs',
-            style: 'secondary-outline',
-            alignment: 'text-right',
-            links: _.transform(links, function(links, link) {
-              if (!link.isAggregate) {
-                links.push({
-                  path: link.path,
-                  text: link.title,
-                  icon: link.icon,
-                  style: link.style,
-                  target: link.action === 'view' ? '_blank' : 'crm-popup'
-                });
-              }
-            })
-          });
-        }
+        ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
+        ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
+          columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+        }).concat(ctrl.settings.columns);
         ctrl.debug = {
           apiParams: JSON.stringify(ctrl.search.api_params, null, 2)
         };
-        ctrl.settings = ctrl.display.settings;
-        setLabel();
         ctrl.results = null;
         ctrl.rowCount = null;
         ctrl.page = 1;
-      }
-
-      function setLabel() {
-        ctrl.display.label = ctrl.search.label || searchMeta.getEntity(ctrl.search.api_entity).title_plural;
       }
 
       this.$onInit = function() {
         buildSettings();
         this.initializeDisplay($scope, $element);
         $scope.$watch('$ctrl.search.api_params', buildSettings, true);
-        $scope.$watch('$ctrl.search.label', setLabel);
       };
 
       // Add callbacks for pre & post run
