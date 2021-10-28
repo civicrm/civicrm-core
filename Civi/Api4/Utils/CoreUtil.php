@@ -230,4 +230,17 @@ class CoreUtil {
     return static::checkAccessRecord($apiRequest, $record, $userID);
   }
 
+  /**
+   * @return \Civi\Api4\Service\Schema\SchemaMap
+   */
+  public static function getSchemaMap() {
+    $cache = \Civi::cache('metadata');
+    $schemaMap = $cache->get('api4.schema.map');
+    if (!$schemaMap) {
+      $schemaMap = \Civi::service('schema_map_builder')->build();
+      $cache->set('api4.schema.map', $schemaMap);
+    }
+    return $schemaMap;
+  }
+
 }
