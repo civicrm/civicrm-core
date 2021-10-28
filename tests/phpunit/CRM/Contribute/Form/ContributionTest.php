@@ -75,7 +75,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Setup function.
    *
-   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
   public function setUp(): void {
@@ -123,7 +122,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Clean up after each test.
    *
-   * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -246,7 +244,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertTrue(empty($contact['source']));
     if (!$error) {
       $msgs = $mut->getAllMessages();
-      $this->assertEquals(1, count($msgs));
+      $this->assertCount(1, $msgs);
     }
     $mut->clearMessages();
     $mut->stop();
@@ -257,7 +255,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testSubmitCreditCardWithEmailReceipt() {
+  public function testSubmitCreditCardWithEmailReceipt(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
@@ -315,7 +313,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function on the contribution page.
    */
-  public function testSubmitCreditCardNoReceipt() {
+  public function testSubmitCreditCardNoReceipt(): void {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $form = new CRM_Contribute_Form_Contribution();
@@ -377,7 +375,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test the submit function on the contribution page.
    */
-  public function testSubmitCreditCardFee() {
+  public function testSubmitCreditCardFee(): void {
     $form = new CRM_Contribute_Form_Contribution();
     $this->paymentProcessor->setDoDirectPaymentResult(['payment_status_id' => 1, 'is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08]);
     $form->_mode = 'Live';
@@ -429,7 +427,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   /**
    * Test a fully deductible contribution submitted by credit card (CRM-16669).
    */
-  public function testSubmitCreditCardFullyDeductible() {
+  public function testSubmitCreditCardFullyDeductible(): void {
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
     $form->testSubmit([
@@ -744,9 +742,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
-      'pledge_payment_id' => $pledgePaymentID,
       'contribution_status_id' => 1,
-    ]);
+    ], NULL, NULL, $pledgePaymentID);
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'getsingle', ['id' => $pledgePaymentID]);
     $this->assertNotEmpty($pledgePayment['contribution_id']);
     $this->assertEquals(50, $pledgePayment['actual_amount']);
@@ -2194,8 +2191,11 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    *
    * @param array $formValues
    * @param int|null $contributionID
+   * @param string|null $cardMode
+   *   Either 'test' or 'live' or NULL
+   * @param int|null $pledgePaymentID
    */
-  protected function submitContributionForm(array $formValues, ?int $contributionID = NULL, $cardMode = NULL): void {
+  protected function submitContributionForm(array $formValues, ?int $contributionID = NULL, ?string $cardMode = NULL, ?int $pledgePaymentID = NULL): void {
     if ($contributionID) {
       $_REQUEST['action'] = 'update';
       $_REQUEST['id'] = $contributionID;
@@ -2203,6 +2203,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     if ($cardMode) {
       $_REQUEST['mode'] = $cardMode;
     }
+    $_REQUEST['ppid'] = $pledgePaymentID;
     $form = $this->getContributionForm($formValues);
     $form->postProcess();
   }

@@ -376,7 +376,10 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
    * @throws \CRM_Core_Exception
    * @throws \API_Exception
    */
-  public static function sendTemplate($params) {
+  public static function sendTemplate(array $params): array {
+    // Handle isEmailPdf here as the unit test on that function deems it 'non-conforming'.
+    $isAttachPDF = !empty($params['isEmailPdf']);
+    unset($params['isEmailPdf']);
     [$mailContent, $params] = self::renderTemplateRaw($params);
 
     // create the params array
@@ -403,7 +406,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
 
       $config = CRM_Core_Config::singleton();
-      if (isset($params['isEmailPdf']) && $params['isEmailPdf'] == 1) {
+      if ($isAttachPDF) {
         // FIXME: $params['contributionId'] is not modeled in the parameter list. When is it supplied? Should probably move to tokenContext.contributionId.
         $pdfHtml = CRM_Contribute_BAO_ContributionPage::addInvoicePdfToEmail($params['contributionId'], $params['contactId']);
         if (empty($params['attachments'])) {
