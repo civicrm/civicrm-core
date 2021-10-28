@@ -31,12 +31,16 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   /**
-   * The visitTokens() method is internal - but it is important basis for other methods.
-   * Specifically, it parses all token expressions and invokes a callback for each.
+   * The visitTokens() method is internal - but it is important basis for other
+   * methods. Specifically, it parses all token expressions and invokes a
+   * callback for each.
    *
-   * Ensure these callbacks get the expected data (with various quirky notations).
+   * Ensure these callbacks get the expected data (with various quirky
+   * notations).
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testVisitTokens() {
+  public function testVisitTokens(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -58,7 +62,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         $log[] = [$fullToken, $entity, $field, $modifier];
         return 'Replaced!';
       });
-      $this->assertEquals(1, count($log), "Should receive one callback on expression: $input");
+      $this->assertCount(1, $log, "Should receive one callback on expression: $input");
       $this->assertEquals($expected, $log[0]);
       $this->assertEquals('Replaced!', $filtered);
     }
@@ -67,7 +71,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Test that a row can be added via "addRow(array $context)".
    */
-  public function testAddRow() {
+  public function testAddRow(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -83,7 +87,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Test that multiple rows can be added via "addRows(array $contexts)".
    */
-  public function testAddRows() {
+  public function testAddRows(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -107,7 +111,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    * Check that the TokenRow helper can correctly read/update context
    * values.
    */
-  public function testRowContext() {
+  public function testRowContext(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'omega' => '99',
@@ -134,7 +138,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Check that getContextValues() returns the correct data
    */
-  public function testGetContextValues() {
+  public function testGetContextValues(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'omega' => '99',
@@ -151,7 +155,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    * Check that the TokenRow helper can correctly read/update token
    * values.
    */
-  public function testRowTokens() {
+  public function testRowTokens(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -215,21 +219,22 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ];
     });
     \Civi::dispatcher()->addListener('hook_civicrm_tokenValues', function($e) {
-      if (in_array('affirm', $e->tokens['trans'])) {
+      if (in_array('affirm', $e->tokens['trans'], TRUE)) {
         foreach ($e->contactIDs as $cid) {
           $e->details[$cid]['trans.affirm'] = ts('Yes');
         }
       }
     });
 
-    $p = new TokenProcessor($this->dispatcher, [
+    unset(\Civi::$statics['CRM_Contact_Tokens']['hook_tokens']);
+    $tokenProcessor = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'smarty' => FALSE,
     ]);
-    $p->addMessage('text', '!!{trans.affirm}!!', 'text/plain');
-    $p->addRow(['contactId' => $cid]);
-    $p->addRow(['contactId' => $cid, 'locale' => 'fr_FR']);
-    $p->addRow(['contactId' => $cid, 'locale' => 'es_MX']);
+    $tokenProcessor->addMessage('text', '!!{trans.affirm}!!', 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $cid]);
+    $tokenProcessor->addRow(['contactId' => $cid, 'locale' => 'fr_FR']);
+    $tokenProcessor->addRow(['contactId' => $cid, 'locale' => 'es_MX']);
 
     $expectText = [
       '!!Yes!!',
@@ -238,7 +243,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     ];
 
     $rowCount = 0;
-    foreach ($p->evaluate()->getRows() as $key => $row) {
+    foreach ($tokenProcessor->evaluate()->getRows() as $key => $row) {
       /** @var TokenRow */
       $this->assertTrue($row instanceof TokenRow);
       $this->assertEquals($expectText[$key], $row->render('text'));
@@ -260,7 +265,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, $p->getMessageTokens());
   }
 
-  public function testListTokens() {
+  public function testListTokens(): void {
     $p = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
     ]);
@@ -400,18 +405,19 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       }
     });
 
-    $p = new TokenProcessor($this->dispatcher, [
+    unset(\Civi::$statics['CRM_Contact_Tokens']['hook_tokens']);
+    $tokenProcessor = new TokenProcessor($this->dispatcher, [
       'controller' => __CLASS__,
       'smarty' => FALSE,
     ]);
-    $p->addMessage('subject', '!!{fruit.apple}!!', 'text/plain');
-    $p->addMessage('body_html', '!!{fruit.banana}!!', 'text/html');
-    $p->addMessage('body_text', '!!{fruit.cherry}!!', 'text/plain');
-    $p->addMessage('other', 'No fruit :(', 'text/plain');
-    $p->addRow(['contactId' => $cid]);
-    $p->evaluate();
+    $tokenProcessor->addMessage('subject', '!!{fruit.apple}!!', 'text/plain');
+    $tokenProcessor->addMessage('body_html', '!!{fruit.banana}!!', 'text/html');
+    $tokenProcessor->addMessage('body_text', '!!{fruit.cherry}!!', 'text/plain');
+    $tokenProcessor->addMessage('other', 'No fruit :(', 'text/plain');
+    $tokenProcessor->addRow(['contactId' => $cid]);
+    $tokenProcessor->evaluate();
 
-    foreach ($p->getRows() as $row) {
+    foreach ($tokenProcessor->getRows() as $row) {
       $this->assertEquals('!!Nomnomnomapple!!', $row->render('subject'));
       $this->assertEquals('!!Nomnomnombanana!!', $row->render('body_html'));
       $this->assertEquals('!!Nomnomnomcherry!!', $row->render('body_text'));
@@ -450,7 +456,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         }
       }
     });
-
+    unset(\Civi::$statics['CRM_Contact_Tokens']['hook_tokens']);
     $expectRealSmartyOutputs = [
       TRUE => 'Fruit of the Tree yes',
       FALSE => 'Fruit of the Tree {if 1}yes{else}no{/if}',
@@ -458,21 +464,21 @@ class TokenProcessorTest extends \CiviUnitTestCase {
 
     $loops = 0;
     foreach ([TRUE, FALSE] as $smarty) {
-      $p = new TokenProcessor($this->dispatcher, [
+      $tokenProcessor = new TokenProcessor($this->dispatcher, [
         'controller' => __CLASS__,
         'smarty' => $smarty,
       ]);
-      $p->addMessage('real_dot', '!!{food.fruit.apple}!!', 'text/plain');
-      $p->addMessage('real_dot_smarty', '{food.fruit.apple} {if 1}yes{else}no{/if}', 'text/plain');
-      $p->addMessage('real_colon', 'Summary of fruits: {food.fruit:summary}!', 'text/plain');
-      $p->addMessage('not_real_1', '!!{food.fruit}!!', 'text/plain');
-      $p->addMessage('not_real_2', '!!{food.apple}!!', 'text/plain');
-      $p->addMessage('not_real_3', '!!{fruit.apple}!!', 'text/plain');
-      $p->addMessage('not_real_4', '!!{food.fruit:apple}!!', 'text/plain');
-      $p->addRow(['contactId' => $cid]);
-      $p->evaluate();
+      $tokenProcessor->addMessage('real_dot', '!!{food.fruit.apple}!!', 'text/plain');
+      $tokenProcessor->addMessage('real_dot_smarty', '{food.fruit.apple} {if 1}yes{else}no{/if}', 'text/plain');
+      $tokenProcessor->addMessage('real_colon', 'Summary of fruits: {food.fruit:summary}!', 'text/plain');
+      $tokenProcessor->addMessage('not_real_1', '!!{food.fruit}!!', 'text/plain');
+      $tokenProcessor->addMessage('not_real_2', '!!{food.apple}!!', 'text/plain');
+      $tokenProcessor->addMessage('not_real_3', '!!{fruit.apple}!!', 'text/plain');
+      $tokenProcessor->addMessage('not_real_4', '!!{food.fruit:apple}!!', 'text/plain');
+      $tokenProcessor->addRow(['contactId' => $cid]);
+      $tokenProcessor->evaluate();
 
-      foreach ($p->getRows() as $row) {
+      foreach ($tokenProcessor->getRows() as $row) {
         $loops++;
         $this->assertEquals('!!Fruit of the Tree!!', $row->render('real_dot'));
         $this->assertEquals($expectRealSmartyOutputs[$smarty], $row->render('real_dot_smarty'));
@@ -489,7 +495,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   /**
    * Process a message using mocked data.
    */
-  public function testMockData_ContactContribution() {
+  public function testMockData_ContactContribution(): void {
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
     $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());

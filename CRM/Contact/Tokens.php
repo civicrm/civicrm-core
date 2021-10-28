@@ -288,8 +288,8 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @throws \CRM_Core_Exception
    */
   public function onEvaluate(TokenValueEvent $e) {
-    $messageTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
-    if (empty($messageTokens)) {
+    $this->activeTokens = $e->getTokenProcessor()->getMessageTokens()['contact'] ?? [];
+    if (empty($this->activeTokens)) {
       return;
     }
 
@@ -302,10 +302,10 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
 
       if (empty($row->context['contact'])) {
-        $row->context['contact'] = $this->getContact($row->context['contactId'], $messageTokens);
+        $row->context['contact'] = $this->getContact($row->context['contactId'], $this->activeTokens);
       }
 
-      foreach ($messageTokens as $token) {
+      foreach ($this->activeTokens as $token) {
         if ($token === 'checksum') {
           $cs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($row->context['contactId'],
             NULL,
@@ -351,6 +351,13 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         return $row->context[$entityName][$possibility];
       }
     }
+    $contactID = $this->getFieldValue($row, 'id');
+    if ($contactID) {
+      $row->context['contact'] = array_merge($this->getContact($contactID, $this->activeTokens), $row->context['contact']);
+      if (isset($row->context[$entityName][$field])) {
+        return $row->context[$entityName][$field];
+      }
+    }
     return '';
   }
 
@@ -362,37 +369,34 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
    * @noinspection PhpUnhandledExceptionInspection
    */
   protected function getTokenMetadata(): array {
-    if ($this->tokensMetadata) {
-      return $this->tokensMetadata;
-    }
     if (Civi::cache('metadata')->has($this->getCacheKey())) {
       return Civi::cache('metadata')->get($this->getCacheKey());
     }
     $this->fieldMetadata = (array) civicrm_api4('Contact', 'getfields', ['checkPermissions' => FALSE], 'name');
-    $this->tokensMetadata = $this->getBespokeTokens();
+    $tokensMetadata = $this->getBespokeTokens();
     foreach ($this->fieldMetadata as $field) {
-      $this->addFieldToTokenMetadata($field, $this->getExposedFields());
+      $this->addFieldToTokenMetadata($tokensMetadata, $field, $this->getExposedFields());
     }
 
     foreach ($this->getRelatedEntityTokenMetadata() as $entity => $exposedFields) {
       $apiEntity = ($entity === 'openid') ? 'OpenID' : ucfirst($entity);
       $metadata = (array) civicrm_api4($apiEntity, 'getfields', ['checkPermissions' => FALSE], 'name');
       foreach ($metadata as $field) {
-        $this->addFieldToTokenMetadata($field, $exposedFields, 'primary_' . $entity);
+        $this->addFieldToTokenMetadata($tokensMetadata, $field, $exposedFields, 'primary_' . $entity);
       }
     }
     // Manually add in the abbreviated state province as that maps to
     // what has traditionally been delivered.
-    $this->tokensMetadata['primary_address.state_province_id:abbr'] = $this->tokensMetadata['primary_address.state_province_id:label'];
-    $this->tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
-    $this->tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
+    $tokensMetadata['primary_address.state_province_id:abbr'] = $tokensMetadata['primary_address.state_province_id:label'];
+    $tokensMetadata['primary_address.state_province_id:abbr']['name'] = 'state_province_id:abbr';
+    $tokensMetadata['primary_address.state_province_id:abbr']['audience'] = 'user';
     // Hide the label for now because we are not sure if there are paths
     // where legacy token resolution is in play where this could not be resolved.
-    $this->tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
+    $tokensMetadata['primary_address.state_province_id:label']['audience'] = 'sysadmin';
     // Hide this really obscure one. Just cos it annoys me.
-    $this->tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
-    Civi::cache('metadata')->set($this->getCacheKey(), $this->tokensMetadata);
-    return $this->tokensMetadata;
+    $tokensMetadata['primary_address.manual_geo_code:label']['audience'] = 'sysadmin';
+    Civi::cache('metadata')->set($this->getCacheKey(), $tokensMetadata);
+    return $tokensMetadata;
   }
 
   /**
@@ -446,6 +450,11 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
         ($joinEntity !== 'Website' ? [$alias . '.is_primary', '=', 1] : []));
     }
     $contact = $contactApi->execute()->first();
+    if (!$contact) {
+      // This is probably a test-only situation where tokens are retrieved for a
+      // fake contact id - check `testReplaceGreetingTokens`
+      return [];
+    }
 
     foreach ($this->getDeprecatedTokens() as $apiv3Name => $fieldName) {
       // it would be set already with the right value for a greeting token
@@ -673,6 +682,15 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
       'organization_name' => [
         'title' => ts('Organization name'),
         'name' => 'organization_name',
+        'type' => 'Field',
+        'options' => NULL,
+        'data_type' => 'String',
+        'audience' => 'sysadmin',
+      ],
+      // this gets forced out if we specify individual fields
+      'household_name' => [
+        'title' => ts('Household name'),
+        'name' => 'household_name',
         'type' => 'Field',
         'options' => NULL,
         'data_type' => 'String',

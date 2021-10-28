@@ -13,6 +13,7 @@ namespace Civi\Api4\Query;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Service\Schema\Joinable\CustomGroupJoinable;
+use Civi\Api4\Service\Schema\Joiner;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\SelectUtil;
@@ -1007,8 +1008,7 @@ class Api4SelectQuery {
     if (isset($this->apiFieldSpec[$key])) {
       return;
     }
-    /** @var \Civi\Api4\Service\Schema\Joiner $joiner */
-    $joiner = \Civi::container()->get('joiner');
+    $joiner = new Joiner(CoreUtil::getSchemaMap());
 
     $pathArray = explode('.', $key);
     // The last item in the path is the field name. We don't care about that; we'll add all fields from the joined entity.
