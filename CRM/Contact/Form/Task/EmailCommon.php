@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_EmailCommon {
    * @param CRM_Core_Form $form
    * @param bool $bounce determine if we want to throw a status bounce.
    *
-   * @throws \API_Exception
+   * @throws \API_Exception|\CRM_Core_Exception
    */
   public static function preProcessFromAddress(&$form, $bounce = TRUE) {
     $form->_emails = [];
@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_EmailCommon {
       $defaults = CRM_Core_BAO_Email::getEmailSignatureDefaults($emailID);
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
-      $defaults['from_email_address'] = current(CRM_Core_BAO_Domain::getNameAndEmail(FALSE, TRUE));
+      $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
     }
     $form->setDefaults($defaults);
   }

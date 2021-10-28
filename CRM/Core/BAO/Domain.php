@@ -108,6 +108,17 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   }
 
   /**
+   * @return string
+   */
+  protected static function getMissingDomainFromEmailMessage(): string {
+    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
+      'reset=1'
+    );
+    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    return $status;
+  }
+
+  /**
    * Get the location values of a domain.
    *
    * @return CRM_Core_BAO_Location[]|NULL
@@ -167,6 +178,8 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
   /**
    * @param bool $skipFatal
    * @param bool $returnString
+   *  If you are using this second parameter you probably are better
+   *  calling `getFromEmail()` which will return an actual string.
    *
    * @return array
    *   name & email for domain
@@ -193,12 +206,24 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
       return [NULL, NULL];
     }
 
-    $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address',
-      'reset=1'
-    );
-    $status = ts("There is no valid default from email address configured for the domain. You can configure here <a href='%1'>Configure From Email Address.</a>", [1 => $url]);
+    $status = self::getMissingDomainFromEmailMessage();
 
     throw new CRM_Core_Exception($status);
+  }
+
+  /**
+   * Get the domain email in a format suitable for using as the from address.
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public static function getFromEmail(): string {
+    $email = CRM_Core_OptionGroup::values('from_email_address', NULL, NULL, NULL, ' AND is_default = 1');
+    $email = current($email);
+    if (!$email) {
+      throw new CRM_Core_Exception(self::getMissingDomainFromEmailMessage());
+    }
+    return $email;
   }
 
   /**
@@ -326,7 +351,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
     $userID = CRM_Core_Session::getLoggedInContactID();
     if (!empty($userID)) {
-      list($userName, $userEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
+      [$userName, $userEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($userID);
     }
     // If still empty fall back to the logged in user details.
     // return empty values no matter what.
