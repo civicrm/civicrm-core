@@ -71,10 +71,10 @@ class Download extends AbstractRunAction {
     $rows = $this->formatResult($apiResult);
 
     $columns = [];
-    foreach ($this->display['settings']['columns'] as $col) {
+    foreach ($this->display['settings']['columns'] as $index => $col) {
       $col += ['type' => NULL, 'label' => '', 'rewrite' => FALSE];
       if ($col['type'] === 'field' && !empty($col['key'])) {
-        $columns[] = $col;
+        $columns[$index] = $col;
       }
     }
 
@@ -83,12 +83,9 @@ class Download extends AbstractRunAction {
 
     switch ($this->format) {
       case 'array':
-        $result[] = $columns;
+        $result[] = array_column($columns, 'label');
         foreach ($rows as $data) {
-          $row = [];
-          foreach ($columns as $col) {
-            $row[] = $this->formatColumnValue($col, $data);
-          }
+          $row = array_column(array_intersect_key($data['columns'], $columns), 'val');
           $result[] = $row;
         }
         return;
@@ -119,9 +116,11 @@ class Download extends AbstractRunAction {
     $csv->insertOne(array_column($columns, 'label'));
 
     foreach ($rows as $data) {
-      $row = [];
-      foreach ($columns as $col) {
-        $row[] = $this->formatColumnValue($col, $data);
+      $row = array_column(array_intersect_key($data['columns'], $columns), 'val');
+      foreach ($row as &$val) {
+        if (is_array($val)) {
+          $val = implode(', ', $val);
+        }
       }
       $csv->insertOne($row);
     }
@@ -141,13 +140,14 @@ class Download extends AbstractRunAction {
     $sheet = $document->getActiveSheet();
 
     // Header row
-    foreach ($columns as $index => $col) {
+    foreach (array_values($columns) as $index => $col) {
       $sheet->setCellValueByColumnAndRow($index + 1, 1, $col['label']);
     }
 
     foreach ($rows as $rowNum => $data) {
+      $colNum = 1;
       foreach ($columns as $index => $col) {
-        $sheet->setCellValueByColumnAndRow($index + 1, $rowNum + 2, $this->formatColumnValue($col, $data));
+        $sheet->setCellValueByColumnAndRow($colNum++, $rowNum + 2, $this->formatColumnValue($col, $data['columns'][$index]));
       }
     }
 
@@ -160,16 +160,11 @@ class Download extends AbstractRunAction {
    * Returns final formatted column value
    *
    * @param array $col
-   * @param array $data
+   * @param array $value
    * @return string
    */
-  protected function formatColumnValue(array $col, array $data) {
-    $val = $col['rewrite'] ?: $data[$col['key']]['view'] ?? '';
-    if ($col['rewrite']) {
-      foreach ($data as $k => $v) {
-        $val = str_replace("[$k]", $v['view'], $val);
-      }
-    }
+  protected function formatColumnValue(array $col, array $value) {
+    $val = $value['val'] ?? '';
     return is_array($val) ? implode(', ', $val) : $val;
   }
 

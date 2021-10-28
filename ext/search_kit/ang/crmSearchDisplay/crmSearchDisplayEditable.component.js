@@ -19,16 +19,16 @@
 
       this.$onInit = function() {
         col = this.col;
-        this.value = _.cloneDeep(this.row[col.editable.value].raw);
-        initialValue = _.cloneDeep(this.row[col.editable.value].raw);
+        this.value = _.cloneDeep(col.edit.value);
+        initialValue = _.cloneDeep(col.edit.value);
 
         this.field = {
-          data_type: col.editable.data_type,
-          input_type: col.editable.input_type,
-          name: col.editable.name,
-          options: col.editable.options,
-          fk_entity: col.editable.fk_entity,
-          serialize: col.editable.serialize,
+          data_type: col.edit.data_type,
+          input_type: col.edit.input_type,
+          name: col.edit.value_key,
+          options: col.edit.options,
+          fk_entity: col.edit.fk_entity,
+          serialize: col.edit.serialize,
         };
 
         $(document).on('keydown.crmSearchDisplayEditable', function(e) {
@@ -55,21 +55,21 @@
           ctrl.cancel();
           return;
         }
-        var values = {id: ctrl.row[col.editable.id].raw};
-        values[col.editable.name] = ctrl.value;
+        var record = _.cloneDeep(col.edit.record);
+        record[col.edit.value_key] = ctrl.value;
         $('input', $element).attr('disabled', true);
-        crmStatus({}, crmApi4(col.editable.entity, 'update', {
-          values: values
+        crmStatus({}, crmApi4(col.edit.entity, 'update', {
+          values: record
         })).then(ctrl.onSuccess);
       };
 
       function loadOptions() {
-        var cacheKey = col.editable.entity + ' ' + ctrl.field.name;
+        var cacheKey = col.edit.entity + ' ' + ctrl.field.name;
         if (optionsCache[cacheKey]) {
           ctrl.field.options = optionsCache[cacheKey];
           return;
         }
-        crmApi4(col.editable.entity, 'getFields', {
+        crmApi4(col.edit.entity, 'getFields', {
           action: 'update',
           select: ['options'],
           loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],

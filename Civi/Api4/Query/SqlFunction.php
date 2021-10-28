@@ -196,6 +196,16 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
+   * All functions return 'SqlFunction' as their type.
+   *
+   * To get the function name @see SqlFunction::getName()
+   * @return string
+   */
+  public function getType(): string {
+    return 'SqlFunction';
+  }
+
+  /**
    * @return string
    */
   abstract public static function getDescription(): string;

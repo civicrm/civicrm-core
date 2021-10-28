@@ -37,9 +37,9 @@
 
       // Toggle row selection
       selectRow: function(row) {
-        var index = this.selectedRows.indexOf(row.id.raw);
+        var index = this.selectedRows.indexOf(row.data.id);
         if (index < 0) {
-          this.selectedRows.push(row.id.raw);
+          this.selectedRows.push(row.data.id);
           this.allRowsSelected = (this.rowCount === this.selectedRows.length);
         } else {
           this.allRowsSelected = false;
@@ -49,7 +49,7 @@
 
       // @return bool
       isRowSelected: function(row) {
-        return this.allRowsSelected || _.includes(this.selectedRows, row.id.raw);
+        return this.allRowsSelected || _.includes(this.selectedRows, row.data.id);
       },
 
       refreshAfterTask: function() {
@@ -69,8 +69,8 @@
       onPostRun: [function(results, status, editedRow) {
         if (editedRow && status === 'success') {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
-          var index = this.selectedRows.indexOf(editedRow.id.raw);
-          if (index > -1 && !_.findWhere(results, {id: editedRow.id.raw})) {
+          var index = this.selectedRows.indexOf(editedRow.data.id);
+          if (index > -1 && !_.findWhere(results, {id: editedRow.data.id})) {
             this.selectedRows.splice(index, 1);
           }
         }

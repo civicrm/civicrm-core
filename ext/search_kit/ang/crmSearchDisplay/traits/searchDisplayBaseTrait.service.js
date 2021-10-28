@@ -4,54 +4,7 @@
   // Trait provides base methods and properties common to all search display types
   angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4) {
     var ts = CRM.ts('org.civicrm.search_kit'),
-      runCount = 0,
-      seed = Date.now();
-
-    // Replace tokens keyed to rowData.
-    // Pass view=true to replace with view value, otherwise raw value is used.
-    function replaceTokens(str, rowData, view, index) {
-      if (!str) {
-        return '';
-      }
-      _.each(rowData, function(value, key) {
-        if (str.indexOf('[' + key + ']') >= 0) {
-          var val = view ? value.view : value.raw,
-            replacement = angular.isArray(val) ? val[index || 0] : val;
-          str = str.replace(new RegExp(_.escapeRegExp('[' + key + ']', 'g')), replacement);
-        }
-      });
-      return str;
-    }
-
-    function getUrl(link, rowData, index) {
-      var url = replaceTokens(link, rowData, false, index);
-      if (url.slice(0, 1) !== '/' && url.slice(0, 4) !== 'http') {
-        url = CRM.url(url);
-      }
-      return url;
-    }
-
-    // Returns display value for a single column in a row
-    function formatDisplayValue(rowData, key, columns) {
-      var column = _.findWhere(columns, {key: key}),
-        displayValue = column.rewrite ? replaceTokens(column.rewrite, rowData, columns) : getValue(rowData[key], 'view');
-      return angular.isArray(displayValue) ? displayValue.join(', ') : displayValue;
-    }
-
-    // Returns value and url for a column formatted as link(s)
-    function formatLinks(rowData, key, columns) {
-      var column = _.findWhere(columns, {key: key}),
-        value = column.image ? '' : getValue(rowData[key], 'view'),
-        values = angular.isArray(value) ? value : [value],
-        links = [];
-      _.each(values, function(value, index) {
-        links.push({
-          value: value,
-          url: getUrl(column.link.path, rowData, index)
-        });
-      });
-      return links;
-    }
+      runCount = 0;
 
     // Get value from column data, specify either 'raw' or 'view'
     function getValue(data, ret) {
@@ -63,7 +16,6 @@
     return {
       page: 1,
       rowCount: null,
-      getUrl: getUrl,
       // Arrays may contain callback functions for various events
       onChangeFilters: [],
       onPreRun: [],
@@ -182,18 +134,8 @@
           });
         });
       },
-      replaceTokens: function(value, row) {
-        return replaceTokens(value, row, this.settings.columns);
-      },
-      getLinks: function(rowData, col) {
-        rowData._links = rowData._links || {};
-        if (!(col.key in rowData._links)) {
-          rowData._links[col.key] = formatLinks(rowData, col.key, this.settings.columns);
-        }
-        return rowData._links[col.key];
-      },
-      formatFieldValue: function(rowData, col) {
-        return formatDisplayValue(rowData, col.key, this.settings.columns);
+      formatFieldValue: function(colData) {
+        return angular.isArray(colData.val) ? colData.val.join(', ') : colData.val;
       }
     };
   });

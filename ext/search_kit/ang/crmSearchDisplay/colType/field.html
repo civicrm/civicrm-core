@@ -1,17 +1,17 @@
-<crm-search-display-editable row="row" col="col" on-success="$ctrl.runSearch(row)" cancel="$ctrl.editing = null;" ng-if="col.editable && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === col.key"></crm-search-display-editable>
-<span ng-if="::!col.link && !col.image" ng-class="{'crm-editable-enabled': col.editable && !$ctrl.editing && row[col.editable.id]}" ng-click="col.editable && !$ctrl.editing && ($ctrl.editing = [rowIndex, col.key])">
-  {{:: $ctrl.formatFieldValue(row, col) }}
+<crm-search-display-editable row="row" col="colData" on-success="$ctrl.runSearch(row)" cancel="$ctrl.editing = null;" ng-if="colData.edit && $ctrl.editing && $ctrl.editing[0] === rowIndex && $ctrl.editing[1] === colIndex"></crm-search-display-editable>
+<span ng-if="::!colData.links && !colData.img" ng-class="{'crm-editable-enabled': colData.edit && !$ctrl.editing}" ng-click="colData.edit && !$ctrl.editing && ($ctrl.editing = [rowIndex, colIndex])">
+  {{:: $ctrl.formatFieldValue(colData) }}
 </span>
-<span ng-if="::col.link">
-  <span ng-repeat="link in $ctrl.getLinks(row, col)">
-    <a target="{{:: col.link.target }}" href="{{:: link.url }}">
-      <span ng-if=":: col.image && $ctrl.formatFieldValue(row, col).length">
-        <img ng-src="{{:: $ctrl.formatFieldValue(row, col) }}" alt="{{:: $ctrl.replaceTokens(col.image.alt, row) }}" height="{{:: col.image.height }}" width="{{:: col.image.width }}"/>
+<span ng-if="::colData.links">
+  <span ng-repeat="link in colData.links">
+    <a target="{{:: link.target }}" href="{{:: link.url }}">
+      <span ng-if=":: colData.img">
+        <img ng-src="{{:: colData.img.src }}" alt="{{:: colData.val }}" height="{{:: colData.img.height }}" width="{{:: colData.img.width }}"/>
       </span>
-      {{:: link.value }}</a><span ng-if="!$last">,
+      {{:: link.text }}</a><span ng-if="!$last">,
     </span>
   </span>
 </span>
-<span ng-if=":: !col.link && col.image && $ctrl.formatFieldValue(row, col).length">
-  <img ng-src="{{:: $ctrl.formatFieldValue(row, col) }}" alt="{{:: $ctrl.replaceTokens(col.image.alt, row, $ctrl.settings.columns) }}" height="{{:: col.image.height }}" width="{{:: col.image.width }}"/>
+<span ng-if=":: !colData.links && colData.img">
+  <img ng-src="{{:: colData.img.src }}" alt="{{:: colData.val }}" height="{{:: colData.img.height }}" width="{{:: colData.img.width }}"/>
 </span>

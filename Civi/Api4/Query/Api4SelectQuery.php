@@ -722,12 +722,14 @@ class Api4SelectQuery {
       $joinEntityFields = $joinEntityGet->entityFields();
       foreach ($joinEntityFields as $field) {
         $field['sql_name'] = '`' . $alias . '`.`' . $field['column_name'] . '`';
+        $field['explicit_join'] = $alias;
         $this->addSpecField($alias . '.' . $field['name'], $field);
       }
       $tableName = CoreUtil::getTableName($entity);
       // Save join info to be retrieved by $this->getExplicitJoin()
       $this->explicitJoins[$alias] = [
         'entity' => $entity,
+        'alias' => $alias,
         'table' => $tableName,
         'bridge' => NULL,
       ];
@@ -938,6 +940,7 @@ class Api4SelectQuery {
       // For INNER joins, these fields get a sql alias pointing to the bridge entity,
       // but an api alias pretending they belong to the join entity.
       $field['sql_name'] = '`' . ($side === 'LEFT' ? $alias : $bridgeAlias) . '`.`' . $field['column_name'] . '`';
+      $field['explicit_join'] = $alias;
       $this->addSpecField($alias . '.' . $name, $field);
       if ($field['type'] === 'Field') {
         $fakeFields[$field['column_name']] = '`' . $bridgeAlias . '`.`' . $field['column_name'] . '`';
@@ -1094,6 +1097,8 @@ class Api4SelectQuery {
           else {
             $fieldArray['sql_name'] = '`' . $baseTableAlias . '`.`' . $link->getBaseColumn() . '`';
           }
+          $fieldArray['implicit_join'] = $link->getBaseColumn();
+          $fieldArray['explicit_join'] = $explicitJoin ? $explicitJoin['alias'] : NULL;
           // Custom fields will already have the group name prefixed
           $fieldName = $isCustom ? explode('.', $fieldArray['name'])[1] : $fieldArray['name'];
           $this->addSpecField($joinTreeNode[$joinName]['#path'] . $fieldName, $fieldArray);
@@ -1252,7 +1257,10 @@ class Api4SelectQuery {
       $this->apiFieldSpec[$path] = FALSE;
       return;
     }
-    $this->apiFieldSpec[$path] = $field;
+    $this->apiFieldSpec[$path] = $field + [
+      'implicit_join' => NULL,
+      'explicit_join' => NULL,
+    ];
   }
 
   /**

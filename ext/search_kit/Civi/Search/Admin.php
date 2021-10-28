@@ -122,7 +122,6 @@ class Admin {
           $field['fieldName'] = $field['name'];
           // Hack for RelationshipCache to make Relationship fields editable
           if ($entity['name'] === 'RelationshipCache') {
-            $entity['primary_key'] = ['relationship_id'];
             if (in_array($field['name'], ['is_active', 'start_date', 'end_date'])) {
               $field['readonly'] = FALSE;
             }

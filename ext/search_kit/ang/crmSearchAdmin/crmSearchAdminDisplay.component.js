@@ -156,37 +156,12 @@
       this.toggleEditable = function(col) {
         if (col.editable) {
           delete col.editable;
-          return;
+        } else {
+          col.editable = true;
         }
-
-        var info = searchMeta.parseExpr(col.key),
-          arg = _.findWhere(info.args, {type: 'field'}) || {},
-          value = col.key.split(':')[0];
-        if (!arg.field || info.fn) {
-          delete col.editable;
-          return;
-        }
-        // If field is an implicit join, use the original fk field
-        if (arg.field.name !== arg.field.fieldName) {
-          value = value.substr(0, value.lastIndexOf('.'));
-          info = searchMeta.parseExpr(value);
-          arg = info.args[0];
-        }
-        col.editable = {
-          // Hack to support editing relationships
-          entity: arg.field.entity.replace('RelationshipCache', 'Relationship'),
-          input_type: arg.field.input_type,
-          data_type: arg.field.data_type,
-          options: !!arg.field.options,
-          serialize: !!arg.field.serialize,
-          fk_entity: arg.field.fk_entity,
-          id: arg.prefix + searchMeta.getEntity(arg.field.entity).primary_key[0],
-          name: arg.field.name,
-          value: value
-        };
       };
 
-      this.isEditable = function(col) {
+      this.canBeEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
         return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
@@ -213,6 +188,7 @@
         if (column.link) {
           ctrl.onChangeLink(column, column.link.path, '');
         } else {
+          delete column.editable;
           var defaultLink = ctrl.getLinks(column.key)[0];
           column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
           ctrl.onChangeLink(column, null, column.link.path);

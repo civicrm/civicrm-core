@@ -430,9 +430,6 @@ abstract class AbstractAction implements \ArrayAccess {
   public function entityFields() {
     if (!$this->_entityFields) {
       $allowedTypes = ['Field', 'Filter', 'Extra'];
-      if (method_exists($this, 'getCustomGroup')) {
-        $allowedTypes[] = 'Custom';
-      }
       $getFields = \Civi\API\Request::create($this->getEntityName(), 'getFields', [
         'version' => 4,
         'checkPermissions' => FALSE,

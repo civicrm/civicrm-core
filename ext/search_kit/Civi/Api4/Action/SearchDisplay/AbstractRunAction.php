@@ -66,6 +66,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private $_afform;
 
   /**
+   * @var array
+   */
+  private $_selectClause;
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    * @throws UnauthorizedException
    * @throws \API_Exception
@@ -108,61 +113,232 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   abstract protected function processResult(\Civi\Api4\Generic\Result $result);
 
   /**
-   * Transform each value returned by the API into 'raw' and 'view' properties
+   * Transforms each row into an array of raw data and an array of formatted columns
+   *
    * @param \Civi\Api4\Generic\Result $result
-   * @return array
+   * @return array{data: array, columns: array}[]
    */
   protected function formatResult(\Civi\Api4\Generic\Result $result): array {
-    $select = [];
-    foreach ($this->savedSearch['api_params']['select'] as $selectExpr) {
-      $expr = SqlExpression::convert($selectExpr, TRUE);
-      $item = [
-        'fields' => [],
-        'dataType' => $expr->getDataType(),
+    $rows = [];
+    foreach ($result as $index => $row) {
+      $data = $columns = [];
+      foreach ($this->getSelectClause() as $key => $item) {
+        $data[$key] = $this->getValue($key, $row, $index);
+      }
+      foreach ($this->display['settings']['columns'] as $column) {
+        $columns[] = $this->formatColumn($column, $data);
+      }
+      $rows[] = [
+        'data' => $data,
+        'columns' => $columns,
       ];
-      foreach ($expr->getFields() as $field) {
-        $item['fields'][] = $this->getField($field);
-      }
-      if (!isset($item['dataType']) && $item['fields']) {
-        $item['dataType'] = $item['fields'][0]['data_type'];
-      }
-      $select[$expr->getAlias()] = $item;
     }
-    $formatted = [];
-    foreach ($result as $index => $data) {
-      $row = [];
-      foreach ($select as $key => $item) {
-        $row[$key] = $this->getValue($key, $data, $item['dataType'], $index);
-      }
-      $formatted[] = $row;
+    return $rows;
+  }
+
+  /**
+   * @param string $key
+   * @param array $data
+   * @param int $rowIndex
+   * @return mixed
+   */
+  private function getValue($key, $data, $rowIndex) {
+    // Get value from api result unless this is a pseudo-field which gets a calculated value
+    switch ($key) {
+      case 'result_row_num':
+        return $rowIndex + 1 + ($this->savedSearch['api_params']['offset'] ?? 0);
+
+      case 'user_contact_id':
+        return \CRM_Core_Session::getLoggedInContactID();
+
+      default:
+        return $data[$key] ?? NULL;
     }
-    return $formatted;
+  }
+
+  /**
+   * @param $column
+   * @param $data
+   * @return array{val: mixed, links: array, edit: array, label: string, title: string, image: array, cssClass: string}
+   */
+  private function formatColumn($column, $data) {
+    $column += ['rewrite' => NULL, 'label' => NULL];
+    $out = $cssClass = [];
+    switch ($column['type']) {
+      case 'field':
+        if (isset($column['image']) && is_array($column['image'])) {
+          $out['img'] = $this->formatImage($column, $data);
+          $out['val'] = $this->replaceTokens($column['image']['alt'] ?? NULL, $data, 'view');
+        }
+        elseif ($column['rewrite']) {
+          $out['val'] = $this->replaceTokens($column['rewrite'], $data, 'view');
+        }
+        else {
+          $out['val'] = $this->formatViewValue($column['key'], $data[$column['key']] ?? NULL);
+        }
+        if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
+          $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
+        }
+        if (isset($column['title']) && strlen($column['title'])) {
+          $out['title'] = $this->replaceTokens($column['title'], $data, 'view');
+        }
+        if (!empty($column['link']['path'])) {
+          $out['links'] = $this->formatFieldLinks($column, $data, $out['val']);
+        }
+        elseif (!empty($column['editable']) && !$column['rewrite']) {
+          $out['edit'] = $this->formatEditableColumn($column, $data);
+        }
+        break;
+
+      case 'links':
+      case 'buttons':
+      case 'menu':
+        $out = $this->formatLinksColumn($column, $data);
+        break;
+    }
+    if (!empty($column['alignment'])) {
+      $cssClass[] = $column['alignment'];
+    }
+    if ($cssClass) {
+      $out['cssClass'] = implode(' ', $cssClass);
+    }
+    return $out;
+  }
+
+  /**
+   * Format a field value as links
+   * @param $column
+   * @param $data
+   * @param $value
+   * @return array{text: string, url: string, target: string}[]
+   */
+  private function formatFieldLinks($column, $data, $value): array {
+    $links = [];
+    if (!empty($column['image'])) {
+      $value = [''];
+    }
+    foreach ((array) $value as $index => $val) {
+      $path = $this->replaceTokens($column['link']['path'], $data, 'url', $index);
+      if ($path) {
+        $link = [
+          'text' => $val,
+          'url' => $this->getUrl($path),
+        ];
+        if (!empty($column['link']['target'])) {
+          $link['target'] = $column['link']['target'];
+        }
+        $links[] = $link;
+      }
+    }
+    return $links;
+  }
+
+  /**
+   * Format links for a menu/buttons/links column
+   * @param $column
+   * @param $data
+   * @return array{text: string, url: string, target: string, style: string, icon: string}[]
+   */
+  private function formatLinksColumn($column, $data): array {
+    $out = ['links' => []];
+    if (isset($column['text'])) {
+      $out['text'] = $this->replaceTokens($column['text'], $data, 'view');
+    }
+    foreach ($column['links'] as $item) {
+      $path = $this->replaceTokens($item['path'], $data, 'url');
+      if ($path) {
+        $link = [
+          'text' => $this->replaceTokens($item['text'] ?? '', $data, 'view'),
+          'url' => $this->getUrl($path),
+        ];
+        foreach (['target', 'style', 'icon'] as $prop) {
+          if (!empty($item[$prop])) {
+            $link[$prop] = $item[$prop];
+          }
+        }
+        $out['links'][] = $link;
+      }
+    }
+    return $out;
+  }
+
+  /**
+   * @param string $path
+   * @return string
+   */
+  private function getUrl(string $path) {
+    if ($path[0] === '/' || strpos($path, 'http://') || strpos($path, 'https://')) {
+      return $path;
+    }
+    // Use absolute urls when downloading spreadsheet
+    $absolute = $this->getActionName() === 'download';
+    return \CRM_Utils_System::url($path, NULL, $absolute, NULL, FALSE);
+  }
+
+  /**
+   * @param $column
+   * @param $data
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, record: array, value: mixed}|null
+   */
+  private function formatEditableColumn($column, $data) {
+    $editable = $this->getEditableInfo($column['key']);
+    if (!empty($data[$editable['id_path']])) {
+      $editable['record'] = [
+        $editable['id_key'] => $data[$editable['id_path']],
+      ];
+      $editable['value'] = $data[$editable['value_path']];
+      \CRM_Utils_Array::remove($editable, 'id_key', 'id_path', 'value_path');
+      return $editable;
+    }
+    return NULL;
   }
 
   /**
    * @param $key
-   * @param $data
-   * @param $dataType
-   * @param $index
-   * @return array
+   * @return array{entity: string, input_type: string, data_type: string, options: bool, serialize: bool, fk_entity: string, value_key: string, value_path: string, id_key: string, id_path: string}|null
    */
-  private function getValue($key, $data, $dataType, $index) {
-    // Get value from api result unless this is a pseudo-field which gets a calculated value
-    switch ($key) {
-      case 'result_row_num':
-        $raw = $index + 1 + ($this->savedSearch['api_params']['offset'] ?? 0);
-        break;
-
-      case 'user_contact_id':
-        $raw = \CRM_Core_Session::getLoggedInContactID();
-        break;
-
-      default:
-        $raw = $data[$key] ?? NULL;
+  private function getEditableInfo($key) {
+    [$key] = explode(':', $key);
+    $field = $this->getField($key);
+    // If field is an implicit join, use the original fk field
+    if (!empty($field['implicit_join'])) {
+      return $this->getEditableInfo(substr($key, 0, -1 - strlen($field['name'])));
     }
+    if ($field) {
+      $idKey = CoreUtil::getIdFieldName($field['entity']);
+      $idPath = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . $idKey;
+      // Hack to support editing relationships
+      if ($field['entity'] === 'RelationshipCache') {
+        $field['entity'] = 'Relationship';
+        $idPath = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . 'relationship_id';
+      }
+      return [
+        'entity' => $field['entity'],
+        'input_type' => $field['input_type'],
+        'data_type' => $field['data_type'],
+        'options' => !empty($field['options']),
+        'serialize' => !empty($field['serialize']),
+        'fk_entity' => $field['fk_entity'],
+        'value_key' => $field['name'],
+        'value_path' => $key,
+        'id_key' => $idKey,
+        'id_path' => $idPath,
+      ];
+    }
+    return NULL;
+  }
+
+  /**
+   * @param $column
+   * @param $data
+   * @return array{url: string, width: int, height: int}
+   */
+  private function formatImage($column, $data) {
+    $tokenExpr = $column['rewrite'] ?: '[' . $column['key'] . ']';
     return [
-      'raw' => $raw,
-      'view' => $this->formatViewValue($dataType, $raw),
+      'url' => $this->replaceTokens($tokenExpr, $data, 'url'),
+      'height' => $column['image']['height'] ?? NULL,
+      'width' => $column['image']['width'] ?? NULL,
     ];
   }
 
@@ -180,17 +356,80 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
+   * Returns the select clause enhanced with metadata
+   *
+   * @return array
+   */
+  protected function getSelectClause() {
+    if (!isset($this->_selectClause)) {
+      $this->_selectClause = [];
+      foreach ($this->savedSearch['api_params']['select'] as $selectExpr) {
+        $expr = SqlExpression::convert($selectExpr, TRUE);
+        $item = [
+          'fields' => [],
+          'type' => $expr->getType(),
+          'dataType' => $expr->getDataType(),
+        ];
+        foreach ($expr->getFields() as $fieldName) {
+          $fieldMeta = $this->getField($fieldName);
+          if ($fieldMeta) {
+            $item['fields'][] = $fieldMeta;
+          }
+        }
+        if (!isset($item['dataType']) && $item['fields']) {
+          $item['dataType'] = $item['fields'][0]['data_type'];
+        }
+        $this->_selectClause[$expr->getAlias()] = $item;
+      }
+    }
+    return $this->_selectClause;
+  }
+
+  /**
+   * @param string $key
+   * @return array{fields: array, dataType: string}|NULL
+   */
+  protected function getSelectExpression($key) {
+    return $this->getSelectClause()[$key] ?? NULL;
+  }
+
+  /**
+   * @param string $tokenExpr
+   * @param array $data
+   * @param string $format view|raw|url
+   * @param int $index
+   * @return string
+   */
+  private function replaceTokens($tokenExpr, $data, $format, $index = 0) {
+    foreach ($this->getTokens($tokenExpr) as $token) {
+      $val = $data[$token] ?? NULL;
+      if (isset($val) && $format === 'view') {
+        $val = $this->formatViewValue($token, $val);
+      }
+      $replacement = is_array($val) ? $val[$index] ?? '' : $val;
+      // A missing token value in a url invalidates it
+      if ($format === 'url' && (!isset($replacement) || $replacement === '')) {
+        return NULL;
+      }
+      $tokenExpr = str_replace('[' . $token . ']', $replacement, $tokenExpr);
+    }
+    return $tokenExpr;
+  }
+
+  /**
    * Format raw field value according to data type
-   * @param $dataType
+   * @param string $key
    * @param mixed $rawValue
    * @return array|string
    */
-  protected function formatViewValue($dataType, $rawValue) {
+  protected function formatViewValue($key, $rawValue) {
     if (is_array($rawValue)) {
-      return array_map(function($val) use ($dataType) {
-        return $this->formatViewValue($dataType, $val);
+      return array_map(function($val) use ($key) {
+        return $this->formatViewValue($key, $val);
       }, $rawValue);
     }
+
+    $dataType = $this->getSelectExpression($key)['dataType'] ?? NULL;
 
     $formatted = $rawValue;
 
@@ -348,9 +587,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $defaultSort = $this->display['settings']['sort'] ?? [];
     $currentSort = $this->sort;
 
-    // Validate that requested sort fields are part of the SELECT
+    // Verify requested sort corresponds to sortable columns
     foreach ($this->sort as $item) {
-      if (!in_array($item[0], $this->getSelectAliases())) {
+      $column = array_column($this->display['settings']['columns'], NULL, 'key')[$item[0]] ?? NULL;
+      if (!$column || (isset($column['sortable']) && !$column['sortable'])) {
         $currentSort = NULL;
       }
     }
@@ -389,24 +629,36 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $possibleTokens .= implode('', array_column($column['links'], 'text'));
       }
 
-      // Select value fields for in-place editing
-      if (isset($column['editable']['value'])) {
-        $additions[] = $column['editable']['value'];
-        $additions[] = $column['editable']['id'];
+      // Select id & value for in-place editing
+      if (!empty($column['editable'])) {
+        $editable = $this->getEditableInfo($column['key']);
+        if ($editable) {
+          $additions[] = $editable['value_path'];
+          $additions[] = $editable['id_path'];
+        }
       }
     }
     // Add fields referenced via token
-    $tokens = [];
-    preg_match_all('/\\[([^]]+)\\]/', $possibleTokens, $tokens);
+    $tokens = $this->getTokens($possibleTokens);
     // Only add fields not already in SELECT clause
-    $additions = array_diff(array_merge($additions, $tokens[1]), $existing);
+    $additions = array_diff(array_merge($additions, $tokens), $existing);
     // Tokens for aggregated columns start with 'GROUP_CONCAT_'
     foreach ($additions as $index => $alias) {
       if (strpos($alias, 'GROUP_CONCAT_') === 0) {
         $additions[$index] = 'GROUP_CONCAT(' . $this->getJoinFromAlias(explode('_', $alias, 3)[2]) . ') AS ' . $alias;
       }
     }
+    $this->_selectClause = NULL;
     $apiParams['select'] = array_unique(array_merge($apiParams['select'], $additions));
+  }
+
+  /**
+   * @param string $str
+   */
+  private function getTokens($str) {
+    $tokens = [];
+    preg_match_all('/\\[([^]]+)\\]/', $str, $tokens);
+    return array_unique($tokens[1]);
   }
 
   /**
