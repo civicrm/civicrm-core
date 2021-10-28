@@ -378,7 +378,6 @@ INSERT INTO civicrm_navigation
 VALUES
 
     ( @domainID, 'civicrm/admin/setting/component?reset=1',             '{ts escape="sql" skip="true"}Components{/ts}', 'Enable Components',                                    'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 1 ),
-    ( @domainID, 'civicrm/a/#/cxn',                                     '{ts escape="sql" skip="true"}Connections{/ts}', 'Connections',                                         'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 2 ),
     ( @domainID, 'civicrm/admin/extensions?reset=1',                    '{ts escape="sql" skip="true"}Extensions{/ts}', 'Manage Extensions',                                    'administer CiviCRM', '', @systemSettingslastID, '1', 1,    3 ),
 
     ( @domainID, 'civicrm/admin/setting/updateConfigBackend?reset=1',   '{ts escape="sql" skip="true"}Cleanup Caches and Update Paths{/ts}', 'Cleanup Caches and Update Paths', 'administer CiviCRM', '', @systemSettingslastID, '1', NULL, 4 ),
