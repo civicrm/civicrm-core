@@ -366,7 +366,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     foreach ($e->getRows() as $row) {
       /** @var TokenRow $row */
       $row->format('text/html');
-      $row->tokens['custom']['foobar'] = sprintf("#%04d is a good number. Trickster {contact.display_name}.", $row->context['contact_id']);
+      $row->tokens['custom']['foobar'] = sprintf('#%04d is a good number. Trickster {contact.display_name}.', $row->context['contact_id']);
     }
   }
 

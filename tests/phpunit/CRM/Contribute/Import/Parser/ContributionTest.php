@@ -56,13 +56,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contact1Id = $this->individualCreate($contact1Params);
     $contact2Id = $this->individualCreate($contact2Params);
     $values = [
-      "total_amount" => $this->formatMoneyInput(1230.99),
-      "financial_type" => "Donation",
-      "external_identifier" => "ext-1",
-      "soft_credit" => "ext-2",
+      'total_amount' => $this->formatMoneyInput(1230.99),
+      'financial_type' => 'Donation',
+      'external_identifier' => 'ext-1',
+      'soft_credit' => 'ext-2',
     ];
-    $mapperSoftCredit = [NULL, NULL, NULL, "external_identifier"];
-    $mapperSoftCreditType = [NULL, NULL, NULL, "1"];
+    $mapperSoftCredit = [NULL, NULL, NULL, 'external_identifier'];
+    $mapperSoftCreditType = [NULL, NULL, NULL, '1'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
     $params = ['contact_id' => $contact1Id];
     $values = [];
@@ -71,7 +71,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1230.99, $contributionsOfMainContact->net_amount);
     $this->assertEquals(0, $contributionsOfMainContact->fee_amount);
 
-    $params["contact_id"] = $contact2Id;
+    $params['contact_id'] = $contact2Id;
     $contributionsOfSoftContact = CRM_Contribute_BAO_ContributionSoft::retrieve($params, $values);
     $this->assertEquals(1, $contributionsOfMainContact->N, 'Contribution not added for primary contact');
     $this->assertEquals(1, $contributionsOfSoftContact->N, 'Soft Contribution not added for secondary contact');

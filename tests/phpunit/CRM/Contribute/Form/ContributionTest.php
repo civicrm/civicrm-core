@@ -1515,45 +1515,45 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'group_type' => 'Membership,Individual',
       'title' => 'Membership Custom Fields',
       'add_captcha' => 0,
-      'is_map' => "0",
-      "is_edit_link" => "0",
-      "is_uf_link" => "0",
-      "is_update_dupe" => "0",
+      'is_map' => '0',
+      'is_edit_link' => '0',
+      'is_uf_link' => '0',
+      'is_update_dupe' => '0',
     ]);
 
     // add custom fields to profile
     civicrm_api3('UFField', 'create', [
-      "uf_group_id" => $membershipCustomFieldsProfile['id'],
-      "field_name" => "custom_" . $membershipCustomField['id'],
-      "is_active" => "1",
-      "visibility" => "User and User Admin Only",
-      "in_selector" => "0",
-      "is_searchable" => "0",
-      "label" => "custom text field on membership",
-      "field_type" => "Membership",
+      'uf_group_id' => $membershipCustomFieldsProfile['id'],
+      'field_name' => 'custom_' . $membershipCustomField['id'],
+      'is_active' => '1',
+      'visibility' => 'User and User Admin Only',
+      'in_selector' => '0',
+      'is_searchable' => '0',
+      'label' => 'custom text field on membership',
+      'field_type' => 'Membership',
     ]);
 
     $contribPage = civicrm_api3('ContributionPage', 'create', [
-      "title" => "Membership",
-      "financial_type_id" => 1,
+      'title' => 'Membership',
+      'financial_type_id' => 1,
       'financial_account_id' => 1,
-      "is_credit_card_only" => "0",
-      "is_monetary" => "0",
-      "is_recur" => "0",
-      "is_confirm_enabled" => "1",
-      "is_recur_interval" => "0",
-      "is_recur_installments" => "0",
-      "adjust_recur_start_date" => "0",
-      "is_pay_later" => "1",
-      "pay_later_text" => "I will send payment by check",
-      "is_partial_payment" => "0",
-      "is_email_receipt" => "0",
-      "is_active" => "1",
-      "amount_block_is_active" => "0",
-      "currency" => "USD",
-      "is_share" => "0",
-      "is_billing_required" => "0",
-      "contribution_type_id" => "2",
+      'is_credit_card_only' => '0',
+      'is_monetary' => '0',
+      'is_recur' => '0',
+      'is_confirm_enabled' => '1',
+      'is_recur_interval' => '0',
+      'is_recur_installments' => '0',
+      'adjust_recur_start_date' => '0',
+      'is_pay_later' => '1',
+      'pay_later_text' => 'I will send payment by check',
+      'is_partial_payment' => '0',
+      'is_email_receipt' => '0',
+      'is_active' => '1',
+      'amount_block_is_active' => '0',
+      'currency' => 'USD',
+      'is_share' => '0',
+      'is_billing_required' => '0',
+      'contribution_type_id' => '2',
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
@@ -1562,78 +1562,78 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     //create price set with two options for the two different memberships
     $priceSet = civicrm_api3('PriceSet', 'create', [
-      'title' => "Two Membership Type Checkbox",
+      'title' => 'Two Membership Type Checkbox',
       'extends' => 'CiviMember',
       'is_active' => 1,
-      "financial_type_id" => "1",
+      'financial_type_id' => '1',
     ]);
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set_entity (entity_table, entity_id, price_set_id) VALUES('civicrm_contribution_page', $contribPage1, {$priceSet['id']})");
 
     $priceField = civicrm_api3('PriceField', 'create', [
       'price_set_id' => $priceSet['id'],
       'name' => 'mt',
-      "label" => "Membership Types",
-      "html_type" => "CheckBox",
-      "is_enter_qty" => "0",
-      "weight" => "1",
-      "is_display_amounts" => "1",
-      "options_per_line" => "1",
-      "is_active" => "1",
-      "is_required" => "0",
-      "visibility_id" => "1",
+      'label' => 'Membership Types',
+      'html_type' => 'CheckBox',
+      'is_enter_qty' => '0',
+      'weight' => '1',
+      'is_display_amounts' => '1',
+      'options_per_line' => '1',
+      'is_active' => '1',
+      'is_required' => '0',
+      'visibility_id' => '1',
     ]);
 
     $priceFieldOption1 = civicrm_api3('PriceFieldValue', 'create', [
-      "price_field_id" => $priceField['id'],
-      "name" => "membership_type_one",
-      "label" => "Membership Type One",
-      "amount" => "50",
-      "weight" => "1",
-      "membership_type_id" => $membershipTypeOne['id'],
-      "membership_num_terms" => "1",
-      "is_default" => "0",
-      "is_active" => "1",
-      "financial_type_id" => "1",
-      "non_deductible_amount" => "0.00",
-      "contribution_type_id" => "2",
+      'price_field_id' => $priceField['id'],
+      'name' => 'membership_type_one',
+      'label' => 'Membership Type One',
+      'amount' => '50',
+      'weight' => '1',
+      'membership_type_id' => $membershipTypeOne['id'],
+      'membership_num_terms' => '1',
+      'is_default' => '0',
+      'is_active' => '1',
+      'financial_type_id' => '1',
+      'non_deductible_amount' => '0.00',
+      'contribution_type_id' => '2',
     ]);
 
     $priceFieldOption2 = civicrm_api3('PriceFieldValue', 'create', [
-      "price_field_id" => $priceField['id'],
-      "name" => "membership_type_two",
-      "label" => "Membership Type Two",
-      "amount" => "50",
-      "weight" => "1",
-      "membership_type_id" => $membershipTypeTwo['id'],
-      "membership_num_terms" => "1",
-      "is_default" => "0",
-      "is_active" => "1",
-      "financial_type_id" => "1",
-      "non_deductible_amount" => "0.00",
-      "contribution_type_id" => "2",
+      'price_field_id' => $priceField['id'],
+      'name' => 'membership_type_two',
+      'label' => 'Membership Type Two',
+      'amount' => '50',
+      'weight' => '1',
+      'membership_type_id' => $membershipTypeTwo['id'],
+      'membership_num_terms' => '1',
+      'is_default' => '0',
+      'is_active' => '1',
+      'financial_type_id' => '1',
+      'non_deductible_amount' => '0.00',
+      'contribution_type_id' => '2',
     ]);
 
     // assign profile with custom fields to contribution page
     civicrm_api3('UFJoin', 'create', [
-      'module' => "CiviContribute",
-      'weight' => "1",
+      'module' => 'CiviContribute',
+      'weight' => '1',
       'uf_group_id' => $membershipCustomFieldsProfile['id'],
-      "entity_table" => "civicrm_contribution_page",
-      "entity_id" => $contribPage1,
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contribPage1,
     ]);
 
     $form = new CRM_Contribute_Form_Contribution_Confirm();
     $form->_params = [
       'id' => $contribPage1,
-      'qfKey' => "donotcare",
-      "custom_{$membershipCustomField['id']}" => "Hello",
-      "priceSetId" => $priceSet['id'],
+      'qfKey' => 'donotcare',
+      "custom_{$membershipCustomField['id']}" => 'Hello',
+      'priceSetId' => $priceSet['id'],
       'price_set_id' => $priceSet['id'],
-      "price_" . $priceField['id'] => [$priceFieldOption1['id'] => 1, $priceFieldOption2['id'] => 1],
-      'invoiceID' => "9a6f7b49358dc31c3604e463b225c5be",
-      'email' => "admin@example.com",
-      "currencyID" => "USD",
-      'description' => "Membership Contribution",
+      'price_' . $priceField['id'] => [$priceFieldOption1['id'] => 1, $priceFieldOption2['id'] => 1],
+      'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
+      'email' => 'admin@example.com',
+      'currencyID' => 'USD',
+      'description' => 'Membership Contribution',
       'contact_id' => $contactID,
       'skipLineItem' => 0,
       'email-5' => 'test@test.com',
@@ -1647,13 +1647,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contact_id' => $contactID,
       'membership_type_id' => $membershipTypeOne['id'],
     ]);
-    $this->assertEquals("Hello", $membership1["custom_{$membershipCustomField['id']}"]);
+    $this->assertEquals('Hello', $membership1["custom_{$membershipCustomField['id']}"]);
 
     $membership2 = civicrm_api3('Membership', 'getsingle', [
       'contact_id' => $contactID,
       'membership_type_id' => $membershipTypeTwo['id'],
     ]);
-    $this->assertEquals("Hello", $membership2["custom_{$membershipCustomField['id']}"]);
+    $this->assertEquals('Hello', $membership2["custom_{$membershipCustomField['id']}"]);
   }
 
   /**
@@ -1667,14 +1667,14 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form->controller = new CRM_Core_Controller();
     $form->_params = [
       'id' => $this->_ids['contribution_page'],
-      "qfKey" => "donotcare",
-      "priceSetId" => $this->_ids['price_set'],
+      'qfKey' => 'donotcare',
+      'priceSetId' => $this->_ids['price_set'],
       'price_set_id' => $this->_ids['price_set'],
-      "price_" . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
-      "invoiceID" => "9a6f7b49358dc31c3604e463b225c5be",
-      "email" => "admin@example.com",
-      "currencyID" => "USD",
-      'description' => "Membership Contribution",
+      'price_' . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      'invoiceID' => '9a6f7b49358dc31c3604e463b225c5be',
+      'email' => 'admin@example.com',
+      'currencyID' => 'USD',
+      'description' => 'Membership Contribution',
       'contact_id' => $contactID,
       'select_contact_id' => $contactID,
       'useForMember' => 1,
@@ -1698,7 +1698,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     //Choose Membership Priceset
     $form->_params["price_{$this->_ids['price_field'][0]}"] = $this->_ids['price_field_value'][0];
-    $form->_params["amount"] = 20;
+    $form->_params['amount'] = 20;
     $form->submit($form->_params);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
@@ -1765,7 +1765,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     // The page contents load later by ajax, so there's just the surrounding
     // html available now, but we can check at least one thing while we're here.
-    $this->assertStringContainsString("mainTabContainer", $contents);
+    $this->assertStringContainsString('mainTabContainer', $contents);
   }
 
   /**

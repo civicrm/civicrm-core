@@ -376,7 +376,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     if ($entity != 'Contribution') {
       return;
     }
-    $clauses['id'] = "NOT IN (0)";
+    $clauses['id'] = 'NOT IN (0)';
   }
 
   /**
@@ -1172,8 +1172,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $originalContactId = $contactID = $this->individualCreate();
     $orgId = $this->organizationCreate(['organization_name' => 'testorg1']);
     $orgCount = $this->callAPISuccessGetCount('Contact', [
-      'contact_type' => "Organization",
-      'organization_name' => "testorg1",
+      'contact_type' => 'Organization',
+      'organization_name' => 'testorg1',
     ]);
     $this->assertEquals($orgCount, 1);
 
@@ -1219,8 +1219,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     //Check whether new organisation is created.
     $result = $this->callAPISuccess('Contact', 'get', [
-      'contact_type' => "Organization",
-      'organization_name' => "testorg1",
+      'contact_type' => 'Organization',
+      'organization_name' => 'testorg1',
     ]);
     $this->assertEquals($result['count'], 1);
 
@@ -1297,7 +1297,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       TRUE
     );
 
-    $this->assertEquals('Contribution Amount: € 100.00', $contributionDetails[$contactId1]['text'], "The text does not match");
+    $this->assertEquals('Contribution Amount: € 100.00', $contributionDetails[$contactId1]['text'], 'The text does not match');
     $this->assertEquals('<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
       <p>Contribution Receive Date: May 11th, 2015 12:00 AM</p></br>
@@ -1320,12 +1320,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
-      'revenue_recognition_date' => date('Ymd', strtotime("+3 month")),
+      'revenue_recognition_date' => date('Ymd', strtotime('+3 month')),
     ];
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $this->callAPISuccessGetCount('EntityFinancialTrxn', [
-      'entity_table' => "civicrm_contribution",
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
     ], 2);
 
@@ -1336,17 +1336,17 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', [
       'return' => [
-        "financial_trxn_id.from_financial_account_id.name",
-        "financial_trxn_id.to_financial_account_id.name",
-        "financial_trxn_id",
+        'financial_trxn_id.from_financial_account_id.name',
+        'financial_trxn_id.to_financial_account_id.name',
+        'financial_trxn_id',
       ],
-      'entity_table' => "civicrm_contribution",
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
       'financial_trxn_id.is_payment' => 0,
     ], $checkAgainst);
 
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', [
-      'entity_table' => "civicrm_financial_item",
+      'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $result['financial_trxn_id'],
       'return' => ['entity_id'],
     ]);
@@ -1357,7 +1357,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $result = $this->callAPISuccessGetSingle('FinancialItem', [
       'id' => $result['entity_id'],
-      'return' => ["financial_account_id.name"],
+      'return' => ['financial_account_id.name'],
     ], $checkAgainst);
   }
 
@@ -1391,7 +1391,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     // Get line item
     $lineItem = $this->callAPISuccessGetSingle('LineItem', [
       'contribution_id' => $contributionId,
-      'return' => ["financial_type_id.name", "line_total"],
+      'return' => ['financial_type_id.name', 'line_total'],
     ]);
 
     $this->assertEquals(
@@ -1411,8 +1411,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $lineItem['id'],
       'sequential' => 1,
       'entity_table' => 'civicrm_line_item',
-      'options' => ['sort' => "id"],
-      'return' => ["financial_account_id.name", "amount", "description"],
+      'options' => ['sort' => 'id'],
+      'return' => ['financial_account_id.name', 'amount', 'description'],
     ]);
 
     $this->assertEquals($financialItems['count'], 3, 'Count mismatch.');
@@ -1443,8 +1443,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     // Check transactions.
     $financialTransactions = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
-      'return' => ["financial_trxn_id"],
-      'entity_table' => "civicrm_contribution",
+      'return' => ['financial_trxn_id'],
+      'entity_table' => 'civicrm_contribution',
       'entity_id' => $contributionId,
       'sequential' => 1,
     ]);

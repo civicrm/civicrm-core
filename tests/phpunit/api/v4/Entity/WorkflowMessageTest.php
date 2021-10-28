@@ -72,8 +72,8 @@ class WorkflowMessageTest extends UnitTestCase {
       ->execute();
     $this->assertTrue($examples->rowCount >= 1);
     foreach ($examples as $example) {
-      $this->assertTrue(!empty($example['data']['modelProps']), sprintf("Example (%s) is tagged phpunit. It should have modelProps.", $example['name']));
-      $this->assertTrue(!empty($example['asserts']['default']), sprintf("Example (%s) is tagged phpunit. It should have assertions.", $example['name']));
+      $this->assertTrue(!empty($example['data']['modelProps']), sprintf('Example (%s) is tagged phpunit. It should have modelProps.', $example['name']));
+      $this->assertTrue(!empty($example['asserts']['default']), sprintf('Example (%s) is tagged phpunit. It should have assertions.', $example['name']));
       $result = \Civi\Api4\WorkflowMessage::render(0)
         ->setWorkflow($example['data']['workflow'])
         ->setValues($example['data']['modelProps'])

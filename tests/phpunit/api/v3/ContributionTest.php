@@ -347,7 +347,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       if ($returnField === 'contribution_contact_id') {
         $returnField = 'contact_id';
       }
-      $this->assertTrue((!empty($contribution[$returnField]) || $contribution[$returnField] === "0"), $returnField);
+      $this->assertTrue((!empty($contribution[$returnField]) || $contribution[$returnField] === '0'), $returnField);
     }
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
       'entity_id' => $contributionID,
@@ -485,7 +485,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
-    $params['custom_' . $ids['custom_field_id']] = "custom string";
+    $params['custom_' . $ids['custom_field_id']] = 'custom string';
 
     $result = $this->callAPIAndDocument($this->entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
@@ -1019,8 +1019,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * This is the test for creating soft credits.
    */
   public function testCreateContributionWithSoftCredit() {
-    $description = "Demonstrates creating contribution with SoftCredit.";
-    $subfile = "ContributionCreateWithSoftCredit";
+    $description = 'Demonstrates creating contribution with SoftCredit.';
+    $subfile = 'ContributionCreateWithSoftCredit';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -1044,8 +1044,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   public function testCreateContributionWithSoftCreditDefaults() {
-    $description = "Demonstrates creating contribution with Soft Credit defaults for amount and type.";
-    $subfile = "ContributionCreateWithSoftCreditDefaults";
+    $description = 'Demonstrates creating contribution with Soft Credit defaults for amount and type.';
+    $subfile = 'ContributionCreateWithSoftCreditDefaults';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -1059,7 +1059,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contact2['id'], $result['values'][0]['soft_credit'][1]['contact_id']);
     // Default soft credit amount = contribution.total_amount
     $this->assertEquals($this->_params['total_amount'], $result['values'][0]['soft_credit'][1]['amount']);
-    $this->assertEquals(CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"), $result['values'][0]['soft_credit'][1]['soft_credit_type']);
+    $this->assertEquals(CRM_Core_OptionGroup::getDefaultValue('soft_credit_type'), $result['values'][0]['soft_credit'][1]['soft_credit_type']);
 
     $this->callAPISuccess('contribution', 'delete', ['id' => $contribution['id']]);
     $this->callAPISuccess('contact', 'delete', ['id' => $contact2['id']]);
@@ -1069,8 +1069,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Test creating contribution with Soft Credit by passing in honor_contact_id.
    */
   public function testCreateContributionWithHonoreeContact() {
-    $description = "Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.";
-    $subfile = "ContributionCreateWithHonoreeContact";
+    $description = 'Demonstrates creating contribution with Soft Credit by passing in honor_contact_id.';
+    $subfile = 'ContributionCreateWithHonoreeContact';
     $contact2 = $this->callAPISuccess('Contact', 'create', [
       'display_name' => 'superman',
       'contact_type' => 'Individual',
@@ -2645,8 +2645,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function contributionStatusProvider() {
     $contributionStatuses = civicrm_api3('OptionValue', 'get', [
-      'return' => ["id", "name"],
-      'option_group_id' => "contribution_status",
+      'return' => ['id', 'name'],
+      'option_group_id' => 'contribution_status',
     ]);
     foreach ($contributionStatuses['values'] as $statusName) {
       $statuses[] = [$statusName];
@@ -3198,7 +3198,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
       'receipt_from_name' => 'Mickey Mouse',
       'receipt_from_email' => 'mickey@mouse.com',
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'NZD',
       'goal_amount' => 50,
@@ -3719,7 +3719,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       // Need to figure out how to stop this some other day
       // We don't care about the Payment Processor because this is Pay Later
       // The point of this test is to check we get the pay_later version of the mail
-      if ($e->getMessage() !== "Undefined variable: CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage") {
+      if ($e->getMessage() !== 'Undefined variable: CRM16923AnUnreliableMethodHasBeenUserToDeterminePaymentProcessorFromContributionPage') {
         throw $e;
       }
     }
@@ -4598,7 +4598,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contributionPage = $this->callAPISuccess('ContributionPage', 'create', array_merge([
       'receipt_from_name' => 'Mickey Mouse',
       'receipt_from_email' => 'mickey@mouse.com',
-      'title' => "Test Contribution Page",
+      'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'CAD',
       'is_monetary' => TRUE,
@@ -4747,7 +4747,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertNotContains('$', $result['values']);
     $result = $this->callAPISuccess('Contribution', 'getoptions', [
       'field' => 'currency',
-      'context' => "abbreviate",
+      'context' => 'abbreviate',
     ]);
     $this->assertEquals('$', $result['values']['USD']);
     $this->assertNotContains('US Dollar', $result['values']);
