@@ -52,7 +52,7 @@
 
       function buildFieldList(search) {
         $scope.fieldList.length = 0;
-        var entity = afGui.getEntity(ctrl.display['saved_search.api_entity']),
+        var entity = afGui.getEntity(ctrl.display['saved_search_id.api_entity']),
           entityCount = {};
         entityCount[entity.entity] = 1;
         $scope.fieldList.push({
@@ -61,7 +61,7 @@
           fields: filterFields(entity.fields)
         });
 
-        _.each(ctrl.display['saved_search.api_params'].join, function(join) {
+        _.each(ctrl.display['saved_search_id.api_params'].join, function(join) {
           var joinInfo = join[0].split(' AS '),
             entity = afGui.getEntity(joinInfo[0]),
             alias = joinInfo[1];

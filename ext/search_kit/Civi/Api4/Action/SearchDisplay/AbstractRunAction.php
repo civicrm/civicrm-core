@@ -85,9 +85,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     elseif (is_null($this->display)) {
       $this->display = SearchDisplay::getDefault(FALSE)
+        ->addSelect('*', 'type:name')
         ->setSavedSearch($this->savedSearch)
         ->execute()->first();
-      $this->display['type:name'] = 'crm-search-display-table';
     }
     // Displays with acl_bypass must be embedded on an afform which the user has access to
     if (

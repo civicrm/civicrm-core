@@ -20,6 +20,8 @@ use Civi\API\Exception\UnauthorizedException;
 class GetDefault extends \Civi\Api4\Generic\AbstractAction {
 
   use SavedSearchInspectorTrait;
+  use \Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
+  use \Civi\Api4\Generic\Traits\SelectParamTrait;
 
   /**
    * Either the name of the savedSearch or an array containing the savedSearch definition (for preview mode)
@@ -43,6 +45,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       throw new UnauthorizedException('Access denied');
     }
     $this->loadSavedSearch();
+    $this->expandSelectClauseWildcards();
     // Use label from saved search
     $label = $this->savedSearch['label'] ?? '';
     // Fall back on entity title as label
@@ -50,13 +53,16 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       $label = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'title_plural');
     }
     $display = [
-      'saved_search_id' => $this->savedSearch['id'] ?? NULL,
+      'id' => NULL,
       'name' => NULL,
+      'saved_search_id' => $this->savedSearch['id'] ?? NULL,
       'label' => $label,
       'type' => 'table',
+      'type:label' => E::ts('Table'),
+      'type:name' => 'crm-search-display-table',
+      'type:icon' => 'fa-table',
       'acl_bypass' => FALSE,
       'settings' => [
-        'button' => E::ts('Search'),
         'actions' => TRUE,
         'limit' => \Civi::settings()->get('default_pager_size'),
         'classes' => ['table', 'table-striped'],
@@ -67,6 +73,10 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
         'columns' => [],
       ],
     ];
+    // Allow implicit-join-style selection of saved search fields
+    foreach ($this->savedSearch as $key => $val) {
+      $display['saved_search_id.' . $key] = $val;
+    }
     foreach ($this->getSelectClause() as $key => $clause) {
       $display['settings']['columns'][] = $this->configureColumn($clause, $key);
     }
@@ -79,7 +89,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'alignment' => 'text-right',
       'links' => $this->getLinksMenu(),
     ];
-    $result[] = $display;
+    $result->exchangeArray($this->selectArray([$display]));
   }
 
   /**

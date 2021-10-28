@@ -37,7 +37,6 @@
         ctrl = this,
         afforms;
 
-      this.afformPath = CRM.url('civicrm/admin/afform');
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
 
@@ -300,16 +299,6 @@
         if (_.findIndex(ctrl.display.settings[name], value) < 0) {
           ctrl.display.settings[name].push(value);
         }
-      };
-
-      // @return {Array}
-      this.getAfforms = function() {
-        if (ctrl.display.name && ctrl.crmSearchAdmin.afforms) {
-          if (!afforms || (ctrl.crmSearchAdmin.afforms[ctrl.display.name] && afforms !== ctrl.crmSearchAdmin.afforms[ctrl.display.name])) {
-            afforms = ctrl.crmSearchAdmin.afforms[ctrl.display.name] || [];
-          }
-        }
-        return afforms;
       };
 
       $scope.$watch('$ctrl.display.settings', function() {

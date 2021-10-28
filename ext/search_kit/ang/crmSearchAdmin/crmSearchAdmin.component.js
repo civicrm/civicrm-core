@@ -16,6 +16,8 @@
       this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
       this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
       this.displayTypes = _.indexBy(CRM.crmSearchAdmin.displayTypes, 'id');
+      this.searchDisplayPath = CRM.url('civicrm/search');
+      this.afformPath = CRM.url('civicrm/admin/afform');
 
       $scope.controls = {tab: 'compose', joinType: 'LEFT'};
       $scope.joinTypes = [
@@ -156,10 +158,13 @@
           }
           if (display.trashed && afformLoad) {
             afformLoad.then(function() {
-              if (ctrl.afforms[display.name]) {
-                var msg = ctrl.afforms[display.name].length === 1 ?
-                  ts('Form "%1" will be deleted if the embedded display "%2" is deleted.', {1: ctrl.afforms[display.name][0].title, 2: display.label}) :
-                  ts('%1 forms will be deleted if the embedded display "%2" is deleted.', {1: ctrl.afforms[display.name].length, 2: display.label});
+              var displayForms = _.filter(ctrl.afforms, function(form) {
+                return _.includes(form.displays, ctrl.savedSearch.name + '.' + display.name);
+              });
+              if (displayForms.length) {
+                var msg = displayForms.length === 1 ?
+                  ts('Form "%1" will be deleted if the embedded display "%2" is deleted.', {1: displayForms[0].title, 2: display.label}) :
+                  ts('%1 forms will be deleted if the embedded display "%2" is deleted.', {1: displayForms.length, 2: display.label});
                 CRM.alert(msg, ts('Display embedded'), 'alert');
               }
             });
@@ -679,6 +684,7 @@
       };
 
       function loadAfforms() {
+        ctrl.afforms = null;
         if (ctrl.afformEnabled && ctrl.savedSearch.id) {
           var findDisplays = _.transform(ctrl.savedSearch.displays, function(findDisplays, display) {
             if (display.id && display.name) {
@@ -689,22 +695,20 @@
             select: ['name', 'title', 'search_displays'],
             where: [['OR', findDisplays]]
           }).then(function(afforms) {
-            ctrl.afforms = {};
+            ctrl.afforms = [];
             _.each(afforms, function(afform) {
-              _.each(_.uniq(afform.search_displays), function(searchNameDisplayName) {
-                var displayName = searchNameDisplayName.split('.')[1] || '';
-                ctrl.afforms[displayName] = ctrl.afforms[displayName] || [];
-                ctrl.afforms[displayName].push({
-                  title: afform.title,
-                  link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
-                });
+              ctrl.afforms.push({
+                title: afform.title,
+                displays: afform.search_displays,
+                link: ctrl.afformAdminEnabled ? CRM.url('civicrm/admin/afform#/edit/' + afform.name) : '',
               });
             });
+            ctrl.afformCount = ctrl.afforms.length;
           });
         }
       }
 
-      // Creating an Afform opens a new tab, so when switching back to this tab, re-check for Afforms
+      // Creating an Afform opens a new tab, so when switching back after > 10 sec, re-check for Afforms
       $(window).on('focus', _.debounce(function() {
         $scope.$apply(loadAfforms);
       }, 10000, {leading: true, trailing: false}));

@@ -75,7 +75,7 @@
       <td>{{:: afform.placement.join(', ') }}</td>
       <td class="text-right">
         <a ng-if="afform.type !== 'system'" href="#/edit/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Edit') }}</a>
-        <a ng-if="afform.type !== 'system'" href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-primary">{{:: ts('Clone') }}</a>
+        <a ng-if="afform.type !== 'system'" href="#/clone/{{:: afform.name }}" class="btn btn-xs btn-secondary">{{:: ts('Clone') }}</a>
         <a href ng-if="afform.has_local" class="btn btn-xs btn-danger" crm-confirm="{type: afform.has_base ? 'revert' : 'delete', obj: afform}" on-yes="$ctrl.revert(afform)">
           {{ afform.has_base ? ts('Revert') : ts('Delete') }}
         </a>

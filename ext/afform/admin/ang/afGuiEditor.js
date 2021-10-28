@@ -118,7 +118,7 @@
             );
           }
           _.each(data.search_displays, function(display) {
-            CRM.afGuiEditor.searchDisplays[display['saved_search.name'] + '.' + display.name] = display;
+            CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });
         },
 
@@ -131,6 +131,10 @@
         getField: function(entityName, fieldName) {
           var fields = CRM.afGuiEditor.entities[entityName].fields;
           return fields[fieldName] || fields[fieldName.substr(fieldName.indexOf('.') + 1)];
+        },
+
+        getSearchDisplay: function(searchName, displayName) {
+          return CRM.afGuiEditor.searchDisplays[searchName + (displayName ? '.' + displayName : '')];
         },
 
         // Recursively searches a collection and its children using _.filter

@@ -18,6 +18,8 @@
       function buildSettings() {
         ctrl.apiEntity = ctrl.search.api_entity;
         ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
+        ctrl.settings.button = ts('Search');
+        // The default-display settings contain just one column (the last one, with the links menu)
         ctrl.settings.columns = _.transform(ctrl.search.api_params.select, function(columns, fieldExpr) {
           columns.push(searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
         }).concat(ctrl.settings.columns);
