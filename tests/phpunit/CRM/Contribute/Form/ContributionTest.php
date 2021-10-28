@@ -719,8 +719,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   /**
    * Test that a contribution is assigned against a pledge.
    */
-  public function testUpdatePledge() {
-    $pledge = $this->callAPISuccess('pledge', 'create', [
+  public function testUpdatePledge(): void {
+    $pledge = $this->callAPISuccess('Pledge', 'create', [
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
@@ -739,38 +739,37 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'options' => ['limit' => 1],
       'return' => 'id',
     ]);
-    $form = new CRM_Contribute_Form_Contribution();
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'pledge_payment_id' => $pledgePaymentID,
       'contribution_status_id' => 1,
-    ], CRM_Core_Action::ADD);
+    ]);
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'getsingle', ['id' => $pledgePaymentID]);
     $this->assertNotEmpty($pledgePayment['contribution_id']);
-    $this->assertEquals($pledgePayment['actual_amount'], 50);
+    $this->assertEquals(50, $pledgePayment['actual_amount']);
     $this->assertEquals(1, $pledgePayment['status_id']);
   }
 
   /**
    * Test functions involving premiums.
    */
-  public function testPremiumUpdate() {
-    $form = new CRM_Contribute_Form_Contribution();
+  public function testPremiumUpdate(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'product_name' => [$this->products[0]['id'], 1],
       'fulfilled_date' => '',
       'is_email_receipt' => TRUE,
       'from_email_address' => 'test@test.com',
-    ], CRM_Core_Action::ADD);
+      'hidden_Premium' => 1,
+    ]);
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $mut->checkMailLog([
@@ -784,14 +783,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
   /**
    * Test functions involving premiums.
    */
-  public function testPremiumUpdateCreditCard() {
-    $form = new CRM_Contribute_Form_Contribution();
+  public function testPremiumUpdateCreditCard(): void {
     $mut = new CiviMailUtils($this, TRUE);
-    $form->testSubmit([
+    $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => 1,
       'contact_id' => $this->_individualId,
-      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'product_name' => [$this->products[0]['id'], 1],
       'fulfilled_date' => '',
@@ -800,7 +798,8 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => ['M' => 5, 'Y' => 2026],
       'credit_card_number' => '411111111111111',
-    ], CRM_Core_Action::ADD, 'live');
+      'hidden_Premium' => 1,
+    ], NULL, 'live');
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', []);
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $mut->checkMailLog([
@@ -2196,10 +2195,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
    * @param array $formValues
    * @param int|null $contributionID
    */
-  protected function submitContributionForm(array $formValues, ?int $contributionID = NULL): void {
+  protected function submitContributionForm(array $formValues, ?int $contributionID = NULL, $cardMode = NULL): void {
     if ($contributionID) {
       $_REQUEST['action'] = 'update';
       $_REQUEST['id'] = $contributionID;
+    }
+    if ($cardMode) {
+      $_REQUEST['mode'] = $cardMode;
     }
     $form = $this->getContributionForm($formValues);
     $form->postProcess();
