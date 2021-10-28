@@ -120,10 +120,6 @@
         return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
       };
 
-      this.getEntities = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
-      };
-
       function buildDisplaySettings() {
         ctrl.display = {
           type: 'table',
