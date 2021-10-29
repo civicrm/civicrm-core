@@ -157,33 +157,6 @@ AND (
   }
 
   /**
-   * Store values into the group contact cache.
-   *
-   * @todo review use of INSERT IGNORE. This function appears to be slower that inserting
-   * with a left join. Also, 200 at once seems too little.
-   *
-   * @param array $groupID
-   * @param array $values
-   */
-  protected static function store($groupID, &$values) {
-    $processed = FALSE;
-
-    // sort the values so we put group IDs in front and hence optimize
-    // mysql storage (or so we think) CRM-9493
-    sort($values);
-
-    // to avoid long strings, lets do BULK_INSERT_COUNT values at a time
-    while (!empty($values)) {
-      $processed = TRUE;
-      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str = implode(',', $input);
-      $sql = "INSERT IGNORE INTO civicrm_group_contact_cache (group_id,contact_id) VALUES $str;";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-    self::updateCacheTime($groupID, $processed);
-  }
-
-  /**
    * Change the cache_date.
    *
    * @param array $groupID
