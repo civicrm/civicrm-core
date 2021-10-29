@@ -10,7 +10,7 @@
 -- {$generated}
 --{if $database.comment} {$database.comment}{/if}
 
-{include file="drop.tpl" no_license=TRUE}
+{include file="drop.tpl" isOutputLicense=false}
 
 -- /*******************************************************
 -- *
