@@ -88,7 +88,7 @@
           </td>
           <td class="crm-contribution-soft_credit_type">{$row.contribution_soft_credit_type}</td>
         {/if}
-        <td>{$row.action|replace:'xx':$row.contribution_id}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.contribution_id}</td>
       </tr>
     {/foreach}
 

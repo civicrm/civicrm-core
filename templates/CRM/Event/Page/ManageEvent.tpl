@@ -122,7 +122,7 @@
               {$row.eventlinks|replace:'xx':$row.id}
             </div>
             <div class="crm-event-more">
-              {$row.action|replace:'xx':$row.id}
+              {$row.action|smarty:nodefaults|replace:'xx':$row.id}
             </div>
           </td>
           <td class="crm-event-start_date hiddenElement">{$row.start_date|crmDate}</td>

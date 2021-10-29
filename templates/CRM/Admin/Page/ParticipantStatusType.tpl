@@ -38,7 +38,7 @@
           <td class="center crmf-is_counted">{icon condition=$row.is_counted}{ts}Counted{/ts}{/icon}</td>
           <td class="crmf-weight">{$row.weight}</td>
           <td class="crmf-visibility">{$row.visibility}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
       {/foreach}
     </table>

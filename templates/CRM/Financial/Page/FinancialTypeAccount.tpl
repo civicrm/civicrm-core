@@ -40,7 +40,7 @@
           <td>{$row.financial_account_type}{if $row.account_type_code} ({$row.account_type_code}){/if}</td>
           <td>{$row.owned_by}</td>
           <td id="row_{$row.id}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
       </table>

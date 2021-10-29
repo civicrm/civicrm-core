@@ -45,7 +45,7 @@
             <td class="crm-editable" data-type="boolean" data-field="is_required">{if !empty($row.is_required)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td class="crm-editable" data-type="boolean" data-field="is_searchable">{if !empty($row.is_searchable)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
             <td>{if !empty($row.is_active)} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-            <td>{$row.action|replace:'xx':$row.id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </tbody>

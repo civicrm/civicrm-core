@@ -48,7 +48,7 @@
           <td>{if !empty($row.extends_entity_column_value)}{$row.extends_entity_column_value}{/if}</td>
           <td class="nowrap">{$row.weight}</td>
           <td>{$row.style_display}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </tbody>

@@ -38,7 +38,7 @@
               <tr class="{cycle values="odd-row,even-row"}">
                 <td>{$row.title}</td>
                 <td>{$row.used_display}</td>
-                <td>{$row.action|replace:'xx':$row.id}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
               </tr>
             {/foreach}
           </table>

@@ -55,7 +55,7 @@
             <td>{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
             <td class="right">{$row.pledge_next_pay_amount|crmMoney:$row.pledge_currency}</td>
             <td>{$row.pledge_status}</td>
-            <td>{$row.action|replace:'xx':$row.pledge_id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.pledge_id}</td>
         </tr>
     {/foreach}
 

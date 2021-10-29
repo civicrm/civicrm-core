@@ -48,7 +48,7 @@
           <td class="crmf-is_admin crm-editable" data-type="boolean">{if $row.is_admin eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td class="nowrap crmf-weight">{$row.weight}</td>
           <td class="crmf-is_reserved">{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-          <td>{if !empty($row.action)}{$row.action|replace:'xx':$row.id}{/if}</td>
+          <td>{if !empty($row.action)}{$row.action|smarty:nodefaults|replace:'xx':$row.id}{/if}</td>
         </tr>
         {/foreach}
         </table>

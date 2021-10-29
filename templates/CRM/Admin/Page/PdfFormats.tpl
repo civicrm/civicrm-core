@@ -52,7 +52,7 @@
             <td class="crm-pdfFormat-description">{$row.description}</td>
             <td class="crm-pdfFormat-is_default">{icon condition=$row.is_default}{ts}Default{/ts}{/icon}&nbsp;</td>
           <td class="crm-pdfFormat-order nowrap">{$row.weight}</td>
-          <td>{$row.action|replace:'xx':$row.id}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
         </tr>
         {/foreach}
         </table>

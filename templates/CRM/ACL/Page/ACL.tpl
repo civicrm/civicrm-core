@@ -42,7 +42,7 @@
                 <td class="crm-acl-object" >{$row.object}</td>
                 <td class="crm-acl-name crm-editable" data-field="name">{$row.name}</td>
                 <td class="crm-acl-is_active" id="row_{$aclID}_status">{if $row.is_active eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-                <td>{$row.action|replace:'xx':$aclID}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$aclID}</td>
               </tr>
             {/foreach}
             </tbody>

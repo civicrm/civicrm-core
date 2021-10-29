@@ -63,7 +63,7 @@
               </td>
                {/if}
             {/foreach}
-            <td>{$row.action|replace:'xx':$row.contact_id}</td>
+            <td>{$row.action|smarty:nodefaults|replace:'xx':$row.contact_id}</td>
         </tr>
      {/foreach}
   {else}
@@ -118,7 +118,7 @@
                 {/if}
               {/foreach}
             {/if}
-            <td style='width:125px;'>{$row.action|replace:'xx':$row.contact_id}</td>
+            <td style='width:125px;'>{$row.action|smarty:nodefaults|replace:'xx':$row.contact_id}</td>
          </tr>
     {/foreach}
   {/if}

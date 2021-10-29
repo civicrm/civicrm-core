@@ -59,7 +59,7 @@
       {/if}
     </td>
     <td>
-        {$row.action|replace:'xx':$row.membership_id}
+        {$row.action|smarty:nodefaults|replace:'xx':$row.membership_id}
         {if $row.owner_membership_id}
             <a href="{crmURL p='civicrm/membership/view' q="reset=1&id=`$row.owner_membership_id`&action=view&context=search"}" title="{ts}View Primary member record{/ts}" class="action-item">{ts}View Primary{/ts}</a>
         {/if}

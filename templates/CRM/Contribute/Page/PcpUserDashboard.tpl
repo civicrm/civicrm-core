@@ -31,7 +31,7 @@
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
         <td>{$row.pcpStatus}</td>
         {if empty($userChecksum)}
-          <td>{$row.action|replace:'xx':$row.pcpId}</td>
+          <td>{$row.action|smarty:nodefaults|replace:'xx':$row.pcpId}</td>
         {/if}
   </tr>
   {/foreach}
@@ -66,7 +66,7 @@
   <tr class="{cycle values="odd-row,even-row"}">
     <td>{if $row.component eq 'contribute'}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$row.pageId`&reset=1"}" title="{ts}View campaign page{/ts}">{else}<a href="{crmURL p='civicrm/event/register' q="id=`$row.pageId`&reset=1"}" title="{ts}View campaign page{/ts}">{/if}{$row.pageTitle}</a></td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
-    <td>{$row.action|replace:'xx':$row.pageId}</td>
+    <td>{$row.action|smarty:nodefaults|replace:'xx':$row.pageId}</td>
   </tr>
   {/foreach}
 </table>

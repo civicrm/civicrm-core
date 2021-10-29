@@ -29,7 +29,7 @@
         <td>{$row.installments}</td>
         <td>{$row.payment_processor}</td>
         <td>{$row.contribution_status}</td>
-        <td>{$row.action|replace:'xx':$row.recurId}</td>
+        <td>{$row.action|smarty:nodefaults|replace:'xx':$row.recurId}</td>
       </tr>
     {/foreach}
   </table>

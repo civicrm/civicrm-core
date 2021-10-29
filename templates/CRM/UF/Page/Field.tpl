@@ -53,7 +53,7 @@
                 <td class="crm-editable crmf-is_required" data-type="boolean">{if $row.is_required eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td class="crm-editable crmf-is_view" data-type="boolean">{if $row.is_view eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
                 <td>{if $row.is_reserved     eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
-                <td>{$row.action|replace:'xx':$row.id}</td>
+                <td>{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
             </tr>
             {/foreach}
         </table>

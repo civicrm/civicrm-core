@@ -45,7 +45,7 @@
     <td>{$row.mailing_subject}</td>
     <td>{$row.mailing_job_status}</td>
     <td class="crm-mailing-end_date">{$row.mailing_job_end_date|crmDate}</td>
-    <td>{$row.action|replace:'xx':$row.contact_id}</td>
+    <td>{$row.action|smarty:nodefaults|replace:'xx':$row.contact_id}</td>
   </tr>
   {/foreach}
 </table>

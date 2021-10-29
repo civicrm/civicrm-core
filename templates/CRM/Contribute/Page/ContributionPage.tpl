@@ -72,7 +72,7 @@
         {/if}
 
         <div class="crm-contribution-page-more">
-                    {$row.action|replace:'xx':$row.id}
+                    {$row.action|smarty:nodefaults|replace:'xx':$row.id}
             </div>
 
       </td>
