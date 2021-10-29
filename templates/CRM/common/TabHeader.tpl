@@ -13,12 +13,12 @@
     <div id="mainTabContainer">
     <ul>
        {foreach from=$tabHeader key=tabName item=tabValue}
-          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if isset($tabValue.class)} {$tabValue.class}{/if}" {if isset($tabValue.extra)}{$tabValue.extra}{/if}>
+          <li id="tab_{$tabName}" class="crm-tab-button ui-corner-all{if !$tabValue.valid} disabled{/if}{if !empty($tabValue.class)} {$tabValue.class}{/if}" {if !empty($tabValue.extra)}{$tabValue.extra}{/if}>
           {if $tabValue.active}
              <a href="{if !empty($tabValue.template)}#panel_{$tabName}{else}{$tabValue.link}{/if}" title="{$tabValue.title|escape}{if !$tabValue.valid} ({ts}disabled{/ts}){/if}">
                {if !empty($tabValue.icon)}<i class="{$tabValue.icon}"></i>{/if}
                <span>{$tabValue.title}</span>
-               {if isset($tabValue.count)}<em>{$tabValue.count}</em>{/if}
+               {if isset($tabValue.count|smarty:nodefaults)}<em>{$tabValue.count}</em>{/if}
              </a>
           {else}
              <span {if !$tabValue.valid} title="{ts}disabled{/ts}"{/if}>{$tabValue.title}</span>
