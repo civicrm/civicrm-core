@@ -20,12 +20,20 @@
  */
 class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
+  protected $expectedTemplateVariables = [
+    'breadcrumb',
+    'groupOrganizationUrl',
+    'hookContentPlacement',
+    'hookContent',
+  ];
+
   /**
    * Heart of the viewing process.
    *
    * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
    */
   public function preProcess() {
+    CRM_Core_Smarty::singleton()->ensureVariablesAreAssigned($this->expectedTemplateVariables);
     parent::preProcess();
 
     // actions buttom contextMenu
