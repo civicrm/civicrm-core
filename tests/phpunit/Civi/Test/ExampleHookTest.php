@@ -82,6 +82,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   public function testPageOutput() {
+    \CRM_Core_Smarty::singleton()->assign('urlIsPublic', FALSE);
     ob_start();
     $p = new Main();
     $p->run();
