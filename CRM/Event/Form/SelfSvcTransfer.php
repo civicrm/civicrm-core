@@ -458,23 +458,13 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     //get the location info
     $locParams = ['entity_id' => $this->_event_id, 'entity_table' => 'civicrm_event'];
     $eventDetails[$this->_event_id]['location'] = CRM_Core_BAO_Location::getValues($locParams, TRUE);
-    //get contact details
-    $contactIds[$this->_from_contact_id] = $this->_from_contact_id;
-    list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-      FALSE, FALSE, NULL, [],
-      'CRM_Event_BAO_Participant'
-    );
-    foreach ($currentContactDetails as $contactId => $contactValues) {
-      $contactDetails[$this->_from_contact_id] = $contactValues;
-    }
     //send a 'cancelled' email to user, and cc the event's cc_confirm email
-    $mail = CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
+    CRM_Event_BAO_Participant::sendTransitionParticipantMail($this->_from_participant_id,
       $participantDetails[$this->_from_participant_id],
       $eventDetails[$this->_event_id],
-      $contactDetails[$this->_from_contact_id],
+      NULL,
       $domainValues,
-      "Transferred",
-      ""
+      'Transferred'
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
     $statusMsg .= ' ' . ts('A cancellation email has been sent to %1.', [1 => $this->_contact_email]);
