@@ -32,7 +32,7 @@ CREATE TABLE `{$table.name}` ({assign var='first' value=true}
 {foreach from=$table.fields item=field}
 {if ! $first},{/if}{assign var='first' value=false}
 
-  `{$field.name}` {$field.sqlType}{if $field.collate} COLLATE {$field.collate}{/if}{if $field.required} {if $field.required == "false"}NULL{else}NOT NULL{/if}{/if}{if isset($field.autoincrement)} AUTO_INCREMENT{/if}{if $field.default|count_characters} DEFAULT {$field.default}{/if}{if $field.comment} COMMENT '{ts escape=sql}{$field.comment}{/ts}'{/if}
+  `{$field.name}` {$field.sqlType}{if $field.collate} COLLATE {$field.collate}{/if}{if $field.required} {if $field.required == "false"}NULL{else}NOT NULL{/if}{/if}{if !empty($field.autoincrement)} AUTO_INCREMENT{/if}{if $field.default|count_characters} DEFAULT {$field.default}{/if}{if $field.comment} COMMENT '{ts escape=sql}{$field.comment}{/ts}'{/if}
 {/foreach}{* table.fields *}{strip}
 
 {/strip}{if $table.primaryKey}{if !$first},
@@ -40,7 +40,7 @@ CREATE TABLE `{$table.name}` ({assign var='first' value=true}
   PRIMARY KEY ({foreach from=$table.primaryKey.field item=fieldName}{if $firstIndexField}{assign var='firstIndexField' value=false}{else},{/if}`{$fieldName}`{/foreach}){/if}{* table.primaryKey *}
 {if !empty($table.index)}{foreach from=$table.index item=index}{if !$first},
 {/if}{assign var='first' value=false}
-  {if isset($index.unique)}UNIQUE {/if}INDEX `{$index.name}`({assign var='firstIndexField' value=true}{foreach from=$index.field item=fieldName}{strip}
+  {if !empty($index.unique)}UNIQUE {/if}INDEX `{$index.name}`({assign var='firstIndexField' value=true}{foreach from=$index.field item=fieldName}{strip}
 {/strip}{if $firstIndexField}{assign var='firstIndexField' value=false}{else}, {/if}{$fieldName}{/foreach}){/foreach}{* table.index *}
 {/if}{* table.index *}
 {if !empty($table.foreignKey)}
