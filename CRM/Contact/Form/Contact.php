@@ -333,7 +333,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         if ($groupCount > 1) {
           $this->set('groupID', $groupID);
           //loop the group
-          for ($i = 0; $i <= $groupCount; $i++) {
+          for ($i = 1; $i <= $groupCount; $i++) {
             CRM_Custom_Form_CustomData::preProcess($this, NULL, $contactSubType,
               $i, $this->_contactType, $this->_contactId
             );
