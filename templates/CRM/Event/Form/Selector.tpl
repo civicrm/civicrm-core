@@ -66,7 +66,7 @@
    </td>
     <td class="crm-participant-participant_status crm-participant_status_{$row.participant_status_id}">{$row.participant_status}</td>
     <td class="crm-participant-participant_role">{$row.participant_role_id}</td>
-    <td>{$row.action|replace:'xx':$participant_id}</td>
+    <td>{$row.action|smarty:nodefaults|replace:'xx':$participant_id}</td>
    </tr>
   {/foreach}
 {* Link to "View all participants" for Dashboard and Contact Summary *}
