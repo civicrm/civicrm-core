@@ -298,7 +298,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
       }
     }
 
-    $errorText = "Incorrect messages: " . print_r([
+    $errorText = 'Incorrect messages: ' . print_r([
       'actualMessages' => $actualMessages,
       'expectMessages' => $expectMessages,
     ], 1);

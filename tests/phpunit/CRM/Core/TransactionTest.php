@@ -305,7 +305,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
         $test->assertContactsExistByOffset([0 => TRUE]);
-        throw new Exception("Ruh-roh");
+        throw new Exception('Ruh-roh');
       });
     }
     catch (Exception $ex) {

@@ -65,7 +65,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
         'activity_type_id' => 'Phone Call',
         'subject' => $subject,
       ]);
-      $case = $this->callAPISuccessGetSingle('Activity', ['return' => ["case_id"], 'id' => $activity['id']]);
+      $case = $this->callAPISuccessGetSingle('Activity', ['return' => ['case_id'], 'id' => $activity['id']]);
       //Check if case id is present for the activity.
       $this->assertEquals($this->_case['id'], $case['case_id'][0]);
     }

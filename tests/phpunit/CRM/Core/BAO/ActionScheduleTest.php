@@ -998,7 +998,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'subject' => 'Phone call',
       'details' => 'A phone call about a bear',
     ];
-    $activityTokensExpected = "Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM";
+    $activityTokensExpected = 'Phone call;;A phone call about a bear;;June 15th, 2012 10:00 AM';
     $cases[4] = [
       // Schedule definition.
       [
