@@ -13,7 +13,7 @@
 {if $overlayProfile }
     {foreach from=$profileGroups item=group}
         <div class="crm-summary-group">
-           {$group.content}
+           {$group.content|smarty:nodefaults}
         </div>
     {/foreach}
 {else}

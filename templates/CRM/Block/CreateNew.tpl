@@ -28,12 +28,13 @@
     <div id="crm-create-new-list">
       <div class="crm-create-new-list-inner">
       <ul>
+
         {foreach from=$shortCuts item=short}
-          <li><a href="{$short.url}" class="crm-{$short.ref}">{$short.title}</a>
+          <li><a href="{$short.url}" class="crm-{$short.ref}">{$short.title|smarty:nodefaults}</a>
             {if $short.shortCuts}
               <ul>
                 {foreach from=$short.shortCuts item=shortCut}
-                  <li><a href="{$shortCut.url}" class="crm-{$shortCut.ref}">{$shortCut.title}</a></li>
+                  <li><a href="{$shortCut.url}" class="crm-{$shortCut.ref}">{$shortCut.title|smarty:nodefaults}</a></li>
                 {/foreach}
               </ul>
             {/if}
