@@ -41,6 +41,25 @@ class CRM_Extension_Browser {
   const CHECK_TIMEOUT = 5;
 
   /**
+   * @var GuzzleHttp\Client
+   */
+  protected $guzzleClient;
+
+  /**
+   * @return \GuzzleHttp\Client
+   */
+  public function getGuzzleClient(): \GuzzleHttp\Client {
+    return $this->guzzleClient ?? new \GuzzleHttp\Client();
+  }
+
+  /**
+   * @param \GuzzleHttp\Client $guzzleClient
+   */
+  public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient) {
+    $this->guzzleClient = $guzzleClient;
+  }
+
+  /**
    * @param string $repoUrl
    *   URL of the remote repository.
    * @param string $indexPath
@@ -230,7 +249,7 @@ class CRM_Extension_Browser {
     $filename = $this->cacheDir . DIRECTORY_SEPARATOR . self::CACHE_JSON_FILE . '.' . md5($this->getRepositoryUrl());
     $url = $this->getRepositoryUrl() . $this->indexPath;
 
-    $client = new GuzzleHttp\Client();
+    $client = $this->getGuzzleClient();
     $response = $client->request('GET', $url, ['sink' => $filename, 'timeout' => \Civi::settings()->get('http_timeout')]);
     restore_error_handler();
 
