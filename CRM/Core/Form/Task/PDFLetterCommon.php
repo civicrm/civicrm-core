@@ -236,16 +236,16 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       $errors['saveTemplateName'] = ts("Enter name to save message template");
     }
     if (!is_numeric($fields['margin_left'])) {
-      $errors['margin_left'] = 'Margin must be numeric';
+      $errors['margin_left'] = ts('Margin must be numeric');
     }
     if (!is_numeric($fields['margin_right'])) {
-      $errors['margin_right'] = 'Margin must be numeric';
+      $errors['margin_right'] = ts('Margin must be numeric');
     }
     if (!is_numeric($fields['margin_top'])) {
-      $errors['margin_top'] = 'Margin must be numeric';
+      $errors['margin_top'] = ts('Margin must be numeric');
     }
     if (!is_numeric($fields['margin_bottom'])) {
-      $errors['margin_bottom'] = 'Margin must be numeric';
+      $errors['margin_bottom'] = ts('Margin must be numeric');
     }
     return empty($errors) ? TRUE : $errors;
   }

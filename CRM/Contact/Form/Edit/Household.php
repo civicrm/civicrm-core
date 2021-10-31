@@ -73,7 +73,7 @@ class CRM_Contact_Form_Edit_Household {
 
     // make sure that household name is set
     if (empty($fields['household_name'])) {
-      $errors['household_name'] = 'Household Name should be set.';
+      $errors['household_name'] = ts('Household Name should be set.');
     }
 
     return empty($errors) ? TRUE : $errors;
