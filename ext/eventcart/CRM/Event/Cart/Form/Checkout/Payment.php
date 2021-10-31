@@ -194,7 +194,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     ];
 
     if ($this->total) {
-      $this->add('text', 'billing_contact_email', 'Billing Email', '', TRUE);
+      $this->add('text', 'billing_contact_email', ts('Billing Email'), '', TRUE);
       $this->assign('collect_billing_email', TRUE);
     }
 
