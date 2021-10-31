@@ -37,7 +37,7 @@
   $.fn.select2.defaults.formatLoadMore = "{ts escape='js'}Loading...{/ts}";
   $.fn.select2.defaults.formatSearching = "{ts escape='js'}Searching...{/ts}";
   $.fn.select2.defaults.formatInputTooShort = function() {ldelim}
-    return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch} : {$otherSearch};
+    return ($(this).data('api-entity') === 'contact' || $(this).data('api-entity') === 'Contact') ? {$contactSearch|smarty:nodefaults} : {$otherSearch|smarty:nodefaults};
   {rdelim};
 
   // Localize jQuery UI
