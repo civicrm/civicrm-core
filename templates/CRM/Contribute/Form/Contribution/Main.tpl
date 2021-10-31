@@ -57,7 +57,7 @@
   {/if}
   {include file="CRM/common/TrackingFields.tpl"}
 
-  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block">
+  <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-main-form-block" data-page-id="{$contributionPageID}" data-page-template="main">
 
     {crmRegion name='contribution-main-not-you-block'}
     {if $contact_id && !$ccid}
