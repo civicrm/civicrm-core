@@ -21,7 +21,7 @@
         {name: 'table-striped', label: ts('Even/Odd Stripes')}
       ];
 
-      // Check if array conatains item
+      // Check if array contains item
       this.includes = _.includes;
 
       // Add or remove an item from an array

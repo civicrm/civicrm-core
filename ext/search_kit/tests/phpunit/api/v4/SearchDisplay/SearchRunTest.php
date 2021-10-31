@@ -4,6 +4,7 @@ namespace api\v4\SearchDisplay;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\Email;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\UFMatch;
@@ -570,8 +571,141 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     // Same seed, same order every time
     for ($i = 0; $i <= 9; ++$i) {
       $repeat = civicrm_api4('SearchDisplay', 'run', $params);
-      $this->assertEquals($seeded->column('id'), $repeat->column('id'));
+      $this->assertEquals($seeded->column('data'), $repeat->column('data'));
     }
+  }
+
+  /**
+   * Test conditional styles
+   */
+  public function testCssRules() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleContacts = [
+      ['first_name' => 'Zero', 'last_name' => $lastName, 'is_deceased' => TRUE],
+      ['first_name' => 'One', 'last_name' => $lastName],
+      ['first_name' => 'Two', 'last_name' => $lastName],
+      ['first_name' => 'Three', 'last_name' => $lastName],
+    ];
+    $contacts = Contact::save(FALSE)->setRecords($sampleContacts)->execute();
+    $sampleEmails = [
+      ['contact_id' => $contacts[0]['id'], 'email' => 'abc@123', 'on_hold' => 1],
+      ['contact_id' => $contacts[0]['id'], 'email' => 'def@123', 'on_hold' => 0],
+      ['contact_id' => $contacts[1]['id'], 'email' => 'ghi@123', 'on_hold' => 0],
+      ['contact_id' => $contacts[2]['id'], 'email' => 'jkl@123', 'on_hold' => 2],
+    ];
+    Email::save(FALSE)->setRecords($sampleEmails)->execute();
+
+    $search = [
+      'name' => 'Test',
+      'label' => 'Test Me',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'display_name',
+          'GROUP_CONCAT(DISTINCT Contact_Email_contact_id_01.email) AS GROUP_CONCAT_Contact_Email_contact_id_01_email',
+        ],
+        'where' => [['last_name', '=', $lastName]],
+        'groupBy' => ['id'],
+        'join' => [
+          [
+            'Email AS Contact_Email_contact_id_01',
+            'LEFT',
+            ['id', '=', 'Contact_Email_contact_id_01.contact_id'],
+          ],
+        ],
+        'having' => [],
+      ],
+      'acl_bypass' => FALSE,
+    ];
+
+    $display = [
+      'type' => 'table',
+      'settings' => [
+        'actions' => TRUE,
+        'limit' => 50,
+        'classes' => ['table', 'table-striped'],
+        'pager' => [
+          'show_count' => TRUE,
+          'expose_limit' => TRUE,
+        ],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'dataType' => 'Integer',
+            'label' => 'Contact ID',
+            'sortable' => TRUE,
+            'alignment' => 'text-center',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'display_name',
+            'dataType' => 'String',
+            'label' => 'Display Name',
+            'sortable' => TRUE,
+            'link' => [
+              'entity' => 'Contact',
+              'action' => 'view',
+              'target' => '_blank',
+            ],
+            'title' => 'View Contact',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'GROUP_CONCAT_Contact_Email_contact_id_01_email',
+            'dataType' => 'String',
+            'label' => '(List) Contact Emails: Email',
+            'sortable' => TRUE,
+            'alignment' => 'text-right',
+            'cssRules' => [
+              [
+                'bg-danger',
+                'Contact_Email_contact_id_01.on_hold:name',
+                '=',
+                'On Hold Bounce',
+              ],
+              [
+                'bg-warning',
+                'Contact_Email_contact_id_01.on_hold:name',
+                '=',
+                'On Hold Opt Out',
+              ],
+            ],
+            'rewrite' => '',
+            'title' => NULL,
+          ],
+        ],
+        'cssRules' => [
+          ['strikethrough', 'is_deceased', '=', TRUE],
+        ],
+      ],
+    ];
+
+    $result = SearchDisplay::Run(FALSE)
+      ->setSavedSearch($search)
+      ->setDisplay($display)
+      ->setReturn('page:1')
+      ->setSort([['id', 'ASC']])
+      ->execute();
+
+    // Non-conditional style rule
+    $this->assertEquals('text-center', $result[0]['columns'][0]['cssClass']);
+    // First contact is deceased, gets strikethrough class
+    $this->assertEquals('strikethrough', $result[0]['cssClass']);
+    $this->assertNotEquals('strikethrough', $result[1]['cssClass']);
+    // Ensure the view contact link was formed
+    $this->assertStringContainsString('cid=' . $contacts[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
+    $this->assertEquals('_blank', $result[0]['columns'][1]['links'][0]['target']);
+    // 1st column gets static + conditional style
+    $this->assertStringContainsString('text-right', $result[0]['columns'][2]['cssClass']);
+    $this->assertStringContainsString('bg-danger', $result[0]['columns'][2]['cssClass']);
+    // 2nd row gets static style but no conditional styles apply
+    $this->assertEquals('text-right', $result[1]['columns'][2]['cssClass']);
+    // 3rd column gets static + conditional style
+    $this->assertStringContainsString('text-right', $result[2]['columns'][2]['cssClass']);
+    $this->assertStringContainsString('bg-warning', $result[2]['columns'][2]['cssClass']);
   }
 
 }

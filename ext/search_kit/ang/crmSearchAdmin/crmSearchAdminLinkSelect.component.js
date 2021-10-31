@@ -14,6 +14,14 @@
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
+      this.$onInit = function() {
+        $element.on('hidden.bs.dropdown', function() {
+          $scope.$apply(function() {
+            ctrl.menuOpen = false;
+          });
+        });
+      };
+
       this.setValue = function(val) {
         if (val.path) {
           $timeout(function () {

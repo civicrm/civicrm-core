@@ -3,6 +3,7 @@
 namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -123,9 +124,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       foreach ($this->display['settings']['columns'] as $column) {
         $columns[] = $this->formatColumn($column, $data);
       }
+      $style = $this->getCssStyles($this->display['settings']['cssRules'] ?? [], $data);
       $row = [
         'data' => $data,
         'columns' => $columns,
+        'cssClass' => implode(' ', $style),
       ];
       if (isset($data[$keyName])) {
         $row['key'] = $data[$keyName];
@@ -162,7 +165,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   private function formatColumn($column, $data) {
     $column += ['rewrite' => NULL, 'label' => NULL];
-    $out = $cssClass = [];
+    $out = [];
     switch ($column['type']) {
       case 'field':
         if (isset($column['image']) && is_array($column['image'])) {
@@ -201,6 +204,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $out = $this->formatLinksColumn($column, $data);
         break;
     }
+    $cssClass = $this->getCssStyles($column['cssRules'] ?? [], $data);
     if (!empty($column['alignment'])) {
       $cssClass[] = $column['alignment'];
     }
@@ -208,6 +212,66 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $out['cssClass'] = implode(' ', $cssClass);
     }
     return $out;
+  }
+
+  /**
+   * Evaluates conditional style rules
+   *
+   * Rules are in the format ['css class', 'field_name', 'OPERATOR', 'value']
+   *
+   * @param array[] $styleRules
+   * @param array $data
+   * @return array
+   */
+  protected function getCssStyles(array $styleRules, array $data) {
+    $classes = [];
+    foreach ($styleRules as $clause) {
+      $cssClass = $clause[0] ?? '';
+      if ($cssClass) {
+        $condition = $this->getCssRuleCondition($clause);
+        if (is_null($condition[0]) || (ArrayQueryActionTrait::filterCompare($data, $condition))) {
+          $classes[] = $cssClass;
+        }
+      }
+    }
+    return $classes;
+  }
+
+  /**
+   * Returns the condition of a cssRules
+   *
+   * @param array $clause
+   * @return array
+   */
+  protected function getCssRuleCondition($clause) {
+    $fieldKey = $clause[1] ?? NULL;
+    // For fields used in group by, add aggregation and change operator from = to CONTAINS
+    // FIXME: This assumes the operator is always set to '=', which so far is all the admin UI supports.
+    // That's only a safe assumption as long as the admin UI doesn't have an operator selector.
+    // @see ang/crmSearchAdmin/displays/common/searchAdminCssRules.html
+    if ($fieldKey && $this->canAggregate($fieldKey)) {
+      $clause[2] = 'CONTAINS';
+      $fieldKey = 'GROUP_CONCAT_' . str_replace(['.', ':'], '_', $clause[1]);
+    }
+    return [$fieldKey, $clause[2] ?? 'IS NOT EMPTY', $clause[3] ?? NULL];
+  }
+
+  /**
+   * Return fields needed for the select clause by a set of css rules
+   *
+   * @param array $cssRules
+   * @return array
+   */
+  protected function getCssRulesSelect($cssRules) {
+    $select = [];
+    foreach ($cssRules as $clause) {
+      $fieldKey = $clause[1] ?? NULL;
+      if ($fieldKey) {
+        // For fields used in group by, add aggregation
+        $select[] = $this->canAggregate($fieldKey) ? "GROUP_CONCAT($fieldKey) AS GROUP_CONCAT_" . str_replace(['.', ':'], '_', $fieldKey) : $fieldKey;
+      }
+    }
+    return $select;
   }
 
   /**
@@ -635,6 +699,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     if (!empty($this->display['settings']['actions'])) {
       $additions = CoreUtil::getInfoItem($this->savedSearch['api_entity'], 'primary_key');
     }
+    // Add style conditions for the display
+    foreach ($this->getCssRulesSelect($this->display['settings']['cssRules'] ?? []) as $addition) {
+      $additions[] = $addition;
+    }
     $possibleTokens = '';
     foreach ($this->display['settings']['columns'] as $column) {
       // Collect display values in which a token is allowed
@@ -654,6 +722,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
           $additions[] = $editable['value_path'];
           $additions[] = $editable['id_path'];
         }
+      }
+      // Add style conditions for the column
+      foreach ($this->getCssRulesSelect($column['cssRules'] ?? []) as $addition) {
+        $additions[] = $addition;
       }
     }
     // Add fields referenced via token
@@ -697,7 +769,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
       }
     }
-    return $result;
+    return $result ?: $alias;
   }
 
   /**

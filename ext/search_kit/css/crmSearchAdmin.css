@@ -247,3 +247,8 @@
   width: 30px;
   padding: 2px 4px;
 }
+
+#bootstrap-theme button.crm-search-admin-combo-button {
+  min-width: 200px;
+  text-align: left;
+}
