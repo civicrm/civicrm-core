@@ -36,13 +36,7 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
       $this->assign('hookContentPlacement', $contentPlacement);
     }
 
-    $communityMessages = CRM_Core_CommunityMessages::create();
-    if ($communityMessages->isEnabled()) {
-      $message = $communityMessages->pick();
-      if ($message) {
-        $this->assign('communityMessages', $communityMessages->evalMarkup($message['markup']));
-      }
-    }
+    $this->assign('communityMessages', $this->getCommunityMessageOutput());
 
     $loader = Civi::service('angularjs.loader');
     $loader->addModules('crmDashboard');
@@ -93,6 +87,22 @@ class CRM_Contact_Page_DashBoard extends CRM_Core_Page {
     return [
       'dashlets' => CRM_Core_BAO_Dashboard::getContactDashlets(),
     ];
+  }
+
+  /**
+   * Get community message output.
+   *
+   * @return string
+   */
+  protected function getCommunityMessageOutput(): string {
+    $communityMessages = CRM_Core_CommunityMessages::create();
+    if ($communityMessages->isEnabled()) {
+      $message = $communityMessages->pick();
+      if ($message) {
+        return $communityMessages->evalMarkup($message['markup']);
+      }
+    }
+    return '';
   }
 
 }

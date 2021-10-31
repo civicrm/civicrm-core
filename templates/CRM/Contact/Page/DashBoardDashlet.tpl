@@ -9,7 +9,7 @@
 *}
 {include file="CRM/common/chart.tpl"}
 {* Alerts for critical configuration settings. *}
-{$communityMessages|default:''}
+{$communityMessages}
 <div class="clear"></div>
 <div class="crm-block crm-content-block">
 
