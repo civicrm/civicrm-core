@@ -1138,7 +1138,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
         $dao = self::$_tableDAOMapper[$linkedEntityTable];
       }
       else {
-        CRM_Core_Session::setStatus('Could not update mode for linked entities');
+        CRM_Core_Session::setStatus(ts('Could not update mode for linked entities'));
         return NULL;
       }
       $entityTable = $linkedEntityTable;
