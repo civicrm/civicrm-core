@@ -218,26 +218,26 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   public static function formRule($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
       if (empty($fields['smtpServer'])) {
-        $errors['smtpServer'] = 'SMTP Server name is a required field.';
+        $errors['smtpServer'] = ts('SMTP Server name is a required field.');
       }
       if (empty($fields['smtpPort'])) {
-        $errors['smtpPort'] = 'SMTP Port is a required field.';
+        $errors['smtpPort'] = ts('SMTP Port is a required field.');
       }
       if (!empty($fields['smtpAuth'])) {
         if (empty($fields['smtpUsername'])) {
-          $errors['smtpUsername'] = 'If your SMTP server requires authentication please provide a valid user name.';
+          $errors['smtpUsername'] = ts('If your SMTP server requires authentication please provide a valid user name.');
         }
         if (empty($fields['smtpPassword'])) {
-          $errors['smtpPassword'] = 'If your SMTP server requires authentication, please provide a password.';
+          $errors['smtpPassword'] = ts('If your SMTP server requires authentication, please provide a password.');
         }
       }
     }
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SENDMAIL) {
       if (!$fields['sendmail_path']) {
-        $errors['sendmail_path'] = 'Sendmail Path is a required field.';
+        $errors['sendmail_path'] = ts('Sendmail Path is a required field.');
       }
       if (!$fields['sendmail_args']) {
-        $errors['sendmail_args'] = 'Sendmail Argument is a required field.';
+        $errors['sendmail_args'] = ts('Sendmail Argument is a required field.');
       }
     }
 

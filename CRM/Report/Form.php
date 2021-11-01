@@ -1798,14 +1798,14 @@ class CRM_Report_Form extends CRM_Core_Form {
             if (array_key_exists($fieldName, $fields['group_bys']) &&
               !array_key_exists($fieldName, $fields['fields'])
             ) {
-              $errors['fields'] = "Please make sure fields selected in 'Group by Columns' section are also selected in 'Display Columns' section.";
+              $errors['fields'] = ts("Please make sure fields selected in 'Group by Columns' section are also selected in 'Display Columns' section.");
             }
             elseif (array_key_exists($fieldName, $fields['group_bys'])) {
               foreach ($fields['fields'] as $fld => $val) {
                 if (!array_key_exists($fld, $fields['group_bys']) &&
                   !in_array($fld, $ignoreFields)
                 ) {
-                  $errors['fields'] = "Please ensure that fields selected in 'Display Columns' are also selected in 'Group by Columns' section.";
+                  $errors['fields'] = ts("Please ensure that fields selected in 'Display Columns' are also selected in 'Group by Columns' section.");
                 }
               }
             }
