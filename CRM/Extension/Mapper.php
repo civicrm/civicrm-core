@@ -480,8 +480,7 @@ class CRM_Extension_Mapper {
   /**
    * Get a list of all installed modules, including enabled and disabled ones
    *
-   * @return array
-   *   CRM_Core_Module
+   * @return CRM_Core_Module[]
    */
   public function getModules() {
     $result = [];

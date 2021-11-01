@@ -3,6 +3,7 @@
 namespace Civi\Api4;
 
 use Civi\Api4\Generic\BasicBatchAction;
+use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * User-configurable forms.
@@ -138,7 +139,7 @@ class Afform extends Generic\AbstractEntity {
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function($self) {
+    return (new Generic\BasicGetFieldsAction('Afform', __FUNCTION__, function(BasicGetFieldsAction $self) {
       $fields = [
         [
           'name' => 'name',
@@ -222,13 +223,23 @@ class Afform extends Generic\AbstractEntity {
           'name' => 'has_local',
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'description' => 'Whether a local copy is saved on site',
           'readonly' => TRUE,
         ];
         $fields[] = [
           'name' => 'has_base',
           'type' => 'Extra',
           'data_type' => 'Boolean',
+          'description' => 'Is provided by an extension',
           'readonly' => TRUE,
+        ];
+        $fields[] = [
+          'name' => 'base_module',
+          'type' => 'Extra',
+          'data_type' => 'String',
+          'description' => 'Name of extension which provides this form',
+          'readonly' => TRUE,
+          'options' => $self->getLoadOptions() ? \CRM_Core_PseudoConstant::getExtensions() : TRUE,
         ];
         $fields[] = [
           'name' => 'search_displays',

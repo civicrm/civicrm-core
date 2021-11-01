@@ -17,7 +17,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
   public function getRecords() {
     /** @var \CRM_Afform_AfformScanner $scanner */
     $scanner = \Civi::service('afform_scanner');
-    $getComputed = $this->_isFieldSelected('has_local', 'has_base');
+    $getComputed = $this->_isFieldSelected('has_local', 'has_base', 'base_module');
     $getLayout = $this->_isFieldSelected('layout');
     $getSearchDisplays = $this->_isFieldSelected('search_displays');
     $values = [];

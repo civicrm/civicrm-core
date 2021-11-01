@@ -76,6 +76,7 @@ class GetFromArrayTest extends UnitTestCase {
       ],
       [
         'field1' => 3,
+        'field3' => NULL,
       ],
       [
         'field1' => 4,

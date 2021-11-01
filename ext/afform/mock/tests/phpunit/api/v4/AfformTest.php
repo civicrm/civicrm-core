@@ -54,7 +54,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     $message = 'The initial Afform.get should return default data';
     $result = Civi\Api4\Afform::get()
-      ->addSelect('*', 'has_base', 'has_local')
+      ->addSelect('*', 'has_base', 'has_local', 'base_module')
       ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
@@ -65,6 +65,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
+    $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
 
     $message = 'After updating with Afform.create, the revised data should be returned';
     $result = Civi\Api4\Afform::update()
@@ -78,7 +79,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
     $message = 'After updating, the Afform.get API should return blended data';
     $result = Civi\Api4\Afform::get()
-      ->addSelect('*', 'has_base', 'has_local')
+      ->addSelect('*', 'has_base', 'has_local', 'base_module')
       ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
@@ -89,11 +90,12 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_local'), $message);
+    $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $formName)->execute();
     $message = 'After reverting, the final Afform.get should return default data';
     $result = Civi\Api4\Afform::get()
-      ->addSelect('*', 'has_base', 'has_local')
+      ->addSelect('*', 'has_base', 'has_local', 'base_module')
       ->addWhere('name', '=', $formName)->execute();
     $this->assertEquals($formName, $result[0]['name'], $message);
     $this->assertEquals($get($originalMetadata, 'title'), $get($result[0], 'title'), $message);
@@ -103,6 +105,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertTrue(is_array($result[0]['layout']), $message);
     $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
     $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
+    $this->assertEquals('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
   }
 
   public function getFormatExamples() {
