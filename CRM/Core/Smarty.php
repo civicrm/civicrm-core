@@ -188,6 +188,19 @@ class CRM_Core_Smarty extends Smarty {
   }
 
   /**
+   * Ensure these variables are set to make it easier to access them without e-notice.
+   *
+   * @param array $variables
+   */
+  public function ensureVariablesAreAssigned(array $variables): void {
+    foreach ($variables as $variable) {
+      if (!isset($this->get_template_vars()[$variable])) {
+        $this->assign($variable);
+      }
+    }
+  }
+
+  /**
    * Fetch a template (while using certain variables)
    *
    * @param string $resource_name
