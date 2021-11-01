@@ -116,10 +116,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('textarea', 'options', ts('Options'), ['cols' => 60, 'rows' => 3]);
 
-    $this->add('select', 'period_type', ts('Period Type'), [
-      'rolling' => 'Rolling',
-      'fixed' => 'Fixed',
-    ], FALSE, ['placeholder' => TRUE]);
+    $this->add('select', 'period_type', ts('Period Type'), CRM_Core_SelectValues::periodType(), FALSE, ['placeholder' => TRUE]);
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
