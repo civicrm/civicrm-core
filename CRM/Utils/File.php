@@ -1101,18 +1101,36 @@ HTACCESS;
   }
 
   /**
-   * Check that filename is a directory and within open_basedir.
+   * Check that filename is a directory.
    * @param string $fileName
    * @return bool
    */
   public static function isDir($fileName = '') {
-    // Ensure filename is within open_basedir restrictions.
+    // If not within open_basedir do not consider it a directory.
+    if (!CRM_Utils_File::isFileInOpenbasedir($filename)) {
+      return FALSE;
+    }
+    return is_dir($fileName);
+  }
+
+  /**
+   * Check that path is within open_basedir restriction.
+   * @param string $filePath the absolute path
+   * @return bool
+   */
+  private static function isFileInOpenbasedir($filePath = '') {
+    // Use the appropriate comparison function.
+    $compareFunc = 'strncmp';
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $compareFunc = 'strncasecmp';
+    }
+    // Ensure file path is within open_basedir restrictions.
     $openBasedir = ini_get('open_basedir');
     if (!empty($openBasedir)) {
       $baseDirs = explode(PATH_SEPARATOR, $openBasedir);
       $withinBasedir = FALSE;
       foreach ($baseDirs as $baseDir) {
-        if (strncasecmp($fileName, $baseDir, strlen($baseDir)) === 0) {
+        if ($compareFunc($filepath, $baseDir, strlen($baseDir)) === 0) {
           $withinBasedir = TRUE;
         }
       }
@@ -1120,7 +1138,7 @@ HTACCESS;
         return FALSE;
       }
     }
-    return is_dir($fileName);
+    return TRUE;
   }
 
 }
