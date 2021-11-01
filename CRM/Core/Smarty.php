@@ -138,6 +138,12 @@ class CRM_Core_Smarty extends Smarty {
     }
 
     $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
+    if (CRM_Utils_Constant::value('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
+      if (!isset($this->_plugins['modifier']['escape'])) {
+        $this->register_modifier('escape', ['CRM_Core_Smarty', 'escape']);
+      }
+      $this->default_modifiers[] = 'escape:"htmlall"';
+    }
     $this->load_filter('pre', 'resetExtScope');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
@@ -346,6 +352,90 @@ class CRM_Core_Smarty extends Smarty {
   private function isCheckSmartyIsCompiled() {
     // check for define in civicrm.settings.php as FALSE, otherwise returns TRUE
     return CRM_Utils_Constant::value('CIVICRM_TEMPLATE_COMPILE_CHECK', TRUE);
+  }
+
+  /**
+   * Smarty escape modifier plugin.
+   *
+   * This replaces the core smarty modifier and basically does a lot of
+   * early-returning before calling the core function.
+   *
+   * It early returns on patterns that are common 'no-escape' patterns
+   * in CiviCRM - this list can be honed over time.
+   *
+   * It also logs anything that is actually escaped. Since this only kicks
+   * in when CIVICRM_SMARTY_DEFAULT_ESCAPE is defined it is ok to be aggressive
+   * about logging as we mostly care about developers using it at this stage.
+   *
+   * Note we don't actually use 'htmlall' anywhere in our tpl layer yet so
+   * anything coming in with this be happening because of the default modifier.
+   *
+   * Also note the right way to opt a field OUT of escaping is
+   * ``{$fieldName|smarty:nodefaults}``
+   * This should be used for fields with known html AND for fields where
+   * we are doing empty or isset checks - as otherwise the value is passed for
+   * escaping first so you still get an enotice for 'empty' or a fatal for 'isset'
+   *
+   * Type:     modifier<br>
+   * Name:     escape<br>
+   * Purpose:  Escape the string according to escapement type
+   *
+   * @link http://smarty.php.net/manual/en/language.modifier.escape.php
+   *          escape (Smarty online manual)
+   * @author   Monte Ohrt <monte at ohrt dot com>
+   *
+   * @param string $string
+   * @param string $esc_type
+   * @param string $char_set
+   *
+   * @return string
+   */
+  public static function escape($string, $esc_type = 'html', $char_set = 'ISO-8859-1') {
+    // CiviCRM variables are often arrays - just handle them.
+    // The early return on booleans & numbers is mostly to prevent them being
+    // logged as 'changed' when they are cast to a string.
+    if (!is_scalar($string) || empty($string) || is_bool($string) || is_numeric($string) || $esc_type === 'none') {
+      return $string;
+    }
+    if ($esc_type === 'htmlall') {
+      // 'htmlall' is the nothing-specified default.
+      // Don't escape things we think quickform added.
+      if (strpos($string, '<input') === 0
+        || strpos($string, '<select') === 0
+        // Not handling as yet but these ones really should get some love.
+        || strpos($string, '<label') === 0
+        || strpos($string, '<button') === 0
+        || strpos($string, '<span class="crm-frozen-field">') === 0
+        || strpos($string, '<textarea') === 0
+
+        // The ones below this point are hopefully here short term.
+        || strpos($string, '<a') === 0
+        // Not sure how big a pattern this is - used in Pledge view tab
+        // not sure if it needs escaping
+        || strpos($string, ' action="/civicrm/') === 0
+        // This seems to be urls...
+        || strpos($string, '/civicrm/') === 0
+        // Validation error message - eg. <span class="crm-error">Tournament Fees is a required field.</span>
+        || strpos($string, '
+    <span class="crm-error">') === 0
+        // e.g from participant tab class="action-item" href=/civicrm/contact/view/participant?reset=1&amp;action=add&amp;cid=142&amp;context=participant
+        || strpos($string, 'class="action-item" href=/civicrm/"') === 0
+      ) {
+        // Do not escape the above common patterns.
+        return $string;
+      }
+    }
+    require_once 'Smarty/plugins/modifier.escape.php';
+    $value = smarty_modifier_escape($string, $esc_type, $char_set);
+    if ($value !== $string) {
+      Civi::log()->debug('smarty escaping original {original}, escaped {escaped} type {type} charset {charset}', [
+        'original' => $string,
+        'escaped' => $value,
+        'type' => $esc_type,
+        'charset' => $char_set,
+      ]);
+    }
+    return $value;
   }
 
 }
