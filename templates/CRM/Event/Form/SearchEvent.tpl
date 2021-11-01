@@ -7,7 +7,7 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-  <div class="crm-accordion-wrapper crm-block crm-form-block crm-event-searchevent-form-block collapsed">
+  <div class="crm-accordion-wrapper crm-block crm-form-block crm-event-searchevent-form-block">
     <div class="crm-accordion-header">
       {ts}Find Events{/ts}
     </div>
