@@ -14,32 +14,6 @@
       <i class="crm-i fa-unlock"></i>
       {{:: ts('Anyone who can view this display will be able to see all results, regardless of their permission level.') }}
     </div>
-    <div class="btn-group pull-right" ng-if="$ctrl.crmSearchAdmin.afformEnabled && $ctrl.display.name">
-      <button type="button" ng-click="$ctrl.openAfformMenu = true;" class="btn dropdown-toggle btn-primary-outline" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="crm-i fa-list-alt"></i>
-        {{ $ctrl.getAfforms() ? ($ctrl.getAfforms().length === 1 ? ts('1 Form') : ts('%1 Forms', {1: $ctrl.getAfforms().length})) : ts('Forms...') }}
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu" ng-if=":: $ctrl.openAfformMenu">
-        <li ng-if=":: $ctrl.crmSearchAdmin.afformAdminEnabled">
-          <a target="_blank" href="{{:: $ctrl.afformPath + '#/create/search/' + $ctrl.crmSearchAdmin.savedSearch.name + '.' + $ctrl.display.name }}">
-            <i class="fa fa-plus"></i> {{:: ts('Create form for this display') }}
-          </a>
-        </li>
-        <li class="divider" role="separator" ng-if=":: $ctrl.crmSearchAdmin.afformAdminEnabled"></li>
-        <li ng-if="!$ctrl.getAfforms()" class="disabled">
-          <a href>
-            <i class="crm-i fa-spinner fa-spin"></i>
-          </a>
-        </li>
-        <li ng-repeat="afform in $ctrl.getAfforms()" title="{{:: $ctrl.crmSearchAdmin.afformAdminEnabled ? ts('Edit form') : '' }}">
-          <a target="_blank" ng-href="{{:: afform.link }}">
-            <i class="crm-i {{:: $ctrl.crmSearchAdmin.afformAdminEnabled ? 'fa-pencil-square-o' : 'fa-list-alt' }}"></i>
-            {{:: afform.title }}
-          </a>
-        </li>
-      </ul>
-    </div>
   </div>
 
 </fieldset>

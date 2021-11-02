@@ -2,9 +2,15 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * Load the results for rendering a SearchDisplay.
  *
+ * @method $this setReturn(string $return)
+ * @method string getReturn()
+ * @method $this setLimit(int $limit)
+ * @method int getLimit()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Run extends AbstractRunAction {
@@ -30,23 +36,26 @@ class Run extends AbstractRunAction {
     $entityName = $this->savedSearch['api_entity'];
     $apiParams =& $this->savedSearch['api_params'];
     $settings = $this->display['settings'];
-    $page = NULL;
+    $page = $index = NULL;
+    $key = $this->return;
 
     switch ($this->return) {
-      case 'row_count':
       case 'id':
+        $key = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+        $index = [$key];
+      case 'row_count':
         if (empty($apiParams['having'])) {
           $apiParams['select'] = [];
         }
-        if (!in_array($this->return, $apiParams['select'], TRUE)) {
-          $apiParams['select'][] = $this->return;
+        if (!in_array($key, $apiParams['select'], TRUE)) {
+          $apiParams['select'][] = $key;
         }
         unset($apiParams['orderBy'], $apiParams['limit']);
         break;
 
       default:
-        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^page:\d+$/', $this->return)) {
-          $page = explode(':', $this->return)[1];
+        if (($settings['pager'] ?? FALSE) !== FALSE && preg_match('/^page:\d+$/', $key)) {
+          $page = explode(':', $key)[1];
         }
         $limit = !empty($settings['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         $apiParams['debug'] = $this->debug;
@@ -58,7 +67,7 @@ class Run extends AbstractRunAction {
 
     $this->applyFilters();
 
-    $apiResult = civicrm_api4($entityName, 'get', $apiParams);
+    $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
     // Copy over meta properties to this result
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;

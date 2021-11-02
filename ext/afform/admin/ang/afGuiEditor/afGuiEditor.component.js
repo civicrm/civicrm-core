@@ -234,13 +234,13 @@
       };
 
       function getSearchFilterOptions() {
-        var searchDisplay = editor.meta.searchDisplays[editor.searchDisplay['search-name'] + '.' + editor.searchDisplay['display-name']],
+        var searchDisplay = afGui.getSearchDisplay(editor.searchDisplay['search-name'], editor.searchDisplay['display-name']),
           entityCount = {},
           options = [];
 
-        addFields(searchDisplay['saved_search.api_entity'], '');
+        addFields(searchDisplay['saved_search_id.api_entity'], '');
 
-        _.each(searchDisplay['saved_search.api_params'].join, function(join) {
+        _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
           var joinInfo = join[0].split(' AS ');
           addFields(joinInfo[0], joinInfo[1] + '.');
         });

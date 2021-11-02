@@ -87,17 +87,34 @@
       }
 
       if (ctrl.tab === 'search') {
-        crmApi4('SearchDisplay', 'get', {
-          select: ['name', 'label', 'type:icon', 'saved_search.name', 'saved_search.label']
-        }).then(function(searchDisplays) {
-          _.each(searchDisplays, function(searchDisplay) {
-            links.push({
-              url: '#create/search/' + searchDisplay['saved_search.name'] + '.' + searchDisplay.name,
-              label: searchDisplay['saved_search.label'] + ': ' + searchDisplay.label,
-              icon: searchDisplay['type:icon']
-            });
+        var searchNames = [];
+        // Non-aggregated query will return the same search multiple times - once per display
+        crmApi4('SavedSearch', 'get', {
+          select: ['name', 'label', 'display.name', 'display.label', 'display.type:icon'],
+          where: [['api_entity', 'IS NOT NULL'], ['api_params', 'IS NOT NULL']],
+          join: [['SearchDisplay AS display', 'LEFT', ['id', '=', 'display.saved_search_id']]],
+          orderBy: {'label':'ASC'}
+        }).then(function(searches) {
+          _.each(searches, function(search) {
+            // Add default display for each search (track searchNames in a var to just add once per search)
+            if (!_.includes(searchNames, search.name)) {
+              searchNames.push(search.name);
+              links.push({
+                url: '#create/search/' + search.name,
+                label: search.label + ': ' + ts('Search results table'),
+                icon: 'fa-table'
+              });
+            }
+            // If the search has no displays (other than the default) this will be empty
+            if (search['display.name']) {
+              links.push({
+                url: '#create/search/' + search.name + '.' + search['display.name'],
+                label: search.label + ': ' + search['display.label'],
+                icon: search['display.type:icon']
+              });
+            }
           });
-          $scope.types.search.options = _.sortBy(links, 'Label');
+          $scope.types.search.options = links;
         });
       }
     };

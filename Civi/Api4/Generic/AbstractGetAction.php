@@ -12,29 +12,14 @@
 
 namespace Civi\Api4\Generic;
 
-use Civi\Api4\Utils\SelectUtil;
-
 /**
  * Base class for all `Get` api actions.
  *
  * @package Civi\Api4\Generic
- *
- * @method $this setSelect(array $selects) Set array of fields to be selected (wildcard * allowed)
- * @method array getSelect()
  */
 abstract class AbstractGetAction extends AbstractQueryAction {
 
-  /**
-   * Fields to return for each $ENTITY. Defaults to all fields `[*]`.
-   *
-   * Use the * wildcard by itself to select all available fields, or use it to match similarly-named fields.
-   * E.g. `is_*` will match fields named is_primary, is_active, etc.
-   *
-   * Set to `["row_count"]` to return only the number of $ENTITIES found.
-   *
-   * @var array
-   */
-  protected $select = [];
+  use Traits\SelectParamTrait;
 
   /**
    * Only return the number of found items.
@@ -63,37 +48,6 @@ abstract class AbstractGetAction extends AbstractQueryAction {
         }
       }
     }
-  }
-
-  /**
-   * Adds all standard fields matched by the * wildcard
-   *
-   * Note: this function only deals with simple wildcard expressions.
-   * It ignores those containing special characters like dots or parentheses,
-   * they are handled separately in Api4SelectQuery.
-   *
-   * @throws \API_Exception
-   */
-  protected function expandSelectClauseWildcards() {
-    if (!$this->select) {
-      $this->select = ['*'];
-    }
-    // Get expressions containing wildcards but no dots or parentheses
-    $wildFields = array_filter($this->select, function($item) {
-      return strpos($item, '*') !== FALSE && strpos($item, '.') === FALSE && strpos($item, '(') === FALSE && strpos($item, ' ') === FALSE;
-    });
-    if ($wildFields) {
-      // Wildcards should not match "Extra" fields
-      $standardFields = array_filter(array_map(function($field) {
-        return $field['type'] === 'Extra' ? NULL : $field['name'];
-      }, $this->entityFields()));
-      foreach ($wildFields as $item) {
-        $pos = array_search($item, array_values($this->select));
-        $matches = SelectUtil::getMatchingFields($item, $standardFields);
-        array_splice($this->select, $pos, 1, $matches);
-      }
-    }
-    $this->select = array_unique($this->select);
   }
 
   /**
@@ -164,16 +118,6 @@ abstract class AbstractGetAction extends AbstractQueryAction {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * Add one or more fields to be selected (wildcard * allowed)
-   * @param string ...$fieldNames
-   * @return $this
-   */
-  public function addSelect(string ...$fieldNames) {
-    $this->select = array_merge($this->select, $fieldNames);
-    return $this;
   }
 
 }

@@ -31,10 +31,19 @@ class SearchDisplay extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\SearchDisplay\Run
+   * @return Action\SearchDisplay\Download
    */
   public static function download($checkPermissions = TRUE) {
     return (new Action\SearchDisplay\Download(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\SearchDisplay\GetDefault
+   */
+  public static function getDefault($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\GetDefault(__CLASS__, __FUNCTION__))
       ->setCheckPermissions($checkPermissions);
   }
 

@@ -1,7 +1,10 @@
-<a class="btn btn-xs btn-default" href="#/edit/{{:: row.data.id }}" ng-if="row.permissionToEdit">
+<a class="btn btn-xs btn-default" title="{{:: ts('View search results table') }}" ng-href="{{:: $ctrl.searchDisplayPath + '#/display/' + row.data.name }}" target="_blank">
+  {{:: ts('View') }}
+</a>
+<a class="btn btn-xs btn-primary" href="#/edit/{{:: row.data.id }}" ng-if="row.permissionToEdit">
   {{:: ts('Edit') }}
 </a>
-<a class="btn btn-xs btn-default" href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
+<a class="btn btn-xs btn-secondary" href="#/create/{{:: row.data.api_entity + '?params=' + $ctrl.encode(row.data.api_params) }}">
   {{:: ts('Clone') }}
 </a>
 <a href class="btn btn-xs btn-danger" ng-click="$ctrl.confirmDelete(row)">

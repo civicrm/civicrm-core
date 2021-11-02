@@ -323,7 +323,7 @@
           prefix = _.includes(fieldName, '.') ? fieldName.split('.')[0] : null;
         _.each(afGui.meta.searchDisplays, function(searchDisplay) {
           if (prefix) {
-            _.each(searchDisplay['saved_search.api_params'].join, function(join) {
+            _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
               var joinInfo = join[0].split(' AS ');
               if (prefix === joinInfo[1]) {
                 entityType = joinInfo[0];
@@ -331,14 +331,14 @@
               }
             });
           }
-          if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search.api_entity'], fieldName)) {
-            entityType = searchDisplay['saved_search.api_entity'];
+          if (!entityType && fieldName && afGui.getField(searchDisplay['saved_search_id.api_entity'], fieldName)) {
+            entityType = searchDisplay['saved_search_id.api_entity'];
           }
           if (entityType) {
             return false;
           }
         });
-        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search.api_entity')[0];
+        return entityType || _.map(afGui.meta.searchDisplays, 'saved_search_id.api_entity')[0];
       };
 
     }

@@ -37,7 +37,6 @@
         ctrl = this,
         afforms;
 
-      this.afformPath = CRM.url('civicrm/admin/afform');
       this.isSuperAdmin = CRM.checkPerm('all CiviCRM permissions and ACLs');
       this.aclBypassHelp = ts('Only users with "all CiviCRM permissions and ACLs" can disable permission checks.');
 
@@ -184,30 +183,36 @@
         return !info.fn || info.fn.category !== 'aggregate' || info.fn.name === 'GROUP_CONCAT';
       };
 
+      var linkProps = ['path', 'entity', 'action', 'join', 'target'];
+
       this.toggleLink = function(column) {
         if (column.link) {
-          ctrl.onChangeLink(column, column.link.path, '');
+          ctrl.onChangeLink(column, {});
         } else {
           delete column.editable;
           var defaultLink = ctrl.getLinks(column.key)[0];
-          column.link = {path: defaultLink ? defaultLink.path : 'civicrm/'};
-          ctrl.onChangeLink(column, null, column.link.path);
+          ctrl.onChangeLink(column, defaultLink || {path: 'civicrm/'});
         }
       };
 
-      this.onChangeLink = function(column, before, after) {
-        var beforeLink = before && _.findWhere(ctrl.getLinks(), {path: before}),
-          afterLink = after && _.findWhere(ctrl.getLinks(), {path: after});
-        if (!after) {
-          if (beforeLink && column.title === beforeLink.title) {
+      this.onChangeLink = function(column, afterLink) {
+        column.link = column.link || {};
+        var beforeLink = column.link.action && _.findWhere(ctrl.getLinks(column.key), {action: column.link.action});
+        if (!afterLink.action && !afterLink.path) {
+          if (beforeLink && beforeLink.text === column.title) {
             delete column.title;
           }
           delete column.link;
-        } else if (afterLink && ((!column.title && !before) || (beforeLink && beforeLink.title === column.title))) {
-          column.title = afterLink.title;
-        } else if (!afterLink && (beforeLink && beforeLink.title === column.title)) {
+          return;
+        }
+        if (afterLink.text && ((!column.title && !beforeLink) || (beforeLink && beforeLink.text === column.title))) {
+          column.title = afterLink.text;
+        } else if (!afterLink.text && (beforeLink && beforeLink.text === column.title)) {
           delete column.title;
         }
+        _.each(linkProps, function(prop) {
+          column.link[prop] = afterLink[prop] || '';
+        });
       };
 
       this.getLinks = function(columnKey) {
@@ -294,16 +299,6 @@
         if (_.findIndex(ctrl.display.settings[name], value) < 0) {
           ctrl.display.settings[name].push(value);
         }
-      };
-
-      // @return {Array}
-      this.getAfforms = function() {
-        if (ctrl.display.name && ctrl.crmSearchAdmin.afforms) {
-          if (!afforms || (ctrl.crmSearchAdmin.afforms[ctrl.display.name] && afforms !== ctrl.crmSearchAdmin.afforms[ctrl.display.name])) {
-            afforms = ctrl.crmSearchAdmin.afforms[ctrl.display.name] || [];
-          }
-        }
-        return afforms;
       };
 
       $scope.$watch('$ctrl.display.settings', function() {

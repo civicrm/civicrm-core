@@ -12,7 +12,7 @@
         ctrl = this;
 
       this.$onInit = function() {
-        ctrl.display = afGui.meta.searchDisplays[ctrl.node['search-name'] + '.' + ctrl.node['display-name']];
+        ctrl.display = afGui.getSearchDisplay(ctrl.node['search-name'], ctrl.node['display-name']);
         ctrl.editUrl = CRM.url('civicrm/admin/search#/edit/' + ctrl.display.saved_search_id);
       };
 
