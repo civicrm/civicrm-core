@@ -140,9 +140,10 @@
       };
 
       this.addDisplay = function(type) {
+        var count = _.filter(ctrl.savedSearch.displays, {type: type}).length;
         ctrl.savedSearch.displays.push({
           type: type,
-          label: ''
+          label: ctrl.displayTypes[type].label + (count ? ' ' + (++count) : '')
         });
         $scope.selectTab('display_' + (ctrl.savedSearch.displays.length - 1));
       };
