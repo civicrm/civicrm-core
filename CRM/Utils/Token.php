@@ -1515,11 +1515,16 @@ class CRM_Utils_Token {
           'contribution_status_id:label',
           'contribution_status_id:name',
           'is_template:label',
+          'campaign_id:label',
+          'campaign_id:name',
         ]
       );
       foreach ($tokens as $token) {
         if (!empty($token['name'])) {
           $tokens[$token['name']] = [];
+        }
+        elseif (is_string($token) && strpos($token, ':') !== FALSE) {
+          $tokens[$token] = [];
         }
       }
       Civi::$statics[__CLASS__][__FUNCTION__][$key] = array_keys($tokens);
