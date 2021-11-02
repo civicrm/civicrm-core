@@ -135,6 +135,27 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
+   * Force-revert a record back to its original state.
+   * @param array $params
+   *   Key->value properties of CRM_Core_DAO_Managed used to match an existing record
+   */
+  public function revert(array $params) {
+    $mgd = new \CRM_Core_DAO_Managed();
+    $mgd->copyValues($params);
+    $mgd->find(TRUE);
+    $declarations = CRM_Utils_Array::findAll($this->declarations, [
+      'module' => $mgd->module,
+      'name' => $mgd->name,
+      'entity' => $mgd->entity_type,
+    ]);
+    if ($mgd->id && isset($declarations[0])) {
+      $this->updateExistingEntity($mgd, ['update' => 'always'] + $declarations[0]);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
    * For all enabled modules, add new entities, update
    * existing entities, and remove orphaned (stale) entities.
    */
@@ -195,7 +216,7 @@ class CRM_Core_ManagedEntities {
   }
 
   /**
-   * Get the managed entities to be created.
+   * Get the managed entities to be updated.
    *
    * @param array $filters
    *
@@ -287,6 +308,10 @@ class CRM_Core_ManagedEntities {
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   protected function insertNewEntity($todo) {
+    if ($todo['params']['version'] == 4) {
+      $todo['params']['checkPermissions'] = FALSE;
+    }
+
     $result = civicrm_api($todo['entity_type'], 'create', $todo['params']);
     if (!empty($result['is_error'])) {
       $this->onApiError($todo['entity_type'], 'create', $todo['params'], $result);
@@ -314,7 +339,7 @@ class CRM_Core_ManagedEntities {
     $policy = CRM_Utils_Array::value('update', $todo, 'always');
     $doUpdate = ($policy === 'always');
 
-    if ($doUpdate) {
+    if ($doUpdate && $todo['params']['version'] == 3) {
       $defaults = ['id' => $dao->entity_id];
       if ($this->isActivationSupported($dao->entity_type)) {
         $defaults['is_active'] = 1;
@@ -342,6 +367,11 @@ class CRM_Core_ManagedEntities {
       if ($result['is_error']) {
         $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
+    }
+    elseif ($doUpdate && $todo['params']['version'] == 4) {
+      $params = ['checkPermissions' => FALSE] + $todo['params'];
+      $params['values']['id'] = $dao->entity_id;
+      civicrm_api4($dao->entity_type, 'update', $params);
     }
 
     if (isset($todo['cleanup'])) {
