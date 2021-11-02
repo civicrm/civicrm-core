@@ -23,13 +23,13 @@
         // Select all
         ctrl.allRowsSelected = true;
         if (ctrl.page === 1 && ctrl.results.length < ctrl.limit) {
-          ctrl.selectedRows = _.pluck(_.pluck(ctrl.results, 'id'), 'raw');
+          ctrl.selectedRows = _.pluck(ctrl.results, 'key');
           return;
         }
         // If more than one page of results, use ajax to fetch all ids
         ctrl.loadingAllRows = true;
         var params = ctrl.getApiParams('id');
-        crmApi4('SearchDisplay', 'run', params, ['id']).then(function(ids) {
+        crmApi4('SearchDisplay', 'run', params).then(function(ids) {
           ctrl.loadingAllRows = false;
           ctrl.selectedRows = _.toArray(ids);
         });
@@ -37,9 +37,9 @@
 
       // Toggle row selection
       selectRow: function(row) {
-        var index = this.selectedRows.indexOf(row.data.id);
+        var index = this.selectedRows.indexOf(row.key);
         if (index < 0) {
-          this.selectedRows.push(row.data.id);
+          this.selectedRows.push(row.key);
           this.allRowsSelected = (this.rowCount === this.selectedRows.length);
         } else {
           this.allRowsSelected = false;
@@ -49,7 +49,7 @@
 
       // @return bool
       isRowSelected: function(row) {
-        return this.allRowsSelected || _.includes(this.selectedRows, row.data.id);
+        return this.allRowsSelected || _.includes(this.selectedRows, row.key);
       },
 
       refreshAfterTask: function() {
@@ -69,8 +69,8 @@
       onPostRun: [function(results, status, editedRow) {
         if (editedRow && status === 'success') {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
-          var index = this.selectedRows.indexOf(editedRow.data.id);
-          if (index > -1 && !_.findWhere(results, {id: editedRow.data.id})) {
+          var index = this.selectedRows.indexOf(editedRow.key);
+          if (index > -1 && !_.findWhere(results, {id: editedRow.key})) {
             this.selectedRows.splice(index, 1);
           }
         }

@@ -1,6 +1,6 @@
 <tr ng-repeat="(rowIndex, row) in $ctrl.results">
   <td ng-if=":: $ctrl.settings.actions">
-    <input type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.selectRow(row)" ng-disabled="!(!$ctrl.loadingAllRows && row.id)">
+    <input type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.selectRow(row)" ng-disabled="!!$ctrl.loadingAllRows">
   </td>
   <td ng-repeat="(colIndex, colData) in row.columns" ng-include="'~/crmSearchDisplay/colType/' + $ctrl.settings.columns[colIndex].type + '.html'" title="{{:: colData.title }}" class="{{:: colData.cssClass }}">
   </td>

@@ -114,18 +114,23 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function formatResult(\Civi\Api4\Generic\Result $result): array {
     $rows = [];
-    foreach ($result as $index => $row) {
+    $keyName = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+    foreach ($result as $index => $record) {
       $data = $columns = [];
       foreach ($this->getSelectClause() as $key => $item) {
-        $data[$key] = $this->getValue($key, $row, $index);
+        $data[$key] = $this->getValue($key, $record, $index);
       }
       foreach ($this->display['settings']['columns'] as $column) {
         $columns[] = $this->formatColumn($column, $data);
       }
-      $rows[] = [
+      $row = [
         'data' => $data,
         'columns' => $columns,
       ];
+      if (isset($data[$keyName])) {
+        $row['key'] = $data[$keyName];
+      }
+      $rows[] = $row;
     }
     return $rows;
   }
