@@ -1336,4 +1336,19 @@ class CRM_Utils_Array {
     return NULL;
   }
 
+  /**
+   * Prepend string prefix to every key in an array
+   *
+   * @param array $collection
+   * @param string $prefix
+   * @return array
+   */
+  public static function prefixKeys(array $collection, string $prefix) {
+    $result = [];
+    foreach ($collection as $key => $value) {
+      $result[$prefix . $key] = $value;
+    }
+    return $result;
+  }
+
 }

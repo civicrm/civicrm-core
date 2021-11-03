@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\SavedSearch;
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Search\Display;
 use CRM_Search_ExtensionUtil as E;
 use Civi\Api4\Query\SqlEquation;
@@ -58,9 +60,6 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'saved_search_id' => $this->savedSearch['id'] ?? NULL,
       'label' => $label,
       'type' => 'table',
-      'type:label' => E::ts('Table'),
-      'type:name' => 'crm-search-display-table',
-      'type:icon' => 'fa-table',
       'acl_bypass' => FALSE,
       'settings' => [
         'actions' => TRUE,
@@ -73,10 +72,6 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
         'columns' => [],
       ],
     ];
-    // Allow implicit-join-style selection of saved search fields
-    foreach ($this->savedSearch as $key => $val) {
-      $display['saved_search_id.' . $key] = $val;
-    }
     foreach ($this->getSelectClause() as $key => $clause) {
       $display['settings']['columns'][] = $this->configureColumn($clause, $key);
     }
@@ -89,7 +84,23 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       'alignment' => 'text-right',
       'links' => $this->getLinksMenu(),
     ];
-    $result->exchangeArray($this->selectArray([$display]));
+    $fields = $this->entityFields();
+    // Allow implicit-join-style selection of saved search fields
+    if ($this->savedSearch) {
+      $display += \CRM_Utils_Array::prefixKeys($this->savedSearch, 'saved_search_id.');
+      $fields += \CRM_Utils_Array::prefixKeys(SavedSearch::get()->entityFields(), 'saved_search_id.');
+    }
+    // Fill pseudoconstant keys with raw values for replacement
+    foreach ($this->select as $fieldExpr) {
+      [$fieldName, $suffix] = array_pad(explode(':', $fieldExpr), 2, NULL);
+      if ($suffix && array_key_exists($fieldName, $display)) {
+        $display[$fieldExpr] = $display[$fieldName];
+      }
+    }
+    $results = [$display];
+    // Replace pseudoconstants
+    FormattingUtil::formatOutputValues($results, $fields);
+    $result->exchangeArray($this->selectArray($results));
   }
 
   /**

@@ -48,7 +48,7 @@ trait SavedSearchInspectorTrait {
         ->addWhere('name', '=', $this->savedSearch)
         ->execute()->single();
     }
-    $this->_apiParams = $this->savedSearch['api_params'] + ['where' => [], 'join' => [], 'having' => []];
+    $this->_apiParams = ($this->savedSearch['api_params'] ?? []) + ['select' => [], 'where' => [], 'join' => [], 'having' => []];
   }
 
   /**

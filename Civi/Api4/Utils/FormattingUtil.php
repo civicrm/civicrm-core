@@ -185,20 +185,20 @@ class FormattingUtil {
    *
    * @param array $results
    * @param array $fields
-   * @param string $entity
    * @param string $action
    * @param array $selectAliases
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
    */
-  public static function formatOutputValues(&$results, $fields, $entity, $action = 'get', $selectAliases = []) {
+  public static function formatOutputValues(&$results, $fields, $action = 'get', $selectAliases = []) {
     $fieldOptions = [];
     foreach ($results as &$result) {
       $contactTypePaths = [];
       foreach ($result as $key => $value) {
         $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
         $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
-        $field = $fieldName && isset($fields[$fieldName]) ? $fields[$fieldName] : NULL;
+        $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
+        $field = $fields[$fieldName] ?? $fields[$baseName] ?? NULL;
         $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
         // Allow Sql Functions to do special formatting and/or alter the $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {

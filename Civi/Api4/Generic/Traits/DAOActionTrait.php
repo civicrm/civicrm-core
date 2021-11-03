@@ -161,7 +161,7 @@ trait DAOActionTrait {
       }
     }
 
-    FormattingUtil::formatOutputValues($result, $this->entityFields(), $this->getEntityName());
+    FormattingUtil::formatOutputValues($result, $this->entityFields());
     return $result;
   }
 

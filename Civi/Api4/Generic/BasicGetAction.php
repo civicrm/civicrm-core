@@ -112,14 +112,13 @@ class BasicGetAction extends AbstractGetAction {
             $pseudofield = $field['name'] . ':' . $suffix;
             if (!isset($values[$pseudofield]) && isset($values[$field['name']]) && $this->_isFieldSelected($pseudofield)) {
               $values[$pseudofield] = $values[$field['name']];
-              $fields[$pseudofield] = $field;
             }
           }
         }
       }
     }
     // Swap raw values with pseudoconstants
-    FormattingUtil::formatOutputValues($records, $fields, $this->getEntityName(), $this->getActionName());
+    FormattingUtil::formatOutputValues($records, $fields, $this->getActionName());
   }
 
 }
