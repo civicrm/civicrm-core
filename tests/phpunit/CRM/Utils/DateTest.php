@@ -308,7 +308,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   public function testLocalizeConsts() {
     $expect['en_US'] = ['Jan', 'Tue', 'March', 'Thursday'];
-    $expect['fr_FR'] = ['janv.', 'mar.', 'Mars', 'jeudi'];
+    $expect['fr_FR'] = ['janv.', 'mar.', 'mars', 'jeudi'];
     $expect['es_MX'] = ['ene', 'mar', 'Marzo', 'jueves'];
 
     foreach ($expect as $lang => $expectNames) {
