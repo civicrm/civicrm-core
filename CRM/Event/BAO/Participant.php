@@ -1236,15 +1236,7 @@ UPDATE  civicrm_participant
 
     //get all required contacts detail.
     if (!empty($contactIds)) {
-      // get the contact details.
-      list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
-        FALSE, FALSE, NULL,
-        [],
-        'CRM_Event_BAO_Participant'
-      );
-      foreach ($currentContactDetails as $contactId => $contactValues) {
-        $contactDetails[$contactId] = $contactValues;
-      }
+      $contactDetails = civicrm_api3('Contact', 'get', ['id' => ['IN' => $contactIds, 'return' => 'display_name']])['values'];
     }
 
     //get all required events detail.
@@ -1312,7 +1304,7 @@ UPDATE  civicrm_participant
             $mail = self::sendTransitionParticipantMail($additionalId,
               $participantDetails[$additionalId],
               $eventDetails[$participantDetails[$additionalId]['event_id']],
-              $contactDetails[$participantDetails[$additionalId]['contact_id']],
+              NULL,
               $emailType
             );
 
@@ -1331,7 +1323,7 @@ UPDATE  civicrm_participant
         $mail = self::sendTransitionParticipantMail($participantId,
           $participantValues,
           $eventDetails[$participantValues['event_id']],
-          $contactDetails[$participantValues['contact_id']],
+          NULL,
           $emailType
         );
 
