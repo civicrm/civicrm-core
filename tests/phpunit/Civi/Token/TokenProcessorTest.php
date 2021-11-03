@@ -190,7 +190,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
 
     $expectText = [
       'Yes No April',
-      'Oui Non Avril',
+      'Oui Non avril',
       'Sí No Abril',
     ];
 
