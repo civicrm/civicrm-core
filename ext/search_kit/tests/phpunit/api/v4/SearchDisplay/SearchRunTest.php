@@ -111,6 +111,8 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertCount(2, $result);
     $this->assertEquals('One', $result[0]['data']['first_name']);
     $this->assertEquals('Two', $result[1]['data']['first_name']);
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(2, $count);
 
     // Raw value should be boolean, view value should be string
     $this->assertEquals(FALSE, $result[0]['data']['is_deceased']);
@@ -122,20 +124,28 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertCount(2, $result);
     $this->assertEquals('Three', $result[0]['data']['first_name']);
     $this->assertEquals('Two', $result[1]['data']['first_name']);
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(2, $count);
 
     $params['filters'] = ['last_name' => $lastName, 'contact_sub_type:label' => ['Tester', 'Bot']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(3, $count);
 
     // Comma indicates first_name OR last_name
     $params['filters'] = ['first_name,last_name' => $lastName, 'contact_sub_type' => ['Tester']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(2, $count);
 
     // Comma indicates first_name OR middle_name, matches "One" or "None"
     $params['filters'] = ['first_name,middle_name' => 'one', 'last_name' => $lastName];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
+    $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
+    $this->assertCount(2, $count);
   }
 
   /**

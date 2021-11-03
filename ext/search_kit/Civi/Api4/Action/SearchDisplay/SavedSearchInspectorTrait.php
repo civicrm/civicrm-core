@@ -23,6 +23,11 @@ trait SavedSearchInspectorTrait {
   protected $savedSearch;
 
   /**
+   * @var array{select: array, where: array, having: array, orderBy: array, limit: int, offset: int, checkPermissions: bool, debug: bool}
+   */
+  protected $_apiParams;
+
+  /**
    * @var \Civi\Api4\Query\Api4SelectQuery
    */
   private $_selectQuery;
@@ -43,6 +48,7 @@ trait SavedSearchInspectorTrait {
         ->addWhere('name', '=', $this->savedSearch)
         ->execute()->single();
     }
+    $this->_apiParams = $this->savedSearch['api_params'] + ['where' => [], 'join' => [], 'having' => []];
   }
 
   /**
@@ -88,7 +94,7 @@ trait SavedSearchInspectorTrait {
   protected function getSelectClause() {
     if (!isset($this->_selectClause)) {
       $this->_selectClause = [];
-      foreach ($this->savedSearch['api_params']['select'] ?? [] as $selectExpr) {
+      foreach ($this->_apiParams['select'] as $selectExpr) {
         $expr = SqlExpression::convert($selectExpr, TRUE);
         $item = [
           'fields' => [],

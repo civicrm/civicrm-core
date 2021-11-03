@@ -97,8 +97,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       throw new UnauthorizedException('Access denied');
     }
 
-    $this->savedSearch['api_params'] += ['where' => []];
-    $this->savedSearch['api_params']['checkPermissions'] = empty($this->display['acl_bypass']);
+    $this->_apiParams['checkPermissions'] = empty($this->display['acl_bypass']);
     $this->display['settings']['columns'] = $this->display['settings']['columns'] ?? [];
 
     $this->processResult($result);
@@ -145,7 +144,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     // Get value from api result unless this is a pseudo-field which gets a calculated value
     switch ($key) {
       case 'result_row_num':
-        return $rowIndex + 1 + ($this->savedSearch['api_params']['offset'] ?? 0);
+        return $rowIndex + 1 + ($this->_apiParams['offset'] ?? 0);
 
       case 'user_contact_id':
         return \CRM_Core_Session::getLoggedInContactID();
@@ -521,21 +520,20 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $field = $this->getField($fieldName);
     // If field is not found it must be an aggregated column & belongs in the HAVING clause.
     if (!$field) {
-      $this->savedSearch['api_params']['having'] = $this->savedSearch['api_params']['having'] ?? [];
-      $clause =& $this->savedSearch['api_params']['having'];
+      $clause =& $this->_apiParams['having'];
     }
     // If field belongs to an EXCLUDE join, it should be added as a join condition
     else {
       $prefix = strpos($fieldName, '.') ? explode('.', $fieldName)[0] : NULL;
-      foreach ($this->savedSearch['api_params']['join'] ?? [] as $idx => $join) {
+      foreach ($this->_apiParams['join'] as $idx => $join) {
         if (($join[1] ?? 'LEFT') === 'EXCLUDE' && (explode(' AS ', $join[0])[1] ?? '') === $prefix) {
-          $clause =& $this->savedSearch['api_params']['join'][$idx];
+          $clause =& $this->_apiParams['join'][$idx];
         }
       }
     }
     // Default: add filter to WHERE clause
     if (!isset($clause)) {
-      $clause =& $this->savedSearch['api_params']['where'];
+      $clause =& $this->_apiParams['where'];
     }
 
     $filterClauses = [];
@@ -687,7 +685,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   protected function getJoinFromAlias(string $alias) {
     $result = '';
-    foreach ($this->savedSearch['api_params']['join'] ?? [] as $join) {
+    foreach ($this->_apiParams['join'] as $join) {
       $joinName = explode(' AS ', $join[0])[1];
       if (strpos($alias, $joinName) === 0) {
         $parsed = $joinName . '.' . substr($alias, strlen($joinName) + 1);

@@ -34,14 +34,14 @@ class Run extends AbstractRunAction {
    */
   protected function processResult(\Civi\Api4\Generic\Result $result) {
     $entityName = $this->savedSearch['api_entity'];
-    $apiParams =& $this->savedSearch['api_params'];
+    $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
     $page = $index = NULL;
     $key = $this->return;
 
     switch ($this->return) {
       case 'id':
-        $key = CoreUtil::getIdFieldName($this->savedSearch['api_entity']);
+        $key = CoreUtil::getIdFieldName($entityName);
         $index = [$key];
       case 'row_count':
         if (empty($apiParams['having'])) {
