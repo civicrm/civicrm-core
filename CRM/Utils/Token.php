@@ -1164,7 +1164,7 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [
