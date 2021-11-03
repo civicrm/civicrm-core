@@ -1197,7 +1197,6 @@ UPDATE  civicrm_participant
 
     //pull required participants, contacts, events  data, if not in hand
     static $eventDetails = [];
-    static $domainValues = [];
     static $contactDetails = [];
 
     $contactIds = $eventIds = $participantDetails = [];
@@ -1232,20 +1231,6 @@ UPDATE  civicrm_participant
 
       if (!array_key_exists($dao->event_id, $eventDetails)) {
         $eventIds[$dao->event_id] = $dao->event_id;
-      }
-    }
-
-    //get the domain values.
-    if (empty($domainValues)) {
-      // making all tokens available to templates.
-      $domain = CRM_Core_BAO_Domain::getDomain();
-      $tokens = [
-        'domain' => ['name', 'phone', 'address', 'email'],
-        'contact' => CRM_Core_SelectValues::contactTokens(),
-      ];
-
-      foreach ($tokens['domain'] as $token) {
-        $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
       }
     }
 
@@ -1328,7 +1313,6 @@ UPDATE  civicrm_participant
               $participantDetails[$additionalId],
               $eventDetails[$participantDetails[$additionalId]['event_id']],
               $contactDetails[$participantDetails[$additionalId]['contact_id']],
-              $domainValues,
               $emailType
             );
 
@@ -1348,7 +1332,6 @@ UPDATE  civicrm_participant
           $participantValues,
           $eventDetails[$participantValues['event_id']],
           $contactDetails[$participantValues['contact_id']],
-          $domainValues,
           $emailType
         );
 
@@ -1394,8 +1377,6 @@ UPDATE  civicrm_participant
    *   Required event details.
    * @param array $contactDetails
    *   Required contact details.
-   * @param array $domainValues
-   *   Required domain values.
    * @param string $mailType
    *   (eg 'approval', 'confirm', 'expired' ).
    *
@@ -1406,7 +1387,6 @@ UPDATE  civicrm_participant
     $participantValues,
     $eventDetails,
     $contactDetails,
-    $domainValues,
     $mailType
   ) {
     //send emails.

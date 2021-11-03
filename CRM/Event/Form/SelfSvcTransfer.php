@@ -417,22 +417,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
    * return @ void
    */
   public function sendCancellation() {
-    $domainValues = [];
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $tokens = [
-      'domain' =>
-      [
-        'name',
-        'phone',
-        'address',
-        'email',
-      ],
-      'contact' => CRM_Core_SelectValues::contactTokens(),
-    ];
-    foreach ($tokens['domain'] as $token) {
-      $domainValues[$token] = CRM_Utils_Token::getDomainTokenReplacement($token, $domain);
-    }
-
     $participantRoles = CRM_Event_PseudoConstant::participantRole();
     $participantDetails = [];
     $query = "SELECT * FROM civicrm_participant WHERE id = {$this->_from_participant_id}";
@@ -463,7 +447,6 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $participantDetails[$this->_from_participant_id],
       $eventDetails[$this->_event_id],
       NULL,
-      $domainValues,
       'Transferred'
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
