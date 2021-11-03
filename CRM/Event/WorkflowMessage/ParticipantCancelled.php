@@ -12,15 +12,15 @@
 use Civi\WorkflowMessage\GenericWorkflowMessage;
 
 /**
- * Notification that a registration has been transferred to a different person.
+ * Notification that a registration has been cancelled.
  *
  * @support template-only
  *
  * @see CRM_Event_BAO_Participant::sendTransitionParticipantMail
  */
-class CRM_Event_WorkflowMessage_ParticipantTransferred extends GenericWorkflowMessage {
+class CRM_Event_WorkflowMessage_ParticipantCancelled extends GenericWorkflowMessage {
   use CRM_Event_WorkflowMessage_ParticipantTrait;
 
-  public const WORKFLOW = 'participant_transferred';
+  public const WORKFLOW = 'participant_cancelled';
 
 }

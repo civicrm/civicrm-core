@@ -280,10 +280,19 @@ class CRM_Upgrade_Incremental_MessageTemplates {
       [
         'version' => '5.44.alpha1',
         'upgrade_descriptor' => ts('Use domain and contact tokens instead of smarty values'),
-        'label' => ts('Pledge Transferred'),
+        'label' => ts('Participant Transferred'),
         'templates' => [
           ['name' => 'participant_transferred', 'type' => 'text'],
           ['name' => 'participant_transferred', 'type' => 'html'],
+        ],
+      ],
+      [
+        'version' => '5.44.alpha1',
+        'upgrade_descriptor' => ts('Use domain and contact tokens instead of smarty values'),
+        'label' => ts('Participant Cancelled'),
+        'templates' => [
+          ['name' => 'participant_cancelled', 'type' => 'text'],
+          ['name' => 'participant_cancelled', 'type' => 'html'],
         ],
       ],
     ];
