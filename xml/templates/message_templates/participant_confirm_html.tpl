@@ -19,7 +19,7 @@
 
   <tr>
    <td>
-    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
    </td>
   </tr>
@@ -134,7 +134,7 @@
       </tr>
      {/if}
 
-     {if $contact.email}
+     {if '{contact.email}'}
       <tr>
        <th {$headerStyle}>
         {ts}Registered Email{/ts}
@@ -142,7 +142,7 @@
       </tr>
       <tr>
        <td colspan="2" {$valueStyle}>
-        {$contact.email}
+        {contact.email}
        </td>
       </tr>
      {/if}
@@ -172,7 +172,7 @@
   {/if}
   <tr>
    <td colspan="2" {$valueStyle}>
-    <p>{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
+    <p>{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}</p>
    </td>
   </tr>
 

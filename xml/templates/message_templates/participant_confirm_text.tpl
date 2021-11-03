@@ -1,4 +1,4 @@
-{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}{$greeting},{/if}
 
 {ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}
 
@@ -67,18 +67,18 @@ Click this link to go to a web page where you can confirm your registration onli
 {ts}Download iCalendar File:{/ts} {$icalFeed}
 {/if}
 
-{if $contact.email}
+{if '{contact.email}'}
 
 ===========================================================
 {ts}Registered Email{/ts}
 
 ===========================================================
-{$contact.email}
+{contact.email}
 {/if}
 
 {if $register_date}
 {ts}Registration Date{/ts}: {$participant.register_date|crmDate}
 {/if}
 
-{ts 1=$domain.phone 2=$domain.email}Please contact us at %1 or send email to %2 if you have questions.{/ts}
+{ts 1='{domain.phone}' 2='{domain.email}'}Please contact us at %1 or send email to %2 if you have questions.{/ts}
 
