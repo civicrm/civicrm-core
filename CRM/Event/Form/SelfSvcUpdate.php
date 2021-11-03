@@ -287,7 +287,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
       $participantDetails[$this->_participant_id],
       $eventDetails[$this->_event_id],
       NULL,
-      NULL,
       'Cancelled'
     );
     $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $this->_contact_name]);
