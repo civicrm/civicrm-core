@@ -63,6 +63,15 @@ class CRM_Upgrade_Incremental_php_FiveFortyFour extends CRM_Upgrade_Incremental_
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_44_beta1($rev) {
+    $this->addTask('Repair option value label for nb_NO', 'repairNBNOOptionValue');
+  }
+
+  /**
    * @param \CRM_Queue_TaskContext $ctx
    * @return bool
    */
@@ -75,6 +84,26 @@ class CRM_Upgrade_Incremental_php_FiveFortyFour extends CRM_Upgrade_Incremental_
             ON DELETE CASCADE;
       ", [], TRUE, NULL, FALSE, FALSE);
     }
+    return TRUE;
+  }
+
+  /**
+   * Repair the option value label for nb_NO language.
+   *
+   * @param CRM_Queue_TaskContext $ctx
+   */
+  public static function repairNBNOOptionValue(CRM_Queue_TaskContext $ctx) {
+    // Repair the existing nb_NO entry.
+    $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_option_value SET label = @newLabel WHERE option_group_id = #group AND name = @name AND label IN (@oldLabels)', [
+      'name' => 'nb_NO',
+      'newLabel' => ts('Norwegian Bokmål'),
+      // Adding check against old label in case they've customized it, in which
+      // case we don't want to overwrite that. The ts() part is tricky since
+      // it depends if they installed it in English first.
+      'oldLabels' => ['Norwegian BokmÃ¥l', ts('Norwegian BokmÃ¥l')],
+      'group' => CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "languages"'),
+    ]);
+    CRM_Core_DAO::executeQuery($sql);
     return TRUE;
   }
 
