@@ -1134,6 +1134,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use this function.
+   *
    * Gives required details of contacts in an indexed array format so we
    * can iterate in a nice loop and do token evaluation
    *
@@ -1152,6 +1154,8 @@ class CRM_Utils_Token {
    * @param int|null $jobID
    *   The mailing list jobID - this is a legacy param.
    *
+   * @deprecated
+   *
    * @return array - e.g [[1 => ['first_name' => 'bob'...], 34 => ['first_name' => 'fred'...]]]
    */
   public static function getTokenDetails(
@@ -1164,7 +1168,6 @@ class CRM_Utils_Token {
     $className = NULL,
     $jobID = NULL
   ) {
-
     $params = [];
     foreach ($contactIDs as $contactID) {
       $params[] = [
