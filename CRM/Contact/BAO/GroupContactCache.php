@@ -370,7 +370,7 @@ WHERE  id IN ( $groupIDs )
    *
    * The groups are refreshable if both the following conditions are met:
    * 1) the cache date in the database is null or stale
-   * 2) a mysql lock can be aquired for the group.
+   * 2) a mysql lock can be acquired for the group.
    *
    * @param array $groupIDs
    *
