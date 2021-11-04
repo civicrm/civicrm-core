@@ -361,6 +361,7 @@ WHERE  id IN ( $groupIDs )
       self::clearGroupContactCache([$groupID]);
       self::updateCacheFromTempTable($groupContactsTempTable, [$groupID]);
       self::releaseGroupLocks([$groupID]);
+      $groupContactsTempTable->drop();
     }
   }
 
@@ -705,6 +706,7 @@ ORDER BY   gc.contact_id, g.children
         self::clearGroupContactCache($lockedGroups);
         self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
         self::releaseGroupLocks($lockedGroups);
+        $groupContactsTempTable->drop();
       }
 
       $smartGroups = implode(',', $smartGroups);
@@ -769,7 +771,6 @@ ORDER BY   gc.contact_id, g.children
       "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
         SELECT DISTINCT contact_id, group_id FROM $tempTable
       ");
-    $groupContactsTempTable->drop();
     foreach ($groupIDs as $groupID) {
       self::updateCacheTime([$groupID], TRUE);
     }
