@@ -149,8 +149,22 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     if ($schedule->recipient_listing && $schedule->limit_to) {
       switch ($schedule->recipient) {
         case 'participant_role':
-          $query->where("e.role_id IN (#recipList)")
-            ->param('recipList', \CRM_Utils_Array::explodePadded($schedule->recipient_listing));
+          // Issue #2377 role_id can be a separated list of values
+          // To perform intersection test (does role_id contain any of the values in $schedule->recipient_listing),
+          //    don't use an IN() database clause but instead use a regular expression, chaining together options to be included.
+          // Longer term, this field could be changed from SERIALIZE_SEPARATOR_TRIMMED type to SERIALIZE_SEPARATOR_BOOKEND,
+          //   so that a simple LIKE clause can be used for improved performance.
+          $roles_raw = \CRM_Utils_Array::explodePadded($schedule->recipient_listing);
+          $roles_sql = [];
+
+          foreach ($roles_raw as $role) {
+            $roles_sql[] = preg_quote($role);
+          }
+
+          $delim = \CRM_Core_DAO::VALUE_SEPARATOR;
+          $pattern = '(^|' . $delim . ')(' . implode('|', $roles_sql) . ')(' . $delim . '|$)';
+          $query->where("e.role_id REGEXP @recipList")
+            ->param('recipList', $pattern);
           break;
 
         default:
