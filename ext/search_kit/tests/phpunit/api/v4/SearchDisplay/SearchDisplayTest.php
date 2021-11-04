@@ -27,13 +27,27 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     ];
     $display = SearchDisplay::getDefault(FALSE)
       ->setSavedSearch($params)
-      ->addSelect('*', 'saved_search_id.api_entity', 'type:name')
+      ->addSelect('*', 'saved_search_id.api_entity', 'saved_search_id.api_entity:label', 'type:name', 'type:icon')
       ->execute()->single();
 
     $this->assertCount(5, $display['settings']['columns']);
     $this->assertEquals('Contacts', $display['label']);
     $this->assertEquals('crm-search-display-table', $display['type:name']);
+    $this->assertEquals('fa-table', $display['type:icon']);
     $this->assertEquals('Contact', $display['saved_search_id.api_entity']);
+    $this->assertEquals('Contacts', $display['saved_search_id.api_entity:label']);
+  }
+
+  public function testGetDefaultNoEntity() {
+    $display = SearchDisplay::getDefault(FALSE)
+      ->addSelect('*', 'saved_search_id', 'type:name', 'type:icon')
+      ->execute()->single();
+
+    $this->assertCount(1, $display['settings']['columns']);
+    $this->assertEquals('', $display['label']);
+    $this->assertEquals('crm-search-display-table', $display['type:name']);
+    $this->assertEquals('fa-table', $display['type:icon']);
+    $this->assertNull($display['saved_search_id']);
   }
 
 }

@@ -51,7 +51,7 @@ class Download extends AbstractRunAction {
    */
   protected function processResult(\Civi\Api4\Generic\Result $result) {
     $entityName = $this->savedSearch['api_entity'];
-    $apiParams =& $this->savedSearch['api_params'];
+    $apiParams =& $this->_apiParams;
     $settings = $this->display['settings'];
 
     // Displays are only exportable if they have actions enabled
