@@ -1,10 +1,10 @@
 <div class="crm-flex-1 input-group" >
   <input type="text" class="form-control" ng-if="!$ctrl.link.action" ng-model="$ctrl.link.path" ng-model-options="{updateOn: 'blur'}" ng-change="$ctrl.onChange({newLink: $ctrl.link})">
   <div class="input-group-btn" style="{{ $ctrl.link.action ? '' : 'width:27px' }}">
-    <button type="button" class="btn btn-sm btn-secondary-outline dropdown-toggle" style="min-width: 200px; text-align: left;" ng-if="$ctrl.link.action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" ng-click="$ctrl.menuOpen = true;" class="btn btn-sm btn-secondary-outline dropdown-toggle crm-search-admin-combo-button" ng-if="$ctrl.link.action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       {{ $ctrl.getLink().text }}
     </button>
-    <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" ng-click="$ctrl.menuOpen = true;" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>
     </button>
     <ul class="dropdown-menu {{ $ctrl.link.action ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">

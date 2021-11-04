@@ -87,7 +87,7 @@ trait ArrayQueryActionTrait {
         return $result;
 
       default:
-        return $this->filterCompare($row, $filters);
+        return self::filterCompare($row, $filters);
     }
   }
 
@@ -97,7 +97,7 @@ trait ArrayQueryActionTrait {
    * @return bool
    * @throws \Civi\API\Exception\NotImplementedException
    */
-  private function filterCompare($row, $condition) {
+  public static function filterCompare($row, $condition) {
     if (!is_array($condition)) {
       throw new NotImplementedException('Unexpected where syntax; expecting array.');
     }

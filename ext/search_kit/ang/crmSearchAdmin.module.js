@@ -143,8 +143,8 @@
         }
         if (field) {
           field.baseEntity = entityName;
-          return {field: field, join: join};
         }
+        return {field: field, join: join};
       }
       function parseFnArgs(info, expr) {
         var fnName = expr.split('(')[0],
@@ -224,7 +224,7 @@
           };
         } else if (arg) {
           var fieldAndJoin = getFieldAndJoin(arg, searchEntity);
-          if (fieldAndJoin) {
+          if (fieldAndJoin.field) {
             var split = arg.split(':'),
               prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
             return {
@@ -294,7 +294,7 @@
       return {
         getEntity: getEntity,
         getField: function(fieldName, entityName) {
-          return getFieldAndJoin(fieldName, entityName).field;
+          return getFieldAndJoin(fieldName, entityName || searchEntity).field;
         },
         getJoin: getJoin,
         parseExpr: parseExpr,

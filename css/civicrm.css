@@ -862,6 +862,10 @@ input.crm-form-entityref {
   font-weight: bold;
 }
 
+.crm-container .font-bold {
+  font-weight: bold !important;
+}
+
 .crm-container .font-italic {
   font-style: italic;
 }
@@ -3867,7 +3871,7 @@ span.crm-status-icon {
 }
 
 .crm-container .strikethrough {
-  text-decoration: line-through;
+  text-decoration: line-through !important;
 }
 
 .crm-container input.ng-invalid.ng-dirty,
