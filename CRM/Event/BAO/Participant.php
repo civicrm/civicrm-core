@@ -1236,7 +1236,7 @@ UPDATE  civicrm_participant
 
     //get all required contacts detail.
     if (!empty($contactIds)) {
-      $contactDetails = civicrm_api3('Contact', 'get', ['id' => ['IN' => $contactIds, 'return' => 'display_name']])['values'];
+      $contactDetails += civicrm_api3('Contact', 'get', ['id' => ['IN' => $contactIds, 'return' => 'display_name']])['values'];
     }
 
     //get all required events detail.
