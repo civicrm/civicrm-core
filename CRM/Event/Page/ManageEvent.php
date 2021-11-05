@@ -348,7 +348,14 @@ ORDER BY start_date desc
     $eventType = CRM_Core_OptionGroup::values('event_type');
     while ($dao->fetch()) {
       if (in_array($dao->id, $permittedEventsByAction[CRM_Core_Permission::VIEW])) {
-        $manageEvent[$dao->id] = [];
+        $manageEvent[$dao->id] = [
+          // Set defaults to prevent smarty e-notices, will be overwritten if populated.
+          'city' => '',
+          'state_province' => '',
+          'end_date' => '',
+          'loc_block_id' => '',
+          'participant_listing_id' => '',
+        ];
         $repeat = CRM_Core_BAO_RecurringEntity::getPositionAndCount($dao->id, 'civicrm_event');
         $manageEvent[$dao->id]['repeat'] = '';
         if ($repeat) {
