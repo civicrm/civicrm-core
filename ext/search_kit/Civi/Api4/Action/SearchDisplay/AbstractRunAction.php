@@ -463,7 +463,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private function formatImage($column, $data) {
     $tokenExpr = $column['rewrite'] ?: '[' . $column['key'] . ']';
     return [
-      'url' => $this->replaceTokens($tokenExpr, $data, 'url'),
+      'src' => $this->replaceTokens($tokenExpr, $data, 'url'),
       'height' => $column['image']['height'] ?? NULL,
       'width' => $column['image']['width'] ?? NULL,
     ];
