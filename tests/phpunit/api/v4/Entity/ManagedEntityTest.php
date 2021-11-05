@@ -119,4 +119,28 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertFalse($search['has_base']);
   }
 
+  /**
+   * @dataProvider sampleEntityTypes
+   * @param string $entityName
+   * @param bool $expected
+   */
+  public function testIsApi4ManagedType($entityName, $expected) {
+    $this->assertEquals($expected, \CRM_Core_BAO_Managed::isAPi4ManagedType($entityName));
+  }
+
+  public function sampleEntityTypes() {
+    return [
+      // v3 pseudo-entity
+      'ActivityType' => ['ActivityType', FALSE],
+      // v3 pseudo-entity
+      'CustomSearch' => ['CustomSearch', FALSE],
+      // Not a dao entity, can't be managed
+      'Entity' => ['Entity', FALSE],
+      // v4 entity not using ManagedEntity trait
+      'UFJoin' => ['UFJoin', FALSE],
+      // v4 entity using ManagedEntity trait
+      'SavedSearch' => ['SavedSearch', TRUE],
+    ];
+  }
+
 }

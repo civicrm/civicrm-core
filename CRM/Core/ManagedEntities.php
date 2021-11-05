@@ -439,13 +439,21 @@ class CRM_Core_ManagedEntities {
         throw new CRM_Core_Exception('Unrecognized cleanup policy: ' . $policy);
     }
 
-    if ($doDelete) {
+    // APIv4 delete - deletion from `civicrm_managed` will be taken care of by
+    // CRM_Core_BAO_Managed::on_hook_civicrm_post()
+    if ($doDelete && CRM_Core_BAO_Managed::isApi4ManagedType($dao->entity_type)) {
+      civicrm_api4($dao->entity_type, 'delete', [
+        'where' => [['id', '=', $dao->entity_id]],
+      ]);
+    }
+    // APIv3 delete
+    elseif ($doDelete) {
       $params = [
         'version' => 3,
         'id' => $dao->entity_id,
       ];
       $check = civicrm_api3($dao->entity_type, 'get', $params);
-      if ((bool) $check['count']) {
+      if ($check['count']) {
         $result = civicrm_api($dao->entity_type, 'delete', $params);
         if ($result['is_error']) {
           if (isset($dao->name)) {
