@@ -29,6 +29,19 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
   private $_dataSourceClass;
 
   /**
+   * Get any smarty elements that may not be present in the form.
+   *
+   * To make life simpler for smarty we ensure they are set to null
+   * rather than unset. This is done at the last minute when $this
+   * is converted to an array to be assigned to the form.
+   *
+   * @return array
+   */
+  public function getOptionalSmartyElements(): array {
+    return ['disableUSPS'];
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception

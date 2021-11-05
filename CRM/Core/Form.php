@@ -908,7 +908,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $params['country'] = $params["country-{$this->_bltID}"] = $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
     }
 
-    list($hasAddressField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params, $this->_bltID);
+    [$hasAddressField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params, $this->_bltID);
     if ($hasAddressField) {
       $params = array_merge($params, $addressParams);
     }
@@ -1023,6 +1023,19 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * Get any smarty elements that may not be present in the form.
+   *
+   * To make life simpler for smarty we ensure they are set to null
+   * rather than unset. This is done at the last minute when $this
+   * is converted to an array to be assigned to the form.
+   *
+   * @return array
+   */
+  public function getOptionalSmartyElements(): array {
+    return [];
+  }
+
+  /**
    * Render form and return contents.
    *
    * @return string
@@ -1035,6 +1048,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $content['formName'] = $this->getName();
     // CRM-15153
     $content['formClass'] = CRM_Utils_System::getClassName($this);
+    foreach ($this->getOptionalSmartyElements() as $string) {
+      if (!array_key_exists($string, $content)) {
+        $content[$string] = NULL;
+      }
+    }
     return $content;
   }
 
@@ -1520,7 +1538,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     // Handle custom field
     if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
-      list(, $id) = explode('_', $name);
+      [, $id] = explode('_', $name);
       $label = $props['label'] ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'label', $id);
       $gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', 'option_group_id', $id);
       if (CRM_Utils_Array::value('context', $props) != 'search') {
