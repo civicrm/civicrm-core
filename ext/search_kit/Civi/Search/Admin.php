@@ -42,6 +42,8 @@ class Admin {
       'defaultDisplay' => SearchDisplay::getDefault(FALSE)->setSavedSearch(['id' => NULL])->execute()->first(),
       'afformEnabled' => $extensions->isActiveModule('afform'),
       'afformAdminEnabled' => $extensions->isActiveModule('afform_admin'),
+      // TODO: Add v4 API for Extensions
+      'modules' => array_column(civicrm_api3('Extension', 'get', ['status' => "installed"])['values'], 'label', 'key'),
       'tags' => Tag::get()
         ->addSelect('id', 'name', 'color', 'is_selectable', 'description')
         ->addWhere('used_for', 'CONTAINS', 'civicrm_saved_search')
