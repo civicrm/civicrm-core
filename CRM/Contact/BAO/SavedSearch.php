@@ -360,7 +360,10 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       if (empty($params['id'])) {
         $params['created_id'] = $loggedInContactID;
       }
-      $params['modified_id'] = $loggedInContactID;
+      // dev/core#2550: Prevent 5.x to 5.36+ upgrade failure
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_saved_search', 'modified_id')) {
+        $params['modified_id'] = $loggedInContactID;
+      }
     }
     // Set by mysql
     unset($params['modified_date']);
