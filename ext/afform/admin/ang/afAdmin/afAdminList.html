@@ -3,7 +3,10 @@
 
   <ul class="nav nav-tabs">
     <li role="presentation" ng-repeat="tab in $ctrl.tabs" ng-class="{active: tab.name === $ctrl.tab}">
-      <a href ng-click="$ctrl.tab = tab.name; $ctrl.searchAfformList = ''"><i class="crm-i {{ tab.icon }}"></i> {{:: tab.plural }}</a>
+      <a href ng-click="$ctrl.tab = tab.name; $ctrl.searchAfformList = ''">
+        <i class="crm-i {{ tab.icon }}"></i> {{:: tab.plural }}
+        <span class="badge">{{ $ctrl.afforms[tab.name].length }}</span>
+      </a>
     </li>
   </ul>
 
