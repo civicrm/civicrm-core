@@ -718,4 +718,80 @@ class SearchRunTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertStringContainsString('bg-warning', $result[2]['columns'][2]['cssClass']);
   }
 
+  /**
+   * Test conditional styles
+   */
+  public function testPlaceholderFields() {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleContacts = [
+      ['first_name' => 'Zero', 'last_name' => $lastName, 'nick_name' => 'Nick'],
+      ['first_name' => 'First', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleContacts)->execute();
+
+    $search = [
+      'name' => 'Test',
+      'label' => 'Test Me',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id', 'nick_name'],
+        'where' => [['last_name', '=', $lastName]],
+      ],
+      'acl_bypass' => FALSE,
+    ];
+
+    $display = [
+      'type' => 'table',
+      'settings' => [
+        'actions' => TRUE,
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'id',
+            'dataType' => 'Integer',
+            'label' => 'Contact ID',
+            'sortable' => TRUE,
+            'alignment' => 'text-center',
+          ],
+          [
+            'type' => 'field',
+            'key' => 'nick_name',
+            'dataType' => 'String',
+            'label' => 'Display Name',
+            'sortable' => TRUE,
+            'rewrite' => '[nick_name] [last_name]',
+            'empty_value' => '[first_name] [last_name]',
+            'link' => [
+              'entity' => 'Contact',
+              'action' => 'view',
+              'target' => '_blank',
+            ],
+            'title' => '[display_name]',
+          ],
+        ],
+      ],
+    ];
+
+    $result = SearchDisplay::Run(FALSE)
+      ->setSavedSearch($search)
+      ->setDisplay($display)
+      ->setReturn('page:1')
+      ->setSort([['id', 'ASC']])
+      ->execute();
+
+    // Has a nick name
+    $this->assertEquals("Nick $lastName", $result[0]['columns'][1]['val']);
+    $this->assertEquals("Nick $lastName", $result[0]['columns'][1]['links'][0]['text']);
+    // Title is display name
+    $this->assertEquals("Zero $lastName", $result[0]['columns'][1]['title']);
+    // No nick name - using first name instead per empty_value setting
+    $this->assertEquals("First $lastName", $result[1]['columns'][1]['val']);
+    $this->assertEquals("First $lastName", $result[1]['columns'][1]['title']);
+    $this->assertEquals("First $lastName", $result[1]['columns'][1]['links'][0]['text']);
+    // Check links
+    $this->assertNotEmpty($result[0]['columns'][1]['links'][0]['url']);
+    $this->assertNotEmpty($result[1]['columns'][1]['links'][0]['url']);
+  }
+
 }

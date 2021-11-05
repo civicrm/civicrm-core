@@ -156,6 +156,32 @@ class CRM_Search_Upgrader extends CRM_Search_Upgrader_Base {
   }
 
   /**
+   * Upgrade 1006 - add image column type
+   * @return bool
+   */
+  public function upgrade_1006(): bool {
+    $this->ctx->log->info('Applying update 1006 - add image column type.');
+    $displays = \Civi\Api4\SearchDisplay::get(FALSE)
+      ->setSelect(['id', 'settings'])
+      ->execute();
+    foreach ($displays as $display) {
+      $update = FALSE;
+      foreach ($display['settings']['columns'] ?? [] as $c => $column) {
+        if (!empty($column['image'])) {
+          $display['settings']['columns'][$c]['type'] = 'image';
+          $update = TRUE;
+        }
+      }
+      if ($update) {
+        \Civi\Api4\SearchDisplay::update(FALSE)
+          ->setValues($display)
+          ->execute();
+      }
+    }
+    return TRUE;
+  }
+
+  /**
    * Add a column to a table if it doesn't already exist
    *
    * FIXME: Move to a shared class, delegate to CRM_Upgrade_Incremental_Base::addColumn

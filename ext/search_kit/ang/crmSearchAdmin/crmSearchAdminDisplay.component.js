@@ -42,6 +42,7 @@
 
       this.preview = this.stale = false;
 
+      // Extra (non-field) colum types
       this.colTypes = {
         links: {
           label: ts('Links'),
@@ -126,10 +127,18 @@
       };
 
       this.getColLabel = function(col) {
-        if (col.type === 'field') {
+        if (col.type === 'field' || col.type === 'image') {
           return ctrl.getFieldLabel(col.key);
         }
         return ctrl.colTypes[col.type].label;
+      };
+
+      this.toggleEmptyVal = function(col) {
+        if (col.empty_value) {
+          delete col.empty_value;
+        } else {
+          col.empty_value = ts('None');
+        }
       };
 
       this.toggleRewrite = function(col) {
@@ -142,14 +151,22 @@
       };
 
       this.toggleImage = function(col) {
-        if (col.image) {
+        if (col.type === 'image') {
           delete col.image;
+          col.type = 'field';
         } else {
           col.image = {
             alt: this.getColLabel(col)
           };
           delete col.editable;
+          col.type = 'image';
         }
+      };
+
+      this.canBeImage = function(col) {
+        var expr = ctrl.getExprFromSelect(col.key),
+          info = searchMeta.parseExpr(expr);
+        return info.args[0] && info.args[0].field && info.args[0].field.input_type === 'File';
       };
 
       this.toggleEditable = function(col) {
@@ -163,7 +180,7 @@
       this.canBeEditable = function(col) {
         var expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr);
-        return !col.image && !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
+        return !col.rewrite && !col.link && !info.fn && info.args[0] && info.args[0].field && !info.args[0].field.readonly;
       };
 
       // Checks if a column contains a sortable value
