@@ -125,7 +125,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   public static function createMapXML($ids, $locationId, &$page, $addBreadCrumb, $type = 'Contact') {
     $config = CRM_Core_Config::singleton();
 
-    $this->setTitle(ts('Map Location(s)'));
+    $page->setTitle(ts('Map Location(s)'));
     $page->assign('query', 'CiviCRM Search Query');
     $page->assign('mapProvider', $config->mapProvider);
     $page->assign('mapKey', urlencode($config->mapAPIKey));
