@@ -98,6 +98,16 @@ class CRM_Core_Page {
   public $useLivePageJS;
 
   /**
+   * Variables smarty expects to have set.
+   *
+   * We ensure these are assigned (value = NULL) when Smarty is instantiated in
+   * order to avoid e-notices / having to use empty or isset in the template layer.
+   *
+   * @var string[]
+   */
+  public $expectedSmartyVariables = ['breadcrumb', 'pageTitle', 'isForm', 'hookContent'];
+
+  /**
    * Class constructor.
    *
    * @param string $title
@@ -116,6 +126,7 @@ class CRM_Core_Page {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
+      self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     }
 
     // FIXME - why are we messing with 'snippet'? Why not just pass it directly into $this->_print?

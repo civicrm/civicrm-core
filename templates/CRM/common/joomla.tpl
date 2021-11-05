@@ -53,7 +53,7 @@
     <div id="crm-main-content-wrapper">
       {include file="CRM/common/status.tpl"}
       {crmRegion name='page-body'}
-        {if isset($isForm) and $isForm and isset($formTpl)}
+        {if $isForm and $formTpl}
           {include file="CRM/Form/$formTpl.tpl"}
         {else}
           {include file=$tplFile}
