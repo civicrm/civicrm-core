@@ -49,27 +49,16 @@ class CRM_Upgrade_Incremental_php_FiveFortyFive extends CRM_Upgrade_Incremental_
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
-
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev): void {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...): bool {
-  //   return TRUE;
-  // }
+  public function upgrade_5_45_alpha1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add entity_modified_date column to civicrm_managed', 'addColumn',
+      'civicrm_managed', 'entity_modified_date', "timestamp NULL DEFAULT NULL COMMENT 'When the managed entity was changed from its original settings.'"
+    );
+  }
 
 }

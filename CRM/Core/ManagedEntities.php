@@ -336,7 +336,7 @@ class CRM_Core_ManagedEntities {
    *   Entity specification (per hook_civicrm_managedEntities).
    */
   protected function updateExistingEntity($dao, $todo) {
-    $policy = CRM_Utils_Array::value('update', $todo, 'always');
+    $policy = $todo['update'] ?? 'always';
     $doUpdate = ($policy === 'always');
 
     if ($doUpdate && $todo['params']['version'] == 3) {
@@ -374,8 +374,10 @@ class CRM_Core_ManagedEntities {
       civicrm_api4($dao->entity_type, 'update', $params);
     }
 
-    if (isset($todo['cleanup'])) {
-      $dao->cleanup = $todo['cleanup'];
+    if (isset($todo['cleanup']) || $doUpdate) {
+      $dao->cleanup = $todo['cleanup'] ?? NULL;
+      // Reset the `entity_modified_date` timestamp if reverting record.
+      $dao->entity_modified_date = $doUpdate ? 'null' : NULL;
       $dao->update();
     }
   }
@@ -401,6 +403,9 @@ class CRM_Core_ManagedEntities {
       if ($result['is_error']) {
         $this->onApiError($dao->entity_type, 'create', $params, $result);
       }
+      // Reset the `entity_modified_date` timestamp to indicate that the entity has not been modified by the user.
+      $dao->entity_modified_date = 'null';
+      $dao->update();
     }
   }
 

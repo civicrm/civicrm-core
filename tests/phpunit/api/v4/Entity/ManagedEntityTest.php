@@ -70,22 +70,28 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
 
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
+      ->addSelect('description', 'local_modified_date')
       ->execute()->single();
     $this->assertEquals('Original state', $search['description']);
+    $this->assertNull($search['local_modified_date']);
 
     SavedSearch::update(FALSE)
       ->addValue('id', $search['id'])
       ->addValue('description', 'Altered state')
       ->execute();
 
+    $time = $this->getCurrentTimestamp();
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('description', 'has_base', 'base_module')
+      ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
       ->execute()->single();
     $this->assertEquals('Altered state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
     $this->assertEquals('civicrm', $search['base_module']);
+    // local_modified_date should reflect the update just made
+    $this->assertGreaterThanOrEqual($time, $search['local_modified_date']);
+    $this->assertLessThanOrEqual($this->getCurrentTimestamp(), $search['local_modified_date']);
 
     SavedSearch::revert(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
@@ -94,7 +100,7 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     // Entity should be revered to original state
     $result = SavedSearch::get(FALSE)
       ->addWhere('name', '=', 'TestManagedSavedSearch')
-      ->addSelect('description', 'has_base', 'base_module')
+      ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
       ->setDebug(TRUE)
       ->execute();
     $search = $result->single();
@@ -102,6 +108,8 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     // Check calculated fields
     $this->assertTrue($search['has_base']);
     $this->assertEquals('civicrm', $search['base_module']);
+    // local_modified_date should be reset by the revert action
+    $this->assertNull($search['local_modified_date']);
 
     // Check calculated fields for a non-managed entity - they should be empty
     $newName = uniqid(__FUNCTION__);
@@ -111,12 +119,13 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       ->execute();
     $search = SavedSearch::get(FALSE)
       ->addWhere('name', '=', $newName)
-      ->addSelect('label', 'has_base', 'base_module')
+      ->addSelect('label', 'has_base', 'base_module', 'local_modified_date')
       ->execute()->single();
     $this->assertEquals('Whatever', $search['label']);
     // Check calculated fields
     $this->assertEquals(NULL, $search['base_module']);
     $this->assertFalse($search['has_base']);
+    $this->assertNull($search['local_modified_date']);
   }
 
   /**
@@ -141,6 +150,10 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
       // v4 entity using ManagedEntity trait
       'SavedSearch' => ['SavedSearch', TRUE],
     ];
+  }
+
+  private function getCurrentTimestamp() {
+    return \CRM_Core_DAO::singleValueQuery('SELECT CURRENT_TIMESTAMP');
   }
 
 }

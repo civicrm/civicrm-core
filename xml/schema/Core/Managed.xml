@@ -76,6 +76,14 @@
     </html>
     <add>4.5</add>
   </field>
+  <field>
+    <name>entity_modified_date</name>
+    <type>timestamp</type>
+    <comment>When the managed entity was changed from its original settings.</comment>
+    <required>false</required>
+    <default>NULL</default>
+    <add>5.45</add>
+  </field>
   <index>
     <name>UI_managed_entity</name>
     <fieldName>entity_type</fieldName>

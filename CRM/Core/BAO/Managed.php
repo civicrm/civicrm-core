@@ -32,6 +32,13 @@ class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Test\Hoo
         ->addWhere('entity_id', '=', $event->id)
         ->execute();
     }
+    // When an entity is updated, update the timestamp in corresponding Managed record
+    elseif ($event->action === 'edit' && $event->id && self::isApi4ManagedType($event->entity)) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_managed SET entity_modified_date = CURRENT_TIMESTAMP WHERE entity_type = %1 AND entity_id = %2', [
+        1 => [$event->entity, 'String'],
+        2 => [$event->id, 'Integer'],
+      ]);
+    }
   }
 
   /**
