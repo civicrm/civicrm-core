@@ -9,7 +9,7 @@
 *}
 {if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
   {include file="CRM/common/accesskeys.tpl"}
-  {if !empty($contactId)}
+  {if $contactId}
     {include file="CRM/common/contactFooter.tpl"}
   {/if}
 
