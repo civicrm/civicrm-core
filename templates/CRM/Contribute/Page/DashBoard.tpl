@@ -13,24 +13,24 @@
 <tr class="columnheader-dark">
     <th scope="col">{ts}Period{/ts}</th>
     <th scope="col">{ts}Total Amount{/ts}</th>
-    <th scope="col" title="Contribution Count"><strong>#</strong></th><th></th></tr>
+    <th scope="col" title="{ts}Contribution Count{/ts}"><strong>#</strong></th><th></th></tr>
 <tr>
     <td><strong>{ts}Current Month-To-Date{/ts}</strong></td>
     <td class="label">{if NOT $monthToDate.Valid.amount}{ts}(n/a){/ts}{else}{$monthToDate.Valid.amount}{/if}</td>
     <td class="label">{$monthToDate.Valid.count}</td>
-    <td><a href="{$monthToDate.Valid.url}">{ts}view details{/ts}...</a></td>
+    <td><a href="{$monthToDate.Valid.url}">{ts}View details{/ts}...</a></td>
 </tr>
 <tr>
     <td><strong>{ts}Current Fiscal Year-To-Date{/ts}</strong></td>
     <td class="label">{if NOT $yearToDate.Valid.amount}{ts}(n/a){/ts}{else}{$yearToDate.Valid.amount}{/if}</td>
     <td class="label">{$yearToDate.Valid.count}</td>
-    <td><a href="{$yearToDate.Valid.url}">{ts}view details{/ts}...</a></td>
+    <td><a href="{$yearToDate.Valid.url}">{ts}View details{/ts}...</a></td>
 </tr>
 <tr>
     <td><strong>{ts}Cumulative{/ts}</strong><br />{ts}(since inception){/ts}</td>
     <td class="label">{if NOT $startToDate.Valid.amount}{ts}(n/a){/ts}{else}{$startToDate.Valid.amount}{/if}</td>
     <td class="label">{$startToDate.Valid.count}</td>
-    <td><a href="{$startToDate.Valid.url}">{ts}view details{/ts}...</a></td>
+    <td><a href="{$startToDate.Valid.url}">{ts}View details{/ts}...</a></td>
 </tr>
 </table>
 {elseif $buildChart}

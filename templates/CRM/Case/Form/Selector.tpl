@@ -13,7 +13,7 @@
   <tr class="columnheader">
 
   {if ! $single and $context eq 'Search' }
-    <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+    <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
   {/if}
 
   <th></th>

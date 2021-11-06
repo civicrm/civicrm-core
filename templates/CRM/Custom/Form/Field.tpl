@@ -105,12 +105,12 @@
       </td>
     </tr>
     <tr class="crm-custom-field-form-block-default_value" id="hideDefault" {if $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
-      <td title="hideDefaultValTxt" class="label">{$form.default_value.label}</td>
-      <td title="hideDefaultValDef" class="html-adjust">{$form.default_value.html}</td>
+      <td class="label">{$form.default_value.label}</td>
+      <td class="html-adjust">{$form.default_value.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-description"  id="hideDesc" {if $action neq 4 && $action eq 2 && ($form.data_type.value.0.0 < 4 && $form.data_type.value.1.0 NEQ 'Text')}class="hiddenElement"{/if}>
-      <td title="hideDescTxt" class="label">&nbsp;</td>
-      <td title="hideDescDef" class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
+      <td class="label">&nbsp;</td>
+      <td class="html-adjust"><span class="description">{ts}If you want to provide a default value for this field, enter it here. For date fields, format is YYYY-MM-DD.{/ts}</span></td>
     </tr>
     <tr class="crm-custom-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_pre' id=$id}{/if}</td>

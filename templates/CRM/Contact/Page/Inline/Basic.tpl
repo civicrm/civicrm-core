@@ -28,7 +28,7 @@
       <span class="crm-contact-contact_id">{$contactId}</span>
       {if !empty($userRecordUrl)}
         <span class="crm-contact-user_record_id">
-          &nbsp;/&nbsp;<a title="View user record" class="user-record-link"
+          &nbsp;/&nbsp;<a title="{ts}View user record{/ts}" class="user-record-link"
                           href="{$userRecordUrl}">{$userRecordId}</a>
         </span>
       {/if}
