@@ -323,7 +323,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
             "Boolean"
           );
 
-          $isTest = $value ? 'a Test' : 'not a Test';
+          $isTest = $value ? ts('a Test') : ts('not a Test');
           $query->_qill[$grouping][] = ts("Participant is %1", [1 => $isTest]);
           $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
         }

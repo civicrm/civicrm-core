@@ -109,7 +109,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
         //build the params for chart.
         $chartData['by_month']['values'][$monthName] = $val;
       }
-      $chartData['by_month']['legend'] = 'By Month' . ' - ' . $selectedYear;
+      $chartData['by_month']['legend'] = ts('By Month - %1', [1 => $selectedYear]);
 
       // handle onclick event.
       $chartData['by_month']['on_click_fun_name'] = 'byMonthOnClick';
@@ -124,7 +124,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     $hasContributions = FALSE;
     if (is_array($chartInfoYearly)) {
       $hasContributions = TRUE;
-      $chartData['by_year']['legend'] = 'By Year';
+      $chartData['by_year']['legend'] = ts('By Year');
       $chartData['by_year']['values'] = $chartInfoYearly['By Year'];
 
       // handle onclick event.

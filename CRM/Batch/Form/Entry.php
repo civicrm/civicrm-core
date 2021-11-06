@@ -319,7 +319,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $this->add('select', "member_option[$rowNumber]", '', $options);
       }
       if ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment']) {
-        $options = ['' => '-select-'];
+        $options = ['' => ts('-select-')];
         $optionTypes = [
           '1' => ts('Adjust Pledge Payment Schedule?'),
           '2' => ts('Adjust Total Pledge Amount?'),

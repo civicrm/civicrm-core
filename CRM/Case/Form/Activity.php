@@ -255,7 +255,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $openCaseID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       unset($aTypes[$openCaseID]);
       asort($aTypes);
-      $this->_fields['followup_activity_type_id']['attributes'] = ['' => '- select activity type -'] + $aTypes;
+      $this->_fields['followup_activity_type_id']['attributes'] = ['' => ts('- select activity type -')] + $aTypes;
     }
 
     parent::buildQuickForm();
