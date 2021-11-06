@@ -81,7 +81,7 @@ class CRM_Contact_Form_Edit_Individual {
 
     if (!$inlineEditMode) {
       //External Identifier Element
-      $form->addField('external_identifier', ['label' => 'External ID']);
+      $form->addField('external_identifier', ['label' => ts('External ID')]);
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),

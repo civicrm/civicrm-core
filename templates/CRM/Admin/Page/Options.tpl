@@ -100,7 +100,7 @@
                     {ts}Value{/ts}
                 {/if}
             </th>
-            {if $gName eq "payment_instrument"}<th>Account</th>{/if}
+            {if $gName eq "payment_instrument"}<th>{ts}Account{/ts}</th>{/if}
             {if !empty($showCounted)}<th>{ts}Counted?{/ts}</th>{/if}
             {if !empty($showVisibility)}<th>{ts}Visibility{/ts}</th>{/if}
             <th id="nosort">{ts}Description{/ts}</th>

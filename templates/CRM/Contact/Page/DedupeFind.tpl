@@ -55,7 +55,7 @@
     </div><!-- /.crm-accordion-body -->
   </div><!-- /.crm-accordion-wrapper -->
   <div>
-    Show / Hide columns:
+    {ts}Show / Hide columns:{/ts}
     <input type='checkbox' id='steet-address' class='toggle-vis' data-column-main="7" data-column-dupe="8" >
         <label for="steet-address">{ts}Street Address{/ts}&nbsp;</label>
     <input type='checkbox' id='post-code' class='toggle-vis' data-column-main="9" data-column-dupe="10" >

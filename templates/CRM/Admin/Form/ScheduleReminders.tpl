@@ -31,7 +31,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>OR</strong><br /></td>
+        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>{ts}OR{/ts}</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">

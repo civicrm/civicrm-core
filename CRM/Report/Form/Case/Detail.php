@@ -122,7 +122,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         'dao' => 'CRM_Case_DAO_Case',
         'order_bys' => [
           'case_type_title' => [
-            'title' => 'Case Type',
+            'title' => ts('Case Type'),
             'name' => 'title',
           ],
         ],
