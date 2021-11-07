@@ -157,7 +157,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     // check logged in user permission
     self::checkUserPermission($this);
 
-    list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl) = self::getContactDetails($this->_contactId);
+    [$displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl] = self::getContactDetails($this->_contactId);
     $this->assign('displayName', $displayName);
 
     $this->set('contactType', $contactType);
@@ -208,19 +208,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
     // Add links for actions menu
     self::addUrls($this, $this->_contactId);
-
-    if ($contactType == 'Organization' &&
-      CRM_Core_Permission::check('administer Multiple Organizations') &&
-      Civi::settings()->get('is_enabled')) {
-      //check is any relationship between the organization and groups
-      $groupOrg = CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId);
-      if ($groupOrg) {
-        $groupOrganizationUrl = CRM_Utils_System::url('civicrm/group',
-          "reset=1&oid={$this->_contactId}"
-        );
-        $this->assign('groupOrganizationUrl', $groupOrganizationUrl);
-      }
-    }
+    $this->assign('groupOrganizationUrl', $this->getGroupOrganizationUrl($contactType));
   }
 
   /**
@@ -292,7 +280,7 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     static $contactDetails;
     $contactImage = NULL;
     if (!isset($contactDetails[$contactId])) {
-      list($displayName, $contactImage) = self::getContactDetails($contactId);
+      [$displayName, $contactImage] = self::getContactDetails($contactId);
       $contactDetails[$contactId] = [
         'displayName' => $displayName,
         'contactImage' => $contactImage,
@@ -369,6 +357,21 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     if (is_array($hookLinks)) {
       $obj->assign('hookLinks', $hookLinks);
     }
+  }
+
+  /**
+   * @param string $contactType
+   *
+   * @return string
+   */
+  protected function getGroupOrganizationUrl(string $contactType): string {
+    if ($contactType !== 'Organization' || !CRM_Core_Permission::check('administer Multiple Organizations')
+      || !CRM_Contact_BAO_GroupOrganization::hasGroupAssociated($this->_contactId)
+      || !Civi::settings()->get('is_enabled')
+    ) {
+      return '';
+    }
+    return CRM_Utils_System::url('civicrm/group', "reset=1&oid={$this->_contactId}");
   }
 
 }
