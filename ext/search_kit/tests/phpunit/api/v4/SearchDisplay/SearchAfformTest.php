@@ -24,7 +24,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->apply();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     Afform::revert(FALSE)->addWhere('has_local', '=', TRUE)->execute();
     parent::tearDown();
   }

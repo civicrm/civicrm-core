@@ -185,6 +185,7 @@ class CRM_Core_ManagedEntities {
       $dao->name = $todo['name'];
       $dao->entity_type = $todo['entity_type'];
       $dao->entity_id = $todo['entity_id'];
+      $dao->entity_modified_date = $todo['entity_modified_date'];
       $dao->id = $todo['id'];
       $this->updateExistingEntity($dao, $todo);
     }
@@ -234,7 +235,8 @@ class CRM_Core_ManagedEntities {
    * @return array
    */
   protected function getManagedEntitiesToDelete(array $filters = []): array {
-    return $this->getManagedEntities(array_merge($filters, ['managed_action' => 'delete']));
+    // Return array in reverse-order so that child entities are cleaned up before their parents
+    return array_reverse($this->getManagedEntities(array_merge($filters, ['managed_action' => 'delete'])));
   }
 
   /**
@@ -339,6 +341,14 @@ class CRM_Core_ManagedEntities {
     $policy = $todo['update'] ?? 'always';
     $doUpdate = ($policy === 'always');
 
+    if ($policy === 'unmodified') {
+      // If this is not an APIv4 managed entity, the entity_modidfied_date will always be null
+      if (!CRM_Core_BAO_Managed::isApi4ManagedType($dao->entity_type)) {
+        Civi::log()->warning('ManagedEntity update policy "unmodified" specified for entity type ' . $dao->entity_type . ' which is not an APIv4 ManagedEntity. Falling back to policy "always".');
+      }
+      $doUpdate = empty($dao->entity_modified_date);
+    }
+
     if ($doUpdate && $todo['params']['version'] == 3) {
       $defaults = ['id' => $dao->entity_id];
       if ($this->isActivationSupported($dao->entity_type)) {
@@ -427,13 +437,18 @@ class CRM_Core_ManagedEntities {
         break;
 
       case 'unused':
-        $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', [
-          'debug' => 1,
-          'id' => $dao->entity_id,
-        ]);
+        if (CRM_Core_BAO_Managed::isApi4ManagedType($dao->entity_type)) {
+          $getRefCount = \Civi\Api4\Utils\CoreUtil::getRefCount($dao->entity_type, $dao->entity_id);
+        }
+        else {
+          $getRefCount = civicrm_api3($dao->entity_type, 'getrefcount', [
+            'id' => $dao->entity_id,
+          ])['values'];
+        }
 
+        // FIXME: This extra counting should be unnecessary, because getRefCount only returns values if count > 0
         $total = 0;
-        foreach ($getRefCount['values'] as $refCount) {
+        foreach ($getRefCount as $refCount) {
           $total += $refCount['count'];
         }
 
