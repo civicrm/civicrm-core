@@ -1096,11 +1096,17 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       case 'Radio':
       case 'CheckBox':
         if ($field['data_type'] == 'ContactReference' && (is_array($value) || is_numeric($value))) {
-          $displayNames = [];
-          foreach ((array) $value as $contactId) {
-            $displayNames[] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+          // Issue #2939 - guard against passing empty values to CRM_Core_DAO::getFieldValue(), which would throw an exception
+          if (empty($value)) {
+            $display = '';
           }
-          $display = implode(', ', $displayNames);
+          else {
+            $displayNames = [];
+            foreach ((array) $value as $contactId) {
+              $displayNames[] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
+            }
+            $display = implode(', ', $displayNames);
+          }
         }
         elseif ($field['data_type'] == 'ContactReference') {
           $display = $value;
