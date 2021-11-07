@@ -15,7 +15,7 @@
     <thead class="sticky">
     <tr>
       {if !$single and $context eq 'Search' }
-        <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+        <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
       {/if}
       {if !$single}
       <th scope="col"></th>

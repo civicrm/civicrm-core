@@ -15,7 +15,7 @@
 <table summary="{ts}Search results listings.{/ts}" class="selector row-highlight">
   <thead class="sticky">
     <tr>
-      <th scope="col" title="Select All Rows">{$form.toggleSelect.html}</th>
+      <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
       {if $context eq 'smog'}
           <th scope="col">
             {ts}Status{/ts}

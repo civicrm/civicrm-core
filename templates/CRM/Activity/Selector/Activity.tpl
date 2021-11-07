@@ -14,7 +14,7 @@
   <h3 class="crm-table-title">{ts}Activities{/ts}</h3>
   {/if}
 {if $rows}
-  <form title="activity_pager" action="{crmURL}" method="post">
+  <form action="{crmURL}" method="post">
   {include file="CRM/common/pager.tpl" location="top"}
 
   {strip}

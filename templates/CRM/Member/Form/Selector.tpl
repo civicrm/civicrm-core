@@ -15,7 +15,7 @@
 <table class="selector row-highlight">
 <thead class="sticky">
 {if ! $single and $context eq 'Search' }
-  <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
+  <th scope="col" title="{ts}Select rows{/ts}">{$form.toggleSelect.html}</th>
 {/if}
   {foreach from=$columnHeaders item=header}
     <th scope="col">
