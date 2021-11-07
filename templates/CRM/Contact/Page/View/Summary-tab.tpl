@@ -9,9 +9,9 @@
 *}
 {* Summary tab from Contact Summary screen *}
 
-{if (isset($hookContentPlacement) and ($hookContentPlacement neq 3)) or empty($hookContentPlacement)}
+{if $hookContentPlacement !== 3}
 
-  {if !empty($hookContent) and isset($hookContentPlacement) and $hookContentPlacement eq 2}
+  {if $hookContent && $hookContentPlacement eq 2}
     {include file="CRM/Contact/Page/View/SummaryHook.tpl"}
   {/if}
 
@@ -148,7 +148,7 @@
     </div>
   {/if}
 
-  {if !empty($hookContent) and isset($hookContentPlacement) and $hookContentPlacement eq 1}
+  {if $hookContent && $hookContentPlacement eq 1}
     {include file="CRM/Contact/Page/View/SummaryHook.tpl"}
   {/if}
 {else}
