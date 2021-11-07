@@ -918,7 +918,9 @@ class CRM_Core_DAO extends DB_DataObject {
 
     \CRM_Utils_Hook::pre($hook, $entityName, $record['id'] ?? NULL, $record);
     $instance = new $className();
-    $instance->copyValues($record);
+    // Ensure fields exist before attempting to write to them
+    $values = array_intersect_key($record, self::getSupportedFields());
+    $instance->copyValues($values);
     $instance->save();
     \CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
