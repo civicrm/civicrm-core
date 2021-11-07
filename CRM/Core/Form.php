@@ -254,6 +254,18 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   ];
 
   /**
+   * Variables smarty expects to have set.
+   *
+   * We ensure these are assigned (value = NULL) when Smarty is instantiated in
+   * order to avoid e-notices / having to use empty or isset in the template layer.
+   *
+   * @var string[]
+   */
+  public $expectedSmartyVariables = [
+    'beginHookFormElements',
+  ];
+
+  /**
    * Constructor for the basic form page.
    *
    * We should not use QuickForm directly. This class provides a lot
@@ -297,6 +309,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
+      self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     }
     // Workaround for CRM-15153 - give each form a reasonably unique css class
     $this->addClass(CRM_Utils_System::getClassName($this));
