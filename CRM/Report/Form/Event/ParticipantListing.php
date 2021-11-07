@@ -183,6 +183,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
           'rid' => array(
             'name' => 'role_id',
             'title' => ts('Participant Role'),
+            'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantRole(),
           ),
@@ -207,6 +208,11 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
           ),
+          'is_test' => [
+            'title' => ts('Is Test'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'default' => 0,
+          ],
         ),
         'order_bys' => array(
           'participant_register_date' => array(
@@ -526,67 +532,6 @@ ORDER BY  cv.label
                   ON (ft.id = eft.financial_trxn_id AND eft.entity_table = 'civicrm_contribution') AND
                      (ft.is_payment = 1)
       ";
-    }
-  }
-
-  public function where() {
-    $clauses = [];
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-
-          if (CRM_Utils_Array::value('type', $field) & CRM_Utils_Type::T_DATE) {
-            $relative = $this->_params["{$fieldName}_relative"] ?? NULL;
-            $from = $this->_params["{$fieldName}_from"] ?? NULL;
-            $to = $this->_params["{$fieldName}_to"] ?? NULL;
-
-            if ($relative || $from || $to) {
-              $clause = $this->dateClause($field['name'], $relative, $from, $to, $field['type']);
-            }
-          }
-          else {
-            $op = $this->_params["{$fieldName}_op"] ?? NULL;
-
-            if ($fieldName == 'rid') {
-              $value = $this->_params["{$fieldName}_value"] ?? NULL;
-              if (!empty($value)) {
-                $operator = '';
-                if ($op == 'notin') {
-                  $operator = 'NOT';
-                }
-
-                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
-                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
-              }
-              $op = NULL;
-            }
-
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-    if (empty($clauses)) {
-      $this->_where = "WHERE {$this->_aliases['civicrm_participant']}.is_test = 0 ";
-    }
-    else {
-      $this->_where = "WHERE {$this->_aliases['civicrm_participant']}.is_test = 0 AND " .
-        implode(' AND ', $clauses);
-    }
-    if ($this->_aclWhere) {
-      $this->_where .= " AND {$this->_aclWhere} ";
     }
   }
 
