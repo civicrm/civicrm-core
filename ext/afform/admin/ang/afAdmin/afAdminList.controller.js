@@ -126,7 +126,7 @@
         if (afform.has_base) {
           apiOps.push(['Afform', 'get', {
             where: [['name', '=', afform.name]],
-            select: ['name', 'title', 'type', 'is_public', 'server_route', 'has_local', 'has_base']
+            select: ['name', 'title', 'type', 'is_public', 'server_route', 'has_local', 'has_base', 'base_module', 'base_module:label']
           }, 0]);
         }
         var apiCall = crmStatus(

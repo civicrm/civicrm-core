@@ -107,6 +107,7 @@ class BasicGetAction extends AbstractGetAction {
     $fields = $this->entityFields();
     foreach ($records as &$values) {
       foreach ($this->entityFields() as $field) {
+        $values += [$field['name'] => NULL];
         if (!empty($field['options'])) {
           foreach (FormattingUtil::$pseudoConstantSuffixes as $suffix) {
             $pseudofield = $field['name'] . ':' . $suffix;

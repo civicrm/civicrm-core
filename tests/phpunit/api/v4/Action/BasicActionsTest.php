@@ -279,7 +279,7 @@ class BasicActionsTest extends UnitTestCase implements HookInterface {
 
     foreach (MockBasicEntity::get()->addSelect('*')->execute() as $result) {
       ksort($result);
-      $this->assertEquals(['color', 'group', 'identifier', 'shape', 'size', 'weight'], array_keys($result));
+      $this->assertEquals(['color', 'foo', 'fruit', 'group', 'identifier', 'shape', 'size', 'weight'], array_keys($result));
     }
 
     $result = MockBasicEntity::get()

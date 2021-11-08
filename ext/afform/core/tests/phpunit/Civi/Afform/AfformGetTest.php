@@ -52,6 +52,7 @@ class AfformGetTest extends \PHPUnit\Framework\TestCase implements HeadlessInter
     $this->assertEquals($this->formName, $result['name']);
     $this->assertFalse($result['has_base']);
     $this->assertArrayNotHasKey('has_local', $result);
+    $this->assertArrayNotHasKey('base_module', $result);
   }
 
   public function testGetSearchDisplays() {
