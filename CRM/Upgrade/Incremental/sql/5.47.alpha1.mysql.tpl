@@ -15,3 +15,14 @@ UPDATE `civicrm_navigation` SET `weight` = 0 WHERE `weight` IS NULL;
 ALTER TABLE `civicrm_navigation`
   MODIFY COLUMN `is_active` tinyint NOT NULL DEFAULT 1 COMMENT 'Is this navigation item active?',
   MODIFY COLUMN `weight` int NOT NULL DEFAULT 0 COMMENT 'Ordering of the navigation items in various blocks.';
+
+{* https://lab.civicrm.org/dev/core/-/issues/2122 *}
+UPDATE `civicrm_event` SET `start_date` = NULL WHERE `start_date` < 19700102;
+UPDATE `civicrm_event` SET `end_date` = NULL WHERE `end_date` < 19700102;
+UPDATE `civicrm_event` SET `registration_start_date` = NULL WHERE `registration_start_date` < 19700102;
+UPDATE `civicrm_event` SET `registration_end_date` = NULL WHERE `registration_end_date` < 19700102;
+ALTER TABLE `civicrm_event`
+  MODIFY COLUMN `start_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that event starts.',
+  MODIFY COLUMN `end_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that event ends. May be NULL if no defined end date/time',
+  MODIFY COLUMN `registration_start_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that online registration starts.',
+  MODIFY COLUMN `registration_end_date` timestamp NULL DEFAULT NULL COMMENT 'Date and time that online registration ends.';
