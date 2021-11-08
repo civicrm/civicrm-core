@@ -1,0 +1,10 @@
+<div
+  ng-if="routeParams.name"
+  af-api4="['Afform', 'get', {select: ['title'], where: [['name', '=', routeParams.name]]}, 0]"
+  af-api4-ctrl="api4">
+  <h2>{{ ts('%1 Submissions', {1: api4.result.title || ts('Loading')}) }}</h2>
+</div>
+<div af-fieldset="">
+  <crm-search-display-table search-name="AfAdmin_Submission_List" display-name="AfAdmin_Submission_List_Display" filters="{afform_name: routeParams.name}">
+  </crm-search-display-table>
+</div>
