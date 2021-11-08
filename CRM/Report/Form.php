@@ -1321,6 +1321,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $this->assign('tabs', $this->tabs);
     }
 
+    CRM_Utils_Hook::alterReportVar('colGroups', $colGroups, $this);
     $this->assign('colGroups', $colGroups);
   }
 
