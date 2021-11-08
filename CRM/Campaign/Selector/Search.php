@@ -267,7 +267,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
 
       $selectSQL = "
       SELECT %1, contact_a.id, contact_a.display_name
-{$sql['from']}
+{$sql['from']} {$sql['where']}
 ";
 
       try {
