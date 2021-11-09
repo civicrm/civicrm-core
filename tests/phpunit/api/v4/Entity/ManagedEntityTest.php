@@ -352,6 +352,17 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertCount(0, OptionGroup::get(FALSE)->addWhere('name', '=', 'testManagedOptionGroup')->execute());
   }
 
+  public function testExportOptionGroupWithDomain() {
+    $result = OptionGroup::get(FALSE)
+      ->addWhere('name', '=', 'from_email_address')
+      ->addChain('export', OptionGroup::export()->setId('$id'))
+      ->execute()->first();
+    $this->assertEquals('from_email_address', $result['export'][1]['params']['values']['option_group_id.name']);
+    $this->assertEquals('current_domain', $result['export'][1]['params']['values']['domain_id']);
+    $this->assertNull($result['export'][1]['params']['values']['visibility_id']);
+    $this->assertStringStartsWith('OptionGroup_from_email_address_OptionValue_', $result['export'][1]['name']);
+  }
+
   /**
    * @dataProvider sampleEntityTypes
    * @param string $entityName
