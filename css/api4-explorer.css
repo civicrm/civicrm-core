@@ -26,10 +26,7 @@
   border-bottom-left-radius: 0;
   margin-bottom: 0;
 }
-#bootstrap-theme.api4-explorer-page .panel-heading.nav-tabs {
-  padding: 8px 0 0 20px;
-}
-#bootstrap-theme .panel-heading>li>a {
+#bootstrap-theme .panel-heading li>a {
   background-color: #f1f1f18c
 }
 #bootstrap-theme.api4-explorer-page .explorer-code-panel pre {
@@ -37,7 +34,7 @@
   word-break: break-all;
   white-space: pre-wrap;
 }
-#bootstrap-theme.api4-explorer-page .explorer-code-panel .panel-heading.nav li a {
+#bootstrap-theme.api4-explorer-page .explorer-code-panel .panel-heading>.nav li a {
   text-transform: uppercase;
 }
 

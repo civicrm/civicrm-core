@@ -42,6 +42,7 @@
     var getMetaParams = {},
       objectParams = {orderBy: 'ASC', values: '', defaults: '', chain: ['Entity', '', '{}']},
       docs = CRM.vars.api4.docs,
+      response,
       helpTitle = '',
       helpContent = {};
     $scope.helpTitle = '';
@@ -74,6 +75,17 @@
         {name: 'pipe', label: ts('CV (pipe)'), code: ''}
       ]
     };
+    this.resultFormat = 'json';
+    this.resultFormats = [
+      {
+        name: 'json',
+        label: ts('View as JSON')
+      },
+      {
+        name: 'php',
+        label: ts('View as PHP')
+      },
+    ];
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description', 'icon']);
@@ -261,9 +273,9 @@
         return;
       }
       var info = {
-          description: field.description,
-          type: field.data_type
-        };
+        description: field.description,
+        type: field.data_type
+      };
       if (field.default_value) {
         info.default = field.default_value;
       }
@@ -846,22 +858,37 @@
           'X-Requested-With': 'XMLHttpRequest'
         }
       }).then(function(resp) {
-          $scope.loading = false;
-          $scope.status = resp.data && resp.data.debug && resp.data.debug.log ? 'warning' : 'success';
-          $scope.debug = debugFormat(resp.data);
-          $scope.result = [
-            formatMeta(resp.data),
-            prettyPrintOne((_.isArray(resp.data.values) ? '(' + resp.data.values.length + ') ' : '') + _.escape(JSON.stringify(resp.data.values, null, 2)), 'js', 1)
-          ];
-        }, function(resp) {
-          $scope.loading = false;
-          $scope.status = 'danger';
-          $scope.debug = debugFormat(resp.data);
-          $scope.result = [
-            formatMeta(resp),
-            prettyPrintOne(_.escape(JSON.stringify(resp.data, null, 2)))
-          ];
-        });
+        $scope.loading = false;
+        $scope.status = resp.data && resp.data.debug && resp.data.debug.log ? 'warning' : 'success';
+        $scope.debug = debugFormat(resp.data);
+        response = {
+          meta: resp.data,
+          values: resp.data.values
+        };
+        ctrl.formatResult();
+      }, function(resp) {
+        $scope.loading = false;
+        $scope.status = 'danger';
+        $scope.debug = debugFormat(resp.data);
+        response = {
+          meta: resp,
+          values: resp.data
+        };
+        ctrl.formatResult();
+      });
+    };
+
+    ctrl.formatResult = function() {
+      $scope.result = [formatMeta(response.meta)];
+      switch (ctrl.resultFormat) {
+        case 'json':
+          $scope.result.push(prettyPrintOne((_.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(JSON.stringify(response.values, null, 2)), 'js', 1));
+          break;
+
+        case 'php':
+          $scope.result.push(prettyPrintOne((_.isArray(response.values) ? '(' + response.values.length + ') ' : '') + _.escape(phpFormat(response.values, 2, 2)), 'php', 1));
+          break;
+      }
     };
 
     function debugFormat(data) {
@@ -873,27 +900,34 @@
     /**
      * Format value to look like php code
      */
-    function phpFormat(val, indent) {
+    function phpFormat(val, indent, indentChildren) {
       if (typeof val === 'undefined') {
         return '';
       }
       if (val === null || val === true || val === false) {
         return JSON.stringify(val).toUpperCase();
       }
+      var indentChild = indentChildren ? indent + indentChildren : null;
       indent = (typeof indent === 'number') ? _.repeat(' ', indent) : (indent || '');
       var ret = '',
         baseLine = indent ? indent.slice(0, -2) : '',
         newLine = indent ? '\n' : '',
         trailingComma = indent ? ',' : '';
       if ($.isPlainObject(val)) {
+        if ($.isEmptyObject(val)) {
+          return '[]';
+        }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v);
+          ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v, indentChild, indentChildren);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
       if ($.isArray(val)) {
+        if (!val.length) {
+          return '[]';
+        }
         $.each(val, function(k, v) {
-          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v);
+          ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v, indentChild, indentChildren);
         });
         return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
