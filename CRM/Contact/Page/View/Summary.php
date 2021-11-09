@@ -444,6 +444,14 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // now sort the tabs based on weight
     usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
+    $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
+    foreach ($allTabs as $index => $tab) {
+      foreach ($expectedKeys as $key) {
+        if (!array_key_exists($key, $tab)) {
+          $allTabs[$index][$key] = NULL;
+        }
+      }
+    }
     return $allTabs;
   }
 
