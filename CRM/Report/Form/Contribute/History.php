@@ -839,12 +839,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
-        $entryFound = TRUE;
       }
 
-      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
-      $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
-
+      $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL);
+      $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL);
     }
   }
 
