@@ -169,12 +169,20 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
         return $this->hackyHandleBrokenCode(self::$jobLog);
       }
 
-      $query = "SELECT GET_LOCK( %1, %2 )";
       $params = [
         1 => [$this->_id, 'String'],
         2 => [$timeout ? $timeout : $this->_timeout, 'Integer'],
       ];
+      if (CRM_Core_DAO::singleValueQuery('SELECT IS_USED_LOCK(%1)', $params)) {
+        if (defined('CIVICRM_LOCK_DEBUG')) {
+          \Civi::log()->debug('already locked for ' . $this->_name . '(' . $this->_id . ')');
+        }
+        return FALSE;
+      }
+
+      $query = "SELECT GET_LOCK( %1, %2 )";
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
+
       if ($res) {
         if (defined('CIVICRM_LOCK_DEBUG')) {
           \Civi::log()->debug('acquire lock for ' . $this->_name . '(' . $this->_id . ')');
