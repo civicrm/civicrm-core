@@ -2061,7 +2061,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         'clicks' => $mailing->clicks,
         'unique' => $mailing->unique_clicks,
         'rate' => !empty($report['event_totals']['delivered']) ? (100.0 * $mailing->unique_clicks) / $report['event_totals']['delivered'] : 0,
-        'report' => CRM_Report_Utils_Report::getNextUrl('mailing/clicks', "reset=1&mailing_id_value={$mailing_id}&url_value={$mailing->url}", FALSE, TRUE),
+        'report' => CRM_Report_Utils_Report::getNextUrl('mailing/clicks', "reset=1&mailing_id_value={$mailing_id}&url_value=" . rawurlencode($mailing->url), FALSE, TRUE),
       ];
     }
 
