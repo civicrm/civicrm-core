@@ -93,7 +93,7 @@
           {/if}
         {/if}
 
-        {if !empty($groupOrganizationUrl)}
+        {if $groupOrganizationUrl}
           <li class="crm-contact-associated-groups">
             {crmButton href=$groupOrganizationUrl class="associated-groups" icon="cubes"}
               {ts}Associated Multi-Org Group{/ts}
