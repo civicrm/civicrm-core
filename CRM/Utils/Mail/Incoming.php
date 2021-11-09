@@ -452,6 +452,12 @@ class CRM_Utils_Mail_Incoming {
     $contactID = NULL;
     if ($dao) {
       $contactID = $dao->contact_id;
+    } else {
+      $dao = CRM_Contact_BAO_Contact::matchContactOnEmail($email, 'Organization');
+
+      if ($dao) {
+        $contactID = $dao->contact_id;
+      }
     }
 
     $result = NULL;
