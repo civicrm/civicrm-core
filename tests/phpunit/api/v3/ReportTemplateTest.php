@@ -1623,6 +1623,33 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the contribution aggregate by relationship report filters
+   * by financial type.
+   */
+  public function testContributionAggregateByRelationship() {
+    $contact = $this->individualCreate();
+    // Two contributions with different financial types.
+    // We don't really care which types, just different.
+    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
+    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 2, 'total_amount' => '20']);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'contribute/history',
+      'financial_type_id_op' => 'in',
+      'financial_type_id_value' => [1],
+      'options' => ['metadata' => ['sql']],
+      'fields' => [
+        'relationship_type_id' => 1,
+        'total_amount' => 1,
+      ],
+    ]);
+
+    // Hmm it has styling in it before being sent to the template. If that gets fixed then will need to update this.
+    $this->assertEquals('<strong>10.00</strong>', $rows['values'][$contact]['civicrm_contribution_total_amount'], 'should only include the $10 contribution');
+
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact]);
+  }
+
+  /**
    * Convoluted test of the convoluted logging detail report.
    *
    * In principle it's just make an update and get the report and see if it
