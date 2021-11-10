@@ -26,7 +26,7 @@
         {if !empty($searchKey)}
           {assign var='urlParams' value=$urlParams|cat:"&key=$searchKey"}
         {/if}
-        {if !empty($context)}
+        {if $context}
           {assign var='urlParams' value=$urlParams|cat:"&context=$context"}
         {/if}
 
