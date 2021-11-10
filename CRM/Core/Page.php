@@ -105,7 +105,20 @@ class CRM_Core_Page {
    *
    * @var string[]
    */
-  public $expectedSmartyVariables = ['breadcrumb', 'pageTitle', 'isForm', 'hookContent', 'hookContentPlacement'];
+  public $expectedSmartyVariables = [
+    'breadcrumb',
+    'pageTitle',
+    'isForm',
+    'hookContent',
+    'hookContentPlacement',
+    // required for footer.tpl
+    'contactId',
+    // required for info.tpl
+    'infoMessage',
+    'infoTitle',
+    'infoType',
+    'infoOptions',
+  ];
 
   /**
    * Class constructor.
