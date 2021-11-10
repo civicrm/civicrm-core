@@ -52,7 +52,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Takes an associative array and creates a membership Status object.
+   * Takes an associative array and creates a membership status object.
    *
    * @param array $params
    *   Array of name/value pairs.
@@ -73,7 +73,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Add the membership types.
+   * Add the membership status.
    *
    * @param array $params
    *   Reference array contains the values submitted by the form.
@@ -130,7 +130,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Get  membership status.
+   * Get membership status.
    *
    * @param int $membershipStatusId
    *
@@ -147,28 +147,25 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
   }
 
   /**
-   * Delete membership Types.
+   * Delete membership status.
    *
    * @param int $membershipStatusId
    *
    * @throws CRM_Core_Exception
    */
   public static function del($membershipStatusId) {
-    //check dependencies
-    //checking if membership status is present in some other table
-    $check = FALSE;
-
-    $dependency = ['Membership', 'MembershipLog'];
+    // Check if any membership records are assigned this membership status
+    $dependency = ['Membership'];
     foreach ($dependency as $name) {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
       $dao->status_id = $membershipStatusId;
       if ($dao->find(TRUE)) {
-        throw new CRM_Core_Exception(ts('This membership status cannot be deleted as memberships exist with this status'));
+        throw new CRM_Core_Exception(ts('This membership status cannot be deleted. Memberships exist with this status.'));
       }
     }
     CRM_Utils_Weight::delWeight('CRM_Member_DAO_MembershipStatus', $membershipStatusId);
-    //delete from membership Type table
+    // Delete from Membership Status table
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->id = $membershipStatusId;
     if (!$membershipStatus->find()) {
