@@ -802,6 +802,9 @@ HTACCESS;
     if ($checkRealPath) {
       $parent = realpath($parent);
       $child = realpath($child);
+      if ($parent === FALSE || $child === FALSE) {
+        return FALSE;
+      }
     }
     $parentParts = explode('/', rtrim($parent, '/'));
     $childParts = explode('/', rtrim($child, '/'));

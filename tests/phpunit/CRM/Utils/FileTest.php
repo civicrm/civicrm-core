@@ -18,7 +18,22 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $testCases[] = ['/ab/cd', 'ab/cd/ef', FALSE];
     foreach ($testCases as $testCase) {
       $actual = CRM_Utils_File::isChildPath($testCase[0], $testCase[1], FALSE);
-      $this->assertEquals($testCase[2], $actual, sprintf("parent=[%s] child=[%s] expected=[%s] actual=[%s]",
+      $this->assertEquals($testCase[2], $actual, sprintf("parent=[%s] child=[%s] checkRealPath=[FALSE] expected=[%s] actual=[%s]",
+        $testCase[0], $testCase[1], $testCase[2], $actual
+      ));
+    }
+
+    global $civicrm_root;
+    $realCases = [];
+    $realCases[] = ["$civicrm_root", "$civicrm_root/CRM", TRUE];
+    $realCases[] = ["$civicrm_root/CRM", "$civicrm_root", FALSE];
+    $realCases[] = ["/nonexistent", "/nonexistent/child", FALSE];
+    $realCases[] = ["/nonexistent/child", "/nonexistent", FALSE];
+    $realCases[] = ["$civicrm_root", "/nonexistent", FALSE];
+    $realCases[] = ["/nonexistent", "$civicrm_root", FALSE];
+    foreach ($realCases as $testCase) {
+      $actual = CRM_Utils_File::isChildPath($testCase[0], $testCase[1], TRUE);
+      $this->assertEquals($testCase[2], $actual, sprintf("parent=[%s] child=[%s] checkRealPath=[TRUE] expected=[%s] actual=[%s]",
         $testCase[0], $testCase[1], $testCase[2], $actual
       ));
     }
