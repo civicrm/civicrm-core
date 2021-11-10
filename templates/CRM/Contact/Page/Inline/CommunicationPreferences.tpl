@@ -44,7 +44,7 @@
         {$preferred_mail_format}
       </div>
     </div>
-    {if isset($communication_style_display)}
+    {if $communication_style_display}
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Communication Style{/ts}</div>
       <div class="crm-content crm-contact-communication_style_display">
