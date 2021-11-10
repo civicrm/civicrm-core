@@ -27,12 +27,12 @@
     </div>
     <div class="contactCardRight">
       {crmRegion name="contact-basic-info-right"}
-      {if !empty($imageURL)}
+      {if $imageURL}
         <div id="crm-contact-thumbnail">
           {include file="CRM/Contact/Page/ContactImage.tpl"}
         </div>
       {/if}
-        <div class="{if !empty($imageURL)} float-left{/if}">
+        <div class="{if $imageURL} float-left{/if}">
           <div class="crm-summary-basic-block crm-summary-block">
             {include file="CRM/Contact/Page/Inline/Basic.tpl"}
           </div>

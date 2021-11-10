@@ -426,9 +426,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     //set address block defaults
     CRM_Contact_Form_Edit_Address::setDefaultValues($defaults, $this);
 
-    if (!empty($defaults['image_URL'])) {
-      $this->assign("imageURL", CRM_Utils_File::getImageURL($defaults['image_URL']));
-    }
+    $this->assign('imageURL', !empty($defaults['image_URL']) ? CRM_Utils_File::getImageURL($defaults['image_URL']) : '');
 
     //set location type and country to default for each block
     $this->blockSetDefaults($defaults);

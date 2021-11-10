@@ -143,9 +143,8 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     $path = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
     CRM_Utils_System::appendBreadCrumb([['title' => ts('View Contact'), 'url' => $path]]);
 
-    if ($image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL')) {
-      $this->assign("imageURL", CRM_Utils_File::getImageURL($image_URL));
-    }
+    $image_URL = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $this->_contactId, 'image_URL');
+    $this->assign('imageURL', $image_URL ? CRM_Utils_File::getImageURL($image_URL) : '');
 
     // also store in session for future use
     $session = CRM_Core_Session::singleton();
