@@ -2545,7 +2545,7 @@ SELECT contact_id
   }
 
   /**
-   * @return array
+   * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
    *   each item has keys:
    *   - name: string
    *   - type: string
