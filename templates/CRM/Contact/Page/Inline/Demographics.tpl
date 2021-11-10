@@ -16,7 +16,7 @@
     {/if}
     <div class="crm-summary-row">
       <div class="crm-label">{ts}Gender{/ts}</div>
-      <div class="crm-content crm-contact-gender_display">{if !empty($gender_display)}{$gender_display}{/if}</div>
+      <div class="crm-content crm-contact-gender_display">$gender_display}</div>
     </div>
 
     <div class="crm-summary-row">
