@@ -52,7 +52,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
              ";
 
           $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Event_DAO_Event');
-          $permissions = CRM_Event_BAO_Event::checkPermission();
+          $permissions = CRM_Event_BAO_Event::getAllPermissions();
           while ($dao->fetch()) {
             if (in_array($dao->id, $permissions[CRM_Core_Permission::VIEW])) {
               $manageEvent[$dao->id] = [];
