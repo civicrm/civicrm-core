@@ -20,7 +20,7 @@
 {/if}
 
 {if empty($printOnly)} {* NO print section starts *}
-  {if !empty($section)}
+  {if empty($section)}
     {include file="CRM/common/chart.tpl" divId="chart_$uniqueId"}
   {/if}
   {if !empty($chartData)}
