@@ -16,10 +16,6 @@
  */
 class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
   /**
-   * Primary Contacts count limitCONSTROW_COUNT_LIMIT = 10;
-   */
-
-  /**
    * @var array
    */
   protected $_relationshipColumns = [];
