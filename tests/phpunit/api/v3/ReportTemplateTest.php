@@ -145,6 +145,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $allTemplates = self::getReportTemplates();
     // Exclude all that do not work as of test being written. I have not dug into why not.
     $currentlyExcluded = [
+      'contribute/history',
       'contribute/repeat',
       'member/summary',
       'event/summary',
@@ -383,8 +384,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   public static function getReportTemplates() {
     $reportTemplates = [];
     $reportsToSkip = [
-      'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
-      'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
+      'event/income' => "This report overrides buildQuery() so doesn't seem compatible with this test and you get a syntax error `WHERE civicrm_event.id IN( ) GROUP BY civicrm_event.id`",
     ];
 
     $reports = civicrm_api3('report_template', 'get', ['return' => 'value', 'options' => ['limit' => 500]]);
