@@ -172,6 +172,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
+      self::$_template->ensureVariablesAreAssigned(['formTpl']);
     }
 
     // lets try to get it from the session and/or the request vars
