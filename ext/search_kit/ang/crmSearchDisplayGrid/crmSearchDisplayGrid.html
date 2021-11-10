@@ -2,7 +2,7 @@
   <div ng-include="'~/crmSearchDisplay/SearchButton.html'" ng-if="$ctrl.settings.button"></div>
   <div
     class="crm-search-display-grid-container crm-search-display-grid-layout-{{$ctrl.settings.colno}}"
-    ng-include="'~/crmSearchDisplayGrid/crmSearchDisplayGridItems.html'"
+    ng-include="'~/crmSearchDisplayGrid/crmSearchDisplayGrid' + ($ctrl.loading ? 'Loading' : 'Items') + '.html'"
   ></div>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>

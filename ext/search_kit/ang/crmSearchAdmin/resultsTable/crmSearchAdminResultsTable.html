@@ -25,7 +25,7 @@
         </th>
       </tr>
     </thead>
-    <tbody ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTableBody.html'"></tbody>
+    <tbody ng-include="'~/crmSearchDisplayTable/crmSearchDisplayTable' + ($ctrl.loading ? 'Loading' : 'Body') + '.html'"></tbody>
   </table>
   <div ng-include="'~/crmSearchDisplay/Pager.html'"></div>
 </div>
