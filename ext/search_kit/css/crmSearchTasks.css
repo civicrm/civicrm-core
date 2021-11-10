@@ -26,13 +26,3 @@
   bottom: -22px;
   left: 0;
 }
-#bootstrap-theme .crm-search-display th[ng-click] {
-  cursor: pointer;
-}
-#bootstrap-theme .crm-search-display th i.fa-sort-desc,
-#bootstrap-theme .crm-search-display th i.fa-sort-asc {
-  color: #1a5a82;
-}
-#bootstrap-theme .crm-search-display th:not(:hover) i.fa-sort {
-  opacity: .5;
-}
