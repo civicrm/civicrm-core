@@ -15,6 +15,12 @@
       this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
       this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
       this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
+      this.modules = _.sortBy(_.transform((CRM.crmSearchAdmin.modules), function(modules, label, key) {
+        modules.push({text: label, id: key});
+      }, []), 'text');
+
+      this.filters = {has_base: false};
+      this.totals = {};
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -33,6 +39,8 @@
             'modified_id.display_name',
             'created_date',
             'modified_date',
+            'has_base',
+            'base_module:label',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
@@ -56,6 +64,27 @@
       this.$onInit = function() {
         buildDisplaySettings();
         this.initializeDisplay($scope, $());
+        // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
+        $scope.$watch('$ctrl.rowCount', function(val) {
+          if (typeof val === 'number' && angular.equals({has_base: true}, ctrl.filters)) {
+            ctrl.totals.has_base = val;
+          }
+          else if (typeof val === 'number' && angular.equals({has_base: false}, ctrl.filters)) {
+            ctrl.totals.no_base = val;
+          }
+        });
+        // Initialize count for inactive tab
+        var params = ctrl.getApiParams('row_count');
+        params.filters.has_base = true;
+        crmApi4('SearchDisplay', 'run', params).then(function(result) {
+          ctrl.totals.has_base = result.count;
+        });
+      };
+
+      // Change tabs and clear other filters
+      this.setHasBaseFilter = function(val) {
+        ctrl.filters = {has_base: val};
+        buildDisplaySettings();
       };
 
       this.onPostRun.push(function(result) {
@@ -73,43 +102,77 @@
         return encodeURI(angular.toJson(params));
       };
 
-      this.confirmDelete = function(search) {
-        function getConfirmationMsg() {
-          var msg = '<h4>' + _.escape(ts('Permanently delete this saved search?')) + '</h4>' +
+      this.deleteOrRevert = function(row) {
+        var search = row.data,
+          revert = !!search['base_module:label'];
+        function getMessage() {
+          var title = revert ? ts('Revert this search to its packaged settings?') : ts('Permanently delete this saved search?'),
+            msg = '<h4>' + _.escape(title) + '</h4>' +
             '<ul>';
-          if (search.data.display_label && search.data.display_label.length === 1) {
-            msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
-          } else if (search.data.display_label && search.data.display_label.length > 1) {
-            msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.data.display_label.length})) + '</li>';
-          }
-          _.each(search.data.groups, function(smartGroup) {
-            msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
-          });
-          if (search.afform_count) {
-            _.each(ctrl.afforms[search.data.name], function(afform) {
-              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+          if (revert) {
+            if (search.display_label && search.display_label.length === 1) {
+              msg += '<li>' + _.escape(ts('Includes 1 display which will also be reverted.')) + '</li>';
+            } else if (search.display_label && search.display_label.length > 1) {
+              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be reverted.', {1: search.display_label.length})) + '</li>';
+            }
+            _.each(search.groups, function(smartGroup) {
+              msg += '<li>' + _.escape(ts('Smart group "%1" will be reset to the packaged search criteria.', {1: smartGroup})) + '</li>';
             });
+            if (row.afform_count) {
+              _.each(ctrl.afforms[search.name], function(afform) {
+                msg += '<li><i class="crm-i fa-list-alt"></i> ' + _.escape(ts('Form "%1" will be affected because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+              });
+            }
+          } else {
+            if (search.display_label && search.display_label.length === 1) {
+              msg += '<li>' + _.escape(ts('Includes 1 display which will also be deleted.')) + '</li>';
+            } else if (search.display_label && search.display_label.length > 1) {
+              msg += '<li>' + _.escape(ts('Includes %1 displays which will also be deleted.', {1: search.display_label.length})) + '</li>';
+            }
+            _.each(search.groups, function (smartGroup) {
+              msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Smart group "%1" will also be deleted.', {1: smartGroup})) + '</li>';
+            });
+            if (row.afform_count) {
+              _.each(ctrl.afforms[search.name], function (afform) {
+                msg += '<li class="crm-error"><i class="crm-i fa-exclamation-triangle"></i> ' + _.escape(ts('Form "%1" will also be deleted because it contains an embedded display from this search.', {1: afform.title})) + '</li>';
+              });
+            }
           }
           return msg + '</ul>';
         }
 
         var dialog = CRM.confirm({
-          title: ts('Delete %1', {1: search.data.label}),
-          message: getConfirmationMsg(),
+          title: revert ? ts('Revert %1', {1: search.label}) : ts('Delete %1', {1: search.label}),
+          message: getMessage(),
         }).on('crmConfirm:yes', function() {
           $scope.$apply(function() {
-            ctrl.deleteSearch(search);
+            return revert ? ctrl.revertSearch(search) : ctrl.deleteSearch(search);
           });
         }).block();
 
         ctrl.loadAfforms().then(function() {
-          dialog.html(getConfirmationMsg()).unblock();
+          dialog.html(getMessage()).unblock();
         });
       };
 
       this.deleteSearch = function(search) {
         crmStatus({start: ts('Deleting...'), success: ts('Search Deleted')},
-          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.data.id]]}).then(function() {
+          crmApi4('SavedSearch', 'delete', {where: [['id', '=', search.id]]}).then(function() {
+            ctrl.rowCount = null;
+            ctrl.runSearch();
+          })
+        );
+      };
+
+      this.revertSearch = function(search) {
+        crmStatus({start: ts('Reverting...'), success: ts('Search Reverted')},
+          crmApi4('SavedSearch', 'revert', {
+            where: [['id', '=', search.id]],
+            chain: {
+              revertDisplays: ['SearchDisplay', 'revert', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', true]]}],
+              deleteDisplays: ['SearchDisplay', 'delete', {'where': [['saved_search_id', '=', '$id'], ['has_base', '=', false]]}]
+            }
+          }).then(function() {
             ctrl.rowCount = null;
             ctrl.runSearch();
           })
@@ -147,35 +210,54 @@
                 type: 'include',
                 label: ts('Displays'),
                 path: '~/crmSearchAdmin/searchListing/displays.html'
-              },
-              searchMeta.fieldToColumn('GROUP_CONCAT(DISTINCT group.title) AS groups', {
-                label: ts('Smart Group')
-              }),
-              searchMeta.fieldToColumn('created_date', {
-                label: ts('Created'),
-                title: '[created_date]',
-                rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
-              }),
-              searchMeta.fieldToColumn('modified_date', {
-                label: ts('Last Modified'),
-                title: '[modified_date]',
-                rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
-              }),
-              {
-                type: 'include',
-                alignment: 'text-right',
-                path: '~/crmSearchAdmin/searchListing/buttons.html'
               }
             ]
           }
         };
         if (ctrl.afformEnabled) {
-          ctrl.display.settings.columns.splice(4, 0, {
+          ctrl.display.settings.columns.push({
             type: 'include',
             label: ts('Forms'),
             path: '~/crmSearchAdmin/searchListing/afforms.html'
           });
         }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('GROUP_CONCAT(DISTINCT group.title) AS groups', {
+            label: ts('Smart Group')
+          })
+        );
+        if (ctrl.filters.has_base) {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('base_module:label', {
+              label: ts('Package'),
+              title: '[base_module]',
+              empty_value: ts('Missing'),
+              cssRules: [
+                ['font-italic', 'base_module:label', 'IS EMPTY']
+              ]
+            })
+          );
+        } else {
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('created_date', {
+              label: ts('Created'),
+              title: '[created_date]',
+              rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
+            })
+          );
+        }
+        ctrl.display.settings.columns.push(
+          searchMeta.fieldToColumn('modified_date', {
+            label: ts('Last Modified'),
+            title: '[modified_date]',
+            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+          })
+        );
+        ctrl.display.settings.columns.push({
+          type: 'include',
+          alignment: 'text-right',
+          path: '~/crmSearchAdmin/searchListing/buttons.html'
+        });
         ctrl.settings = ctrl.display.settings;
       }
 

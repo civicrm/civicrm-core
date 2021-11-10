@@ -143,6 +143,7 @@ class CRM_Core_ManagedEntities {
     $mgd = new \CRM_Core_DAO_Managed();
     $mgd->copyValues($params);
     $mgd->find(TRUE);
+    $this->loadDeclarations();
     $declarations = CRM_Utils_Array::findAll($this->declarations, [
       'module' => $mgd->module,
       'name' => $mgd->name,
