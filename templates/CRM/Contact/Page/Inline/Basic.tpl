@@ -22,11 +22,11 @@
   </div>
   <div class="crm-summary-row">
     <div class="crm-label">
-      {ts}Contact ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
+      {ts}Contact ID{/ts}{if $userRecordUrl} / {ts}User ID{/ts}{/if}
     </div>
     <div class="crm-content">
       <span class="crm-contact-contact_id">{$contactId}</span>
-      {if !empty($userRecordUrl)}
+      {if $userRecordUrl}
         <span class="crm-contact-user_record_id">
           &nbsp;/&nbsp;<a title="{ts}View user record{/ts}" class="user-record-link"
                           href="{$userRecordUrl}">{$userRecordId}</a>
