@@ -201,10 +201,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $defaults['contact_type_label'] = CRM_Contact_BAO_ContactType::contactTypePairs(TRUE, $contactType, ', ');
 
     // get contact tags
-    $contactTags = CRM_Core_BAO_EntityTag::getContactTags($this->_contactId);
-
-    if (!empty($contactTags)) {
-      $defaults['contactTag'] = $contactTags;
+    $defaults['contactTag'] = CRM_Core_BAO_EntityTag::getContactTags($this->_contactId);
+    if (!empty($defaults['contactTag'])) {
       $defaults['allTags'] = CRM_Core_BAO_Tag::getTagsUsedFor('civicrm_contact', FALSE);
     }
 
