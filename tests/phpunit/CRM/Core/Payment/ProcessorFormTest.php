@@ -217,6 +217,19 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
 class PaymentProcessorWithStandardBillingRequirements extends CRM_Core_Payment {
 
   /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->_paymentProcessor = [
+      'payment_type' => 0,
+      'billing_mode' => 0,
+      'id' => 0,
+      'url_recur' => '',
+      'is_recur' => 0,
+    ];
+  }
+
+  /**
    * again, `checkConfig` is abstract in CRM_Core_Payment, so we are forced to implement it
    */
   public function checkConfig() {
@@ -225,6 +238,19 @@ class PaymentProcessorWithStandardBillingRequirements extends CRM_Core_Payment {
 }
 
 class PaymentProcessorWithCustomBillingRequirements extends CRM_Core_Payment {
+
+  /**
+   * Constructor.
+   */
+  public function __construct() {
+    $this->_paymentProcessor = [
+      'payment_type' => 0,
+      'billing_mode' => 0,
+      'id' => 0,
+      'url_recur' => '',
+      'is_recur' => 0,
+    ];
+  }
 
   /**
    * again, `checkConfig` is abstract in CRM_Core_Payment, so we are forced to implement it
