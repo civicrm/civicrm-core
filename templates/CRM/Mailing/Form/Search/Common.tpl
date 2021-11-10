@@ -66,7 +66,7 @@
 </tr>
 <tr>
   <td>{* campaign in Advance search *}
-      {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+      {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
        campaignTrClass='crmCampaign' campaignTdClass='crmCampaignContainer'}
   </td>
 </tr>

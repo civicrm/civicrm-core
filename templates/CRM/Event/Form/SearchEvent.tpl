@@ -45,7 +45,7 @@
     </td></tr>
 
     {* campaign in event search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
     campaignTrClass='crm-event-searchevent-form-block-campaign_id' campaignTdClass=''}
     <td class="right">{include file="CRM/common/formButtons.tpl"}</td>
   </table>

@@ -599,16 +599,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
         ['id' => 'campaigns', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
-    $infoFields = [
-      'elementName',
-      'hasAccessCampaign',
-      'isCampaignEnabled',
-      'showCampaignInSearch',
-    ];
-    foreach ($infoFields as $fld) {
-      $campaignInfo[$fld] = $$fld;
-    }
-    $form->assign('campaignInfo', $campaignInfo);
+
+    $form->assign('campaignElementName', $showCampaignInSearch ? $elementName : '');
   }
 
   /**

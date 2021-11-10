@@ -114,8 +114,8 @@
 {/if}
 
 {* campaign in activity search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+campaignTrClass='' campaignTdClass=''}
 
 {if !empty($activityGroupTree)}
   <tr id="activityCustom">
