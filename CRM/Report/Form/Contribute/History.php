@@ -821,6 +821,11 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         $rows[$rowNum] = $row;
       }
 
+      // The main rows don't have this set so gives a smarty warning.
+      if (!isset($row['civicrm_relationship_relationship_type_id'])) {
+        $rows[$rowNum]['civicrm_relationship_relationship_type_id'] = '';
+      }
+
       // Convert Display name into link
       if (!empty($row['civicrm_contact_sort_name']) &&
         !empty($row['civicrm_contact_id'])
