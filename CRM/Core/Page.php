@@ -113,6 +113,11 @@ class CRM_Core_Page {
     'hookContentPlacement',
     // required for footer.tpl
     'contactId',
+    // required for info.tpl
+    'infoMessage',
+    'infoTitle',
+    'infoType',
+    'infoOptions',
   ];
 
   /**

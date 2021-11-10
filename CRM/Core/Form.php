@@ -263,6 +263,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public $expectedSmartyVariables = [
     'beginHookFormElements',
+    // required for footer.tpl
+    'contactId',
+    // required for info.tpl
+    'infoMessage',
+    'infoTitle',
+    'infoType',
+    'infoOptions',
   ];
 
   /**
