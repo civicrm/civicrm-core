@@ -197,6 +197,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $dashboard = new CRM_Contact_Page_View_UserDashBoard();
     $dashboard->_contactId = $this->contactID;
     $dashboard->assign('formTpl', NULL);
+    $dashboard->assign('action', CRM_Core_Action::VIEW);
     $dashboard->run();
     $_REQUEST = [];
   }
