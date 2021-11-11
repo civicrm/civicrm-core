@@ -534,6 +534,7 @@ GROUP BY  currency
           [
             'amount' => $values['scheduled_amount'] ?? NULL,
             'due_date' => $values['scheduled_date'] ?? NULL,
+            'status' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
           ]
         );
 
@@ -570,10 +571,10 @@ GROUP BY  currency
     }
 
     // handle custom data.
+    $customGroup = [];
     if (!empty($params['hidden_custom'])) {
       $groupTree = CRM_Core_BAO_CustomGroup::getTree('Pledge', NULL, $params['id']);
       $pledgeParams = [['pledge_id', '=', $params['id'], 0, 0]];
-      $customGroup = [];
       // retrieve custom data
       foreach ($groupTree as $groupID => $group) {
         $customFields = $customValues = [];
@@ -590,8 +591,8 @@ GROUP BY  currency
         $customGroup[$group['title']] = $customValues;
       }
 
-      $form->assign('customGroup', $customGroup);
     }
+    $form->assign('customGroup', $customGroup);
 
     // handle acknowledgment email stuff.
     [$pledgerDisplayName, $pledgerEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
