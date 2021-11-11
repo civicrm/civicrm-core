@@ -435,8 +435,12 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $context = ['contact_id' => $this->_contactId];
     CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
 
-    // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
+    $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
+
     foreach ($allTabs as &$tab) {
+      // Ensure tab has all expected keys
+      $tab += array_fill_keys($expectedKeys, NULL);
+      // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
       if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
         $tab['count'] = call_user_func_array(['CRM_Contact_BAO_Contact', 'getCountComponent'], $getCountParams[$tab['id']]);
       }
@@ -444,14 +448,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
 
     // now sort the tabs based on weight
     usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
-    $expectedKeys = ['count', 'class', 'template', 'hideCount', 'icon'];
-    foreach ($allTabs as $index => $tab) {
-      foreach ($expectedKeys as $key) {
-        if (!array_key_exists($key, $tab)) {
-          $allTabs[$index][$key] = NULL;
-        }
-      }
-    }
     return $allTabs;
   }
 
