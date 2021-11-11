@@ -13,7 +13,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 
 <head>
-  <title>{if !empty($pageTitle)}{$pageTitle|escape}{/if}</title>
+  <title>{$pageTitle|escape}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <base href="{$config->resourceBase}" />
   <style type="text/css" media="screen">
