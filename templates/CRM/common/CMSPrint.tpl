@@ -13,7 +13,7 @@
 
 <div id="crm-container" class="crm-container{if !empty($urlIsPublic)} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-{if !empty($breadcrumb)}
+{if $breadcrumb}
   <div class="breadcrumb">
     {foreach from=$breadcrumb item=crumb key=key}
       {if $key != 0}
@@ -24,7 +24,7 @@
   </div>
 {/if}
 
-{if !empty($pageTitle)}
+{if $pageTitle}
   <div class="crm-title">
     <h1 class="title">{if !empty($isDeleted)}<del>{/if}{$pageTitle}{if !empty($isDeleted)}</del>{/if}</h1>
   </div>

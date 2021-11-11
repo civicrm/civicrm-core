@@ -262,6 +262,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @var string[]
    */
   public $expectedSmartyVariables = [
+    // in CMSPrint.tpl
+    'breadcrumb',
+    'pageTitle',
+    // in 'body.tpl
+    'suppressForm',
     'beginHookFormElements',
     // required for footer.tpl
     'contactId',
