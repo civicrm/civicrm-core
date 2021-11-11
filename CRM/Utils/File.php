@@ -1107,7 +1107,7 @@ HTACCESS;
    */
   public static function isDir($fileName = '') {
     // If not within open_basedir do not consider it a directory.
-    if (!CRM_Utils_File::isFileInOpenbasedir($filename)) {
+    if (!CRM_Utils_File::isFileInOpenbasedir($fileName)) {
       return FALSE;
     }
     return is_dir($fileName);
