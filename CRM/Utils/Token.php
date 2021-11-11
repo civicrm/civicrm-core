@@ -213,6 +213,8 @@ class CRM_Utils_Token {
   /**
    * Replace all the domain-level tokens in $str
    *
+   * @deprecated
+   *
    * @param string $str
    *   The string with tokens to be replaced.
    * @param object $domain
@@ -251,6 +253,10 @@ class CRM_Utils_Token {
   }
 
   /**
+   * Do not use.
+   *
+   * @deprecated
+   *
    * @param string $token
    * @param CRM_Core_BAO_Domain $domain
    * @param bool $html
@@ -367,6 +373,8 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated
    */
   public static function &replaceMailingTokens(
     $str,
@@ -534,6 +542,8 @@ class CRM_Utils_Token {
   }
 
   /**
+   * @deprecated
+   *
    * @param $token
    * @param $addresses
    * @param $urls
@@ -1281,6 +1291,8 @@ class CRM_Utils_Token {
    * @param string $jobID
    * @return array
    *   contactDetails with hooks swapped out
+   *
+   * @deprecated
    */
   public static function getAnonymousTokenDetails($contactIDs = [0],
                                            $returnProperties = NULL,
