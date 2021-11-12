@@ -31,6 +31,13 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
       'from_email_address' => Email::get()
         ->addWhere('contact_id', '=', $loggedInUser)
         ->addSelect('id')->execute()->first()['id'],
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'installments' => 5,
+      'currency' => 'USD',
+      'scheduled_amount' => 10,
+      'frequency_day' => 4,
+      'status' => 'Pending',
     ]);
     $form->buildForm();
     $form->postProcess();
