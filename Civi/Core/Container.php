@@ -338,6 +338,10 @@ class Container {
         []
       ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     }
+    $container->setDefinition('civi_token_impliedcontext', new Definition(
+      'Civi\Token\ImpliedContextSubscriber',
+      []
+    ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
     $container->setDefinition('crm_participant_tokens', new Definition(
       'CRM_Event_ParticipantTokens',
       []
