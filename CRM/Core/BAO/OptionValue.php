@@ -264,9 +264,12 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     if (!$optionValue->find()) {
       return FALSE;
     }
+    $hookParams = ['id' => $optionValueId];
+    CRM_Utils_Hook::pre('delete', 'OptionValue', $optionValueId, $hookParams);
     if (self::updateRecords($optionValueId, CRM_Core_Action::DELETE)) {
       CRM_Core_PseudoConstant::flush();
       $optionValue->delete();
+      CRM_Utils_Hook::post('delete', 'OptionValue', $optionValueId, $optionValue);
       return TRUE;
     }
     return FALSE;

@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Utils;
 
+use Civi\API\Exception\NotImplementedException;
 use Civi\API\Request;
 use Civi\Api4\Entity;
 use Civi\Api4\Event\CreateApi4RequestEvent;
@@ -250,6 +251,26 @@ class CoreUtil {
       $cache->set('api4.schema.map', $schemaMap);
     }
     return $schemaMap;
+  }
+
+  /**
+   * Fetches database references + those returned by hook
+   *
+   * @see \CRM_Utils_Hook::referenceCounts()
+   * @param string $entityName
+   * @param int $entityId
+   * @return array{name: string, type: string, count: int, table: string|null, key: string|null}[]
+   * @throws NotImplementedException
+   */
+  public static function getRefCount(string $entityName, $entityId) {
+    $daoName = self::getInfoItem($entityName, 'dao');
+    if (!$daoName) {
+      throw new NotImplementedException("Cannot getRefCount for $entityName - dao not found.");
+    }
+    /** @var \CRM_Core_DAO $dao */
+    $dao = new $daoName();
+    $dao->id = $entityId;
+    return $dao->getReferenceCounts();
   }
 
 }

@@ -263,8 +263,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
   /**
    * Set up an active module with one managed-entity using the
-   * policy "cleanup=>never". When the managed-entity goes away,
-   * ensure that the policy is followed (ie the entity is not
+   * policy "cleanup=>unused". When the managed-entity goes away,
+   * ensure that the policy is followed (ie the entity is conditionally
    * deleted).
    *
    * @throws \CRM_Core_Exception

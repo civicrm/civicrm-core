@@ -535,6 +535,72 @@ function afform_civicrm_pre($op, $entity, $id, &$params) {
       ->addWhere('search_displays', 'CONTAINS', $display['saved_search_id.name'] . ".{$display['name']}")
       ->execute();
   }
+  // When deleting a savedSearch, delete any Afforms which use the default display
+  if ($entity === 'SearchDisplay' && $op === 'delete') {
+    $search = \Civi\Api4\SavedSearch::get(FALSE)
+      ->addSelect('name')
+      ->addWhere('id', '=', $id)
+      ->execute()->first();
+    \Civi\Api4\Afform::revert(FALSE)
+      ->addWhere('search_displays', 'CONTAINS', $search['name'])
+      ->execute();
+  }
+}
+
+/**
+ * Implements hook_civicrm_referenceCounts().
+ */
+function afform_civicrm_referenceCounts($dao, &$counts) {
+  // Count afforms which contain a search display
+  if (is_a($dao, 'CRM_Search_DAO_SearchDisplay') && $dao->id) {
+    if (empty($dao->saved_search_id) || empty($dao->name)) {
+      $dao->find(TRUE);
+    }
+    $search = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $dao->saved_search_id);
+    $afforms = \Civi\Api4\Afform::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('search_displays', 'CONTAINS', "$search.$dao->name")
+      ->execute();
+    if ($afforms->count()) {
+      $counts[] = [
+        'name' => 'Afform',
+        'type' => 'Afform',
+        'count' => $afforms->count(),
+      ];
+    }
+  }
+  // Count afforms which contain any displays from a SavedSearch (including the default display)
+  elseif (is_a($dao, 'CRM_Contact_DAO_SavedSearch') && $dao->id) {
+    if (empty($dao->name)) {
+      $dao->find(TRUE);
+    }
+    $clauses = [
+      ['search_displays', 'CONTAINS', $dao->name],
+    ];
+    try {
+      $displays = civicrm_api4('SearchDisplay', 'get', [
+        'where' => [['saved_search_id', '=', $dao->id]],
+        'select' => 'name',
+      ], ['name']);
+      foreach ($displays as $displayName) {
+        $clauses[] = ['search_displays', 'CONTAINS', $dao->name . '.' . $displayName];
+      }
+    }
+    catch (Exception $e) {
+      // In case SearchKit is not installed, the api call would fail
+    }
+    $afforms = \Civi\Api4\Afform::get(FALSE)
+      ->selectRowCount()
+      ->addClause('OR', $clauses)
+      ->execute();
+    if ($afforms->count()) {
+      $counts[] = [
+        'name' => 'Afform',
+        'type' => 'Afform',
+        'count' => $afforms->count(),
+      ];
+    }
+  }
 }
 
 // Wordpress only: Register callback for rendering shortcodes

@@ -7,6 +7,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -21,6 +22,11 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     return \Civi\Test::headless()
       ->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'org.civicrm.afform-mock'])
       ->apply();
+  }
+
+  public function tearDown(): void {
+    Afform::revert(FALSE)->addWhere('has_local', '=', TRUE)->execute();
+    parent::tearDown();
   }
 
   /**
@@ -153,7 +159,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(1, $result);
   }
 
-  public function testDeleteSearchWillDeleteAfform() {
+  public function testSearchReferencesToAfform() {
     $search = SavedSearch::create(FALSE)
       ->setValues([
         'name' => 'TestSearchToDelete',
@@ -186,6 +192,14 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ])
       ->execute()->first();
 
+    // The search should have one reference (its display)
+    $refs = CoreUtil::getRefCount('SavedSearch', $search['id']);
+    $this->assertCount(1, $refs);
+
+    // The display should have zero references
+    $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
+    $this->assertCount(0, $refs);
+
     Afform::create(FALSE)
       ->addValue('name', 'TestAfformToDelete')
       ->addValue('title', 'TestAfformToDelete')
@@ -193,13 +207,44 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->addValue('layout', '<div><crm-search-display-table search-name="TestSearchToDelete" display-name="TestDisplayToDelete"></crm-search-display-table></div>')
       ->execute();
 
-    $this->assertCount(1, Afform::get(FALSE)->addWhere('name', '=', 'TestAfformToDelete')->execute());
+    $this->assertCount(1, Afform::get(FALSE)->addWhere('search_displays', 'CONTAINS', 'TestSearchToDelete.TestDisplayToDelete')->execute());
+
+    // The search should now have two references (its display + Afform)
+    $refs = CoreUtil::getRefCount('SavedSearch', $search['id']);
+    $this->assertCount(2, $refs);
+
+    // The display should now have one reference (the Afform)
+    $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
+    $this->assertCount(1, $refs);
+    $this->assertEquals('Afform', $refs[0]['type']);
+
+    // Create an afform that uses the search default display
+    Afform::create(FALSE)
+      ->addValue('name', 'TestAfformToDelete2')
+      ->addValue('title', 'TestAfformToDelete2')
+      ->setLayoutFormat('html')
+      ->addValue('layout', '<div><crm-search-display-table search-name="TestSearchToDelete"></crm-search-display-table></div>')
+      ->execute();
+
+    $this->assertCount(1, Afform::get(FALSE)->addWhere('search_displays', 'CONTAINS', 'TestSearchToDelete')->execute());
+    $this->assertCount(2, Afform::get(FALSE)->addWhere('name', 'CONTAINS', 'TestAfformToDelete')->execute());
+
+    // The search should now have three references (its display + 2 Afforms)
+    $refs = CoreUtil::getRefCount('SavedSearch', $search['id']);
+    $this->assertCount(2, $refs);
+    $this->assertEquals(2, array_column($refs, 'count', 'type')['Afform']);
+
+    // The display should still have one reference (the Afform)
+    $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
+    $this->assertCount(1, $refs);
+    $this->assertEquals('Afform', $refs[0]['type']);
 
     SavedSearch::delete(FALSE)
       ->addWhere('name', '=', 'TestSearchToDelete')
       ->execute();
 
-    $this->assertCount(0, Afform::get(FALSE)->addWhere('name', '=', 'TestAfformToDelete')->execute());
+    $this->assertCount(0, Afform::get(FALSE)->addWhere('search_displays', 'CONTAINS', 'TestSearchToDelete.TestDisplayToDelete')->execute());
+    $this->assertCount(0, Afform::get(FALSE)->addWhere('name', 'CONTAINS', 'TestAfformToDelete')->execute());
   }
 
 }

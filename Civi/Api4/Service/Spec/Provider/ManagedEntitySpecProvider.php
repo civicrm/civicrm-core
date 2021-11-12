@@ -53,6 +53,16 @@ class ManagedEntitySpecProvider implements Generic\SpecProviderInterface {
       ->setOptionsCallback(['CRM_Core_PseudoConstant', 'getExtensions'])
       ->setSqlRenderer([__CLASS__, 'renderBaseModule']);
     $spec->addFieldSpec($field);
+
+    $field = (new FieldSpec('local_modified_date', $spec->getEntity(), 'Timestamp'))
+      ->setLabel(ts('Locally Modified'))
+      ->setTitle(ts('Locally modified'))
+      ->setColumnName('id')
+      ->setDescription(ts('When the managed entity was changed from its original settings'))
+      ->setType('Extra')
+      ->setReadonly(TRUE)
+      ->setSqlRenderer([__CLASS__, 'renderLocalModifiedDate']);
+    $spec->addFieldSpec($field);
   }
 
   /**
@@ -89,6 +99,17 @@ class ManagedEntitySpecProvider implements Generic\SpecProviderInterface {
     $id = $field['sql_name'];
     $entity = $field['entity'];
     return "(SELECT `civicrm_managed`.`module` FROM `civicrm_managed` WHERE `civicrm_managed`.`entity_id` = $id AND `civicrm_managed`.`entity_type` = '$entity' LIMIT 1)";
+  }
+
+  /**
+   * Get sql snippet for local_modified_date
+   * @param array $field
+   * return string
+   */
+  public static function renderLocalModifiedDate(array $field): string {
+    $id = $field['sql_name'];
+    $entity = $field['entity'];
+    return "(SELECT `civicrm_managed`.`entity_modified_date` FROM `civicrm_managed` WHERE `civicrm_managed`.`entity_id` = $id AND `civicrm_managed`.`entity_type` = '$entity' LIMIT 1)";
   }
 
 }
