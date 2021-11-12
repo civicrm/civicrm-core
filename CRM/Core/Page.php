@@ -118,6 +118,9 @@ class CRM_Core_Page {
     'infoTitle',
     'infoType',
     'infoOptions',
+    // required for Summary.tpl (contact summary) but seems
+    // likely to be used more broadly to warrant inclusion here.
+    'context',
   ];
 
   /**
