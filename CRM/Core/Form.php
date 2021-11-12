@@ -321,8 +321,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
       self::$_template = CRM_Core_Smarty::singleton();
-      self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
     }
+    // Smarty $_template is a static var which persists between tests, so
+    // if something calls clearTemplateVars(), the static still exists but
+    // our ensured variables get blown away, so we need to set them even if
+    // it's already been initialized.
+    self::$_template->ensureVariablesAreAssigned($this->expectedSmartyVariables);
+
     // Workaround for CRM-15153 - give each form a reasonably unique css class
     $this->addClass(CRM_Utils_System::getClassName($this));
 
