@@ -639,7 +639,7 @@ December 21st, 2007
       'smarty' => FALSE,
       'schema' => ['participantId'],
     ]);
-    $this->assertEquals(array_merge($tokens, $this->getDomainTokens()), $tokenProcessor->listTokens());
+    $this->assertEquals(array_merge($tokens, $this->getEventTokens(), $this->getDomainTokens()), $tokenProcessor->listTokens());
 
     $this->callAPISuccess('job', 'send_reminder', []);
     $expected = $this->getExpectedParticipantTokenOutput();
