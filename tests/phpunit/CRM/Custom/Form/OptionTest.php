@@ -22,6 +22,7 @@ class CRM_Custom_Form_OptionTest extends CiviUnitTestCase {
 
     // Run the form
     $form = new CRM_Custom_Form_Option();
+    $form->assign('formTpl', NULL);
     $form->controller = new CRM_Core_Controller_Simple('CRM_Custom_Form_Option', 'Custom Option');
 
     $form->set('id', $optionValue['id']);
