@@ -2275,7 +2275,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->individualCreate($contactParams_2);
 
     $result = $this->callAPISuccess('contact', 'get', ['sort_name' => 'Blackwell F']);
-    $this->assertEquals(1, $result['count']);
+    // Since #22060 we expect both results as space is being replaced with wildcard
+    $this->assertEquals(2, $result['count']);
   }
 
   /**

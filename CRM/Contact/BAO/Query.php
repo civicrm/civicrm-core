@@ -3478,7 +3478,7 @@ WHERE  $smartGroupClause
     // Replace spaces with wildcards for a LIKE operation
     // UNLESS string contains a comma (this exception is a tiny bit questionable)
     // Also need to check if there is space in between sort name.
-    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE && strpos($value, ' ') === TRUE) {
+    elseif ($op == 'LIKE' && strpos($value, ',') === FALSE && strpos($value, ' ') !== FALSE) {
       $value = str_replace(' ', '%', $value);
     }
     $value = CRM_Core_DAO::escapeString(trim($value));
