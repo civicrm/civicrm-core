@@ -328,16 +328,16 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    */
   public static function addUrls(&$obj, $cid) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
-
+    $obj->assign('userRecordId', $uid);
+    $userRecordUrl = '';
     if ($uid) {
       $userRecordUrl = CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($cid);
-      $obj->assign('userRecordUrl', $userRecordUrl);
-      $obj->assign('userRecordId', $uid);
     }
     elseif (CRM_Core_Config::singleton()->userSystem->checkPermissionAddUser()) {
       $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd', 'reset=1&action=add&cid=' . $cid);
       $obj->assign('userAddUrl', $userAddUrl);
     }
+    $obj->assign('userRecordUrl', $userRecordUrl);
 
     if (CRM_Core_Permission::check('access Contact Dashboard')) {
       $dashboardURL = CRM_Utils_System::url('civicrm/user',
