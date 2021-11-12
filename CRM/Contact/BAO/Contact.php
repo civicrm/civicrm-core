@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Token\TokenProcessor;
+
 /**
  *
  * @package CRM
@@ -2773,69 +2775,42 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
   }
 
   /**
-   * Process greetings and cache.
+   * Update the greetings on the contact record.
+   *
+   * This is done as a database update post-contact save.
+   * We could reduce db writes by calculating these values and
+   * also sort_name and display_name pre-save but there could be some hook
+   * interaction?
    *
    * @param \CRM_Contact_DAO_Contact $contact
    *   Contact object after save.
    */
-  public static function processGreetings(&$contact) {
+  public static function processGreetings(CRM_Contact_DAO_Contact $contact): void {
 
     $emailGreetingString = self::getTemplateForGreeting('email_greeting', $contact);
     $postalGreetingString = self::getTemplateForGreeting('postal_greeting', $contact);
     $addresseeString = self::getTemplateForGreeting('addressee', $contact);
-    //@todo this function does a lot of unnecessary loading.
-    // ensureGreetingParamsAreSet now makes sure that the contact is
-    // loaded and using updateGreetingsOnTokenFieldChange
-    // allows us the possibility of only doing an update if required.
 
-    // The contact object has not always required the
-    // fields that are required to calculate greetings
-    // so we need to retrieve it again.
-    if ($contact->_query !== FALSE) {
-      $contact->find(TRUE);
-    }
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['class' => __CLASS__]);
+    $tokenProcessor->addRow(['contactId' => $contact->id, 'contact' => (array) $contact]);
+    $tokenProcessor->addMessage('email_greeting_display', $emailGreetingString, 'text/plain');
+    $tokenProcessor->addMessage('postal_greeting_display', $postalGreetingString, 'text/plain');
+    $tokenProcessor->addMessage('addressee_display', $addresseeString, 'text/plain');
 
-    // store object values to an array
-    $contactDetails = [];
-    CRM_Core_DAO::storeValues($contact, $contactDetails);
-    $contactDetails = [[$contact->id => $contactDetails]];
-
-    $updateQueryString = [];
-
-    if ($emailGreetingString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($emailGreetingString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $emailGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($emailGreetingString));
-      $updateQueryString[] = " email_greeting_display = '{$emailGreetingString}'";
-    }
-
-    if ($postalGreetingString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($postalGreetingString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $postalGreetingString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($postalGreetingString));
-      $updateQueryString[] = " postal_greeting_display = '{$postalGreetingString}'";
-    }
-
-    if ($addresseeString) {
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($addresseeString,
-        $contactDetails,
-        $contact->id,
-        'CRM_Contact_BAO_Contact'
-      );
-      $addresseeString = CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($addresseeString));
-      $updateQueryString[] = " addressee_display = '{$addresseeString}'";
-    }
-
-    if (!empty($updateQueryString)) {
-      $updateQueryString = implode(',', $updateQueryString);
-      $queryString = "UPDATE civicrm_contact SET {$updateQueryString} WHERE id = {$contact->id}";
-      CRM_Core_DAO::executeQuery($queryString);
+    $tokenProcessor->evaluate();
+    foreach ($tokenProcessor->getRows() as $row) {
+      CRM_Core_DAO::executeQuery('
+        UPDATE civicrm_contact
+        SET email_greeting_display = %1,
+        postal_greeting_display = %2,
+        addressee_display = %3
+        WHERE id = %4
+      ', [
+        1 => [$row->render('email_greeting_display'), 'String'],
+        2 => [$row->render('postal_greeting_display'), 'String'],
+        3 => [$row->render('addressee_display'), 'String'],
+        4 => [$contact->id, 'Integer'],
+      ]);
     }
   }
 
