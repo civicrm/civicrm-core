@@ -46,7 +46,7 @@ $_authx_settings = function() {
     'settings_pages' => ['authx' => ['weight' => $weight]],
   ];
   foreach ($flows as $flow) {
-    $weight = $weight+10;
+    $weight = $weight + 10;
     $s["authx_{$flow}_cred"] = $basic + [
       'name' => "authx_{$flow}_cred",
       'type' => 'Array',
@@ -78,7 +78,7 @@ $_authx_settings = function() {
       'pseudoconstant' => [
         'callback' => ['\Civi\Authx\Meta', 'getUserModes'],
       ],
-      'settings_pages' => ['authx' => ['weight' => $weight+5]],
+      'settings_pages' => ['authx' => ['weight' => $weight + 5]],
     ];
   }
 
