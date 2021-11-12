@@ -106,6 +106,7 @@ function _civigrant_civix_civicrm_config(&$config = NULL) {
   $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
 }
+
 /**
  * (Delegated) Implements hook_civicrm_alterSettingsFolders().
  *
@@ -126,5 +127,11 @@ function _civigrant_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
 function _civigrant_civix_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes = array_merge($entityTypes, []);
+  $entityTypes = array_merge($entityTypes, [
+    'CRM_Grant_DAO_Grant' => [
+      'name' => 'Grant',
+      'class' => 'CRM_Grant_DAO_Grant',
+      'table' => 'civicrm_grant',
+    ],
+  ]);
 }

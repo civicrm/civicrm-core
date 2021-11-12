@@ -8,7 +8,6 @@
      <access_arguments>access CiviGrant</access_arguments>
      <page_type>1</page_type>
      <weight>1000</weight>
-     <component>CiviGrant</component>
   </item>
   <item>
      <path>civicrm/grant/info</path>
@@ -30,7 +29,6 @@
      <path_arguments>action=add</path_arguments>
      <access_arguments>access CiviGrant</access_arguments>
      <page_type>1</page_type>
-     <component>CiviGrant</component>
   </item>
   <item>
      <path>civicrm/contact/view/grant</path>

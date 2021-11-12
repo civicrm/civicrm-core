@@ -26,6 +26,11 @@ INSERT INTO civicrm_component (name, namespace) VALUES ('CiviCase'      , 'CRM_C
 INSERT INTO civicrm_component (name, namespace) VALUES ('CiviReport'    , 'CRM_Report' );
 INSERT INTO civicrm_component (name, namespace) VALUES ('CiviCampaign'  , 'CRM_Campaign' );
 
+-- CiviGrant has migrated to an extension, but instead of removing the above insert,
+-- go ahead and insert it, then delete. This is because too much legacy code has hard-coded
+-- references to component ID, so it's better to keep the auto-increment values stable.
+DELETE FROM civicrm_component WHERE name = 'CiviGrant';
+
 -- Create organization contact
 INSERT INTO civicrm_contact( `contact_type`, `sort_name`, `display_name`, `legal_name`, `organization_name`)
 VALUES ('Organization', @defaultOrganization, @defaultOrganization, @defaultOrganization, @defaultOrganization);
