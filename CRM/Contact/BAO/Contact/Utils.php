@@ -888,7 +888,13 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
   }
 
   /**
+   * Do not use - this function calls legacy hooks directly.
+   *
+   * Calls deprecated functions but is so nasty no-one wants to re-write it to make sense.
+   *
    * @param array $params
+   *
+   * @deprecated
    *
    * @throws Exception
    */
@@ -1110,11 +1116,14 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $templateString
    *   The greeting template string with contact tokens + Smarty syntax.
    *
+   * @deprecated
+   *
    * @param array $contactDetails
    * @param int $contactID
    * @param string $className
    */
   public static function processGreetingTemplate(&$templateString, $contactDetails, $contactID, $className) {
+    CRM_Core_Error::deprecatedFunctionWarning('Us the token processor');
     CRM_Utils_Token::replaceGreetingTokens($templateString, $contactDetails, $contactID, $className, TRUE);
     $templateString = CRM_Utils_String::parseOneOffStringThroughSmarty($templateString);
   }

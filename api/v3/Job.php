@@ -259,6 +259,10 @@ function civicrm_api3_job_mail_report($params) {
  *
  * @param array $params
  *
+ * @deprecated - this function calls legacy hook token processing
+ * & is generally bad & the function it calls is bad. We should do something
+ * new (in core or an extension).
+ *
  * @return array
  */
 function civicrm_api3_job_update_greeting($params) {

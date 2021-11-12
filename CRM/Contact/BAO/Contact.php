@@ -2792,7 +2792,7 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
     $addresseeString = self::getTemplateForGreeting('addressee', $contact);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['class' => __CLASS__]);
-    $tokenProcessor->addRow(['contactId' => $contact->id, 'contact' => (array) $contact]);
+    $tokenProcessor->addRow(['contactId' => $contact->id, 'contact' => array_filter((array) $contact)]);
     $tokenProcessor->addMessage('email_greeting_display', $emailGreetingString, 'text/plain');
     $tokenProcessor->addMessage('postal_greeting_display', $postalGreetingString, 'text/plain');
     $tokenProcessor->addMessage('addressee_display', $addresseeString, 'text/plain');
@@ -2806,9 +2806,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         addressee_display = %3
         WHERE id = %4
       ', [
-        1 => [$row->render('email_greeting_display'), 'String'],
-        2 => [$row->render('postal_greeting_display'), 'String'],
-        3 => [$row->render('addressee_display'), 'String'],
+        1 => [CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($row->render('email_greeting_display'))), 'String'],
+        2 => [CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($row->render('postal_greeting_display'))), 'String'],
+        3 => [CRM_Core_DAO::escapeString(CRM_Utils_String::stripSpaces($row->render('addressee_display'))), 'String'],
         4 => [$contact->id, 'Integer'],
       ]);
     }
