@@ -128,6 +128,17 @@ class TokenProcessor {
   }
 
   /**
+   * Add new elements to the field schema.
+   *
+   * @param string|string[] $fieldNames
+   * @return TokenProcessor
+   */
+  public function addSchema($fieldNames) {
+    $this->context['schema'] = array_unique(array_merge($this->context['schema'], (array) $fieldNames));
+    return $this;
+  }
+
+  /**
    * Register a string for which we'll need to merge in tokens.
    *
    * @param string $name

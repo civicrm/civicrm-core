@@ -598,7 +598,7 @@ class CRM_Core_SelectValues {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['participantId']]);
     $allTokens = $tokenProcessor->listTokens();
     foreach (array_keys($allTokens) as $token) {
-      if (strpos($token, '{domain.') === 0) {
+      if (strpos($token, '{domain.') === 0 || strpos($token, '{event.') === 0) {
         unset($allTokens[$token]);
       }
     }
