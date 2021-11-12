@@ -80,6 +80,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
         'preProcess' => [],
       ];
       $page = new $pageName();
+      $page->assign('formTpl', NULL);
       ob_start();
       $page->run();
       ob_end_clean();
@@ -116,6 +117,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
       // Reset the counters
       $this->hookCount = ['pageRun' => []];
       $page = new $pageName();
+      $page->assign('formTpl', NULL);
       ob_start();
       $page->run();
       ob_end_clean();
