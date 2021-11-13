@@ -45,6 +45,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipStatusDelete($this->_membershipStatusID);
     $this->contactDelete($this->_orgContactID);
     $this->contactDelete($this->_indiviContactID);
+    parent::tearDown();
   }
 
   /**

@@ -33,6 +33,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**

@@ -26,6 +26,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
       CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     }
     $this->financialAccountDelete('Donations');
+    parent::tearDown();
   }
 
   /**

@@ -130,6 +130,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       $this->callAPISuccess('contact', 'delete', ['id' => $contactID, 'skip_undelete' => TRUE]);
     }
     CRM_Utils_Time::resetTime();
+    parent::tearDown();
   }
 
   /**

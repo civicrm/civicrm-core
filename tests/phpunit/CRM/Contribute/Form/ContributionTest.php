@@ -126,6 +126,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_note', 'civicrm_uf_match', 'civicrm_address']);
+    parent::tearDown();
   }
 
   /**

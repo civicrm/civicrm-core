@@ -98,6 +98,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     if (!empty($type['count'])) {
       $this->callAPISuccess('option_value', 'delete', ['id' => $this->test_activity_type_id]);
     }
+    parent::tearDown();
   }
 
   /**

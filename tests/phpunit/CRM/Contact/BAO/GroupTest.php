@@ -27,6 +27,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
    */
   protected function tearDown(): void {
     $this->quickCleanup(['civicrm_mapping_field', 'civicrm_mapping', 'civicrm_group', 'civicrm_saved_search']);
+    parent::tearDown();
   }
 
   /**
