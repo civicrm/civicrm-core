@@ -354,6 +354,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *  Common setup functions for all unit tests.
    */
   protected function setUp(): void {
+    parent::setUp();
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
@@ -555,6 +556,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // classes frees memory as they are not otherwise unset until the
     // very end.
     unset($this->mut);
+    parent::tearDown();
   }
 
   /**
