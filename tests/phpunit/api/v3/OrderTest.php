@@ -62,6 +62,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
+    parent::tearDown();
   }
 
   /**

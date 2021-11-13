@@ -54,6 +54,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->contactDelete($this->_individualId);
+    parent::tearDown();
   }
 
   /**

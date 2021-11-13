@@ -34,6 +34,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'civicrm_relationship_type',
     ];
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   ///////////////// civicrm_relationship_type_add methods

@@ -43,6 +43,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $tablesToTruncate = ['civicrm_custom_group', 'civicrm_custom_field'];
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   ///////////////// civicrm_custom_group_create methods

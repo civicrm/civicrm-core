@@ -116,6 +116,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     if (!empty($type['count'])) {
       $this->callAPISuccess('option_value', 'delete', ['id' => $this->test_activity_type_id]);
     }
+    parent::tearDown();
   }
 
   /**

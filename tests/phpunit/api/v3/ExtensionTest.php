@@ -23,12 +23,14 @@
 class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   public function setUp(): void {
+    parent::setUp();
     $url = 'file://' . dirname(dirname(dirname(dirname(__FILE__)))) . '/mock/extension_browser_results';
     Civi::settings()->set('ext_repo_url', $url);
   }
 
   public function tearDown(): void {
     Civi::settings()->revert('ext_repo_url');
+    parent::tearDown();
   }
 
   /**

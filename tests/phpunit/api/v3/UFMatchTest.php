@@ -59,6 +59,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
+    parent::tearDown();
   }
 
   /**

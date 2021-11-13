@@ -93,6 +93,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $tablesToTruncate = ['civicrm_contact', 'civicrm_cache'];
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**

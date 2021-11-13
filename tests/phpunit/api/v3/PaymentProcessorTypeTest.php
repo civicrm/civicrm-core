@@ -44,6 +44,7 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPIFailure('payment_processor_type', 'create', $payProcParams);
     $this->assertStringContainsString('name, title, class_name, billing_mode', $result['error_message']);
+    parent::tearDown();
   }
 
   /**

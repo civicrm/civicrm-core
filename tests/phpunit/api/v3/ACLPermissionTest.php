@@ -71,6 +71,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'civicrm_tag',
     ];
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   /**

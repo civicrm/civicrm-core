@@ -117,6 +117,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     ]);
 
     $this->assertAPISuccess($delete);
+    parent::tearDown();
   }
 
   public function testCreatePriceFieldValue() {
