@@ -31,6 +31,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   protected function setUp(): void {
+    parent::setUp();
     $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
     ]);
@@ -41,6 +42,7 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
   protected function tearDown(): void {
     $this->contact->delete();
+    parent::tearDown();
   }
 
   /**
