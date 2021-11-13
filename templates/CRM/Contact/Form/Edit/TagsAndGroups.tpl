@@ -12,7 +12,7 @@
   <div class="crm-accordion-header">{$title}</div>
   <div class="crm-accordion-body" id="tagGroup">
 {/if}
-    <table class="form-layout-compressed{if isset($context) && $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
+    <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
         {if empty($type) || $type eq 'tag'}
           <td>
@@ -20,7 +20,7 @@
               {if !empty($title)}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
-            {if !isset($context) || $context NEQ 'profile'}
+            {if $context NEQ 'profile'}
               {include file="CRM/common/Tagset.tpl"}
             {/if}
           </td>
