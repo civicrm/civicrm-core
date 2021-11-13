@@ -31,6 +31,7 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
   public $adminPass;
 
   public function setUp(): void {
+    parent::setUp();
     CRM_Core_Config::singleton(1, 1);
 
     global $_CV;
