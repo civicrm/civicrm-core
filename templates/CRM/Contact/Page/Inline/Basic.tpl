@@ -15,7 +15,7 @@
   <div class="crm-summary-row">
     <div class="crm-label">{ts}Contact Type{/ts}</div>
     <div class="crm-content crm-contact_type_label">
-      {if isset($contact_type_label)}{$contact_type_label}{/if}
+      {$contact_type_label}
     </div>
   </div>
   <div class="crm-summary-row">
@@ -35,7 +35,7 @@
   <div class="crm-summary-row">
     <div class="crm-label">{ts}External ID{/ts}</div>
     <div class="crm-content crm-contact_external_identifier_label">
-      {if isset($external_identifier)}{$external_identifier}{/if}
+      {$external_identifier}
     </div>
   </div>
 </div>

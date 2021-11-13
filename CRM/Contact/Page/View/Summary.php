@@ -121,7 +121,30 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $this->assignFieldMetadataToTemplate('Contact');
 
     $params = [];
-    $defaults = [];
+    $defaults = [
+      // Set empty default values for these - they will be overwritten when the contact is
+      // loaded in CRM_Contact_BAO_Contact::retrieve if there are real values
+      // but since we are not using apiV4 they will be left unset if empty.
+      // However, the wind up assigned as smarty variables so we ensure they are set to prevent e-notices
+      // used by ContactInfo.tpl
+      'job_title' => '',
+      'current_employer_id' => '',
+      'nick_name' => '',
+      'legal_name' => '',
+      'source' => '',
+      'sic_code' => '',
+      'external_identifier' => '',
+      // for CommunicationPreferences.tpl
+      'postal_greeting_custom' => '',
+      'email_greeting_custom' => '',
+      'addressee_custom' => '',
+      'communication_style_display' => '',
+      // for Demographics.tpl
+      'age' => ['y' => '', 'm' => ''],
+      'birth_date' => '',
+      // for Website.tpl (the others don't seem to enotice for some reason).
+      'website' => '',
+    ];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
     $params['noRelationships'] = $params['noNotes'] = $params['noGroups'] = TRUE;
@@ -243,7 +266,6 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
-    $defaults['external_identifier'] = $contact->external_identifier;
     $this->assign($defaults);
 
     // FIXME: when we sort out TZ isssues with DATETIME/TIMESTAMP, we can skip next query
