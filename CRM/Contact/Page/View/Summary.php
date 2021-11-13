@@ -110,10 +110,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       ->addScriptFile('civicrm', 'templates/CRM/Contact/Page/View/Summary.js', 2, 'html-header')
       ->addStyleFile('civicrm', 'css/contactSummary.css', 2, 'html-header')
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array(
-        'summaryPrint' => array('mode' => $this->_print),
-        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, 'summary')),
-      ));
+      ->addSetting([
+        'summaryPrint' => ['mode' => $this->_print],
+        'tabSettings' => ['active' => CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, 'summary')],
+      ]);
     $this->assign('summaryPrint', $this->_print);
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $this->_contactId);
@@ -153,34 +153,34 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $mailingBackend = Civi::settings()->get('mailing_backend');
     $this->assign('mailingOutboundOption', $mailingBackend['outBound_option']);
 
-    $communicationType = array(
-      'phone' => array(
+    $communicationType = [
+      'phone' => [
         'type' => 'phoneType',
         'id' => 'phone_type',
         'daoName' => 'CRM_Core_DAO_Phone',
         'fieldName' => 'phone_type_id',
-      ),
-      'im' => array(
+      ],
+      'im' => [
         'type' => 'IMProvider',
         'id' => 'provider',
         'daoName' => 'CRM_Core_DAO_IM',
         'fieldName' => 'provider_id',
-      ),
-      'website' => array(
+      ],
+      'website' => [
         'type' => 'websiteType',
         'id' => 'website_type',
         'daoName' => 'CRM_Core_DAO_Website',
         'fieldName' => 'website_type_id',
-      ),
-      'address' => array('skip' => TRUE, 'customData' => 1),
-      'email' => array('skip' => TRUE),
-      'openid' => array('skip' => TRUE),
-    );
+      ],
+      'address' => ['skip' => TRUE, 'customData' => 1],
+      'email' => ['skip' => TRUE],
+      'openid' => ['skip' => TRUE],
+    ];
 
     foreach ($communicationType as $key => $value) {
       if (!empty($defaults[$key])) {
         foreach ($defaults[$key] as & $val) {
-          CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name')), FALSE);
+          CRM_Utils_Array::lookupValue($val, 'location_type', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']), FALSE);
           if (empty($value['skip'])) {
             $daoName = $value['daoName'];
             $pseudoConst = $daoName::buildOptions($value['fieldName'], 'get');
@@ -250,10 +250,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       if (!empty($addressValue['master_id']) &&
         !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']
       ) {
-        $sharedAddresses[$key]['shared_address_display'] = array(
+        $sharedAddresses[$key]['shared_address_display'] = [
           'address' => $addressValue['display'],
           'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
-        );
+        ];
       }
     }
     $this->assign('sharedAddresses', $sharedAddresses);
@@ -460,7 +460,10 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $tab += array_fill_keys($expectedKeys, NULL);
       // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
       if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
-        $tab['count'] = call_user_func_array(['CRM_Contact_BAO_Contact', 'getCountComponent'], $getCountParams[$tab['id']]);
+        $tab['count'] = call_user_func_array([
+          'CRM_Contact_BAO_Contact',
+          'getCountComponent',
+        ], $getCountParams[$tab['id']]);
       }
     }
 
