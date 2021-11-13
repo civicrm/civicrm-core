@@ -28,6 +28,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
     if ($dbLocale) {
       CRM_Core_I18n_Schema::makeSinglelingual('en_US');
     }
+    parent::tearDown();
   }
 
   /**

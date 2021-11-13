@@ -45,6 +45,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
       'civicrm_loc_block',
     ];
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   public function testCreateWithMissingParams() {

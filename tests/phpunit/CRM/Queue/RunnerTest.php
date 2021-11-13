@@ -33,6 +33,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
     $tablesToTruncate = ['civicrm_queue_item'];
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   public function testRunAllNormal() {

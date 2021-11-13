@@ -22,6 +22,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     CRM_Utils_Hook::singleton()->reset();
+    parent::tearDown();
   }
 
   /**

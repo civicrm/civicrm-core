@@ -21,6 +21,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       'civicrm_activity_contact',
     ];
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   /**

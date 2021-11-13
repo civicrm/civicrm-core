@@ -86,6 +86,7 @@ DELETE FROM civicrm_contact_type
       WHERE name IN ('{$this->student}','{$this->parent}','{$this->sponsor}');
     ";
     CRM_Core_DAO::executeQuery($query);
+    parent::tearDown();
   }
 
   /**

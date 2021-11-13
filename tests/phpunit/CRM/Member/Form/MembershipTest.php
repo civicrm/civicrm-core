@@ -171,6 +171,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['contact']['organization'], 'skip_undelete' => TRUE]);
     $this->callAPISuccess('RelationshipType', 'delete', ['id' => $this->ids['relationship_type']['member']]);
+    parent::tearDown();
   }
 
   /**
