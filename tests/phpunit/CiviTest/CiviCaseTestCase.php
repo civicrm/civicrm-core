@@ -114,6 +114,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     $this->customDirectories(array('template_path' => FALSE));
     $this->quickCleanup($this->tablesToTruncate, TRUE);
     CRM_Case_XMLRepository::singleton(TRUE);
+    parent::tearDown();
   }
 
   /**
