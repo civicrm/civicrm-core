@@ -19,5 +19,6 @@ namespace Civi\Api4;
  */
 class MembershipType extends Generic\DAOEntity {
   use Generic\Traits\OptionList;
+  use Generic\Traits\ManagedEntity;
 
 }

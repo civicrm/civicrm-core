@@ -21,5 +21,6 @@ namespace Civi\Api4;
  */
 class RelationshipType extends Generic\DAOEntity {
   use Generic\Traits\OptionList;
+  use Generic\Traits\ManagedEntity;
 
 }
