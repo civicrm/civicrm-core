@@ -2793,9 +2793,9 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['class' => __CLASS__]);
     $tokenProcessor->addRow(['contactId' => $contact->id, 'contact' => array_filter((array) $contact)]);
-    $tokenProcessor->addMessage('email_greeting_display', $emailGreetingString, 'text/plain');
-    $tokenProcessor->addMessage('postal_greeting_display', $postalGreetingString, 'text/plain');
-    $tokenProcessor->addMessage('addressee_display', $addresseeString, 'text/plain');
+    $tokenProcessor->addMessage('email_greeting_display', $emailGreetingString, 'text/html');
+    $tokenProcessor->addMessage('postal_greeting_display', $postalGreetingString, 'text/html');
+    $tokenProcessor->addMessage('addressee_display', $addresseeString, 'text/html');
 
     $tokenProcessor->evaluate();
     foreach ($tokenProcessor->getRows() as $row) {
