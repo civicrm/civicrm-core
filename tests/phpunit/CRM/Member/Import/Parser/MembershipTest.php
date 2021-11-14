@@ -108,6 +108,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_mebershipStatusID);
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**

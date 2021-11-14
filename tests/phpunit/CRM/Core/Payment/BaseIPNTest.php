@@ -100,6 +100,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
     CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'name', TRUE);
+    parent::tearDown();
   }
 
   /**

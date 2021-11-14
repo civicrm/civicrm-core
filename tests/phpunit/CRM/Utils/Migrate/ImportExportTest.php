@@ -12,6 +12,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       'civicrm_custom_field',
     ];
     $this->quickCleanup($tablesToTruncate, TRUE);
+    parent::tearDown();
   }
 
   /**
