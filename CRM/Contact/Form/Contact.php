@@ -357,8 +357,6 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       if ($this->_contactSubType || isset($paramSubType)) {
         $paramSubType = (isset($paramSubType)) ? $paramSubType :
           str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($this->_contactSubType, CRM_Core_DAO::VALUE_SEPARATOR));
-
-        $this->assign('paramSubType', $paramSubType);
       }
 
       if (CRM_Utils_Request::retrieve('type', 'String')) {
@@ -377,6 +375,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $this->assign('customValueCount', $this->_customValueCount);
       }
     }
+    $this->assign('paramSubType', $paramSubType ?? '');
   }
 
   /**
