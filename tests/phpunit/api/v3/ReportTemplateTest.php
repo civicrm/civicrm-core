@@ -1282,6 +1282,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_contact_contact_source_link' => '/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->contactIDs[2],
       'civicrm_contact_contact_source_hover' => 'View Contact Summary for this Contact',
       'civicrm_activity_activity_type_id_hover' => 'View Activity Record',
+      'class' => NULL,
     ];
     $row = $rows[0];
     // This link is not relative - skip for now

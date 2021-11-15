@@ -76,7 +76,7 @@ ENDOUTPUT;
    * tests for that - we're more interested in does it echo it in print
    * format.
    */
-  public function testOutputPrint() {
+  public function testOutputPrint(): void {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -114,8 +114,7 @@ ENDOUTPUT;
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = ob_get_contents();
-      ob_end_clean();
+      $contents = ob_get_clean();
     }
     $this->assertStringContainsString('<title>CiviCRM Report</title>', $contents);
     $this->assertStringContainsString('test report', $contents);
@@ -133,7 +132,8 @@ ENDOUTPUT;
    * @runInSeparateProcess
    * @preserveGlobalState disabled
    */
-  public function testOutputPdf() {
+  public function testOutputPdf(): void {
+    $contents = '';
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {
@@ -171,8 +171,7 @@ ENDOUTPUT;
       ]);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $contents = ob_get_contents();
-      ob_end_clean();
+      $contents = ob_get_clean();
     }
     $this->assertStringStartsWith('%PDF', $contents);
     $this->assertStringContainsString("id_value={$last_contact['id']}", $contents);
@@ -181,7 +180,7 @@ ENDOUTPUT;
   /**
    * Test when you choose Csv from the actions dropdown.
    */
-  public function testOutputCsv() {
+  public function testOutputCsv(): void {
     // Create many contacts, in particular so that the report would be more
     // than a one-pager.
     for ($i = 0; $i < 110; $i++) {

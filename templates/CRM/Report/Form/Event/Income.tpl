@@ -18,7 +18,7 @@
 {include file="CRM/Report/Form/Actions.tpl"}
 {*Statistics at the Top of the page*}
     {if !$section }
-        {include file="CRM/Report/Form/Statistics.tpl" top=true}
+        {include file="CRM/Report/Form/Statistics.tpl" top=true bottom=false}
     {/if}
 
     {if $events}
@@ -70,7 +70,7 @@
         </div>
         {if !$section }
             {*Statistics at the bottom of the page*}
-            {include file="CRM/Report/Form/Statistics.tpl" bottom=true}
+            {include file="CRM/Report/Form/Statistics.tpl" top="false" bottom=true}
         {/if}
     {/if}
     {include file="CRM/Report/Form/ErrorMessage.tpl"}
