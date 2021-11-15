@@ -11,7 +11,7 @@
       sort: [],
 
       isSortable: function(col) {
-        return col.type === 'field' && col.sortable !== false;
+        return !this.settings.draggable && col.type === 'field' && col.sortable !== false;
       },
 
       getSort: function(col) {

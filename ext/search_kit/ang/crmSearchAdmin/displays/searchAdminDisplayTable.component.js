@@ -33,6 +33,15 @@
         }
       };
 
+      this.toggleDraggable = function() {
+        if (ctrl.display.settings.draggable) {
+          delete ctrl.display.settings.draggable;
+        } else {
+          ctrl.display.settings.sort = [];
+          ctrl.display.settings.draggable = searchMeta.getEntity(ctrl.apiEntity).order_by;
+        }
+      };
+
       this.$onInit = function () {
         if (!ctrl.display.settings) {
           ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null});
@@ -42,6 +51,8 @@
         }
         // Displays created prior to 5.43 may not have this property
         ctrl.display.settings.classes = ctrl.display.settings.classes || [];
+        // Table can be draggable if the main entity is a SortableEntity.
+        ctrl.canBeDraggable = _.includes(searchMeta.getEntity(ctrl.apiEntity).type, 'SortableEntity');
         ctrl.parent.initColumns({label: true, sortable: true});
       };
 

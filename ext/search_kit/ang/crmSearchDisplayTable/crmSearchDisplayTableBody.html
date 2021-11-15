@@ -1,6 +1,9 @@
 <tr ng-repeat="(rowIndex, row) in $ctrl.results">
-  <td ng-if=":: $ctrl.settings.actions" class="{{:: row.cssClass }}">
-    <input type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.selectRow(row)" ng-disabled="!!$ctrl.loadingAllRows">
+  <td ng-if=":: $ctrl.settings.actions || $ctrl.settings.draggable" class="{{:: row.cssClass }}">
+    <span ng-if=":: $ctrl.settings.draggable" class="crm-draggable" title="{{:: ts('Drag to reposition') }}">
+      <i class="crm-i fa-arrows-v"></i>
+    </span>
+    <input ng-if=":: $ctrl.settings.actions" type="checkbox" ng-checked="$ctrl.isRowSelected(row)" ng-click="$ctrl.selectRow(row)" ng-disabled="!!$ctrl.loadingAllRows">
   </td>
   <td ng-repeat="(colIndex, colData) in row.columns" ng-include="'~/crmSearchDisplay/colType/' + $ctrl.settings.columns[colIndex].type + '.html'" title="{{:: colData.title }}" class="{{:: row.cssClass }} {{:: colData.cssClass }}">
   </td>
