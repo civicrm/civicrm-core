@@ -185,7 +185,7 @@
         subTypeValues = null;
       }
       else if (!subTypeValues) {
-        subTypeValues = {/literal}{if isset($paramSubType)}"{$paramSubType}"{else}""{/if}{literal};
+        subTypeValues = {/literal}"{$paramSubType}"{literal};
       }
       function loadNextRecord(i, groupValue, groupCount) {
         if (i < groupCount) {
