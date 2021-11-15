@@ -37,7 +37,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
    *
    * @return array
    */
-  public function getOptionalSmartyElements(): array {
+  public function getOptionalQuickFormElements(): array {
     return ['disableUSPS'];
   }
 
