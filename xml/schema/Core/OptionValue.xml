@@ -6,6 +6,10 @@
   <name>civicrm_option_value</name>
   <add>1.5</add>
   <log>true</log>
+  <paths>
+    <update>civicrm/admin/options/[option_group_id:name]?reset=1&amp;action=update&amp;id=[id]</update>
+    <delete>civicrm/admin/options/[option_group_id:name]?reset=1&amp;action=delete&amp;id=[id]</delete>
+  </paths>
   <field>
     <name>id</name>
     <title>Option Value ID</title>

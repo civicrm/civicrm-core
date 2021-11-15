@@ -14,7 +14,7 @@ namespace Civi\Api4;
  * OptionValue entity.
  *
  * @see \Civi\Api4\OptionGroup
- * @searchable none
+ * @searchable secondary
  * @since 5.19
  * @package Civi\Api4
  */
