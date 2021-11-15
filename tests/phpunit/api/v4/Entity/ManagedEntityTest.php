@@ -19,6 +19,8 @@
 namespace api\v4\Entity;
 
 use api\v4\UnitTestCase;
+use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
 use Civi\Api4\SavedSearch;
 use Civi\Test\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -257,6 +259,97 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
     $this->assertNull($search['local_modified_date']);
   }
 
+  public function testOptionGroupAndValues() {
+    $optionGroup = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionGroup',
+      'entity' => 'OptionGroup',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => 'testManagedOptionGroup',
+          'title' => 'Test Managed Option Group',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_locked' => FALSE,
+        ],
+      ],
+    ];
+    $optionValue1 = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionValue1',
+      'entity' => 'OptionValue',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'option_group_id.name' => 'testManagedOptionGroup',
+          'value' => 1,
+          'label' => 'Option Value 1',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_reserved' => FALSE,
+          'weight' => 1,
+          'icon' => 'fa-test',
+        ],
+      ],
+    ];
+    $this->_managedEntities[] = $optionGroup;
+    $this->_managedEntities[] = $optionValue1;
+    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $values = OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
+      ->execute();
+
+    $this->assertCount(1, $values);
+    $this->assertEquals('Option Value 1', $values[0]['label']);
+
+    $optionValue2 = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionValue2',
+      'entity' => 'OptionValue',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'option_group_id.name' => 'testManagedOptionGroup',
+          'value' => 2,
+          'label' => 'Option Value 2',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_reserved' => FALSE,
+          'weight' => 2,
+          'icon' => 'fa-test',
+        ],
+      ],
+    ];
+
+    $this->_managedEntities[] = $optionValue2;
+    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $values = OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
+      ->addSelect('*', 'local_modified_date', 'has_base')
+      ->addOrderBy('weight')
+      ->execute();
+
+    $this->assertCount(2, $values);
+    $this->assertEquals('Option Value 2', $values[1]['label']);
+    $this->assertNull($values[0]['local_modified_date']);
+    $this->assertTrue($values[0]['has_base']);
+
+    $this->_managedEntities = [];
+    \CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $this->assertCount(0, OptionValue::get(FALSE)->addWhere('id', 'IN', $values->column('id'))->execute());
+    $this->assertCount(0, OptionGroup::get(FALSE)->addWhere('name', '=', 'testManagedOptionGroup')->execute());
+  }
+
   /**
    * @dataProvider sampleEntityTypes
    * @param string $entityName
@@ -267,18 +360,27 @@ class ManagedEntityTest extends UnitTestCase implements TransactionalInterface, 
   }
 
   public function sampleEntityTypes() {
-    return [
+    $entityTypes = [
       // v3 pseudo-entity
-      'ActivityType' => ['ActivityType', FALSE],
+      'ActivityType' => FALSE,
       // v3 pseudo-entity
-      'CustomSearch' => ['CustomSearch', FALSE],
-      // Not a dao entity, can't be managed
-      'Entity' => ['Entity', FALSE],
+      'CustomSearch' => FALSE,
+      // Non-dao entities can't be managed
+      'Entity' => FALSE,
+      'Afform' => FALSE,
+      'Settings' => FALSE,
       // v4 entity not using ManagedEntity trait
-      'UFJoin' => ['UFJoin', FALSE],
-      // v4 entity using ManagedEntity trait
-      'SavedSearch' => ['SavedSearch', TRUE],
+      'UFJoin' => FALSE,
+      // v4 entities using ManagedEntity trait
+      'ContactType' => TRUE,
+      'CustomField' => TRUE,
+      'CustomGroup' => TRUE,
+      'MembershipType' => TRUE,
+      'OptionGroup' => TRUE,
+      'OptionValue' => TRUE,
+      'SavedSearch' => TRUE,
     ];
+    return array_combine(array_keys($entityTypes), \CRM_Utils_Array::makeNonAssociative($entityTypes, 0, 1));
   }
 
   private function getCurrentTimestamp() {
