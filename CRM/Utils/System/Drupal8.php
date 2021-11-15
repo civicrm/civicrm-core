@@ -849,6 +849,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getSessionId() {
+    if (\Drupal::hasContainer()) {
+      $session = \Drupal::service('session');
+      if (!$session->has('civicrm.tempstore.sessionid')) {
+        $session->set('civicrm.tempstore.sessionid', \Drupal\Component\Utility\Crypt::randomBytesBase64());
+      }
+      return $session->get('civicrm.tempstore.sessionid');
+    }
+    return '';
+  }
+
+  /**
    * Load the user object.
    *
    * @param int $userID
