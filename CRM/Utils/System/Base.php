@@ -1020,6 +1020,15 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * This exists because of https://www.drupal.org/node/3006306 where
+   * they changed so that they don't start sessions for anonymous, but we
+   * want that.
+   */
+  public function getSessionId() {
+    return session_id();
+  }
+
+  /**
    * Get role names
    *
    * @return array|null
