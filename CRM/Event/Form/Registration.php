@@ -686,12 +686,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('primaryParticipant', $this->_params);
     }
 
-    CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
-      'civicrm_participant',
-      $participant->id,
-      'Participant'
-    );
-
     $createPayment = (CRM_Utils_Array::value('amount', $this->_params, 0) != 0) ? TRUE : FALSE;
 
     // force to create zero amount payment, CRM-5095
@@ -826,6 +820,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     if (!$participantParams['discount_id']) {
       $participantParams['discount_id'] = "null";
+    }
+
+    $participantParams['custom'] = [];
+    foreach ($form->_params as $paramName => $paramValue) {
+      if (strpos($paramName, 'custom_') === 0) {
+        list($customFieldID, $customValueID) = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
+        CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
+
+      }
     }
 
     $participant = CRM_Event_BAO_Participant::create($participantParams);
