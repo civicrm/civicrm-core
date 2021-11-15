@@ -231,6 +231,9 @@ class CRM_Contact_Form_Edit_Address {
    */
   public static function setDefaultValues(&$defaults, &$form) {
     $addressValues = [];
+    // Actual values will be assigned to these below if there are some.
+    $form->assign('masterAddress');
+    $form->assign('sharedAddresses', []);
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])
     ) {
