@@ -362,6 +362,7 @@ ENDBODY;
     $form->set('atype', $activity['values'][$activity_id]['activity_type_id']);
 
     $form->buildForm();
+    $form->assign('formTpl', NULL);
 
     // Wish there was another way to do this
     $form->controller->handle($form, 'display');

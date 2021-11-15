@@ -47,14 +47,6 @@ class CRM_Core_Smarty extends Smarty {
     PRINT_JSON = 'json';
 
   /**
-   * We only need one instance of this object. So we use the singleton
-   * pattern and cache the instance in this variable
-   *
-   * @var object
-   */
-  static private $_singleton = NULL;
-
-  /**
    * Backup frames.
    *
    * A list of variables ot save temporarily in format (string $name => mixed $value).
@@ -162,13 +154,13 @@ class CRM_Core_Smarty extends Smarty {
    * @return \CRM_Core_Smarty
    */
   public static function &singleton() {
-    if (!isset(self::$_singleton)) {
-      self::$_singleton = new CRM_Core_Smarty();
-      self::$_singleton->initialize();
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__] = new CRM_Core_Smarty();
+      \Civi::$statics[__CLASS__][__FUNCTION__]->initialize();
 
       self::registerStringResource();
     }
-    return self::$_singleton;
+    return \Civi::$statics[__CLASS__][__FUNCTION__];
   }
 
   /**

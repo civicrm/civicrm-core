@@ -8,7 +8,6 @@ class CRM_Core_SessionTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    CRM_Core_Smarty::singleton()->clearTemplateVars();
     // set null defaults
     foreach (['infoOptions', 'infoType', 'infoMessage', 'infoTitle'] as $info) {
       CRM_Core_Smarty::singleton()->assign($info, NULL);

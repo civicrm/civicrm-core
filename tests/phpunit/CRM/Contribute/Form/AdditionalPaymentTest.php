@@ -222,7 +222,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // from previous tests causing a fail.
     // The reason this is hard to fix is that we save a billing address per contribution not
     // per payment so it's a problem with the data model
-    CRM_Core_Smarty::singleton()->clearTemplateVars();
 
     // pay additional amount
     $this->submitPayment(50, NULL, TRUE);

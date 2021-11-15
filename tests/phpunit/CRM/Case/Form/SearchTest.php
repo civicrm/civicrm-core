@@ -25,6 +25,7 @@ class CRM_Case_Form_SearchTest extends CiviCaseTestCase {
   public function testOpeningFindCaseForm() {
     $form = new CRM_Case_Form_Search();
     $form->controller = new CRM_Case_Controller_Search('Find Cases');
+    $form->assign('formTpl', NULL);
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');

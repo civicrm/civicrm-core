@@ -155,6 +155,7 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
 
     $form = new CRM_Case_Form_ActivityToCase();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_ActivityToCase', 'Case Thing');
+    $form->assign('formTpl', NULL);
     $_REQUEST['activityId'] = $activity['id'];
     $_REQUEST['fileOnCaseAction'] = $input['variation_type'];
 

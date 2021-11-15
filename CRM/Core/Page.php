@@ -139,7 +139,9 @@ class CRM_Core_Page {
     $this->_mode = $mode;
 
     // let the constructor initialize this, should happen only once
-    if (!isset(self::$_template)) {
+    if (!isset(\Civi::$statics[__CLASS__][__FUNCTION__])) {
+      \Civi::$statics[__CLASS__][__FUNCTION__] = CRM_Core_Smarty::singleton();
+      // We still need this since it's referenced a fair amount and in subclasses.
       self::$_template = CRM_Core_Smarty::singleton();
       self::$_session = CRM_Core_Session::singleton();
     }

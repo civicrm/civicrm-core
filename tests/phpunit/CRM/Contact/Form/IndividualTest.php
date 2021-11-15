@@ -21,6 +21,7 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
 
     $form->set('reset', '1');
     $form->set('ct', 'Individual');
+    $form->assign('formTpl', NULL);
 
     ob_start();
     $form->controller->_actions['display']->perform($form, 'display');
@@ -58,6 +59,7 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     ]);
     $form = new CRM_Contact_Form_Contact();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_Contact', 'New Individual');
+    $form->assign('formTpl', NULL);
 
     $form->set('reset', '1');
     $form->set('ct', 'Individual');
