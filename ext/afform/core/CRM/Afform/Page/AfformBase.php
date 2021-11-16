@@ -18,8 +18,11 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     Civi::service('angularjs.loader')
       ->addModules([$afform['module_name'], 'afformStandalone']);
 
-    // If the user has "access civicrm" append home breadcrumb
-    if (CRM_Core_Permission::check('access CiviCRM')) {
+    $config = \CRM_Core_Config::singleton();
+    $isFrontEndPage = $config->userSystem->isFrontEndPage();
+
+    // If the user has "access civicrm" append home breadcrumb, if not being shown on the front-end website
+    if (CRM_Core_Permission::check('access CiviCRM') && !$isFrontEndPage) {
       CRM_Utils_System::appendBreadCrumb([['title' => E::ts('CiviCRM'), 'url' => CRM_Utils_System::url('civicrm')]]);
       // If the user has "admin civicrm" & the admin extension is enabled
       if (CRM_Core_Permission::check('administer CiviCRM')) {
@@ -38,7 +41,14 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     if (!empty($afform['title'])) {
       $title = strip_tags($afform['title']);
       CRM_Utils_System::setTitle($title);
-      CRM_Utils_System::appendBreadCrumb([['title' => $title, 'url' => CRM_Utils_System::url(implode('/', $pagePath)) . '#']]);
+      if (!$isFrontEndPage) {
+        CRM_Utils_System::appendBreadCrumb([
+          [
+            'title' => $title,
+            'url' => CRM_Utils_System::url(implode('/', $pagePath)) . '#',
+          ],
+        ]);
+      }
     }
 
     parent::run();
