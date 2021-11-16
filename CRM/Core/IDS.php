@@ -237,13 +237,14 @@ class CRM_Core_IDS {
 
     $data = [];
     $session = CRM_Core_Session::singleton();
+    $session_id = CRM_Core_Config::singleton()->userSystem->getSessionId() ? CRM_Core_Config::singleton()->userSystem->getSessionId() : '0';
     foreach ($result as $event) {
       $data[] = [
         'name' => $event->getName(),
         'value' => stripslashes($event->getValue()),
         'page' => $_SERVER['REQUEST_URI'],
         'userid' => $session->get('userID'),
-        'session' => session_id() ? session_id() : '0',
+        'session' => $session_id,
         'ip' => $ip,
         'reaction' => $reaction,
         'impact' => $result->getImpact(),

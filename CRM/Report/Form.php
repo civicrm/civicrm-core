@@ -2478,7 +2478,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       $this->assign('chartEnabled', TRUE);
       $this->_chartId = "{$this->_params['charts']}_" .
         ($this->_id ? $this->_id : substr(get_class($this), 16)) . '_' .
-        session_id();
+        CRM_Core_Config::singleton()->userSystem->getSessionId();
       $this->assign('chartId', $this->_chartId);
     }
 
