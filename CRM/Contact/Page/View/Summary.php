@@ -143,7 +143,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       'age' => ['y' => '', 'm' => ''],
       'birth_date' => '',
       // for Website.tpl (the others don't seem to enotice for some reason).
-      'website' => '',
+      'website' => [],
     ];
 
     $params['id'] = $params['contact_id'] = $this->_contactId;
