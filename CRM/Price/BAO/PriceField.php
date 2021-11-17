@@ -274,6 +274,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     $config = CRM_Core_Config::singleton();
     $currencySymbol = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_Currency', $config->defaultCurrency, 'symbol', 'name');
     $qf->assign('currencySymbol', $currencySymbol);
+    $qf->assign('currency', $config->defaultCurrency);
     // get currency name for price field and option attributes
     $currencyName = $config->defaultCurrency;
 

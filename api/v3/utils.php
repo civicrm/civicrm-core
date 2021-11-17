@@ -2244,7 +2244,7 @@ function _civicrm_api3_validate_string(&$params, &$fieldName, &$fieldInfo, $enti
       if ($fieldName == 'currency') {
         //When using IN operator $fieldValue is a array of currency codes
         if (!CRM_Utils_Rule::currencyCode($value)) {
-          throw new Exception("Currency not a valid code: $currency");
+          throw new Exception("Currency not a valid code: $value");
         }
       }
     }
