@@ -175,7 +175,9 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     }
 
     // When setting a default option, unset other options in this group as default
-    if (!empty($params['is_default'])) {
+    // FIXME: The extra CRM_Utils_System::isNull is because the API will pass the string 'null'
+    // FIXME: It would help to make this column NOT NULL DEFAULT 0
+    if (!empty($params['is_default']) && !CRM_Utils_System::isNull($params['is_default'])) {
       $query = 'UPDATE civicrm_option_value SET is_default = 0 WHERE  option_group_id = %1';
 
       // tweak default reset, and allow multiple default within group.
