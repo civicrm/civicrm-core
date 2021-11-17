@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\SearchDisplay;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
+use Civi\Api4\Query\SqlField;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 
@@ -153,8 +154,36 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         return \CRM_Core_Session::getLoggedInContactID();
 
       default:
+        if (!empty($data[$key])) {
+          $item = $this->getSelectExpression($key);
+          if ($item['expr'] instanceof SqlField && $item['fields'][0]['fk_entity'] === 'File') {
+            return $this->generateFileUrl($data[$key]);
+          }
+        }
         return $data[$key] ?? NULL;
     }
+  }
+
+  /**
+   * Convert file id to a readable url
+   *
+   * @param $fileID
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  private function generateFileUrl($fileID) {
+    $entityId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile',
+      $fileID,
+      'entity_id',
+      'file_id'
+    );
+    $fileHash = \CRM_Core_BAO_File::generateFileHash($entityId, $fileID);
+    return $this->getUrl('civicrm/file', [
+      'reset' => 1,
+      'id' => $fileID,
+      'eid' => $entityId,
+      'fcs' => $fileHash,
+    ]);
   }
 
   /**
@@ -167,21 +196,18 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     $out = [];
     switch ($column['type']) {
       case 'field':
-        if (isset($column['image']) && is_array($column['image'])) {
-          $out['img'] = $this->formatImage($column, $data);
-          $out['val'] = $this->replaceTokens($column['image']['alt'] ?? NULL, $data, 'view');
+        $rawValue = $data[$column['key']] ?? NULL;
+        if (!$this->hasValue($rawValue) && isset($column['empty_value'])) {
+          $out['val'] = $this->replaceTokens($column['empty_value'], $data, 'view');
         }
         elseif ($column['rewrite']) {
           $out['val'] = $this->replaceTokens($column['rewrite'], $data, 'view');
         }
         else {
-          $out['val'] = $this->formatViewValue($column['key'], $data[$column['key']] ?? NULL);
+          $out['val'] = $this->formatViewValue($column['key'], $rawValue);
         }
         if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $this->hasValue($out['val']))) {
           $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
-        }
-        if (isset($column['title']) && strlen($column['title'])) {
-          $out['title'] = $this->replaceTokens($column['title'], $data, 'view');
         }
         if (!empty($column['link'])) {
           $links = $this->formatFieldLinks($column, $data, $out['val']);
@@ -197,11 +223,31 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         }
         break;
 
+      case 'image':
+        $out['img'] = $this->formatImage($column, $data);
+        if ($out['img']) {
+          $out['val'] = $this->replaceTokens($column['image']['alt'] ?? NULL, $data, 'view');
+        }
+        if ($this->hasValue($column['label']) && (!empty($column['forceLabel']) || $out['img'])) {
+          $out['label'] = $this->replaceTokens($column['label'], $data, 'view');
+        }
+        if (!empty($column['link'])) {
+          $links = $this->formatFieldLinks($column, $data, '');
+          if ($links) {
+            $out['links'] = $links;
+          }
+        }
+        break;
+
       case 'links':
       case 'buttons':
       case 'menu':
         $out = $this->formatLinksColumn($column, $data);
         break;
+    }
+    // Format tooltip
+    if (isset($column['title']) && strlen($column['title'])) {
+      $out['title'] = $this->replaceTokens($column['title'], $data, 'view');
     }
     $cssClass = $this->getCssStyles($column['cssRules'] ?? [], $data);
     if (!empty($column['alignment'])) {
@@ -282,9 +328,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    */
   private function formatFieldLinks($column, $data, $value): array {
     $links = [];
-    if (!empty($column['image'])) {
-      $value = [''];
-    }
     foreach ((array) $value as $index => $val) {
       $path = $this->getLinkPath($column['link'], $data, $index);
       $path = $this->replaceTokens($path, $data, 'url', $index);
@@ -382,15 +425,16 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * @param string $path
+   * @param array $query
    * @return string
    */
-  private function getUrl(string $path) {
+  private function getUrl(string $path, $query = NULL) {
     if ($path[0] === '/' || strpos($path, 'http://') || strpos($path, 'https://')) {
       return $path;
     }
     // Use absolute urls when downloading spreadsheet
     $absolute = $this->getActionName() === 'download';
-    return \CRM_Utils_System::url($path, NULL, $absolute, NULL, FALSE);
+    return \CRM_Utils_System::url($path, $query, $absolute, NULL, FALSE);
   }
 
   /**
@@ -458,12 +502,19 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   /**
    * @param $column
    * @param $data
-   * @return array{url: string, width: int, height: int}
+   * @return array{url: string, width: int, height: int}|NULL
    */
   private function formatImage($column, $data) {
     $tokenExpr = $column['rewrite'] ?: '[' . $column['key'] . ']';
+    $url = $this->replaceTokens($tokenExpr, $data, 'url');
+    if (!$url && !empty($column['empty_value'])) {
+      $url = $this->replaceTokens($column['empty_value'], $data, 'url');
+    }
+    if (!$url) {
+      return NULL;
+    }
     return [
-      'src' => $this->replaceTokens($tokenExpr, $data, 'url'),
+      'src' => $url,
       'height' => $column['image']['height'] ?? NULL,
       'width' => $column['image']['width'] ?? NULL,
     ];
@@ -705,6 +756,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     foreach ($this->display['settings']['columns'] as $column) {
       // Collect display values in which a token is allowed
       $possibleTokens .= ($column['rewrite'] ?? '');
+      $possibleTokens .= ($column['title'] ?? '');
+      $possibleTokens .= ($column['empty_value'] ?? '');
       if (!empty($column['link'])) {
         $possibleTokens .= $this->getLinkPath($column['link']) ?? '';
       }
