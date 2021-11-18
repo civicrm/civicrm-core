@@ -17,6 +17,9 @@
 class CRM_Group_Form_Search extends CRM_Core_Form {
 
   public function preProcess() {
+    // This variable does not appear to be set in core civicrm
+    // and is possibly obsolete? It probably relates to the multisite extension.
+    $this->expectedSmartyVariables[] = 'showOrgInfo';
     parent::preProcess();
 
     CRM_Core_Resources::singleton()->addPermissions('edit groups');

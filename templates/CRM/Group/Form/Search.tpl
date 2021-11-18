@@ -136,7 +136,7 @@
           d.status = groupStatus,
           d.savedSearch = $('.crm-group-search-form-block select#saved_search').val(),
           d.component_mode = $(".crm-group-search-form-block select#component_mode").val(),
-          d.showOrgInfo = {/literal}{if isset($showOrgInfo)}"{$showOrgInfo}"{else}"0"{/if}{literal},
+          d.showOrgInfo = {/literal}{if $showOrgInfo}"{$showOrgInfo}"{else}"0"{/if}{literal},
           d.parentsOnly = parentsOnly
         }
       },
@@ -186,7 +186,7 @@
     // show hide children
     var context = $('#crm-main-content-wrapper');
     $('table.crm-group-selector', context).on( 'click', 'span.show-children', function(){
-      var showOrgInfo = {/literal}{if isset($showOrgInfo)}"{$showOrgInfo}"{else}"0"{/if}{literal};
+      var showOrgInfo = {/literal}{if $showOrgInfo}"{$showOrgInfo}"{else}"0"{/if}{literal};
       var rowID = $(this).parents('tr').prop('id');
       var parentRow = rowID.split('_');
       var parent_id = parentRow[1];

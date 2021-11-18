@@ -56,20 +56,21 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
         continue;
       }
       $class = is_array($item['page_callback']) ? $item['page_callback'][0] : $item['page_callback'];
-      if (in_array($class, $this->skip)) {
+      if (in_array($class, $this->skip, TRUE)) {
         continue;
       }
-      if (is_subclass_of($class, 'CRM_Core_Page_Basic')) {
+      if ($class instanceof CRM_Core_Page_Basic) {
         $this->basicPages[] = $class;
       }
     }
+    CRM_Core_Smarty::singleton()->ensureVariablesAreAssigned($this->getSmartyNoticeVariables());
     parent::setUp();
   }
 
   /**
    * Make sure form hooks are only invoked once.
    */
-  public function testFormsCallBuildFormOnce() {
+  public function testFormsCallBuildFormOnce(): void {
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_buildForm', [$this, 'onBuildForm']);
     CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_preProcess', [$this, 'onPreProcess']);
     $_REQUEST = ['action' => 'add'];
@@ -80,12 +81,35 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
         'preProcess' => [],
       ];
       $page = new $pageName();
-      $page->assign('formTpl', NULL);
       ob_start();
-      $page->run();
+      try {
+        $page->run();
+      }
+      catch (Exception $e) {
+        throw new CRM_Core_Exception($pageName . ' ' . $e->getTraceAsString());
+      }
       ob_end_clean();
       $this->runTestAssert($pageName);
     }
+  }
+
+  /**
+   * Get all the variables that we have learnt will cause notices in this test.
+   *
+   * This test is like a sledge hammer - it calls each form without figuring
+   * out what the form needs to run. For example the first form is
+   * CRM_Group_Page_Group - when called without an action this winds up calling
+   * CRM_Group_Form_Edit = but without all the right magic for the form to call
+   * the template for that form - so it renders the page template with only
+   * the form values assigned & we wind up in e-notice hell. These notices
+   * relate to the test not the core forms so we should fix them in the test.
+   *
+   * However, it's pretty hard to see how we would turn off e-notices in Smarty
+   * reliably for just this one test so instead we embark on a journey of
+   * whack-a-mole where we assign away until the test passes.
+   */
+  protected function getSmartyNoticeVariables(): array {
+    return ['formTpl', 'showOrgInfo', 'rows', 'gName'];
   }
 
   /**

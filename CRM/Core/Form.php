@@ -1061,7 +1061,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @return array
    */
-  public function getOptionalSmartyElements(): array {
+  public function getOptionalQuickFormElements(): array {
     return [];
   }
 
@@ -1078,7 +1078,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $content['formName'] = $this->getName();
     // CRM-15153
     $content['formClass'] = CRM_Utils_System::getClassName($this);
-    foreach ($this->getOptionalSmartyElements() as $string) {
+    foreach (array_merge($this->getOptionalQuickFormElements(), $this->expectedSmartyVariables) as $string) {
       if (!array_key_exists($string, $content)) {
         $content[$string] = NULL;
       }
