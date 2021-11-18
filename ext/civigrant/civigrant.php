@@ -87,3 +87,17 @@ function civigrant_civicrm_tabSet($tabSetName, &$tabs, $context) {
     ];
   }
 }
+
+/**
+ * Implements hook_civicrm_queryObjects().
+ *
+ * Adds query object for legacy screens like advanced search, search builder, etc.
+ */
+function civigrant_civicrm_queryObjects(&$queryObjects, $type) {
+  if ($type == 'Contact') {
+    $queryObjects[] = new CRM_Grant_BAO_Query();
+  }
+  elseif ($type == 'Report') {
+    // Do we need to do something here?
+  }
+}

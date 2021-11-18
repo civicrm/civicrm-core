@@ -5700,7 +5700,6 @@ civicrm_relationship.start_date > {$today}
       ts('Activities') => 'civicrm_activity',
       ts('Pledges') => 'civicrm_pledge',
       ts('Cases') => 'civicrm_case',
-      ts('Grants') => 'civicrm_grant',
       ts('Address Fields') => 'civicrm_address',
       ts('Notes') => 'civicrm_note',
       ts('Change Log') => 'civicrm_log',

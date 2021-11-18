@@ -119,7 +119,8 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     parent::buildQuickForm();
     $this->addSortNameField();
 
-    CRM_Grant_BAO_Query::buildSearchForm($this);
+    (new CRM_Grant_BAO_Query())
+      ->buildAdvancedSearchPaneForm($this, 'CiviGrant');
 
     $rows = $this->get('rows');
     if (is_array($rows)) {

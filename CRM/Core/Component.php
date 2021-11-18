@@ -313,6 +313,9 @@ class CRM_Core_Component {
         }
       }
     }
+    if (!$properties) {
+      $properties = CRM_Contact_BAO_Query_Hook::singleton()->getDefaultReturnProperties($mode);
+    }
     return $properties;
   }
 

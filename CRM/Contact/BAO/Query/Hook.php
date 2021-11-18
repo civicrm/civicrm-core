@@ -43,8 +43,7 @@ class CRM_Contact_BAO_Query_Hook {
   /**
    * Get or build the list of search objects (via hook).
    *
-   * @return array
-   *   Array of CRM_Contact_BAO_Query_Interface objects
+   * @return CRM_Contact_BAO_Query_Interface[]
    */
   public function getSearchQueryObjects() {
     if ($this->_queryObjects === NULL) {
@@ -148,6 +147,20 @@ class CRM_Contact_BAO_Query_Hook {
     foreach (self::getSearchQueryObjects() as $obj) {
       $obj->setAdvancedSearchPaneTemplatePath($paneTemplatePathArray, $type);
     }
+  }
+
+  /**
+   * @param $mode
+   * @return array|null
+   */
+  public function getDefaultReturnProperties($mode) {
+    foreach (self::getSearchQueryObjects() as $obj) {
+      $properties = $obj::defaultReturnProperties($mode);
+      if ($properties) {
+        return $properties;
+      }
+    }
+    return NULL;
   }
 
 }
