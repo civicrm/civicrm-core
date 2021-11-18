@@ -213,9 +213,7 @@ class CRM_Core_Page {
       CRM_Utils_Hook::alterContent($content, 'page', $pageTemplateFile, $this);
 
       if ($this->_print == CRM_Core_Smarty::PRINT_PDF) {
-        CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE,
-          ['paper_size' => 'a3', 'orientation' => 'landscape']
-        );
+        CRM_Utils_PDF_Utils::html2pdf($content, "{$this->_name}.pdf", FALSE);
       }
       elseif ($this->_print == CRM_Core_Smarty::PRINT_JSON) {
         $this->ajaxResponse['content'] = $content;
