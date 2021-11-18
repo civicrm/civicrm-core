@@ -69,7 +69,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     'Event' => 'CiviEvent',
     'Case' => 'CiviCase',
     'Pledge' => 'CiviPledge',
-    'Grant' => 'CiviGrant',
     'Campaign' => 'CiviCampaign',
     'Survey' => 'CiviCampaign',
   ];
@@ -1506,10 +1505,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         'id' => $entity['id'],
         $field => $entity[$field] ?? NULL,
       ];
-      if (isset($updateParams['financial_type_id']) && in_array($entityName, ['Grant'])) {
-        //api has special handling on these 2 fields for backward compatibility reasons
-        $entity['contribution_type_id'] = $updateParams['financial_type_id'];
-      }
       if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, ['ContributionRecur'])) {
         //api has special handling on these 2 fields for backward compatibility reasons
         $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];
@@ -1558,10 +1553,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
         $entity = array_merge($entity, $resetFKTo);
         $updateParams = array_merge($updateParams, $resetFKTo);
         $this->callAPISuccess($entityName, 'create', $updateParams);
-        if (isset($updateParams['financial_type_id']) && in_array($entityName, ['Grant'])) {
-          //api has special handling on these 2 fields for backward compatibility reasons
-          $entity['contribution_type_id'] = $updateParams['financial_type_id'];
-        }
         if (isset($updateParams['next_sched_contribution_date']) && in_array($entityName, ['ContributionRecur'])) {
           //api has special handling on these 2 fields for backward compatibility reasons
           $entity['next_sched_contribution'] = $updateParams['next_sched_contribution_date'];

@@ -54,7 +54,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $entityId = $result['id'];
     $this->assertIsNumeric($entityId);
-    $this->assertEquals(7, $result['values'][$entityId]['component_id']);
+    $caseComponentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', 'CiviCase', 'id', 'name');
+    $this->assertEquals($caseComponentId, $result['values'][$entityId]['component_id']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -1388,24 +1389,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => ['metadata' => ['sql']],
     ]);
-  }
-
-  /**
-   * Test contact subtype filter on grant report.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testGrantReportSeparatedFilter() {
-    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
-    $contactID2 = $this->individualCreate();
-    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
-    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
-      'report_id' => 'grant/detail',
-      'contact_sub_type_op' => 'in',
-      'contact_sub_type_value' => ['Student'],
-    ]);
-    $this->assertEquals(1, $rows['count']);
   }
 
   /**

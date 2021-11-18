@@ -16,13 +16,23 @@
  * @subpackage API_Grant
  * @group headless
  */
-class api_v3_GrantTest extends CiviUnitTestCase {
+class api_v3_GrantTest extends \PHPUnit\Framework\TestCase implements \Civi\Test\HeadlessInterface {
+  use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\ContactTestTrait;
+
+
   protected $_apiversion = 3;
   protected $params;
   protected $ids = [];
   protected $_entity = 'Grant';
 
   public $DBResetRequired = FALSE;
+
+  public function setUpHeadless() {
+    return \Civi\Test::headless()
+      ->installMe(__DIR__)
+      ->apply();
+  }
 
   public function setUp(): void {
     parent::setUp();
@@ -50,15 +60,14 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         $this->callAPISuccess($entity, 'delete', ['id' => $id]);
       }
     }
-    $this->quickCleanup(['civicrm_grant']);
     parent::tearDown();
   }
 
   public function testCreateGrant() {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->ids['grant'][0] = $result['id'];
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
   /**
@@ -67,13 +76,16 @@ class api_v3_GrantTest extends CiviUnitTestCase {
    * We want to ensure they are saved with separators as appropriate
    */
   public function testCreateCustomCheckboxGrant() {
-    $ids = [];
-    $result = $this->customGroupCreate(['extends' => 'Grant']);
-    $ids['custom_group_id'] = $result['id'];
-    $customTable = $result['values'][$result['id']]['table_name'];
-    $result = $this->customFieldCreate([
+    $cg = $this->callAPISuccess('customGroup', 'create', [
+      'title' => 'Grant custom group',
+      'extends' => 'Grant',
+    ]);
+    $customTable = $cg['values'][$cg['id']]['table_name'];
+    $cf = $this->callAPISuccess('CustomField', 'create', [
+      'label' => 'Custom Field',
+      'data_type' => 'String',
       'html_type' => 'CheckBox',
-      'custom_group_id' => $ids['custom_group_id'],
+      'custom_group_id' => $cg['id'],
       'option_values' => [
         ['label' => 'my valley', 'value' => 'valley', 'is_active' => TRUE, 'weight' => 1],
         ['label' => 'my goat', 'value' => 'goat', 'is_active' => TRUE, 'weight' => 2],
@@ -81,9 +93,10 @@ class api_v3_GrantTest extends CiviUnitTestCase {
         ['label' => 'hungry', 'value' => '', 'is_active' => TRUE, 'weight' => 3],
       ],
     ]);
-    $columnName = $result['values'][$result['id']]['column_name'];
-    $ids['custom_field_id'] = $result['id'];
-    $customFieldLabel = 'custom_' . $ids['custom_field_id'];
+    $columnName = $cf['values'][$cf['id']]['column_name'];
+    $this->ids['custom_field'][] = $cf['id'];
+    $this->ids['custom_group'][] = $cg['id'];
+    $customFieldLabel = 'custom_' . $cf['id'];
     $expectedValue = CRM_Core_DAO::VALUE_SEPARATOR . 'valley' . CRM_Core_DAO::VALUE_SEPARATOR;
     //first we pass in the core separators ourselves
     $this->params[$customFieldLabel] = $expectedValue;
@@ -112,24 +125,19 @@ class api_v3_GrantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $savedValue = CRM_Core_DAO::singleValueQuery("SELECT {$columnName} FROM $customTable WHERE entity_id = {$result['id']}");
     $this->assertEquals($expectedValue, $savedValue);
-
-    $this->customFieldDelete($ids['custom_field_id']);
-    $this->customGroupDelete($ids['custom_group_id']);
   }
 
   public function testGetGrant() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->ids['grant'][0] = $result['id'];
-    $result = $this->callAPIAndDocument($this->_entity, 'get', ['rationale' => 'Just Because'], __FUNCTION__, __FILE__);
-    $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
-    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccess($this->_entity, 'get', ['rationale' => 'Just Because']);
+    $this->assertGreaterThanOrEqual(1, $result['count']);
   }
 
   public function testDeleteGrant() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $result = $this->callAPIAndDocument($this->_entity, 'delete', ['id' => $result['id']], __FUNCTION__, __FILE__);
-    $this->assertAPISuccess($result);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -154,6 +162,24 @@ class api_v3_GrantTest extends CiviUnitTestCase {
       ],
     ];
     $this->assertEquals($validation['values'][0], $expectedOut);
+  }
+
+  /**
+   * Test contact subtype filter on grant report.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGrantReportSeparatedFilter() {
+    $this->ids['contact'][] = $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $this->ids['contact'][] = $contactID2 = $this->individualCreate();
+    $this->ids['grant'][] = $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1])['id'];
+    $this->ids['grant'][] = $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1])['id'];
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'grant/detail',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+    ]);
+    $this->assertEquals(1, $rows['count']);
   }
 
 }
