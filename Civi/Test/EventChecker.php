@@ -30,7 +30,7 @@ class EventChecker {
    *
    * @return $this
    */
-  public function start(\PHPUnit\Framework\Test $test) {
+  public function start($test) {
     if ($this->activeChecks === NULL) {
       $this->activeChecks = [];
       foreach ($this->findAll() as $template) {
