@@ -170,7 +170,8 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     $optionValue->copyValues($params);
 
     $isDomainOptionGroup = in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups);
-    if (empty($params['domain_id']) && $isDomainOptionGroup) {
+    // When creating a new option for a group that requires a domain, set default domain
+    if ($isDomainOptionGroup && empty($params['id']) && (empty($params['domain_id']) || CRM_Utils_System::isNull($params['domain_id']))) {
       $optionValue->domain_id = CRM_Core_Config::domainID();
     }
 
@@ -192,7 +193,7 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
       $p = [1 => [$params['option_group_id'], 'Integer']];
 
       // Limit update by domain of option
-      $domain = $optionValue->domain_id ?? NULL;
+      $domain = CRM_Utils_System::isNull($optionValue->domain_id) ? NULL : $optionValue->domain_id;
       if (!$domain && $id && $isDomainOptionGroup) {
         $domain = CRM_Core_DAO::getFieldValue(__CLASS__, $id, 'domain_id');
       }
