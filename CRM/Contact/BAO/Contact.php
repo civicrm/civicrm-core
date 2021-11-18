@@ -2742,9 +2742,6 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
       case 'case':
         return CRM_Case_BAO_Case::caseCount($contactId);
 
-      case 'grant':
-        return CRM_Grant_BAO_Grant::getContactGrantCount($contactId);
-
       case 'activity':
         $input = [
           'contact_id' => $contactId,
