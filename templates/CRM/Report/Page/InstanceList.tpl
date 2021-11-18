@@ -68,7 +68,11 @@
         {if !empty($myReports)}
           {ts}You do not have any private reports. To add a report to this section, edit the Report Settings for a report and set 'Add to My Reports' to Yes.{/ts} &nbsp;
         {else}
-          {ts 1=$compName}No %1 reports have been created.{/ts} &nbsp;
+          {if $compName}
+            {ts 1=$compName}No %1 reports have been created.{/ts} &nbsp;
+          {else}
+            {ts}No reports have been created.{/ts} &nbsp;
+          {/if}
           {if !empty($templateUrl)}
             {ts 1=$templateUrl}You can create reports by selecting from the <a href="%1">list of report templates here.</a>{/ts}
           {else}
