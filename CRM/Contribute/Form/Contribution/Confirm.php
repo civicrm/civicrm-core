@@ -35,6 +35,13 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    */
   public $_contributionID;
 
+  /**
+   * The id of the recurring contribution object, created on submission when recur is true.
+   *
+   *  @var int
+   */
+  public $_recurringContributionID;
+
   public $submitOnce = TRUE;
 
   /**
@@ -1128,6 +1135,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       // lets store it in the form variable so postProcess hook can get to this and use it
       $form->_contributionID = $contribution->id;
+      $form->_recurringContributionID = $recurringContributionID;
     }
 
     // process soft credit / pcp params first
@@ -1852,7 +1860,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $isRecur
     );
 
-    $result = [];
+    $result = [];  
 
     // We're not processing the line item here because we are processing a membership.
     // To ensure processing of the correct parameters, replace relevant parameters
@@ -1865,6 +1873,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $tempParams['invoiceID'] = $membershipContribution->invoice_id;
     $tempParams['trxn_id'] = $membershipContribution->trxn_id;
     $tempParams['contributionID'] = $membershipContribution->id;
+
+    //Also, add the ID for the recurrenceContribution.
+    $tempParams['contributionRecurID'] = $this->_recurringContributionID;
 
     if ($form->_values['is_monetary'] && !$form->_params['is_pay_later'] && $minimumFee > 0.0) {
       // At the moment our tests are calling this form in a way that leaves 'object' empty. For
