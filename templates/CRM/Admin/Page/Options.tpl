@@ -102,7 +102,6 @@
             </th>
             {if $gName eq "payment_instrument"}<th>{ts}Account{/ts}</th>{/if}
             {if !empty($showCounted)}<th>{ts}Counted?{/ts}</th>{/if}
-            {if !empty($showVisibility)}<th>{ts}Visibility{/ts}</th>{/if}
             <th id="nosort">{ts}Description{/ts}</th>
             <th>{ts}Order{/ts}</th>
             {if !empty($showIsDefault)}<th>{ts}Default{/ts}</th>{/if}
@@ -133,7 +132,6 @@
             {if !empty($showCounted)}
               <td class="center crm-admin-options-filter">{icon condition=$row.filter}{ts}Counted{/ts}{/icon}</td>
             {/if}
-            {if !empty($showVisibility)}<td class="crm-admin-visibility_label">{$row.visibility_label}</td>{/if}
             <td class="crm-admin-options-description crm-editable" data-field="description" data-type="textarea">{if isset($row.description)}{$row.description}{/if}</td>
             <td class="nowrap crm-admin-options-order">{if isset($row.weight)}{$row.weight}{/if}</td>
             {if !empty($showIsDefault)}
