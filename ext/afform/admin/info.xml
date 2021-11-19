@@ -23,6 +23,7 @@
   <comments>Administer, edit and compose CiviCRM Afforms.</comments>
   <requires>
     <ext>org.civicrm.afform</ext>
+    <ext>org.civicrm.search_kit</ext>
   </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>

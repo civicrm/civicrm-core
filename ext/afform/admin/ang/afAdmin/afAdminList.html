@@ -50,7 +50,7 @@
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'name'"></i>
         {{:: ts('Name') }}
       </th>
-      <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('server_route')">
+      <th  ng-if="$ctrl.tab !== 'block'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('server_route')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'server_route'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'server_route'"></i>
         {{:: ts('Page') }}
@@ -59,6 +59,11 @@
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'placement.length'"></i>
         <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'placement.length'"></i>
         {{:: ts('Placement') }}
+      </th>
+      <th ng-if="$ctrl.tab === 'form'" title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('submission_count')">
+        <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'submission_count'"></i>
+        <i class="crm-i fa-sort-{{ $ctrl.sortDir ? 'asc' : 'desc' }}" ng-if="$ctrl.sortField === 'submission_count'"></i>
+        {{:: ts('Submissions') }}
       </th>
       <th title="{{:: ts('Click to sort') }}" ng-click="$ctrl.sortBy('base_module')">
         <i class="crm-i fa-sort disabled" ng-if="$ctrl.sortField !== 'base_module'"></i>
@@ -74,13 +79,21 @@
       <td>
         <code>{{:: afform.name }}</code>
       </td>
-      <td>
+      <td ng-if="$ctrl.tab !== 'block'">
         <a ng-if=":: afform.server_route" ng-href="{{:: crmUrl(afform.server_route, null, afform.is_public ? 'front' : 'back') }}" target="_blank">
           <i class="crm-i fa-external-link"></i>
           {{:: afform.server_route }}
         </a>
       </td>
       <td>{{:: afform.placement.join(', ') }}</td>
+      <td ng-if="$ctrl.tab === 'form'">
+        <a ng-if="afform.submission_count" ng-href="{{:: crmUrl('civicrm/admin/afform/submissions#/?name=' + afform.name) }}">
+          {{:: afform.submission_count === 1 ? ts('1 Submission') : ts('%1 Submissions', {1: afform.submission_count}) }}
+        </a>
+        <div ng-if="afform.last_submission">
+          {{:: ts('Last submitted: %1', {1: afform.last_submission}) }}
+        </div>
+      </td>
       <td>
         {{:: afform['base_module:label'] }}
       </td>
