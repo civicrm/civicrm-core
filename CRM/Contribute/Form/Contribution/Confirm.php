@@ -1860,7 +1860,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $isRecur
     );
 
-    $result = [];  
+    $result = [];
 
     // We're not processing the line item here because we are processing a membership.
     // To ensure processing of the correct parameters, replace relevant parameters
