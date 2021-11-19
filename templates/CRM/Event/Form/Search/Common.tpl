@@ -52,7 +52,7 @@
 </tr>
 
 {* campaign in contribution search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass='crm-event-form-block-participant_campaign_id'}
 
 {if $participantGroupTree }

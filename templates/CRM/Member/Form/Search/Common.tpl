@@ -57,7 +57,7 @@
 </tr>
 
 {* campaign in membership search *}
-{include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignContext="componentSearch"
+{include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
 campaignTrClass='' campaignTdClass=''}
 
 {if !empty($membershipGroupTree)}

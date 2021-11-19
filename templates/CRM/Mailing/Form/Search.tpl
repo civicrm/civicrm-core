@@ -52,8 +52,8 @@
     {/if}
 
     {* campaign in mailing search *}
-    {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
-      campaignContext="componentSearch" campaignTrClass='' campaignTdClass=''}
+    {include file="CRM/Campaign/Form/addCampaignToSearch.tpl"
+      campaignTrClass='' campaignTdClass=''}
 
     <tr>
       <td>{$form.buttons.html}</td><td colspan="2"></td>
