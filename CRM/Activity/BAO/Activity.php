@@ -2795,4 +2795,15 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     ];
   }
 
+  /**
+   * @return array
+   */
+  public static function sourceEntityTables() {
+    return [
+      'civicrm_contact' => ts('Contact'),
+      'civicrm_contribution' => ts('Contribution'),
+      'civicrm_event' => ts('Event'),
+    ];
+  }
+
 }

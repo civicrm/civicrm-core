@@ -237,6 +237,7 @@ class Admin {
           }
           // Dynamic references use a column like "entity_table" (for normal joins this value will be null)
           $dynamicCol = $reference->getTypeColumn();
+          $targetTableCallback = (is_string($reference->getTargetTable()) && strstr($reference->getTargetTable(), '::'));
 
           // For dynamic references getTargetEntities will return multiple targets; for normal joins this loop will only run once
           foreach ($reference->getTargetEntities() as $targetTable => $targetEntityName) {
@@ -249,7 +250,7 @@ class Admin {
               // Add the straight 1-1 join
               $alias = $entity['name'] . '_' . $targetEntityName . '_' . $keyField['name'];
               $joins[$entity['name']][] = [
-                'label' => $entity['title'] . ' ' . ($dynamicCol ? $targetEntity['title'] : $keyField['label']),
+                'label' => $entity['title'] . ' ' . (($dynamicCol || $targetTableCallback) ? $targetEntity['title'] : $keyField['label']),
                 'description' => '',
                 'entity' => $targetEntityName,
                 'conditions' => self::getJoinConditions($keyField['name'], $alias . '.' . $reference->getTargetKey(), $targetTable, $dynamicCol),

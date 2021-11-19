@@ -126,7 +126,11 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if}
 {if isset($table.dynamicForeignKey)}
 {foreach from=$table.dynamicForeignKey item=foreign}
-        Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
+        {if isset($foreign.targetTableCallback)}
+          Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', '{$foreign.targetTableCallback}', '{$foreign.key|default:'id'}');
+        {else}
+          Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), '{$foreign.idColumn}', NULL, '{$foreign.key|default:'id'}', '{$foreign.typeColumn}');
+        {/if}
 {/foreach}
 {/if}
         CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);

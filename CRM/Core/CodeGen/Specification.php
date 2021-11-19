@@ -659,6 +659,7 @@ class CRM_Core_CodeGen_Specification {
   public function getDynamicForeignKey(&$foreignXML, &$dynamicForeignKeys) {
     $foreignKey = [
       'idColumn' => trim($foreignXML->idColumn),
+      'targetTableCallback' => trim($this->value('targetTableCallback', $foreignXML)),
       'typeColumn' => trim($foreignXML->typeColumn),
       'key' => trim($this->value('key', $foreignXML)),
     ];

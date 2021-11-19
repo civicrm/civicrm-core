@@ -40,6 +40,12 @@
     <readonly>true</readonly>
     <add>2.0</add>
   </field>
+  <dynamicForeignKey>
+    <idColumn>source_record_id</idColumn>
+    <targetTableCallback>CRM_Activity_BAO_Activity::sourceEntityTables</targetTableCallback>
+    <typeColumn>source_record_id</typeColumn>
+    <add>5.44</add>
+  </dynamicForeignKey>
   <index>
     <name>UI_source_record_id</name>
     <fieldName>source_record_id</fieldName>
