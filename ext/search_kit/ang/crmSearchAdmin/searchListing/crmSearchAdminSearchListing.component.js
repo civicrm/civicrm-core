@@ -41,6 +41,7 @@
             'modified_date',
             'has_base',
             'base_module:label',
+            'local_modified_date',
             'DATE(created_date) AS date_created',
             'DATE(modified_date) AS date_modified',
             'GROUP_CONCAT(display.name ORDER BY display.id) AS display_name',
@@ -237,6 +238,19 @@
               ]
             })
           );
+          ctrl.display.settings.columns.push(
+            // Using 'local_modified_date' as the column + an empty_value will only show the rewritten value
+            // if the record has been modified from its packaged state.
+            searchMeta.fieldToColumn('local_modified_date', {
+              label: ts('Modified'),
+              empty_value: ts('No'),
+              title: ts('Whether and when a search was modified from its packaged settings'),
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'}),
+              cssRules: [
+                ['font-italic', 'local_modified_date', 'IS EMPTY']
+              ]
+            })
+          );
         } else {
           ctrl.display.settings.columns.push(
             searchMeta.fieldToColumn('created_date', {
@@ -245,14 +259,14 @@
               rewrite: ts('%1 by %2', {1: '[date_created]', 2: '[created_id.display_name]'})
             })
           );
+          ctrl.display.settings.columns.push(
+            searchMeta.fieldToColumn('modified_date', {
+              label: ts('Modified'),
+              title: '[modified_date]',
+              rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
+            })
+          );
         }
-        ctrl.display.settings.columns.push(
-          searchMeta.fieldToColumn('modified_date', {
-            label: ts('Last Modified'),
-            title: '[modified_date]',
-            rewrite: ts('%1 by %2', {1: '[date_modified]', 2: '[modified_id.display_name]'})
-          })
-        );
         ctrl.display.settings.columns.push({
           type: 'include',
           alignment: 'text-right',
