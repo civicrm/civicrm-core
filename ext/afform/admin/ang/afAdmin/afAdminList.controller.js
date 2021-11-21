@@ -57,9 +57,12 @@
     $scope.$bindToRoute({
       expr: '$ctrl.tab',
       param: 'tab',
-      format: 'raw',
-      default: ctrl.tabs[0].name
+      format: 'raw'
     });
+
+    if (!ctrl.tab) {
+      ctrl.tab = ctrl.tabs[0].name;
+    }
 
     this.createLinks = function() {
       ctrl.searchCreateLinks = '';

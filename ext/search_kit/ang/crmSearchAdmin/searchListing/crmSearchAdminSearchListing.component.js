@@ -3,8 +3,12 @@
 
   // Specialized searchDisplay, only used by Admins
   angular.module('crmSearchAdmin').component('crmSearchAdminSearchListing', {
-    templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
-    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait, formatForSelect2) {
+    bindings: {
+      filters: '<',
+      tabCount: '='
+    },
+    templateUrl: '~/crmSearchDisplayTable/crmSearchDisplayTable.html',
+    controller: function($scope, $q, crmApi4, crmStatus, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
         ctrl = angular.extend(this, searchDisplayBaseTrait, searchDisplaySortableTrait),
@@ -14,13 +18,6 @@
       this.afformPath = CRM.url('civicrm/admin/afform');
       this.afformEnabled = CRM.crmSearchAdmin.afformEnabled;
       this.afformAdminEnabled = CRM.crmSearchAdmin.afformAdminEnabled;
-      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
-      this.modules = _.sortBy(_.transform((CRM.crmSearchAdmin.modules), function(modules, label, key) {
-        modules.push({text: label, id: key});
-      }, []), 'text');
-
-      this.filters = {has_base: false};
-      this.totals = {};
 
       this.apiEntity = 'SavedSearch';
       this.search = {
@@ -67,25 +64,10 @@
         this.initializeDisplay($scope, $());
         // Keep tab counts up-to-date - put rowCount in current tab if there are no other filters
         $scope.$watch('$ctrl.rowCount', function(val) {
-          if (typeof val === 'number' && angular.equals({has_base: true}, ctrl.filters)) {
-            ctrl.totals.has_base = val;
-          }
-          else if (typeof val === 'number' && angular.equals({has_base: false}, ctrl.filters)) {
-            ctrl.totals.no_base = val;
+          if (typeof val === 'number' && angular.equals(['has_base'], _.keys(ctrl.filters))) {
+            ctrl.tabCount = val;
           }
         });
-        // Initialize count for inactive tab
-        var params = ctrl.getApiParams('row_count');
-        params.filters.has_base = true;
-        crmApi4('SearchDisplay', 'run', params).then(function(result) {
-          ctrl.totals.has_base = result.count;
-        });
-      };
-
-      // Change tabs and clear other filters
-      this.setHasBaseFilter = function(val) {
-        ctrl.filters = {has_base: val};
-        buildDisplaySettings();
       };
 
       this.onPostRun.push(function(result) {
@@ -178,10 +160,6 @@
             ctrl.runSearch();
           })
         );
-      };
-
-      this.getTags = function() {
-        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
       };
 
       function buildDisplaySettings() {

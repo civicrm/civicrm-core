@@ -11,10 +11,9 @@
 
     .config(function($routeProvider) {
       $routeProvider.when('/list', {
-        controller: function() {
-          searchEntity = 'SavedSearch';
-        },
-        template: '<crm-search-admin-search-listing></crm-search-admin-search-listing>',
+        controller: 'searchList',
+        reloadOnSearch: false,
+        templateUrl: '~/crmSearchAdmin/searchListing/crmSearchAdminSearchListing.html',
       });
       $routeProvider.when('/create/:entity', {
         controller: 'searchCreate',
@@ -43,6 +42,36 @@
           }
         }
       });
+    })
+
+    // Controller for tabbed view of SavedSearches
+    .controller('searchList', function($scope, searchMeta, formatForSelect2) {
+      var ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
+        ctrl = $scope.$ctrl = this;
+      searchEntity = 'SavedSearch';
+
+        // Metadata needed for filters
+      this.entitySelect = searchMeta.getPrimaryAndSecondaryEntitySelect();
+      this.modules = _.sortBy(_.transform((CRM.crmSearchAdmin.modules), function(modules, label, key) {
+        modules.push({text: label, id: key});
+      }, []), 'text');
+      this.getTags = function() {
+        return {results: formatForSelect2(CRM.crmSearchAdmin.tags, 'id', 'name', ['color', 'description'])};
+      };
+
+      // Tabs include a rowCount which will be updated by the search controller
+      this.tabs = [
+        {name: 'custom', title: ts('Custom Searches'), icon: 'fa-search-plus', rowCount: null, filters: {has_base: false}},
+        {name: 'packaged', title: ts('Packaged Searches'), icon: 'fa-gift', rowCount: null, filters: {has_base: true}}
+      ];
+      $scope.$bindToRoute({
+        expr: '$ctrl.tab',
+        param: 'tab',
+        format: 'raw'
+      });
+      if (!this.tab) {
+        this.tab = this.tabs[0].name;
+      }
     })
 
     // Controller for creating a new search
