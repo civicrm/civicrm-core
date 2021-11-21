@@ -3,13 +3,6 @@
 
   // Trait provides base methods and properties common to all search display types
   angular.module('crmSearchDisplay').factory('searchDisplayBaseTrait', function(crmApi4) {
-    var ts = CRM.ts('org.civicrm.search_kit'),
-      runCount = 0;
-
-    // Get value from column data, specify either 'raw' or 'view'
-    function getValue(data, ret) {
-      return (data || {})[ret];
-    }
 
     // Return a base trait shared by all search display controllers
     // Gets mixed in using angular.extend()
@@ -20,6 +13,7 @@
       onChangeFilters: [],
       onPreRun: [],
       onPostRun: [],
+      _runCount: 0,
 
       // Called by the controller's $onInit function
       initializeDisplay: function($scope, $element) {
@@ -98,14 +92,14 @@
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(editedRow) {
         var ctrl = this,
-          requestId = ++runCount,
+          requestId = ++this._runCount,
           apiParams = this.getApiParams();
         this.loading = true;
         _.each(ctrl.onPreRun, function(callback) {
           callback.call(ctrl, apiParams);
         });
         return crmApi4('SearchDisplay', 'run', apiParams).then(function(results) {
-          if (requestId < runCount) {
+          if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
           ctrl.results = results;
@@ -124,7 +118,7 @@
             callback.call(ctrl, results, 'success', editedRow);
           });
         }, function(error) {
-          if (requestId < runCount) {
+          if (requestId < ctrl._runCount) {
             return; // Another request started after this one
           }
           ctrl.results = [];
