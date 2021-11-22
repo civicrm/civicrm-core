@@ -796,6 +796,11 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
         $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
         break;
 
+      case 'PayPal_Express':
+        // "PayPal - Express"
+        $paypalIPN = new CRM_Core_Payment_PayPalProIPN($params);
+        break;
+
       case 'PayPal_Standard':
         // "PayPal - Website Payments Standard"
         $paypalIPN = new CRM_Core_Payment_PayPalIPN($params);
