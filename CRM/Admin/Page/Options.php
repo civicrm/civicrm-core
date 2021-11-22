@@ -95,9 +95,6 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       self::$_gLabel = ts('Option');
     }
 
-    $this->assign('gName', self::$_gName);
-    $this->assign('gLabel', self::$_gLabel);
-
     if (self::$_gName == 'acl_role') {
       CRM_Utils_System::setTitle(ts('Manage ACL Roles'));
       // set breadcrumb to append to admin/access
@@ -128,14 +125,12 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
       ]
     ));
 
-    if (self::$_gName == 'participant_role') {
-      $this->assign('showCounted', TRUE);
-    }
+    $this->assign('showCounted', self::$_gName === 'participant_role');
     $this->assign('isLocked', self::$_isLocked);
     $this->assign('allowLoggedIn', Civi::settings()->get('allow_mail_from_logged_in_contact'));
-    if (self::$_gName == 'activity_type') {
-      $this->assign('showComponent', TRUE);
-    }
+    $this->assign('showComponent', self::$_gName === 'activity_type');
+    $this->assign('gName', self::$_gName);
+    $this->assign('gLabel', self::$_gLabel);
   }
 
   /**
