@@ -78,15 +78,6 @@ CRM.$(function($) {
     return false;
   });
 
-  // Update title dynamically
-  $('h1').each(function() {
-    var title = {/literal}{$title|json_encode}{literal};
-    $(this).html($(this).html().replace(title, '<span id="crm-event-name-page-title">' + title + '</span>'));
-  });
-  $('#crm-main-content-wrapper').on('keyup change', 'input#title', function() {
-    $('#crm-event-name-page-title').text($(this).val());
-  });
-
 });
 </script>
 {/literal}
