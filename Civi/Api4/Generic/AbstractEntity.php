@@ -52,7 +52,7 @@ abstract class AbstractEntity {
    * @return \Civi\Api4\Generic\CheckAccessAction
    */
   public static function checkAccess() {
-    return new CheckAccessAction(self::getEntityName(), __FUNCTION__);
+    return new CheckAccessAction(static::getEntityName(), __FUNCTION__);
   }
 
   /**
@@ -64,7 +64,7 @@ abstract class AbstractEntity {
     $permissions = \CRM_Core_Permission::getEntityActionPermissions();
 
     // For legacy reasons the permissions are keyed by lowercase entity name
-    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(self::getEntityName());
+    $lcentity = \CRM_Core_DAO_AllCoreTables::convertEntityNameToLower(static::getEntityName());
     // Merge permissions for this entity with the defaults
     return ($permissions[$lcentity] ?? []) + $permissions['default'];
   }
