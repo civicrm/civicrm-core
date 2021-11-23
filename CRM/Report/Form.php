@@ -5029,7 +5029,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   public function setEntityRefDefaults(&$field, $table) {
     $field['attributes'] = $field['attributes'] ? $field['attributes'] : [];
     $field['attributes'] += [
-      'entity' => CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($table)),
+      'entity' => CRM_Core_DAO_AllCoreTables::getEntityNameForTable($table),
       'multiple' => TRUE,
       'placeholder' => ts('- select -'),
     ];

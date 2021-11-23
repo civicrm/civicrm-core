@@ -237,7 +237,7 @@ class CRM_Dedupe_BAO_DedupeRule extends CRM_Dedupe_DAO_DedupeRule {
    * @throws \CiviCRM_API3_Exception
    */
   public function getFieldType($fieldName) {
-    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($this->rule_table));
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->rule_table);
     if (!$entity) {
       // This means we have stored a custom field rather than an entity name in rule_table, figure out the entity.
       $entity = civicrm_api3('CustomGroup', 'getvalue', ['table_name' => $this->rule_table, 'return' => 'extends']);
