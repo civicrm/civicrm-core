@@ -147,12 +147,12 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * Make sure the total amount of a contribution doesn't multiply by the number
    * of soft credits.
    */
-  public function testMultipleSoftCredits() {
+  public function testMultipleSoftCredits(): void {
     $this->quickCleanup($this->_tablesToTruncate);
 
     $solParams = [
       'first_name' => 'Solicitor 1',
-      'last_name' => 'User ' . rand(),
+      'last_name' => 'User',
       'contact_type' => 'Individual',
     ];
     $solicitor1Id = $this->individualCreate($solParams);
@@ -210,6 +210,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
         'rowCount' => [
           'title' => 'Row(s) Listed',
           'value' => 1,
+          'type' => CRM_Utils_Type::T_INT,
         ],
         'amount' => [
           'title' => 'Total Amount (Contributions)',

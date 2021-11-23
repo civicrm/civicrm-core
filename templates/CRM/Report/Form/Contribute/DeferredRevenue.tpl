@@ -18,12 +18,12 @@
   {include file="CRM/Report/Form/Actions.tpl"}
 
   {*Statistics at the Top of the page*}
-  {include file="CRM/Report/Form/Statistics.tpl" top=true}
-  
+  {include file="CRM/Report/Form/Statistics.tpl" top=true bottom=false}
+
 <table class="report-layout display">
    {foreach from=$rows item=row}
      <thead><th colspan=16><font color="black" size="3">{$row.label}</font></th></thead>
-   
+
      <thead class="sticky">
      <tr>
        {foreach from=$columnHeaders item=label key=header}
@@ -43,7 +43,7 @@
 
   <br />
   {*Statistics at the bottom of the page*}
-  {include file="CRM/Report/Form/Statistics.tpl" bottom=true}
+  {include file="CRM/Report/Form/Statistics.tpl" top="false" bottom=true}
 
   {include file="CRM/Report/Form/ErrorMessage.tpl"}
 </div>
