@@ -757,11 +757,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     $frUnits = $form->_values['recur_frequency_unit'] ?? NULL;
+    $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
     if (empty($frUnits) &&
       $className == 'CRM_Contribute_Form_Contribution'
     ) {
       $frUnits = implode(CRM_Core_DAO::VALUE_SEPARATOR,
-        CRM_Core_OptionGroup::values('recur_frequency_units')
+        CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, FALSE, NULL, 'value')
       );
     }
 
@@ -783,15 +784,14 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // CRM 10860, display text instead of a dropdown if there's only 1 frequency unit
     if (count($unitVals) == 1) {
       $form->assign('one_frequency_unit', TRUE);
-      $unit = $unitVals[0];
-      $form->add('hidden', 'frequency_unit', $unit);
+      $form->add('hidden', 'frequency_unit', $unitVals[0]);
       if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-        $unit .= "(s)";
+        $unit = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($unitVals[0]);
         $form->assign('frequency_unit', $unit);
       }
       else {
         $is_recur_label = ts('I want to contribute this amount every %1',
-          [1 => $unit]
+          [1 => $frequencyUnits[$unitVals[0]]]
         );
         $form->assign('all_text_recur', TRUE);
       }
@@ -799,12 +799,11 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     else {
       $form->assign('one_frequency_unit', FALSE);
       $units = [];
-      $frequencyUnits = CRM_Core_OptionGroup::values('recur_frequency_units', FALSE, FALSE, TRUE);
       foreach ($unitVals as $key => $val) {
         if (array_key_exists($val, $frequencyUnits)) {
           $units[$val] = $frequencyUnits[$val];
           if (!empty($form->_values['is_recur_interval']) || $className == 'CRM_Contribute_Form_Contribution') {
-            $units[$val] = "{$frequencyUnits[$val]}(s)";
+            $units[$val] = CRM_Contribute_BAO_Contribution::getUnitLabelWithPlural($val);
             $unit = ts('Every');
           }
         }

@@ -5030,4 +5030,29 @@ LIMIT 1;";
     return [$sourceContactId, $targetContactId];
   }
 
+  /**
+   * Get the unit label with the plural option
+   *
+   * @param string $unit
+   * @return string
+   */
+  public static function getUnitLabelWithPlural($unit) {
+    switch ($unit) {
+      case 'day':
+        return ts('day(s)');
+
+      case 'week':
+        return ts('week(s)');
+
+      case 'month':
+        return ts('month(s)');
+
+      case 'year':
+        return ts('year(s)');
+
+      default:
+        throw new CRM_Core_Exception('Unknown unit: ' . $unit);
+    }
+  }
+
 }
