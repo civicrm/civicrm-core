@@ -27,4 +27,24 @@ class CaseContact extends Generic\DAOEntity {
     return $plural ? ts('Case Clients') : ts('Case Client');
   }
 
+  /**
+   * @return array
+   */
+  public static function getInfo() {
+    $info = parent::getInfo();
+    $info['bridge_title'] = ts('Clients');
+    $info['bridge'] = [
+      'case_id' => [
+        'to' => 'contact_id',
+        'description' => ts('Cases with this contact as a client'),
+      ],
+      'contact_id' => [
+        'label' => ts('Clients'),
+        'to' => 'case_id',
+        'description' => ts('Clients for this case'),
+      ],
+    ];
+    return $info;
+  }
+
 }

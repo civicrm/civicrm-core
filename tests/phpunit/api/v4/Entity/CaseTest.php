@@ -21,6 +21,7 @@ namespace api\v4\Entity;
 
 use Civi\Api4\CiviCase;
 use api\v4\UnitTestCase;
+use Civi\Api4\Relationship;
 
 /**
  * @group headless
@@ -33,12 +34,25 @@ class CaseTest extends UnitTestCase {
     $this->loadDataSet('CaseType');
   }
 
+  public function tearDown(): void {
+    $relatedTables = [
+      'civicrm_activity',
+      'civicrm_activity_contact',
+      'civicrm_relationship',
+      'civicrm_case_contact',
+      'civicrm_case_type',
+      'civicrm_case',
+    ];
+    $this->cleanup(['tablesToTruncate' => $relatedTables]);
+    parent::tearDown();
+  }
+
   public function testCreateUsingLoggedInUser() {
-    $this->createLoggedInUser();
+    $uid = $this->createLoggedInUser();
 
     $contactID = $this->createEntity(['type' => 'Individual'])['id'];
 
-    $result = CiviCase::create(FALSE)
+    $case = CiviCase::create(FALSE)
       ->addValue('case_type_id', $this->getReference('test_case_type_1')['id'])
       ->addValue('creator_id', 'user_contact_id')
       ->addValue('status_id', 1)
@@ -46,6 +60,13 @@ class CaseTest extends UnitTestCase {
       ->execute()
       ->first();
 
+    $relationships = Relationship::get(FALSE)
+      ->addWhere('case_id', '=', $case['id'])
+      ->execute();
+
+    $this->assertCount(1, $relationships);
+    $this->assertEquals($uid, $relationships[0]['contact_id_b']);
+    $this->assertEquals($contactID, $relationships[0]['contact_id_a']);
   }
 
 }
