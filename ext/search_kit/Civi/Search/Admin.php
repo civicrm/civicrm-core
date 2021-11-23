@@ -180,21 +180,22 @@ class Admin {
     foreach ($allowedEntities as $entity) {
       // Multi-record custom field groups (to-date only the contact entity supports these)
       if (in_array('CustomValue', $entity['type'])) {
+        // TODO: Lookup target entity from custom group if someday other entities support multi-record custom data
         $targetEntity = $allowedEntities['Contact'];
         // Join from Custom group to Contact (n-1)
-        $alias = $entity['name'] . '_Contact_entity_id';
+        $alias = "{$entity['name']}_{$targetEntity['name']}_entity_id";
         $joins[$entity['name']][] = [
           'label' => $entity['title'] . ' ' . $targetEntity['title'],
           'description' => '',
-          'entity' => 'Contact',
+          'entity' => $targetEntity['name'],
           'conditions' => self::getJoinConditions('entity_id', $alias . '.id'),
           'defaults' => self::getJoinDefaults($alias, $targetEntity),
           'alias' => $alias,
           'multi' => FALSE,
         ];
         // Join from Contact to Custom group (n-n)
-        $alias = 'Contact_' . $entity['name'] . '_entity_id';
-        $joins['Contact'][] = [
+        $alias = "{$targetEntity['name']}_{$entity['name']}_entity_id";
+        $joins[$targetEntity['name']][] = [
           'label' => $entity['title_plural'],
           'description' => '',
           'entity' => $entity['name'],
